@@ -39,6 +39,7 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -150,15 +151,18 @@ public final class BridgeFactory {
 	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
 	 *
 	 * @param spatial the {@code Spatial} annotation
-	 * @param clazz the {@code XClass} on which the annotation is defined on
+	 * @param clazz the class on which the annotation is defined
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 * @param latitudeField a {@link java.lang.String} object.
 	 * @param longitudeField a {@link java.lang.String} object.
 	 */
-	public FieldBridge buildSpatialBridge(Spatial spatial, XClass clazz, String latitudeField, String longitudeField) {
-		FieldBridge bridge;
+	public FieldBridge buildSpatialBridge(Spatial spatial, Class<?> clazz, String latitudeField, String longitudeField) {
+		SpatialFieldBridge bridge;
 		try {
 			bridge = SpatialBridgeProvider.buildSpatialBridge( spatial, latitudeField, longitudeField );
+			if ( bridge != null ) {
+				bridge.setAppliedOnType( clazz );
+			}
 		}
 		catch (Exception e) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), e );

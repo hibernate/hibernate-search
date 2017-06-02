@@ -42,10 +42,9 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 	}
 
 	public SpatialFieldBridgeByHash(int topSpatialHashLevel, int bottomSpatialHashLevel, String latitudeField, String longitudeField) {
+		super( latitudeField, longitudeField );
 		this.topSpatialHashLevel = topSpatialHashLevel;
 		this.bottomSpatialHashLevel = bottomSpatialHashLevel;
-		this.latitudeField = latitudeField;
-		this.longitudeField = longitudeField;
 	}
 
 	@Override

@@ -10,20 +10,23 @@ import static java.util.Locale.ENGLISH;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge {
+public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge, AppliedOnTypeAwareBridge {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -33,12 +36,31 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 	protected String latitudeIndexedFieldName;
 	protected String longitudeIndexedFieldName;
 
+	private MethodHandle latitudeHandle;
+	private MethodHandle longitudeHandle;
+
+	public SpatialFieldBridge() {
+	}
+
+	public SpatialFieldBridge(String latitudeField, String longitudeField) {
+		this.latitudeField = latitudeField;
+		this.longitudeField = longitudeField;
+	}
+
+	@Override
+	public void setAppliedOnType(Class<?> returnType) {
+		if ( latitudeField != null && longitudeField != null ) {
+			latitudeHandle = getHandleFromName( returnType, latitudeField );
+			longitudeHandle = getHandleFromName( returnType, longitudeField );
+		}
+	}
+
 	@Override
 	public abstract void set(String name, Object value, Document document, LuceneOptions luceneOptions);
 
 	protected Double getLatitude(final Object value ) {
-		if ( useFieldMode() ) {
-			return getCoordinateFromField( latitudeField, value );
+		if ( latitudeHandle != null ) {
+			return invokeHandle( latitudeHandle, value );
 		}
 		else {
 			try {
@@ -60,11 +82,10 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 			.sortable( true );
 	}
 
-	private Double getCoordinateFromField(String coordinateField, Object value) {
-		Class<?> clazz = value.getClass();
+	private MethodHandle getHandleFromName(Class<?> clazz, String coordinateField) {
 		try {
-			Field latitude = clazz.getField( coordinateField );
-			return (Double) latitude.get( value );
+			Field field = clazz.getField( coordinateField );
+			return MethodHandles.lookup().unreflectGetter( field );
 		}
 		catch (NoSuchFieldException e) {
 			try {
@@ -73,21 +94,15 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 						clazz,
 						"get" + capitalize( coordinateField ),
 						null );
-				Method latitudeGetter = propertyDescriptor.getReadMethod();
-				if ( latitudeGetter != null ) {
-					return (Double) latitudeGetter.invoke( value );
+				Method getterMethod = propertyDescriptor.getReadMethod();
+				if ( getterMethod != null ) {
+					return MethodHandles.lookup().unreflect( getterMethod );
 				}
 				else {
 					throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 				}
 			}
-			catch (IllegalAccessException ex) {
-				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
-			}
-			catch (InvocationTargetException ex) {
-				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
-			}
-			catch (IntrospectionException ex) {
+			catch (IllegalAccessException | IntrospectionException ex) {
 				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 			}
 		}
@@ -97,8 +112,8 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 	}
 
 	protected Double getLongitude(final Object value) {
-		if ( useFieldMode() ) {
-			return getCoordinateFromField( longitudeField, value );
+		if ( longitudeHandle != null ) {
+			return invokeHandle( longitudeHandle, value );
 		}
 		else {
 			try {
@@ -111,8 +126,21 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 		}
 	}
 
-	private boolean useFieldMode() {
-		return latitudeField != null && longitudeField != null;
+	private Double invokeHandle(MethodHandle handle, Object value) {
+		try {
+			return (Double) handle.invoke( value );
+		}
+		catch (Throwable e) {
+			if ( e instanceof RuntimeException ) {
+				throw (RuntimeException) e;
+			}
+			else if ( e instanceof Error ) {
+				throw (Error) e;
+			}
+			else {
+				throw new AssertionFailure( "Getting a spatial value from " + handle + " failed", e );
+			}
+		}
 	}
 
 	public static String capitalize(final String name) {
