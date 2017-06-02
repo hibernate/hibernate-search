@@ -581,10 +581,12 @@
         
         <profile>
             <id>aws</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.host.aws.access_key</name>
+                </property>
+            </activation>
             <properties>
-                <test.elasticsearch.client.http_client_configurer>
-                    org.hibernate.search.elasticsearch.testutil.aws.AWSElasticsearchHttpClientConfigurer
-                </test.elasticsearch.client.http_client_configurer>
                 <test.elasticsearch.failsafe.excludedGroups.aws>
                     ,
                     org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS

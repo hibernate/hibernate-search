@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.testutil.aws;
 
+import java.util.Properties;
+
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.hibernate.search.elasticsearch.client.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -15,26 +17,40 @@ import org.hibernate.search.util.StringHelper;
  */
 public class AWSElasticsearchHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
 
+	private static final String ACCESS_KEY_PROPERTY = "elasticsearch.aws.access_key";
+	private static final String SECRET_KEY_PROPERTY = "elasticsearch.aws.secret_key";
+	private static final String REGION_PROPERTY = "elasticsearch.aws.region";
 	private static final String ELASTICSEARCH_SERVICE_NAME = "es";
 
 	@Override
-	public HttpAsyncClientBuilder configure(HttpAsyncClientBuilder builder) {
+	public void configure(HttpAsyncClientBuilder builder, Properties properties) {
+		String accessKey = properties.getProperty( ACCESS_KEY_PROPERTY );
+		String secretKey = properties.getProperty( SECRET_KEY_PROPERTY );
+		String region = properties.getProperty( REGION_PROPERTY );
+
+		if ( StringHelper.isEmpty( accessKey )
+				&& StringHelper.isEmpty( secretKey )
+				&& StringHelper.isEmpty( region ) ) {
+			// AWS authentication isn't used
+			return;
+		}
+
+		requireNonEmpty( accessKey, ACCESS_KEY_PROPERTY );
+		requireNonEmpty( secretKey, SECRET_KEY_PROPERTY );
+		requireNonEmpty( region, REGION_PROPERTY );
+
 		AWSSigningRequestInterceptor interceptor = new AWSSigningRequestInterceptor(
-				getEnv( "AWS_ACCESS_KEY_ID" ),
-				getEnv( "AWS_SECRET_KEY" ),
-				getEnv( "AWS_REGION" ),
+				accessKey, secretKey, region,
 				ELASTICSEARCH_SERVICE_NAME
 				);
 
-		return builder.addInterceptorLast( interceptor );
+		builder.addInterceptorLast( interceptor );
 	}
 
-	private String getEnv(String name) {
-		String value = System.getenv( name );
+	private void requireNonEmpty(String value, String name) {
 		if ( StringHelper.isEmpty( value ) ) {
-			throw new IllegalStateException( "Missing value for environment variable '" + name + "'." );
+			throw new IllegalStateException( "Missing value for property '" + name + "'." );
 		}
-		return value;
 	}
 
 }
