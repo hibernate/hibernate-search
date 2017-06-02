@@ -97,9 +97,12 @@ is, or by the words it contains. It make sense to analyze a text field, but prob
 field.
 ====
 +
-[TIP]
+[IMPORTANT]
 ====
-Fields used for sorting or faceting _must not_ be analyzed.
+Fields used for faceting _must not_ be analyzed.
+
+Fields used for sorting _can_ be analyzed, but _must not_ be tokenized,
+so you should rather use <<section-normalizers,normalizers>> on those fields.
 ====
 
 * [[field-annotation-norms]]`norms`: describes whether index time scoring information should be stored (`Norms.YES`) or
@@ -291,7 +294,11 @@ In case several fields exist for a single property, the `@Field` to be marked as
 via `@SortableField#forField()`.
 Several sortable fields can be defined as the `@SortableField` annotation is repeatable.
 
-The field to be marked as sortable must not be analyzed.
+[IMPORTANT]
+====
+The field to be marked as sortable must not be tokenized, so you should either disable analysis on this field,
+or use a <<section-normalizers,normalizer>>.
+====
 
 Note that sorting also works if a property is not explicitly marked with `@SortableField`. This has negative runtime
 performance and memory consumption implications, though. Therefore it is highly recommended to explicitly mark each
@@ -463,9 +470,11 @@ tokenized way, and once as `summary_forSort` in an un-tokenized way.
 `@Field` supports two attributes which are particularly useful when the annotation is repeated:
 
 * `analyzer`: defines a `@Analyzer` annotation per field rather than per property
+* `normalizer`: defines a `@Normalizer` annotation for the given field, instead of an analyzer.
+`analyzer` and `normalizer` are mutually exclusive: you can only use one of the two.
 * `bridge`: defines a `@FieldBridge` annotation per field rather than per property
 
-See below for more information about analyzers and field bridges.
+See below for more information about analyzers/normalizers and field bridges.
 
 [[search-mapping-associated]]
 ==== Embedded and associated objects
@@ -1135,11 +1144,11 @@ public class Team {
 
 The other way to define analyzers is programmatically.
 You can of course use the <<hsearch-mapping-programmaticapi,programmatic mapping API>> to do so,
-but an easier way may be to use the `hibernate.search.lucene.analyzer_definition_provider`
+but an easier way may be to use the `hibernate.search.lucene.analysis_definition_provider`
 configuration property.
 
 This property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
-This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider` directly
+This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider` directly
 or expose a `@Factory`-annotated method that returns such implementation.
 
 [IMPORTANT]
@@ -1149,11 +1158,11 @@ The builder in particular could be altered in the future.
 ====
 
 [[example-programmatic-analyzer-def]]
-.Analyzer definition using a LuceneAnalyzerDefinitionProvider
+.Analyzer definition using a LuceneAnalysisDefinitionProvider
 ====
 [source, JAVA]
 ----
-public static class CustomAnalyzerProvider implements LuceneAnalyzerDefinitionProvider {
+public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
     @Override
     public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
         builder
@@ -1218,7 +1227,38 @@ speak a common "language": the same tokens are reused between the query and the 
 This rule has some exceptions but is true most of the time. Respect it unless you know what you are
 doing.
 
-===== Available analyzers
+[[section-normalizers]]
+==== Normalizers
+
+Analyzers are great when you need to search in text documents,
+but what if you want to sort the analyzed text?
+Then you're in for a bit of trouble, because analyzed text is multi-valued:
+when indexing a book with the title `"Refactoring: Improving the Design of Existing Code"`,
+the analyzed title is in fact the (unordered) set `{"refactoring", "improving", "design", "existing", "code"}`.
+If you tried to sort on the title after such an analysis, any of those words could be used,
+so your book could end up in the D's (because of "design"), or in the R's (because of "refactoring"),
+or in the E's, etc.
+
+So in the end, you probably don't want your fields to be tokenized when you sort on those fields.
+Normalizers solve exactly this issue: they are analyzers, but without a tokenizer,
+and with some runtime checks that prevent the analysis to produce multiple tokens,
+thereby ensuring your sorts will always be consistent.
+
+Hibernate Search provides normalizer equivalent for relevant analyzer annotations:
+`@Normalizer`, `@NormalizerDef`, `@NormalizerDefs`.
+As with analyzer, you can use implementations directly
+(for instance `@Normalizer(impl = MyCollactionKeyAnalyzer.class)`)
+or named normalizers (for instance `@Normalizer(definition = "myNormalizer")`
+with `@NormalizerDef(filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class))`.
+
+[IMPORTANT]
+====
+You cannot define a "class-level", "property-level", or a "default" normalizer:
+each field requiring normalization must be assigned a normalizer explicitly
+using `@Field.normalizer`.
+====
+
+===== Available analysis components
 
 Apache Lucene comes with a lot of useful default char filters, tokenizers and filters.
 You can find a complete list of char filter factories, tokenizer factories and filter factories at
@@ -1381,6 +1421,12 @@ An implementation of the `Discriminator` interface has to return the name of an 
 definition or null if the default analyzer should not be overridden.
 <<example-analyzer-discriminator>> assumes that the language parameter is either 'de' or 'en' which matches the
 name of an analyzer.
+
+[NOTE]
+====
+There is no equivalent of `@AnalyzerDiscriminator` for <<section-normalizers,normalizers>>, at least for now.
+See https://hibernate.atlassian.net/browse/HSEARCH-2738[HSEARCH-2738].
+====
 
 [[analyzer-retrievinganalyzer]]
 ==== Retrieving an analyzer
@@ -2483,6 +2529,33 @@ public class Address {
 ====
 
 
+==== Defining normalizers
+
+Similarly to analyzers, normalizers can be programmatically defined using the
+`normalizerDef(String name)` method.
+
+.Defining normalizers using programmatic model
+====
+[source, JAVA]
+----
+SearchMapping mapping = new SearchMapping();
+
+mapping
+    .normalizerDef( "lowercase" )
+        .filter( ASCIIFoldingFilterFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+    .normalizerDef( "charmapping" )
+        .charFilter( MappingChar.class )
+            .param( "mapping", "com/example/myapplication/lucene/mapping.properties" )
+    .entity(Address.class).indexed()
+        .property("addressId", ElementType.METHOD) //getter access
+            .documentId()
+                .name("id");
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
+----
+====
+
 ==== Defining full text filter definitions
 
 The programmatic API provides easy mechanism for defining full text filter definitions which is
@@ -2558,7 +2631,8 @@ public class Address {
 
 When defining fields for indexing using the programmatic API, call `field()` on the
 `property(String propertyName, ElementType elementType)` method. From `field()` you can specify
-the `name`, `index`, `store`, `bridge` and `analyzer` definitions.
+the `name`, `index`, `store`, `bridge`, `analyzer` and `normalizer` parameters,
+as well as make the field sortable using `.sortableField()`.
 
 .Indexing fields using programmatic API
 ====
@@ -2570,6 +2644,9 @@ mapping
     .analyzerDef( "en", StandardTokenizerFactory.class )
         .filter( LowerCaseFilterFactory.class )
         .filter( EnglishPorterFilterFactory.class )
+    .normalizerDef( "lowercase" )
+        .filter( ASCIIFoldingFilterFactory.class )
+        .filter( LowerCaseFilterFactory.class )
     .entity(Address.class).indexed()
         .property("addressId", ElementType.METHOD)
             .documentId()
@@ -2580,7 +2657,11 @@ mapping
                 .store(Store.YES)
             .field()
                 .name("address_data")
-                .analyzer("en");
+                .analyzer("en")
+            .field()
+                .name("address_sort")
+                .sortableField()
+                .normalizer("lowercase");
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
@@ -2601,6 +2682,12 @@ seen below:
     @TokenFilterDef(factory = LowerCaseFilterFactory.class),
     @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
  })
+@NormalizerDef(name = "lowercase",
+  filters = {
+    @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+  }
+ )
 public class Address {
 
  @Id
@@ -2610,6 +2697,8 @@ public class Address {
 
  @Field(store=Store.YES, analyzer=@Analyzer(definition="en"))
  @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ @Field(name="address_sort", normalizer=@Normalizer(definition="lowercase"))
+ @SortableField(forField="address_sort")
  public String getAddress1() {...}
 
  // ...

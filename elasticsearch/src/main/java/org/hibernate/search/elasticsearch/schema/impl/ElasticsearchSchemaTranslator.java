@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
+import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 
@@ -29,5 +30,11 @@ public interface ElasticsearchSchemaTranslator {
 	 * @throws SearchException If an error occurs.
 	 */
 	IndexMetadata translate(URLEncodedString indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions);
+
+	/**
+	 * @param fieldMetadata Metadata to inspect
+	 * @return {@code true} if the given field will have the "text" datatype on Elasticsearch, {@code false} otherwise.
+	 */
+	boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata);
 
 }

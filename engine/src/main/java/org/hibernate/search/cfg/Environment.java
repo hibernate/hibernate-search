@@ -8,7 +8,7 @@ package org.hibernate.search.cfg;
 
 import java.util.Map;
 
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.engine.service.named.impl.NoopNamedResolver;
@@ -55,11 +55,11 @@ public final class Environment {
 	public static final String ANALYZER_CLASS = "hibernate.search.analyzer";
 
 	/**
-	 * Provider of default analyzer definitions for Lucene.
+	 * Provider of default analysis-related definitions for Lucene.
 	 * <p>
-	 * The value must be the fully-qualified name of a class implementing {@link LuceneAnalyzerDefinitionProvider}.
+	 * The value must be the fully-qualified name of a class implementing {@link LuceneAnalysisDefinitionProvider}.
 	 */
-	public static final String ANALYZER_DEFINITION_PROVIDER = "hibernate.search.lucene.analyzer_definition_provider";
+	public static final String ANALYSIS_DEFINITION_PROVIDER = "hibernate.search.lucene.analysis_definition_provider";
 
 	/**
 	 * Default Lucene similarity

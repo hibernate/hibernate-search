@@ -50,6 +50,10 @@ public class ProvidedIdMapping {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, searchMapping );
 	}
 
+	public NormalizerDefMapping normalizerDef(String name) {
+		return new NormalizerDefMapping( name, searchMapping );
+	}
+
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping( entityType, searchMapping );
 	}

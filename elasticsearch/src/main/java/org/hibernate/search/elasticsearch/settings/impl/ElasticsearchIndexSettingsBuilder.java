@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl;
 
-import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 
 /**
@@ -17,8 +17,9 @@ public class ElasticsearchIndexSettingsBuilder {
 
 	private final SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry = new SimpleElasticsearchAnalysisDefinitionRegistry();
 
-	public String register(ElasticsearchAnalyzer analyzer, String fieldName) {
-		return analyzer.registerDefinitions( analysisDefinitionRegistry, fieldName );
+	public String register(ElasticsearchAnalyzerReference analyzerReference, String fieldName) {
+		analyzerReference.registerDefinitions( fieldName, analysisDefinitionRegistry );
+		return analyzerReference.getAnalyzerName( fieldName );
 	}
 
 	public IndexSettings build() {
@@ -26,6 +27,9 @@ public class ElasticsearchIndexSettingsBuilder {
 
 		if ( !analysisDefinitionRegistry.getAnalyzerDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setAnalyzers( analysisDefinitionRegistry.getAnalyzerDefinitions() );
+		}
+		if ( !analysisDefinitionRegistry.getNormalizerDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setNormalizers( analysisDefinitionRegistry.getNormalizerDefinitions() );
 		}
 		if ( !analysisDefinitionRegistry.getTokenizerDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setTokenizers( analysisDefinitionRegistry.getTokenizerDefinitions() );

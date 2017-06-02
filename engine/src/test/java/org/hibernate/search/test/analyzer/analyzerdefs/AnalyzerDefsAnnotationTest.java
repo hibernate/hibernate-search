@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -21,6 +22,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
@@ -64,7 +66,8 @@ public class AnalyzerDefsAnnotationTest {
 		ExtendedSearchIntegrator factory = sfHolder.getSearchFactory();
 
 		Set<String> analyzerNames = new LinkedHashSet<>();
-		for ( AnalyzerRegistry registry : factory.getAnalyzerRegistries().values() ) {
+		for ( SearchIntegration integration : factory.getIntegrations().values() ) {
+			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			analyzerNames.addAll( registry.getNamedAnalyzerReferences().keySet() );
 		}
 
@@ -85,10 +88,13 @@ public class AnalyzerDefsAnnotationTest {
 	}
 
 	private void assertThatAnalyzerExists(String analyzerName) {
-		for ( AnalyzerRegistry registry : sfHolder.getSearchFactory().getAnalyzerRegistries().values() ) {
+		for ( SearchIntegration integration : sfHolder.getSearchFactory().getIntegrations().values() ) {
+			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
 			if ( analyzerReference != null ) {
-				assertThat( analyzerReference.getAnalyzer() ).isNotNull();
+				if ( analyzerReference.is( LuceneAnalyzerReference.class ) ) {
+					assertThat( analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() ).isNotNull();
+				}
 				return;
 			}
 		}

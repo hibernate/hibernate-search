@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es2;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
-import org.hibernate.search.elasticsearch.nulls.impl.Elasticsearch2MissingValueStrategy;
 import org.hibernate.search.elasticsearch.query.impl.Elasticsearch2QueryFactory;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch2SchemaTranslator;
@@ -25,7 +26,7 @@ import org.hibernate.search.elasticsearch.util.impl.gson.ES2IndexTypeJsonAdapter
 import org.hibernate.search.elasticsearch.util.impl.gson.ES2NormsTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch2WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 import com.google.gson.GsonBuilder;
 
@@ -60,8 +61,8 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 	}
 
 	@Override
-	public MissingValueStrategy createMissingValueStrategy() {
-		return Elasticsearch2MissingValueStrategy.INSTANCE;
+	public ElasticsearchAnalyzerStrategyFactory createAnalyzerStrategyFactory(ServiceManager serviceManager) {
+		return configuration -> new Elasticsearch2AnalyzerStrategy( serviceManager, configuration );
 	}
 
 	@Override

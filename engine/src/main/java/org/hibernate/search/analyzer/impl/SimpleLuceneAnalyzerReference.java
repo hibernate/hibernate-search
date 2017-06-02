@@ -7,7 +7,6 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -34,22 +33,18 @@ public class SimpleLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		return analyzer;
 	}
 
-	public boolean isInitialized() {
-		return analyzer != null;
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
 	}
 
-	public void initialize(Analyzer analyzer) {
-		if ( this.analyzer != null ) {
-			throw new AssertionFailure( "An analyzer reference has been initialized more than once:" + this );
-		}
-		this.analyzer = analyzer;
+	public boolean isInitialized() {
+		return true;
 	}
 
 	@Override
 	public void close() {
-		if ( analyzer != null ) {
-			analyzer.close();
-		}
+		analyzer.close();
 	}
 
 	@Override

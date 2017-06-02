@@ -62,10 +62,16 @@ public @interface ClassBridge {
 	TermVector termVector() default TermVector.NO;
 
 	/**
-	 * @return Returns a analyzer annotation defining the analyzer to be used. Defaults to
-	 *         the inherited analyzer
+	 * @return Returns the analyzer to be used. Defaults to none.
+	 * Must be empty if {@link #normalizer()} is used.
 	 */
 	Analyzer analyzer() default @Analyzer;
+
+	/**
+	 * @return Returns the normalizer to be used. Defaults to none.
+	 * Must be empty if {@link #analyzer()} is used.
+	 */
+	Normalizer normalizer() default @Normalizer;
 
 	/**
 	 * @return Returns a {@code Boost} annotation defining a float index time boost value

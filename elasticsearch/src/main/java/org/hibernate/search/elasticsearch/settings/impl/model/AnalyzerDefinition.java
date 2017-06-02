@@ -6,12 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * A definition of an Elasticsearch analyzer, to be included in index settings.
@@ -19,15 +14,9 @@ import com.google.gson.annotations.SerializedName;
  * @author Yoann Rodiere
  */
 @JsonAdapter(AnalyzerDefinitionJsonAdapterFactory.class)
-public class AnalyzerDefinition extends AnalysisDefinition {
+public class AnalyzerDefinition extends AbstractCompositeAnalysisDefinition {
 
 	private String tokenizer;
-
-	@SerializedName("filter")
-	private List<String> tokenFilters;
-
-	@SerializedName("char_filter")
-	private List<String> charFilters;
 
 	public String getTokenizer() {
 		return tokenizer;
@@ -35,49 +24,6 @@ public class AnalyzerDefinition extends AnalysisDefinition {
 
 	public void setTokenizer(String tokenizer) {
 		this.tokenizer = tokenizer;
-	}
-
-	public List<String> getTokenFilters() {
-		return tokenFilters;
-	}
-
-	public void setTokenFilters(List<String> tokenFilters) {
-		this.tokenFilters = tokenFilters;
-	}
-
-	public void addTokenFilter(String tokenFilter) {
-		getInitializedTokenFilters().add( tokenFilter );
-	}
-
-	private List<String> getInitializedTokenFilters() {
-		if ( tokenFilters == null ) {
-			tokenFilters = new ArrayList<>();
-		}
-		return tokenFilters;
-	}
-
-	public List<String> getCharFilters() {
-		return charFilters;
-	}
-
-	public void setCharFilters(List<String> charFilters) {
-		this.charFilters = charFilters;
-	}
-
-	public void addCharFilter(String charFilter) {
-		getInitializedCharFilters().add( charFilter );
-	}
-
-	private List<String> getInitializedCharFilters() {
-		if ( charFilters == null ) {
-			charFilters = new ArrayList<>();
-		}
-		return charFilters;
-	}
-
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
 
 }

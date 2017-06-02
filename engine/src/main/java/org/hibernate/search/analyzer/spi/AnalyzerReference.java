@@ -10,6 +10,9 @@ import java.io.Closeable;
 
 /**
  * Reference to an analyzer implementation.
+ * <p>
+ * Note that the implementation can be a normalizer
+ * (a normalizer is a specific sort of analyzer).
  *
  * @author Davide D'Alto
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You should be
@@ -18,9 +21,11 @@ import java.io.Closeable;
 public interface AnalyzerReference extends Closeable {
 
 	/**
-	 * @return The referenced analyzer.
+	 * @param fieldName name of the field whose analyzer is to be inspected
+	 * @return {@code true} if the analyzer for the field with the given name is
+	 * a normalizer, {@code false} otherwise.
 	 */
-	Object getAnalyzer();
+	boolean isNormalizer(String fieldName);
 
 	/**
 	 * Check if the analyzer can be represented using a specific class.
@@ -44,4 +49,5 @@ public interface AnalyzerReference extends Closeable {
 	 */
 	@Override
 	void close();
+
 }

@@ -11,8 +11,9 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
 import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionContext;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.analyzer.definition.LuceneCharFilterDefinitionContext;
+import org.hibernate.search.analyzer.definition.LuceneCompositeAnalysisDefinitionContext;
+import org.hibernate.search.analyzer.definition.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneTokenFilterDefinitionContext;
 import org.hibernate.search.annotations.CharFilterDef;
 
@@ -23,15 +24,16 @@ import org.hibernate.search.annotations.CharFilterDef;
 public class LuceneCharFilterDefinitionContextImpl
 		implements LuceneCharFilterDefinitionContext, LuceneAnalysisDefinitionBuilder<CharFilterDef> {
 
-	private final LuceneAnalyzerDefinitionWithTokenizerContext analyzerContext;
+	private final LuceneCompositeAnalysisDefinitionContext parentContext;
 
 	private final Class<? extends CharFilterFactory> factoryClass;
 
 	private final ParametersBuilder params = new ParametersBuilder();
 
-	public LuceneCharFilterDefinitionContextImpl(LuceneAnalyzerDefinitionWithTokenizerContext analyzerContext,
+	public LuceneCharFilterDefinitionContextImpl(
+			LuceneCompositeAnalysisDefinitionContext parentContext,
 			Class<? extends CharFilterFactory> factoryClass) {
-		this.analyzerContext = analyzerContext;
+		this.parentContext = parentContext;
 		this.factoryClass = factoryClass;
 	}
 
@@ -43,17 +45,22 @@ public class LuceneCharFilterDefinitionContextImpl
 
 	@Override
 	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		return analyzerContext.analyzer( name );
+		return parentContext.analyzer( name );
+	}
+
+	@Override
+	public LuceneNormalizerDefinitionContext normalizer(String name) {
+		return parentContext.normalizer( name );
 	}
 
 	@Override
 	public LuceneCharFilterDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		return analyzerContext.charFilter( factory );
+		return parentContext.charFilter( factory );
 	}
 
 	@Override
 	public LuceneTokenFilterDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		return analyzerContext.tokenFilter( factory );
+		return parentContext.tokenFilter( factory );
 	}
 
 	@Override

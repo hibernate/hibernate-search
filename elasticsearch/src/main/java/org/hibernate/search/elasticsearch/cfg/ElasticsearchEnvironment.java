@@ -292,11 +292,11 @@ public final class ElasticsearchEnvironment {
 	public static final String DYNAMIC_MAPPING = "elasticsearch.dynamic_mapping";
 
 	/**
-	 * Provider of default analyzer definitions for Elasticsearch.
+	 * Provider of default analysis-related definitions for Elasticsearch.
 	 * <p>
 	 * The value must be the fully-qualified name of a class implementing {@link ElasticsearchAnalysisDefinitionProvider}.
 	 */
-	public static final String ANALYZER_DEFINITION_PROVIDER = "hibernate.search.elasticsearch.analyzer_definition_provider";
+	public static final String ANALYSIS_DEFINITION_PROVIDER = "hibernate.search.elasticsearch.analysis_definition_provider";
 
 	private ElasticsearchEnvironment() {
 	}

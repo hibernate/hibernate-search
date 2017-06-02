@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.definition.impl;
 
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.util.StringHelper;
 

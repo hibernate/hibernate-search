@@ -30,6 +30,8 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.NormalizerDefs;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
@@ -38,18 +40,19 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.ImmutableSearchFactory;
 import org.hibernate.search.engine.impl.IncrementalSearchConfiguration;
+import org.hibernate.search.engine.impl.MappingDefinitionRegistry;
 import org.hibernate.search.engine.impl.MappingModelMetadataProvider;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.impl.MutableSearchFactoryState;
 import org.hibernate.search.engine.impl.ReflectionReplacingSearchConfiguration;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
@@ -275,8 +278,8 @@ public class SearchIntegratorBuilder {
 
 		factoryState.getServiceManager().releaseAllServices();
 
-		for ( AnalyzerRegistry an : factoryState.getAnalyzerRegistries().values() ) {
-			an.close();
+		for ( SearchIntegration integration : factoryState.getIntegrations().values() ) {
+			integration.close();
 		}
 	}
 
@@ -355,9 +358,10 @@ public class SearchIntegratorBuilder {
 	 */
 	private void initDocumentBuilders(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
 		ConfigContext configContext = new ConfigContext( searchConfiguration, buildContext, searchMapping,
-				factoryState.getAnalyzerRegistries() );
+				factoryState.getIntegrations() );
 
 		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
+		initProgrammaticNormalizers( configContext, searchConfiguration.getReflectionManager() );
 		initProgrammaticallyDefinedFilterDef( configContext, searchConfiguration.getReflectionManager() );
 		final TypeHierarchy configuredTypeHierarchy = factoryState.getConfiguredTypeHierarchy();
 		final TypeHierarchy indexedTypeHierarchy = factoryState.getIndexedTypeHierarchy();
@@ -463,7 +467,7 @@ public class SearchIntegratorBuilder {
 		);
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
-		factoryState.addAnalyzerRegistries( configContext.initAnalyzerRegistries( indexesFactory ) );
+		factoryState.addIntegrations( configContext.initIntegrations( indexesFactory ) );
 	}
 
 	private void detectIndexNamesCollisions(Collection<IndexManager> indexManagers) {
@@ -567,8 +571,23 @@ public class SearchIntegratorBuilder {
 		if ( defaults != null ) {
 			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
 			if ( defs != null ) {
+				MappingDefinitionRegistry<AnalyzerDef, ?> registry = context.getAnalyzerDefinitionRegistry();
 				for ( AnalyzerDef def : defs ) {
-					context.addGlobalAnalyzerDef( def );
+					registry.registerGlobal( def.name(), def );
+				}
+			}
+		}
+	}
+
+	private void initProgrammaticNormalizers(ConfigContext context, ReflectionManager reflectionManager) {
+		final Map<?, ?> defaults = reflectionManager.getDefaults();
+
+		if ( defaults != null ) {
+			NormalizerDef[] defs = (NormalizerDef[]) defaults.get( NormalizerDefs.class );
+			if ( defs != null ) {
+				MappingDefinitionRegistry<NormalizerDef, ?> registry = context.getNormalizerDefinitionRegistry();
+				for ( NormalizerDef def : defs ) {
+					registry.registerGlobal( def.name(), def );
 				}
 			}
 		}
@@ -578,12 +597,14 @@ public class SearchIntegratorBuilder {
 		Map<?, ?> defaults = reflectionManager.getDefaults();
 		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class );
 		if ( filterDefs != null && filterDefs.length != 0 ) {
+			MappingDefinitionRegistry<FullTextFilterDef, ?> registry = context.getFullTextFilterDefinitionRegistry();
 			final Map<String, FilterDef> filterDefinitions = factoryState.getFilterDefinitions();
 			for ( FullTextFilterDef defAnn : filterDefs ) {
-				if ( filterDefinitions.containsKey( defAnn.name() ) ) {
+				String name = defAnn.name();
+				if ( filterDefinitions.containsKey( name ) ) {
 					throw new SearchException( "Multiple definition of @FullTextFilterDef.name=" + defAnn.name() );
 				}
-				context.addGlobalFullTextFilterDef( defAnn );
+				registry.registerGlobal( name, defAnn );
 			}
 		}
 	}

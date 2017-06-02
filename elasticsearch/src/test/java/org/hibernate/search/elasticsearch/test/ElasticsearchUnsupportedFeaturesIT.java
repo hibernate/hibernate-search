@@ -10,14 +10,27 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
+import org.hibernate.testing.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test that users attempting to use unsupported features are duly warned.
@@ -29,11 +42,26 @@ public class ElasticsearchUnsupportedFeaturesIT extends SearchInitializationTest
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	@Test
 	public void dynamicBoosting() throws Exception {
 		logged.expectMessage( "HSEARCH400032", "@DynamicBoost", DynamicBoostingEntity.class.getSimpleName() );
 
 		init( DynamicBoostingEntity.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2726")
+	@Category( SkipFromElasticsearch52.class )
+	public void conflictingAnalyzerNormalizerDefinitions() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400087" );
+		thrown.expectMessage( "same name" );
+		thrown.expectMessage( "'standard'" );
+
+		init( EntityWithConflictingAnalyzerNormalizerDefinitions.class );
 	}
 
 	@Indexed
@@ -77,6 +105,26 @@ public class ElasticsearchUnsupportedFeaturesIT extends SearchInitializationTest
 			DynamicBoostingEntity entity = (DynamicBoostingEntity) value;
 			return entity.getBoost();
 		}
+	}
+
+	@Entity
+	@Indexed
+	@AnalyzerDef(
+			name = "standard",
+			tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
+	)
+	@NormalizerDef(
+			name = "standard",
+			filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+	)
+	private static class EntityWithConflictingAnalyzerNormalizerDefinitions {
+		@Id
+		@GeneratedValue
+		Long id;
+
+		@Field(analyzer = @Analyzer(definition = "standard"))
+		@Field(name = "normalized", normalizer = @Normalizer(definition = "standard"))
+		String myField;
 	}
 
 }

@@ -28,11 +28,16 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  */
 public class SearchMapping {
 	private final Set<Map<String, Object>> analyzerDefs = new HashSet<Map<String, Object>>();
+	private final Set<Map<String, Object>> normalizerDefs = new HashSet<Map<String, Object>>();
 	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private final Map<Class<?>, EntityDescriptor> entities = new HashMap<Class<?>, EntityDescriptor>();
 
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;
+	}
+
+	public Set<Map<String, Object>> getNormalizerDefs() {
+		return normalizerDefs;
 	}
 
 	public Set<Map<String, Object>> getFullTextFilterDefs() {
@@ -53,6 +58,10 @@ public class SearchMapping {
 
 	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, this );
+	}
+
+	public NormalizerDefMapping normalizerDef(String name) {
+		return new NormalizerDefMapping( name, this );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
@@ -82,6 +91,10 @@ public class SearchMapping {
 
 	void addAnalyzerDef(Map<String, Object> analyzerDef) {
 		analyzerDefs.add( analyzerDef );
+	}
+
+	void addNormalizerDef(Map<String, Object> normalizerDef) {
+		normalizerDefs.add( normalizerDef );
 	}
 
 	EntityDescriptor getEntity(Class<?> entityType) {

@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
@@ -16,6 +17,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImpleme
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaCreator;
@@ -64,6 +66,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private ElasticsearchSchemaTranslator schemaTranslator;
 
+	private ElasticsearchAnalyzerStrategyFactory analyzerStrategyFactory;
+
 	private MissingValueStrategy missingValueStrategy;
 
 	private ElasticsearchQueryFactory queryFactory;
@@ -107,7 +111,9 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaDropper = new DefaultElasticsearchSchemaDropper( schemaAccessor );
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 
-			this.missingValueStrategy = dialect.createMissingValueStrategy();
+			this.analyzerStrategyFactory = dialect.createAnalyzerStrategyFactory( serviceManager );
+
+			this.missingValueStrategy = new ElasticsearchMissingValueStrategy( schemaTranslator );
 
 			this.queryFactory = dialect.createQueryFactory();
 		}
@@ -167,6 +173,11 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public ElasticsearchSchemaTranslator getSchemaTranslator() {
 		return schemaTranslator;
+	}
+
+	@Override
+	public ElasticsearchAnalyzerStrategyFactory getAnalyzerStrategyFactory() {
+		return analyzerStrategyFactory;
 	}
 
 	@Override
