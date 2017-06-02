@@ -106,7 +106,7 @@ public class TypeMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@Field
+		@Field(analyze = Analyze.NO)
 		@SortableField
 		private String name;
 

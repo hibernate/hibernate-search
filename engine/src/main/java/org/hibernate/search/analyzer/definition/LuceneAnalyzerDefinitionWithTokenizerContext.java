@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.analyzer.definition;
 
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-
 /**
  * @author Yoann Rodiere
  *
@@ -16,7 +13,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * Please let us know what you like and what you don't like, and bear in mind
  * that this will likely change in any future version.
  */
-public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneAnalyzerDefinitionRegistryBuilder {
+public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneCompositeAnalysisDefinitionContext {
 
 	/**
 	 * Set a tokenizer parameter.
@@ -26,21 +23,5 @@ public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneAnal
 	 * @return This context, allowing to chain calls.
 	 */
 	LuceneAnalyzerDefinitionWithTokenizerContext param(String name, String value);
-
-	/**
-	 * Add a char filter that the analyzer will use.
-	 *
-	 * @param factory The factory that will create the char filter.
-	 * @return A context allowing to further define this analyzer or the char filter.
-	 */
-	LuceneCharFilterDefinitionContext charFilter(Class<? extends CharFilterFactory> factory);
-
-	/**
-	 * Add a token filter that the analyzer will use.
-	 *
-	 * @param factory The factory that will create the token filter.
-	 * @return A context allowing to further define this analyzer or the token filter.
-	 */
-	LuceneTokenFilterDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory);
 
 }

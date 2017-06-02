@@ -9,11 +9,12 @@ package org.hibernate.search.elasticsearch.analyzer.definition;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 
 /**
- * A provider of analyzer definitions that can be referenced from the mapping,
- * e.g. with {@literal @Analyzer(definition = "some-name")}.
+ * A provider of analysis-related definitions that can be referenced from the mapping,
+ * e.g. with {@literal @Analyzer(definition = "some-name")}
+ * or {@literal @Normalizer(definition = "some-other-name")}.
  * <p>
  * Users can select a definition provider through the
- * {@link ElasticsearchEnvironment#ANALYZER_DEFINITION_PROVIDER configuration properties}.
+ * {@link ElasticsearchEnvironment#ANALYSIS_DEFINITION_PROVIDER configuration properties}.
  *
  * @author Yoann Rodiere
  *

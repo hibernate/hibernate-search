@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -19,7 +18,9 @@ import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
+import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
+import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -31,6 +32,20 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslator {
 
 	private static final Log log = LoggerFactory.make( Log.class );
+
+	@Override
+	public boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata) {
+		if ( DataType.TEXT.equals( getStringType( fieldMetadata.getIndex() ) ) ) {
+			// Also check that this is actually a string field
+			ExtendedFieldType fieldType = FieldHelper.getType( fieldMetadata );
+			if ( ExtendedFieldType.STRING.equals( fieldType )
+					// We also use strings when the type is unknown
+					|| ExtendedFieldType.UNKNOWN.equals( fieldType ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	protected PropertyMapping generateTenantIdProperty() {
@@ -72,8 +87,7 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 			}
 			else {
 				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-				ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-				String analyzerName = settingsBuilder.register( analyzer, propertyPath );
+				String analyzerName = settingsBuilder.register( elasticsearchReference, propertyPath );
 				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}
@@ -86,7 +100,7 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 
 	@Override
 	@SuppressWarnings("deprecation")
-	protected DataType getStringType(PropertyMapping propertyMapping, Index index) {
+	protected DataType getStringType(Index index) {
 		return index.isAnalyzed() ? DataType.TEXT : DataType.KEYWORD;
 	}
 

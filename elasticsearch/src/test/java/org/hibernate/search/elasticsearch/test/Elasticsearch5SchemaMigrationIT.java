@@ -25,7 +25,7 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
@@ -39,7 +39,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch2.class)
+@Category(SkipBelowElasticsearch50.class)
 public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBase {
 
 	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
@@ -126,6 +126,10 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'text',"
 									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'customNormalizer'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -184,6 +188,10 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'text',"
 									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'customNormalizer'"
 							+ "}"
 					+ "}"
 				+ "}",
@@ -357,6 +365,52 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'text',"
 									+ "'analyzer': 'standard'" // Invalid
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'customNormalizer'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( UPDATE_FAILED_MESSAGE_ID )
+				.causedBy( SearchException.class )
+						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
+				.causedBy( SearchException.class )
+						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
+						.withMessage( "analyzer" )
+				.build()
+		);
+
+		init( SimpleTextEntity.class );
+	}
+
+	@Test
+	public void property_attribute_invalid_conflictingNormalizer() throws Exception {
+		elasticSearchClient.index( SimpleTextEntity.class ).deleteAndCreate();
+		putAnalysisSettings( SimpleTextEntity.class );
+		elasticSearchClient.type( SimpleTextEntity.class ).putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
+									+ "'store': true"
+							+ "},"
+							+ "'defaultAnalyzer': {"
+									+ "'type': 'text'"
+							+ "},"
+							+ "'nonDefaultAnalyzer': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'standard'" // Invalid
 							+ "}"
 					+ "}"
 				+ "}"
@@ -382,6 +436,9 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 					+ "'analyzer': {"
 							+ "'customAnalyzer': {"
 									+ "'tokenizer': 'whitespace'"
+							+ "},"
+							+ "'customNormalizer': {"
+									+ "'tokenizer': 'keyword'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -422,6 +479,9 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 
 		@Field(analyzer = @Analyzer(definition = "customAnalyzer"))
 		String nonDefaultAnalyzer;
+
+		@Field(analyzer = @Analyzer(definition = "customNormalizer"))
+		String normalizer;
 	}
 
 }

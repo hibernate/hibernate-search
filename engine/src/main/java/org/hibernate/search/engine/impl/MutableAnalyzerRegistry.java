@@ -17,7 +17,6 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference.Builder;
-import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.util.impl.Closeables;
 
 /**
@@ -40,22 +39,29 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	private final Collection<AnalyzerReference> scopedReferences = new ArrayList<>();
 
-	MutableAnalyzerRegistry(AnalyzerStrategy strategy) {
-		this( strategy, null );
-	}
-
 	MutableAnalyzerRegistry(AnalyzerStrategy strategy, AnalyzerRegistry registryState) {
 		this.strategy = strategy;
 
 		if ( registryState != null ) {
 			this.defaultReference = registryState.getDefaultAnalyzerReference();
 			this.passThroughReference = registryState.getPassThroughAnalyzerReference();
+
+			/*
+			 * We add the provided references first, so that *if* some of them were
+			 * already present in the previous registry state, we'll keep those previous
+			 * references and will not risk replacing them with new ones.
+			 * This avoids duplicate references, but also avoids having multiple
+			 * references with the same name target different analyzers.
+			 */
+			this.referencesByName.putAll( strategy.createProvidedAnalyzerReferences() );
 			this.referencesByName.putAll( registryState.getNamedAnalyzerReferences() );
+
 			this.referencesByLuceneClass.putAll( registryState.getLuceneClassAnalyzerReferences() );
 		}
 		else {
 			this.defaultReference = strategy.createDefaultAnalyzerReference();
 			this.passThroughReference = strategy.createPassThroughAnalyzerReference();
+			this.referencesByName.putAll( strategy.createProvidedAnalyzerReferences() );
 		}
 	}
 
@@ -117,20 +123,13 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 		Closeables.closeQuietly( getAllReferences() );
 	}
 
-	public void initialize(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		List<AnalyzerReference> references = getAllReferences();
-		Map<String, AnalyzerReference> additionalReferences =
-				strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
-		referencesByName.putAll( additionalReferences );
-	}
-
 	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
 		return new ScopedAnalyzerReferenceBuilderRegisteringWrapper(
 				strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() )
 				);
 	}
 
-	private List<AnalyzerReference> getAllReferences() {
+	public List<AnalyzerReference> getAllReferences() {
 		List<AnalyzerReference> references = new ArrayList<>();
 		references.add( defaultReference );
 		references.add( passThroughReference );

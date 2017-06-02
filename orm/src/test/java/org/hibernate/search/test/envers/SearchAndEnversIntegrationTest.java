@@ -8,12 +8,11 @@ package org.hibernate.search.test.envers;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.envers.AuditReader;
@@ -154,7 +153,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				assertEquals( 1, houseNumberAddressChangedAtRevision2.size() );
 
 				//Let's assert that Hibernate Search has indexed everything correctly
-				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
+				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
 				assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
 				//Let's compare that entities from Hibernate Search and last revision entities from Hibernate Envers are equals
 				Person harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
@@ -208,7 +207,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				assertEquals( 3, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
 				assertEquals( 5, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
 				//Let's assert that Hibernate Search has indexed everything correctly
-				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
+				List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
 				assertEquals( 2, peopleLivingInPrivetDriveFromHibSearch.size() );
 
 				tx.commit();
@@ -255,7 +254,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 				//Let's assert that Hibernate Search has indexed everything correctly
 				assertNull( findPersonFromIndexBySurname( session, "Potter" ) );
 				assertNull( findPersonFromIndexBySurname( session, "Granger" ) );
-				assertEquals( 0, findPeopleFromIndexByStreetName( session, "Privet" ).size() );
+				assertEquals( 0, findPeopleFromIndexByStreetName( session, "privet" ).size() );
 				assertEquals( 0, findPeopleFromIndexByStreetName( session, "Guillaume" ).size() );
 
 				tx.commit();
@@ -317,16 +316,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 	}
 
 	private Query createLuceneQuery(String term, String value) {
-		String searchQuery = term + ":" + value;
-		QueryParser parser = new QueryParser( term, new StopAnalyzer() );
-		Query luceneQuery;
-		try {
-			luceneQuery = parser.parse( searchQuery );
-		}
-		catch (ParseException e) {
-			throw new RuntimeException( "Unable to parse query", e );
-		}
-		return luceneQuery;
+		return new TermQuery( new Term( term, value ) );
 	}
 
 	@Override

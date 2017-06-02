@@ -1628,9 +1628,48 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </build>
         </profile>
 
-        <!-- Elasticsearch 5.x test environment (default) -->
+        <!-- Elasticsearch 5.0/5.1 test environment -->
         <profile>
             <id>elasticsearch-5.0</id>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <version>${test.elasticsearch.host.version}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
+                            </configuration>
+                            <dependencies>
+                                <!-- The next two are used to get ES log output into the Maven console -->
+                                <dependency>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
+                                    <version>${project.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-core</artifactId>
+                                    <version>2.6.2</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        
+        <!-- Elasticsearch 5.2+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-5.2</id>
             <activation>
                 <!-- Activate by default, i.e. if testElasticsearchVersion has not been defined explicitly -->
                 <property>

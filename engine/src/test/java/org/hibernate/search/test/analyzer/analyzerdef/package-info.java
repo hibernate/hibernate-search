@@ -8,11 +8,15 @@
 	name = "package-analyzer",
 	tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 	filters = { @TokenFilterDef(factory = StandardFilterFactory.class) } )
+@NormalizerDef(
+	name = "package-normalizer",
+	filters = @TokenFilterDef(factory = org.apache.lucene.analysis.core.LowerCaseFilterFactory.class) )
 package org.hibernate.search.test.analyzer.analyzerdef;
 
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 

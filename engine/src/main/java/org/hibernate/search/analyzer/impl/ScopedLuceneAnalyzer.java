@@ -7,12 +7,10 @@
 package org.hibernate.search.analyzer.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 
 /**
  * A {@code ScopedLuceneAnalyzer} is a wrapper class containing all analyzers for a given class.
@@ -23,27 +21,21 @@ import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements ScopedAnalyzer {
+public final class ScopedLuceneAnalyzer extends AnalyzerWrapper {
 
-	private final Analyzer globalAnalyzer;
-	private final Map<String, Analyzer> scopedAnalyzers;
+	private final LuceneAnalyzerReference globalAnalyzerReference;
+	private final Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences;
 
 	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer) {
-		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );
+		this( new SimpleLuceneAnalyzerReference( globalAnalyzer ), Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}
 
-	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+	// For package use only; assumes the map is immutable
+	ScopedLuceneAnalyzer(LuceneAnalyzerReference globalAnalyzerReference,
+			Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences) {
 		super( PER_FIELD_REUSE_STRATEGY );
-		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers = Collections.unmodifiableMap( new HashMap<>( scopedAnalyzers ) );
-	}
-
-	Analyzer getGlobalAnalyzer() {
-		return globalAnalyzer;
-	}
-
-	Map<String, Analyzer> getScopedAnalyzers() {
-		return scopedAnalyzers;
+		this.globalAnalyzerReference = globalAnalyzerReference;
+		this.scopedAnalyzerReferences = scopedAnalyzerReferences;
 	}
 
 	/**
@@ -54,27 +46,31 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	 * and all scoped analyzers also match, by reference.
 	 */
 	public boolean isCompositeOfSameInstances(ScopedLuceneAnalyzer other) {
-		if ( this.globalAnalyzer != other.globalAnalyzer ) {
+		if ( toAnalyzer( this.globalAnalyzerReference ) != toAnalyzer( other.globalAnalyzerReference ) ) {
 			return false;
 		}
-		if ( this.scopedAnalyzers.size() != other.scopedAnalyzers.size() ) {
+		if ( this.scopedAnalyzerReferences.size() != other.scopedAnalyzerReferences.size() ) {
 			return false;
 		}
-		for ( String fieldname : scopedAnalyzers.keySet() ) {
-			if ( this.scopedAnalyzers.get( fieldname ) != other.scopedAnalyzers.get( fieldname ) ) {
+		for ( String fieldname : scopedAnalyzerReferences.keySet() ) {
+			if ( toAnalyzer( this.scopedAnalyzerReferences.get( fieldname ) ) != toAnalyzer( other.scopedAnalyzerReferences.get( fieldname ) ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	private Analyzer toAnalyzer(LuceneAnalyzerReference reference) {
+		return reference == null ? null : reference.getAnalyzer();
+	}
+
 	@Override
 	protected Analyzer getWrappedAnalyzer(String fieldName) {
-		Analyzer analyzer = scopedAnalyzers.get( fieldName );
-		if ( analyzer == null ) {
-			analyzer = globalAnalyzer;
+		LuceneAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
 		}
-		return analyzer;
+		return analyzerReference.getAnalyzer();
 	}
 
 	@Override
@@ -82,9 +78,9 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( globalAnalyzer );
+		sb.append( globalAnalyzerReference );
 		sb.append( "," );
-		sb.append( scopedAnalyzers );
+		sb.append( scopedAnalyzerReferences );
 		sb.append( ">" );
 		return sb.toString();
 	}

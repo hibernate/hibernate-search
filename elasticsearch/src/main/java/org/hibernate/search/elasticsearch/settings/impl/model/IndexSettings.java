@@ -51,10 +51,6 @@ public class IndexSettings {
 		@SerializedName("char_filter")
 		private Map<String, CharFilterDefinition> charFilters;
 
-		public Map<String, AnalyzerDefinition> getAnalyzers() {
-			return analyzers;
-		}
-
 		public boolean isEmpty() {
 			return ! hasContent( analyzers, tokenizers, tokenFilters, charFilters );
 		}
@@ -66,6 +62,10 @@ public class IndexSettings {
 				}
 			}
 			return false;
+		}
+
+		public Map<String, AnalyzerDefinition> getAnalyzers() {
+			return analyzers;
 		}
 
 		public void setAnalyzers(Map<String, AnalyzerDefinition> analyzers) {

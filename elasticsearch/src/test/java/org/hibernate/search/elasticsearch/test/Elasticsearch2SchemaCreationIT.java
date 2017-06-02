@@ -24,7 +24,7 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -41,7 +41,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
-@Category(SkipOnElasticsearch5.class)
+@Category(SkipFromElasticsearch50.class)
 public class Elasticsearch2SchemaCreationIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")

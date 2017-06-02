@@ -15,6 +15,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
 
 @Entity
 @Indexed(index = "idx1")
@@ -31,7 +32,8 @@ public class AlarmEntity {
 
 	@Fields({
 			@Field(name = "description_analyzer2", analyzer = @Analyzer(impl = AnalyzerForTests2.class)),
-			@Field(name = "description_analyzer3", analyzer = @Analyzer(impl = AnalyzerForTests3.class))
+			@Field(name = "description_analyzer3", analyzer = @Analyzer(impl = AnalyzerForTests3.class)),
+			@Field(name = "description_normalizer1", normalizer = @Normalizer(impl = NormalizerForTests1.class))
 	})
 	private String alarmDescription;
 

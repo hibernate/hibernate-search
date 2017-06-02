@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -43,8 +44,9 @@ public class Author {
 		this.id = id;
 	}
 
-	@SortableField
 	@Field(store = Store.YES)
+	@Field(name = "name_sort", analyze = Analyze.NO)
+	@SortableField(forField = "name_sort")
 	public String getName() {
 		return name;
 	}

@@ -58,7 +58,9 @@ public class AnalyzerBuilderIndexingTest extends SearchTestBase {
 				new String[] { "please divide this" }
 			},
 			{ "pattern_analyzer", "foo,bar", new String[] { "foo", "bar" }, new String[] { "foo,bar" } },
-			{ "mapping_char_analyzer", "CORA\u00C7\u00C3O DE MEL\u00C3O", new String[] { "CORACAO", "DE", "MELAO" }, new String[] { "CORA\u00C7\u00C3O" } }
+			{ "mapping_char_analyzer", "CORA\u00C7\u00C3O DE MEL\u00C3O", new String[] { "CORACAO", "DE", "MELAO" }, new String[] { "CORA\u00C7\u00C3O" } },
+			{ "custom_normalizer", "This is a D\u00E0scription", new String[] { "this is a dascription" },
+					new String[] { "This", "this", "is", "a", "D\u00E0scription", "dascription" } }
 		};
 	}
 

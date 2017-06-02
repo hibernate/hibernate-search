@@ -13,23 +13,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
-import org.hibernate.annotations.common.reflection.XAnnotatedElement;
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.annotations.common.reflection.XPackage;
-import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Key;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
@@ -42,9 +39,10 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+
 /**
- * Provides access to some default configuration settings (eg default {@code Analyzer} or default
- * {@code Similarity}) and checks whether certain optional libraries are available.
+ * Provides access to some default configuration settings (eg is JPA present, what is the default null token)
+ * and holds mapping-scoped configuration (such as analyzer definitions).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -58,47 +56,16 @@ public final class ConfigContext {
 	 */
 	private static final String DEFAULT_NULL_INDEX_TOKEN = "_null_";
 
-	/**
-	 * Constant used as definition point for a global (programmatic) analyzer definition. In this case no annotated
-	 * element is available to be used as definition point.
-	 */
-	private static final String PROGRAMMATIC_ANALYZER_DEFINITION = "PROGRAMMATIC_ANALYZER_DEFINITION";
+	private final MappingDefinitionRegistry<AnalyzerDef, AnalyzerDef> analyzerDefinitionRegistry =
+			new MappingDefinitionRegistry<>( Function.identity(), LOG::analyzerDefinitionNamingConflict );
 
-	/**
-	 * Constant used as definition point for a global (programmatic) filter definition. In this case no annotated
-	 * element is available to be used as definition point.
-	 */
-	private static final String PROGRAMMATIC_FILTER_DEFINITION = "PROGRAMMATIC_FILTER_DEFINITION";
+	private final MappingDefinitionRegistry<NormalizerDef, NormalizerDef> normalizerDefinitionRegistry =
+			new MappingDefinitionRegistry<>( this::interpretNormalizerDef, LOG::normalizerDefinitionNamingConflict );
 
-	/**
-	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
-	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
-	 * name together with the annotated element name is used. See also {@link #PROGRAMMATIC_ANALYZER_DEFINITION}.
-	 */
-	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
+	private final MappingDefinitionRegistry<FullTextFilterDef, FilterDef> fullTextFilterDefinitionRegistry =
+			new MappingDefinitionRegistry<>( this::interpretFullTextFilterDef, LOG::fullTextFilterDefinitionNamingConflict );
 
-	/**
-	 * Used to keep track of duplicated filter definitions. The key of the map is the filter definition
-	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
-	 * name together with the annotated element name is used.
-	 */
-	private final Map<String, String> filterDefinitionPoints = new HashMap<String, String>();
-
-	/**
-	 * Map of discovered analyzer definitions. The key of the map is the analyzer def name and the value is the
-	 * {@code AnalyzerDef} annotation.
-	 */
-	private final Map<String, AnalyzerDef> mappingAnalyzerDefs = new HashMap<String, AnalyzerDef>();
-
-	/**
-	 * Map of discovered filter definitions. The key of the map is the filter def name and the value is the
-	 * {@code FilterDef} instance.
-	 */
-	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
-
-	private final Map<IndexManagerType, MissingValueStrategy> missingValueStrategies = new HashMap<>();
-
-	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries = new HashMap<>();
+	private final Map<IndexManagerType, SearchIntegrationConfigContext> indexManagerTypeConfigContexts = new HashMap<>();
 
 	private final boolean jpaPresent;
 	private final String nullToken;
@@ -112,19 +79,20 @@ public final class ConfigContext {
 	}
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping,
-			Map<IndexManagerType, AnalyzerRegistry> previousAnalyzerRegistries) {
+			Map<IndexManagerType, SearchIntegration> previousSearchIntegrations) {
 		this.serviceManager = buildContext.getServiceManager();
 		this.jpaPresent = searchConfiguration.isJPAAnnotationsProcessingEnabled();
 		this.nullToken = initNullToken( searchConfiguration );
 		this.implicitProvidedId = searchConfiguration.isIdProvidedImplicit();
 		this.searchMapping = searchMapping;
 		this.searchConfiguration = searchConfiguration;
-		if ( previousAnalyzerRegistries != null ) {
-			for ( Map.Entry<IndexManagerType, AnalyzerRegistry> entry : previousAnalyzerRegistries.entrySet() ) {
+		if ( previousSearchIntegrations != null ) {
+			for ( Map.Entry<IndexManagerType, SearchIntegration> entry : previousSearchIntegrations.entrySet() ) {
 				IndexManagerType type = entry.getKey();
-				AnalyzerRegistry registryState = entry.getValue();
-				AnalyzerStrategy strategy = type.createAnalyzerStrategy( serviceManager, searchConfiguration );
-				analyzerRegistries.put( type, new MutableAnalyzerRegistry( strategy, registryState ) );
+				SearchIntegration integrationState = entry.getValue();
+				SearchIntegrationConfigContext context = new SearchIntegrationConfigContext(
+						type, serviceManager, searchConfiguration, integrationState );
+				indexManagerTypeConfigContexts.put( type, context );
 			}
 		}
 	}
@@ -133,69 +101,25 @@ public final class ConfigContext {
 		return serviceManager;
 	}
 
-	/**
-	 * Add an analyzer definition which was defined as annotation.
-	 *
-	 * @param analyzerDef the analyzer definition annotation
-	 * @param annotatedElement the annotated element it was defined on
-	 */
-	public void addAnalyzerDef(AnalyzerDef analyzerDef, XAnnotatedElement annotatedElement) {
-		if ( analyzerDef == null ) {
-			return;
-		}
-		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	public MappingDefinitionRegistry<AnalyzerDef, ?> getAnalyzerDefinitionRegistry() {
+		return analyzerDefinitionRegistry;
 	}
 
-	/** Add a full-filter definition which was defined as annotation
-	 *
-	 * @param filterDef the filter definition annotation
-	 * @param annotatedElement the annotated element it was defined on
-	 */
-	public void addFullTextFilterDef(FullTextFilterDef filterDef, XAnnotatedElement annotatedElement) {
-		if ( filterDef == null ) {
-			return;
-		}
-		addFullTextFilterDef( filterDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	public MappingDefinitionRegistry<NormalizerDef, ?> getNormalizerDefinitionRegistry() {
+		return normalizerDefinitionRegistry;
 	}
 
-	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
-		addAnalyzerDef( analyzerDef, PROGRAMMATIC_ANALYZER_DEFINITION );
+	public MappingDefinitionRegistry<FullTextFilterDef, ?> getFullTextFilterDefinitionRegistry() {
+		return fullTextFilterDefinitionRegistry;
 	}
 
-	public void addGlobalFullTextFilterDef(FullTextFilterDef filterDef) {
-		addFullTextFilterDef( filterDef, PROGRAMMATIC_FILTER_DEFINITION );
-	}
-
-	private void addAnalyzerDef(AnalyzerDef analyzerDef, String annotationDefinitionPoint) {
-		String analyzerDefinitionName = analyzerDef.name();
-
-		if ( analyzerDefinitionPoints.containsKey( analyzerDefinitionName ) ) {
-			if ( !analyzerDefinitionPoints.get( analyzerDefinitionName ).equals( annotationDefinitionPoint ) ) {
-				throw LOG.analyzerDefinitionNamingConflict( analyzerDefinitionName );
-			}
+	public SearchIntegrationConfigContext forType(IndexManagerType type) {
+		SearchIntegrationConfigContext context = indexManagerTypeConfigContexts.get( type );
+		if ( context == null ) {
+			context = new SearchIntegrationConfigContext( type, serviceManager, searchConfiguration );
+			indexManagerTypeConfigContexts.put( type, context );
 		}
-		else {
-			mappingAnalyzerDefs.put( analyzerDefinitionName, analyzerDef );
-			analyzerDefinitionPoints.put( analyzerDefinitionName, annotationDefinitionPoint );
-		}
-	}
-
-	public MissingValueStrategy getMissingValueStrategy(IndexManagerType type) {
-		MissingValueStrategy strategy = missingValueStrategies.get( type );
-		if ( strategy == null ) {
-			strategy = type.createMissingValueStrategy( serviceManager, searchConfiguration );
-			missingValueStrategies.put( type, strategy );
-		}
-		return strategy;
-	}
-
-	public MutableAnalyzerRegistry getAnalyzerRegistry(IndexManagerType type) {
-		MutableAnalyzerRegistry registry = analyzerRegistries.get( type );
-		if ( registry == null ) {
-			registry = new MutableAnalyzerRegistry( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
-			analyzerRegistries.put( type, registry );
-		}
-		return registry;
+		return context;
 	}
 
 	private String initNullToken(SearchConfiguration cfg) {
@@ -210,26 +134,26 @@ public final class ConfigContext {
 		return nullToken;
 	}
 
-	private void addFullTextFilterDef(FullTextFilterDef filterDef, String filterDefinitionPoint) {
-		String filterDefinitionName = filterDef.name();
+	/**
+	 * Check that a given {@link NormalizerDef} is "well-formed",
+	 * i.e. that it defines at least one char filter or token filter.
+	 *
+	 * @param normalizerDef The normalizer def to check
+	 * @return The same normalizer def
+	 */
+	private NormalizerDef interpretNormalizerDef(NormalizerDef normalizerDef) {
+		if ( normalizerDef.charFilters().length == 0 && normalizerDef.filters().length == 0 ) {
+			throw LOG.invalidEmptyNormalizerDefinition( normalizerDef.name() );
+		}
 
-		if ( filterDefinitionPoints.containsKey( filterDefinitionName ) ) {
-			if ( !filterDefinitionPoints.get( filterDefinitionName ).equals( filterDefinitionPoint ) ) {
-				throw new SearchException( "Multiple filter definitions with the same name: " + filterDef.name() );
-			}
-		}
-		else {
-			filterDefinitionPoints.put( filterDefinitionName, filterDefinitionPoint );
-			addFilterDef( filterDef );
-		}
+		return normalizerDef;
 	}
 
-	private void addFilterDef(FullTextFilterDef defAnn) {
+	private FilterDef interpretFullTextFilterDef(FullTextFilterDef defAnn) {
 		FilterDef filterDef = new FilterDef( defAnn );
 		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
 			//this is a placeholder don't process regularly
-			filterDefs.put( defAnn.name(), filterDef );
-			return;
+			return filterDef;
 		}
 		try {
 			filterDef.getImpl().newInstance();
@@ -267,11 +191,13 @@ public final class ConfigContext {
 				filterDef.addSetter( Introspector.decapitalize( name.substring( 3 ) ), method );
 			}
 		}
-		filterDefs.put( defAnn.name(), filterDef );
+		return filterDef;
 	}
 
 	/**
-	 * Initialize the named analyzer references created throughout the mapping creation
+	 * Initialize integrations for all discovered index manager types.
+	 *
+	 * In particular, initialize the named analyzer references created throughout the mapping creation
 	 * with the analyzer definitions collected throughout the mapping creation.
 	 * <p>
 	 * Analyzer definitions and references are handled simultaneously during the mapping
@@ -280,28 +206,36 @@ public final class ConfigContext {
 	 * <p>
 	 * To work around this issue, we do not resolve references immediately, but instead
 	 * create "dangling" references whose initialization will be delayed to the end of
-	 * the mapping (see {@link #getAnalyzerRegistry(IndexManagerType)}).
+	 * the mapping (see {@link SearchIntegrationConfigContext#getAnalyzerRegistry()}).
 	 * <p>
 	 * This method executes the final initialization, resolving dangling references.
 	 *
 	 * @param indexesFactory The index manager holder, giving access to the relevant index manager types.
-	 * @return The named analyzer references, to be accessed through SearchFactory.getAnalyzer(String)
-	 * or ExtendedSearchIntegrator.getAnalyzerReference(String).
+	 * @return The initialized (and immutable) search integrations.
 	 */
-	public Map<IndexManagerType, AnalyzerRegistry> initAnalyzerRegistries(IndexManagerHolder indexesFactory) {
+	public Map<IndexManagerType, SearchIntegration> initIntegrations(IndexManagerHolder indexesFactory) {
+		Map<String, AnalyzerDef> mappingAnalyzerDefs = analyzerDefinitionRegistry.getAll();
+		Map<String, NormalizerDef> mappingNormalizerDefs = normalizerDefinitionRegistry.getAll();
 
 		/*
-		 * For analyzer defined in the mapping, but not referenced in this mapping,
+		 * For analyzers/normalizers defined in the mapping, but not referenced in this mapping,
 		 * we assume these are Lucene analyzer definitions that will be used
 		 * when querying.
 		 * Thus we create references to these definitions, so that the references
-		 * are initialized below, making the analyzers available through
-		 * SearchFactory.getAnalyzer(String).
+		 * are initialized below, making the analyzers available at runtime.
 		 */
 		for ( String name : mappingAnalyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
-				MutableAnalyzerRegistry registry = getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
+				MutableAnalyzerRegistry registry = forType( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry();
 				registry.getOrCreateAnalyzerReference( name );
+			}
+		}
+		for ( String name : mappingNormalizerDefs.keySet() ) {
+			if ( !hasNormalizerReference( name ) ) {
+				MutableNormalizerRegistry registry = forType( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry();
+				registry.getOrCreateNamedNormalizerReference( name );
 			}
 		}
 
@@ -309,21 +243,22 @@ public final class ConfigContext {
 		Set<IndexManagerType> indexManagerTypes = new HashSet<>();
 		indexManagerTypes.addAll( indexesFactory.getIndexManagerTypes() );
 		// Make sure to initialize every registry, even those that are not used by index managers (see the loop above)
-		indexManagerTypes.addAll( analyzerRegistries.keySet() );
+		indexManagerTypes.addAll( indexManagerTypeConfigContexts.keySet() );
 
-		final Map<IndexManagerType, AnalyzerRegistry> immutableAnalyzerRegistries = new HashMap<>( indexManagerTypes.size() );
+		final Map<IndexManagerType, SearchIntegration> immutableSearchIntegrations = new HashMap<>( indexManagerTypes.size() );
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
-			MutableAnalyzerRegistry registry = getAnalyzerRegistry( indexManagerType );
-			registry.initialize( mappingAnalyzerDefs );
-			immutableAnalyzerRegistries.put( indexManagerType, new ImmutableAnalyzerRegistry( registry ) );
+			ImmutableSearchIntegration searchIntegration = forType( indexManagerType )
+					.initialize( mappingAnalyzerDefs, mappingNormalizerDefs );
+			immutableSearchIntegrations.put( indexManagerType, searchIntegration );
 		}
 
-		return immutableAnalyzerRegistries;
+		return immutableSearchIntegrations;
 	}
 
 	private boolean hasAnalyzerReference(String name) {
-		for ( MutableAnalyzerRegistry registry : analyzerRegistries.values() ) {
+		for ( SearchIntegrationConfigContext context : indexManagerTypeConfigContexts.values() ) {
+			MutableAnalyzerRegistry registry = context.getAnalyzerRegistry();
 			if ( registry.getNamedAnalyzerReferences().containsKey( name ) ) {
 				return true;
 			}
@@ -331,34 +266,22 @@ public final class ConfigContext {
 		return false;
 	}
 
+	private boolean hasNormalizerReference(String name) {
+		for ( SearchIntegrationConfigContext context : indexManagerTypeConfigContexts.values() ) {
+			MutableNormalizerRegistry registry = context.getNormalizerRegistry();
+			if ( registry.getNamedNormalizerReferences().containsKey( name ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Map<String, FilterDef> initFilters() {
-		return Collections.unmodifiableMap( filterDefs );
+		return fullTextFilterDefinitionRegistry.getAll();
 	}
 
 	public boolean isJpaPresent() {
 		return jpaPresent;
-	}
-
-	/**
-	 * @param annotatedElement an annotated element
-	 *
-	 * @return a string which identifies the location/point the annotation was placed on. Something of the
-	 * form package.[[className].[field|member]]
-	 */
-	private String buildAnnotationDefinitionPoint(XAnnotatedElement annotatedElement) {
-		if ( annotatedElement instanceof XClass ) {
-			return ( (XClass) annotatedElement ).getName();
-		}
-		else if ( annotatedElement instanceof XMember ) {
-			XMember member = (XMember) annotatedElement;
-			return member.getType().getName() + '.' + member.getName();
-		}
-		else if ( annotatedElement instanceof XPackage ) {
-			return ( (XPackage) annotatedElement ).getName();
-		}
-		else {
-			throw new SearchException( "Unknown XAnnotatedElement: " + annotatedElement );
-		}
 	}
 
 	/**

@@ -12,7 +12,8 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es5.Elasticsearch5Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -46,11 +47,16 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 			return new Elasticsearch2Dialect();
 		}
 		else if ( version.startsWith( "5." ) ) {
-			return new Elasticsearch5Dialect();
+			if ( version.startsWith( "5.0." ) || version.startsWith( "5.1." ) ) {
+				return new Elasticsearch50Dialect();
+			}
+			else {
+				return new Elasticsearch52Dialect();
+			}
 		}
 		else {
 			log.unexpectedElasticsearchVersion( version );
-			return new Elasticsearch5Dialect();
+			return new Elasticsearch52Dialect();
 		}
 	}
 

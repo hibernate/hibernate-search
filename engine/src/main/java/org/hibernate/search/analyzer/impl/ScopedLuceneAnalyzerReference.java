@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -23,64 +22,50 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private ScopedLuceneAnalyzer analyzer;
+	private final LuceneAnalyzerReference globalAnalyzerReference;
+	private final Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences;
+	private final ScopedLuceneAnalyzer scopedAnalyzer;
 
-	private DeferredInitializationBuilder builder;
-
-	public ScopedLuceneAnalyzerReference(ScopedLuceneAnalyzer analyzer) {
-		this.builder = null;
-		this.analyzer = analyzer; // Already initialized
-	}
-
-	private ScopedLuceneAnalyzerReference(DeferredInitializationBuilder builder) {
-		this.builder = builder;
-		this.analyzer = null; // Not initialized yet
+	public ScopedLuceneAnalyzerReference(Builder builder) {
+		this.globalAnalyzerReference = builder.globalAnalyzerReference;
+		this.scopedAnalyzerReferences = Collections.unmodifiableMap( new HashMap<>( builder.scopedAnalyzerReferences ) );
+		this.scopedAnalyzer = new ScopedLuceneAnalyzer( globalAnalyzerReference, scopedAnalyzerReferences );
 	}
 
 	@Override
 	public ScopedLuceneAnalyzer getAnalyzer() {
-		if ( analyzer == null ) {
-			throw LOG.lazyLuceneAnalyzerReferenceNotInitialized( this );
-		}
-		return analyzer;
+		return scopedAnalyzer;
 	}
 
-	public boolean isInitialized() {
-		return analyzer != null;
-	}
-
-	public void initialize() {
-		if ( this.analyzer != null ) {
-			throw new AssertionFailure( "A lucene analyzer reference has been initialized more than once: " + this );
-		}
-		this.analyzer = builder.buildAnalyzer();
-		this.builder = null;
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return getDelegate( fieldName ).isNormalizer( fieldName );
 	}
 
 	@Override
 	public void close() {
-		if ( isInitialized() ) {
-			getAnalyzer().close();
-		}
+		getAnalyzer().close();
 	}
 
 	@Override
 	public CopyBuilder startCopy() {
-		return new CopyBuilder( getAnalyzer() );
+		return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
 	}
 
-	/**
-	 * A builder that defers the actual analyzer creation to later during the search
-	 * factory initialization, so that the builder accepts dangling references.
-	 *
-	 * @author Yoann Rodiere
-	 */
-	public static class DeferredInitializationBuilder implements ScopedAnalyzerReference.Builder {
+	private LuceneAnalyzerReference getDelegate(String fieldName) {
+		LuceneAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
+		}
+		return analyzerReference;
+	}
+
+	public static class Builder implements ScopedAnalyzerReference.Builder, ScopedAnalyzerReference.CopyBuilder {
 
 		private LuceneAnalyzerReference globalAnalyzerReference;
 		private final Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences = new HashMap<>();
 
-		public DeferredInitializationBuilder(LuceneAnalyzerReference globalAnalyzerReference,
+		public Builder(LuceneAnalyzerReference globalAnalyzerReference,
 				Map<String, LuceneAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzerReferences.putAll( scopedAnalyzers );
@@ -104,44 +89,6 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 		@Override
 		public ScopedLuceneAnalyzerReference build() {
 			return new ScopedLuceneAnalyzerReference( this );
-		}
-
-		protected final ScopedLuceneAnalyzer buildAnalyzer() {
-			Analyzer globalAnalyzer = globalAnalyzerReference.getAnalyzer();
-
-			Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
-			for ( Map.Entry<String, LuceneAnalyzerReference> entry : scopedAnalyzerReferences.entrySet() ) {
-				scopedAnalyzers.put( entry.getKey(), entry.getValue().getAnalyzer() );
-			}
-
-			return new ScopedLuceneAnalyzer( globalAnalyzer, scopedAnalyzers );
-		}
-	}
-
-	public static class CopyBuilder implements ScopedAnalyzerReference.CopyBuilder {
-
-		private final ScopedLuceneAnalyzer baseAnalyzer;
-		private final Map<String, Analyzer> scopedAnalyzersOverrides = new HashMap<>();
-
-		protected CopyBuilder(ScopedLuceneAnalyzer baseAnalyzer) {
-			this.baseAnalyzer = baseAnalyzer;
-		}
-
-		@Override
-		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-			scopedAnalyzersOverrides.put( scope, getLuceneAnalyzerReference( analyzerReference ).getAnalyzer() );
-		}
-
-		@Override
-		public ScopedLuceneAnalyzerReference build() {
-			Analyzer globalAnalyzer = baseAnalyzer.getGlobalAnalyzer();
-
-			Map<String, Analyzer> scopedAnalyzers = new HashMap<>( baseAnalyzer.getScopedAnalyzers() );
-			scopedAnalyzers.putAll( scopedAnalyzersOverrides );
-
-			ScopedLuceneAnalyzer scopedAnalyzer = new ScopedLuceneAnalyzer( globalAnalyzer, scopedAnalyzers );
-
-			return new ScopedLuceneAnalyzerReference( scopedAnalyzer );
 		}
 	}
 

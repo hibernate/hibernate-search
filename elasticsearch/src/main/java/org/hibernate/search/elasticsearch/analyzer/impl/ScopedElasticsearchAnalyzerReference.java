@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -22,64 +24,58 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private ScopedElasticsearchAnalyzer analyzer;
+	private final ElasticsearchAnalyzerReference globalAnalyzerReference;
+	private final Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences;
 
-	private DeferredInitializationBuilder builder;
-
-	public ScopedElasticsearchAnalyzerReference(ScopedElasticsearchAnalyzer analyzer) {
-		this.builder = null;
-		this.analyzer = analyzer; // Already initialized
-	}
-
-	private ScopedElasticsearchAnalyzerReference(DeferredInitializationBuilder builder) {
-		this.builder = builder;
-		this.analyzer = null; // Not initialized yet
+	public ScopedElasticsearchAnalyzerReference(Builder builder) {
+		this.globalAnalyzerReference = builder.globalAnalyzerReference;
+		this.scopedAnalyzerReferences = Collections.unmodifiableMap( new HashMap<>( builder.scopedAnalyzerReferences ) );
 	}
 
 	@Override
-	public ScopedElasticsearchAnalyzer getAnalyzer() {
-		if ( analyzer == null ) {
-			throw LOG.lazyRemoteAnalyzerReferenceNotInitialized( this );
-		}
-		return analyzer;
+	public String getAnalyzerName(String fieldName) {
+		return getDelegate( fieldName ).getAnalyzerName( fieldName );
 	}
 
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return getDelegate( fieldName ).isNormalizer( fieldName );
+	}
+
+	@Override
+	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+		getDelegate( fieldName ).registerDefinitions( fieldName, definitionRegistry );
+	}
+
+	@Override
 	public boolean isInitialized() {
-		return analyzer != null;
-	}
-
-	public void initialize() {
-		if ( this.analyzer != null ) {
-			throw new AssertionFailure( "An Elasticsearch analyzer reference has been initialized more than once: " + this );
-		}
-		this.analyzer = builder.buildAnalyzer();
-		this.builder = null;
+		return true;
 	}
 
 	@Override
-	public void close() {
-		if ( isInitialized() ) {
-			getAnalyzer().close();
-		}
+	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, ElasticsearchAnalyzerDefinitionTranslator translator) {
+		// Nothing to do
 	}
 
 	@Override
 	public CopyBuilder startCopy() {
-		return new CopyBuilder( getAnalyzer() );
+		return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
 	}
 
-	/**
-	 * A builder that defers the actual analyzer creation to later during the search
-	 * factory initialization, so that the builder accepts dangling references.
-	 *
-	 * @author Yoann Rodiere
-	 */
-	public static class DeferredInitializationBuilder implements ScopedAnalyzerReference.Builder {
+	private ElasticsearchAnalyzerReference getDelegate(String fieldName) {
+		ElasticsearchAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
+		}
+		return analyzerReference;
+	}
+
+	public static class Builder implements ScopedAnalyzerReference.Builder, ScopedAnalyzerReference.CopyBuilder {
 
 		private ElasticsearchAnalyzerReference globalAnalyzerReference;
 		private final Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences = new HashMap<>();
 
-		public DeferredInitializationBuilder(ElasticsearchAnalyzerReference globalAnalyzerReference,
+		public Builder(ElasticsearchAnalyzerReference globalAnalyzerReference,
 				Map<String, ElasticsearchAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzerReferences.putAll( scopedAnalyzers );
@@ -103,44 +99,6 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 		@Override
 		public ScopedElasticsearchAnalyzerReference build() {
 			return new ScopedElasticsearchAnalyzerReference( this );
-		}
-
-		protected final ScopedElasticsearchAnalyzer buildAnalyzer() {
-			ElasticsearchAnalyzer globalAnalyzer = globalAnalyzerReference.getAnalyzer();
-
-			Map<String, ElasticsearchAnalyzer> scopedAnalyzers = new HashMap<>();
-			for ( Map.Entry<String, ElasticsearchAnalyzerReference> entry : scopedAnalyzerReferences.entrySet() ) {
-				scopedAnalyzers.put( entry.getKey(), entry.getValue().getAnalyzer() );
-			}
-
-			return new ScopedElasticsearchAnalyzer( globalAnalyzer, scopedAnalyzers );
-		}
-	}
-
-	public static class CopyBuilder implements ScopedAnalyzerReference.CopyBuilder {
-
-		private final ScopedElasticsearchAnalyzer baseAnalyzer;
-		private final Map<String, ElasticsearchAnalyzer> scopedAnalyzersOverrides = new HashMap<>();
-
-		protected CopyBuilder(ScopedElasticsearchAnalyzer baseAnalyzer) {
-			this.baseAnalyzer = baseAnalyzer;
-		}
-
-		@Override
-		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-			scopedAnalyzersOverrides.put( scope, getElasticsearchAnalyzerReference( analyzerReference ).getAnalyzer() );
-		}
-
-		@Override
-		public ScopedElasticsearchAnalyzerReference build() {
-			ElasticsearchAnalyzer globalAnalyzer = baseAnalyzer.getGlobalAnalyzer();
-
-			Map<String, ElasticsearchAnalyzer> scopedAnalyzers = new HashMap<>( baseAnalyzer.getScopedAnalyzers() );
-			scopedAnalyzers.putAll( scopedAnalyzersOverrides );
-
-			ScopedElasticsearchAnalyzer scopedAnalyzer = new ScopedElasticsearchAnalyzer( globalAnalyzer, scopedAnalyzers );
-
-			return new ScopedElasticsearchAnalyzerReference( scopedAnalyzer );
 		}
 	}
 

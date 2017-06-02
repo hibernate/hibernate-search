@@ -36,7 +36,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearch2Client;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Rule;
@@ -50,7 +50,7 @@ import com.google.gson.JsonObject;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch5.class)
+@Category(SkipFromElasticsearch50.class)
 public class Elasticsearch2JavaTimeIT extends SearchTestBase {
 
 	@Rule

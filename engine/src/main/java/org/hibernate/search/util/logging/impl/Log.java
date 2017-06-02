@@ -26,7 +26,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
@@ -935,12 +934,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 309, value = "Analyzer reference %1$s is not a Lucene analyzer reference.")
 	SearchException analyzerReferenceIsNotLucene(AnalyzerReference analyzerReference);
 
-	@Message(id = 310, value = "Analyzer %1$s is not a scoped remote analyzer.")
-	SearchException scopedAnalyzerIsNotRemote(ScopedAnalyzer analyzer);
-
-	@Message(id = 311, value = "Analyzer %1$s is not a scoped Lucene analyzer.")
-	SearchException scopedAnalyzerIsNotLucene(ScopedAnalyzer analyzer);
-
 	@Message(id = 312, value = "Lazy Lucene analyzer reference %1$s is not initialized.")
 	SearchException lazyLuceneAnalyzerReferenceNotInitialized(LuceneAnalyzerReference reference);
 
@@ -993,7 +986,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 328, value = "Cannot create context for class: %1$s" )
 	SearchException cannotCreateBridgeDefinedField(@FormatWith(ClassFormatter.class) Class<?> backend, @Cause Exception e);
 
-	@Message(id = 329, value = "Property '" + Environment.ANALYZER_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
+	@Message(id = 329, value = "Property '" + Environment.ANALYSIS_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
 			+ " The value must be the fully-qualified name of a class with a public, no-arg constructor in your classpath."
 			+ " Also, the class must either implement LuceneAnalyzerDefinitionProvider or expose a public,"
 			+ " @Factory-annotated method returning a LuceneAnalyzerDefinitionProvider.")
@@ -1030,4 +1023,30 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 339, value = "BeanResolver cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getBeanResolver!")
 	SearchException beanResolverContainedInProvidedServicesException();
+
+	@Message(id = 340, value = "Multiple full-text filter definitions with the same name: '%1$s'." )
+	SearchException fullTextFilterDefinitionNamingConflict(String filterDefinitionName);
+
+	@Message(id = 341, value = "Multiple normalizer definitions with the same name: '%1$s'." )
+	SearchException normalizerDefinitionNamingConflict(String normalizerDefinitionName);
+
+	@Message(id = 342, value = "Field '%2$s' on entity '%1$s' refers to both an analyzer and a normalizer." )
+	SearchException cannotReferenceAnalyzerAndNormalizer(@FormatWith(ClassFormatter.class) Class<?> entityType, String relativeFieldPath);
+
+	@Message(id = 343, value = "Normalizer definition for '%s' must define at least a char filter or a token filter (or both)." )
+	SearchException invalidEmptyNormalizerDefinition(String name);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 344, value = "The normalizer for definition '%s' produced %d tokens."
+			+ " Normalizers should never produce more than one token."
+			+ " The tokens have been concatenated by Hibernate Search,"
+			+ " but you should fix your normalizer definition." )
+	void normalizerProducedMultipleTokens(String normalizerName, int token);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 345, value = "Field '%2$s' on entity '%1$s' is marked as sortable and will be analyzed,"
+			+ " but is assigned an Analyzer instead of a Normalizer."
+			+ " Sortable fields should be assigned normalizers in order to avoid problems with tokenization.")
+	void sortableFieldWithNonNormalizerAnalyzer(@FormatWith(ClassFormatter.class) Class<?> entityType, String absoluteFieldPath);
+
 }

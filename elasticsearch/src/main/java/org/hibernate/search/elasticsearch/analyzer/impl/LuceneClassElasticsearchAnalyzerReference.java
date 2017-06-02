@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -21,41 +23,42 @@ public class LuceneClassElasticsearchAnalyzerReference extends ElasticsearchAnal
 
 	private final Class<?> luceneClass;
 
-	private ElasticsearchAnalyzer analyzer;
+	private String name;
 
 	public LuceneClassElasticsearchAnalyzerReference(Class<?> luceneClass) {
 		this.luceneClass = luceneClass;
-		this.analyzer = null; // Not initialized yet
-	}
-
-	public Class<?> getLuceneClass() {
-		return luceneClass;
+		this.name = null; // Not initialized yet
 	}
 
 	@Override
-	public ElasticsearchAnalyzer getAnalyzer() {
-		if ( analyzer == null ) {
+	public String getAnalyzerName(String fieldName) {
+		if ( name == null ) {
 			throw LOG.lazyRemoteAnalyzerReferenceNotInitialized( this );
 		}
-		return analyzer;
-	}
-
-	public boolean isInitialized() {
-		return analyzer != null;
-	}
-
-	public void initialize(String name, ElasticsearchAnalyzer analyzer) {
-		if ( this.analyzer != null ) {
-			throw new AssertionFailure( "A named analyzer reference has been initialized more than once: " + this );
-		}
-		this.analyzer = analyzer;
+		return name;
 	}
 
 	@Override
-	public void close() {
-		if ( analyzer != null ) {
-			analyzer.close();
+	public boolean isNormalizer(String fieldName) {
+		return false;
+	}
+
+	@Override
+	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+		// Nothing to do
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return name != null;
+	}
+
+	@Override
+	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, ElasticsearchAnalyzerDefinitionTranslator translator) {
+		if ( this.name != null ) {
+			throw new AssertionFailure( "A Lucene class analyzer reference has been initialized more than once: " + this );
 		}
+		this.name = translator.translate( luceneClass );
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class LuceneClassElasticsearchAnalyzerReference extends ElasticsearchAnal
 		sb.append( "<" );
 		sb.append( luceneClass );
 		sb.append( "," );
-		sb.append( analyzer );
+		sb.append( name );
 		sb.append( ">" );
 		return sb.toString();
 	}

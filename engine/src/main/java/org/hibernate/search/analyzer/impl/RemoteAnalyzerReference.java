@@ -16,8 +16,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
  */
 public abstract class RemoteAnalyzerReference implements AnalyzerReference {
 
-	@Override
-	public abstract RemoteAnalyzer getAnalyzer();
+	public abstract String getAnalyzerName(String fieldName);
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {

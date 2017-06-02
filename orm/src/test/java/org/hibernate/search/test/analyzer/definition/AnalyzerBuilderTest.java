@@ -14,6 +14,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.engine.impl.NormalizerRegistry;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.AnalyzerUtils;
@@ -122,6 +126,17 @@ public class AnalyzerBuilderTest extends SearchTestBase {
 		text = "CORA\u00C7\u00C3O DE MEL\u00C3O";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
 		assertTokensEqual( tokens, new String[] { "CORACAO", "DE", "MELAO" } );
+
+		ExtendedSearchIntegrator integrator = getExtendedSearchIntegrator();
+		NormalizerRegistry normalizerRegistry =
+				integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+				.getNormalizerRegistry();
+
+		analyzer = normalizerRegistry.getNamedNormalizerReference( "custom_normalizer" )
+				.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		text = "This is a D\u00E0scription";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		assertTokensEqual( tokens, new String[] { "this is a dascription" } );
 
 		fts.close();
 	}
