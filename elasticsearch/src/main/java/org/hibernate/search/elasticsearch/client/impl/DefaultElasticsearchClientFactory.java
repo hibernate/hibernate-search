@@ -20,20 +20,14 @@ import org.elasticsearch.client.sniff.HostsSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.SearchThreadFactory;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class );
-
-	private static final String HTTP_SCHEME = "http";
 
 	@Override
 	public ElasticsearchClientImplementor create(Properties properties) {
