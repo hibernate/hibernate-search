@@ -36,6 +36,7 @@ import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 
 /**
  * Provides access to the JEST client.
@@ -44,14 +45,6 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchService implements ElasticsearchService, Startable, Stoppable {
-
-	/**
-	 * The name of the scope to get client properties from;
-	 * we currently only have a single client for all index managers.
-	 */
-	private static final String CLIENT_SCOPE_NAME = "default";
-
-	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
 
 	private ElasticsearchClient client;
 
@@ -78,7 +71,11 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	private ElasticsearchQueryOptions queryOptions;
 
 	@Override
-	public void start(Properties properties, BuildContext context) {
+	public void start(Properties unkmaskedProperties, BuildContext context) {
+		Properties rootCfg = new MaskedProperty( unkmaskedProperties, "hibernate.search" );
+		// Use root as a fallback to support query options in particular
+		Properties properties = new MaskedProperty( rootCfg, "default", rootCfg );
+
 		ServiceManager serviceManager = context.getServiceManager();
 
 		this.queryOptions = createQueryOptions( properties );
@@ -86,7 +83,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		ElasticsearchClientImplementor clientImplementor;
 		try ( ServiceReference<ElasticsearchClientFactory> clientFactory =
 				serviceManager.requestReference( ElasticsearchClientFactory.class ) ) {
-			clientImplementor = clientFactory.get().create( CLIENT_SCOPE_NAME, properties );
+			clientImplementor = clientFactory.get().create( properties );
 		}
 
 		try ( ServiceReference<ElasticsearchDialectFactory> dialectFactory =
@@ -190,17 +187,17 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	private ElasticsearchQueryOptions createQueryOptions(Properties properties) {
 		String scrollTimeout = ConfigurationParseHelper.getIntValue(
 				properties,
-				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_TIMEOUT,
+				ElasticsearchEnvironment.SCROLL_TIMEOUT,
 				ElasticsearchEnvironment.Defaults.SCROLL_TIMEOUT
 				) + "s";
 		int scrollFetchSize = ConfigurationParseHelper.getIntValue(
 				properties,
-				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
+				ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
 				ElasticsearchEnvironment.Defaults.SCROLL_FETCH_SIZE
 				);
 		int scrollBacktrackingWindowSize = ConfigurationParseHelper.getIntValue(
 				properties,
-				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
+				ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
 				ElasticsearchEnvironment.Defaults.SCROLL_BACKTRACKING_WINDOW_SIZE
 				);
 
