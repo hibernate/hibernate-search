@@ -73,8 +73,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public void start(Properties unkmaskedProperties, BuildContext context) {
 		Properties rootCfg = new MaskedProperty( unkmaskedProperties, "hibernate.search" );
-		Properties globalProperties = new MaskedProperty( rootCfg, "elasticsearch" ); // For query options in particular
-		Properties properties = new MaskedProperty( rootCfg, "default.elasticsearch", globalProperties );
+		// Use root as a fallback to support query options in particular
+		Properties properties = new MaskedProperty( rootCfg, "default", rootCfg );
 
 		ServiceManager serviceManager = context.getServiceManager();
 
