@@ -4,10 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.analyzer.impl;
+package org.hibernate.search.elasticsearch.analyzer.definition.impl;
 
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.SearchException;
@@ -26,6 +27,14 @@ public interface ElasticsearchAnalysisDefinitionRegistry {
 	 * @throws SearchException if the name is already associated with a different definition.
 	 */
 	void register(String name, AnalyzerDefinition definition);
+
+	/**
+	 * Register a normalizer definition.
+	 * @param name The name of the definition to be registered.
+	 * @param definition The definition to be registered.
+	 * @throws SearchException if the name is already associated with a different definition.
+	 */
+	void register(String name, NormalizerDefinition definition);
 
 	/**
 	 * Register a tokenizer definition.
@@ -57,6 +66,13 @@ public interface ElasticsearchAnalysisDefinitionRegistry {
 	 * or {@code null} if there isn't any.
 	 */
 	AnalyzerDefinition getAnalyzerDefinition(String name);
+
+	/**
+	 * @param name A normalizer name
+	 * @return The normalizer definition associated with the given name,
+	 * or {@code null} if there isn't any.
+	 */
+	NormalizerDefinition getNormalizerDefinition(String name);
 
 	/**
 	 * @param name A tokenizer name

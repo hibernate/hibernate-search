@@ -17,6 +17,7 @@ import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.analyzer.definition.LuceneCharFilterDefinitionContext;
+import org.hibernate.search.analyzer.definition.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneTokenFilterDefinitionContext;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
@@ -29,7 +30,7 @@ import org.hibernate.search.annotations.TokenFilterDef;
 public class LuceneAnalyzerDefinitionContextImpl
 		implements LuceneAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext {
 
-	private final LuceneAnalyzerDefinitionRegistryBuilderImpl registry;
+	private final LuceneAnalysisDefinitionRegistryBuilderImpl registry;
 
 	private final String name;
 
@@ -39,7 +40,7 @@ public class LuceneAnalyzerDefinitionContextImpl
 
 	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
 
-	public LuceneAnalyzerDefinitionContextImpl(LuceneAnalyzerDefinitionRegistryBuilderImpl registry, String name) {
+	public LuceneAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionRegistryBuilderImpl registry, String name) {
 		this.registry = registry;
 		this.name = name;
 	}
@@ -47,6 +48,11 @@ public class LuceneAnalyzerDefinitionContextImpl
 	@Override
 	public LuceneAnalyzerDefinitionContext analyzer(String name) {
 		return registry.analyzer( name );
+	}
+
+	@Override
+	public LuceneNormalizerDefinitionContext normalizer(String name) {
+		return registry.normalizer( name );
 	}
 
 	@Override
@@ -80,8 +86,8 @@ public class LuceneAnalyzerDefinitionContextImpl
 		descriptor.setValue( "name", name );
 		descriptor.setValue( "tokenizer", tokenizer.build() );
 
-		descriptor.setValue( "charFilters", LuceneAnalyzerDefinitionUtils.buildAll( charFilters, CharFilterDef[]::new ) );
-		descriptor.setValue( "filters", LuceneAnalyzerDefinitionUtils.buildAll( tokenFilters, TokenFilterDef[]::new ) );
+		descriptor.setValue( "charFilters", LuceneAnalysisDefinitionUtils.buildAll( charFilters, CharFilterDef[]::new ) );
+		descriptor.setValue( "filters", LuceneAnalysisDefinitionUtils.buildAll( tokenFilters, TokenFilterDef[]::new ) );
 		return AnnotationFactory.create( descriptor );
 	}
 

@@ -35,6 +35,9 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.NormalizerDefs;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -180,6 +183,14 @@ import org.hibernate.search.annotations.TokenizerDef;
 						})
 		})
 })
+@NormalizerDefs({
+		@NormalizerDef(name = "custom_normalizer",
+				filters = {
+						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				}
+		)
+})
 public class Team {
 	@Id
 	@DocumentId
@@ -201,6 +212,7 @@ public class Team {
 	@Field(name = "name_html_char_analyzer", analyzer = @Analyzer(definition = "html_char_analyzer"))
 	@Field(name = "name_mapping_char_analyzer", analyzer = @Analyzer(definition = "mapping_char_analyzer"))
 	@Field(name = "name_stemmer_override_analyzer", analyzer = @Analyzer(definition = "stemmer_override_analyzer"))
+	@Field(name = "name_custom_normalizer", normalizer = @Normalizer(definition = "custom_normalizer"))
 	private String name;
 
 	@Field

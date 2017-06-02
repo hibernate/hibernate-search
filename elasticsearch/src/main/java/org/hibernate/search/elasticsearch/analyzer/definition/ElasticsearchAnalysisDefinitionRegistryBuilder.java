@@ -23,9 +23,16 @@ public interface ElasticsearchAnalysisDefinitionRegistryBuilder {
 	/**
 	 * Start an analyzer definition.
 	 * @param name The name used to reference this analyzer (both in Elasticsearch and in Hibernate Search).
-	 * @return The analyzer definition context, allowing to define the analyzer's type and components (tokenizer, ...).
+	 * @return The analyzer definition context, allowing to define the analyzer's components (tokenizer, ...).
 	 */
 	ElasticsearchAnalyzerDefinitionContext analyzer(String name);
+
+	/**
+	 * Start a normalizer definition.
+	 * @param name The name used to reference this normalizer (both in Elasticsearch and in Hibernate Search).
+	 * @return The normalizer definition context, allowing to define the normalizer's components (token filters, ...).
+	 */
+	ElasticsearchNormalizerDefinitionContext normalizer(String name);
 
 	/**
 	 * Start a tokenizer definition.
@@ -38,7 +45,7 @@ public interface ElasticsearchAnalysisDefinitionRegistryBuilder {
 	/**
 	 * Start a char filter definition.
 	 * @param name The name used to reference this char filter
-	 * {@link ElasticsearchAnalyzerDefinitionWithTokenizerContext#withCharFilters(String...) in analyzer definitions}.
+	 * {@link ElasticsearchCompositeAnalysisDefinitionContext#withCharFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The char filter definition context, allowing to define the char filter's type and parameters.
 	 */
 	ElasticsearchAnalysisComponentDefinitionContext charFilter(String name);
@@ -46,7 +53,7 @@ public interface ElasticsearchAnalysisDefinitionRegistryBuilder {
 	/**
 	 * Start a token filter definition.
 	 * @param name The name used to reference this token filter
-	 * {@link ElasticsearchAnalyzerDefinitionWithTokenizerContext#withTokenFilters(String...) in analyzer definitions}.
+	 * {@link ElasticsearchCompositeAnalysisDefinitionContext#withTokenFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The token filter definition context, allowing to define the token filter's type and parameters.
 	 */
 	ElasticsearchAnalysisComponentDefinitionContext tokenFilter(String name);

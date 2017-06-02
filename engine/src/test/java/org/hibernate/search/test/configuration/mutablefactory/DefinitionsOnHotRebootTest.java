@@ -7,6 +7,7 @@
 package org.hibernate.search.test.configuration.mutablefactory;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
@@ -16,6 +17,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -64,10 +66,16 @@ public class DefinitionsOnHotRebootTest {
 	}
 
 	private boolean analyzerExists(SearchIntegrator sf, String analyzerName) {
-		for ( AnalyzerRegistry registry : sf.unwrap( ExtendedSearchIntegrator.class ).getAnalyzerRegistries().values() ) {
+		for ( SearchIntegration integration : sf.unwrap( ExtendedSearchIntegrator.class ).getIntegrations().values() ) {
+			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
-			if ( analyzerReference != null && analyzerReference.getAnalyzer() != null ) {
-				return true;
+			if ( analyzerReference != null ) {
+				if ( analyzerReference.is( LuceneAnalyzerReference.class ) ) {
+					return analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() != null;
+				}
+				else {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -75,7 +83,8 @@ public class DefinitionsOnHotRebootTest {
 
 	private int countAnalyzers(SearchIntegrator sf) {
 		int count = 0;
-		for ( AnalyzerRegistry registry : sf.unwrap( ExtendedSearchIntegrator.class ).getAnalyzerRegistries().values() ) {
+		for ( SearchIntegration integration : sf.unwrap( ExtendedSearchIntegrator.class ).getIntegrations().values() ) {
+			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			count += registry.getNamedAnalyzerReferences().size();
 		}
 		return count;

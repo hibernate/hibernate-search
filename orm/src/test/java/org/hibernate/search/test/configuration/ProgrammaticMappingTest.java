@@ -287,6 +287,31 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testNormalizerDef() throws Exception {
+		Address address = new Address();
+		address.setStreet1( "3340 Peachtree Rd NE" );
+		address.setStreet2( "JBoss" );
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( address );
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		org.apache.lucene.search.Query luceneQuery = new TermQuery( new Term( "street1_normalized", "3340 peachtree rd ne" ) );
+
+		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Normalizer inoperant", 1, query.getResultSize() );
+
+		s.delete( query.list().get( 0 ) );
+		tx.commit();
+		s.close();
+	}
+
+	@Test
 	public void testBridgeMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );

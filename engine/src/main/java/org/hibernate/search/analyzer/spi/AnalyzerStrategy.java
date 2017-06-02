@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 
 /**
  * A strategy for applying analyzers.
@@ -34,32 +35,58 @@ public interface AnalyzerStrategy {
 	AnalyzerReference createPassThroughAnalyzerReference();
 
 	/**
+	 * @return a map of named references to provided analyzers, i.e. those that we know for sure will be available.
+	 */
+	Map<String, AnalyzerReference> createProvidedAnalyzerReferences();
+
+	/**
 	 * @param name The name of the analyzer to be referenced.
-	 * @return a reference that will be {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
+	 * @return a reference that will be {@link #initializeReferences(Collection, Map, Collection, Map) initialized later}.
 	 */
 	AnalyzerReference createNamedAnalyzerReference(String name);
 
 	/**
 	 * @param analyzerClass The analyzer class the reference should reference.
 	 * @return a reference to an instance of the given analyzer class that will be
-	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
+	 * {@link #initializeReferences(Collection, Map, Collection, Map) initialized later}.
 	 */
 	AnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass);
 
 	/**
-	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.
-	 * @param references The references to initialize, gathered through calls to methods of this strategy.
-	 * @param mappingAnalyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
-	 * @return The additional named references that should be made available at runtime.
+	 * @return a map of named references to provided normalizers, i.e. those that we know for sure will be available.
 	 */
-	Map<String, AnalyzerReference> initializeAnalyzerReferences(
-			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions);
+	Map<String, AnalyzerReference> createProvidedNormalizerReferences();
+
+	/**
+	 * @param name The name of the normalizer to be referenced.
+	 * @return a reference that will be {@link #initializeReferences(Collection, Map, Collection, Map) initialized later}.
+	 */
+	AnalyzerReference createNamedNormalizerReference(String name);
+
+	/**
+	 * @param analyzerClass The analyzer class the reference should reference.
+	 * @return a reference to an instance of the given analyzer class that will be
+	 * {@link #initializeReferences(Collection, Map, Collection, Map) initialized later}.
+	 */
+	AnalyzerReference createLuceneClassNormalizerReference(Class<?> analyzerClass);
+
+	/**
+	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer/normalizer definition.
+	 * @param analyzerReferences The analyzer references to initialize, gathered through calls to methods of this strategy.
+	 * @param mappingAnalyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
+	 * @param normalizerReferences The normalizer references to initialize, gathered through calls to methods of this strategy.
+	 * @param mappingNormalizerDefinitions The normalizer definitions gathered through the Hibernate Search mappings.
+	 */
+	void initializeReferences(Collection<AnalyzerReference> analyzerReferences,
+			Map<String, AnalyzerDef> mappingAnalyzerDefinitions,
+			Collection<AnalyzerReference> normalizerReferences,
+			Map<String, NormalizerDef> mappingNormalizerDefinitions);
 
 	/**
 	 * Creates a {@link ScopedAnalyzerReference} builder.
 	 * @param initialGlobalAnalyzerReference The global analyzer to set initially on the builder.
 	 * @return A {@link ScopedAnalyzerReference} builder. The returned reference will be
-	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
+	 * {@link #initializeReferences(Collection, Map, Collection, Map) initialized later}.
 	 */
 	ScopedAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference);
 

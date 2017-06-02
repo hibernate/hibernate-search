@@ -513,7 +513,7 @@ public class TypeMetadata {
 			}
 			else {
 				IndexManagerType indexManagerType = parseContext.getIndexManagerType();
-				this.analyzerRegistry = configContext.getAnalyzerRegistry( indexManagerType );
+				this.analyzerRegistry = configContext.forType( indexManagerType ).getAnalyzerRegistry();
 				this.scopedAnalyzerReferenceBuilder = analyzerRegistry.buildScopedAnalyzerReference();
 			}
 		}

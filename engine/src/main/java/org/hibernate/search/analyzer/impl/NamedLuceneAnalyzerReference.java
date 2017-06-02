@@ -32,13 +32,13 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		this.analyzer = null; // Not initialized yet
 	}
 
-	public NamedLuceneAnalyzerReference(String name, Analyzer analyzer) {
-		this.name = name;
-		this.analyzer = analyzer; // Initialized from the start
-	}
-
 	public String getAnalyzerName() {
 		return name;
+	}
+
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
 	}
 
 	@Override
@@ -53,11 +53,15 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		return analyzer != null;
 	}
 
-	public void initialize(Analyzer analyzer) {
+	public void initialize(LuceneAnalyzerBuilder builder) {
 		if ( this.analyzer != null ) {
 			throw new AssertionFailure( "A lucene analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = analyzer;
+		this.analyzer = createAnalyzer(builder);
+	}
+
+	protected Analyzer createAnalyzer(LuceneAnalyzerBuilder builder) {
+		return builder.buildAnalyzer( name );
 	}
 
 	@Override

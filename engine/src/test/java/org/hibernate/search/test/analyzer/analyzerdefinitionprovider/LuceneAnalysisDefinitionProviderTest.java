@@ -19,16 +19,19 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -52,13 +55,17 @@ import org.junit.rules.ExpectedException;
 /**
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch.class) // LuceneAnalyzerDefinitionProvider is Lucene-specific
+@Category(SkipOnElasticsearch.class) // LuceneAnalysisDefinitionProvider is Lucene-specific
 @TestForIssue(jiraKey = "HSEARCH-2418")
-public class LuceneAnalyzerDefinitionProviderTest {
+public class LuceneAnalysisDefinitionProviderTest {
 
 	private static final String CUSTOM_ANALYZER_NAME = "custom-analyzer";
 
 	private static final String CUSTOM_ANALYZER_2_NAME = "custom-analyzer-2";
+
+	private static final String CUSTOM_NORMALIZER_NAME = "custom-normalizer";
+
+	private static final String CUSTOM_NORMALIZER_2_NAME = "custom-normalizer-2";
 
 	@Rule
 	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
@@ -74,9 +81,16 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
@@ -84,6 +98,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
 	}
 
 	@Test
@@ -94,9 +109,16 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
@@ -104,6 +126,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
 	}
 
 	@Test
@@ -114,9 +137,16 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
 		AnalyzerDefAnnotationEntity entity = new AnalyzerDefAnnotationEntity();
@@ -124,6 +154,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charFilterShouldReplace|foo" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfiltershouldreplace|foo" );
 	}
 
 	/**
@@ -138,7 +169,8 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -157,7 +189,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 	public void invalid() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( Environment.ANALYZER_DEFINITION_PROVIDER, "invalidValue" );
+		cfg.addProperty( Environment.ANALYSIS_DEFINITION_PROVIDER, "invalidValue" );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000329" );
@@ -166,22 +198,30 @@ public class LuceneAnalyzerDefinitionProviderTest {
 	}
 
 	@Test
-	public void namingConflict_withinProvider() {
+	public void namingConflict_withinProvider_analyzer() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000330" );
 
-		init( ProviderWithInternalNamingConflict.class, CustomAnalyzerEntity.class );
+		init( ProviderWithInternalAnalyzerNamingConflict.class, CustomAnalyzerEntity.class );
 	}
 
-	private ExtendedSearchIntegrator initUsingService(LuceneAnalyzerDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
+	@Test
+	public void namingConflict_withinProvider_normalizer() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000341" );
+
+		init( ProviderWithInternalNormalizerNamingConflict.class, CustomAnalyzerEntity.class );
+	}
+
+	private ExtendedSearchIntegrator initUsingService(LuceneAnalysisDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.getProvidedServices().put( LuceneAnalyzerDefinitionSourceService.class, new LuceneAnalyzerDefinitionSourceService() {
+		cfg.getProvidedServices().put( LuceneAnalysisDefinitionSourceService.class, new LuceneAnalysisDefinitionSourceService() {
 
 					@Override
-					public LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+					public LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
 						return analyzerProvider;
 					}
 
@@ -194,7 +234,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.addProperty( Environment.ANALYZER_DEFINITION_PROVIDER, providerClass.getName() );
+		cfg.addProperty( Environment.ANALYSIS_DEFINITION_PROVIDER, providerClass.getName() );
 		return integratorResource.create( cfg );
 	}
 
@@ -246,6 +286,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_NAME))
+		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_NAME))
 		String field;
 
 		@Override
@@ -256,6 +297,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 
 	@Indexed
 	@AnalyzerDef(name = CUSTOM_ANALYZER_NAME, tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class))
+	@NormalizerDef(name = CUSTOM_NORMALIZER_NAME, filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class))
 	static class AnalyzerDefAnnotationEntity extends CustomAnalyzerEntity {
 	}
 
@@ -265,6 +307,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_2_NAME))
+		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_2_NAME))
 		String field;
 
 		@Override
@@ -273,13 +316,18 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		}
 	}
 
-	public static class CustomAnalyzerProvider implements LuceneAnalyzerDefinitionProvider {
+	public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( PatternTokenizerFactory.class )
 									.param( "pattern", "\\|" )
+							.charFilter( PatternReplaceCharFilterFactory.class )
+									.param( "pattern", "charFilterShouldReplace" )
+									.param( "replacement", "charFilterDidReplace" )
+							.tokenFilter( LowerCaseFilterFactory.class )
+					.normalizer( CUSTOM_NORMALIZER_NAME )
 							.charFilter( PatternReplaceCharFilterFactory.class )
 									.param( "pattern", "charFilterShouldReplace" )
 									.param( "replacement", "charFilterDidReplace" )
@@ -294,23 +342,33 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		}
 	}
 
-	public static class CustomAnalyzer2Provider implements LuceneAnalyzerDefinitionProvider {
+	public static class CustomAnalyzer2Provider implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_2_NAME )
-							.tokenizer( WhitespaceTokenizerFactory.class );
+							.tokenizer( WhitespaceTokenizerFactory.class )
+					.normalizer( CUSTOM_NORMALIZER_2_NAME );
 		}
 	}
 
-	public static class ProviderWithInternalNamingConflict implements LuceneAnalyzerDefinitionProvider {
+	public static class ProviderWithInternalAnalyzerNamingConflict implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( StandardTokenizerFactory.class )
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( StandardTokenizerFactory.class );
+		}
+	}
+
+	public static class ProviderWithInternalNormalizerNamingConflict implements LuceneAnalysisDefinitionProvider {
+		@Override
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
+			builder
+					.normalizer( CUSTOM_NORMALIZER_NAME )
+					.normalizer( CUSTOM_NORMALIZER_NAME );
 		}
 	}
 

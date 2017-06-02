@@ -179,7 +179,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 					.createQuery();
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
 			List<Book> results = fullTextQuery.getResultList();
 
 			compareBookResultsAndExpected( Arrays.asList( "Le Grand Molière illustré", "Tartuffe" ), results );
@@ -191,7 +191,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 					.createQuery();
 
 			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
 			results = fullTextQuery.getResultList();
 
 			compareBookResultsAndExpected( Arrays.asList( "Le chat qui déplaçait des montagnes" ), results );
@@ -208,7 +208,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 					.createQuery();
 
 			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
 			results = fullTextQuery.getResultList();
 
 			compareBookResultsAndExpected( Arrays.asList( "Dom Garcie de Navarre", "Le Grand Molière illustré" ), results );

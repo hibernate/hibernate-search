@@ -13,8 +13,8 @@ import java.util.Properties;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -47,7 +47,7 @@ public interface SearchFactoryState {
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
-	Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries();
+	Map<IndexManagerType, SearchIntegration> getIntegrations();
 
 	int getCacheBitResultsSize();
 

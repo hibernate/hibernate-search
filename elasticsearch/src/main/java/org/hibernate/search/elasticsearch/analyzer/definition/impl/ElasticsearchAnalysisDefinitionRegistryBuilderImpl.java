@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionRegistryBuilder;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalyzerDefinitionContext;
-import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchNormalizerDefinitionContext;
 
 
 /**
@@ -20,11 +20,18 @@ import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnaly
  */
 public class ElasticsearchAnalysisDefinitionRegistryBuilderImpl implements ElasticsearchAnalysisDefinitionRegistryBuilder {
 
-	private List<ElasticsearchAnalysisDefinitionRegistryPopulator> populators = new ArrayList<>();
+	private final List<ElasticsearchAnalysisDefinitionRegistryPopulator> populators = new ArrayList<>();
 
 	@Override
 	public ElasticsearchAnalyzerDefinitionContext analyzer(String name) {
 		ElasticsearchAnalyzerDefinitionContextImpl context = new ElasticsearchAnalyzerDefinitionContextImpl( name );
+		populators.add( context );
+		return context;
+	}
+
+	@Override
+	public ElasticsearchNormalizerDefinitionContext normalizer(String name) {
+		ElasticsearchNormalizerDefinitionContextImpl context = new ElasticsearchNormalizerDefinitionContextImpl( name );
 		populators.add( context );
 		return context;
 	}
@@ -50,12 +57,10 @@ public class ElasticsearchAnalysisDefinitionRegistryBuilderImpl implements Elast
 		return context;
 	}
 
-	public SimpleElasticsearchAnalysisDefinitionRegistry build() {
-		SimpleElasticsearchAnalysisDefinitionRegistry registry = new SimpleElasticsearchAnalysisDefinitionRegistry();
+	public void build(ElasticsearchAnalysisDefinitionRegistry registry) {
 		for ( ElasticsearchAnalysisDefinitionRegistryPopulator populator : populators ) {
 			populator.populate( registry );
 		}
-		return registry;
 	}
 
 }

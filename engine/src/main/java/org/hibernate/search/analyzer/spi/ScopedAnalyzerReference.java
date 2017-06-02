@@ -16,9 +16,6 @@ package org.hibernate.search.analyzer.spi;
  */
 public interface ScopedAnalyzerReference extends AnalyzerReference {
 
-	@Override
-	ScopedAnalyzer getAnalyzer();
-
 	/**
 	 * @return A builder for copying the referenced analyzer, altering some scopes as necessary.
 	 */

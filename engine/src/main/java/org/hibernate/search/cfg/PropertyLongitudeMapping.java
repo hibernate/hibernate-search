@@ -51,6 +51,10 @@ public class PropertyLongitudeMapping {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
+	public NormalizerDefMapping normalizerDef(String name) {
+		return new NormalizerDefMapping( name, mapping );
+	}
+
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping( entityType, mapping );
 	}

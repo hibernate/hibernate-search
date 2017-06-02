@@ -9,23 +9,23 @@ package org.hibernate.search.elasticsearch.analyzer.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ChainingElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryBuilderImpl;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.NamespaceMergingElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
@@ -44,18 +44,23 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	private final ServiceManager serviceManager;
 
-	private final SearchConfiguration cfg;
+	private final SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry;
 
 	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
-		this.cfg = cfg;
+		/*
+		 * Make sure to re-create the default definition registry with each newly instantiated strategy,
+		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 * Caching those in a Service, for instance, would prevent that.
+		 */
+		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry(cfg);
 	}
 
-	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry() {
+	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry( SearchConfiguration cfg ) {
 		ElasticsearchAnalysisDefinitionRegistryBuilderImpl builder =
 				new ElasticsearchAnalysisDefinitionRegistryBuilderImpl();
 
-		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER );
+		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER );
 		if ( providerClassName != null ) {
 			ElasticsearchAnalysisDefinitionProvider provider;
 			try {
@@ -76,7 +81,9 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 			}
 		}
 
-		return builder.build();
+		SimpleElasticsearchAnalysisDefinitionRegistry registry = new SimpleElasticsearchAnalysisDefinitionRegistry();
+		builder.build( new NamespaceMergingElasticsearchAnalysisDefinitionRegistry( registry ) );
+		return registry;
 	}
 
 	@Override
@@ -90,6 +97,16 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
+	public Map<String, AnalyzerReference> createProvidedAnalyzerReferences() {
+		Map<String, AnalyzerReference> references = new HashMap<>();
+		for ( String defaultAnalyzerName : defaultDefinitionRegistry.getAnalyzerDefinitions().keySet() ) {
+			NamedElasticsearchAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
+			references.put( defaultAnalyzerName, reference );
+		}
+		return references;
+	}
+
+	@Override
 	public NamedElasticsearchAnalyzerReference createNamedAnalyzerReference(String name) {
 		return new NamedElasticsearchAnalyzerReference( name );
 	}
@@ -100,68 +117,56 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> initializeAnalyzerReferences(
-			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public Map<String, AnalyzerReference> createProvidedNormalizerReferences() {
+		Map<String, AnalyzerReference> references = new HashMap<>();
+		for ( String name : defaultDefinitionRegistry.getNormalizerDefinitions().keySet() ) {
+			NamedElasticsearchNormalizerReference reference = createNamedNormalizerReference( name );
+			references.put( name, reference );
+		}
+		return references;
+	}
+
+	@Override
+	public NamedElasticsearchNormalizerReference createNamedNormalizerReference(String name) {
+		return new NamedElasticsearchNormalizerReference( name );
+	}
+
+	@Override
+	public ElasticsearchAnalyzerReference createLuceneClassNormalizerReference(Class<?> analyzerClass) {
+		throw LOG.cannotUseNormalizerImpl( analyzerClass );
+	}
+
+	@Override
+	public void initializeReferences(Collection<AnalyzerReference> analyzerReferences, Map<String, AnalyzerDef> mappingAnalyzerDefinitions,
+			Collection<AnalyzerReference> normalizerReferences, Map<String, NormalizerDef> mappingNormalizerDefinitions) {
 		try ( ServiceReference<ElasticsearchAnalyzerDefinitionTranslator> translatorReference =
 				serviceManager.requestReference( ElasticsearchAnalyzerDefinitionTranslator.class ) ) {
 			ElasticsearchAnalyzerDefinitionTranslator translator = translatorReference.get();
 
 			// First, create a registry containing all relevant definitions
-			/*
-			 * Recreate the default definitions for each call,
-			 * so that the definition providers can add new definitions between two SearchFactory increments.
-			 */
-			SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry = createDefaultDefinitionRegistry();
 			ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
-					createDefinitionRegistry( references, defaultDefinitionRegistry, analyzerDefinitions, translator);
-
-			Set<String> existingNamedReferences = new HashSet<>();
+					createDefinitionRegistry( analyzerReferences, mappingAnalyzerDefinitions,
+							normalizerReferences, mappingNormalizerDefinitions,
+							defaultDefinitionRegistry, translator);
 
 			// When all definitions are known and translated, actually initialize the references
-			for ( AnalyzerReference reference : references ) {
-				if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
-					NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-					if ( !namedReference.isInitialized() ) {
-						initializeNamedReference( namedReference, definitionRegistry );
-					}
-					existingNamedReferences.add( namedReference.getAnalyzerName() );
-				}
-				else if ( reference.is( LuceneClassElasticsearchAnalyzerReference.class ) ) {
-					LuceneClassElasticsearchAnalyzerReference luceneClassReference = reference.unwrap( LuceneClassElasticsearchAnalyzerReference.class );
-					if ( !luceneClassReference.isInitialized() ) {
-						initializeLuceneClassReference( luceneClassReference, translator );
-					}
-				}
-				else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
-					ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
-					if ( !scopedReference.isInitialized() ) {
-						scopedReference.initialize();
-					}
-				}
-			}
-
-			/*
-			 * Finally, create additional references for default definitions that
-			 * haven't any matching reference, so that they will be available when querying.
-			 * We don't do that for @AnalyzerDefs because they may not all be related to Elasticsearch,
-			 * and they might even not be translatable to an Elasticsearch definition.
-			 */
-			Map<String, AnalyzerReference> additionalNamedReferences = new HashMap<>();
-			for ( String defaultAnalyzerName : defaultDefinitionRegistry.getAnalyzerDefinitions().keySet() ) {
-				if ( !existingNamedReferences.contains( defaultAnalyzerName ) ) {
-					NamedElasticsearchAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
-					initializeNamedReference( reference, definitionRegistry );
-					additionalNamedReferences.put( defaultAnalyzerName, reference );
-				}
-			}
-
-			return additionalNamedReferences;
+			Stream.concat( analyzerReferences.stream(), normalizerReferences.stream() )
+					.map( this::getUninitializedReference )
+					.filter( Objects::nonNull )
+					.forEach( r -> r.initialize( definitionRegistry, translator ) );
 		}
 	}
 
-	private ElasticsearchAnalysisDefinitionRegistry createDefinitionRegistry(Collection<AnalyzerReference> references,
+	private ElasticsearchAnalysisDefinitionRegistry createDefinitionRegistry(
+			Collection<AnalyzerReference> analyzerReferences,
+			Map<String, AnalyzerDef> analyzerDefinitions,
+			Collection<AnalyzerReference> normalizerReferences,
+			Map<String, NormalizerDef> normalizerDefinitions,
 			ElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry,
-			Map<String, AnalyzerDef> analyzerDefinitions, ElasticsearchAnalyzerDefinitionTranslator translator) {
+			ElasticsearchAnalyzerDefinitionTranslator translator) {
+		ElasticsearchAnalysisDefinitionRegistry localDefinitionRegistry =
+				new SimpleElasticsearchAnalysisDefinitionRegistry();
+
 		/*
 		 * Make default definitions accessible in the final definition registry.
 		 * This final registry has two scopes:
@@ -171,11 +176,14 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		 *
 		 * When fetching definitions, the "local" scope takes precedence over the "default"/"global" scope.
 		 *
-		 * Note that thanks to this setup, changes to pre-existing default definitions are ignored
-		 * if the definitions were already used in pre-existing references.
+		 * Note that thanks to this setup, changes to pre-existing default definitions are ignored.
 		 */
+		ElasticsearchAnalysisDefinitionRegistry chainingRegistry =
+				new ChainingElasticsearchAnalysisDefinitionRegistry(
+						localDefinitionRegistry, defaultDefinitionRegistry );
+
 		ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
-				new ChainingElasticsearchAnalysisDefinitionRegistry( defaultDefinitionRegistry );
+				new NamespaceMergingElasticsearchAnalysisDefinitionRegistry( chainingRegistry );
 
 		/*
 		 * First, populate the registry with definitions from already initialized references.
@@ -185,16 +193,17 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		 * In this case, we want to add previous definitions to the registry,
 		 * so as to check that we don't have conflicts
 		 * between the previous definitions and some new ones.
+		 *
+		 * This is especially necessary to handle cases where normalizers are translated
+		 * to analyzers under the hood (ES 5.1 and below), which means normalizer definitions
+		 * and analyzer definitions will share the same namespace even if references don't.
+		 * See HSEARCH-2730 and why it was rejected for details.
 		 */
-		for ( AnalyzerReference reference : references ) {
-			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
-				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-				if ( namedReference.isInitialized() ) {
-					// Note: these analyzers don't handle scope, we don't care about the field name
-					namedReference.getAnalyzer().registerDefinitions( definitionRegistry, null );
-				}
-			}
-		}
+		Stream.concat( analyzerReferences.stream(), normalizerReferences.stream() )
+				.map( this::getInitializedNamedReference )
+				.filter( Objects::nonNull )
+				// Note: these references don't handle scope, we don't care about the field name
+				.forEach( r -> r.registerDefinitions( null, definitionRegistry ) );
 
 		/*
 		 * Once the registry has been populated with pre-existing definitions,
@@ -205,86 +214,64 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		 * and users may decide to add such definitions anyway because they need them
 		 * for entities indexed in an embedded Lucene instance (not ES).
 		 */
-		TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator translatingPopulator =
-				new TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator( definitionRegistry, translator );
+		TranslatingElasticsearchAnalysisDefinitionRegistryPopulator translatingPopulator =
+				new TranslatingElasticsearchAnalysisDefinitionRegistryPopulator( definitionRegistry, translator );
 
-		for ( AnalyzerReference reference : references ) {
-			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
-				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-				if ( !namedReference.isInitialized() ) {
-					String name = namedReference.getAnalyzerName();
-					AnalyzerDef hibernateSearchAnalyzerDef = analyzerDefinitions.get( name );
-					if ( hibernateSearchAnalyzerDef != null ) {
-						translatingPopulator.registerAnalyzerDef( hibernateSearchAnalyzerDef );
-					}
-				}
-			}
-		}
+		analyzerReferences.stream()
+				.map( this::getUninitializedNamedReference )
+				.filter( Objects::nonNull )
+				// Note: these references don't handle scope, we don't care about the field name
+				.map( r -> r.getAnalyzerName( null ) )
+				.map( analyzerDefinitions::get )
+				.filter( Objects::nonNull )
+				.forEach( translatingPopulator::registerAnalyzerDef );
+
+		normalizerReferences.stream()
+				.map( this::getUninitializedNamedReference )
+				.filter( Objects::nonNull )
+				// Note: these references don't handle scope, we don't care about the field name
+				.map( r -> r.getAnalyzerName( null ) )
+				.map( normalizerDefinitions::get )
+				.filter( Objects::nonNull )
+				.forEach( translatingPopulator::registerNormalizerDef );
 
 		return definitionRegistry;
 	}
 
-	private void initializeNamedReference(NamedElasticsearchAnalyzerReference analyzerReference,
-			ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
-		String name = analyzerReference.getAnalyzerName();
-
-		ElasticsearchAnalyzer analyzer = createAnalyzer( definitionRegistry, name );
-
-		analyzerReference.initialize( analyzer );
+	private NamedElasticsearchAnalyzerReference getInitializedNamedReference(AnalyzerReference reference) {
+		if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
+			NamedElasticsearchAnalyzerReference esReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
+			if ( esReference.isInitialized() ) {
+				return esReference;
+			}
+		}
+		return null;
 	}
 
-	private void initializeLuceneClassReference(LuceneClassElasticsearchAnalyzerReference analyzerReference,
-			ElasticsearchAnalyzerDefinitionTranslator translator) {
-		Class<?> clazz = analyzerReference.getLuceneClass();
+	private NamedElasticsearchAnalyzerReference getUninitializedNamedReference(AnalyzerReference reference) {
+		ElasticsearchAnalyzerReference esReference = getUninitializedReference( reference );
+		if ( esReference != null && esReference.is( NamedElasticsearchAnalyzerReference.class ) ) {
+			return esReference.unwrap( NamedElasticsearchAnalyzerReference.class );
+		}
+		return null;
+	}
 
-		String name = translator.translate( clazz );
-
-		ElasticsearchAnalyzer analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
-
-		analyzerReference.initialize( name, analyzer );
+	private ElasticsearchAnalyzerReference getUninitializedReference(AnalyzerReference reference) {
+		if ( reference.is( ElasticsearchAnalyzerReference.class ) ) {
+			ElasticsearchAnalyzerReference esReference = reference.unwrap( ElasticsearchAnalyzerReference.class );
+			if ( !esReference.isInitialized() ) {
+				return esReference;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedElasticsearchAnalyzerReference.DeferredInitializationBuilder(
+		return new ScopedElasticsearchAnalyzerReference.Builder(
 				initialGlobalAnalyzerReference.unwrap( ElasticsearchAnalyzerReference.class ),
 				Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
-	}
-
-	private ElasticsearchAnalyzer createAnalyzer(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, String analyzerName) {
-		AnalyzerDefinition analyzerDefinition = definitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( analyzerDefinition == null ) {
-			return new UndefinedElasticsearchAnalyzerImpl( analyzerName );
-		}
-
-		String tokenizerName = analyzerDefinition.getTokenizer();
-		TokenizerDefinition tokenizerDefinition = definitionRegistry.getTokenizerDefinition( tokenizerName );
-
-		Map<String, TokenFilterDefinition> tokenFilters = new TreeMap<>();
-		if ( analyzerDefinition.getTokenFilters() != null ) {
-			for ( String name : analyzerDefinition.getTokenFilters() ) {
-				TokenFilterDefinition definition = definitionRegistry.getTokenFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					tokenFilters.put( name, definition );
-				}
-			}
-		}
-
-		Map<String, CharFilterDefinition> charFilters = new TreeMap<>();
-		if ( analyzerDefinition.getCharFilters() != null ) {
-			for ( String name : analyzerDefinition.getCharFilters() ) {
-				CharFilterDefinition definition = definitionRegistry.getCharFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					charFilters.put( name, definition );
-				}
-			}
-		}
-
-		return new CustomElasticsearchAnalyzerImpl(
-				analyzerName, analyzerDefinition,
-				tokenizerName, tokenizerDefinition,
-				charFilters, tokenFilters );
 	}
 
 }

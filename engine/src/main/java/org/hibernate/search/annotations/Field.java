@@ -74,8 +74,15 @@ public @interface Field {
 
 	/**
 	 * @return Returns the analyzer for the field. Defaults to the inherited analyzer.
+	 * Must be empty if {@link #normalizer()} is used.
 	 */
 	Analyzer analyzer() default @Analyzer;
+
+	/**
+	 * @return Returns the normalizer for the field. Defaults to none.
+	 * Must be empty if {@link #analyzer()} is used.
+	 */
+	Normalizer normalizer() default @Normalizer;
 
 	/**
 	 * @return Returns the boost factor for the field. Default boost factor is 1.0.
