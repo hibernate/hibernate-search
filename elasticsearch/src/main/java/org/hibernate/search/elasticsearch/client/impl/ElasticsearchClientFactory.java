@@ -18,6 +18,6 @@ import org.hibernate.search.engine.service.spi.Service;
  */
 public interface ElasticsearchClientFactory extends Service {
 
-	ElasticsearchClientImplementor create(String scopeName, Properties properties);
+	ElasticsearchClientImplementor create(Properties properties);
 
 }
