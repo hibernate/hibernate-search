@@ -895,21 +895,22 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private FieldBridge determineSpatialFieldBridge(Spatial spatialAnnotation, ParseContext parseContext) {
 		final FieldBridge spatialBridge;
-		XClass clazz = parseContext.getCurrentClass();
-		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( clazz ) ) {
+		XClass xClazz = parseContext.getCurrentClass();
+		Class<?> clazz = reflectionManager.toClass( xClazz );
+		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( xClazz ) ) {
 			spatialBridge = bridgeFactory.buildSpatialBridge( spatialAnnotation, clazz, null, null );
 		}
 		else {
 			String latitudeField = null;
 			String longitudeField = null;
 
-			List<XProperty> fieldList = clazz.getDeclaredProperties( XClass.ACCESS_FIELD );
+			List<XProperty> fieldList = xClazz.getDeclaredProperties( XClass.ACCESS_FIELD );
 
 			for ( XProperty property : fieldList ) {
 				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).of()
 						.equals( spatialAnnotation.name() ) ) {
 					if ( latitudeField != null ) {
-						throw log.ambiguousLatitudeDefinition( clazz.getName(), latitudeField, property.getName() );
+						throw log.ambiguousLatitudeDefinition( xClazz.getName(), latitudeField, property.getName() );
 					}
 					latitudeField = property.getName();
 				}
@@ -917,7 +918,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						.equals( spatialAnnotation.name() ) ) {
 					if ( longitudeField != null ) {
 						throw log.ambiguousLongitudeDefinition(
-								clazz.getName(),
+								xClazz.getName(),
 								longitudeField,
 								property.getName()
 						);
@@ -926,13 +927,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				}
 			}
 
-			List<XProperty> propertyList = clazz.getDeclaredProperties( XClass.ACCESS_PROPERTY );
+			List<XProperty> propertyList = xClazz.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 
 			for ( XProperty property : propertyList ) {
 				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).of()
 						.equals( spatialAnnotation.name() ) ) {
 					if ( latitudeField != null ) {
-						throw log.ambiguousLatitudeDefinition( clazz.getName(), latitudeField, property.getName() );
+						throw log.ambiguousLatitudeDefinition( xClazz.getName(), latitudeField, property.getName() );
 					}
 					latitudeField = property.getName();
 				}
@@ -940,7 +941,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						.equals( spatialAnnotation.name() ) ) {
 					if ( longitudeField != null ) {
 						throw log.ambiguousLongitudeDefinition(
-								clazz.getName(),
+								xClazz.getName(),
 								longitudeField,
 								property.getName()
 						);
@@ -964,7 +965,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( spatialBridge == null ) {
 			throw log.cannotFindCoordinatesNorLatLongForSpatial(
 					spatialAnnotation.name()
-							.isEmpty() ? "default" : spatialAnnotation.name(), clazz.getName()
+							.isEmpty() ? "default" : spatialAnnotation.name(), xClazz.getName()
 			);
 		}
 		return spatialBridge;

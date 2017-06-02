@@ -12,6 +12,7 @@ import java.lang.reflect.AnnotatedElement;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.util.logging.impl.Log;
@@ -56,8 +57,8 @@ class SpatialBridgeProvider extends ExtendedBridgeProvider {
 	 * @param latitudeField a {@link java.lang.String} object.
 	 * @param longitudeField a {@link java.lang.String} object.
 	 */
-	public static FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
-		FieldBridge bridge = null;
+	public static SpatialFieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
+		SpatialFieldBridge bridge = null;
 		if ( spatial != null ) {
 			if ( spatial.spatialMode() == SpatialMode.HASH ) {
 				if ( latitudeField != null && longitudeField != null ) {

@@ -65,4 +65,15 @@ public class Snafu {
 	@Field
 	@org.hibernate.search.annotations.Analyzer(impl = FooAnalyzer.class)
 	private String custom;
+
+
+	// Just so that @Spatial works; see HSEARCH-2759
+	public double getLatitude() {
+		return latitude;
+	}
+
+	// Just so that @Spatial works; see HSEARCH-2759
+	public double getLongitude() {
+		return longitude;
+	}
 }

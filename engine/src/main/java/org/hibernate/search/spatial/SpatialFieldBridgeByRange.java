@@ -24,8 +24,7 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 	}
 
 	public SpatialFieldBridgeByRange(String latitudeField, String longitudeField) {
-		this.latitudeField = latitudeField;
-		this.longitudeField = longitudeField;
+		super( latitudeField, longitudeField );
 	}
 
 	@Override
