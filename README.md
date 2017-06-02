@@ -113,7 +113,7 @@ Also, the elasticsearch module (and only this one) can execute its integration t
 against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
-    > AWS_ACCESS_KEY_ID=<Your access key> AWS_SECRET_KEY=<Your secret key> AWS_REGION=<Your AWS region ID> mvn integration-test -pl elasticsearch -Paws -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint>
+    > mvn integration-test -pl elasticsearch -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.access_key=<Your access key> -Dtest.elasticsearch.host.aws.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.region=<Your AWS region ID>
 
 ### Contributing
 

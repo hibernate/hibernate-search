@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.cfg;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider;
-import org.hibernate.search.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 
 /**
  * Configuration properties for Elasticsearch,
@@ -149,17 +148,6 @@ public final class ElasticsearchEnvironment {
 	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String MAX_TOTAL_CONNECTION_PER_ROUTE = "elasticsearch.max_total_connection_per_route";
-
-	/**
-	 * Apache HTTP Client configurer for the connection to Elasticsearch.
-	 * <p>
-	 * The value must be the fully-qualified name of a class implementing {@link ElasticsearchHttpClientConfigurer}.
-	 * <p>
-	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
-	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.http_client_configurer}).
-	 * This limitation will be removed in a future version of Hibernate Search.
-	 */
-	public static final String HTTP_CLIENT_CONFIGURER = "elasticsearch.http_client_configurer";
 
 	/**
 	 * Property for specifying whether automatic discovery of nodes in the Elasticsearch cluster is enabled.
