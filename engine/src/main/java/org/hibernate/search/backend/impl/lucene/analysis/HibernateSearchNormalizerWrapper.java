@@ -36,4 +36,9 @@ public class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 		return new TokenStreamComponents( components.getTokenizer(), filter );
 	}
 
+	@Override
+	public String toString() {
+		return "HibernateSearchNormalizerWrapper(" + delegate.toString() + ", normalizerName=" + normalizerName + ")";
+	}
+
 }
