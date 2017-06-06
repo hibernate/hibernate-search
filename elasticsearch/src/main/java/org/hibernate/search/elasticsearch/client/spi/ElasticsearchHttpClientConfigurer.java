@@ -16,25 +16,25 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
  * This enables in particular connecting to cloud services that require a particular authentication method,
  * such as request signing on Amazon Web Services.
  *
- * The `ElasticsearchHttpClientConfigurer` implementation will be given access to the HTTP client builder
+ * The ElasticsearchHttpClientConfigurer implementation will be given access to the HTTP client builder
  * on startup.
  *
  * Note that you don't have to configure the client unless you have specific needs:
  * the default configuration should work just fine for an on-premises Elasticsearch server.
  * @author Yoann Rodiere
- * @hsearch.experimental This contract is currently under active development and may be altered in future releases,
+ * @hsearch.experimental This contract is currently under active development and may be altered in any maintenance release
  */
 public interface ElasticsearchHttpClientConfigurer {
 
 	/**
 	 * Configure the HTTP Client.
 	 * <p>
-	 * This method is called once for every configurer each time an Elasticsearch client is set up.
+	 * This method is called once for every configurer, each time an Elasticsearch client is set up.
 	 * <p>
 	 * Implementors should take care of only applying configuration if relevant:
-	 * There may be multiple, conflicting configurers in the path, so implementors should first check
-	 * (through a configuration property) whether they are needed or not before applying any configuration.
-	 * For instance an authentication configurer could decide not to do anything if no username is provided,
+	 * there may be multiple, conflicting configurers in the path, so implementors should first check
+	 * (through a configuration property) whether they are needed or not before applying any modification.
+	 * For example an authentication configurer could decide not to do anything if no username is provided,
 	 * or if the configuration property {@code my.configurer.enabled} is {@code false}.
 	 *
 	 * @param builder An Apache HTTP client builder, to set the configuration to be applied.
