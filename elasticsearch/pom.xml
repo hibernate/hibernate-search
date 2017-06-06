@@ -51,7 +51,6 @@
         </dependency>
 
         <!-- Test -->
-
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-testing</artifactId>
@@ -188,6 +187,15 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Enable extracting shared test build resources -->
+        <!-- See how maven-dependency-plugin is configured in the parent pom -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-sharedtestresources</artifactId>
+            <classifier>build-resources</classifier>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -323,15 +331,12 @@
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>com.github.alexcojocaru</groupId>
-                <artifactId>elasticsearch-maven-plugin</artifactId>
-                <configuration>
-                    <clusterName>hsearchEsTestCluster</clusterName>
-                    <httpPort>9200</httpPort>
-                </configuration>
-            </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <!-- Inherit execution unpack-shared-test-build-resources -->
+            </plugin>
         </plugins>
     </build>
     
@@ -377,12 +382,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                            <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
-                            <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
-                            <configPath>${project.build.directory}/test-classes/elasticsearch/2.0/configuration/</configPath>
-                        </configuration>
                         <dependencies>
                             <!-- Groovy is in a core module named "org.elasticsearch:elasticsearch-groovy" in Elasticsearch 2.0.x and 2.1.x
                                  Also, in ES 2.0/2.1, core modules are not located in the plugin directory as with newer versions, but are
@@ -465,12 +464,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                            <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
-                            <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
-                            <configPath>${project.build.directory}/test-classes/elasticsearch/2.0/configuration/</configPath>
-                        </configuration>
                         <executions>
                             <execution >
                                 <id>start-elasticsearch</id>
@@ -506,11 +499,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
-                            <pathInitScript>${project.build.directory}/test-classes/elasticsearch/5.0/init/init.script</pathInitScript>
-                            <autoCreateIndex>false</autoCreateIndex>
-                        </configuration>
                         <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                         <executions>
                             <execution >
@@ -553,11 +541,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
-                            <pathInitScript>${project.build.directory}/test-classes/elasticsearch/5.0/init/init.script</pathInitScript>
-                            <autoCreateIndex>false</autoCreateIndex>
-                        </configuration>
                         <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                         <executions>
                             <execution >

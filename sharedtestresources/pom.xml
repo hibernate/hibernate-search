@@ -16,7 +16,7 @@
 
     <name>Shared test resources</name>
     <description>Contains resources which we want to reuse across multiple modules for testing purposes</description>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -24,6 +24,24 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
+                        <id>package-shared-test-build-resources</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/build-resources.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

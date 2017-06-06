@@ -98,6 +98,16 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Enable extracting shared test build resources -->
+        <!-- See how maven-dependency-plugin is configured in the parent pom -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-sharedtestresources</artifactId>
+            <classifier>build-resources</classifier>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,6 +133,11 @@
             <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <!-- Inherit execution unpack-shared-test-build-resources -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -182,16 +197,11 @@
                     </execution>
                 </executions>
             </plugin>
-
+            
             <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
-                <configuration>
-                    <clusterName>hsearchEsTestCluster</clusterName>
-                    <httpPort>9200</httpPort>
-                </configuration>
             </plugin>
-
         </plugins>
     </build>
     
@@ -203,9 +213,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                        </configuration>
                         <executions>
                             <execution >
                                 <id>start-elasticsearch</id>
@@ -233,9 +240,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                        </configuration>
                         <executions>
                             <execution >
                                 <id>start-elasticsearch</id>

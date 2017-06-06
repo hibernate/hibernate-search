@@ -178,6 +178,16 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
+        
+        <!-- Enable extracting shared test build resources -->
+        <!-- See how maven-dependency-plugin is configured in the parent pom -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-sharedtestresources</artifactId>
+            <classifier>build-resources</classifier>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -239,16 +249,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.github.alexcojocaru</groupId>
-                <artifactId>elasticsearch-maven-plugin</artifactId>
-                <configuration>
-                    <clusterName>hsearchEsTestCluster</clusterName>
-                    <httpPort>9200</httpPort>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
+                    <!-- Inherit execution unpack-shared-test-build-resources -->
                     <execution>
                         <id>unpack</id>
                         <phase>pre-integration-test</phase>
@@ -353,6 +356,10 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.github.alexcojocaru</groupId>
+                <artifactId>elasticsearch-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
     
@@ -364,12 +371,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                            <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
-                            <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
-                            <configPath>${project.build.directory}/test-classes/elasticsearch/2.0/configuration/</configPath>
-                        </configuration>
                         <executions>
                             <execution >
                                 <id>start-elasticsearch</id>
@@ -397,12 +398,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <tcpPort>9300</tcpPort>
-                            <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
-                            <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
-                            <configPath>${project.build.directory}/test-classes/elasticsearch/2.0/configuration/</configPath>
-                        </configuration>
                         <executions>
                             <execution >
                                 <id>start-elasticsearch</id>
@@ -430,9 +425,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
-                        </configuration>
                         <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                         <executions>
                             <execution >
@@ -467,9 +459,6 @@
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
-                        </configuration>
                         <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                         <executions>
                             <execution >
