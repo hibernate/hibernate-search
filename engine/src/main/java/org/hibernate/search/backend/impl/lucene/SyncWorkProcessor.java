@@ -8,6 +8,7 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -159,13 +160,15 @@ final class SyncWorkProcessor implements WorkProcessor {
 		}
 
 		private void applyChangesets(Iterable<Changeset> changesets) {
-			ChangesetList changesetList = new ChangesetList( changesets );
+			Iterable<LuceneWork> changesetList = CollectionHelper.flatten( changesets );
 			try {
 				LuceneBackendQueueTask luceneBackendQueueTask = new LuceneBackendQueueTask( changesetList, resources, null );
 				luceneBackendQueueTask.run();
 			}
 			finally {
-				changesetList.markProcessed();
+				for ( Changeset changeset : changesets ) {
+					changeset.markProcessed();
+				}
 			}
 		}
 	}
