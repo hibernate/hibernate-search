@@ -177,7 +177,14 @@ provider and base directory, and override those defaults later on on a per index
 |Name and description
 |Properties
 
-|local-heap: Memory based directory.
+|local-heap: Directory using the local JVM heap.
+
+*Local heap directories and all contained indexes are lost when the JVM shuts down.*
+
+This option is only provided for use in *testing configurations* with *small (trivial) indexes* and *low concurrency*,
+where it could slightly improve performance.
+In setups requiring larger indexes and/or high concurrency,
+a file system based directory (see below) will achieve better performance.
 
 The directory will be uniquely identified (in the same deployment unit) by the `@Indexed.index` element
 |none
