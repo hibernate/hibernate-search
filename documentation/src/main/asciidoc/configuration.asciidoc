@@ -1295,10 +1295,11 @@ Lucene Directorys have default locking strategies which work generally good enou
 but it's possible to specify for each index managed by Hibernate Search a specific LockingFactory
 you want to use. This is generally not needed but could be useful.
 
-Some of these locking strategies require a filesystem level lock and may be used even on local-heap based
-indexes, this combination is valid but in this case the `indexBase` configuration option usually
-needed only for filesystem based Directory instances must be specified to point to a filesystem
-location where to store the lock marker files.
+Some of these locking strategies require a filesystem-level lock.
+They may be used with the `local-heap` directory provider,
+but in this case the `indexBase` configuration option
+(usually not needed when using a `local-heap` directory provider)
+must be specified to point to a filesystem location where the lock marker files will be stored.
 
 To select a locking factory, set the `hibernate.search.<index>.locking_strategy` option to
 one of `simple`, `native`, `single` or `none`. Alternatively set it to the fully qualified name of
