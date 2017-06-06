@@ -92,6 +92,7 @@ requirement in some applications).
 An alternative backend viable for non-clustered and non-shared index configurations is the near-
 real-time backend.
 
+
 [[search-architecture-jms]]
 ==== JMS
 
@@ -136,6 +137,21 @@ pick a new master in case of failure, but during a reelection process some index
 be lost. For this reason this mode is not suited for use cases requiring strong consistency
 guarantees. When configured to perform an automatic election, the master node is defined as an hash
 on the index name: the role is therefore possibly different for each index or shard.
+
+
+==== Elasticsearch
+
+In this mode, the index is not on the application server, but in an Elasticsearch cluster.
+Update operations are sent to the cluster and executed remotely,
+and so are search queries.
+
+image::elasticsearch-backend.png[Elasticsearch backend configuration]
+
+This mode allows to easily set up a clustered application,
+without the advanced configuration required by the JMS and JGroups modes.
+
+More information can be found in the <<elasticsearch-integration,Elasticsearch integration section>>.
+
 
 [[search-architecture-readerstrategy]]
 === Reader strategy
