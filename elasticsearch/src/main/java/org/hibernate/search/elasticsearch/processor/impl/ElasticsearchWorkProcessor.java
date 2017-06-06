@@ -114,7 +114,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param work The work to be executed.
 	 */
 	public void executeAsync(ElasticsearchWork<?> work) {
-		asyncProcessor.submit( work );
+		asyncProcessor.submit( Collections.singleton( work ) );
 	}
 
 	/**
@@ -244,10 +244,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 			asyncWorkQueue = new MultiWriteDrainableLinkedList<>();
 			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
 			asyncWorkerWasStarted = new AtomicBoolean( false );
-		}
-
-		public void submit(ElasticsearchWork<?> work) {
-			submit( Collections.singleton( work ) );
 		}
 
 		public void submit(Iterable<ElasticsearchWork<?>> works) {

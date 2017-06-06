@@ -451,21 +451,10 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
 			workProcessor.awaitAsyncProcessingCompletion();
-			executeWork( elasticsearchWork, true );
+			workProcessor.executeSyncSafe( Collections.singleton( elasticsearchWork ) );
 		}
 		else {
-			executeWork( elasticsearchWork, false );
-		}
-	}
-
-	private void executeWork(ElasticsearchWork<?> elasticsearchWork, boolean sync) {
-		if ( elasticsearchWork != null ) {
-			if ( sync ) {
-				workProcessor.executeSyncSafe( Collections.<ElasticsearchWork<?>>singletonList( elasticsearchWork ) );
-			}
-			else {
-				workProcessor.executeAsync( elasticsearchWork );
-			}
+			workProcessor.executeAsync( elasticsearchWork );
 		}
 	}
 
