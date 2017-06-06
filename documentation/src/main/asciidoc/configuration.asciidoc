@@ -157,7 +157,7 @@ public class Action { ... }
 ----
 hibernate.search.default.directory_provider = filesystem
 hibernate.search.default.indexBase = /usr/lucene/indexes
-hibernate.search.Rules.directory_provider = ram
+hibernate.search.Rules.directory_provider = local-heap
 hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectoryProvider
 ----
 
@@ -177,7 +177,7 @@ provider and base directory, and override those defaults later on on a per index
 |Name and description
 |Properties
 
-|ram: Memory based directory.
+|local-heap: Memory based directory.
 
 The directory will be uniquely identified (in the same deployment unit) by the `@Indexed.index` element
 |none
@@ -1288,7 +1288,7 @@ Lucene Directorys have default locking strategies which work generally good enou
 but it's possible to specify for each index managed by Hibernate Search a specific LockingFactory
 you want to use. This is generally not needed but could be useful.
 
-Some of these locking strategies require a filesystem level lock and may be used even on RAM based
+Some of these locking strategies require a filesystem level lock and may be used even on local-heap based
 indexes, this combination is valid but in this case the `indexBase` configuration option usually
 needed only for filesystem based Directory instances must be specified to point to a filesystem
 location where to store the lock marker files.
@@ -1312,7 +1312,7 @@ This implementation has known problems on NFS, avoid it on network shares.
 `native` is the default implementation for the `filesystem`, `filesystem-master` and `filesystem-slave` directory providers.
 |single|org.apache.lucene.store.SingleInstanceLockFactory|This LockFactory doesn't use a file marker but is a Java object lock held in memory; therefore it's possible to use it only when you are sure the index is not going to be shared by any other process.
 
-This is the default implementation for the `ram` directory provider.
+This is the default implementation for the `local-heap` directory provider.
 |none|org.apache.lucene.store.NoLockFactory|All changes to this index are not coordinated by any lock; test your application carefully and make sure you know what it means.
 
 |===============

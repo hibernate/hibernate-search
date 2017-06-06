@@ -92,7 +92,7 @@ public class RollbackTransactionTest extends SearchTestBase {
 	// Test setup options - SessionFactory Properties
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.directory_provider", "ram" );
+		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
 		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 

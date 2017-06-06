@@ -39,7 +39,7 @@ public class TokenizationTest {
 		config.addAnnotatedClass( Product.class );
 
 		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
-		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 
 		logged.expectMessage( "HSEARCH000120", Product.class.getName(), DEFAULT_FIELD_NAME );
 

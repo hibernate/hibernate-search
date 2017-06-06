@@ -26,8 +26,8 @@ public class SearchIntegratorCreation {
 	public static SearchIntegrator createIntegrator(String directorytype, String readerStrategy, Path storagePath) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		switch ( directorytype ) {
-			case "ram" :
-				cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
+			case "local-heap" :
+				cfg.addProperty( "hibernate.search.default.directory_provider", "local-heap" );
 				break;
 			case "fs" :
 				cfg.addProperty( "hibernate.search.default.directory_provider", "filesystem" );

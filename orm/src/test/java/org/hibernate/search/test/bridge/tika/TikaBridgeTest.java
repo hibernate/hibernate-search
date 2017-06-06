@@ -93,7 +93,7 @@ public class TikaBridgeTest extends SearchTestBase {
 	@Test
 	public void testUnsupportedTypeForTikaBridge() throws Exception {
 		SearchConfiguration conf = new HibernateManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
+				.addProperty( "hibernate.search.default.directory_provider", "local-heap" )
 				.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() )
 				.addClass( Foo.class );
 		boolean throwException = false;

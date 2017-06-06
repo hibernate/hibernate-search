@@ -41,7 +41,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 		cfg.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );// permit this?
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.put( "hibernate.search.default.2.directory_provider", "ram" );
+		cfg.put( "hibernate.search.default.2.directory_provider", "local-heap" );
 		cfg.put( "hibernate.search.Documents.indexwriter.max_buffered_docs", "4" );
 		cfg.put( "hibernate.search.Documents.indexwriter.max_merge_docs", "5" );
 		cfg.put( "hibernate.search.Documents.sharding_strategy.nbr_of_shards", "4" );

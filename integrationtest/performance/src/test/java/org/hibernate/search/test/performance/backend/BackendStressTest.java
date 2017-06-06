@@ -49,7 +49,7 @@ public class BackendStressTest {
 	/**
 	 * Directory used
 	 */
-	private static final Provider provider = Provider.RAM;
+	private static final Provider provider = Provider.LOCAL_HEAP;
 
 	/**
 	 * Index manager
@@ -132,7 +132,7 @@ public class BackendStressTest {
 	}
 
 	private enum Provider {
-		RAM( "ram" ),
+		LOCAL_HEAP( "local-heap" ),
 		FILESYSTEM( "filesystem" ),
 		INFINISPAN( "infinispan" );
 		private final String cfg;
