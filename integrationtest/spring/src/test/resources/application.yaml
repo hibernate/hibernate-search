@@ -8,7 +8,7 @@ spring.jpa.properties:
     ddl-auto: create-drop
   hibernate.search:
     default:
-      directory_provider: ram
+      directory_provider: local-heap
 
 spring.datasource:
   url: jdbc:h2:mem:foobar

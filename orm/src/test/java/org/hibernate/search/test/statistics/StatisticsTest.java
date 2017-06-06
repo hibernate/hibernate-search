@@ -53,7 +53,7 @@ public class StatisticsTest extends SearchTestBase {
 	@Parameters(name = "Directory provider {0}")
 	public static Object[] data() {
 		return new Object[] {
-			"ram",
+			"local-heap",
 			"filesystem" // Mainly to test getIndexSize()
 		};
 	}

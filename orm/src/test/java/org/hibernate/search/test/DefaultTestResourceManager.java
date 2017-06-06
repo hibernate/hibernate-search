@@ -108,7 +108,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		if ( configurationSettings == null ) {
 			configurationSettings = new HashMap<>();
 			configurationSettings.put( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
-			configurationSettings.put( "hibernate.search.default.directory_provider", "ram" );
+			configurationSettings.put( "hibernate.search.default.directory_provider", "local-heap" );
 			configurationSettings.put( "hibernate.search.default.indexBase", getBaseIndexDir().toAbsolutePath().toString() );
 			configurationSettings.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 			configurationSettings.put( "hibernate.search.default.indexwriter.merge_factor", "100" );

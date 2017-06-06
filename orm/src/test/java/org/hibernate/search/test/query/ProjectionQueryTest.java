@@ -682,7 +682,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.directory_provider", "ram" );
+		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
 	}
 
 }

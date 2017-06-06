@@ -65,7 +65,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 		this.properties = properties;
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
 		this.classLoaderService = new DefaultClassLoaderService();
-		addProperty( "hibernate.search.default.directory_provider", "ram" );
+		addProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 	}
 

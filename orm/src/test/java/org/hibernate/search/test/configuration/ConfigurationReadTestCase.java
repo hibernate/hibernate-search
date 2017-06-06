@@ -81,7 +81,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestBase {
 			for ( Class annotated : mapping ) {
 				( configuration ).addAnnotatedClass( annotated );
 			}
-			configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
+			configuration.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 			configuration.buildSessionFactory();
 			fail();
 		}

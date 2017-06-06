@@ -43,7 +43,7 @@ import org.junit.runners.model.Statement;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
- * This is meant to use only ram-based index and databases, for those test
+ * This is meant to use only in-memory index and databases, for those test
  * which need to use several differently configured SessionFactories.
  *
  * @author Sanne Grinovero
@@ -77,7 +77,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 				org.hibernate.search.cfg.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName()
 		);
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		usingFileSystem = false;
 	}
 

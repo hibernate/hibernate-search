@@ -58,7 +58,7 @@ public class RamIndexManagerFactory extends ExternalResource implements TestRule
 	public IndexManager create() {
 		RamIndexManager ramIndexManager = new RamIndexManager();
 		Properties properties = new Properties();
-		properties.setProperty( "directory_provider", "ram" );
+		properties.setProperty( "directory_provider", "local-heap" );
 		ramIndexManager.initialize(
 				"testIndex",
 				properties,

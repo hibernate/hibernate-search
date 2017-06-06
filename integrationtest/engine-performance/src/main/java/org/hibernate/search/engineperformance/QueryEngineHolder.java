@@ -21,7 +21,7 @@ public class QueryEngineHolder extends BaseIndexSetup {
 
 	public volatile SearchIntegrator si;
 
-	@Param( { "ram", "fs", "fs-nrt" } )
+	@Param( { "local-heap", "fs", "fs-nrt" } )
 	private String directorytype;
 
 	@Param( { "async", "shared" } )

@@ -83,7 +83,7 @@ public class JBossTSIT {
 				.addProperty( Environment.JTA_PLATFORM, JBossStandAloneJtaPlatform.class.getName() )
 						//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
 				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
+				.addProperty( "hibernate.search.default.directory_provider", "local-heap" )
 				.create();
 		final HibernatePersistenceProvider hp = new HibernatePersistenceProvider();
 		factory = hp.createContainerEntityManagerFactory( unitInfo, new HashMap() );

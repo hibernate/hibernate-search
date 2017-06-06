@@ -40,7 +40,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( Entity1.class );
 		config.addAnnotatedClass( Entity2.class );
-		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
@@ -57,7 +57,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
 		Configuration config = new Configuration();
 		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
-		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );

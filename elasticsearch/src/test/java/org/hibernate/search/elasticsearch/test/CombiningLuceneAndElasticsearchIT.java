@@ -150,7 +150,7 @@ public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 	public void configure(Map<String, Object> settings) {
 		// default is ES
 		settings.put( "hibernate.search.comic_book.indexmanager", "directory-based" );
-		settings.put( "hibernate.search.comic_book.directory_provider", "ram" );
+		settings.put( "hibernate.search.comic_book.directory_provider", "local-heap" );
 	}
 
 	private static class NotTranslatableQuery extends Query {

@@ -20,7 +20,7 @@ public class SmokeTestScenario extends TestScenario {
 	@Override
 	public Properties getHibernateProperties() {
 		Properties properties = super.getHibernateProperties();
-		properties.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		properties.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		return properties;
 	}
 
