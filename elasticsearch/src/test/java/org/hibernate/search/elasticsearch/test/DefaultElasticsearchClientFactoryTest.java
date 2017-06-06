@@ -18,7 +18,7 @@ import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isExce
 import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpHeader;
-import org.elasticsearch.client.ResponseException;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
@@ -34,9 +34,11 @@ import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.Poller;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -77,10 +79,15 @@ public class DefaultElasticsearchClientFactoryTest {
 
 	private DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
+	@After
+	public void stop() {
+		clientFactory.stop();
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void simple() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
@@ -92,7 +99,7 @@ public class DefaultElasticsearchClientFactoryTest {
 						.withStatusMessage( statusMessage )
 						.withBody( responseBody )) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
@@ -104,7 +111,7 @@ public class DefaultElasticsearchClientFactoryTest {
 
 	@Test
 	public void error() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
@@ -116,7 +123,7 @@ public class DefaultElasticsearchClientFactoryTest {
 						.withBody( responseBody )
 				) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 500 );
 			JsonHelper.assertJsonEquals( responseBody, result.getBody().toString() );
@@ -125,7 +132,7 @@ public class DefaultElasticsearchClientFactoryTest {
 
 	@Test
 	public void timeout_read() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" )
 				.addProperty( ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "99999" );
@@ -144,14 +151,14 @@ public class DefaultElasticsearchClientFactoryTest {
 				.build()
 		);
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			doPost( client, "/myIndex/myType", payload );
 		}
 	}
 
 	@Test
 	public void timeout_request() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "99999" )
 				.addProperty( ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "1000" );
@@ -170,7 +177,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.build()
 		);
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			doPost( client, "/myIndex/myType", payload );
 		}
 	}
@@ -178,7 +185,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2235")
 	public void multipleHosts() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI,
 						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) );
 
@@ -190,7 +197,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
@@ -204,7 +211,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_serverError() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI,
 						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) );
 
@@ -216,7 +223,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 503 ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
@@ -242,7 +249,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_timeout() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI,
 						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) )
 				.addProperty( ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
@@ -255,7 +262,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 10_000 /* 10s => will time out */ ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
@@ -294,7 +301,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_fault() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI,
 						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) )
 				.addProperty( ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
@@ -307,7 +314,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFault( Fault.MALFORMED_RESPONSE_CHUNK ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
@@ -333,7 +340,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2449")
 	public void discovery() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( ElasticsearchEnvironment.DISCOVERY_ENABLED, "true" )
 				.addProperty( ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL, "1" );
@@ -353,7 +360,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
@@ -387,7 +394,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		action = "pushEvent( \"https\" )"
 	)
 	public void discoveryScheme() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				// Need to use HTTP here, so that the sniffer can at least retrieve the host list
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( ElasticsearchEnvironment.DISCOVERY_ENABLED, "true" )
@@ -402,7 +409,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		wireMockRule1.stubFor( get( WireMock.urlMatching( "/_nodes.*" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			/*
 			 * We can't use a valid SSL/TLS certificate, so we just check, using Byteman,
 			 * that the sniffer found some HTTPS hosts at some point.
@@ -419,7 +426,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	public void authentication() throws Exception {
 		String username = "ironman";
 		String password = "j@rV1s";
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( ElasticsearchEnvironment.SERVER_USERNAME, username )
 				.addProperty( ElasticsearchEnvironment.SERVER_PASSWORD, password );
@@ -443,18 +450,16 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-
-			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType/_search" ) ) );
 		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication_error() throws Exception {
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
@@ -466,7 +471,7 @@ public class DefaultElasticsearchClientFactoryTest {
 						.withStatusMessage( statusMessage )
 				) );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 401 );
 			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
@@ -479,19 +484,25 @@ public class DefaultElasticsearchClientFactoryTest {
 		String username = "ironman";
 		String password = "j@rV1s";
 		String httpUri = "http://foo.com/";
-		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUri )
 				.addProperty( ElasticsearchEnvironment.SERVER_USERNAME, username )
 				.addProperty( ElasticsearchEnvironment.SERVER_PASSWORD, password );
 
 		logged.expectMessage( "HSEARCH400073", httpUri );
 
-		try ( ElasticsearchClient client = clientFactory.create( configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			// Nothing to do here
 		}
 	}
 
-	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) throws IOException, ResponseException {
+	private ElasticsearchClient createClient(SearchConfiguration configuration ) {
+		SearchConfigurationForTest searchConfiguration = SearchConfigurationForTest.noTestDefaults();
+		clientFactory.start( searchConfiguration.getProperties(), new BuildContextForTest( searchConfiguration ) );
+		return clientFactory.create( configuration.getProperties() );
+	}
+
+	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
 		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
 	}
 

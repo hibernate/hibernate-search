@@ -29,6 +29,7 @@ import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -41,7 +42,10 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-@Category(SkipBelowElasticsearch52.class)
+@Category({
+		SkipBelowElasticsearch52.class,
+		SkipOnAWS.class // Cannot alter Elasticsearch settings on AWS, because indexes cannot be closed.
+})
 public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitializationTestBase {
 
 	@Rule
@@ -62,8 +66,8 @@ public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitia
 
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'normalizer': {"
 							+ "'normalizerWithElasticsearchFactories': {"
@@ -115,8 +119,8 @@ public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitia
 
 	@Test
 	public void normalizer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-char-mapping-esFactory': {"
@@ -162,8 +166,8 @@ public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitia
 
 	@Test
 	public void normalizer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					/*
 					 * We don't add the analyzer here: since a component is missing
@@ -208,8 +212,8 @@ public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitia
 
 	@Test
 	public void normalizer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'normalizer': {"
 							+ "'normalizerWithElasticsearchFactories': {"
@@ -269,8 +273,8 @@ public class Elasticsearch52NormalizerDefinitionMigrationIT extends SearchInitia
 
 	@Test
 	public void normalizer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'normalizer': {"
 							+ "'normalizerWithElasticsearchFactories': {"

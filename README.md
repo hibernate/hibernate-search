@@ -109,6 +109,11 @@ You may also use authentication:
 
     > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=https://localhost:9200 -Dtest.elasticsearch.host.username=ironman -Dtest.elasticsearch.host.password=j@rV1s
 
+Also, the elasticsearch module (and only this one) can execute its integration tests
+against an Elasticsearch service on AWS.
+You will need to execute something along the lines of:
+
+    > mvn integration-test -pl elasticsearch -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.access_key=<Your access key> -Dtest.elasticsearch.host.aws.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.region=<Your AWS region ID>
 
 ### Contributing
 

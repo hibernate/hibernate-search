@@ -202,6 +202,16 @@ This will delete all content from the indexes!
 |`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
+[WARNING]
+--
+Since Elasticsearch on Amazon Web Services (AWS)
+https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
+the `update` strategy will fail when trying to update analyzer definitions
+on an AWS Elasticsearch cluster.
+
+The only workaround is to avoid the `update` strategy on AWS.
+--
++
 [CAUTION]
 .Strategies in production environments
 ====
@@ -278,7 +288,8 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy update`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
+Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `http_client_configurer`,
+`discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
 --
 
 === Mapping and indexing

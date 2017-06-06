@@ -7,25 +7,17 @@
 package org.hibernate.search.elasticsearch.testutil;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.RestClient;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
@@ -34,13 +26,13 @@ import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.testsupport.setup.TestDefaults;
-import org.hibernate.search.util.impl.SearchThreadFactory;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.rules.ExternalResource;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -52,9 +44,16 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private RestClient client;
+	/**
+	 * We use a {@link DefaultElasticsearchClientFactory} to create our low-level client.
+	 *
+	 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
+	 * as any test-created SearchFactory, allowing to support things like testing on AWS
+	 * (using a {@link AWSElasticsearchHttpClientConfigurer}).
+	 */
+	private final DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
-	private Gson gson;
+	private ElasticsearchClient client;
 
 	private final List<URLEncodedString> createdIndicesNames = Lists.newArrayList();
 
@@ -80,16 +79,22 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.indexName = indexName;
 		}
 
-		public void waitForRequiredIndexStatus() throws IOException {
+		public void waitForRequiredIndexStatus() {
 			TestElasticsearchClient.this.waitForRequiredIndexStatus( indexName );
 		}
 
-		public IndexClient deleteAndCreate() throws IOException {
+		public IndexClient deleteAndCreate() {
 			TestElasticsearchClient.this.deleteAndCreateIndex( indexName );
 			return this;
 		}
 
-		public IndexClient ensureDoesNotExist() throws IOException {
+		public IndexClient deleteAndCreate(String settingsPath, String settings) {
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.deleteAndCreateIndex( indexName, settingsAsJsonObject );
+			return this;
+		}
+
+		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( indexName );
 			return this;
 		}
@@ -127,16 +132,16 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.typeName = URLEncodedString.fromString( mappingName );
 		}
 
-		public TypeClient putMapping(String mappingJson) throws IOException {
+		public TypeClient putMapping(String mappingJson) {
 			TestElasticsearchClient.this.putMapping( indexClient.indexName, typeName, mappingJson );
 			return this;
 		}
 
-		public String getMapping() throws IOException {
+		public String getMapping() {
 			return TestElasticsearchClient.this.getMapping( indexClient.indexName, typeName );
 		}
 
-		public TypeClient index(URLEncodedString id, String jsonDocument) throws IOException {
+		public TypeClient index(URLEncodedString id, String jsonDocument) {
 			URLEncodedString indexName = indexClient.indexName;
 			TestElasticsearchClient.this.index( indexName, typeName, id, jsonDocument );
 			return this;
@@ -158,14 +163,33 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.settingsPath = settingsPath;
 		}
 
-		public String get() throws IOException {
+		public String get() {
 			URLEncodedString indexName = indexClient.indexName;
 			return TestElasticsearchClient.this.getSettings( indexName, settingsPath );
 		}
 
-		public void put(String settings) throws IOException {
+		/**
+		 * Put settings without closing the index first.
+		 *
+		 * @param settings The settings value to put
+		 * @throws IOException
+		 */
+		public void putDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
-			TestElasticsearchClient.this.putSettings( indexName, settingsPath, settings );
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.putDynamicSettings( indexName, settingsAsJsonObject );
+		}
+
+		/**
+		 * Put settings, closing the index first and reopening the index afterwards.
+		 *
+		 * @param settings The settings value to put
+		 * @throws IOException
+		 */
+		public void putNonDynamic(String settings) {
+			URLEncodedString indexName = indexClient.indexName;
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.putNonDynamicSettings( indexName, settingsAsJsonObject );
 		}
 	}
 
@@ -180,11 +204,11 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.id = URLEncodedString.fromString( id );
 		}
 
-		public JsonObject getSource() throws IOException {
+		public JsonObject getSource() {
 			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.indexName, typeClient.typeName, id );
 		}
 
-		public JsonElement getStoredField(String fieldName) throws IOException {
+		public JsonElement getStoredField(String fieldName) {
 			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, typeClient.typeName, id, fieldName );
 		}
 	}
@@ -201,7 +225,7 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.templateName = templateName;
 		}
 
-		public TemplateClient create(String templateString, JsonObject settings) throws IOException {
+		public TemplateClient create(String templateString, JsonObject settings) {
 			TestElasticsearchClient.this.createTemplate( templateName, templateString, settings );
 			return this;
 		}
@@ -212,17 +236,31 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	private void deleteAndCreateIndex(URLEncodedString indexName) throws IOException {
+	private void deleteAndCreateIndex(URLEncodedString indexName) {
+		doDeleteAndCreateIndex(
+				indexName,
+				ElasticsearchRequest.put().pathComponent( indexName ).build()
+				);
+	}
+
+	private void deleteAndCreateIndex(URLEncodedString indexName, JsonObject settingsAsJsonObject) {
+		doDeleteAndCreateIndex(
+				indexName,
+				ElasticsearchRequest.put().pathComponent( indexName ).body( settingsAsJsonObject ).build()
+				);
+	}
+
+	private void doDeleteAndCreateIndex(URLEncodedString indexName, ElasticsearchRequest createRequest) {
 		// Ignore the result: if the deletion fails, we don't care unless the creation just after also fails
 		tryDeleteESIndex( indexName );
 
 		registerIndexForCleanup( indexName );
-		performRequest( ElasticsearchRequest.put().pathComponent( indexName ).build() );
+		performRequest( createRequest );
 
 		waitForRequiredIndexStatus( indexName );
 	}
 
-	private void createTemplate(String templateName, String templateString, JsonObject settings) throws IOException {
+	private void createTemplate(String templateName, String templateString, JsonObject settings) {
 		JsonObject source = JsonBuilder.object()
 				.addProperty( "template", templateString )
 				.add( "settings", settings )
@@ -235,17 +273,10 @@ public class TestElasticsearchClient extends ExternalResource {
 				.build() );
 	}
 
-	private void ensureIndexDoesNotExist(URLEncodedString indexName) throws IOException {
-		try {
-			performRequest( ElasticsearchRequest.delete()
-					.pathComponent( indexName )
-					.build() );
-		}
-		catch (ResponseException e) {
-			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Index not found is ok */ ) {
-				throw e;
-			}
-		}
+	private void ensureIndexDoesNotExist(URLEncodedString indexName) {
+		performRequestIgnore404( ElasticsearchRequest.delete()
+				.pathComponent( indexName )
+				.build() );
 	}
 
 	private void registerIndexForCleanup(URLEncodedString indexName) {
@@ -256,7 +287,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		createdTemplatesNames.add( templateName );
 	}
 
-	private void waitForRequiredIndexStatus(final URLEncodedString indexName) throws IOException {
+	private void waitForRequiredIndexStatus(final URLEncodedString indexName) {
 		performRequest( ElasticsearchRequest.get()
 				.pathComponent( Paths._CLUSTER ).pathComponent( Paths.HEALTH ).pathComponent( indexName )
 				/*
@@ -268,7 +299,7 @@ public class TestElasticsearchClient extends ExternalResource {
 				.build() );
 	}
 
-	private void putMapping(URLEncodedString indexName, URLEncodedString mappingName, String mappingJson) throws IOException {
+	private void putMapping(URLEncodedString indexName, URLEncodedString mappingName, String mappingJson) {
 		JsonObject mappingJsonObject = toJsonElement( mappingJson ).getAsJsonObject();
 
 		performRequest( ElasticsearchRequest.put()
@@ -277,11 +308,11 @@ public class TestElasticsearchClient extends ExternalResource {
 				.build() );
 	}
 
-	private String getMapping(URLEncodedString indexName, URLEncodedString mappingName) throws IOException {
-		Response response = performRequest( ElasticsearchRequest.get()
+	private String getMapping(URLEncodedString indexName, URLEncodedString mappingName) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING ).pathComponent( mappingName )
 				.build() );
-		JsonObject result = toJsonObject( response );
+		JsonObject result = response.getBody();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
 			return new JsonObject().toString();
@@ -297,13 +328,14 @@ public class TestElasticsearchClient extends ExternalResource {
 		return mapping.toString();
 	}
 
-	private void putSettings(URLEncodedString indexName, String settingsPath, String settings) throws IOException {
-		JsonElement settingsJsonElement = toJsonElement( settings );
+	private void putDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
+				.body( settingsJsonObject )
+				.build() );
+	}
 
-		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
-			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
-		}
-
+	private void putNonDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
 		performRequest( ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._CLOSE )
@@ -311,7 +343,7 @@ public class TestElasticsearchClient extends ExternalResource {
 
 		performRequest( ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
-				.body( settingsJsonElement.getAsJsonObject() )
+				.body( settingsJsonObject )
 				.build() );
 
 		performRequest( ElasticsearchRequest.post()
@@ -320,11 +352,21 @@ public class TestElasticsearchClient extends ExternalResource {
 				.build() );
 	}
 
-	private String getSettings(URLEncodedString indexName, String path) throws IOException {
-		Response response = performRequest( ElasticsearchRequest.get()
+	private JsonObject buildSettings(String settingsPath, String settings) {
+		JsonElement settingsJsonElement = toJsonElement( settings );
+
+		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
+			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
+		}
+
+		return settingsJsonElement.getAsJsonObject();
+	}
+
+	private String getSettings(URLEncodedString indexName, String path) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
 				.build() );
-		JsonObject result = toJsonObject( response );
+		JsonObject result = response.getBody();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
 			return new JsonObject().toString();
@@ -342,7 +384,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		return settings.toString();
 	}
 
-	private void index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String jsonDocument) throws IOException {
+	private void index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String jsonDocument) {
 		JsonObject documentJsonObject = toJsonElement( jsonDocument ).getAsJsonObject();
 		performRequest( ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
@@ -351,59 +393,32 @@ public class TestElasticsearchClient extends ExternalResource {
 				.build() );
 	}
 
-	private JsonObject getDocumentSource(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) throws IOException {
-		Response response = performRequest( ElasticsearchRequest.get()
+	private JsonObject getDocumentSource(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
 				.build() );
-		JsonObject result = toJsonObject( response );
+		JsonObject result = response.getBody();
 		return result.get( "_source" ).getAsJsonObject();
 	}
 
-	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String fieldName) throws IOException {
-		Response response = performRequest( ElasticsearchRequest.get()
+	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String fieldName) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
 				.param( "stored_fields", fieldName )
 				.build() );
-		JsonObject result = toJsonObject( response );
+		JsonObject result = response.getBody();
 		return result.get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
 	@Override
 	protected void before() throws Throwable {
-		gson = DialectIndependentGsonProvider.INSTANCE.getGson();
-
-		Properties properties = TestDefaults.getProperties();
-		String username = properties.getProperty( "hibernate.search.default." + ElasticsearchEnvironment.SERVER_USERNAME );
-		String password = properties.getProperty( "hibernate.search.default." + ElasticsearchEnvironment.SERVER_PASSWORD );
-
-		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
-				/*
-				 * Note: this timeout is not only used on retries,
-				 * but also when executing requests synchronously.
-				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
-				 */
-				.setMaxRetryTimeoutMillis( ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT )
-				.setHttpClientConfigCallback( (builder) -> {
-					if ( username != null ) {
-						BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-						credentialsProvider.setCredentials(
-								new AuthScope( AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME ),
-								new UsernamePasswordCredentials( username, password )
-								);
-
-						builder = builder.setDefaultCredentialsProvider( credentialsProvider );
-					}
-					return builder
-							.setMaxConnTotal( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION )
-							.setMaxConnPerRoute( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
-							.setThreadFactory( new SearchThreadFactory( "Test Elasticsearch client transport thread" ) );
-				} )
-				.setRequestConfigCallback( (builder) -> {
-					return builder
-							.setSocketTimeout( ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT )
-							.setConnectTimeout( ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT );
-				} )
-				.build();
+		SearchConfiguration configuration = new SearchConfigurationForTest(); // Includes default test properties
+		Properties unkmaskedProperties = configuration.getProperties();
+		clientFactory.start( unkmaskedProperties, new BuildContextForTest( configuration ) );
+		Properties rootCfg = new MaskedProperty( unkmaskedProperties, "hibernate.search" );
+		// Use root as a fallback to support query options in particular
+		Properties properties = new MaskedProperty( rootCfg, "default", rootCfg );
+		client = clientFactory.create( properties );
 	}
 
 	@Override
@@ -422,60 +437,79 @@ public class TestElasticsearchClient extends ExternalResource {
 			client = null;
 		}
 		catch (IOException e) {
-			throw new AssertionFailure( "Unexpected exception when closing the RestClient", e );
+			throw new AssertionFailure( "Unexpected exception when closing the ElasticsearchClient", e );
 		}
 	}
 
 	private void tryDeleteESIndex(URLEncodedString indexName) {
 		try {
-			performRequest( ElasticsearchRequest.delete()
+			performRequestIgnore404( ElasticsearchRequest.delete()
 					.pathComponent( indexName )
 					.build() );
 		}
-		catch (ResponseException e) {
-			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Index not found is ok */ ) {
-				LOG.warnf( e, "Error while trying to delete index '%s' as part of test cleanup", indexName );
-			}
-		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			LOG.warnf( e, "Error while trying to delete index '%s' as part of test cleanup", indexName );
 		}
 	}
 
 	private void tryDeleteESTemplate(String templateName) {
 		try {
-			performRequest( ElasticsearchRequest.delete()
+			performRequestIgnore404( ElasticsearchRequest.delete()
 					.pathComponent( Paths._TEMPLATE ).pathComponent( URLEncodedString.fromString( templateName ) )
 					.build() );
 		}
-		catch (ResponseException e) {
-			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Template not found is ok */ ) {
-				LOG.warnf( e, "Error while trying to delete template '%s' as part of test cleanup", templateName );
-			}
-		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			LOG.warnf( e, "Error while trying to delete template '%s' as part of test cleanup", templateName );
 		}
 	}
 
-	protected Response performRequest(ElasticsearchRequest request) throws IOException {
-		return client.performRequest(
-				request.getMethod(), request.getPath(), request.getParameters(),
-				ElasticsearchClientUtils.toEntity( gson, request )
-				);
+	protected ElasticsearchResponse performRequest(ElasticsearchRequest request) {
+		ElasticsearchResponse response;
+		try {
+			response = client.execute( request );
+		}
+		catch (Exception e) {
+			throw requestFailed( request, e );
+		}
+		int statusCode = response.getStatusCode();
+		if ( !ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
+			throw requestFailed( request, response );
+		}
+		return response;
 	}
 
-	protected JsonObject toJsonObject(Response response) throws IOException {
-		HttpEntity entity = response.getEntity();
-		if ( entity == null ) {
-			return null;
+	protected ElasticsearchResponse performRequestIgnore404(ElasticsearchRequest request) {
+		ElasticsearchResponse response;
+		try {
+			response = client.execute( request );
 		}
+		catch (Exception e) {
+			throw requestFailed( request, e );
+		}
+		int statusCode = response.getStatusCode();
+		if ( !ElasticsearchClientUtils.isSuccessCode( statusCode ) && 404 != statusCode ) {
+			throw requestFailed( request, response );
+		}
+		return response;
+	}
 
-		ContentType contentType = ContentType.get( entity );
-		try ( InputStream inputStream = entity.getContent();
-				Reader reader = new InputStreamReader( inputStream, contentType.getCharset() ) ) {
-			return gson.fromJson( reader, JsonObject.class );
-		}
+	private AssertionFailure requestFailed(ElasticsearchRequest request, Exception e) {
+		return new AssertionFailure( "Elasticsearch request in TestElasticsearchClient failed:"
+				+ "Request:\n"
+				+ "========\n"
+				+ ElasticsearchClientUtils.formatRequest( DialectIndependentGsonProvider.INSTANCE, request ),
+				e );
+	}
+
+	private AssertionFailure requestFailed(ElasticsearchRequest request, ElasticsearchResponse response) {
+		return new AssertionFailure( "Elasticsearch request in TestElasticsearchClient failed:\n"
+				+ "Request:\n"
+				+ "========\n"
+				+ ElasticsearchClientUtils.formatRequest( DialectIndependentGsonProvider.INSTANCE, request )
+				+ "\nResponse:\n"
+				+ "========\n"
+				+ ElasticsearchClientUtils.formatResponse( DialectIndependentGsonProvider.INSTANCE, response )
+				);
 	}
 
 	/*

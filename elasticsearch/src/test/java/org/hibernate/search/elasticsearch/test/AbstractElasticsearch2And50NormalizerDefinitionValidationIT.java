@@ -66,8 +66,8 @@ public abstract class AbstractElasticsearch2And50NormalizerDefinitionValidationI
 
 	@Test
 	public void success_simple() throws Exception {
-		elasticSearchClient.index( NormalizedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( NormalizedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( NormalizedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'normalizerWithElasticsearchFactories': {"
@@ -102,8 +102,8 @@ public abstract class AbstractElasticsearch2And50NormalizerDefinitionValidationI
 
 	@Test
 	public void normalizer_missing() throws Exception {
-		elasticSearchClient.index( NormalizedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( NormalizedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( NormalizedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-char-mapping-esFactory': {"

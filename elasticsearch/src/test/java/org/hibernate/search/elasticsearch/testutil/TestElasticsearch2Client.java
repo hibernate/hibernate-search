@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.testutil;
 
-import java.io.IOException;
-
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 
 import com.google.gson.JsonElement;
@@ -21,12 +19,12 @@ import com.google.gson.JsonObject;
 public class TestElasticsearch2Client extends TestElasticsearchClient {
 
 	@Override
-	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String fieldName) throws IOException {
-		Response response = performRequest( ElasticsearchRequest.get()
+	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String fieldName) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
 				.param( "fields", fieldName )
 				.build() );
-		JsonObject result = toJsonObject( response );
+		JsonObject result = response.getBody();
 		return result.get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
