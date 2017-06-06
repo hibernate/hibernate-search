@@ -185,12 +185,32 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	public void defaultTearDown() throws Exception {
+		close();
+		cleanUp();
+	}
+
+	/**
+	 * Close all open resources (streams, sessions, session factories, ...)
+	 * @throws Exception
+	 */
+	public void close() {
 		handleUnclosedResources();
 		closeSessionFactory();
+	}
+
+	/**
+	 * Clean up any side-effects of the test (temporary files in particular).
+	 * <p>
+	 * If multiple managers share the same files, this must be executed after
+	 * <em>every</em> manager has been {@link #closeResources() closed}.
+	 *
+	 * @throws Exception
+	 */
+	public void cleanUp() throws IOException {
 		ensureIndexesAreEmpty();
 	}
 
-	public void handleUnclosedResources() {
+	private void handleUnclosedResources() {
 		if ( session != null && session.isOpen() ) {
 			if ( session.isConnected() ) {
 				session.doWork( new RollbackWork() );

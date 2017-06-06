@@ -67,7 +67,14 @@ public abstract class DynamicMasterSlaveSearchTestCase implements TestConfigurat
 	@After
 	public void tearDown() throws Exception {
 		for ( DefaultTestResourceManager resourceManager : resourceManagers ) {
-			resourceManager.defaultTearDown();
+			resourceManager.close();
+		}
+		/*
+		 * Only do this after closing every resource manager,
+		 * so as not to delete files that are still being used.
+		 */
+		for ( DefaultTestResourceManager resourceManager : resourceManagers ) {
+			resourceManager.cleanUp();
 		}
 	}
 
