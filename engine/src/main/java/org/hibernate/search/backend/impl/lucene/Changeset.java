@@ -18,7 +18,7 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author gustavonalle
  */
-public final class Changeset {
+public final class Changeset implements Iterable<LuceneWork> {
 
 	private final List<LuceneWork> workList;
 	private final Thread producer;
@@ -31,7 +31,8 @@ public final class Changeset {
 		this.monitor = monitor;
 	}
 
-	Iterator<LuceneWork> getWorkListIterator() {
+	@Override
+	public Iterator<LuceneWork> iterator() {
 		return workList.iterator();
 	}
 

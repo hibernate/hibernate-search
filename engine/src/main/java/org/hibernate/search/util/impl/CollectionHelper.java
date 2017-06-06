@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -105,6 +106,19 @@ public final class CollectionHelper {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Reflection is used to ensure the correct types are used
 	public static Iterable<?> iterableFromArray(Object object) {
 		return new ArrayIterable( accessorFromArray( object ), object );
+	}
+
+	public static <T> Iterable<T> flatten(Iterable<? extends Iterable<T>> nonFlat) {
+		return new Iterable<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return flatten( nonFlat.iterator() );
+			}
+		};
+	}
+
+	public static <T> Iterator<T> flatten(Iterator<? extends Iterable<T>> nonFlat) {
+		return new FlatteningIterator<>( nonFlat );
 	}
 
 	private static ArrayAccessor<?, ?> accessorFromArray(Object object) {
@@ -294,4 +308,39 @@ public final class CollectionHelper {
 			}
 		};
 	}
+
+	private static class FlatteningIterator<T> implements Iterator<T> {
+
+		private Iterator<? extends Iterable<T>> nonFlatIterator;
+		private Iterator<T> current = Collections.<T>emptyIterator();
+
+		public FlatteningIterator(Iterator<? extends Iterable<T>> nonFlatIterator) {
+			this.nonFlatIterator = nonFlatIterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			// Get the next iterable if we iterated through all elements of the current one
+			while ( ! current.hasNext() && nonFlatIterator.hasNext() ) {
+				current = nonFlatIterator.next().iterator();
+			}
+			return current.hasNext() || nonFlatIterator.hasNext();
+		}
+
+		@Override
+		public T next() {
+			// force the position to an non empty current or the end of the flow
+			if ( ! hasNext() ) {
+				throw new NoSuchElementException();
+			}
+			return current.next();
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 }
