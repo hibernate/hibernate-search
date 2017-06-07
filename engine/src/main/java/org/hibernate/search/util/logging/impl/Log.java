@@ -1049,4 +1049,11 @@ public interface Log extends BasicLogger {
 			+ " Sortable fields should be assigned normalizers in order to avoid problems with tokenization.")
 	void sortableFieldWithNonNormalizerAnalyzer(@FormatWith(ClassFormatter.class) Class<?> entityType, String absoluteFieldPath);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 346, value = "The 'ram' directory provider is deprecated and will be removed in a future version."
+			+ " You should use 'local-heap' instead."
+			+ " Also, this should not be used in a production environment."
+			+ " Please refer to the official documentation for more information." )
+	void usingDeprecatedNameForRamDirectoryProvider();
+
 }

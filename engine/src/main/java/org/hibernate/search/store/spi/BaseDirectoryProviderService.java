@@ -39,6 +39,13 @@ public abstract class BaseDirectoryProviderService implements DirectoryProviderS
 		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "local-heap", RAMDirectoryProvider.class.getName() );
+		/*
+		 * This is a hack: when implementors use this map to get the class name for
+		 * the "ram" short name, we want to log a warning,
+		 * but when they explicitly associate the "ram" short name to RAMDirectoryProvider.class,
+		 * then they must have a reason and we don't want to log anything.
+		 */
+		defaultProviderClasses.put( "ram", DeprecatedRAMDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "infinispan", "org.infinispan.hibernate.search.spi.InfinispanDirectoryProvider" );
 	}
 
@@ -49,6 +56,10 @@ public abstract class BaseDirectoryProviderService implements DirectoryProviderS
 			return initialize( getDefault().getName(), indexName, indexProps, context );
 		}
 		String fullClassName = toFullyQualifiedClassName( className );
+		if ( DeprecatedRAMDirectoryProvider.class.getName().equals( fullClassName ) ) {
+			fullClassName = RAMDirectoryProvider.class.getName();
+			LOG.usingDeprecatedNameForRamDirectoryProvider();
+		}
 		return initialize( fullClassName, indexName, indexProps, context );
 	}
 
@@ -67,6 +78,10 @@ public abstract class BaseDirectoryProviderService implements DirectoryProviderS
 			throw LOG.cannotInitializeDirectoryProvider( provider.getClass(), indexName, e );
 		}
 		return provider;
+	}
+
+	private static final class DeprecatedRAMDirectoryProvider extends RAMDirectoryProvider {
+
 	}
 
 }
