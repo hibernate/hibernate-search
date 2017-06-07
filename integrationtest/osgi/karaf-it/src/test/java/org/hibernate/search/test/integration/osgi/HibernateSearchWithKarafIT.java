@@ -19,7 +19,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import javax.inject.Inject;
 
@@ -286,8 +286,8 @@ public class HibernateSearchWithKarafIT {
 	}
 
 	public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressMonitor {
-		private final AtomicLong totalCount = new AtomicLong();
-		private final AtomicLong finishedCount = new AtomicLong();
+		private final LongAdder totalCount = new LongAdder();
+		private final LongAdder finishedCount = new LongAdder();
 
 		private final int expectedTotalCount;
 
@@ -309,17 +309,17 @@ public class HibernateSearchWithKarafIT {
 
 		@Override
 		public void addToTotalCount(long count) {
-			totalCount.addAndGet( count );
+			totalCount.add( count );
 		}
 
 		@Override
 		public void indexingCompleted() {
-			finishedCount.incrementAndGet();
+			finishedCount.increment();
 		}
 
 		public void assertExpectedProgressMade() {
-			assertEquals( "Unexpected total count", expectedTotalCount, totalCount.get() );
-			assertEquals( "Finished called more than once", 1, finishedCount.get() );
+			assertEquals( "Unexpected total count", expectedTotalCount, totalCount.intValue() );
+			assertEquals( "Finished called more than once", 1, finishedCount.intValue() );
 		}
 	}
 }

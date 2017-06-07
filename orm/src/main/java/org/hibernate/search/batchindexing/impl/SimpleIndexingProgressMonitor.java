@@ -8,6 +8,7 @@ package org.hibernate.search.batchindexing.impl;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.Log;
@@ -23,7 +24,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 
 	private static final Log log = LoggerFactory.make();
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
-	private final AtomicLong totalCounter = new AtomicLong();
+	private final LongAdder totalCounter = new LongAdder();
 	private volatile long startTime;
 	private final int logAfterNumberOfDocuments;
 
@@ -56,7 +57,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 			startTime = System.nanoTime();
 		}
 		if ( current % getStatusMessagePeriod() == 0 ) {
-			printStatusMessage( startTime, totalCounter.get(), current );
+			printStatusMessage( startTime, totalCounter.longValue(), current );
 		}
 	}
 
@@ -67,13 +68,13 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 
 	@Override
 	public void addToTotalCount(long count) {
-		totalCounter.addAndGet( count );
+		totalCounter.add( count );
 		log.indexingEntities( count );
 	}
 
 	@Override
 	public void indexingCompleted() {
-		log.indexingEntitiesCompleted( totalCounter.get() );
+		log.indexingEntitiesCompleted( totalCounter.longValue() );
 	}
 
 	protected int getStatusMessagePeriod() {
