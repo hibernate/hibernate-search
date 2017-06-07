@@ -9,6 +9,7 @@ package org.hibernate.search.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.junit.After;
@@ -27,6 +28,8 @@ import org.junit.After;
 public abstract class SearchInitializationTestBase {
 
 	private DefaultTestResourceManager testResourceManager;
+
+	private BackendTestHelper backendTestHelper;
 
 	/**
 	 * @param configuration The test configuration to use when initializing.
@@ -54,6 +57,14 @@ public abstract class SearchInitializationTestBase {
 	 */
 	protected TestResourceManager getTestResourceManager() {
 		return testResourceManager;
+	}
+
+	protected BackendTestHelper getBackendTestHelper() {
+		if ( backendTestHelper == null ) {
+			backendTestHelper = BackendTestHelper.getInstance( getTestResourceManager() );
+		}
+
+		return backendTestHelper;
 	}
 
 	@After
