@@ -31,7 +31,6 @@ public @interface Indexed {
 	 * Useful for soft deletes and similar patterns
 	 *
 	 * @return the custom {@link EntityIndexingInterceptor} class. Default to {@link EntityIndexingInterceptor} class
-	 * @hsearch.experimental : This feature is experimental
 	 */
 	Class<? extends EntityIndexingInterceptor> interceptor() default EntityIndexingInterceptor.class;
 }

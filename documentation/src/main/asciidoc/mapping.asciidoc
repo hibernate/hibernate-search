@@ -2094,12 +2094,6 @@ CustomBridge cb = classLoaderService.classForName( "com.package.CustomBridge" );
 [[search-mapping-indexinginterceptor]]
 === Conditional indexing
 
-[IMPORTANT]
-====
-This feature is considered experimental. More operation types might be added in the future depending
-on user feedback.
-====
-
 In some situations, you want to index an entity only when it is in a given state, for example:
 
 * only index blog entries marked as published
