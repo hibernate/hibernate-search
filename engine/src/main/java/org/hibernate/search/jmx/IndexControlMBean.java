@@ -9,7 +9,6 @@ package org.hibernate.search.jmx;
 /**
  * Defines the Hibernate Search exposed JMX attributes and operations for index creation and purging.
  *
- * @hsearch.experimental This MBean is experimental
  * @author Hardy Ferentschik
  */
 public interface IndexControlMBean {

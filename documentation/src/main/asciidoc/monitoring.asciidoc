@@ -33,7 +33,7 @@ This MBean allows to build, optimize and purge the index for a given entity. Ind
 mass indexing API (see <<search-batchindex-massindexer>>). A requirement for this bean to be
 registered in JMX is, that the Hibernate SessionFactory is bound to JNDI via the
 `hibernate.session_factory_name` property. Refer to the Hibernate Core manual for more
-information on how to configure JNDI. The IndexControlMBean and its API are for now experimental.
+information on how to configure JNDI.
 
 ==== IndexingProgressMonitorMBean
 
