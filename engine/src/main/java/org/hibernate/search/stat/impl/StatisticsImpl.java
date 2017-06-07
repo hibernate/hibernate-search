@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,73 +43,83 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * A concurrent implementation of the {@code Statistics} interface.
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
-	private AtomicLong searchQueryCount = new AtomicLong();
-	private AtomicLong searchExecutionTotalTime = new AtomicLong();
+	// The following four fields need always be updated
+	// as a group. We use the exclusiveLock only on reads though!
+	// The hot path is on writing, while a read might never happen
+	// and we only care about consistent reads, since races during
+	// writes won't loose any data.
+	private LongAdder searchQueryCount = new LongAdder();
+	private LongAdder searchExecutionTotalTime = new LongAdder();
+	// Following is not a LongAdder as it's frequently read while producing stats
 	private AtomicLong searchExecutionMaxTime = new AtomicLong();
 	private volatile String queryExecutionMaxTimeQueryString;
 
-	private AtomicLong objectLoadedCount = new AtomicLong();
-	private AtomicLong objectLoadTotalTime = new AtomicLong();
+	private LongAdder objectLoadedCount = new LongAdder();
+	private LongAdder objectLoadTotalTime = new LongAdder();
+	// Following is not a LongAdder as it's frequently read while producing stats
 	private AtomicLong objectLoadMaxTime = new AtomicLong();
 
 	private volatile boolean isStatisticsEnabled;
 
-	private final Lock readLock;
-	private final Lock writeLock;
+	private final Lock sharedLock;
+	private final Lock exclusiveLock;
 
 	private final ExtendedSearchIntegrator extendedIntegrator;
 
 	public StatisticsImpl(ExtendedSearchIntegrator extendedIntegrator) {
 		ReadWriteLock lock = new ReentrantReadWriteLock();
-		readLock = lock.readLock();
-		writeLock = lock.writeLock();
-
+		sharedLock = lock.readLock();
+		exclusiveLock = lock.writeLock();
 		this.extendedIntegrator = extendedIntegrator;
 	}
 
 	@Override
 	public void clear() {
-		searchQueryCount.set( 0 );
-		searchExecutionTotalTime.set( 0 );
+		searchQueryCount.reset();
+		searchExecutionTotalTime.reset();
 		searchExecutionMaxTime.set( 0 );
 		queryExecutionMaxTimeQueryString = "";
-
-		objectLoadedCount.set( 0 );
+		objectLoadedCount.reset();
 		objectLoadMaxTime.set( 0 );
-		objectLoadTotalTime.set( 0 );
+		objectLoadTotalTime.reset();
 	}
 
 	@Override
 	public long getSearchQueryExecutionCount() {
-		return searchQueryCount.get();
+		return searchQueryCount.longValue();
 	}
 
 	@Override
 	public long getSearchQueryTotalTime() {
-		return searchExecutionTotalTime.get();
+		return searchExecutionTotalTime.longValue();
 	}
 
 	@Override
 	public long getSearchQueryExecutionMaxTime() {
-		return searchExecutionMaxTime.get();
+		return searchExecutionMaxTime.longValue();
 	}
 
 	@Override
 	public long getSearchQueryExecutionAvgTime() {
-		writeLock.lock();
+		final long searchQueryCountLocal;
+		final long searchExecutionTotalTimeLocal;
+		exclusiveLock.lock();
 		try {
-			long avgExecutionTime = 0;
-			if ( searchQueryCount.get() > 0 ) {
-				avgExecutionTime = searchExecutionTotalTime.get() / searchQueryCount.get();
-			}
-			return avgExecutionTime;
+			searchQueryCountLocal = searchQueryCount.longValue();
+			searchExecutionTotalTimeLocal = searchExecutionTotalTime.longValue();
 		}
 		finally {
-			writeLock.unlock();
+			exclusiveLock.unlock();
 		}
+		long avgExecutionTime = 0;
+		if ( searchQueryCountLocal > 0 ) {
+			avgExecutionTime = searchExecutionTotalTimeLocal / searchQueryCountLocal;
+		}
+		return avgExecutionTime;
 	}
 
 	@Override
@@ -118,7 +129,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	@Override
 	public void searchExecuted(String searchString, long time) {
-		readLock.lock();
+		sharedLock.lock();
 		try {
 			boolean isLongestQuery = false;
 			for ( long old = searchExecutionMaxTime.get();
@@ -129,58 +140,59 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			if ( isLongestQuery ) {
 				queryExecutionMaxTimeQueryString = searchString;
 			}
-			searchQueryCount.getAndIncrement();
-			searchExecutionTotalTime.addAndGet( time );
+			searchQueryCount.increment();
+			searchExecutionTotalTime.add( time );
 		}
 		finally {
-			readLock.unlock();
+			sharedLock.unlock();
 		}
 	}
 
 	@Override
 	public long getObjectsLoadedCount() {
-		return objectLoadedCount.get();
+		return objectLoadedCount.longValue();
 	}
 
 	@Override
 	public long getObjectLoadingTotalTime() {
-		return objectLoadTotalTime.get();
+		return objectLoadTotalTime.longValue();
 	}
 
 	@Override
 	public long getObjectLoadingExecutionMaxTime() {
-		return objectLoadMaxTime.get();
+		return objectLoadMaxTime.longValue();
 	}
 
 	@Override
 	public long getObjectLoadingExecutionAvgTime() {
-		writeLock.lock();
+		exclusiveLock.lock();
 		try {
 			long avgLoadingTime = 0;
-			if ( objectLoadedCount.get() > 0 ) {
-				avgLoadingTime = objectLoadTotalTime.get() / objectLoadedCount.get();
+			final long currentObjectLoadedCount = objectLoadedCount.longValue();
+			if ( currentObjectLoadedCount > 0 ) {
+				avgLoadingTime = objectLoadTotalTime.longValue() / currentObjectLoadedCount;
 			}
 			return avgLoadingTime;
 		}
 		finally {
-			writeLock.unlock();
+			exclusiveLock.unlock();
 		}
 	}
 
 	@Override
 	public void objectLoadExecuted(long numberOfObjectsLoaded, long time) {
-		readLock.lock();
+		sharedLock.lock();
 		try {
-			for ( long old = objectLoadMaxTime.get();
+			for ( long old = objectLoadMaxTime.longValue();
 				( time > old ) && ( objectLoadMaxTime.compareAndSet( old, time ) );
-				old = objectLoadMaxTime.get() ) {
+				old = objectLoadMaxTime.longValue() ) {
 				//no-op
 			}
-			objectLoadedCount.addAndGet( numberOfObjectsLoaded );
-			objectLoadTotalTime.addAndGet( time );
+			objectLoadedCount.add( numberOfObjectsLoaded );
+			objectLoadTotalTime.add( time );
 		}
 		finally {
-			readLock.unlock();
+			sharedLock.unlock();
 		}
 	}
 
