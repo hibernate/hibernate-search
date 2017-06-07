@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -264,7 +264,7 @@ public class IndexingGeneratedCorpusTest {
 
 	private static class SilentProgressMonitor implements MassIndexerProgressMonitor {
 
-		final AtomicLong objectsCounter = new AtomicLong();
+		final LongAdder objectsCounter = new LongAdder();
 
 		volatile boolean finished = false;
 
@@ -282,13 +282,13 @@ public class IndexingGeneratedCorpusTest {
 
 		@Override
 		public void addToTotalCount(long count) {
-			objectsCounter.addAndGet( count );
+			objectsCounter.add( count );
 		}
 
 		@Override
 		public void indexingCompleted() {
 			finished = true;
-			log.debug( "Finished indexing " + objectsCounter.get() + " entities" );
+			log.debug( "Finished indexing " + objectsCounter.doubleValue() + " entities" );
 		}
 	}
 }

@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.util.progessmonitor;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
@@ -20,11 +20,11 @@ import static org.junit.Assert.assertEquals;
 public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressMonitor {
 
 	private final MassIndexerProgressMonitor monitor;
-	private final AtomicLong totalCount = new AtomicLong();
-	private final AtomicLong finishedCount = new AtomicLong();
-	private final AtomicLong addedDocuments = new AtomicLong();
-	private final int expectedAddedDocuments;
-	private final int expectedTotalCount;
+	private final LongAdder totalCount = new LongAdder();
+	private final LongAdder finishedCount = new LongAdder();
+	private final LongAdder addedDocuments = new LongAdder();
+	private final long expectedAddedDocuments;
+	private final long expectedTotalCount;
 
 	public AssertingMassIndexerProgressMonitor(int expectedAddedDocuments, int expectedTotalCount) {
 		this.expectedAddedDocuments = expectedAddedDocuments;
@@ -34,7 +34,7 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 
 	@Override
 	public void documentsAdded(long increment) {
-		addedDocuments.addAndGet( increment );
+		addedDocuments.add( increment );
 		monitor.documentsAdded( increment );
 	}
 
@@ -50,18 +50,19 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 
 	@Override
 	public void addToTotalCount(long count) {
-		totalCount.addAndGet( count );
+		totalCount.add( count );
 		monitor.addToTotalCount( count );
 	}
 
 	@Override
 	public void indexingCompleted() {
-		finishedCount.incrementAndGet();
+		finishedCount.add( 1 );
 	}
 
 	public void assertExpectedProgressMade() {
-		assertEquals( "Unexpected number of added documents", expectedAddedDocuments, addedDocuments.get() );
-		assertEquals( "Unexpected total count", expectedTotalCount, totalCount.get() );
-		assertEquals( "Finished called more than once", 1, finishedCount.get() );
+		assertEquals( "Unexpected number of added documents", expectedAddedDocuments, addedDocuments.longValue() );
+		assertEquals( "Unexpected total count", expectedTotalCount, totalCount.longValue() );
+		assertEquals( "Finished called more than once", 1, finishedCount.longValue() );
 	}
+
 }

@@ -9,7 +9,8 @@ package org.hibernate.search.jmx.impl;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
+
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -227,10 +228,10 @@ public final class JMXRegistrar {
 	public static class IndexingProgressMonitor implements IndexingProgressMonitorMBean, MassIndexerProgressMonitor {
 		private static final Log log = LoggerFactory.make();
 
-		private final AtomicLong documentsDoneCounter = new AtomicLong();
-		private final AtomicLong documentsBuiltCounter = new AtomicLong();
-		private final AtomicLong totalCounter = new AtomicLong();
-		private final AtomicLong entitiesLoadedCounter = new AtomicLong();
+		private final LongAdder documentsDoneCounter = new LongAdder();
+		private final LongAdder documentsBuiltCounter = new LongAdder();
+		private final LongAdder totalCounter = new LongAdder();
+		private final LongAdder entitiesLoadedCounter = new LongAdder();
 
 		private final String registeredName;
 
@@ -244,43 +245,43 @@ public final class JMXRegistrar {
 
 		@Override
 		public final void documentsAdded(long increment) {
-			documentsDoneCounter.addAndGet( increment );
+			documentsDoneCounter.add( increment );
 		}
 
 		@Override
 		public final void documentsBuilt(int number) {
-			documentsBuiltCounter.addAndGet( number );
+			documentsBuiltCounter.add( number );
 		}
 
 		@Override
 		public final void entitiesLoaded(int size) {
-			entitiesLoadedCounter.addAndGet( size );
+			entitiesLoadedCounter.add( size );
 		}
 
 		@Override
 		public final void addToTotalCount(long count) {
-			totalCounter.addAndGet( count );
+			totalCounter.add( count );
 		}
 
 		@Override
 		public final void indexingCompleted() {
-			log.indexingCompletedAndMBeanUnregistered( totalCounter.get() );
+			log.indexingCompletedAndMBeanUnregistered( totalCounter.longValue() );
 			unRegisterMBean( registeredName );
 		}
 
 		@Override
 		public final long getLoadedEntitiesCount() {
-			return entitiesLoadedCounter.get();
+			return entitiesLoadedCounter.longValue();
 		}
 
 		@Override
 		public final long getDocumentsAddedCount() {
-			return documentsDoneCounter.get();
+			return documentsDoneCounter.longValue();
 		}
 
 		@Override
 		public final long getNumberOfEntitiesToIndex() {
-			return totalCounter.get();
+			return totalCounter.longValue();
 		}
 	}
 }
