@@ -1648,6 +1648,22 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>${project.version}</version>
                                 </dependency>
                             </dependencies>
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>start</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1689,6 +1705,22 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>${project.version}</version>
                                 </dependency>
                             </dependencies>
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>start</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1731,6 +1763,23 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>2.6.2</version>
                                 </dependency>
                             </dependencies>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1778,6 +1827,23 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>2.6.2</version>
                                 </dependency>
                             </dependencies>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
                         </plugin>
                     </plugins>
                 </pluginManagement>
