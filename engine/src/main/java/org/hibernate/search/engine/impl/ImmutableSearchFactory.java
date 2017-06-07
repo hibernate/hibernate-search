@@ -286,12 +286,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public HSQuery createHSQuery() {
-		return createLuceneBasedHSQuery();
-	}
-
-	@Override
 	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes) {
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
 

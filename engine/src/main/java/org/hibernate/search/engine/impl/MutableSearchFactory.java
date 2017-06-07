@@ -146,11 +146,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public HSQuery createHSQuery() {
-		return delegate.createHSQuery();
-	}
-
-	@Override
 	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entities) {
 		return delegate.createHSQuery( luceneQuery, entities );
 	}
