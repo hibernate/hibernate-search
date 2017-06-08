@@ -56,7 +56,12 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( indexName );
+					.pathComponent( indexName )
+					/*
+					 * Ignore conflicts: if we wrote to a document concurrently,
+					 * we just want to keep it as is.
+					 */
+					.param( "conflicts", "proceed" );
 
 			if ( !typeNames.isEmpty() ) {
 				builder.multiValuedPathComponent( typeNames );
