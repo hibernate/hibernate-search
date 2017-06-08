@@ -8,7 +8,6 @@ package org.hibernate.search.engine.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,11 +168,15 @@ public class WorkPlan {
 		/**
 		 * We further organize work per entity identifier so that we can cancel or adapt work being done
 		 * on the same entities.
+		 * <p>
 		 * This map uses as key what we originally received as {@link Work#getId()} if the type
 		 * is annotated with @ProvidedId, otherwise it uses the value pointed to by
 		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@code javax.persistence.Id}.
+		 * <p>
+		 * We use a LinkedHashMap to ensure the order will be stable from one run to another.
+		 * This changes everything when debugging...
 		 */
-		private final Map<Serializable, PerEntityWork> entityById = new HashMap<Serializable, PerEntityWork>();
+		private final Map<Serializable, PerEntityWork> entityById = new LinkedHashMap<Serializable, PerEntityWork>();
 
 		/**
 		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
