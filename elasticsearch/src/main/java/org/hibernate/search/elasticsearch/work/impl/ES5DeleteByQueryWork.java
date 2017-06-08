@@ -14,6 +14,8 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 
 import com.google.gson.JsonObject;
 
@@ -24,8 +26,19 @@ import com.google.gson.JsonObject;
  */
 public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 
+	private final ElasticsearchWork<?> refreshWork;
+
 	protected ES5DeleteByQueryWork(Builder builder) {
 		super( builder );
+		this.refreshWork = builder.buildRefreshWork();
+	}
+
+	@Override
+	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+		/*
+		 * Refresh the index so as to minimize the risk of version conflict
+		 */
+		refreshWork.execute( executionContext );
 	}
 
 	@Override
@@ -40,10 +53,13 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		private final JsonObject payload;
 		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
-		public Builder(URLEncodedString indexName, JsonObject payload) {
+		private final RefreshWorkBuilder refreshWorkBuilder;
+
+		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkFactory workFactory) {
 			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
+			this.refreshWorkBuilder = workFactory.refresh().index( indexName );
 		}
 
 		@Override
@@ -66,6 +82,10 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 					.body( payload );
 
 			return builder.build();
+		}
+
+		protected ElasticsearchWork<?> buildRefreshWork() {
+			return refreshWorkBuilder.build();
 		}
 
 		@Override

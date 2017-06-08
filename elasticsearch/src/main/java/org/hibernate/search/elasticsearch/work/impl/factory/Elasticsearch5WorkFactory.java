@@ -38,7 +38,7 @@ public class Elasticsearch5WorkFactory extends Elasticsearch2WorkFactory {
 
 	@Override
 	public DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
-		return new ES5DeleteByQueryWork.Builder( indexName, payload );
+		return new ES5DeleteByQueryWork.Builder( indexName, payload, this );
 	}
 
 }

@@ -17,6 +17,8 @@ import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -30,8 +32,19 @@ import com.google.gson.JsonObject;
  */
 public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 
+	private final ElasticsearchWork<?> refreshWork;
+
 	protected ES2DeleteByQueryWork(Builder builder) {
 		super( builder );
+		this.refreshWork = builder.buildRefreshWork();
+	}
+
+	@Override
+	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+		/*
+		 * Refresh the index so as to minimize the risk of version conflict
+		 */
+		refreshWork.execute( executionContext );
 	}
 
 	@Override
@@ -46,10 +59,13 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		private final JsonObject payload;
 		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
-		public Builder(URLEncodedString indexName, JsonObject payload) {
+		private final RefreshWorkBuilder refreshWorkBuilder;
+
+		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkFactory workFactory) {
 			super( indexName, SuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
+			this.refreshWorkBuilder = workFactory.refresh().index( indexName );
 		}
 
 		@Override
@@ -72,6 +88,10 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 					.body( payload );
 
 			return builder.build();
+		}
+
+		protected ElasticsearchWork<?> buildRefreshWork() {
+			return refreshWorkBuilder.build();
 		}
 
 		@Override
