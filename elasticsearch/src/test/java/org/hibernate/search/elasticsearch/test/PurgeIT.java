@@ -39,7 +39,10 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
+@RunWith(JUnit4.class) // Do not use the CustomRunner, it messes with rules (by reusing the same test instance)
 public class PurgeIT extends SearchTestBase {
 
 	@Rule
@@ -98,6 +101,58 @@ public class PurgeIT extends SearchTestBase {
 		// Order is significant to reproduce the issue, see HSEARCH-2761
 		fullTextSession.purgeAll( Level2.class );
 		fullTextSession.purgeAll( Level3.class );
+		fullTextSession.purgeAll( Level1.class );
+
+		tx.commit();
+
+		flush();
+		all = getAll();
+		assertEquals( "Wrong total number of entries. Index should be empty after purge.", 0, all.size() );
+
+		tx = fullTextSession.beginTransaction();
+		fullTextSession.createIndexer()
+				.batchSizeToLoadObjects( 25 )
+				.threadsToLoadObjects( 1 )
+				.optimizeOnFinish( true )
+				.startAndWait();
+		tx.commit();
+
+		flush();
+		all = getAll();
+		assertEquals( "Wrong total number of entries.", 3, all.size() );
+	}
+
+	/*
+	 * Test executing a purge after a write without explicitly refreshing in-between.
+	 */
+	@Test
+	public void writeThenPurge() throws Exception {
+		flush();
+		List<Level1> all = getAll();
+		assertEquals( "Wrong total number of entries", 3, all.size() );
+
+		// Expect 0 failure in the backend threads
+		logged.expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText( "a LoggingEvent with ERROR level or higher" );
+			}
+
+			@Override
+			protected boolean matchesSafely(LoggingEvent item) {
+				return item.getLevel().isGreaterOrEqual( Level.ERROR );
+			}
+		} );
+
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.index( fullTextSession.get( Level1.class, 1L ) );
+
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+
 		fullTextSession.purgeAll( Level1.class );
 
 		tx.commit();
