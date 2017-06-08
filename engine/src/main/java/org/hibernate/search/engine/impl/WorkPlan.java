@@ -9,6 +9,7 @@ package org.hibernate.search.engine.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,7 +52,11 @@ public class WorkPlan {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final HashMap<Class<?>, PerClassWork> byClass = new HashMap<Class<?>, PerClassWork>();
+	/*
+	 * Using a LinkedHashMap to ensure the order will be stable from one run to another.
+	 * This changes everything when debugging...
+	 */
+	private final Map<Class<?>, PerClassWork> byClass = new LinkedHashMap<Class<?>, PerClassWork>();
 
 	private final ExtendedSearchIntegrator extendedIntegrator;
 
