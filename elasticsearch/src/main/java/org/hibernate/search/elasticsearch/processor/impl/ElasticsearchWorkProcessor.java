@@ -102,7 +102,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		executeSafe( works, true );
+		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
+				client, gsonProvider, workFactory, this, errorHandler );
+		executeSafe( context, works, true );
+		context.flush();
 	}
 
 	/**
@@ -149,9 +152,8 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param nonBulkedWorks The works to be bulked (as much as possible) and executed
 	 * @param refreshInBulkAPICall The parameter to pass to {@link #createRequestGroups(Iterable, boolean)}.
 	 */
-	private void executeSafe(Iterable<ElasticsearchWork<?>> nonBulkedWorks, boolean refreshInBulkAPICall) {
-		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				client, gsonProvider, workFactory, this, errorHandler );
+	private void executeSafe(SequentialWorkExecutionContext context, Iterable<ElasticsearchWork<?>> nonBulkedWorks,
+			boolean refreshInBulkAPICall) {
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( nonBulkedWorks, refreshInBulkAPICall ) ) {
@@ -183,8 +185,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 				break;
 			}
 		}
-
-		context.flush();
 	}
 
 	private void executeUnsafe(ElasticsearchWork<?> work, ElasticsearchWorkExecutionContext context) {
@@ -344,7 +344,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 						return;
 					}
 					Iterable<ElasticsearchWork<?>> flattenedWorks = CollectionHelper.flatten( works );
-					executeSafe( flattenedWorks, false );
+					executeSafe( context, flattenedWorks, false );
 				}
 			}
 		}
