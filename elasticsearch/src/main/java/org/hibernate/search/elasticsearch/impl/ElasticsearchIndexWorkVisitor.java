@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.facet.FacetsConfig;
@@ -113,10 +112,11 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				.luceneWork( work )
 				.markIndexDirty( refreshAfterWrite );
 
-		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
-		for ( Class<?> typeToDelete : typesToDelete ) {
-			builder.type( URLEncodedString.fromString( typeToDelete.getName() ) );
-		}
+		/*
+		 * Deleting only the given type.
+		 * Inheritance trees are handled at a higher level by creating multiple purge works.
+		 */
+		builder.type( URLEncodedString.fromString( work.getEntityClass().getName() ) );
 
 		return builder.build();
 	}
