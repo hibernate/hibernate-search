@@ -83,7 +83,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
-		return new ES2DeleteByQueryWork.Builder( indexName, payload );
+		return new ES2DeleteByQueryWork.Builder( indexName, payload, this );
 	}
 
 	@Override
