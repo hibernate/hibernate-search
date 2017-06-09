@@ -1228,7 +1228,7 @@ This rule has some exceptions but is true most of the time. Respect it unless yo
 doing.
 
 [[section-normalizers]]
-==== Normalizers
+===== Normalizers
 
 Analyzers are great when you need to search in text documents,
 but what if you want to sort the analyzed text?
