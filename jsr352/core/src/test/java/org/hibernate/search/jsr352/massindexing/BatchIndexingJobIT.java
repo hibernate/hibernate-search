@@ -254,6 +254,48 @@ public class BatchIndexingJobIT {
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
+	@Test
+	public void partitioned() throws InterruptedException,
+			IOException {
+		EntityManager em = emf.createEntityManager();
+		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
+		ftem.purgeAll( Person.class );
+		ftem.purgeAll( Company.class );
+		ftem.purgeAll( WhoAmI.class );
+		ftem.flushToIndexes();
+		em.close();
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
+		assertEquals( 0, companies.size() );
+		assertEquals( 0, people.size() );
+		assertEquals( 0, whos.size() );
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( Company.class, Person.class, WhoAmI.class )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.rowsPerPartition( 2 )
+						.checkpointInterval( 1 )
+						.build()
+				);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
+		for ( StepExecution stepExecution : stepExecutions ) {
+			log.infof( "step %s executed.", stepExecution.getStepName() );
+			testBatchStatus( stepExecution );
+		}
+
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
+		assertEquals( 1, companies.size() );
+		assertEquals( 1, people.size() );
+		assertEquals( 1, whos.size() );
+	}
+
 	private void testBatchStatus(StepExecution stepExecution) {
 		BatchStatus batchStatus = stepExecution.getBatchStatus();
 		assertEquals( BatchStatus.COMPLETED, batchStatus );
