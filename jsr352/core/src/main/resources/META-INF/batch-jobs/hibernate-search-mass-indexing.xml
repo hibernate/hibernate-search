@@ -59,6 +59,8 @@
 
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
+                    <property name="lowerBound" value="#{partitionPlan['lowerBound']}" />
+                    <property name="upperBound" value="#{partitionPlan['upperBound']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
