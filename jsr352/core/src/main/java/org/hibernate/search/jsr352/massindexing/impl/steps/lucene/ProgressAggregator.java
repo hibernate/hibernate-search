@@ -7,6 +7,9 @@
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.batch.api.partition.AbstractPartitionAnalyzer;
 import javax.batch.runtime.context.StepContext;
@@ -38,7 +41,6 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 	 */
 	@Override
 	public void analyzeCollectorData(Serializable fromCollector) throws Exception {
-
 		// update step-level progress using partition-level progress
 		PartitionProgress partitionProgress = (PartitionProgress) fromCollector;
 		StepProgress stepProgress = (StepProgress) stepContext.getTransientUserData();
@@ -46,10 +48,28 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 
 		// logging
 		StringBuilder sb = new StringBuilder( System.lineSeparator() );
-		for ( String msg : stepProgress.getProgresses() ) {
+		formatEntityProgresses( stepProgress ).forEach( (msg) -> {
 			sb.append( System.lineSeparator() ).append( "\t" ).append( msg );
-		}
+		} );
 		sb.append( System.lineSeparator() );
 		log.analyzeIndexProgress( sb.toString() );
+	}
+
+	private Stream<String> formatEntityProgresses(StepProgress stepProgress) {
+		Map<String, Long> entityProgress = stepProgress.getEntityProgress();
+		return stepProgress.getEntityTotal().entrySet().stream()
+				.map( (entry) ->
+					formatEntityProgress( entry.getKey() , entityProgress.get( entry.getKey() ), entry.getValue() )
+				);
+	}
+
+	private String formatEntityProgress(String entity, Long processed, Long total) {
+		return String.format(
+				Locale.ROOT,
+				"%s: %d/%d works processed (%.2f%%).",
+				entity,
+				processed,
+				total,
+				processed * 100F / total );
 	}
 }

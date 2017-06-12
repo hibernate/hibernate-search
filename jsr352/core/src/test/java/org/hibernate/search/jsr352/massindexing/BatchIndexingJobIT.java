@@ -308,9 +308,9 @@ public class BatchIndexingJobIT {
 				 * Thus we check our own object.
 				 */
 				StepProgress progress = (StepProgress) stepExecution.getPersistentUserData();
-				assertEquals( 1.0, progress.getProgress( Company.class.getName() ), 0.01 );
-				assertEquals( 1.0, progress.getProgress( Person.class.getName() ), 0.01 );
-				assertEquals( 1.0, progress.getProgress( WhoAmI.class.getName() ), 0.01 );
+				assertEquals( (Long) 3L, progress.getEntityProgress().get( Company.class.getName() ) );
+				assertEquals( (Long) 3L, progress.getEntityProgress().get( Person.class.getName() ) );
+				assertEquals( (Long) 3L, progress.getEntityProgress().get( WhoAmI.class.getName() ) );
 				break;
 
 			default:
