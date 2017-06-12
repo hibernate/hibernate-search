@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.jsr352.massindexing;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.MapAssert.entry;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
@@ -22,6 +25,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
@@ -46,6 +50,8 @@ public class BatchIndexingJobIT {
 	private static final String SESSION_FACTORY_NAME = "h2-entityManagerFactory";
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
+
+	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
 
 	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 	private EntityManagerFactory emf;
@@ -123,10 +129,7 @@ public class BatchIndexingJobIT {
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
-		for ( StepExecution stepExecution : stepExecutions ) {
-			log.infof( "step %s executed.", stepExecution.getStepName() );
-			testBatchStatus( stepExecution );
-		}
+		assertCompletion( stepExecutions );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -283,10 +286,24 @@ public class BatchIndexingJobIT {
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
-		for ( StepExecution stepExecution : stepExecutions ) {
-			log.infof( "step %s executed.", stepExecution.getStepName() );
-			testBatchStatus( stepExecution );
-		}
+		assertCompletion( stepExecutions );
+
+		StepProgress progress = getMainStepProgress( stepExecutions );
+		Map<Integer, Long> partitionProgress = progress.getPartitionProgress();
+		assertThat( partitionProgress )
+				.as( "Entities processed per partition" )
+				.hasSize( 3 * 2 )
+				.includes(
+						// Company
+						entry( 0, 2L ), // Partition 1
+						entry( 1, 1L ), // Partition 2
+						// Person
+						entry( 2, 2L ), // Partition 1
+						entry( 3, 1L ), // Partition 2
+						// WhoAmI
+						entry( 4, 2L ), // Partition 1
+						entry( 5, 1L ) // Partition 2
+				);
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -296,26 +313,35 @@ public class BatchIndexingJobIT {
 		assertEquals( 1, whos.size() );
 	}
 
-	private void testBatchStatus(StepExecution stepExecution) {
-		BatchStatus batchStatus = stepExecution.getBatchStatus();
-		assertEquals( BatchStatus.COMPLETED, batchStatus );
-		switch ( stepExecution.getStepName() ) {
-			case "produceLuceneDoc":
-				/*
-				 * We cannot check the metrics, which in JBatch are set to 0
-				 * for partitioned steps (the metrics are handled separately for
-				 * each partition).
-				 * Thus we check our own object.
-				 */
-				StepProgress progress = (StepProgress) stepExecution.getPersistentUserData();
-				assertEquals( (Long) 3L, progress.getEntityProgress().get( Company.class.getName() ) );
-				assertEquals( (Long) 3L, progress.getEntityProgress().get( Person.class.getName() ) );
-				assertEquals( (Long) 3L, progress.getEntityProgress().get( WhoAmI.class.getName() ) );
-				break;
-
-			default:
-				break;
+	private void assertCompletion(List<StepExecution> stepExecutions) {
+		for ( StepExecution stepExecution : stepExecutions ) {
+			BatchStatus batchStatus = stepExecution.getBatchStatus();
+			log.infof( "step %s executed.", stepExecution.getStepName() );
+			assertEquals( BatchStatus.COMPLETED, batchStatus );
 		}
+
+		/*
+		 * We cannot check the metrics, which in JBatch are set to 0
+		 * for partitioned steps (the metrics are handled separately for
+		 * each partition).
+		 * Thus we check our own object.
+		 */
+		StepProgress progress = getMainStepProgress( stepExecutions );
+		assertEquals( (Long) 3L, progress.getEntityProgress().get( Company.class.getName() ) );
+		assertEquals( (Long) 3L, progress.getEntityProgress().get( Person.class.getName() ) );
+		assertEquals( (Long) 3L, progress.getEntityProgress().get( WhoAmI.class.getName() ) );
+	}
+
+	private StepProgress getMainStepProgress(List<StepExecution> stepExecutions) {
+		for ( StepExecution stepExecution : stepExecutions ) {
+			switch ( stepExecution.getStepName() ) {
+				case MAIN_STEP_NAME:
+					return (StepProgress) stepExecution.getPersistentUserData();
+				default:
+					break;
+			}
+		}
+		throw new AssertionFailure( "Missing step progress for step '" + MAIN_STEP_NAME + "'" );
 	}
 
 }

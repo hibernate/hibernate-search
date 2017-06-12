@@ -74,6 +74,10 @@ public class StepProgress implements Serializable {
 		partitionProgress.put( pid, prevDone + increment );
 	}
 
+	public Map<Integer, Long> getPartitionProgress() {
+		return Collections.unmodifiableMap( partitionProgress );
+	}
+
 	public Map<String, Long> getEntityProgress() {
 		return Collections.unmodifiableMap( entityProgress );
 	}

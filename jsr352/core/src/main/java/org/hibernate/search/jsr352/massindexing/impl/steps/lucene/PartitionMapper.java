@@ -153,6 +153,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND, SerializationUtil.serialize( bound.getUpperBound() ) );
 			}
 
+			log.infof( "Partitions: %s", (Object) props );
+
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );
 			partitionPlan.setPartitions( partitions );
@@ -198,13 +200,25 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	private List<PartitionBound> buildPartitionUnitsFrom(ScrollableResults scroll, Class<?> clazz) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
+
 		Object lowerID = null;
 		Object upperID = null;
+
+		/*
+		 * The scroll results are originally positioned *before* the first element,
+		 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
+		 * upper bound of the first partition, whereas for the next partitions
+		 * we only need to advance rowsPerPartition positions.
+		 * This handle the special case of the first partition.
+		 */
+		scroll.next();
+
 		while ( scroll.scroll( rowsPerPartition ) ) {
 			lowerID = upperID;
 			upperID = scroll.get( 0 );
 			partitionUnits.add( new PartitionBound( clazz, lowerID, upperID ) );
 		}
+
 		// add an additional partition on the tail
 		lowerID = upperID;
 		upperID = null;

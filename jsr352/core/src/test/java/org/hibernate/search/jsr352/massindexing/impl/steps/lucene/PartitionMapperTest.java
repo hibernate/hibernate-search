@@ -90,9 +90,9 @@ public class PartitionMapperTest {
 	}
 
 	/**
-	 * Prove that there're N + 1 partitions for each root entity, where N stands for the ceiling number of the division
-	 * between the rows to index and the max rows per partition, and the 1 stands for the tail partition for entities
-	 * inserted after partitioning.
+	 * Prove that there're N partitions for each root entity,
+	 * where N stands for the ceiling number of the division
+	 * between the rows to index and the max rows per partition.
 	 *
 	 * @throws Exception
 	 */
@@ -120,9 +120,9 @@ public class PartitionMapperTest {
 			}
 		}
 
-		// nbPartitions = rows / rowsPerPartition + 1
-		assertEquals( 2, compPartitions ); // 3 / 3 + 1 = 2 partitions
-		assertEquals( 3, persPartitions ); // 8 / 3 + 1 = 3 partitions
+		// nbPartitions = rows / rowsPerPartition
+		assertEquals( 1, compPartitions ); // 3 / 3 => 1 partition
+		assertEquals( 3, persPartitions ); // 8 / 3 => 3 partitions
 	}
 
 	@After
