@@ -10,15 +10,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
-import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -34,7 +31,6 @@ import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -278,20 +274,6 @@ public class BatchIndexingJobIT {
 			default:
 				break;
 		}
-	}
-
-	/**
-	 * Convert the Metric array contained in StepExecution to a key-value map for easy access to Metric parameters.
-	 *
-	 * @param metrics a Metric array contained in StepExecution.
-	 * @return a map view of the metrics array.
-	 */
-	public Map<Metric.MetricType, Long> getMetricsMap(Metric[] metrics) {
-		Map<Metric.MetricType, Long> metricsMap = new HashMap<>();
-		for ( Metric metric : metrics ) {
-			metricsMap.put( metric.getType(), metric.getValue() );
-		}
-		return metricsMap;
 	}
 
 }
