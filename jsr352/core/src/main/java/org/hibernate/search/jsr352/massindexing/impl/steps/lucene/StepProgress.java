@@ -7,10 +7,8 @@
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -76,38 +74,12 @@ public class StepProgress implements Serializable {
 		partitionProgress.put( pid, prevDone + increment );
 	}
 
-	/**
-	 * Get the progress of a given entity.
-	 *
-	 * @param entityName the name of entity
-	 * @return a progress value varies between {@literal [0.0, 1.0]}.
-	 */
-	public double getProgress(String entityName) {
-		if ( !entityProgress.containsKey( entityName )
-				|| !entityTotal.containsKey( entityName ) ) {
-			throw new NullPointerException( "entityName=" + entityName + " not found." );
-		}
-		return entityProgress.get( entityName ) * 1.0 / entityTotal.get( entityName );
+	public Map<String, Long> getEntityProgress() {
+		return Collections.unmodifiableMap( entityProgress );
 	}
 
-	/**
-	 * Get progresses of each entity at step-level.
-	 *
-	 * @return an iterable results in string format.
-	 */
-	public Iterable<String> getProgresses() {
-		List<String> results = new LinkedList<>();
-		for ( String entity : entityTotal.keySet() ) {
-			String msg = String.format(
-					Locale.ROOT,
-					"%s: %d/%d works processed (%.2f%%).",
-					entity,
-					entityProgress.get( entity ),
-					entityTotal.get( entity ),
-					entityProgress.get( entity ) * 100F / entityTotal.get( entity ) );
-			results.add( msg );
-		}
-		return results;
+	public Map<String, Long> getEntityTotal() {
+		return Collections.unmodifiableMap( entityTotal );
 	}
 
 	public long getRowsToIndex(String entityName) {
