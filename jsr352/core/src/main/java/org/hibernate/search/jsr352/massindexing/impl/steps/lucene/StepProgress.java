@@ -31,12 +31,6 @@ public class StepProgress implements Serializable {
 	private Map<Integer, Long> partitionProgress;
 
 	/**
-	 * A map of the total number of rows to index across all the partitions. Key: the partition id; Value: the number of
-	 * rows to index.
-	 */
-	private Map<Integer, Long> partitionTotal;
-
-	/**
 	 * A map of the total number of rows having already been indexed across all the entity types. Key: the entity name
 	 * in string; Value: the number of rows indexed.
 	 */
@@ -50,7 +44,6 @@ public class StepProgress implements Serializable {
 
 	public StepProgress() {
 		partitionProgress = new HashMap<>();
-		partitionTotal = new HashMap<>();
 		entityProgress = new HashMap<>();
 		entityTotal = new HashMap<>();
 	}
@@ -81,20 +74,6 @@ public class StepProgress implements Serializable {
 	private void increment(int pid, long increment) {
 		long prevDone = partitionProgress.getOrDefault( pid, 0L );
 		partitionProgress.put( pid, prevDone + increment );
-	}
-
-	/**
-	 * Get the progress of a given partition ID.
-	 *
-	 * @param pid partition ID
-	 * @return a progress value varies between {@literal [0.0, 1.0]}.
-	 */
-	public double getProgress(int pid) {
-		if ( !partitionProgress.containsKey( pid )
-				|| !partitionTotal.containsKey( pid ) ) {
-			throw new NullPointerException( "partitionId=" + pid + " not found." );
-		}
-		return partitionProgress.get( pid ) * 1.0 / partitionTotal.get( pid );
 	}
 
 	/**
