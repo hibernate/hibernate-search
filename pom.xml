@@ -216,7 +216,7 @@
         <elasticsearchClientVersion>5.4.2</elasticsearchClientVersion>
         <elasticsearchSnifferVersion>5.4.2</elasticsearchSnifferVersion>
         <elasticsearchGsonVersion>2.8.0</elasticsearchGsonVersion>
-        <elasticsearchAWSV4SignerVersion>1.2</elasticsearchAWSV4SignerVersion>
+        <elasticsearchAWSV4SignerVersion>1.3</elasticsearchAWSV4SignerVersion>
         
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->

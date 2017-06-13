@@ -8,19 +8,11 @@ package org.hibernate.search.elasticsearch.aws.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.Collator;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.Header;
@@ -29,51 +21,30 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.NameValuePair;
 import org.apache.http.RequestLine;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 import uk.co.lucasweb.aws.v4.signer.Signer;
-import uk.co.lucasweb.aws.v4.signer.Signer.Builder;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
 /**
  * @author Yoann Rodiere
  */
-public class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
+class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 
-	private static final DateTimeFormatter AMZ_DATE_FORMATTER = new DateTimeFormatterBuilder()
-			.appendValue( ChronoField.YEAR, 4 )
-			.appendValue( ChronoField.MONTH_OF_YEAR, 2 )
-			.appendValue( ChronoField.DAY_OF_MONTH, 2 )
-			.appendLiteral( 'T' )
-			.appendValue( ChronoField.HOUR_OF_DAY, 2 )
-			.appendValue( ChronoField.MINUTE_OF_HOUR, 2 )
-			.appendValue( ChronoField.SECOND_OF_MINUTE, 2 )
-			.appendLiteral( 'Z' )
-			.toFormatter();
+	private static final Set<String> HEADERS_TO_SIGN = CollectionHelper.asImmutableSet(new String[] {
+			AWSHeaders.HOST,
+			AWSHeaders.X_AMZ_DATE_HEADER_NAME,
+			AWSHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME
+	});
 
-	private static final String HOST_PORT_REGEX = ":\\d+$";
-
-	private static final Comparator<? super String> QUERY_PARAMETER_NAME_COMPARATOR;
-	static {
-		Collator collator = Collator.getInstance( Locale.ROOT );
-		collator.setStrength( Collator.SECONDARY );
-		QUERY_PARAMETER_NAME_COMPARATOR = collator;
-	}
-
-	private final String accessKey;
-	private final String secretKey;
+	private final AwsCredentials credentials;
 	private final String region;
 	private final String service;
 
 	public AWSSigningRequestInterceptor(String accessKey, String secretKey, String region, String service) {
-		super();
-		this.accessKey = accessKey;
-		this.secretKey = secretKey;
+		this.credentials = new AwsCredentials( accessKey, secretKey );
 		this.region = region;
 		this.service = service;
 	}
@@ -81,39 +52,16 @@ public class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 	@Override
 	public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
 		LocalDateTime now = LocalDateTime.now( ZoneOffset.UTC );
-		String contentHash = getContentHash( request );
-		sign( request, now, contentHash );
+		request.addHeader( AWSHeaders.X_AMZ_DATE_HEADER_NAME, AWSHeaders.toAmzDate( now ) );
+
+		String contentHash = computeContentHash( request );
+		request.addHeader( AWSHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME, contentHash );
+
+		request.addHeader( AWSHeaders.AUTHORIZATION, sign( request, contentHash ) );
 	}
 
-	private void sign(HttpRequest request, LocalDateTime now, String contentHash) throws IOException {
-		uk.co.lucasweb.aws.v4.signer.HttpRequest signerRequestLine = getSignerRequestLine( request );
-
-		Signer.Builder builder = Signer.builder()
-				.awsCredentials( new AwsCredentials( accessKey, secretKey ) )
-				.region( region );
-		Header hostHeader = request.getLastHeader( "host" );
-		builder = builder.header( hostHeader.getName(), normalizeHost( hostHeader.getValue() ) );
-		builder = addHeader( builder, request, "x-amz-date", AMZ_DATE_FORMATTER.format( now ) );
-		builder = addHeader( builder, request, "x-amz-content-sha256", contentHash );
-
-		Signer signer = builder.build( signerRequestLine, service, contentHash );
-
-		request.addHeader( "Authorization", signer.getSignature() );
-	}
-
-	private uk.co.lucasweb.aws.v4.signer.HttpRequest getSignerRequestLine(HttpRequest request) {
-		RequestLine requestLine = request.getRequestLine();
-		URI uri = URI.create( requestLine.getUri() );
-		return new FixedHttpRequest( requestLine.getMethod(), uri );
-	}
-
-	private Signer.Builder addHeader(Builder builder, HttpRequest request, String name, String value) {
-		request.addHeader( name, value );
-		return builder.header( name, value );
-	}
-
-	private String getContentHash(HttpRequest request) throws IOException {
-		HttpEntity entity = getEntity( request );
+	private String computeContentHash(HttpRequest request) throws IOException {
+		HttpEntity entity = getEntity(request);
 		if ( entity == null ) {
 			return DigestUtils.sha256Hex( "" );
 		}
@@ -134,80 +82,30 @@ public class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 		}
 	}
 
-	private static String normalizeHost(String value) {
-		return value.replaceAll( HOST_PORT_REGEX, "" );
-	}
+	private String sign(HttpRequest request, String contentHash) {
+		RequestLine requestLine = request.getRequestLine();
+		uk.co.lucasweb.aws.v4.signer.HttpRequest signerRequestLine =
+				new uk.co.lucasweb.aws.v4.signer.HttpRequest( requestLine.getMethod(), requestLine.getUri() );
 
-	private static String getNormalizedPath(URI uri) {
-		// Use the raw path, i.e. the one we send to AWS
-		String rawPath = uri.getRawPath();
-		if ( StringHelper.isEmpty( rawPath ) ) {
-			return "/";
-		}
-		else {
-			/*
-			 * For some unknown reason, AWS seems to URL-encode the path components
-			 * before calculating the hash,
-			 * even though the path components were already URL-encoded...
-			 */
-			StringBuilder builder = new StringBuilder();
+		Signer.Builder builder = Signer.builder()
+				.awsCredentials( credentials )
+				.region( region );
 
-			int componentStart = 0;
-			int nextSeparator = rawPath.indexOf( '/' );
-			while ( nextSeparator >= 0 ) {
-				String pathComponent = rawPath.substring( componentStart, nextSeparator );
-				builder.append( urlEncode( pathComponent ) ).append( '/' );
-				componentStart = nextSeparator + 1;
-				nextSeparator = rawPath.indexOf( '/', componentStart );
+		for ( String headerName : HEADERS_TO_SIGN ) {
+			Stream<String> stream = Arrays.stream( request.getHeaders( headerName ) )
+					.map( Header::getValue );
+
+			// Unspecified behavior: AWS does some extra normalization on the "host" header
+			if ( AWSHeaders.HOST.equalsIgnoreCase( headerName ) ) {
+				stream = stream.map( AWSNormalization::normalizeHost );
 			}
-			String pathComponent = rawPath.substring( componentStart );
-			builder.append( urlEncode( pathComponent ) );
 
-			return builder.toString();
-		}
-	}
-
-	private static String urlEncode(String value) {
-		try {
-			return URLEncoder.encode( value, StandardCharsets.UTF_8.name() );
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new AssertionFailure( "Platform does not support UTF-8... ?", e );
-		}
-	}
-
-	private static String getNormalizedQueryString(URI uri) {
-		// Use the raw query, i.e. the one we send to AWS
-		String rawQuery = uri.getRawQuery();
-		if ( StringHelper.isEmpty( rawQuery ) ) {
-			return "";
-		}
-		else {
-			// Query parameters must be sorted alphabetically before being hashed
-			List<NameValuePair> parameters = URLEncodedUtils.parse( uri, StandardCharsets.UTF_8.name() );
-			parameters.sort( (l, r) -> QUERY_PARAMETER_NAME_COMPARATOR.compare( l.getName(), r.getName() ) );
-			return URLEncodedUtils.format( parameters, StandardCharsets.UTF_8 );
-		}
-	}
-
-	private static class FixedHttpRequest extends uk.co.lucasweb.aws.v4.signer.HttpRequest {
-
-		private final URI uri;
-
-		public FixedHttpRequest(String method, URI uri) {
-			super( method, uri );
-			this.uri = uri;
+			stream.forEach( v -> builder.header( headerName, v ) );
 		}
 
-		@Override
-		public String getPath() {
-			return getNormalizedPath( uri );
-		}
+		Signer signer = builder.build( signerRequestLine, service, contentHash );
 
-		@Override
-		public String getQuery() {
-			return getNormalizedQueryString( uri );
-		}
+		return signer.getSignature();
 	}
 
 }
