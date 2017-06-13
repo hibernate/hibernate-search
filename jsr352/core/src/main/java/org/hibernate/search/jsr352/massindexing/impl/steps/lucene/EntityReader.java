@@ -48,16 +48,7 @@ import static org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPar
  * more item to read. Each reader contains only one entity type.
  * <p>
  * The reading range is restricted by the {@link PartitionBound}, which always represents as a left-closed interval.
- * For example, there 2 entity types Company and Employee. The number of rows are respectively 5 and 4500. The
- * rowsPerPartition is set to 1000. Then, there will be 6 readers and their ranges are :
- * <ul>
- * <li>partitionId = 0, entityType = Company, range = [null, null[
- * <li>partitionId = 1, entityType = Employee, range = [null, 1000[
- * <li>partitionId = 2, entityType = Employee, range = [1000, 2000[
- * <li>partitionId = 3, entityType = Employee, range = [2000, 3000[
- * <li>partitionId = 4, entityType = Employee, range = [3000, 4000[
- * <li>partitionId = 5, entityType = Employee, range = [4000, null[
- * </ul>
+ * See {@link PartitionMapper} for more information about these bounds.
  *
  * @author Mincong Huang
  */
