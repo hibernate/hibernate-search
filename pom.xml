@@ -28,6 +28,7 @@
         <module>backends/jgroups</module>
         <module>backends/jms</module>
         <module>elasticsearch</module>
+        <module>elasticsearch-aws</module>
         <module>orm</module>
         <module>testing</module>
         <module>infinispan</module>
@@ -215,6 +216,7 @@
         <elasticsearchClientVersion>5.4.2</elasticsearchClientVersion>
         <elasticsearchSnifferVersion>5.4.2</elasticsearchSnifferVersion>
         <elasticsearchGsonVersion>2.8.0</elasticsearchGsonVersion>
+        <elasticsearchAWSV4SignerVersion>1.2</elasticsearchAWSV4SignerVersion>
         
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -560,6 +562,11 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-elasticsearch-aws</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
