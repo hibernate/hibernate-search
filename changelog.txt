@@ -1,6 +1,71 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.0.Beta3 (13-06-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2761 Elasticsearch purges may fail due to concurrent (or non-refreshed) writes
+    * HSEARCH-2742 NPE when clearing the index in Elasticsearch
+    * HSEARCH-2736 Discovery_scheme not taken in account
+    * HSEARCH-2683 Avoid explicit usage of hibernate.search. prefix for new Elasticsearch configuration properties
+    * HSEARCH-2481 Byteman-based tests executed in the Elasticsearch module won't work
+    * HSEARCH-2477 Shard filtering doesn't work with Elasticsearch queries
+
+** Deprecation
+    * HSEARCH-2735 Deprecate index-time boosting capabilities
+
+** Improvement
+    * HSEARCH-2763 Use improved statistic collector utilities from JDK8
+    * HSEARCH-2754 SpatialFieldBridge uses inefficient Reflection access
+    * HSEARCH-2752 Improve overhead of checking for Timeout during Query execution
+    * HSEARCH-2748 Just log a warning instead of throwing an exception when connecting to an ES server with a higher version than supported
+    * HSEARCH-2746 Translate parameters of WordDelimiterFilterFactory from 0/1 to booleans on Elasticsearch
+    * HSEARCH-2715 Mention in the documentation *when* a full reindex may be necessary
+    * HSEARCH-2714 Allow finer-grained configuration of Elasticsearch authentication
+    * HSEARCH-2711 Upgrade to Elasticsearch 5.4.1
+    * HSEARCH-2659 Support "normalizers" in Elasticsearch 5.2+
+    * HSEARCH-2652 Create one error context per set of works, instead of one per work, when processing Elasticsearch works
+
+** New Feature
+    * HSEARCH-2726 Add a concept of "normalizer" (analyzer without tokenizer)
+    * HSEARCH-2583 Document the Analyzer definition extension points
+    * HSEARCH-1316 Support @Inject in ClassBridges and FieldBridge instances
+
+** Sub-task
+    * HSEARCH-2666 IndexControlMBean should no longer be flagged experimental
+    * HSEARCH-2665 Promote IndexingInterceptor to be no longer experimental
+
+** Task
+    * HSEARCH-2767 Make ElasticsearchWorkProcessor use one execution context per runnable once again
+    * HSEARCH-2762 Reduce the memory footprint of the Elasticsearch instances in builds
+    * HSEARCH-2751 SimpleQueryStringDSLTest fails on Elasticsearch 5.1
+    * HSEARCH-2749 Make sure every SearchIntegrator built in test is closed properly
+    * HSEARCH-2747 Fix a few typos in the backend section of the documentation
+    * HSEARCH-2745 Make the Elasticsearch option more prominent in the documentation
+    * HSEARCH-2744 Improve Simple Query String documentation
+    * HSEARCH-2743 JGroupsDynamicMasterElectionTest fails on Windows
+    * HSEARCH-2741 Fix dependency convergence issue between MariaDB and integration tests
+    * HSEARCH-2740 Remove dead dependencies from sandbox performance tests
+    * HSEARCH-2739 Some error message use the indexed type and field path inconsistently
+    * HSEARCH-2737 Agents usage during builds requires a new JVM flag on JDK 9
+    * HSEARCH-2734 Re-brand the "ram" DirectoryProvider as "local-heap"
+    * HSEARCH-2733 FullTextIndexEventListener doesn't need to be Serializable
+    * HSEARCH-2732 New Spring integration tests are failing the JDK9 integration tests
+    * HSEARCH-2727 No longer needed to explicitly disable INDEX_UNINVERTING_ALLOWED in tests
+    * HSEARCH-2724 Clarify that "directory-based" indexes are actually just "local Lucene" indexes
+    * HSEARCH-2723 Clarify the documentation about built-in bridges
+    * HSEARCH-2722 Remove conditions around Java 8 specific code
+    * HSEARCH-2721 Fix transient failures in DefaultElasticsearchClientFactoryTest.discovery
+    * HSEARCH-2719 Fix links to hibernate.onjira.com
+    * HSEARCH-2718 Make the analyzer definition provider interfaces API instead of SPI
+    * HSEARCH-2717 Performance tests in sandbox running out of JDBC connections
+    * HSEARCH-2716 Investigate test failures on the MariaDB job in the CI
+    * HSEARCH-2696 Move integration test environment resources to a more fitting location
+    * HSEARCH-2603 Switch to the Painless language for Elasticsearch inline scripts
+    * HSEARCH-1844 Review which components should no longer be tagged as experimental in 5.8
+    * HSEARCH-1404 More flexibility than just Class to identify indexing metadata
+
 5.8.0.Beta2 (11-05-2017)
 -------------------------
 
