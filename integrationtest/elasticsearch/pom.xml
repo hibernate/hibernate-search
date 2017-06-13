@@ -150,13 +150,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>uk.co.lucasweb</groupId>
-            <artifactId>aws-v4-signer-java</artifactId>
-            <version>1.2</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Enable extracting shared test build resources -->
         <!-- See how maven-dependency-plugin is configured in the parent pom -->
         <dependency>
@@ -414,6 +407,13 @@
                     org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS
                 </test.elasticsearch.failsafe.excludedGroups.aws>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-search-elasticsearch-aws</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>
