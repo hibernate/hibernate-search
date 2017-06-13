@@ -7,7 +7,9 @@
 package org.hibernate.search.elasticsearch.testutil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,7 +34,6 @@ import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.rules.ExternalResource;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -55,9 +56,9 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private ElasticsearchClient client;
 
-	private final List<URLEncodedString> createdIndicesNames = Lists.newArrayList();
+	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
 
-	private final List<String> createdTemplatesNames = Lists.newArrayList();
+	private final List<String> createdTemplatesNames = new ArrayList<>();
 
 	public IndexClient index(Class<?> rootClass) {
 		return new IndexClient( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
@@ -355,7 +356,9 @@ public class TestElasticsearchClient extends ExternalResource {
 	private JsonObject buildSettings(String settingsPath, String settings) {
 		JsonElement settingsJsonElement = toJsonElement( settings );
 
-		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
+		List<String> components = Arrays.asList( settingsPath.split( "\\." ) );
+		Collections.reverse( components );
+		for ( String property : components ) {
 			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
 		}
 

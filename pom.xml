@@ -32,6 +32,7 @@
         <module>testing</module>
         <module>infinispan</module>
         <module>modules</module>
+        <module>integrationtest/elasticsearch</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
