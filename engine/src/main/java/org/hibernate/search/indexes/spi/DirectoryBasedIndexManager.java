@@ -27,7 +27,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.Log;
@@ -51,7 +51,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private WorkspaceHolder workspaceHolder;
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
-	private IndexedTypeSet containedEntityTypes = IndexedTypesSets.empty();
+	private IndexedTypeSet containedEntityTypes = IndexedTypeSets.empty();
 	private LuceneWorkSerializer serializer;
 	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
@@ -138,7 +138,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void addContainedEntity(IndexedTypeIdentifier entity) {
 		final IndexedTypeSet oldSet = containedEntityTypes;
-		final IndexedTypeSet newSet = IndexedTypesSets.composite( oldSet, entity );
+		final IndexedTypeSet newSet = IndexedTypeSets.composite( oldSet, entity );
 		if ( ! oldSet.equals( newSet ) ) {
 			this.containedEntityTypes = newSet;
 			triggerWorkspaceReconfiguration();

@@ -19,7 +19,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
@@ -92,7 +92,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 		}
 
 		public IndexedTypeSet getEntityTypes() {
-			return sortableFieldsByType.keySet().stream().collect( IndexedTypesSets.streamCollector() );
+			return sortableFieldsByType.keySet().stream().collect( IndexedTypeSets.streamCollector() );
 		}
 
 		public String getIndexName() {

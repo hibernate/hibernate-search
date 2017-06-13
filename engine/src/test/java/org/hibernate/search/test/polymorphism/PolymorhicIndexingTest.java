@@ -13,7 +13,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,8 +53,8 @@ public class PolymorhicIndexingTest {
 
 	private void expectingForArgument(Class[] argument, Class... expectedInResult) {
 		ExtendedSearchIntegrator searchIntegrator = factoryHolder.getSearchFactory();
-		IndexedTypeSet set = searchIntegrator.getIndexedTypesPolymorphic( IndexedTypesSets.fromClasses( argument ) );
-		IndexedTypeSet expectation = IndexedTypesSets.fromClasses( expectedInResult );
+		IndexedTypeSet set = searchIntegrator.getIndexedTypesPolymorphic( IndexedTypeSets.fromClasses( argument ) );
+		IndexedTypeSet expectation = IndexedTypeSets.fromClasses( expectedInResult );
 		assertEquals( expectation, set );
 	}
 

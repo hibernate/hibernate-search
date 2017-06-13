@@ -41,7 +41,7 @@ public class ConcurrentIndexedTypeMap<V> implements IndexedTypeMap<V> {
 
 	@Override
 	public IndexedTypeSet keySet() {
-		return IndexedTypesSets.fromIdentifiers( map.keySet() );
+		return IndexedTypeSets.fromIdentifiers( map.keySet() );
 	}
 
 	@Override

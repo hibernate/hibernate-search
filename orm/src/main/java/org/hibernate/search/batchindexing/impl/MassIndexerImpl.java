@@ -20,7 +20,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -80,7 +80,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 		Set<Class<?>> entities = new HashSet<Class<?>>();
 		//first build the "entities" set containing all indexed subtypes of "selection".
 		for ( Class<?> entityType : selection ) {
-			IndexedTypeSet targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( IndexedTypesSets.fromClass( entityType ) );
+			IndexedTypeSet targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( IndexedTypeSets.fromClass( entityType ) );
 			if ( targetedClasses.isEmpty() ) {
 				String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 				throw new IllegalArgumentException( msg );
@@ -107,7 +107,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 		}
 		cleaned.removeAll( toRemove );
 		log.debugf( "Targets for indexing job: %s", cleaned );
-		return IndexedTypesSets.fromClasses( cleaned.toArray( new Class[cleaned.size()] ) );
+		return IndexedTypeSets.fromClasses( cleaned.toArray( new Class[cleaned.size()] ) );
 	}
 
 	@Override

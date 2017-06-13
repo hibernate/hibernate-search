@@ -49,7 +49,7 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -90,11 +90,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private Similarity similarity;
 
 	private ExtendedSearchIntegrator searchIntegrator;
-	private IndexedTypeSet containedEntityTypes = IndexedTypesSets.empty();
+	private IndexedTypeSet containedEntityTypes = IndexedTypeSets.empty();
 
 	private boolean indexInitialized = false;
 	private boolean indexCreatedByHibernateSearch = false;
-	private IndexedTypeSet initializedContainedEntityTypes = IndexedTypesSets.empty();
+	private IndexedTypeSet initializedContainedEntityTypes = IndexedTypeSets.empty();
 
 	private ServiceManager serviceManager;
 
@@ -252,17 +252,17 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			 */
 			indexCreatedByHibernateSearch = initializeIndex( containedEntityTypes );
 			indexInitialized = true;
-			initializedContainedEntityTypes = IndexedTypesSets.composite( initializedContainedEntityTypes, containedEntityTypes );
+			initializedContainedEntityTypes = IndexedTypeSets.composite( initializedContainedEntityTypes, containedEntityTypes );
 		}
 		else {
-			IndexedTypeSet notYetInitializedContainedEntityTypes = IndexedTypesSets.subtraction( containedEntityTypes, initializedContainedEntityTypes );
+			IndexedTypeSet notYetInitializedContainedEntityTypes = IndexedTypeSets.subtraction( containedEntityTypes, initializedContainedEntityTypes );
 
 			if ( notYetInitializedContainedEntityTypes.isEmpty() ) {
 				return; // Nothing to do
 			}
 
 			reinitializeIndex( notYetInitializedContainedEntityTypes );
-			initializedContainedEntityTypes = IndexedTypesSets.composite( initializedContainedEntityTypes, notYetInitializedContainedEntityTypes );
+			initializedContainedEntityTypes = IndexedTypeSets.composite( initializedContainedEntityTypes, notYetInitializedContainedEntityTypes );
 		}
 	}
 
@@ -376,7 +376,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void addContainedEntity(IndexedTypeIdentifier entity) {
-		containedEntityTypes = IndexedTypesSets.composite( containedEntityTypes, entity );
+		containedEntityTypes = IndexedTypeSets.composite( containedEntityTypes, entity );
 	}
 
 	// Getters

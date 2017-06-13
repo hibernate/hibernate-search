@@ -16,7 +16,7 @@ import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 
 import com.google.gson.JsonObject;
 
@@ -57,7 +57,7 @@ public class ElasticsearchLuceneQueryTranslator implements LuceneQueryTranslator
 			return extendedIntegrator.getIndexBindings().keySet();
 		}
 		else {
-			return IndexedTypesSets.fromIdentifiers( indexedTargetedEntities );
+			return IndexedTypeSets.fromIdentifiers( indexedTargetedEntities );
 		}
 	}
 

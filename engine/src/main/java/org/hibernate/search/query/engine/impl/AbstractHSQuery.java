@@ -49,7 +49,7 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.IndexedTypeMap;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -126,7 +126,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	@Override
 	public final HSQuery targetedEntities(IndexedTypeSet types) {
-		setTargetedEntities( types == null ? IndexedTypesSets.empty() : types );
+		setTargetedEntities( types == null ? IndexedTypeSets.empty() : types );
 		this.customTypeMetadata = Collections.emptyList();
 		return this;
 	}
@@ -154,7 +154,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 		IndexedTypeSet typesSet = types.stream()
 				.map( CustomTypeMetadata::getEntityType )
-				.collect( IndexedTypesSets.streamCollector() );
+				.collect( IndexedTypeSets.streamCollector() );
 		setTargetedEntities( typesSet );
 		this.customTypeMetadata = new ArrayList<>( types );
 

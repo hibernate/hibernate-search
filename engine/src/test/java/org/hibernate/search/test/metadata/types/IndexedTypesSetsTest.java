@@ -9,7 +9,7 @@ package org.hibernate.search.test.metadata.types;
 import java.util.Collections;
 
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.test.metadata.Foo;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class IndexedTypesSetsTest {
 	@Test
 	public void testingLogFormat() {
 		//take any two random classes:
-		final IndexedTypeSet fromClasses = IndexedTypesSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
+		final IndexedTypeSet fromClasses = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
 		final String tostring = fromClasses.toString();
 		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
 		Assert.assertTrue(
@@ -37,23 +37,23 @@ public class IndexedTypesSetsTest {
 	@Test
 	public void testCreationOfEmptySets() {
 		//This is more to test about creation from special parameters than to test the isEmpty() method
-		Assert.assertTrue( IndexedTypesSets.fromClasses().isEmpty() );
-		Assert.assertTrue( IndexedTypesSets.empty().isEmpty() );
-		Assert.assertTrue( IndexedTypesSets.fromIdentifiers( Collections.emptySet() ).isEmpty() );
+		Assert.assertTrue( IndexedTypeSets.fromClasses().isEmpty() );
+		Assert.assertTrue( IndexedTypeSets.empty().isEmpty() );
+		Assert.assertTrue( IndexedTypeSets.fromIdentifiers( Collections.emptySet() ).isEmpty() );
 	}
 
 	@Test
 	public void testSize() {
-		Assert.assertEquals( 2, IndexedTypesSets.fromClasses( IndexedTypesSetsTest.class, Foo.class ).size() );
-		Assert.assertEquals( 1, IndexedTypesSets.fromClasses( Foo.class, Foo.class ).size() );
-		Assert.assertEquals( 0, IndexedTypesSets.fromClasses( ).size() );
+		Assert.assertEquals( 2, IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class ).size() );
+		Assert.assertEquals( 1, IndexedTypeSets.fromClasses( Foo.class, Foo.class ).size() );
+		Assert.assertEquals( 0, IndexedTypeSets.fromClasses( ).size() );
 	}
 
 	@Test
 	public void testEquality() {
-		final IndexedTypeSet a = IndexedTypesSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
-		final IndexedTypeSet b = IndexedTypesSets.fromClasses( Foo.class, IndexedTypesSetsTest.class );
-		final IndexedTypeSet c = IndexedTypesSets.fromClasses( Foo.class );
+		final IndexedTypeSet a = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
+		final IndexedTypeSet b = IndexedTypeSets.fromClasses( Foo.class, IndexedTypesSetsTest.class );
+		final IndexedTypeSet c = IndexedTypeSets.fromClasses( Foo.class );
 		Assert.assertEquals( a, b );
 		Assert.assertEquals( b, a );
 		Assert.assertEquals( a, a );

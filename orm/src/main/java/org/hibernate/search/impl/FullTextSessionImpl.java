@@ -36,7 +36,7 @@ import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -80,7 +80,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	@Override
 	public FullTextQuery createFullTextQuery(QueryDescriptor queryDescriptor, Class<?>... entities) {
 		HSQuery hsQuery = queryDescriptor.createHSQuery( getSearchIntegrator() )
-				.targetedEntities( IndexedTypesSets.fromClasses( entities ) );
+				.targetedEntities( IndexedTypeSets.fromClasses( entities ) );
 		return createFullTextQuery( hsQuery );
 	}
 

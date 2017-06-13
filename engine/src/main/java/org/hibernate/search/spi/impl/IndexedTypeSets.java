@@ -21,9 +21,9 @@ import java.util.stream.Collector;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 
-public final class IndexedTypesSets {
+public final class IndexedTypeSets {
 
-	private IndexedTypesSets() {
+	private IndexedTypeSets() {
 		//Utility class: not to be constructed
 	}
 
@@ -156,7 +156,7 @@ public final class IndexedTypesSets {
 
 			@Override
 			public Function<HashSet<IndexedTypeIdentifier>, IndexedTypeSet> finisher() {
-				return IndexedTypesSets::fromSafeHashSet;
+				return IndexedTypeSets::fromSafeHashSet;
 			}
 
 			@Override

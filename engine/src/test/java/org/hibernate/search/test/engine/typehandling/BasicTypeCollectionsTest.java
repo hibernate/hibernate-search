@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,96 +24,96 @@ public class BasicTypeCollectionsTest {
 
 	@Test
 	public void emptyStream() {
-		assertIsEmpty( Collections.<IndexedTypeIdentifier>emptyList().stream().collect( IndexedTypesSets.streamCollector() ) );
+		assertIsEmpty( Collections.<IndexedTypeIdentifier>emptyList().stream().collect( IndexedTypeSets.streamCollector() ) );
 	}
 
 	@Test
 	public void nullVararg() {
-		assertIsEmpty( IndexedTypesSets.fromClasses( null ) );
+		assertIsEmpty( IndexedTypeSets.fromClasses( null ) );
 	}
 
 	@Test
 	public void emptyArray() {
-		assertIsEmpty( IndexedTypesSets.fromIdentifiers( new IndexedTypeIdentifier[0] ) );
+		assertIsEmpty( IndexedTypeSets.fromIdentifiers( new IndexedTypeIdentifier[0] ) );
 	}
 
 	@Test
 	public void emptyIterable() {
-		assertIsEmpty( IndexedTypesSets.fromIdentifiers( Collections.<IndexedTypeIdentifier>emptyList() ) );
+		assertIsEmpty( IndexedTypeSets.fromIdentifiers( Collections.<IndexedTypeIdentifier>emptyList() ) );
 	}
 
 	@Test
 	public void singleElementClass() {
-		assertIsSingletonSet( IndexedTypesSets.fromClass( BasicTypeCollectionsTest.class ), BasicTypeCollectionsTest.class, true );
+		assertIsSingletonSet( IndexedTypeSets.fromClass( BasicTypeCollectionsTest.class ), BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void singleElementIterable() {
-		assertIsSingletonSet( IndexedTypesSets.fromIdentifiers( TYPE_A.asTypeSet() ), BasicTypeCollectionsTest.class, true );
+		assertIsSingletonSet( IndexedTypeSets.fromIdentifiers( TYPE_A.asTypeSet() ), BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void singleElementStream() {
 		assertIsSingletonSet(
-				Collections.<IndexedTypeIdentifier>singleton( TYPE_A ).stream().collect( IndexedTypesSets.streamCollector() ),
+				Collections.<IndexedTypeIdentifier>singleton( TYPE_A ).stream().collect( IndexedTypeSets.streamCollector() ),
 				BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void singleElementArray() {
 		assertIsSingletonSet(
-				IndexedTypesSets.fromIdentifiers( new IndexedTypeIdentifier[] { TYPE_A } ),
+				IndexedTypeSets.fromIdentifiers( new IndexedTypeIdentifier[] { TYPE_A } ),
 				BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void compositeEmpty() {
-		assertIsEmpty( IndexedTypesSets.composite( IndexedTypesSets.empty(), IndexedTypesSets.empty() ) );
+		assertIsEmpty( IndexedTypeSets.composite( IndexedTypeSets.empty(), IndexedTypeSets.empty() ) );
 	}
 
 	@Test
 	public void compositeSingle() {
-		assertIsSingletonSet( IndexedTypesSets.composite( TYPE_A.asTypeSet(), TYPE_A ), BasicTypeCollectionsTest.class, true );
+		assertIsSingletonSet( IndexedTypeSets.composite( TYPE_A.asTypeSet(), TYPE_A ), BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void compositeSingleAndEmpty() {
-		assertIsSingletonSet( IndexedTypesSets.composite( TYPE_A.asTypeSet(), IndexedTypesSets.empty() ), BasicTypeCollectionsTest.class, true );
+		assertIsSingletonSet( IndexedTypeSets.composite( TYPE_A.asTypeSet(), IndexedTypeSets.empty() ), BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void subtractionEmpty() {
-		assertIsEmpty( IndexedTypesSets.subtraction( IndexedTypesSets.empty(), IndexedTypesSets.empty() ) );
+		assertIsEmpty( IndexedTypeSets.subtraction( IndexedTypeSets.empty(), IndexedTypeSets.empty() ) );
 	}
 
 	@Test
 	public void subtractionOfSingletons() {
-		assertIsEmpty( IndexedTypesSets.subtraction( TYPE_A.asTypeSet(), TYPE_A.asTypeSet() ) );
+		assertIsEmpty( IndexedTypeSets.subtraction( TYPE_A.asTypeSet(), TYPE_A.asTypeSet() ) );
 	}
 
 	@Test
 	public void subtractionOfSingletonFromEmpty() {
-		assertIsEmpty( IndexedTypesSets.subtraction( IndexedTypesSets.empty(), TYPE_A.asTypeSet() ) );
+		assertIsEmpty( IndexedTypeSets.subtraction( IndexedTypeSets.empty(), TYPE_A.asTypeSet() ) );
 	}
 
 	@Test
 	public void subtractionOfEmptyFromSingleton() {
-		assertIsSingletonSet( IndexedTypesSets.subtraction( TYPE_A.asTypeSet(), IndexedTypesSets.empty() ), BasicTypeCollectionsTest.class, true );
+		assertIsSingletonSet( IndexedTypeSets.subtraction( TYPE_A.asTypeSet(), IndexedTypeSets.empty() ), BasicTypeCollectionsTest.class, true );
 	}
 
 	@Test
 	public void buildCoupleSet() {
-		assertIsDoubleSet( IndexedTypesSets.composite( TYPE_A.asTypeSet(), TYPE_B ) );
+		assertIsDoubleSet( IndexedTypeSets.composite( TYPE_A.asTypeSet(), TYPE_B ) );
 	}
 
 	@Test
 	public void subtractionOfOneFromCouple() {
-		assertIsSingletonSet( IndexedTypesSets.subtraction( IndexedTypesSets.composite( TYPE_A.asTypeSet(), TYPE_B ), TYPE_B.asTypeSet() ), TYPE_A.getPojoType(), true );
-		assertIsSingletonSet( IndexedTypesSets.subtraction( IndexedTypesSets.composite( TYPE_A.asTypeSet(), TYPE_B ), TYPE_A.asTypeSet() ), TYPE_B.getPojoType(), true );
+		assertIsSingletonSet( IndexedTypeSets.subtraction( IndexedTypeSets.composite( TYPE_A.asTypeSet(), TYPE_B ), TYPE_B.asTypeSet() ), TYPE_A.getPojoType(), true );
+		assertIsSingletonSet( IndexedTypeSets.subtraction( IndexedTypeSets.composite( TYPE_A.asTypeSet(), TYPE_B ), TYPE_A.asTypeSet() ), TYPE_B.getPojoType(), true );
 	}
 
 	private void assertIsDoubleSet(IndexedTypeSet typeSet) {
-		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypesSets.empty() );
+		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
 		Assert.assertFalse( typeSet.isEmpty() );
 		Assert.assertEquals( 2, typeSet.size() );
 		Iterator<IndexedTypeIdentifier> iterator = typeSet.iterator();
@@ -129,7 +129,7 @@ public class BasicTypeCollectionsTest {
 	}
 
 	private void assertIsEmpty(IndexedTypeSet typeSet) {
-		Assert.assertTrue( "Verify the singleton optimisation applies", typeSet == IndexedTypesSets.empty() );
+		Assert.assertTrue( "Verify the singleton optimisation applies", typeSet == IndexedTypeSets.empty() );
 		Assert.assertTrue( typeSet.isEmpty() );
 		Assert.assertEquals( 0, typeSet.size() );
 		typeSet.iterator().forEachRemaining( l -> Assert.fail( "should never happen" ) );
@@ -137,7 +137,7 @@ public class BasicTypeCollectionsTest {
 	}
 
 	private void assertIsSingletonSet(IndexedTypeSet typeSet, Class<?> someType, boolean recursive) {
-		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypesSets.empty() );
+		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
 		Assert.assertFalse( typeSet.isEmpty() );
 		Assert.assertEquals( 1, typeSet.size() );
 		Iterator<IndexedTypeIdentifier> iterator = typeSet.iterator();

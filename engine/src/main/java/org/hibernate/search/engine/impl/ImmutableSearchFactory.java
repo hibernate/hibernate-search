@@ -73,7 +73,7 @@ import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.ConcurrentIndexedTypeMap;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -292,7 +292,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 	@Override
 	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes) {
-		IndexedTypeSet newtypes = IndexedTypesSets.fromClasses( entityTypes );
+		IndexedTypeSet newtypes = IndexedTypeSets.fromClasses( entityTypes );
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, newtypes );
 		return descriptor.createHSQuery( this ).targetedEntities( newtypes );
 	}
@@ -302,7 +302,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		List<CustomTypeMetadata> typeList = Arrays.asList( types );
 		IndexedTypeSet entityTypes = typeList.stream()
 				.map( CustomTypeMetadata::getEntityType )
-				.collect( IndexedTypesSets.streamCollector() );
+				.collect( IndexedTypeSets.streamCollector() );
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
 		return descriptor.createHSQuery( this ).targetedTypes( typeList );
 	}
@@ -495,7 +495,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	@Deprecated
 	public IndexedTypeSet getConfiguredTypesPolymorphic(Class<?>[] types) {
-		return getConfiguredTypesPolymorphic( IndexedTypesSets.fromClasses( types ) );
+		return getConfiguredTypesPolymorphic( IndexedTypeSets.fromClasses( types ) );
 	}
 
 	@Override
@@ -506,7 +506,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	@Deprecated
 	public IndexedTypeSet getIndexedTypesPolymorphic(Class<?>[] types) {
-		return getIndexedTypesPolymorphic( IndexedTypesSets.fromClasses( types ) );
+		return getIndexedTypesPolymorphic( IndexedTypeSets.fromClasses( types ) );
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class TypeHierarchy {
 
 	public IndexedTypeSet getConfiguredClasses(IndexedTypeSet types) {
 		if ( types == null ) {
-			return IndexedTypesSets.empty();
+			return IndexedTypeSets.empty();
 		}
 		Set<IndexedTypeIdentifier> indexedClasses = new HashSet<IndexedTypeIdentifier>();
 		for ( IndexedTypeIdentifier type : types ) {
@@ -68,6 +68,6 @@ public class TypeHierarchy {
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Targeted indexed classes for %s: %s", types, indexedClasses );
 		}
-		return IndexedTypesSets.fromIdentifiers( indexedClasses );
+		return IndexedTypeSets.fromIdentifiers( indexedClasses );
 	}
 }
