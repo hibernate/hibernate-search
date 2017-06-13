@@ -44,6 +44,18 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
  * <p>
  * A partition plan specifies the number of partitions, which is calculated based on the quantity of entities selected,
  * and the value of job parameter {@code MassIndexingJobParameters.ROWS_PER_PARTITION} defined by the user.
+ * <p>
+ * For example, there are 2 entity types Company and Employee. The number of rows are respectively 5 and 4500.
+ * Row identifiers start at 0. The rowsPerPartition is set to 1000.
+ * Then, there will be 6 partitions and their ranges will be:
+ * <ul>
+ * <li>partitionId = 0, entityType = Company, range = [null, null[ (effectively [0, 4])
+ * <li>partitionId = 1, entityType = Employee, range = [null, 1000[ (effectively [0, 999])
+ * <li>partitionId = 2, entityType = Employee, range = [1000, 2000[ (effectively [1000, 1999])
+ * <li>partitionId = 3, entityType = Employee, range = [2000, 3000[ (effectively [2000, 2999])
+ * <li>partitionId = 4, entityType = Employee, range = [3000, 4000[ (effectively [3000, 3999])
+ * <li>partitionId = 5, entityType = Employee, range = [4000, null[ (effectively [4000, 4999]
+ * </ul>
  *
  * @author Mincong Huang
  */
