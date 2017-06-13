@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.store;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.hibernate.search.store.spi.DirectoryHelper;
@@ -30,10 +31,11 @@ public class DirectoryHelperTest {
 		properties.put( "indexBase", root );
 		properties.put( "indexName", relative );
 
-		DirectoryHelper.getVerifiedIndexDir( "name", properties, true );
+		DirectoryHelper.getVerifiedIndexPath( "name", properties, true );
 
-		assertTrue( new File( root ).exists() );
+		assertTrue( Files.exists( Paths.get( root ) ) );
 
-		FileHelper.delete( new File( "./testDir" ) );
+		FileHelper.delete( Paths.get( ".", "testDir" ) );
 	}
+
 }

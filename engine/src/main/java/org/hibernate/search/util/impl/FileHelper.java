@@ -6,19 +6,16 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -39,33 +36,33 @@ public class FileHelper {
 	private FileHelper() {
 	}
 
-	public static boolean areInSync(File source, File destination) throws IOException {
-		if ( source.isDirectory() ) {
-			if ( !destination.exists() ) {
+	public static boolean areInSync(Path source, Path destination) throws IOException {
+		if ( Files.isDirectory( source ) ) {
+			if ( ! Files.exists( destination ) ) {
 				return false;
 			}
-			else if ( !destination.isDirectory() ) {
+			else if ( ! Files.isDirectory( destination ) ) {
 				throw new IOException(
 						"Source and Destination not of the same type:"
-								+ source.getCanonicalPath() + " , " + destination.getCanonicalPath()
+								+ source.toAbsolutePath().toString() + " , " + destination.toAbsolutePath().toString()
 				);
 			}
-			String[] sources = source.list();
-			Set<String> srcNames = new HashSet<String>( Arrays.asList( sources ) );
-			String[] dests = destination.list();
+			final Set<Path> sources = listFiles( source );
+			Set<String> sourcesFilenameSet = sources.stream().map( v -> v.getFileName().toString() ).collect( Collectors.toSet() );
+			final Set<String> destinationFilenameSet;
+			try ( Stream<Path> dests = Files.list( destination ) ) {
+				destinationFilenameSet = dests.map( v -> v.getFileName().toString() ).collect( Collectors.toSet() );
+			}
 
-			// check for files in destination and not in source
-			for ( String fileName : dests ) {
-				if ( !srcNames.contains( fileName ) ) {
-					return false;
-				}
+			// check for any file name mismatches first
+			if ( ! sourcesFilenameSet.equals( destinationFilenameSet ) ) {
+				return false;
 			}
 
 			boolean inSync = true;
-			for ( String fileName : sources ) {
-				File srcFile = new File( source, fileName );
-				File destFile = new File( destination, fileName );
-				if ( !areInSync( srcFile, destFile ) ) {
+			for ( Path src : sources ) {
+				Path destFile = destination.resolve( src.getFileName() );
+				if ( !areInSync( src, destFile ) ) {
 					inSync = false;
 					break;
 				}
@@ -73,9 +70,10 @@ public class FileHelper {
 			return inSync;
 		}
 		else {
-			if ( destination.exists() && destination.isFile() ) {
-				long sts = source.lastModified() / FAT_PRECISION;
-				long dts = destination.lastModified() / FAT_PRECISION;
+			if ( Files.exists( destination ) && Files.isRegularFile( destination ) ) {
+				//TODO see if with NIO there's a better way to compare timestamps
+				long sts = Files.getLastModifiedTime( source ).toMillis() / FAT_PRECISION;
+				long dts = Files.getLastModifiedTime( destination ).toMillis() / FAT_PRECISION;
 				return sts == dts;
 			}
 			else {
@@ -84,53 +82,43 @@ public class FileHelper {
 		}
 	}
 
-	public static void synchronize(File source, File destination, boolean smart) throws IOException {
+	public static void synchronize(Path source, Path destination, boolean smart) throws IOException {
 		synchronize( source, destination, smart, DEFAULT_COPY_BUFFER_SIZE );
 	}
 
-	public static void synchronize(File source, File destination, boolean smart, long chunkSize) throws IOException {
+	public static void synchronize(Path source, Path destination, boolean smart, long chunkSize) throws IOException {
 		if ( chunkSize <= 0 ) {
 			log.checkSizeMustBePositive();
 			chunkSize = DEFAULT_COPY_BUFFER_SIZE;
 		}
-		if ( source.isDirectory() ) {
-			if ( !destination.exists() ) {
-				if ( !destination.mkdirs() ) {
-					throw new IOException( "Could not create path " + destination );
-				}
-			}
-			else if ( !destination.isDirectory() ) {
-				throw new IOException(
-						"Source and Destination not of the same type:"
-								+ source.getCanonicalPath() + " , " + destination.getCanonicalPath()
-				);
-			}
-			String[] sources = source.list();
-			Set<String> srcNames = new HashSet<String>( Arrays.asList( sources ) );
-			String[] dests = destination.list();
+		if ( Files.isDirectory( source ) ) {
+			Files.createDirectories( destination );
+			final Set<Path> sources = listFiles( source );
+			Set<String> sourceFilenames = sources.stream().map( v -> v.getFileName().toString() ).collect( Collectors.toSet() );
+			final Set<Path> dests = listFiles( destination );
+			Set<String> destFilenames = dests.stream().map( v -> v.getFileName().toString() ).collect( Collectors.toSet() );
 
 			//delete files not present in source
-			for ( String fileName : dests ) {
-				if ( !srcNames.contains( fileName ) ) {
-					delete( new File( destination, fileName ) );
+			for ( String fileName : destFilenames ) {
+				if ( !sourceFilenames.contains( fileName ) ) {
+					delete( destination.resolve( fileName ) );
 				}
 			}
 			//copy each file from source
-			for ( String fileName : sources ) {
-				File srcFile = new File( source, fileName );
-				File destFile = new File( destination, fileName );
+			for ( Path srcFile : sources ) {
+				Path destFile = destination.resolve( srcFile.getFileName() );
 				synchronize( srcFile, destFile, smart, chunkSize );
 			}
 		}
 		else {
-			if ( destination.exists() && destination.isDirectory() ) {
-				tryDelete( destination.toPath() );
+			if ( Files.exists( destination ) && Files.isDirectory( destination ) ) {
+				tryDelete( destination );
 			}
-			if ( destination.exists() ) {
-				long sts = source.lastModified() / FAT_PRECISION;
-				long dts = destination.lastModified() / FAT_PRECISION;
+			if ( Files.exists( destination ) ) {
+				long sts = Files.getLastModifiedTime( source ).toMillis() / FAT_PRECISION;
+				long dts = Files.getLastModifiedTime( destination ).toMillis() / FAT_PRECISION;
 				//do not copy if smart and same timestamp and same length
-				if ( !smart || sts == 0 || sts != dts || source.length() != destination.length() ) {
+				if ( !smart || sts == 0 || sts != dts || source.toFile().length() != destination.toFile().length() ) {
 					copyFile( source, destination, chunkSize );
 				}
 			}
@@ -140,46 +128,21 @@ public class FileHelper {
 		}
 	}
 
-	private static void copyFile(File srcFile, File destFile, long chunkSize) throws IOException {
-		FileInputStream is = null;
-		FileOutputStream os = null;
-		try {
-			is = new FileInputStream( srcFile );
-			FileChannel iChannel = is.getChannel();
-			os = new FileOutputStream( destFile, false );
-			FileChannel oChannel = os.getChannel();
-			long doneBytes = 0L;
-			long todoBytes = srcFile.length();
-			while ( todoBytes != 0L ) {
-				long iterationBytes = Math.min( todoBytes, chunkSize );
-				long transferredLength = oChannel.transferFrom( iChannel, doneBytes, iterationBytes );
-				if ( iterationBytes != transferredLength ) {
-					throw new IOException(
-							"Error during file transfer: expected "
-									+ iterationBytes + " bytes, only " + transferredLength + " bytes copied."
-					);
-				}
-				doneBytes += transferredLength;
-				todoBytes -= transferredLength;
-			}
-		}
-		finally {
-			if ( is != null ) {
-				is.close();
-			}
-			if ( os != null ) {
-				os.close();
-			}
-		}
-		boolean successTimestampOp = destFile.setLastModified( srcFile.lastModified() );
-		if ( !successTimestampOp ) {
-			log.notChangeTimestamp( destFile );
+	/**
+	 * Lists all files in a directory, making sure the underlying stream is closed.
+	 * @param directory the path to list files from
+	 * @return a set of all contained paths
+	 * @throws IOException
+	 */
+	private static Set<Path> listFiles(Path directory) throws IOException {
+		try ( Stream<Path> stream = Files.list( directory ) ) {
+			return stream.collect( Collectors.toSet() );
 		}
 	}
 
-	@Deprecated
-	public static void delete(File file) throws IOException {
-		delete( file.toPath() );
+	private static void copyFile(Path source, Path destination, long chunkSize) throws IOException {
+		// Copy the attributes as well as we like the "modified" timestamp to be maintained
+		Files.copy( source, destination, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING );
 	}
 
 	/**
@@ -240,7 +203,7 @@ public class FileHelper {
 
 	private static void safeDelete(Path file) {
 		try {
-			Files.delete( file );
+			Files.deleteIfExists( file );
 		}
 		catch (IOException e) {
 			log.fileDeleteFailureIgnored( e );

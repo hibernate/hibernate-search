@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.store.spi;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -89,19 +88,6 @@ public class DirectoryHelper {
 		Path indexDir = baseIndexDir.resolve( indexName );
 		DirectoryProviderHelper.makeSanityCheckedDirectory( indexDir, indexName, verifyIsWritable );
 		return indexDir;
-	}
-
-	/**
-	 * @deprecated use {@link #getVerifiedIndexPath}
-	 *
-	 * @param annotatedIndexName The index name declared on the @Indexed annotation
-	 * @param properties The properties may override the indexname.
-	 * @param verifyIsWritable Verify the directory is writable
-	 * @return the File representing the Index Directory
-	 */
-	@Deprecated
-	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
-		return getVerifiedIndexPath( annotatedIndexName, properties, verifyIsWritable ).toFile();
 	}
 
 }

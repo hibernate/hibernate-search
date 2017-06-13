@@ -62,7 +62,7 @@ public final class TestConstants {
 	/**
 	 * Doing the same as {@link #getIndexDirectory(Path, Class)}, using the immediate caller class as requester.
 	 */
-	public static String getIndexDirectory(Path parent) {
+	public static Path getIndexDirectory(Path parent) {
 		return getIndexDirectory( parent, callerProvider.getCallerClass() );
 	}
 
@@ -73,13 +73,13 @@ public final class TestConstants {
 	 * @param requester The test class requesting the index directory, its name will be part of the returned directory
 	 * @return Return the root directory to store test indexes
 	 */
-	public static String getIndexDirectory(Path parent, Class<?> requester) {
+	public static Path getIndexDirectory(Path parent, Class<?> requester) {
 		Path indexDirPath = parent.resolve( "indextemp-" + requester.getSimpleName() );
 		indexDirPath.toFile().deleteOnExit();
 
 		String indexDir = indexDirPath.toAbsolutePath().toString();
 		log.debugf( "Using %s as index directory.", indexDir );
-		return indexDir;
+		return indexDirPath;
 	}
 
 	public static boolean arePerformanceTestsEnabled() {

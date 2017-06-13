@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.test.performance.reader;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -34,7 +33,6 @@ import org.junit.Test;
  */
 public abstract class ReaderPerformance extends SearchTestBase {
 
-
 	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
 
 	//more iterations for more reliable measures:
@@ -53,20 +51,16 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		String indexBase = getIndexBaseDir();
-		File indexDir = new File( indexBase );
-		indexDir.mkdirs();
-		File[] files = indexDir.listFiles();
-		for ( File file : files ) {
-			FileHelper.delete( file );
-		}
+		Path indexBase = getIndexBaseDir();
+		FileHelper.delete( indexBase );
+		Files.createDirectories( indexBase );
 	}
 
 	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		FileHelper.delete( new File( getIndexBaseDir() ) );
+		FileHelper.delete( getIndexBaseDir() );
 	}
 
 	@Test
@@ -79,7 +73,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 
 	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
-		Path detectiveIndexPath = Paths.get( getIndexBaseDir() ).resolve( Detective.class.getCanonicalName() );
+		Path detectiveIndexPath = getIndexBaseDir().resolve( Detective.class.getCanonicalName() );
 		FSDirectory directory = FSDirectory.open( detectiveIndexPath );
 
 		SimpleAnalyzer analyzer = new SimpleAnalyzer();
@@ -111,7 +105,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.put( "hibernate.search.default.indexBase", getIndexBaseDir() );
+		cfg.put( "hibernate.search.default.indexBase", getIndexBaseDir().toAbsolutePath().toString() );
 		cfg.put( "hibernate.search.default.optimizer.transaction_limit.max", "10" ); // prevent too many open files
 		cfg.put( "hibernate.search.default." + Environment.EXCLUSIVE_INDEX_USE, "true" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
@@ -120,7 +114,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 
 	protected abstract String getReaderStrategyName();
 
-	protected abstract String getIndexBaseDir();
+	protected abstract Path getIndexBaseDir();
 
 	private void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );

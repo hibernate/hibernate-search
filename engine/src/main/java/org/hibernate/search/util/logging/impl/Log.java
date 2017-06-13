@@ -79,7 +79,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 19, value = "Unable to remove previous marker file from source of %1$s")
-	void unableToRemovePreviousMarket(String indexName);
+	void unableToRemovePreviousMarker(String indexName, @Cause Exception e);
 
 	@LogMessage(level = WARN)
 	@Message(id = 20, value = "Unable to create current marker in source of %1$s")
@@ -134,10 +134,6 @@ public interface Log extends BasicLogger {
 	// It's WARN only as it should not be really critical, and it is quite frequent on Windows
 	@Message(id = 32, value = "Could not delete %1$s")
 	void notDeleted(File file);
-
-	@LogMessage(level = WARN)
-	@Message(id = 33, value = "Could not change timestamp for %1$s. Index synchronization may be slow.")
-	void notChangeTimestamp(File destFile);
 
 	@LogMessage(level = INFO)
 	@Message(id = 34, value = "Hibernate Search %1$s")

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.hibernate.search.exception.SearchException;
@@ -32,11 +34,11 @@ public class DirectoryProviderHelperTest {
 		properties.put( "sourceBase", root );
 		properties.put( "source", relative );
 
-		File rel = DirectoryProviderHelper.getSourceDirectory( "name", properties, true );
+		Path rel = DirectoryProviderHelper.getSourceDirectoryPath( "name", properties, true );
 
-		assertTrue( rel.exists() );
+		assertTrue( Files.exists( rel ) );
 
-		FileHelper.delete( new File( root ) );
+		FileHelper.delete( Paths.get( "root" ) );
 	}
 
 	@Test

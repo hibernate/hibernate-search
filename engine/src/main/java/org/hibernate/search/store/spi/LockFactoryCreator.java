@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.store.spi;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.lucene.store.LockFactory;
@@ -23,7 +23,7 @@ public interface LockFactoryCreator extends Service {
 
 	/**
 	 * Creates a {@link LockFactory} as selected in the configuration for the Directory provider. The "simple" and
-	 * "native" strategies a {@link File} to know where to store the file system based locks; other implementations may
+	 * "native" strategies a {@link Path} to know where to store the file system based locks; other implementations may
 	 * ignore this parameter.
 	 *
 	 * @param indexDir the directory to use to store locks, if needed by implementation
@@ -31,5 +31,5 @@ public interface LockFactoryCreator extends Service {
 	 * @return the lock factory as configured, or a factory adhering to the "simple" strategy in case of configuration
 	 * errors or as a default.
 	 */
-	LockFactory createLockFactory(File indexDir, Properties dirConfiguration);
+	LockFactory createLockFactory(Path indexDir, Properties dirConfiguration);
 }

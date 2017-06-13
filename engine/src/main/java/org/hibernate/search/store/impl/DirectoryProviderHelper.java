@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.store.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -47,18 +46,6 @@ public final class DirectoryProviderHelper {
 	private static final String RETRY_INITIALIZE_PROP_NAME = "retry_initialize_period";
 
 	private DirectoryProviderHelper() {
-	}
-
-	/**
-	 * @deprecated Use getSourceDirectoryPath
-	 * @param indexName the name of the index (directory) to create
-	 * @param properties the configuration properties
-	 * @param needWritePermissions when true the directory will be tested for read-write permissions.
-	 * @return The file representing the source directory
-	 */
-	@Deprecated
-	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
-		return getSourceDirectoryPath( indexName, properties, needWritePermissions ).toFile();
 	}
 
 	/**
@@ -120,16 +107,16 @@ public final class DirectoryProviderHelper {
 	 * @return the created {@code FSDirectory} instance
 	 * @throws java.io.IOException if an error
 	 */
-	public static FSDirectory createFSIndex(File indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
+	public static FSDirectory createFSIndex(Path indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
 		LockFactory lockFactory = getLockFactory( indexDir, properties, serviceManager );
 		FSDirectoryType fsDirectoryType = FSDirectoryType.getType( properties );
-		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir.toPath(), lockFactory );
-		log.debugf( "Initialize index: '%s'", indexDir.getAbsolutePath() );
+		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, lockFactory );
+		log.debugf( "Initialize index: '%s'", indexDir.toAbsolutePath() );
 		DirectoryHelper.initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
 	}
 
-	private static LockFactory getLockFactory(File indexDir, Properties properties, ServiceManager serviceManager) {
+	private static LockFactory getLockFactory(Path indexDir, Properties properties, ServiceManager serviceManager) {
 		try {
 			return serviceManager.requestService( LockFactoryCreator.class ).createLockFactory( indexDir, properties );
 		}
@@ -171,18 +158,6 @@ public final class DirectoryProviderHelper {
 					"Cannot write into index directory: "
 							+ directory + " for index " + indexName );
 		}
-	}
-
-	/**
-	 * @deprecated Use makeSanityCheckedDirectory(Path directory, String indexName, boolean verifyIsWritable)
-	 *
-	 * @param directory The directory to create or verify
-	 * @param indexName To label exceptions
-	 * @param verifyIsWritable Verify the directory is writable
-	 */
-	@Deprecated
-	public static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
-		makeSanityCheckedDirectory( directory.toPath(), indexName, verifyIsWritable );
 	}
 
 	/**

@@ -7,6 +7,7 @@
 package org.hibernate.search.store.impl;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.lucene.store.LockFactory;
@@ -43,7 +44,7 @@ public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable 
 	}
 
 	@Override
-	public LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
+	public LockFactory createLockFactory(Path indexDir, Properties dirConfiguration) {
 		//For FS-based indexes default to "native", default to "single" otherwise.
 		String defaultStrategy = indexDir == null ? "single" : "native";
 		String lockFactoryName = dirConfiguration.getProperty( Environment.LOCKING_STRATEGY, defaultStrategy );
@@ -72,7 +73,8 @@ public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable 
 					Environment.LOCKING_STRATEGY,
 					serviceManager
 			);
-			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
+			File legacy = indexDir == null ? null : indexDir.toFile();
+			return lockFactoryFactory.createLockFactory( legacy, dirConfiguration );
 		}
 	}
 }

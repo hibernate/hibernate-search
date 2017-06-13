@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.performance.optimizer;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,19 +38,14 @@ import org.junit.Test;
  * @author Emmanuel Bernard
  */
 public class OptimizerPerformanceTest extends SearchTestBase {
+
+	private static final Path indexDir = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
+
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File( indexBase );
 		FileHelper.delete( indexDir );
-		indexDir.mkdirs();
-		File[] files = indexDir.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
+		Files.createDirectories( indexDir );
 		super.setUp();
 	}
 
@@ -57,8 +53,6 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File( indexBase );
 		FileHelper.delete( indexDir );
 	}
 
@@ -217,7 +211,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) );
+		cfg.put( "hibernate.search.default.indexBase", indexDir.toAbsolutePath().toString() );
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}

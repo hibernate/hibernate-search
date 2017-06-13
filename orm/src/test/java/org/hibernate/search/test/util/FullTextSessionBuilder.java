@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.util;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +53,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
-	private File indexRootDirectory;
+	private Path indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactoryImplementor sessionFactory;
@@ -90,10 +90,10 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder useFileSystemDirectoryProvider(Class<?> testClass) {
-		indexRootDirectory = new File( TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() ) );
-		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
+		indexRootDirectory = TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() );
+		log.debugf( "Using %s as index directory.", indexRootDirectory.toAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.toAbsolutePath().toString() );
 		usingFileSystem = true;
 		return this;
 	}

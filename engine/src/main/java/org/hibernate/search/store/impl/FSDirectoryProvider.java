@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.store.impl;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
@@ -40,15 +41,13 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	private static final Log log = LoggerFactory.make();
 
 	private FSDirectory directory;
-	private String indexName;
 
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		// on "manual" indexing skip read-write check on index directory
 		boolean manual = IndexingMode.MANUAL == context.getIndexingMode();
-		File indexDir = DirectoryHelper.getVerifiedIndexDir( directoryProviderName, properties, !manual );
+		Path indexDir = DirectoryHelper.getVerifiedIndexPath( directoryProviderName, properties, !manual );
 		try {
-			indexName = indexDir.getCanonicalPath();
 			//this is cheap so it's not done in start()
 			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties, context.getServiceManager() );
 		}
@@ -79,24 +78,12 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
 	@Override
 	public boolean equals(Object obj) {
-		// this code is actually broken since the value change after initialize call
-		// but from a practical POV this is fine since we only call this method
-		// after initialize call
-		if ( obj == this ) {
-			return true;
-		}
-		if ( obj == null || !( obj instanceof FSDirectoryProvider ) ) {
-			return false;
-		}
-		return indexName.equals( ( (FSDirectoryProvider) obj ).indexName );
+		throw new AssertionFailure( "this type can not be compared reliably" );
 	}
 
 	@Override
 	public int hashCode() {
-		// this code is actually broken since the value change after initialize call
-		// but from a practical POV this is fine since we only call this method
-		// after initialize call
-		int hash = 11;
-		return 37 * hash + indexName.hashCode();
+		throw new AssertionFailure( "this type can not be compared reliably" );
 	}
+
 }

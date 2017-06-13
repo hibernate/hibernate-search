@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.performance.reader;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -49,15 +50,9 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File( indexBase );
-		indexDir.mkdir();
-		File[] files = indexDir.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
+		Path indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
+		Files.deleteIfExists( indexBase );
+		Files.createDirectories( indexBase );
 		super.setUp();
 	}
 
@@ -65,9 +60,8 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File( indexBase );
-		FileHelper.delete( indexDir );
+		Path indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
+		FileHelper.delete( indexBase );
 	}
 
 	@Override
@@ -275,7 +269,8 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) );
+		cfg.put( "hibernate.search.default.indexBase",
+				TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ).toAbsolutePath().toString() );
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}

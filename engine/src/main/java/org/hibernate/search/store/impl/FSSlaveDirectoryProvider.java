@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.store.impl;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -59,12 +60,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private volatile Directory dummyDirectory;
 	private FSDirectory directory1;
 	private FSDirectory directory2;
-	private String indexName;
 	private long copyChunkSize;
 
 	//variables needed between initialize and start (used by same thread: no special care needed)
-	private File sourceIndexDir;
-	private File indexDir;
+	private Path sourceIndexDir;
+	private Path indexDir;
 	private String directoryProviderName;
 	private Properties properties;
 	private UpdateTask updateTask;
@@ -76,16 +76,10 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		this.directoryProviderName = directoryProviderName;
 		this.serviceManager = context.getServiceManager();
 		//source guessing
-		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
-		log.debugf( "Source directory: %s", sourceIndexDir.getPath() );
-		indexDir = DirectoryHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
-		log.debugf( "Index directory: %s", indexDir.getPath() );
-		try {
-			indexName = indexDir.getCanonicalPath();
-		}
-		catch (IOException e) {
-			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
-		}
+		sourceIndexDir = DirectoryProviderHelper.getSourceDirectoryPath( directoryProviderName, properties, false );
+		log.debugf( "Source directory: %s", sourceIndexDir );
+		indexDir = DirectoryHelper.getVerifiedIndexPath( directoryProviderName, properties, true ).normalize();
+		log.debugf( "Index directory: %s", indexDir );
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		current = 0; //publish all state to other threads
 	}
@@ -109,8 +103,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				}
 			}
 			currentMarkerInSource =
-					new File( sourceIndexDir, "current1" ).exists()
-					|| new File( sourceIndexDir, "current2" ).exists();
+					Files.exists( sourceIndexDir.resolve( "current1" ) )
+					|| Files.exists( sourceIndexDir.resolve( "current2" ) );
 			if ( currentMarkerInSource ) {
 				break;
 			}
@@ -138,46 +132,42 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
 		try {
-			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties, serviceManager );
-			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties, serviceManager );
-			File currentMarker = new File( indexDir, "current1" );
-			File current2Marker = new File( indexDir, "current2" );
-			if ( currentMarker.exists() ) {
+			directory1 = DirectoryProviderHelper.createFSIndex( indexDir.resolve( "1" ), properties, serviceManager );
+			directory2 = DirectoryProviderHelper.createFSIndex( indexDir.resolve( "2" ), properties, serviceManager );
+			Path currentMarker = indexDir.resolve( "current1" );
+			Path current2Marker = indexDir.resolve( "current2" );
+			if ( Files.exists( currentMarker ) ) {
 				currentToBe = 1;
-				if ( current2Marker.exists() ) {
-					current2Marker.delete(); //TODO or throw an exception?
-				}
+				Files.deleteIfExists( current2Marker ); //TODO or throw an exception?
 			}
-			else if ( current2Marker.exists() ) {
+			else if ( Files.exists( current2Marker ) ) {
 				currentToBe = 2;
 			}
 			else {
 				//no default
 				log.debug( "Setting directory 1 as current" );
 				currentToBe = 1;
-				File destinationFile = new File( indexDir, Integer.valueOf( currentToBe ).toString() );
+				Path destinationFile = indexDir.resolve( Integer.valueOf( currentToBe ).toString() );
 				int sourceCurrent;
-				if ( new File( sourceIndexDir, "current1" ).exists() ) {
+				if ( Files.exists( sourceIndexDir.resolve( "current1" ) ) ) {
 					sourceCurrent = 1;
 				}
-				else if ( new File( sourceIndexDir, "current2" ).exists() ) {
+				else if ( Files.exists( sourceIndexDir.resolve( "current2" ) ) ) {
 					sourceCurrent = 2;
 				}
 				else {
-					throw new SearchException( "No current file marker found in source directory: " + sourceIndexDir.getPath() );
+					throw new SearchException( "No current file marker found in source directory: " + sourceIndexDir );
 				}
 				try {
 					FileHelper.synchronize(
-							new File( sourceIndexDir, String.valueOf( sourceCurrent ) ),
+							sourceIndexDir.resolve( String.valueOf( sourceCurrent ) ),
 							destinationFile, true, copyChunkSize
 					);
 				}
 				catch (IOException e) {
-					throw new SearchException( "Unable to synchronize directory: " + indexName, e );
+					throw new SearchException( "Unable to synchronize directory: " + indexDir.toString(), e );
 				}
-				if ( !currentMarker.createNewFile() ) {
-					throw new SearchException( "Unable to create the directory marker file: " + indexName );
-				}
+				Files.createFile( currentMarker );
 			}
 			log.debugf( "Current directory: %d", (Integer) currentToBe );
 		}
@@ -216,32 +206,12 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
 	@Override
 	public boolean equals(Object obj) {
-		// this code is actually broken since the value change after initialize call
-		// but from a practical POV this is fine since we only call this method
-		// after initialize call
-		if ( obj == this ) {
-			return true;
-		}
-		if ( obj == null || !( obj instanceof FSSlaveDirectoryProvider ) ) {
-			return false;
-		}
-		FSSlaveDirectoryProvider other = (FSSlaveDirectoryProvider) obj;
-		//need to break memory barriers on both instances:
-		@SuppressWarnings("unused")
-		int readCurrentState = this.current; //unneeded value, but ensure visibility of indexName
-		readCurrentState = other.current; //another unneeded value, but ensure visibility of indexName
-		return indexName.equals( other.indexName );
+		throw new AssertionFailure( "this type can not be compared reliably" );
 	}
 
 	@Override
 	public int hashCode() {
-		// this code is actually broken since the value change after initialize call
-		// but from a practical POV this is fine since we only call this method
-		// after initialize call
-		@SuppressWarnings("unused")
-		int readCurrentState = current; //unneeded value, but ensure visibility of indexName
-		int hash = 11;
-		return 37 * hash + indexName.hashCode();
+		throw new AssertionFailure( "this type can not be compared reliably" );
 	}
 
 	class InitTask extends TimerTask {
@@ -257,7 +227,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			catch (RuntimeException re) {
 				// we need this to make sure the error is logged somewhere,
 				// as we're executing it in the timer thread
-				log.failedSlaveDirectoryProviderInitialization( indexName, re );
+				log.failedSlaveDirectoryProviderInitialization( indexDir.toString(), re );
 			}
 		}
 	}
@@ -286,9 +256,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		private final ExecutorService executor;
 		private final CopyDirectory copyTask;
 
-		public UpdateTask(File sourceIndexDir, File destination) {
+		public UpdateTask(Path sourceIndexDir, Path indexDir) {
 			executor = Executors.newSingleThreadExecutor();
-			copyTask = new CopyDirectory( sourceIndexDir, destination );
+			copyTask = new CopyDirectory( sourceIndexDir, indexDir );
 		}
 
 		@Override
@@ -300,7 +270,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				if ( log.isTraceEnabled() ) {
 					@SuppressWarnings("unused")
 					int unneeded = current;//ensure visibility of indexName in Timer threads.
-					log.tracef( "Skipping directory synchronization, previous work still in progress: %s", indexName );
+					log.tracef( "Skipping directory synchronization, previous work still in progress: %s", indexDir );
 				}
 			}
 		}
@@ -311,11 +281,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	}
 
 	class CopyDirectory implements Runnable {
-		private final File source;
-		private final File destination;
+		private final Path source;
+		private final Path destination;
 		private final AtomicBoolean inProgress = new AtomicBoolean( false );
 
-		public CopyDirectory(File sourceIndexDir, File destination) {
+		public CopyDirectory(Path sourceIndexDir, Path destination) {
 			this.source = sourceIndexDir;
 			this.destination = destination;
 		}
@@ -324,49 +294,50 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		public void run() {
 			long start = System.nanoTime();
 			try {
-				File sourceFile = determineCurrentSourceFile();
+				Path sourceFile = determineCurrentSourceFile();
 				if ( sourceFile == null ) {
 					log.unableToDetermineCurrentInSourceDirectory();
 					return;
 				}
 
 				// check whether a copy is needed at all
-				File currentDestinationFile = new File( destination, Integer.valueOf( current ).toString() );
+				Path currentDestinationFile = destination.resolve( Integer.valueOf( current ).toString() );
 				try {
 					if ( FileHelper.areInSync( sourceFile, currentDestinationFile ) ) {
-						if ( log.isTraceEnabled() ) {
-							log.trace( "Source and destination directory are in sync. No copying required." );
-						}
+						log.trace( "Source and destination directory are in sync. No copying required." );
 						return;
 					}
 				}
 				catch (IOException ioe) {
-					log.unableToCompareSourceWithDestinationDirectory( sourceFile.getName(), currentDestinationFile.getName() );
+					log.unableToCompareSourceWithDestinationDirectory( sourceFile.toString(), currentDestinationFile.toString() );
 				}
 
 				// copy is required
 				int oldIndex = current;
 				int index = oldIndex == 1 ? 2 : 1;
-				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
+				Path destinationFile = destination.resolve( Integer.valueOf( index ).toString() );
 				try {
 					log.tracef( "Copying %s into %s", sourceFile, destinationFile );
 					FileHelper.synchronize( sourceFile, destinationFile, true, copyChunkSize );
 					current = index;
-					log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
+					log.tracef( "Copy for %s took %d ms", indexDir, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 				}
 				catch (IOException e) {
 					//don't change current
-					log.unableToSynchronizeSource( indexName, e );
+					log.unableToSynchronizeSource( indexDir.toString(), e );
 					return;
 				}
-				if ( !new File( indexName, "current" + oldIndex ).delete() ) {
-					log.unableToRemovePreviousMarket( indexName );
-				}
 				try {
-					new File( indexName, "current" + index ).createNewFile();
+					Files.delete( indexDir.resolve( "current" + oldIndex ) );
 				}
 				catch (IOException e) {
-					log.unableToCreateCurrentMarker( indexName, e );
+					log.unableToRemovePreviousMarker( indexDir.toString(), e );
+				}
+				try {
+					Files.createFile( indexDir.resolve( "current" + index ) );
+				}
+				catch (IOException e) {
+					log.unableToCreateCurrentMarker( indexDir.toString(), e );
 				}
 			}
 			finally {
@@ -379,13 +350,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		 *         "current2" in order to determine which is the current directory. If the marker file does not exist
 		 *         <code>null</code> is returned.
 		 */
-		private File determineCurrentSourceFile() {
-			File sourceFile = null;
-			if ( new File( source, "current1" ).exists() ) {
-				sourceFile = new File( source, "1" );
+		private Path determineCurrentSourceFile() {
+			Path sourceFile = null;
+			if ( Files.exists( source.resolve( "current1" ) ) ) {
+				sourceFile = source.resolve( "1" );
 			}
-			else if ( new File( source, "current2" ).exists() ) {
-				sourceFile = new File( source, "2" );
+			else if ( Files.exists( source.resolve( "current2" ) ) ) {
+				sourceFile = source.resolve( "2" );
 			}
 			return sourceFile;
 		}

@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -42,7 +42,7 @@ public class RetryInitializeTest {
 
 	private FullTextSessionBuilder slave;
 	private FullTextSessionBuilder master;
-	private File root;
+	private Path root;
 
 	@Before
 	public void setUp() throws Exception {
@@ -104,8 +104,8 @@ public class RetryInitializeTest {
 	private FullTextSessionBuilder createMasterNode() {
 		return new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
-			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
-			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain )
+			.setProperty( "hibernate.search.default.sourceBase", root.toAbsolutePath() + masterCopy )
+			.setProperty( "hibernate.search.default.indexBase", root.toAbsolutePath() + masterMain )
 			.setProperty( "hibernate.search.default.directory_provider", "filesystem-master" )
 			.build();
 	}
@@ -113,8 +113,8 @@ public class RetryInitializeTest {
 	private FullTextSessionBuilder createSlaveNode(boolean enableRetryInitializePeriod) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
-			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
-			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave" )
+			.setProperty( "hibernate.search.default.sourceBase", root.toAbsolutePath() + masterCopy )
+			.setProperty( "hibernate.search.default.indexBase", root.toAbsolutePath() + "/slave" )
 			.setProperty( "hibernate.search.default.directory_provider", FSSlaveDirectoryProviderTestingExtension.class.getName() );
 		if ( enableRetryInitializePeriod ) {
 			builder.setProperty( "hibernate.search.default.retry_initialize_period", "12" );

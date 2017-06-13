@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -236,8 +235,8 @@ public class ShardingConfigurationTest {
 		);
 
 		shardingProperties.put( "hibernate.search.foo.snafu.directory_provider", "filesystem" );
-		File indexDir = new File( TestConstants.getIndexDirectory( getTargetDir() ) );
-		shardingProperties.put( "hibernate.search.foo.snafu.indexBase", indexDir.getAbsolutePath() );
+		Path indexDir = TestConstants.getIndexDirectory( getTargetDir() );
+		shardingProperties.put( "hibernate.search.foo.snafu.indexBase", indexDir.toAbsolutePath().toString() );
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 

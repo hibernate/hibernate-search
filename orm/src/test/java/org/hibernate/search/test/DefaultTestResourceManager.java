@@ -8,7 +8,6 @@ package org.hibernate.search.test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -229,10 +228,9 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		// Appending UUID to be extra-sure no directory is ever reused across the test suite as Windows might not be
 		// able to delete the files after usage. See also
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
-		return Paths.get(
-				TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir(), currentTestModuleClass ),
+		return TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir(), currentTestModuleClass ).resolve(
 				UUID.randomUUID().toString().substring( 0, 8 )
-		);
+			);
 	}
 
 	private static class RollbackWork implements Work {

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.performance.reader;
 
+import java.nio.file.Path;
+
 import org.hibernate.search.test.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 
@@ -20,7 +22,7 @@ public class NotSharedReaderPerformanceTest extends ReaderPerformance {
 	}
 
 	@Override
-	protected String getIndexBaseDir() {
+	protected Path getIndexBaseDir() {
 		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
 	}
 

@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -41,24 +41,24 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	/**
 	 * The lucene index directory which is shared between master and slave.
 	 */
-	static final String masterCopy = "/master/copy";
+	static final String masterCopy = "master/copy";
 
 	/**
 	 * The lucene index directory which is specific to the master node.
 	 */
-	static final String masterMain = "/master/main";
+	static final String masterMain = "master/main";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	static final String slave = "/slave";
+	static final String slave = "slave";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	static final String slaveUnready = "/slaveUnready";
+	static final String slaveUnready = "slaveUnready";
 
-	private File root;
+	private Path root;
 
 	/**
 	 * Verifies that copies of the master get properly copied to the slaves.
@@ -158,38 +158,18 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return getSessionFactories()[1].openSession();
 	}
 
-	static File prepareDirectories(String testId) throws IOException {
+	static Path prepareDirectories(String testId) throws IOException {
 
-		String superRootPath = TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() );
-		File root = new File( superRootPath, testId );
+		Path superRootPath = TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() );
+		Path root = superRootPath.resolve( testId );
 
-		if ( root.exists() ) {
-			FileHelper.delete( root );
-		}
+		Files.deleteIfExists( root );
+		Files.createDirectories( root );
 
-		if ( !root.mkdirs() ) {
-			throw new HibernateException( "Unable to setup test directories" );
-		}
-
-		File master = new File( root, masterMain );
-		if ( !master.mkdirs() ) {
-			throw new HibernateException( "Unable to setup master directory" );
-		}
-
-		master = new File( root, masterCopy );
-		if ( !master.mkdirs() ) {
-			throw new HibernateException( "Unable to setup master copy directory" );
-		}
-
-		File slaveFile = new File( root, slave );
-		if ( !slaveFile.mkdirs() ) {
-			throw new HibernateException( "Unable to setup slave directory" );
-		}
-
-		File slaveUnreadyFile = new File( root, slaveUnready );
-		if ( !slaveUnreadyFile.mkdirs() ) {
-			throw new HibernateException( "Unable to setup slave directory" );
-		}
+		Files.createDirectories( root.resolve( masterMain ) );
+		Files.createDirectories( root.resolve( masterCopy ) );
+		Files.createDirectories( root.resolve( slave ) );
+		Files.createDirectories( root.resolve( slaveUnready ) );
 
 		return root;
 	}
@@ -206,8 +186,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cleanupDirectories( root );
 	}
 
-	static void cleanupDirectories( File root ) throws IOException {
-		log.debugf( "Deleting test directory %s ", root.getAbsolutePath() );
+	static void cleanupDirectories( Path root ) throws IOException {
+		log.debugf( "Deleting test directory %s ", root.toAbsolutePath() );
 		FileHelper.delete( root );
 	}
 
@@ -227,8 +207,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		int retries = 1;
 		Configuration cfg = new Configuration();
 		//slave(s)
-		cfg.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy + "nooooot" );
-		cfg.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
+		cfg.setProperty( "hibernate.search.default.sourceBase", root.toAbsolutePath() + masterCopy + "nooooot" );
+		cfg.setProperty( "hibernate.search.default.indexBase", root.toAbsolutePath() + slave );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		cfg.setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		cfg.setProperty(
@@ -251,8 +231,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	@Override
 	protected void configure(Configuration[] cfg) {
 		//master
-		cfg[0].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
-		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain );
+		cfg[0].setProperty( "hibernate.search.default.sourceBase", root.toAbsolutePath() + masterCopy );
+		cfg[0].setProperty( "hibernate.search.default.indexBase", root.toAbsolutePath() + masterMain );
 		cfg[0].setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		cfg[0].setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		cfg[0].setProperty(
@@ -260,8 +240,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		);
 
 		//slave(s)
-		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
-		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
+		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.toAbsolutePath() + masterCopy );
+		cfg[1].setProperty( "hibernate.search.default.indexBase", root.toAbsolutePath() + slave );
 		cfg[1].setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		cfg[1].setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		//keep the fqcn to make sure non short cut solutions still work
