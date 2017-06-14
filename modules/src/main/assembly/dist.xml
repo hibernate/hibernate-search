@@ -66,6 +66,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${module.xml.basedir}/search/elasticsearch-aws/module.xml</source>
+            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${module.xml.basedir}/es-client/module.xml</source>
             <outputDirectory>org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -78,6 +83,11 @@
         <file>
             <source>${module.xml.basedir}/gson/module.xml</source>
             <outputDirectory>org/hibernate/search/elasticsearch-gson/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${module.xml.basedir}/aws-v4-signer-java/module.xml</source>
+            <outputDirectory>org/hibernate/search/aws-v4-signer-java/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -160,6 +170,16 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
@@ -185,6 +205,16 @@
             <unpack>false</unpack>
             <includes>
                 <include>com.google.code.gson:gson</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/aws-v4-signer-java/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>uk.co.lucasweb:aws-v4-signer-java</include>
             </includes>
         </dependencySet>
 
