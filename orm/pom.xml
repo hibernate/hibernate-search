@@ -184,7 +184,7 @@
                             org.apache.lucene.*;version="${luceneOsgiRangeVersion}",
                             org.hibernate.*;version="${hibernateOrmOsgiRangeVersion}",
                             javax.transaction;version="[1.1,2)",
-                            javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional
+                            javax.persistence.*;version="[2.0.0,3.0.0)"
                         </Import-Package>
                         <Export-Package>
                             org.hibernate.search;version="${project.version}",
