@@ -120,7 +120,7 @@ The upgrades that require such changes are the following:
 because Hibernate Search normalizers are mapped to native Elasticsearch normalizers starting from Elasticsearch 5.2,
 thereby changing the datatype of fields using normalizers from `text` to `keyword`.
 
-
+[[elasticsearch-integration-dependencies]]
 ==== Dependencies in your Java application
 
 In addition to the usual dependencies like Hibernate ORM and Hibernate Search,
@@ -134,6 +134,23 @@ you will need the new `hibernate-search-elasticsearch` jar.
 <dependency>
    <groupId>org.hibernate</groupId>
    <artifactId>hibernate-search-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+====
+
+If you use Amazon's proprietary IAM authentication mechanism to access Elasticsearch,
+you will need an additional dependency to handle authentication:
+`hibernate-search-elasticsearch-aws`.
+
+.Maven dependencies for Hibernate Search with AWS-hosted Elasticsearch
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+   <groupId>org.hibernate</groupId>
+   <artifactId>hibernate-search-elasticsearch-aws</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
@@ -292,6 +309,36 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
 Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `http_client_configurer`,
 `discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
+--
+
+[[elasticsearch-integration-configuration-aws]]
+===== Authentication on Amazon Web Services
+
+Amazon's proprietary IAM authentication <<elasticsearch-integration-dependencies,requires additional dependencies>>.
+With these dependencies, you will be able to use the following configuration options.
+
+AWS access key:: `hibernate.search.default.elasticsearch.aws.access_key AKIDEXAMPLE`
++
+This property has no default and must be provided for the AWS authentication to work.
++
+AWS secret key:: `hibernate.search.default.elasticsearch.aws.secret_key wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY`
++
+This property has no default and must be provided for the AWS authentication to work.
++
+AWS region:: `hibernate.search.default.elasticsearch.aws.region us-east-1`
++
+This property has no default and must be provided for the AWS authentication to work.
+
+Should you need help with finding the correct values to use,
+please refer to the AWS documentation on http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[security credentials]
+and http://docs.aws.amazon.com/general/latest/gr/rande.html[regions].
+
+[NOTE]
+--
+Setting these AWS-specific configuration properties is not enough to enable the Elasticsearch integration:
+you should also have a look at the <<elasticsearch-integration-configuration,main configuration properties>>,
+most notably `hibernate.search.default.indexmanager`
+and `hibernate.search.default.elasticsearch.host`.
 --
 
 === Mapping and indexing
