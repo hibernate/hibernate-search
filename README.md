@@ -66,14 +66,17 @@ installation directory. Then read the documentation available in *docs/reference
 #### Build options (profiles and properties)
 
 ##### Documentation
-The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
-output is enabled; to also generate the PDF output use:
 
-    > mvn clean install -Pdocumentation-pdf -s settings-example.xml
+The documentation is based on [Asciidoctor](http://asciidoctor.org/) and is
+automatically generated from the standard maven build.
 
-To build the distribution bundle run:
+    > mvn clean install -s settings-example.xml
 
-    > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
+This will produce both documentation in both `HTML` and `PDF` formats.
+
+You can then find the freshly built documentation in the following location:
+
+    > ./documentation/target/asciidoctor/en-US
 
 ##### Elasticsearch
 
