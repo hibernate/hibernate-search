@@ -181,6 +181,11 @@
     <profiles>
         <profile>
             <id>documentation-pdf</id>
+            <activation>
+                <property>
+                    <name>!skipPdfDocumentation</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
