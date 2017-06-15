@@ -15,7 +15,7 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
 |Hibernate Search| `hibernate-search-{hibernateSearchVersion}.jar` and all
             runtime dependencies. You can get the jar artifacts either from
             the `dist/lib` directory of the link:http://sourceforge.net/projects/hibernate/files/hibernate-search/[Hibernate Search distribution] or you can download them from the
-            link:http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/[JBoss maven repository].
+            Maven Central repository.
 |Hibernate ORM|You will need
             `hibernate-core-{hibernateVersion}.jar` and its
             dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate-orm/[distribution bundle] or the maven repository).
@@ -430,13 +430,11 @@ definitions on each of these types.
 ====
 Why the reference to the Apache Solr wiki?
 
-Apache Solr was historically an indepedent sister project of Apache Lucene and the analyzer factory
-framework was originally created in Solr.
-Since then the Apache Lucene and Solr projects have merged, but the
+The analyzer factory framework was originally created in the Apache Solr project.
+Most of these implementations have been moved to Apache Lucene, but the
 documentation for these additional analyzers can still be found in the Solr Wiki. You might find
-other documentation referring to the "Solr Analyzer Framework" - just remember you don't need to
-depend on Apache Solr anymore to use it. The required classes are part of the core Lucene
-distribution.
+other documentation referring to the "Solr Analyzer Framework"; just remember you don't need to
+depend on Apache Solr anymore: the required classes are part of the core Lucene distribution.
 ====
 
 In the example below a `StandardTokenizerFactory` is used followed by two filter factories,

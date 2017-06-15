@@ -1100,11 +1100,6 @@ representation, returning a list of `Object[]`. Projections avoid a potential da
 increases the index size
 * the properties projected must use a `FieldBridge` implementing org.hibernate.search.bridge.TwoWayFieldBridge or `org.hibernate.search.bridge.TwoWayStringBridge`, the latter being the simpler version.
 
-[NOTE]
-====
-All Hibernate Search built-in types are two-way.
-====
-
 * you can only project simple properties of the indexed entity or its embedded associations.
 This means you cannot project a whole embedded entity.
 * projection does not work on collections or maps which are indexed via `@IndexedEmbedded`

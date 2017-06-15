@@ -27,9 +27,9 @@ but replacing the local Lucene based index with a remote Elasticsearch service.
 
 There could be various reasons to prefer this over an "embedded Lucene" approach:
 
-* wish to separate the service running your application from the Search service
-* integrate with an existing Elasticsearch instance
-* benefit from Elasticsearch's out of the box horizontal scalability features
+* wish to separate the service running your application from the Search service (Microservices)
+* benefit from Elasticsearch's out of the box horizontal scalability and high availability features
+* integrate with an existing Elasticsearch cluster
 * explore the data updated by an Hibernate powered application using the Elasticsearch dashboard integrations such as Kibana
 
 There are a couple of drawbacks compared to the embedded Lucene approach though:
@@ -41,7 +41,7 @@ There are a couple of drawbacks compared to the embedded Lucene approach though:
 Which solution is best will depend on the specific needs of your system and your organization.
 
 [NOTE]
-.Why not use Elasticsearch directly
+.Why not use Elasticsearch directly?
 --
 The #1 reason is that Hibernate Search integrates perfectly with Hibernate ORM.
 All changes done to your objects will trigger the necessary index changes transparently.
@@ -50,11 +50,13 @@ All changes done to your objects will trigger the necessary index changes transp
 * changes to cascaded objects are handled
 * changes to nested object embedded in a root indexed entity are handled
 * changes will be sent in bulk - i.e. optimized systematically for you
+* it generates JSON encoded requests from your entities, parses reponses
+* manages the connection pools
 * etc.
 
 There is no more paradigm shift in your code.
 You are working on Hibernate ORM managed objects,
-doing your queries on object properties with a nice DSL.
+doing your queries on object properties with a nice Java DSL.
 --
 
 === Getting started and configuration
@@ -62,18 +64,18 @@ doing your queries on object properties with a nice DSL.
 To experiment with the Elasticsearch integration you will have to download Elasticsearch and run it:
 Hibernate Search connects to an Elasticsearch node but does not provide one.
 
-One option is to use the https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html[Elasticsearch Docker image] (see https://hub.docker.com/r/library/elasticsearch/[here for Elasticsearch 2]).
+One option is to use the https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html[Elasticsearch Docker image].
 
 ==== Elasticsearch version
 
 Hibernate Search expects an Elasticsearch cluster running version 2.x or 5.x.
 The version running on your cluster will be automatically detected on startup,
-and Hibernate Search will adapt its behavior based on the detected version.
+and Hibernate Search will adapt based on the detected version.
 
-The targeted version is largely transparent to Hibernate Search users,
+The targeted version is mostly transparent to Hibernate Search users,
 but there are a few differences in how Hibernate Search behaves depending
 on the Elasticsearch version that may affect you.
-The table details those differences.
+The following table details those differences.
 
 [cols="h,3*",options="header"]
 |===============
@@ -99,7 +101,7 @@ The table details those differences.
 
 [NOTE]
 --
-Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion} by default.
+The testsuite of Hibernate Search runs against Elasticsearch {testElasticsearchVersion} by default.
 --
 
 ===== Upgrading Elasticsearch
@@ -115,7 +117,7 @@ The upgrades that require such changes are the following:
 
 * upgrading from 2.x to 5.x, because Hibernate Search does not support the `string` datatype on Elasticsearch 5.x;
 * upgrading from 5.0/5.1 to 5.2+ if you used <<section-normalizer,normalizers>>,
-because Hibernate Seach normalizers are mapped to native Elasticsearch normalizers starting from Elasticsearch 5.2,
+because Hibernate Search normalizers are mapped to native Elasticsearch normalizers starting from Elasticsearch 5.2,
 thereby changing the datatype of fields using normalizers from `text` to `keyword`.
 
 
@@ -178,7 +180,7 @@ Password for Elasticsearch connection:: `hibernate.search.default.elasticsearch.
 +
 [CAUTION]
 ====
-If you used HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
+If you use HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
 your password will be transmitted in clear text over the network.
 ====
 [[elasticsearch-schema-management-strategy]]Select the index creation strategy::
@@ -191,14 +193,13 @@ Let's see the options for the `index_schema_management_strategy` property:
 |Value|Definition
 |`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
 Hibernate Search will **not even check** that the index already exists.
-|`validate`|The index, its mappings and analyzer definitions will be checked for conflicts with Hibernate Search's metamodel.
+|`validate`|The index, its existing mappings and analyzer definitions will be checked to be compatible with the metamodel of your application.
 The index, its mappings and analyzer definitions will not be created, deleted nor altered.
 |`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
-+
 Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
 |`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
-|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
-This will delete all content from the indexes!
+|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions to match the requirements of your appllication.
+This will delete all content from the indexes! Useful during development.
 |`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
@@ -212,31 +213,32 @@ on an AWS Elasticsearch cluster.
 The only workaround is to avoid the `update` strategy on AWS.
 --
 +
-[CAUTION]
+[WARNING]
 .Strategies in production environments
 ====
 It is strongly recommended to use either `none` or `validate` in a production environment.
-`drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
-(unless you want to reindex everything upon every startup),
+
+The alternatives `drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
+unless you want to reindex everything upon every startup,
 and `update` may leave your mapping half-updated in case of conflict.
 
 To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
 updating the mapping may be impossible without manual intervention.
 In this case, the `update` strategy will prevent Hibernate Search from starting,
-but it may already have successfully updated the mappings for another index, making a rollback difficult at best.
+but it may already have successfully updated the mappings for another index, making a rollback difficult.
 
-Also, when updating analyzer definitions, Hibernate Search will stop the affected indexes during the update.
+When updating analyzer definitions Hibernate Search will temporarily stop the affected indexes during the update.
 This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
-those clients should be synchronized in such a way that while Hibernate Search is starting, no other client tries to use the index.
+those clients should be synchronized in such a way that while Hibernate Search is starting, no other client needs to access the index.
 
-For these reasons, migrating your mapping should be considered a part of your deployment process and be planned cautiously.
+For these reasons, migrating your mapping on a live cluster should be properly planned within the deployment process.
 ====
 +
 [NOTE]
 --
 Mapping validation is as permissive as possible. Fields or mappings that are unknown to Hibernate Search will be ignored, and settings that are more powerful than required (e.g. a field annotated with `@Field(index = Index.NO)` in Search but marked as `"index": analyzed` in Elasticsearch) will be deemed valid.
 
-One exception should be noted, though: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
+One exception: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
 --
 Maximum time to wait for the successful execution of a request to the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.request_timeout 60000` (default)
 +
@@ -273,9 +275,9 @@ Whether to perform an explicit refresh after a set of operations has been execut
 `hibernate.search.default.elasticsearch.refresh_after_write false` (default)
 +
 This is useful in unit tests to ensure that a write is visible by a query immediately without delay.
-This keeps unit tests simpler and faster.
-But you should not rely on the synchronous behaviour for your production code.
-Leave at `false` for optimal performance of your Elasticsearch cluster.
+This keeps unit tests simpler.
+You should not rely on the synchronous behaviour for your production code except in rare cases as Elasticsearch is optimised for asynchronous writes:
+leave at `false` for optimal performance.
 When <<elasticsearch-scrolling,scrolling>>, the minimum number of previous results kept in memory at any time:: `hibernate.search.elasticsearch.scroll_backtracking_window_size 10000` (default)
 When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by each Elasticsearch call:: `hibernate.search.elasticsearch.scroll_fetch_size 1000` (default)
 When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
@@ -328,11 +330,11 @@ The `org.hibernate.search.annotations.DynamicBoost` annotation is not (and canno
 supported with Elasticsearch, because the platform lacks per-document, index-time boosting capabilities.
 
 The `@Boost` annotation will work, but since it's deprecated
-we suggest to use query-time boosting instead: see <<search-query>>>.
+we suggest to use query-time boosting instead: see <<search-query>>.
 
 ==== [[elasticsearch-mapping-analyzer]] Analyzers
 
-WARNING: Analyzers are treated differently than in Lucene embedded mode.
+INFO: Analyzers are treated differently than in Lucene embedded mode.
 
 ===== Built-in or server-defined analyzers
 
@@ -390,13 +392,13 @@ public class Tweet {
 You may also reference a built-in Lucene analyzer implementation using the `@Analyzer.impl` attribute:
 Hibernate Search will translate the implementation to an equivalent Elasticsearch built-in type, if possible.
 
-[WARNING]
+[INFO]
 ====
 Using the `@Analyzer.impl` attribute is not recommended with Elasticsearch because it will
 never allow you to take full advantage of Elasticsearch analysis capabilities.
 You cannot, for instance, use custom analyzer implementations: only built-in Lucene implementations are supported.
 
-It should only be used when migrating an application that already used Hibernate Search,
+This feature is designed to help migrating an application that already used Hibernate Search,
 moving from an embedded Lucene instance to an Elasticsearch cluster.
 ====
 
@@ -447,7 +449,7 @@ accepted by Elasticsearch for this type.
 The parameter values will be interpreted as JSON. The parser is not strict, though:
 
  * quotes around strings may be left out in some cases, as when a string only contains letters.
- * when quotes *are* required (e.g. your string may be interpreted as a number, and you don't want that),
+ * when quotes are required (e.g. your string may be interpreted as a number, and you don't want that),
    you may use single quotes instead of double quotes (which are painful to write in Java).
 
 [NOTE]
@@ -508,7 +510,7 @@ The second approach is to configure everything as if you were using Lucene:
 use the Lucene factories, their parameter names, and format the parameter values as required in Lucene.
 Hibernate Search will automatically convert these definitions to the Elasticsearch equivalent.
 
-[WARNING]
+[INFO]
 ====
 Referencing Lucene factories is not recommended with Elasticsearch because it will
 never allow you to take full advantage of Elasticsearch analysis capabilities.
@@ -582,12 +584,6 @@ In the case of Elasticsearch, this requires to set the
 The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
 This class must either implement `org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider` directly
 or expose a `@Factory`-annotated method that returns such implementation. 
-
-[IMPORTANT]
-====
-This feature is considered experimental.
-The builder in particular could be altered in the future.
-====
 
 [source,java]
 .Example of mapping that defines analyzers on Elasticsearch using the `Elasticsearch*Factory` types
@@ -711,7 +707,7 @@ You can write custom field bridges and class bridges.
 For class bridges and field bridges creating multiple fields,
 make sure to make your bridge implementation also implement the `MetadataProvidingFieldBridge` contract.
 
-[CAUTION]
+[WARNING]
 ====
 Creating sub-fields in custom field bridges is not supported.
 
@@ -808,15 +804,15 @@ List<?> result = session.createFullTextQuery(query, GolfPlayer.class).list();
 ----
 ====
 
-[CAUTION]
+[NOTE]
 .Date/time in native Elasticsearch queries
 ====
 By default Elasticsearch interprets the date/time strings lacking the time zone as if they were represented using the UTC time zone. If overlooked, this can cause your native Elasticsearch queries to be completely off.
 
-The simplest way to avoid issues is to always explicitly provide time zones IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the `time_zone` parameter (range queries only). See Elasticsearch documentation for more information.
+The simplest way to avoid issues is to always explicitly provide time zone IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the `time_zone` parameter (range queries only). See the Elasticsearch documentation for more information.
 ====
 
-[CAUTION]
+[NOTE]
 .Simple query string queries and analyzers
 ====
 The simple query string DSL is supported by the Elasticsearch integration.
@@ -832,7 +828,7 @@ The Elasticsearch integration supports spatial queries by using either the DSL o
 
 For regular usage, there are no particular requirements for spatial support.
 
-[CAUTION]
+[NOTE]
 --
 On Elasticsearch 2.x only (not necessary on 5.x),
 if you want to calculate the distance from your entities to a point *without sorting* by the distance to this point,
@@ -1008,9 +1004,8 @@ by enabling `TRACE` logging for the log category `org.hibernate.search.elasticse
 === [[elasticsearch-limitations]]Limitations
 
 Not everything is implemented yet.
-Here is a list of known limitations.
 
-Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
+At the time of writing this, the following features are known to not work yet; feel free to check the JIRA links to get updates:
 
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
@@ -1018,20 +1013,20 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 * <<search-monitoring,Statistics>>: https://hibernate.atlassian.net/browse/HSEARCH-2421[HSEARCH-2421]
 * `@AnalyzerDiscriminator`: https://hibernate.atlassian.net/browse/HSEARCH-2428[HSEARCH-2428]
 * Dynamic sharding: https://hibernate.atlassian.net/browse/HSEARCH-2725[HSEARCH-2725]
-* Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
+* Mixing Lucene based indexes and Elasticsearch based indexes (partial support is implemented though)
 * Hibernate Search does not make use of nested objects nor parent child relationship mapping https://hibernate.atlassian.net/browse/HSEARCH-2263[HSEARCH-2263].
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
 * Our new Elasticsearch integration module does not work in OSGi environments. If you need this, please vote for: https://hibernate.atlassian.net/browse/HSEARCH-2524[HSEARCH-2524].
 
-=== Known bugs in Elasticsearch
+=== Specific versions of Elasticsearch to avoid
 
-Depending on the Elasticsearch version you use, you may encounter bugs that are specific to that version.
-Here is a list of known Elasticsearch bugs, and what to do about it.
+We might occasionally hit issues in specific versions of Elasticsearch.
+This is not the right place to track Elasticsearch defects but we'll do our best to track specific issues which affect compatibility with Hibernate Search.
 
 * Mapping `java.time.ZonedDateTime` won't work with Elasticsearch 2.4.1 because of https://github.com/elastic/elasticsearch/issues/20911[a JodaTime bug affecting Elasticsearch]: https://hibernate.atlassian.net/browse/HSEARCH-2414[HSEARCH-2414].
 +
-*Fix:* Upgrade to Elasticsearch 2.4.2.
+*Solution:* Upgrade to Elasticsearch 2.4.2 or later.
 
 === Acknowledgment
 
