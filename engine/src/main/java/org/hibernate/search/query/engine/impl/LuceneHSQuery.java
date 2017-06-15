@@ -281,8 +281,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	}
 
 	@Override
-	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
-		List<IndexManager> indexManagers = super.getIndexManagers( binding );
+	protected Set<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		Set<IndexManager> indexManagers = super.getIndexManagers( binding );
 
 		for ( IndexManager indexManager : indexManagers ) {
 			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
@@ -421,7 +421,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 				allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 			}
 
-			List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
+			Set<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
 			targetedIndexes.addAll( indexManagers );
 			Optional<CustomTypeMetadata> customTypeMetadata = getCustomTypeMetadata( clazz );
 			collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(), customTypeMetadata );

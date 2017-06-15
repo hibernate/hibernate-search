@@ -8,7 +8,6 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
@@ -38,7 +37,8 @@ class DynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		ShardIdentifierProvider shardIdentifierProvider = createShardIdentifierProvider(
 				buildContext, maskedProperties
 		);
-		DynamicShardingStrategy shardingStrategy = new DynamicShardingStrategy( shardIdentifierProvider, holder, properties, entityType );
+		DynamicShardingIndexManagerSelector indexManagerSelector =
+				new DynamicShardingIndexManagerSelector( shardIdentifierProvider, holder, properties, entityType );
 
 		/*
 		 * Ensure the backend is created even if there are no indexes yet:
@@ -48,7 +48,7 @@ class DynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		 */
 		preInitializeBackend( holder, buildContext );
 
-		return new DynamicShardingEntityIndexBinding( holder, shardingStrategy, interceptor );
+		return new MutableEntityIndexBinding( holder, indexManagerSelector, shardIdentifierProvider, interceptor );
 	}
 
 	@Override

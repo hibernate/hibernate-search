@@ -10,7 +10,6 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -539,9 +538,9 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		return facetMetadata;
 	}
 
-	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+	protected Set<IndexManager> getIndexManagers(EntityIndexBinding binding) {
 		FullTextFilterImplementor[] fullTextFilters = getFullTextFilterImplementors();
-		List<IndexManager> indexManagers = Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
+		Set<IndexManager> indexManagers = binding.getIndexManagerSelector().forFilters( fullTextFilters );
 		return indexManagers;
 	}
 

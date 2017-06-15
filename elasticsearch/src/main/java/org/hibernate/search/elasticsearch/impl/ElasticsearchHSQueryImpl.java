@@ -283,8 +283,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
-		List<IndexManager> indexManagers = super.getIndexManagers( binding );
+	protected Set<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		Set<IndexManager> indexManagers = super.getIndexManagers( binding );
 		for ( IndexManager indexManager : indexManagers ) {
 			if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 				throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
@@ -319,7 +319,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		for ( Map.Entry<String, EntityIndexBinding> entry: targetedEntityBindingsByName.entrySet() ) {
 			EntityIndexBinding binding = entry.getValue();
 
-			List<IndexManager> indexManagers = getIndexManagers( binding );
+			Set<IndexManager> indexManagers = getIndexManagers( binding );
 
 			for ( IndexManager indexManager : indexManagers ) {
 				ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;

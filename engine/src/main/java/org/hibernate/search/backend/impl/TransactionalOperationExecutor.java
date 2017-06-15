@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 
 /**
  * Visitor interface to apply the configured sharding strategy to a list of LuceneWork;
@@ -21,9 +21,9 @@ public interface TransactionalOperationExecutor {
 	 * The LuceneWork must be applied to different indexes.
 	 *
 	 * @param work the work to split.
-	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories.
+	 * @param selector the index manager selector used to route works to the relevant index managers
 	 * @param context the transactional context where the pending changes are stored
 	 */
-	void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, WorkQueuePerIndexSplitter context);
+	void performOperation(LuceneWork work, IndexManagerSelector selector, WorkQueuePerIndexSplitter context);
 
 }

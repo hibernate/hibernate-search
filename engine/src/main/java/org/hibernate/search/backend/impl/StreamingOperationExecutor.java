@@ -8,7 +8,7 @@ package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 
 /**
  * Sends a single operation to the related backends, considering the sharding strategy.
@@ -23,11 +23,11 @@ public interface StreamingOperationExecutor {
 	 * The LuceneWork must be applied to different indexes.
 	 *
 	 * @param work the work to split.
-	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories.
+	 * @param selector the index manager selector used to route works to the relevant index managers
 	 * @param monitor to receive notification of indexing operations
 	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
 	 *  When false this will depend on the backend configuration.
 	 */
-	void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync);
+	void performStreamOperation(LuceneWork work, IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync);
 
 }
