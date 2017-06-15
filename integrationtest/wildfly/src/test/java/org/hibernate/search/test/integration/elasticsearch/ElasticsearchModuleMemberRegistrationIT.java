@@ -53,6 +53,9 @@ public class ElasticsearchModuleMemberRegistrationIT {
 	private static final String ES_HOST_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI;
 	private static final String ES_USERNAME_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME;
 	private static final String ES_PASSWORD_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD;
+	private static final String ES_AWS_ACCESS_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.access_key";
+	private static final String ES_AWS_SECRET_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.secret_key";
+	private static final String ES_AWS_REGION_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.region";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
@@ -98,6 +101,9 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( ES_HOST_PROPERTY ).value( testDefaults.getProperty( ES_HOST_PROPERTY ) ).up()
 					.createProperty().name( ES_USERNAME_PROPERTY ).value( testDefaults.getProperty( ES_USERNAME_PROPERTY ) ).up()
 					.createProperty().name( ES_PASSWORD_PROPERTY ).value( testDefaults.getProperty( ES_PASSWORD_PROPERTY ) ).up()
+					.createProperty().name( ES_AWS_ACCESS_KEY_PROPERTY ).value( testDefaults.getProperty( ES_AWS_ACCESS_KEY_PROPERTY ) ).up()
+					.createProperty().name( ES_AWS_SECRET_KEY_PROPERTY ).value( testDefaults.getProperty( ES_AWS_SECRET_KEY_PROPERTY ) ).up()
+					.createProperty().name( ES_AWS_REGION_PROPERTY ).value( testDefaults.getProperty( ES_AWS_REGION_PROPERTY ) ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );
