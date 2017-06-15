@@ -68,8 +68,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 	}
 
 	private static void collectAllIndexManagersInto(EntityIndexBinding bindings, HashMap<String, IndexManager> indexManagers) {
-		IndexManager[] indexManagersForAllShards = bindings.getSelectionStrategy().getIndexManagersForAllShards();
-		for ( IndexManager im : indexManagersForAllShards ) {
+		for ( IndexManager im : bindings.getIndexManagerSelector().all() ) {
 			indexManagers.put( im.getIndexName(), im );
 		}
 	}

@@ -9,10 +9,12 @@ package org.hibernate.search.test.configuration;
 import java.util.Map;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.indexes.impl.IndexShardingStrategyIndexManagerSelector;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.Document;
@@ -75,9 +77,15 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Test
 	public void testSelectionOfShardingStrategy() {
-		IndexShardingStrategy shardingStrategy = getExtendedSearchIntegrator().getIndexBinding( Document.class ).getSelectionStrategy();
-		assertNotNull( shardingStrategy );
-		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );
+		IndexManagerSelector selector = getExtendedSearchIntegrator().getIndexBinding( Document.class ).getIndexManagerSelector();
+		assertNotNull( selector );
+		assertEquals( selector.getClass(), IndexShardingStrategyIndexManagerSelector.class );
+		assertEquals( 4, selector.all().size() );
+		assertEquals(
+				"Expected the useless strategy to be used (never returns any shard)",
+				0,
+				selector.forExisting( new PojoIndexedTypeIdentifier( Document.class ), null, null ).size()
+		);
 	}
 
 	@Test

@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.impl;
 
 
+import java.util.Set;
+
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -17,7 +19,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 
 /**
  * This visitor applies the selection logic from the plugged IndexShardingStrategies to transactional operations, so
@@ -85,10 +87,10 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private class AddSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
-					work.getEntityType().getPojoType(),
+			IndexManager indexManager = selector.forNew(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
@@ -101,10 +103,10 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private class DeleteSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(),
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -118,10 +120,10 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private class DeleteByQuerySelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(),
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -139,9 +141,9 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private static class OptimizeSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
+			Set<IndexManager> indexManagers = selector.all();
 			for ( IndexManager indexManager : indexManagers ) {
 				context.performStreamOperation( indexManager, work );
 			}
@@ -152,9 +154,9 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private static class FlushSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
+			Set<IndexManager> indexManagers = selector.all();
 			for ( IndexManager indexManager : indexManagers ) {
 				context.performStreamOperation( indexManager, work );
 			}
@@ -165,10 +167,10 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private class PurgeAllSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+		public final void performOperation(LuceneWork work, IndexManagerSelector selector,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(),
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString()
 			);

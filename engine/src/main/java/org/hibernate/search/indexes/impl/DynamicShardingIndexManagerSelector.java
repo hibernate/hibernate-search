@@ -15,21 +15,21 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public class DynamicShardingStrategy implements IndexShardingStrategy {
+class DynamicShardingIndexManagerSelector implements IndexManagerSelector {
 	private final ShardIdentifierProvider shardIdentifierProvider;
 	private final IndexManagerGroupHolder indexManagerGroupHolder;
 	private final Properties indexProperties;
 	private final IndexedTypeIdentifier entityType;
 
-	public DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
+	public DynamicShardingIndexManagerSelector(ShardIdentifierProvider shardIdentifierProvider,
 			IndexManagerGroupHolder indexManagerGroupHolder, Properties indexProperties, IndexedTypeIdentifier entityType) {
 		this.shardIdentifierProvider = shardIdentifierProvider;
 		this.indexManagerGroupHolder = indexManagerGroupHolder;
@@ -38,38 +38,30 @@ public class DynamicShardingStrategy implements IndexShardingStrategy {
 	}
 
 	@Override
-	public void initialize(Properties properties, IndexManager[] indexManagers) {
-	}
-
-	@Override
-	public IndexManager[] getIndexManagersForAllShards() {
+	public Set<IndexManager> all() {
 		Set<String> allShardIdentifiers = shardIdentifierProvider.getAllShardIdentifiers();
 		return getIndexManagersFromShards( allShardIdentifiers );
 	}
 
 	@Override
-	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		String shardIdentifier = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
+	public IndexManager forNew(IndexedTypeIdentifier typeId, Serializable id, String idInString, Document document) {
+		String shardIdentifier = shardIdentifierProvider.getShardIdentifier( typeId.getPojoType(), id, idInString, document );
 		return indexManagerGroupHolder.getOrCreateIndexManager( shardIdentifier, indexProperties, entityType, null );
 	}
 
 	@Override
-	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		Set<String> shardIdentifiers = shardIdentifierProvider.getShardIdentifiersForDeletion( entity, id, idInString );
+	public Set<IndexManager> forExisting(IndexedTypeIdentifier typeId, Serializable id, String idInString) {
+		Set<String> shardIdentifiers = shardIdentifierProvider.getShardIdentifiersForDeletion( typeId.getPojoType(), id, idInString );
 		return getIndexManagersFromShards( shardIdentifiers );
 	}
 
 	@Override
-	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public Set<IndexManager> forFilters(FullTextFilterImplementor[] fullTextFilters) {
 		Set<String> shards = shardIdentifierProvider.getShardIdentifiersForQuery( fullTextFilters );
 		return getIndexManagersFromShards( shards );
 	}
 
-	public ShardIdentifierProvider getShardIdentifierProvider() {
-		return shardIdentifierProvider;
-	}
-
-	private IndexManager[] getIndexManagersFromShards(Set<String> shardIdentifiers) {
+	private Set<IndexManager> getIndexManagersFromShards(Set<String> shardIdentifiers) {
 		Set<IndexManager> managers = new HashSet<IndexManager>( shardIdentifiers.size() );
 		for ( String shardIdentifier : shardIdentifiers ) {
 			managers.add(
@@ -81,7 +73,7 @@ public class DynamicShardingStrategy implements IndexShardingStrategy {
 					)
 			);
 		}
-		return managers.toArray( new IndexManager[shardIdentifiers.size()] );
+		return managers;
 	}
 }
 

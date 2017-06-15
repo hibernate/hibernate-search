@@ -9,6 +9,7 @@ package org.hibernate.search.test.sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Sort;
@@ -48,7 +49,7 @@ public class ManagedMultiReaderTest {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
 		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
 
-		IndexManager[] indexManagers = binding.getSelectionStrategy().getIndexManagersForQuery( new FullTextFilterImpl[0] );
+		Set<IndexManager> indexManagers = binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] );
 
 		Sort sort = new Sort(
 				new SortField( "ageForIntSorting", Type.INT ),
@@ -66,8 +67,9 @@ public class ManagedMultiReaderTest {
 			)
 			.build();
 
+		IndexManager[] indexManagersArray = indexManagers.toArray( new IndexManager[indexManagers.size()] );
 
-		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers, false ) ) {
+		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagersArray, false ) ) {
 			List<? extends IndexReader> actualReaders = reader.getSubReaders();
 			assertThat( actualReaders ).hasSize( 1 );
 			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "StandardDirectoryReader" );
@@ -79,7 +81,7 @@ public class ManagedMultiReaderTest {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
 		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
 
-		IndexManager[] indexManagers = binding.getSelectionStrategy().getIndexManagersForQuery( new FullTextFilterImpl[0] );
+		Set<IndexManager> indexManagers = binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] );
 
 		Sort sort = new Sort(
 				new SortField( "ageForIntSorting", Type.INT ),
@@ -96,7 +98,9 @@ public class ManagedMultiReaderTest {
 			)
 			.build();
 
-		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers, true ) ) {
+		IndexManager[] indexManagersArray = indexManagers.toArray( new IndexManager[indexManagers.size()] );
+
+		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagersArray, true ) ) {
 			List<? extends IndexReader> actualReaders = reader.getSubReaders();
 			assertThat( actualReaders ).hasSize( 1 );
 			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );
@@ -108,10 +112,10 @@ public class ManagedMultiReaderTest {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
 
 		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
-		List<IndexManager> indexManagers = new ArrayList<>( Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( new FullTextFilterImpl[0] ) ) );
+		List<IndexManager> indexManagers = new ArrayList<>( binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] ) );
 
 		binding = integrator.getIndexBinding( Customer.class );
-		indexManagers.addAll( Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( new FullTextFilterImpl[0] ) ) );
+		indexManagers.addAll( binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] ) );
 
 		Sort sort = new Sort(
 				new SortField( "ageForIntSorting", Type.INT ),
