@@ -31,7 +31,6 @@ public class FileHelper {
 
 	private static final Log log = LoggerFactory.make();
 	private static final int FAT_PRECISION = 2000;
-	public static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB
 
 	private FileHelper() {
 	}
@@ -83,14 +82,6 @@ public class FileHelper {
 	}
 
 	public static void synchronize(Path source, Path destination, boolean smart) throws IOException {
-		synchronize( source, destination, smart, DEFAULT_COPY_BUFFER_SIZE );
-	}
-
-	public static void synchronize(Path source, Path destination, boolean smart, long chunkSize) throws IOException {
-		if ( chunkSize <= 0 ) {
-			log.checkSizeMustBePositive();
-			chunkSize = DEFAULT_COPY_BUFFER_SIZE;
-		}
 		if ( Files.isDirectory( source ) ) {
 			Files.createDirectories( destination );
 			final Set<Path> sources = listFiles( source );
@@ -107,7 +98,7 @@ public class FileHelper {
 			//copy each file from source
 			for ( Path srcFile : sources ) {
 				Path destFile = destination.resolve( srcFile.getFileName() );
-				synchronize( srcFile, destFile, smart, chunkSize );
+				synchronize( srcFile, destFile, smart );
 			}
 		}
 		else {
@@ -119,11 +110,11 @@ public class FileHelper {
 				long dts = Files.getLastModifiedTime( destination ).toMillis() / FAT_PRECISION;
 				//do not copy if smart and same timestamp and same length
 				if ( !smart || sts == 0 || sts != dts || source.toFile().length() != destination.toFile().length() ) {
-					copyFile( source, destination, chunkSize );
+					copyFile( source, destination );
 				}
 			}
 			else {
-				copyFile( source, destination, chunkSize );
+				copyFile( source, destination );
 			}
 		}
 	}
@@ -140,7 +131,7 @@ public class FileHelper {
 		}
 	}
 
-	private static void copyFile(Path source, Path destination, long chunkSize) throws IOException {
+	private static void copyFile(Path source, Path destination) throws IOException {
 		// Copy the attributes as well as we like the "modified" timestamp to be maintained
 		Files.copy( source, destination, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING );
 	}

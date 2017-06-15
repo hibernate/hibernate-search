@@ -26,7 +26,6 @@ import org.hibernate.search.store.spi.DirectoryHelper;
 import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -40,7 +39,10 @@ public final class DirectoryProviderHelper {
 
 	private static final String ROOT_INDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVE_INDEX_PROP_NAME = "source";
+
+	@Deprecated //Legacy - no longer used:
 	private static final String COPY_BUFFER_SIZE_PROP_NAME = "buffer_size_on_copy";
+
 	private static final String FS_DIRECTORY_TYPE_PROP_NAME = "filesystem_access_type";
 	private static final String REFRESH_PROP_NAME = "refresh";
 	private static final String RETRY_INITIALIZE_PROP_NAME = "retry_initialize_period";
@@ -194,31 +196,19 @@ public final class DirectoryProviderHelper {
 	 * "chunk size" for large file copy operations performed
 	 * by DirectoryProviders.
 	 *
+	 * @deprecated the configured chunk size is actually no longer useful and will be ignored.
+	 *
 	 * @param indexName the index name
 	 * @param properties the configuration properties
 	 * @return the number of Bytes to use as "chunk size" in file copy operations.
 	 */
+	@Deprecated
 	public static long getCopyBufferSize(String indexName, Properties properties) {
 		String value = properties.getProperty( COPY_BUFFER_SIZE_PROP_NAME );
-		long size = FileHelper.DEFAULT_COPY_BUFFER_SIZE;
 		if ( value != null ) {
-			try {
-				size = Long.parseLong( value ) * 1024 * 1024; //from MB to B.
-			}
-			catch (NumberFormatException nfe) {
-				throw new SearchException(
-						"Unable to initialize index " +
-								indexName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " is not numeric.", nfe
-				);
-			}
-			if ( size <= 0 ) {
-				throw new SearchException(
-						"Unable to initialize index " +
-								indexName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " needs to be greater than zero."
-				);
-			}
+			log.deprecatedConfigurationPropertyIsIgnored( COPY_BUFFER_SIZE_PROP_NAME );
 		}
-		return size;
+		return 0l;
 	}
 
 	private enum FSDirectoryType {

@@ -215,10 +215,6 @@ public interface Log extends BasicLogger {
 	void forcingReleaseIndexWriterLock();
 
 	@LogMessage(level = WARN)
-	@Message(id = 53, value = "Chunk size must be positive: using default value.")
-	void checkSizeMustBePositive();
-
-	@LogMessage(level = WARN)
 	@Message(id = 54, value = "ReaderProvider contains readers not properly closed at destroy time")
 	void readersNotProperlyClosedInReaderProvider();
 

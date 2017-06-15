@@ -60,7 +60,6 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private volatile Directory dummyDirectory;
 	private FSDirectory directory1;
 	private FSDirectory directory2;
-	private long copyChunkSize;
 
 	//variables needed between initialize and start (used by same thread: no special care needed)
 	private Path sourceIndexDir;
@@ -80,7 +79,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		log.debugf( "Source directory: %s", sourceIndexDir );
 		indexDir = DirectoryHelper.getVerifiedIndexPath( directoryProviderName, properties, true ).normalize();
 		log.debugf( "Index directory: %s", indexDir );
-		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
+		//No longer useful but invoke it still to log a deprecation warning as needed:
+		DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		current = 0; //publish all state to other threads
 	}
 
@@ -161,7 +161,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				try {
 					FileHelper.synchronize(
 							sourceIndexDir.resolve( String.valueOf( sourceCurrent ) ),
-							destinationFile, true, copyChunkSize
+							destinationFile, true
 					);
 				}
 				catch (IOException e) {
@@ -318,7 +318,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				Path destinationFile = destination.resolve( Integer.valueOf( index ).toString() );
 				try {
 					log.tracef( "Copying %s into %s", sourceFile, destinationFile );
-					FileHelper.synchronize( sourceFile, destinationFile, true, copyChunkSize );
+					FileHelper.synchronize( sourceFile, destinationFile, true );
 					current = index;
 					log.tracef( "Copy for %s took %d ms", indexDir, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 				}

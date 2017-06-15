@@ -214,8 +214,6 @@ Note that the copy is based on an incremental copy mechanism reducing the averag
 
 DirectoryProvider typically used on the master node in a JMS back end cluster.
 
-The `buffer_size_on_copy` optimum depends on your operating system and available RAM; most
-people reported good results using values between 16 and 64MB.
 |`indexBase`: base directory
 `indexName`: override @Indexed.index (useful for sharded indexes)
 `sourceBase`: source (copy) base directory.
@@ -224,8 +222,6 @@ being _<sourceBase>/<source>_
 `refresh`: refresh period in seconds (the copy will take place every refresh seconds). If a copy
 is still in progress when the following refresh period elapses, the second copy operation will be
 skipped.
-`buffer_size_on_copy`: The amount of MegaBytes to move in a single low level copy instruction;
-defaults to 16MB.
 `locking_strategy` : optional, see <<search-configuration-directory-lockfactories>>
 `filesystem_access_type`: allows to determine the exact type of FSDirectory implementation used by
 this DirectoryProvider. Allowed values are `auto` (the default value, selects NIOFSDirectory on non
@@ -247,17 +243,12 @@ If a copy is still in progress when refresh period elapses, the second copy oper
 
 DirectoryProvider typically used on slave nodes using a JMS back end.
 
-The `buffer_size_on_copy` optimum depends on your operating system and available RAM; most
-people reported good results using values between 16 and 64MB.
-
 |`indexBase`: Base directory
 `indexName`: override @Indexed.index (useful for sharded indexes)
 `sourceBase`: Source (copy) base directory.
 `source`: Source directory suffix (default to `@Indexed.index`). The actual source directory
 name being _<sourceBase>/<source>_
 `refresh`: refresh period in second (the copy will take place every refresh seconds).
-`buffer_size_on_copy`: The amount of MegaBytes to move in a single low level copy instruction;
-defaults to 16MB.
 `locking_strategy` : optional, see <<search-configuration-directory-lockfactories>>
 `retry_marker_lookup` : optional, default to 0. Defines how many times we look for the marker files
 in the source directory before failing. Waiting 5 seconds between each try.

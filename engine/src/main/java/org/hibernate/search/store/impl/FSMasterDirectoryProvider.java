@@ -55,7 +55,6 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 
 	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
-	private long copyChunkSize;
 
 	//variables needed between initialize and start (used by same thread: no special care needed)
 	private Path sourceDir;
@@ -80,7 +79,8 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
+		//No longer useful but invoke it still to log a deprecation warning as needed:
+		DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		current = 0; //write to volatile to publish all state
 	}
 
@@ -102,7 +102,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			}
 			String currentString = Integer.valueOf( currentLocal ).toString();
 			Path subDir = sourceDir.resolve( currentString );
-			FileHelper.synchronize( indexDir, subDir, true, copyChunkSize );
+			FileHelper.synchronize( indexDir, subDir, true );
 			Files.deleteIfExists( sourceDir.resolve( CURRENT1 ) );
 			Files.deleteIfExists( sourceDir.resolve( CURRENT2 ) );
 			//TODO small hole, no file can be found here
@@ -199,7 +199,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				Path destinationFile = destination.resolve( Integer.valueOf( index ).toString() );
 				try {
 					log.tracef( "Copying %s into %s", source, destinationFile );
-					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );
+					FileHelper.synchronize( source, destinationFile, true );
 					current = index;
 				}
 				catch (IOException e) {
