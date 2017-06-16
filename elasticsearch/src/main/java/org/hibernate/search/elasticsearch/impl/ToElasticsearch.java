@@ -648,13 +648,7 @@ public class ToElasticsearch {
 		return wrapQueryForNestedIfRequired( filter.getFieldName(), spatialHashFilter );
 	}
 
-	private static final JsonBuilder.JsonAppender<Object> NOOP_APPENDER =
-			new JsonBuilder.JsonAppender<Object>() {
-				@Override
-				public void append(Object appendable) {
-					// Do nothing
-				}
-			};
+	private static final JsonBuilder.JsonAppender<Object> NOOP_APPENDER = builder -> { };
 
 	/**
 	 * Appender that adds an "analyzer" property if necessary.
@@ -669,12 +663,7 @@ public class ToElasticsearch {
 						"Hibernate Search should not try to explicitly override normalizers in search queries"
 						+ "; got normalizer '" + queryAnalyzerName + "' for field '" + fieldName + "'" );
 			}
-			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
-				@Override
-				public void append(JsonBuilder.Object object) {
-					object.addProperty( "analyzer", queryAnalyzerName );
-				}
-			};
+			return builder -> builder.addProperty( "analyzer", queryAnalyzerName );
 		}
 		else {
 			return NOOP_APPENDER;
@@ -686,12 +675,7 @@ public class ToElasticsearch {
 	 */
 	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> slopAppender(final int slop) {
 		if ( slop != DEFAULT_SLOP ) {
-			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
-				@Override
-				public void append(JsonBuilder.Object object) {
-					object.addProperty( "slop", slop );
-				}
-			};
+			return builder -> builder.addProperty( "slop", slop );
 		}
 		else {
 			return NOOP_APPENDER;
@@ -703,12 +687,7 @@ public class ToElasticsearch {
 	 */
 	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> fuzzinessAppender(final int maxEditDistance) {
 		if ( maxEditDistance != DEFAULT_MAX_EDIT_DISTANCE ) {
-			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
-				@Override
-				public void append(JsonBuilder.Object object) {
-					object.addProperty( "fuzziness", maxEditDistance );
-				}
-			};
+			return builder -> builder.addProperty( "fuzziness", maxEditDistance );
 		}
 		else {
 			return NOOP_APPENDER;
@@ -721,12 +700,7 @@ public class ToElasticsearch {
 	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> boostAppender(Query query) {
 		final float boost = query.getBoost();
 		if ( boost != DEFAULT_BOOST ) { // We actually want to use float equality here
-			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
-				@Override
-				public void append(JsonBuilder.Object object) {
-					object.addProperty( "boost", boost );
-				}
-			};
+			return builder -> builder.addProperty( "boost", boost );
 		}
 		else {
 			return NOOP_APPENDER;
