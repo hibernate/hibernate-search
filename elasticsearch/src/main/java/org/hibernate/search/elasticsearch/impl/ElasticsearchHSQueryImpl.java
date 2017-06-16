@@ -73,7 +73,9 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -135,8 +137,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private transient FacetManagerImpl facetManager;
 
-	public ElasticsearchHSQueryImpl(JsonObject rawSearchPayload, ExtendedSearchIntegrator extendedIntegrator) {
-		super( extendedIntegrator );
+	public ElasticsearchHSQueryImpl(JsonObject rawSearchPayload, ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet types) {
+		super( extendedIntegrator, types );
+		this.rawSearchPayload = rawSearchPayload;
+	}
+
+	public ElasticsearchHSQueryImpl(JsonObject rawSearchPayload, ExtendedSearchIntegrator extendedIntegrator, List<CustomTypeMetadata> types) {
+		super( extendedIntegrator, types );
 		this.rawSearchPayload = rawSearchPayload;
 	}
 

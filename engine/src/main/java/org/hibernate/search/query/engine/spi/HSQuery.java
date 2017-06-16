@@ -18,7 +18,6 @@ import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 
@@ -64,30 +63,6 @@ public interface HSQuery extends ProjectionConstants {
 	HSQuery luceneQuery(Query query);
 
 	HSQuery tenantIdentifier(String tenantId);
-
-	/**
-	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
-	 *
-	 * <p><strong>Note:</strong> calling this method is not necessary if you obtained the HSQuery through
-	 * {@link SearchIntegrator#createHSQuery(Query, Class...)}, unless you want to change the targeted
-	 * entities.
-	 *
-	 * @param types the list of classes (indexes) targeted by this query
-	 * @return {@code this} to allow for method chaining
-	 */
-	HSQuery targetedEntities(IndexedTypeSet types);
-
-	/**
-	 * Defines the targeted types, which may carry custom metadata which should override the supporting entity type's metadata.
-	 *
-	 * <p><strong>Note:</strong> calling this method is not necessary if you obtained the HSQuery through
-	 * {@link SearchIntegrator#createHSQuery(Query, CustomTypeMetadata...)}, unless you want to change the
-	 * targeted types.
-	 *
-	 * @param types the list of types (indexes) targeted by this query
-	 * @return {@code this} to allow for method chaining
-	 */
-	HSQuery targetedTypes(List<CustomTypeMetadata> types);
 
 	/**
 	 * Lets Lucene sort the results. This is useful when you have

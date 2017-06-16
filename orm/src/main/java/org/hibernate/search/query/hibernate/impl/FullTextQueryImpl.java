@@ -84,7 +84,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
 	 *
-	 * @param hSearchQuery The query, with the {@link HSQuery#targetedEntities(org.hibernate.search.spi.IndexedTypeSet) targeted entities} already set if necessary.
+	 * @param hSearchQuery The query
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */

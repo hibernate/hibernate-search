@@ -96,8 +96,14 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 */
 	private Integer resultSize;
 
-	public LuceneHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
-		super( extendedIntegrator );
+	public LuceneHSQuery(Query luceneQuery, ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet types) {
+		super( extendedIntegrator, types );
+		this.luceneQuery = luceneQuery;
+	}
+
+	public LuceneHSQuery(Query luceneQuery, ExtendedSearchIntegrator extendedIntegrator, List<CustomTypeMetadata> types) {
+		super( extendedIntegrator, types );
+		this.luceneQuery = luceneQuery;
 	}
 
 	@Override
