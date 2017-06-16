@@ -18,6 +18,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Resolution;
 
@@ -80,7 +81,7 @@ class Month {
 	@Field
 	public double raindropInMm;
 
-	@Field
+	@Field(normalizer = @Normalizer(definition = "lower"))
 	public String getName() {
 		return name;
 	}
@@ -94,7 +95,8 @@ class Month {
 	@Fields({
 			@Field,
 			@Field(name = "mythology_stem", analyzer = @Analyzer(definition = "stemmer")),
-			@Field(name = "mythology_ngram", analyzer = @Analyzer(definition = "ngram"))
+			@Field(name = "mythology_ngram", analyzer = @Analyzer(definition = "ngram")),
+			@Field(name = "mythology_normalized", normalizer = @Normalizer(definition = "lower"))
 	})
 	public String getMythology() {
 		return mythology;
