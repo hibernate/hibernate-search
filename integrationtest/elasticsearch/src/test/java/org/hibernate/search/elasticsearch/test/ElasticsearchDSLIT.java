@@ -64,7 +64,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 	public void testDSLPhrase() throws Exception {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+			QueryBuilder queryBuilder = queryBuilder( fullTextSession );
 
 			Query query = queryBuilder
 					.phrase()
@@ -75,7 +75,37 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'A very important matter','slop':2,'analyzer':'english'}}}}", queryString );
+			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'A very important matter','slop':2}}}}", queryString );
+
+
+			queryBuilder = fullTextSession.getSearchFactory()
+					.buildQueryBuilder().forEntity( Letter.class )
+					.overridesForField( "message", "english" ).get();
+			query = queryBuilder
+					.phrase()
+						.withSlop( 2 )
+						.onField( "message" )
+						.sentence( "A very important matter" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'A very important matter','slop':2}}}}", queryString );
+
+
+			queryBuilder = fullTextSession.getSearchFactory()
+					.buildQueryBuilder().forEntity( Letter.class )
+					.overridesForField( "message", "french" ).get();
+			query = queryBuilder
+					.phrase()
+						.withSlop( 2 )
+						.onField( "message" )
+						.sentence( "A very important matter" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'A very important matter','slop':2,'analyzer':'french'}}}}", queryString );
 		}
 	}
 
@@ -102,7 +132,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 	public void testDSLKeyword() throws Exception {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+			QueryBuilder queryBuilder = queryBuilder( fullTextSession );
 
 			Query query = queryBuilder
 					.keyword()
@@ -112,7 +142,33 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','analyzer':'english'}}}}", queryString );
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter'}}}}", queryString );
+
+			queryBuilder = fullTextSession.getSearchFactory()
+					.buildQueryBuilder().forEntity( Letter.class )
+					.overridesForField( "message", "english" ).get();
+			query = queryBuilder
+					.keyword()
+						.onField( "message" )
+						.matching( "A very important matter" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter'}}}}", queryString );
+
+			queryBuilder = fullTextSession.getSearchFactory()
+					.buildQueryBuilder().forEntity( Letter.class )
+					.overridesForField( "message", "french" ).get();
+			query = queryBuilder
+					.keyword()
+						.onField( "message" )
+						.matching( "A very important matter" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','analyzer':'french'}}}}", queryString );
 		}
 	}
 
@@ -132,7 +188,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','analyzer':'english','fuzziness':2}}}}", queryString );
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','fuzziness':2}}}}", queryString );
 		}
 	}
 
@@ -151,7 +207,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','analyzer':'english','boost':2.0}}}}", queryString );
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','boost':2.0}}}}", queryString );
 		}
 	}
 
@@ -249,7 +305,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match_phrase':{'signature':{'query':'Gunnar Morling','analyzer':'default'}}}}", queryString );
+			assertJsonEquals( "{'query':{'match_phrase':{'signature':{'query':'Gunnar Morling'}}}}", queryString );
 		}
 	}
 
@@ -347,6 +403,8 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 		@Field
 		@Analyzer(definition = "english")
+		// Hack to be able to use a query-only analyzer
+		@Field(name = "message_french", analyzer = @Analyzer(definition = "french"))
 		private String message;
 
 		@Field

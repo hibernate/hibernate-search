@@ -73,6 +73,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		// locally or not
 		if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
 			perFieldQuery = new RemotePhraseQuery( fieldName, phraseContext.getSlop(), sentence,
+					queryContext.getOriginalAnalyzerReference().unwrap( RemoteAnalyzerReference.class ),
 					queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class ) );
 		}
 		else {

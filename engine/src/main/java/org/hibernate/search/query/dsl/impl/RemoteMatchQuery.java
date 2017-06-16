@@ -29,7 +29,9 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 
 		private int maxEditDistance = 0;
 
-		private RemoteAnalyzerReference analyzerReference;
+		private RemoteAnalyzerReference originalAnalyzerReference;
+
+		private RemoteAnalyzerReference queryAnalyzerReference;
 
 		public Builder field(String field) {
 			this.field = field;
@@ -46,19 +48,20 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 			return this;
 		}
 
-		public Builder analyzerReference(RemoteAnalyzerReference analyzerReference) {
-			this.analyzerReference = analyzerReference;
+		public Builder analyzerReference(RemoteAnalyzerReference originalAnalyzerReference, RemoteAnalyzerReference queryAnalyzerReference) {
+			this.originalAnalyzerReference = originalAnalyzerReference;
+			this.queryAnalyzerReference = queryAnalyzerReference;
 			return this;
 		}
 
 		public RemoteMatchQuery build() {
-			return new RemoteMatchQuery( field, searchTerms, maxEditDistance, analyzerReference );
+			return new RemoteMatchQuery( field, searchTerms, maxEditDistance, originalAnalyzerReference, queryAnalyzerReference );
 		}
 	}
 
 	private RemoteMatchQuery(String field, String terms, int maxEditDistance,
-			RemoteAnalyzerReference analyzerReference) {
-		super( analyzerReference );
+			RemoteAnalyzerReference originalAnalyzerReference, RemoteAnalyzerReference queryAnalyzerReference) {
+		super( originalAnalyzerReference, queryAnalyzerReference );
 		this.field = field;
 		this.maxEditDistance = maxEditDistance;
 		this.searchTerms = terms;
@@ -86,9 +89,8 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 			sb.append( "~" ).append( maxEditDistance );
 		}
 		sb.append( ToStringUtils.boost( getBoost() ) );
-		if ( getAnalyzerReference() != null ) {
-			sb.append( ",analyzer=" ).append( getAnalyzerReference() );
-		}
+		sb.append( ", originalAnalyzer=" ).append( getOriginalAnalyzerReference() );
+		sb.append( ", queryAnalyzer=" ).append( getQueryAnalyzerReference() );
 		sb.append( ">" );
 		return sb.toString();
 	}
