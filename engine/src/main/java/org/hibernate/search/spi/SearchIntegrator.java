@@ -77,12 +77,10 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Return an Hibernate Search query object.
-	 * This method DOES support non-Lucene backends (e.g. Elasticsearch).
-	 * The returned object uses fluent APIs to define additional query settings.
+	 * <p>This method DOES support non-Lucene backends (e.g. Elasticsearch).
+	 * <p>The returned object uses fluent APIs to define additional query settings.
 	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
 	 * in which case the query provided here cannot be overridden.
-	 * <p>Calling {@link HSQuery#targetedEntities(IndexedTypeSet)} on the resulting query
-	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
 	 * @param fullTextQuery the full-text engine query
 	 * @param entityTypes the targeted entity types
@@ -92,12 +90,10 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Return an Hibernate Search query object.
-	 * This method DOES support non-Lucene backends (e.g. Elasticsearch).
-	 * The returned object uses fluent APIs to define additional query settings.
+	 * <p>This method DOES support non-Lucene backends (e.g. Elasticsearch).
+	 * <p>The returned object uses fluent APIs to define additional query settings.
 	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
 	 * in which case the query provided here cannot be overridden.
-	 * <p>Calling {@link HSQuery#targetedTypes(java.util.List)} on the resulting query
-	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
 	 * @param fullTextQuery the full-text engine query
 	 * @param types the targeted entity types

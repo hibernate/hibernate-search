@@ -19,7 +19,6 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -180,13 +179,5 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 */
 	@Deprecated
 	ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz);
-
-	/**
-	 * Return an Hibernate Search query object.
-	 * This method does NOT support non-Lucene backends (e.g. Elasticsearch).
-	 *
-	 * @return an Hibernate Search query object
-	 */
-	HSQuery createLuceneBasedHSQuery();
 
 }
