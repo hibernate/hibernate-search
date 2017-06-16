@@ -16,14 +16,22 @@ import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
  */
 public abstract class AbstractRemoteQueryWithAnalyzer extends Query {
 
-	private RemoteAnalyzerReference analyzerReference;
+	private RemoteAnalyzerReference originalAnalyzerReference;
 
-	protected AbstractRemoteQueryWithAnalyzer(RemoteAnalyzerReference analyzerReference) {
-		this.analyzerReference = analyzerReference;
+	private RemoteAnalyzerReference queryAnalyzerReference;
+
+	protected AbstractRemoteQueryWithAnalyzer(RemoteAnalyzerReference originalAnalyzerReference,
+			RemoteAnalyzerReference queryAnalyzerReference) {
+		this.originalAnalyzerReference = originalAnalyzerReference;
+		this.queryAnalyzerReference = queryAnalyzerReference;
 	}
 
-	public RemoteAnalyzerReference getAnalyzerReference() {
-		return analyzerReference;
+	public RemoteAnalyzerReference getOriginalAnalyzerReference() {
+		return originalAnalyzerReference;
+	}
+
+	public RemoteAnalyzerReference getQueryAnalyzerReference() {
+		return queryAnalyzerReference;
 	}
 
 }

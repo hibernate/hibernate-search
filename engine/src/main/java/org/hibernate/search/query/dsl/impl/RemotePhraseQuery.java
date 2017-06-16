@@ -22,8 +22,9 @@ public class RemotePhraseQuery extends AbstractRemoteQueryWithAnalyzer {
 
 	private int slop;
 
-	public RemotePhraseQuery(String field, int slop, String phrase, RemoteAnalyzerReference analyzerReference) {
-		super( analyzerReference );
+	public RemotePhraseQuery(String field, int slop, String phrase,
+			RemoteAnalyzerReference originalAnalyzerReference, RemoteAnalyzerReference queryAnalyzerReference) {
+		super( originalAnalyzerReference, queryAnalyzerReference );
 		this.field = field;
 		this.slop = slop;
 		this.phrase = phrase;
@@ -51,9 +52,8 @@ public class RemotePhraseQuery extends AbstractRemoteQueryWithAnalyzer {
 			sb.append( "~" ).append( slop );
 		}
 		sb.append( ToStringUtils.boost( getBoost() ) );
-		if ( getAnalyzerReference() != null ) {
-			sb.append( ",analyzer=" ).append( getAnalyzerReference() );
-		}
+		sb.append( ", originalAnalyzer=" ).append( getOriginalAnalyzerReference() );
+		sb.append( ", queryAnalyzer=" ).append( getQueryAnalyzerReference() );
 		sb.append( ">" );
 		return sb.toString();
 	}
