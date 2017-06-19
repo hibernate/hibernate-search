@@ -84,7 +84,6 @@ public class CDIInjectionIT {
 
 	@Test
 	public void injectedFieldBridge() throws InterruptedException {
-		Thread.sleep( 10000 );
 		Function<String, List<EntityWithCDIAwareBridges>> search = dao::searchFieldBridge;
 
 		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
@@ -117,7 +116,6 @@ public class CDIInjectionIT {
 
 	@Test
 	public void injectedClassBridge() throws InterruptedException {
-		Thread.sleep( 10000 );
 		Function<String, List<EntityWithCDIAwareBridges>> search = dao::searchClassBridge;
 
 		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
