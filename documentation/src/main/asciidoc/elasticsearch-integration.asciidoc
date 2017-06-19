@@ -334,7 +334,7 @@ we suggest to use query-time boosting instead: see <<search-query>>.
 
 ==== [[elasticsearch-mapping-analyzer]] Analyzers
 
-INFO: Analyzers are treated differently than in Lucene embedded mode.
+NOTE: Analyzers are treated differently than in Lucene embedded mode.
 
 ===== Built-in or server-defined analyzers
 
@@ -392,7 +392,7 @@ public class Tweet {
 You may also reference a built-in Lucene analyzer implementation using the `@Analyzer.impl` attribute:
 Hibernate Search will translate the implementation to an equivalent Elasticsearch built-in type, if possible.
 
-[INFO]
+[NOTE]
 ====
 Using the `@Analyzer.impl` attribute is not recommended with Elasticsearch because it will
 never allow you to take full advantage of Elasticsearch analysis capabilities.
@@ -510,7 +510,7 @@ The second approach is to configure everything as if you were using Lucene:
 use the Lucene factories, their parameter names, and format the parameter values as required in Lucene.
 Hibernate Search will automatically convert these definitions to the Elasticsearch equivalent.
 
-[INFO]
+[NOTE]
 ====
 Referencing Lucene factories is not recommended with Elasticsearch because it will
 never allow you to take full advantage of Elasticsearch analysis capabilities.
