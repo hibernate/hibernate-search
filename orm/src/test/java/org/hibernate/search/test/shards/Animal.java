@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Indexed;
 /**
  * @author Emmanuel Bernard
  */
-@Entity
+@Entity(name = "Animal")
 @Indexed(index = "Animal")
 public class Animal {
 	@Id

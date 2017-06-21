@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Indexed;
 
-@Entity
+@Entity(name = "extending")
 @Indexed
 public class EntityExtendingMappedSuperclassWithCollectionField extends MappedSuperclassWithCollectionField {
 

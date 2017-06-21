@@ -138,25 +138,27 @@ public class DeleteByTermTest {
 		sessionBuilder.close();
 	}
 
-	@Entity
+	@Entity(name = "RootNonIndexed")
 	public static class RootNonIndexed {
 		@Id
 		public String id;
 	}
 
-	@Entity @Indexed(index = "index1")
+	@Entity(name = "ASubOfRoot")
+	@Indexed(index = "index1")
 	public static class ASubOfRoot extends RootNonIndexed {
 		@Field
 		public String name;
 	}
 
-	@Entity @Indexed(index = "index1")
+	@Entity(name = "BSubOfRoot")
+	@Indexed(index = "index1")
 	public static class BSubOfRoot extends RootNonIndexed {
 		@Field
 		public String otherName;
 	}
 
-	@Entity
+	@Entity(name = "Unrelated")
 	@Indexed(index = "index1")
 	public static class Unrelated {
 		@Id
