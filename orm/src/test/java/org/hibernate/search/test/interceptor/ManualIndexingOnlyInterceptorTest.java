@@ -117,7 +117,7 @@ public class ManualIndexingOnlyInterceptorTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
-	@Entity
+	@Entity(name = "Foo")
 	@Indexed(interceptor = ManualIndexingOnly.class)
 	public static class Foo {
 		@Id

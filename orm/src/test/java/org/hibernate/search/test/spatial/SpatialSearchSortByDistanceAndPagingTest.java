@@ -205,7 +205,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		};
 	}
 
-	@Entity
+	@Entity(name = "GeoEntity")
 	@Indexed
 	@Spatial(spatialMode = SpatialMode.RANGE)
 	public static class GeoEntity {

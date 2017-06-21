@@ -211,7 +211,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	@Indexed
-	@Entity
+	@Entity(name = "SomeOtherEntity")
 	private static class SomeOtherEntity {
 		@DocumentId
 		@Field(name = "idField")
