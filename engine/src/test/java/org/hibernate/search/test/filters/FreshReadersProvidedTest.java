@@ -28,15 +28,12 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,7 +53,9 @@ import org.junit.experimental.categories.Category;
 public class FreshReadersProvidedTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Guest.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Guest.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void filtersTest() {
@@ -67,62 +66,43 @@ public class FreshReadersProvidedTest {
 			Guest lastDwarf = new Guest();
 			lastDwarf.id = 13l;
 			lastDwarf.name = "Thorin Oakenshield";
-
-			Work work = new Work( lastDwarf, lastDwarf.id, WorkType.ADD, false );
-			TransactionContextForTest tc = new TransactionContextForTest();
-			searchFactory.getWorker().performWork( work, tc );
-			tc.end();
+			helper.add( lastDwarf );
 		}
 
-		QueryBuilder guestQueryBuilder = searchFactory.buildQueryBuilder()
-				.forEntity( Guest.class )
-				.get();
+		QueryBuilder guestQueryBuilder = helper.queryBuilder( Guest.class );
 
 		Query queryAllGuests = guestQueryBuilder.all().createQuery();
 
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
-			.queryEntityInfos();
-
-		Assert.assertEquals( 1, queryEntityInfos.size() );
-		Assert.assertEquals( 13L, queryEntityInfos.get( 0 ).getId() );
+		helper.assertThat( queryAllGuests )
+				.from( Guest.class )
+				.matchesExactlyIds( 13L );
 
 		RecordingQueryWrapper recordingWrapper = new RecordingQueryWrapper( queryAllGuests, "name" );
-		List<EntityInfo> recordingWrapperEntityInfos = searchFactory.createHSQuery( recordingWrapper, Guest.class )
-				.queryEntityInfos();
+		helper.assertThat( recordingWrapper )
+				.from( Guest.class )
+				.matchesExactlyIds( 13L );
 
 		checkQueryInspectedAllSegments( recordingWrapper );
 		expectedTermsForQuery( recordingWrapper, "thorin", "oakenshield" );
-		Assert.assertEquals( 1, recordingWrapperEntityInfos.size() );
-		Assert.assertEquals( 13L, recordingWrapperEntityInfos.get( 0 ).getId() );
 
 		{ // Store guest "Balin"
 			Guest balin = new Guest();
 			balin.id = 7l;
 			balin.name = "Balin";
-
-			Work work = new Work( balin, balin.id, WorkType.ADD, false );
-			TransactionContextForTest tc = new TransactionContextForTest();
-			searchFactory.getWorker().performWork( work, tc );
-			tc.end();
+			helper.add( balin );
 		}
 
-		List<EntityInfo> queryEntityInfosAgain = searchFactory.createHSQuery( queryAllGuests, Guest.class )
-			.queryEntityInfos();
-
-		Assert.assertEquals( 2, queryEntityInfosAgain.size() );
-		Assert.assertEquals( 13L, queryEntityInfosAgain.get( 0 ).getId() );
-		Assert.assertEquals( 7L, queryEntityInfosAgain.get( 1 ).getId() );
+		helper.assertThat( queryAllGuests )
+				.from( Guest.class )
+				.matchesExactlyIds( 13L, 7L );
 
 		RecordingQueryWrapper secondRecordingWrapper = new RecordingQueryWrapper( queryAllGuests, "name" );
-		List<EntityInfo> secondRecordingWrapperEntityInfos = searchFactory.createHSQuery( secondRecordingWrapper, Guest.class )
-				.queryEntityInfos();
+		helper.assertThat( secondRecordingWrapper )
+				.from( Guest.class )
+				.matchesExactlyIds( 13L, 7L );
 
 		checkQueryInspectedAllSegments( secondRecordingWrapper );
 		expectedTermsForQuery( secondRecordingWrapper, "thorin", "oakenshield", "balin" );
-
-		Assert.assertEquals( 2, secondRecordingWrapperEntityInfos.size() );
-		Assert.assertEquals( 13L, secondRecordingWrapperEntityInfos.get( 0 ).getId() );
-		Assert.assertEquals( 7L, secondRecordingWrapperEntityInfos.get( 1 ).getId() );
 	}
 
 	private void expectedTermsForQuery(RecordingQueryWrapper recordingWrapper, String... term) {

@@ -8,45 +8,35 @@ package org.hibernate.search.test.analyzer.analyzerdefinitionprovider;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import java.util.List;
-
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
 import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -68,14 +58,18 @@ public class LuceneAnalysisDefinitionProviderTest {
 	private static final String CUSTOM_NORMALIZER_2_NAME = "custom-normalizer-2";
 
 	@Rule
-	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+	public final SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+	public final ExpectedException thrown = ExpectedException.none();
+
+	private ExtendedSearchIntegrator integrator;
+
+	private final SearchITHelper helper = new SearchITHelper( () -> this.integrator );
 
 	@Test
 	public void simple() {
-		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, CustomAnalyzerEntity.class );
+		integrator = init( CustomAnalyzerProvider.class, CustomAnalyzerEntity.class );
 
 		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
@@ -96,14 +90,14 @@ public class LuceneAnalysisDefinitionProviderTest {
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
-		index( integrator, entity );
-		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
-		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
+		helper.add( entity );
+		helper.assertThat( "field", "charfilterdidreplace" ).matchesExactlyIds( entity.id );
+		helper.assertThat( "normalized", "charfilterdidreplace|foo" ).matchesExactlyIds( entity.id );
 	}
 
 	@Test
 	public void usingServiceOverride() {
-		ExtendedSearchIntegrator integrator = initUsingService( new CustomAnalyzerProvider(), CustomAnalyzerEntity.class );
+		integrator = initUsingService( new CustomAnalyzerProvider(), CustomAnalyzerEntity.class );
 
 		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
@@ -124,14 +118,14 @@ public class LuceneAnalysisDefinitionProviderTest {
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
-		index( integrator, entity );
-		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
-		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
+		helper.add( entity );
+		helper.assertThat( "field", "charfilterdidreplace" ).matchesExactlyIds( entity.id );
+		helper.assertThat( "normalized", "charfilterdidreplace|foo" ).matchesExactlyIds( entity.id );
 	}
 
 	@Test
 	public void override() {
-		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, AnalyzerDefAnnotationEntity.class );
+		integrator = init( CustomAnalyzerProvider.class, AnalyzerDefAnnotationEntity.class );
 
 		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
@@ -152,9 +146,9 @@ public class LuceneAnalysisDefinitionProviderTest {
 		AnalyzerDefAnnotationEntity entity = new AnalyzerDefAnnotationEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
-		index( integrator, entity );
-		assertMatchesExactly( integrator, entity, "field", "charFilterShouldReplace|foo" );
-		assertMatchesExactly( integrator, entity, "normalized", "charfiltershouldreplace|foo" );
+		helper.add( entity );
+		helper.assertThat( "field", "charFilterShouldReplace|foo" ).matchesExactlyIds( entity.id );
+		helper.assertThat( "normalized", "charfiltershouldreplace|foo" ).matchesExactlyIds( entity.id );
 	}
 
 	/**
@@ -163,7 +157,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 	 */
 	@Test
 	public void unreferencedAnalyzer() {
-		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, NoAnalyzerEntity.class );
+		integrator = init( CustomAnalyzerProvider.class, NoAnalyzerEntity.class );
 
 		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
@@ -178,7 +172,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 
 	@Test
 	public void instantiation_factorymethod() {
-		ExtendedSearchIntegrator integrator = init( ProviderFactory.class, CustomAnalyzerEntity.class );
+		integrator = init( ProviderFactory.class, CustomAnalyzerEntity.class );
 
 		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
@@ -238,61 +232,23 @@ public class LuceneAnalysisDefinitionProviderTest {
 		return integratorResource.create( cfg );
 	}
 
-	private void index(SearchIntegrator integrator, Identifiable entity) {
-		Work work = new Work( entity, entity.getId(), WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		integrator.getWorker().performWork( work, tc );
-		tc.end();
-	}
-
-	private void assertMatchesExactly(SearchIntegrator integrator, Identifiable entity, String fieldName, String termValue) {
-		assertMatchesExactly( integrator, entity, new TermQuery( new Term( fieldName, termValue ) ) );
-	}
-
-	private void assertMatchesExactly(SearchIntegrator integrator, Identifiable entity, Query luceneQuery) {
-		Class<?> entityClass = entity.getClass();
-		HSQuery query = integrator.createHSQuery(
-				luceneQuery,
-				entityClass
-				);
-		List<EntityInfo> results = query.queryEntityInfos();
-		assertThat( results )
-				.onProperty( "id" )
-				.as( "Results of query '" + luceneQuery + "' on " + entityClass.getSimpleName() )
-				.containsExactly( entity.getId() );
-	}
-
-	private interface Identifiable {
-		long getId();
-	}
-
 	@Indexed
-	static class NoAnalyzerEntity implements Identifiable {
+	static class NoAnalyzerEntity {
 		@DocumentId
 		long id;
 
 		@Field(analyze = Analyze.NO)
 		String field;
-
-		@Override
-		public long getId() {
-			return id;
-		}
 	}
 
 	@Indexed
-	static class CustomAnalyzerEntity implements Identifiable {
+	static class CustomAnalyzerEntity {
 		@DocumentId
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_NAME))
 		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_NAME))
 		String field;
-
-		@Override
-		public long getId() {
-			return id;
-		}
 	}
 
 	@Indexed
@@ -302,18 +258,13 @@ public class LuceneAnalysisDefinitionProviderTest {
 	}
 
 	@Indexed
-	static class CustomAnalyzer2Entity implements Identifiable {
+	static class CustomAnalyzer2Entity {
 		@DocumentId
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_2_NAME))
 		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_2_NAME))
 		String field;
-
-		@Override
-		public long getId() {
-			return id;
-		}
 	}
 
 	public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {

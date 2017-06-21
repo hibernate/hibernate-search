@@ -8,18 +8,15 @@ package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
 
-import org.junit.Assert;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.ProvidedId;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,10 +31,14 @@ import org.junit.rules.ExpectedException;
 public class ImplicitProvidedIdTest {
 
 	@Rule
-	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+	public final SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
-	public ExpectedException exceptions = ExpectedException.none();
+	public final ExpectedException exceptions = ExpectedException.none();
+
+	private SearchIntegrator searchIntegrator;
+
+	private final SearchITHelper helper = new SearchITHelper( () -> this.searchIntegrator );
 
 	@Test
 	public void exceptionThrownWhenNotEnabled() {
@@ -143,40 +144,27 @@ public class ImplicitProvidedIdTest {
 	 * @param fieldName The expected name of the ID field
 	 */
 	private void storeBooksViaProvidedId(SearchConfigurationForTest cfg, String fieldName, boolean matchTitle) {
-		SearchIntegrator searchIntegrator = null;
-		try {
-			//Should fail right here when @ProvidedId is not enabled:
-			searchIntegrator = integratorResource.create( cfg );
+		//Should fail right here when @ProvidedId is not enabled:
+		searchIntegrator = integratorResource.create( cfg );
 
-			Book book = new Book();
-			book.title = "Less is nice";
-			book.text = "When using Infinispan Query, users have to always remember to add @ProvidedId on their classes" +
-					" or a nasty exception will remind them. Can't we just assume it's always annotated?";
-			String isbn = "some entity-external id";
-			Work work = new Work( book, isbn, WorkType.ADD, false );
-			TransactionContextForTest tc = new TransactionContextForTest();
-			searchIntegrator.getWorker().performWork( work, tc );
-			tc.end();
+		Book book = new Book();
+		book.title = "Less is nice";
+		book.text = "When using Infinispan Query, users have to always remember to add @ProvidedId on their classes" +
+				" or a nasty exception will remind them. Can't we just assume it's always annotated?";
+		String isbn = "some entity-external id";
+		helper.add( book, isbn );
 
-			QueryBuilder queryBuilder = searchIntegrator.buildQueryBuilder()
-					.forEntity( Book.class )
-					.get();
+		QueryBuilder queryBuilder = helper.queryBuilder( Book.class );
 
-			Query query = queryBuilder.keyword()
-				.onField( fieldName )
-				.ignoreAnalyzer()
-				.matching( matchTitle ? book.title : isbn )
-				.createQuery();
+		Query query = queryBuilder.keyword()
+			.onField( fieldName )
+			.ignoreAnalyzer()
+			.matching( matchTitle ? book.title : isbn )
+			.createQuery();
 
-			int queryResultSize = searchIntegrator.createHSQuery( query, Book.class )
-					.queryResultSize();
-			Assert.assertEquals( 1, queryResultSize );
-		}
-		finally {
-			if ( searchIntegrator != null ) {
-				searchIntegrator.close();
-			}
-		}
+		helper.assertThat( query )
+				.from( Book.class )
+				.hasResultSize( 1 );
 	}
 
 	/**

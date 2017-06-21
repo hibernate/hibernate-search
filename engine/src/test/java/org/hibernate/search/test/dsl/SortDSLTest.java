@@ -6,19 +6,11 @@
  */
 package org.hibernate.search.test.dsl;
 
-import static org.junit.Assert.assertThat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -27,22 +19,18 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +42,9 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1872")
 public class SortDSLTest {
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntry.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntry.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Before
 	public void prepareTestData() {
@@ -109,10 +99,12 @@ public class SortDSLTest {
 				.setPrevious( entry2 );
 		entry0.setPrevious( entry3 );
 
-		storeData( entry0 );
-		storeData( entry1 );
-		storeData( entry2 );
-		storeData( entry3 );
+		helper.add(
+				entry0,
+				entry1,
+				entry2,
+				entry3
+		);
 	}
 
 	private QueryBuilder builder() {
@@ -129,191 +121,130 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byScore()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 3 )
-		);
+		helper.assertThat( query ).from( IndexedEntry.class )
+				.sort( sort ).matchesExactlyIds( 0, 3 );
 
 		sort = builder().sort()
 				.byScore()
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0 )
-		);
+		helper.assertThat( query ).from( IndexedEntry.class )
+				.sort( sort ).matchesExactlyIds( 3, 0 );
 
 		sort = builder().sort()
 				.byScore()
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 3 )
-		);
+		helper.assertThat( query ).from( IndexedEntry.class )
+				.sort( sort ).matchesExactlyIds( 0, 3 );
 	}
 
 	@Test
 	public void docID() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byIndexOrder()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 2, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
 
 		sort = builder().sort()
 				.byIndexOrder()
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 2, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
 
 		sort = builder().sort()
 				.byIndexOrder()
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 2, 1, 0 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
 	}
 
 	@Test
 	public void singleField() throws Exception {
-		Query query = builder().all().createQuery();
-
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test
 	public void singleField_double_missingValue_use() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.desc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
 
 	@Test
 	public void singleField_integer_missingValue_use() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.onMissingValue().use( 2 )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.asc()
 						.onMissingValue().use( 2 )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.desc()
 						.onMissingValue().use( 2 )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
 
 	@Test
 	public void singleField_stringFieldBridge() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedStringField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedStringField" )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedStringField" )
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test(expected = SearchException.class)
@@ -326,231 +257,160 @@ public class SortDSLTest {
 
 	@Test
 	public void singleField_numericFieldBridge() throws Exception {
-		Query query = builder().all().createQuery();
-
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test
 	public void singleField_numericFieldBridge_missingValue_use() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.asc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.desc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
 
 	@Test(expected = ClassCastException.class)
 	public void singleField_numericFieldBridge_missingValue_use_nonRaw() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedNumericField" )
 						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
 				.createSort();
-		query( query, sort );
+		sfHolder.getSearchFactory().createHSQuery( new MatchAllDocsQuery(), IndexedEntry.class )
+				.sort( sort )
+				.queryEntityInfos();
 	}
 
 	@Test
 	public void singleField_double_missingValue_sortFirst() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.desc()
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 3, 0, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 0, 1 );
 	}
 
 	@Test
 	public void singleField_integer_missingValue_sortFirst() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.asc()
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
 						.desc()
 						.onMissingValue().sortFirst()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 3, 0, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 0, 1 );
 	}
 
 	@Test
 	public void singleField_missingValue_sortLast() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.onMissingValue().sortLast()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 0, 3, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().sortLast()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 0, 3, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.desc()
 						.onMissingValue().sortLast()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test
 	public void multipleFields() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 0, 3, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 0, 3, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
 				.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
 
 	@Test
 	public void distance() throws Exception {
-		Query query = builder().all().createQuery();
-
 		Sort sort = builder().sort()
 				.byDistance()
 						.onField( "location_hash" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 3, 2 );
 
 		sort = builder().sort()
 				.byDistance()
@@ -558,10 +418,7 @@ public class SortDSLTest {
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 3, 2 );
 
 		sort = builder().sort()
 				.byDistance()
@@ -569,41 +426,27 @@ public class SortDSLTest {
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 3, 1, 0 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 1, 0 );
 	}
 
 	@Test
 	public void nativeLucene() throws Exception {
-		Query query = builder().all().createQuery();
-
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
 				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE ) )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, false ) )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, true ) )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test
@@ -617,30 +460,21 @@ public class SortDSLTest {
 				.byField( "nonUniqueIntegerField" )
 				.andByScore()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 3, 0, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 						.asc()
 				.andByScore()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 3, 0, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 						.desc()
 				.andByScore()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 1, 3, 0 );
 	}
 
 	@Test
@@ -654,108 +488,56 @@ public class SortDSLTest {
 				.byScore()
 				.andByField( "uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 0, 1, 3 );
 
 		sort = builder().sort()
 				.byScore()
 						.asc()
 				.andByField( "uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 1, 3, 0 );
 
 		sort = builder().sort()
 				.byScore()
 						.desc()
 				.andByField( "uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3 )
-		);
+		assertQuery( query, sort ).matchesExactlyIds( 0, 1, 3 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2587")
 	public void embeddedField() throws Exception {
-		Query query = builder().all().createQuery();
-
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 2, 1, 0 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 2, 1, 0 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
 						.desc()
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 2, 3 )
-		);
+		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
 	}
 
-	private Matcher<List<EntityInfo>> returnsIDsInOrder(Integer ... idsInOrder) {
-		final List<Integer> idsInOrderList = Arrays.asList( idsInOrder );
-		return new TypeSafeMatcher<List<EntityInfo>>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText( "a list containing exactly (and in the same order) " )
-						.appendValue( idsInOrderList );
-			}
-			@Override
-			protected void describeMismatchSafely(List<EntityInfo> item, Description mismatchDescription) {
-				mismatchDescription.appendText( "was " ).appendValue( toIds( item ) );
-			}
-
-			private List<Object> toIds(List<EntityInfo> entityInfos) {
-				List<Object> result = new ArrayList<>();
-				for ( EntityInfo entityInfo : entityInfos ) {
-					result.add( entityInfo.getProjection()[0] );
-				}
-				return result;
-			}
-
-			@Override
-			protected boolean matchesSafely(List<EntityInfo> actual) {
-				return idsInOrderList.equals( toIds( actual ) );
-			}
-		};
+	private AssertBuildingHSQueryContext assertQueryAll(Sort sort) {
+		return helper.assertThat()
+				.from( IndexedEntry.class )
+				.sort( sort );
 	}
 
-	private List<EntityInfo> query(Query luceneQuery, Sort sort) {
-		ExtendedSearchIntegrator sf = sfHolder.getSearchFactory();
-		HSQuery hsQuery = sf.createHSQuery( luceneQuery, IndexedEntry.class );
-		return hsQuery
-				.projection( "id" )
-				.sort( sort )
-				.queryEntityInfos();
-	}
-
-	private void storeData(IndexedEntry entry) {
-		Work work = new Work( entry, entry.id, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		sfHolder.getSearchFactory().getWorker().performWork( work, tc );
-		tc.end();
+	private AssertBuildingHSQueryContext assertQuery(Query query, Sort sort) {
+		return helper.assertThat(query)
+				.from( IndexedEntry.class )
+				.sort( sort );
 	}
 
 	public static class WrappedDoubleValue {

@@ -6,18 +6,21 @@
  */
 package org.hibernate.search.test.backend.lucene;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
@@ -25,11 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the scheduled commit policy
@@ -47,15 +45,17 @@ public class ScheduledCommitPolicyTest {
 	private int globalIdCounter = 0;
 
 	@Rule
-	public SearchFactoryHolder sfAsyncExclusiveIndex = new SearchFactoryHolder( Quote.class )
+	public final SearchFactoryHolder sfAsyncExclusiveIndex = new SearchFactoryHolder( Quote.class )
 			.withProperty( "hibernate.search.default.index_flush_interval", "1" )
 			.withProperty( "hibernate.search.default.worker.execution", "async" )
 			.withProperty( "hibernate.search.default.exclusive_index_use", "true" )
 			.withProperty( "hibernate.search.error_handler", CountingErrorHandler.class.getName() );
 
+	private final SearchITHelper helper = new SearchITHelper( sfAsyncExclusiveIndex );
+
 	@Test
 	public void testScheduledCommits() throws Exception {
-		writeData( sfAsyncExclusiveIndex, NUMBER_ENTITIES );
+		writeData( NUMBER_ENTITIES );
 		AbstractWorkspaceImpl workspace = sfAsyncExclusiveIndex.extractWorkspace( Quote.class );
 		CommitPolicy commitPolicy = workspace.getCommitPolicy();
 
@@ -73,7 +73,7 @@ public class ScheduledCommitPolicyTest {
 			action = "throw new IOException(\"File not found!\")",
 			name = "commitError")
 	public void testErrorHandlingDuringCommit() throws Exception {
-		writeData( sfAsyncExclusiveIndex, 2 );
+		writeData( 2 );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
 		POLLER.pollAssertion( () -> Assert.assertTrue( errorHandler.getCountFor( IOException.class ) >= 2 ) );
 	}
@@ -84,7 +84,7 @@ public class ScheduledCommitPolicyTest {
 			action = "throw new NullPointerException(\"Fake internal error\")",
 			name = "timerDisruptingError")
 	public void testErrorHandlingOnBackgroundThread() throws Exception {
-		writeData( sfAsyncExclusiveIndex, 2 );
+		writeData( 2 );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
 		// It's going to commit once each millisecond, and produce a failure each time.
 		// So "4" is just a random number higher than 0, but high enough to
@@ -95,13 +95,13 @@ public class ScheduledCommitPolicyTest {
 
 	@Test
 	public void testDocVisibility() throws Exception {
-		writeData( sfAsyncExclusiveIndex, NUMBER_ENTITIES );
+		writeData( NUMBER_ENTITIES );
 		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES ) );
 
-		writeData( sfAsyncExclusiveIndex, 10 );
+		writeData( 10 );
 		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 ) );
 
-		writeData( sfAsyncExclusiveIndex, 1 );
+		writeData( 1 );
 		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 + 1 ) );
 	}
 
@@ -114,14 +114,11 @@ public class ScheduledCommitPolicyTest {
 		Assert.assertTrue( executor.getCompletedTaskCount() >= taskCount );
 	}
 
-	private void writeData(SearchFactoryHolder sfHolder, int numberEntities) {
+	private void writeData(int numberEntities) {
 		for ( int i = 0; i < numberEntities; i++ ) {
-			Integer id = Integer.valueOf( globalIdCounter++ );
+			Integer id = globalIdCounter++;
 			Quote quote = new Quote( id, "description" );
-			Work work = new Work( quote, id, WorkType.ADD, false );
-			TransactionContextForTest tc = new TransactionContextForTest();
-			sfHolder.getSearchFactory().getWorker().performWork( work, tc );
-			tc.end();
+			helper.add( quote );
 		}
 	}
 
