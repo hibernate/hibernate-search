@@ -11,9 +11,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
@@ -21,10 +18,8 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -40,9 +35,11 @@ public class DynamicMappingIT {
 			+ ElasticsearchEnvironment.DYNAMIC_MAPPING;
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( ElasticsearchDynamicIndexedValueHolder.class )
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( ElasticsearchDynamicIndexedValueHolder.class )
 			.withProperty( Environment.ERROR_HANDLER, TestExceptionHandler.class.getName() )
 			.withProperty( DYNAMIC_MAPPING, DynamicType.STRICT.name() );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testIndexingWithDynamicField() {
@@ -53,11 +50,12 @@ public class DynamicMappingIT {
 				.dynamicProperty( "surname", "Oakenshield" )
 				.dynamicProperty( "race", "dwarf" );
 
-		index( holder );
-		List<EntityInfo> fieldValue = searchField( "dynamicField.name" );
+		helper.index( holder );
 
-		assertThat( fieldValue ).hasSize( 1 );
-		assertThat( fieldValue.get( 0 ).getProjection()[0] ).isEqualTo( "Thorin" );
+		helper.assertThat()
+				.from( ElasticsearchDynamicIndexedValueHolder.class )
+				.projecting( "dynamicField.name" )
+				.matchesExactlySingleProjections( "Thorin" );
 	}
 
 	@Test
@@ -69,7 +67,7 @@ public class DynamicMappingIT {
 				.strictProperty( "name", "Gimli" )
 				.strictProperty( "race", "dwarf" );
 
-		index( holder );
+		helper.index( holder );
 
 		TestExceptionHandler errorHandler = getErrorHandler();
 
@@ -89,24 +87,6 @@ public class DynamicMappingIT {
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		assertThat( errorHandler ).isInstanceOf( TestExceptionHandler.class );
 		return (TestExceptionHandler) errorHandler;
-	}
-
-	private void index(ElasticsearchDynamicIndexedValueHolder holder) {
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		Work work = new Work( holder, holder.id, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
-	}
-
-	private List<EntityInfo> searchField(String field) {
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		QueryBuilder guestQueryBuilder = searchFactory.buildQueryBuilder().forEntity( ElasticsearchDynamicIndexedValueHolder.class ).get();
-		Query queryAllGuests = guestQueryBuilder.all().createQuery();
-
-		return searchFactory.createHSQuery( queryAllGuests, ElasticsearchDynamicIndexedValueHolder.class )
-				.projection( field )
-				.queryEntityInfos();
 	}
 
 	public static class TestExceptionHandler implements ErrorHandler {

@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,8 +22,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.engine.QueryTimeoutException;
@@ -31,15 +33,11 @@ import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Navin Surtani
@@ -49,7 +47,9 @@ import static org.junit.Assert.assertTrue;
 public class ProvidedIdTest {
 
 	@Rule
-	public SearchFactoryHolder configuration = new SearchFactoryHolder( ProvidedIdPerson.class, ProvidedIdPersonSub.class );
+	public final SearchFactoryHolder configuration = new SearchFactoryHolder( ProvidedIdPerson.class, ProvidedIdPersonSub.class );
+
+	private final SearchITHelper helper = new SearchITHelper( configuration );
 
 	@Test
 	public void testProvidedId() throws Exception {
@@ -67,16 +67,11 @@ public class ProvidedIdTest {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		TransactionContextForTest tc = new TransactionContextForTest();
-
-		Work work = new Work( person1, 1, WorkType.INDEX );
-		extendedIntegrator.getWorker().performWork( work, tc );
-		work = new Work( person2, 2, WorkType.INDEX );
-		extendedIntegrator.getWorker().performWork( work, tc );
-		Work work2 = new Work( person3, 3, WorkType.INDEX );
-		extendedIntegrator.getWorker().performWork( work2, tc );
-
-		tc.end();
+		helper.index()
+				.push( person1, 1 )
+				.push( person2, 2 )
+				.push( person3, 3 )
+				.execute();
 
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );

@@ -7,6 +7,9 @@
 
 package org.hibernate.search.test.bridge;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
@@ -15,21 +18,16 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -37,42 +35,37 @@ import static org.junit.Assert.assertTrue;
 public class AppliedOnTypeAwareBridgeTest {
 
 	@Rule
-	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+	public final SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	private SearchIntegrator searchFactory;
+
+	private final SearchITHelper helper = new SearchITHelper( () -> this.searchFactory );
 
 	@Test
 	public void testTypeIsSetForField() {
-		SearchIntegrator searchFactory = createSearchIntegrator( Foo.class );
+		searchFactory = createSearchIntegrator( Foo.class );
 
 		Foo foo = new Foo( 0l );
 
-		Work work = new Work( foo, foo.getId(), WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( foo );
 	}
 
 	@Test
 	public void testTypeIsSetForGetter() {
-		SearchIntegrator searchFactory = createSearchIntegrator( Bar.class );
+		searchFactory = createSearchIntegrator( Bar.class );
 
 		Bar bar = new Bar( 0l );
 
-		Work work = new Work( bar, bar.getId(), WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( bar );
 	}
 
 	@Test
 	public void testTypeIsSetForClass() {
-		SearchIntegrator searchFactory = createSearchIntegrator( Snafu.class );
+		searchFactory = createSearchIntegrator( Snafu.class );
 
 		Snafu snafu = new Snafu( 0l );
 
-		Work work = new Work( snafu, snafu.getId(), WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( snafu );
 	}
 
 	private SearchIntegrator createSearchIntegrator(Class<?> clazz) {
@@ -94,10 +87,6 @@ public class AppliedOnTypeAwareBridgeTest {
 		public Foo(Long id) {
 			this.id = id;
 		}
-
-		public long getId() {
-			return id;
-		}
 	}
 
 	@Indexed
@@ -109,10 +98,6 @@ public class AppliedOnTypeAwareBridgeTest {
 
 		public Bar(Long id) {
 			this.id = id;
-		}
-
-		public long getId() {
-			return id;
 		}
 
 		@Field(bridge = @org.hibernate.search.annotations.FieldBridge(impl = TypeAssertingFieldBridge.class,
@@ -132,10 +117,6 @@ public class AppliedOnTypeAwareBridgeTest {
 
 		public Snafu(Long id) {
 			this.id = id;
-		}
-
-		public long getId() {
-			return id;
 		}
 	}
 

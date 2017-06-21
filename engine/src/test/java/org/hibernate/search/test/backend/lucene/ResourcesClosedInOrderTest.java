@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.test.backend.lucene;
 
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -23,9 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(BMUnitRunner.class)
 @BMRules(rules = {
@@ -64,10 +62,14 @@ public class ResourcesClosedInOrderTest {
 	private static final int NUMBER_ENTITIES = 2;
 
 	@Rule
-	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+	public final SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
-	public BytemanAccessor byteman = BytemanHelper.createAccessor();
+	public final BytemanAccessor byteman = BytemanHelper.createAccessor();
+
+	private SearchIntegrator searchIntegrator;
+
+	private final SearchITHelper helper = new SearchITHelper( () -> this.searchIntegrator );
 
 	@Test
 	public void asyncExclusiveIndexResourcesOrderedShutdown() {
@@ -103,9 +105,9 @@ public class ResourcesClosedInOrderTest {
 		cfg.addProperty( "hibernate.search.default.exclusive_index_use", exclusiveIndexing ? "true" : "false" );
 		cfg.addProperty( "hibernate.search.error_handler", CountingErrorHandler.class.getName() );
 		cfg.addClass( Quote.class );
-		SearchIntegrator searchIntegrator = integratorResource.create( cfg );
+		searchIntegrator = integratorResource.create( cfg );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) searchIntegrator.getErrorHandler();
-		writeData( searchIntegrator, NUMBER_ENTITIES );
+		writeData( NUMBER_ENTITIES );
 		//Check no errors happened in the asynchronous threads
 		assertEquals( 0, errorHandler.getTotalCount() );
 		searchIntegrator.close();
@@ -119,15 +121,12 @@ public class ResourcesClosedInOrderTest {
 		assertTrue( byteman.isEventStackEmpty() );
 	}
 
-	private void writeData(SearchIntegrator searchIntegrator, int numberEntities) {
+	private void writeData(int numberEntities) {
 		int entityIdGenerator = 0;
 		for ( int i = 0; i < numberEntities; i++ ) {
 			Integer id = Integer.valueOf( entityIdGenerator++ );
 			Quote quote = new Quote( id, "description" );
-			Work work = new Work( quote, id, WorkType.ADD, false );
-			TransactionContextForTest tc = new TransactionContextForTest();
-			searchIntegrator.getWorker().performWork( work, tc );
-			tc.end();
+			helper.add( quote );
 		}
 	}
 
