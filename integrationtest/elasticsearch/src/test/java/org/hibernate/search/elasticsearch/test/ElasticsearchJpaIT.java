@@ -12,11 +12,11 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.hibernate.search.test.util.JsonHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

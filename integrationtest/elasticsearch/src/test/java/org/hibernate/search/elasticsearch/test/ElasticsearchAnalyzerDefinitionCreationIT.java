@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.hibernate.search.elasticsearch.testutil.JsonHelper.assertJsonEquals;
+import static org.hibernate.search.test.util.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
 import java.util.HashMap;
