@@ -35,13 +35,14 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for {@link ElasticsearchIndexManager}'s schema validation feature.
+ * Tests for {@link ElasticsearchIndexManager}'s behavior with respect
+ * to checking that the index has the correct status before starting to work with it.
  *
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-2456")
-public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBase {
+public class ElasticsearchIndexStatusCheckIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")
 	public static Iterable<IndexSchemaManagementStrategy> strategies() {
@@ -57,7 +58,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 
 	private IndexSchemaManagementStrategy strategy;
 
-	public ElasticsearchIndexExistsCheckIT(IndexSchemaManagementStrategy strategy) {
+	public ElasticsearchIndexStatusCheckIT(IndexSchemaManagementStrategy strategy) {
 		super();
 		this.strategy = strategy;
 	}
