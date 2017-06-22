@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.query.dsl.mixedhierarchy;
+package org.hibernate.search.test.query.objectloading.mixedhierarchy;
 
 import java.util.List;
 import java.util.Map;
@@ -25,11 +25,12 @@ import org.junit.Test;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * Tests for using the HSEARCH Query DSL across id spaces (i.e. inheritance hierarchies sharing the same id property).
+ * Tests for using object loading with queries spanning across multiple id spaces
+ * (i.e. inheritance hierarchies sharing the same id property).
  *
  * @author Gunnar Morling
  */
-public class DslCrossHierarchyTest extends SearchTestBase {
+public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 
 	private FullTextSession fullTextSession;
 
