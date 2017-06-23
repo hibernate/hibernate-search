@@ -11,6 +11,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.dsl.DSLTest.MappingFactory;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -19,6 +20,7 @@ import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Guillaume Smet
@@ -29,6 +31,9 @@ public class SimpleQueryStringDSLTest {
 			.withProperty( Environment.MODEL_MAPPING, MappingFactory.class.getName() );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
+
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void setUp() throws Exception {
@@ -157,6 +162,63 @@ public class SimpleQueryStringDSLTest {
 		helper.assertThat( query ).from( Book.class )
 				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
 				.matchesExactlyIds( "Dom Garcie de Navarre", "Le Grand Molière illustré" );
+	}
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2700")
+	public void testNullQueryString() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000334" );
+		thrown.expectMessage( "does not support null queries" );
+
+		qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( null )
+				.createQuery();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2700")
+	public void testEmptyQueryString() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "" )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesNone();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2700")
+	public void testBlankQueryString() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "   " )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesNone();
+
+		query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "() (())" )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesNone();
 	}
 
 	private QueryBuilder getCoffeeQueryBuilder() {

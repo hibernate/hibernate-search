@@ -997,11 +997,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 333, value = "Cannot query: there aren't any mapped entity. Don't forget to add @Indexed to at least one class." )
 	SearchException queryWithNoIndexedType();
 
-	@Message(id = 334, value = "The simple query parser does not support empty queries.")
-	EmptyQueryException simpleQueryParserDoesNotSupportEmptyQueries();
-
-	@Message(id = 335, value = "Unable to build a Lucene query from the query string '%1$s'.")
-	EmptyQueryException unableToBuildLuceneQueryFromQueryString(String query);
+	@Message(id = 334, value = "The simple query parser does not support null queries.")
+	SearchException simpleQueryParserDoesNotSupportNullQueries();
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 336, value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")

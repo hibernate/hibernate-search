@@ -14,7 +14,6 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -47,8 +46,8 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 
 	@Override
 	public Query createQuery() {
-		if ( StringHelper.isEmpty( simpleQueryString ) ) {
-			throw LOG.simpleQueryParserDoesNotSupportEmptyQueries();
+		if ( simpleQueryString == null ) {
+			throw LOG.simpleQueryParserDoesNotSupportNullQueries();
 		}
 
 		Query query;
@@ -74,10 +73,6 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 			queryParser.setDefaultOperator( withAndAsDefaultOperator ? Occur.MUST : Occur.SHOULD );
 
 			query = queryParser.parse( simpleQueryString );
-
-			if ( query == null ) {
-				throw LOG.unableToBuildLuceneQueryFromQueryString( simpleQueryString );
-			}
 		}
 
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
