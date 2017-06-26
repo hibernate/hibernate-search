@@ -12,10 +12,10 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-parent</artifactId>
         <version>5.8.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-engine-performance</artifactId>
+    <artifactId>hibernate-search-performance-engine</artifactId>
     <name>Hibernate Search Engine Performance Testing</name>
     <description>Performance testing for the Hibernate Search engine module</description>
  
