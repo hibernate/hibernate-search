@@ -36,8 +36,8 @@
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/osgi/karaf-features</module>
-        <module>integrationtest/sandbox</module>
-        <module>integrationtest/engine-performance</module>
+	<module>integrationtest/performance/sandbox</module>
+	<module>integrationtest/performance/engine</module>
     </modules>
 
     <issueManagement>
@@ -1551,7 +1551,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <module>documentation</module>
                 <module>integrationtest/wildfly</module>
                 <module>integrationtest/osgi/karaf-it</module>
-                <module>integrationtest/performance</module>
+		<module>integrationtest/performance/orm</module>
             </modules>
         </profile>
 
