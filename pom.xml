@@ -39,7 +39,7 @@
         <module>integrationtest/spring</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/performance/sandbox</module>
-        <module>integrationtest/performance/engine</module>
+        <module>integrationtest/performance/engine-lucene</module>
     </modules>
 
     <issueManagement>
