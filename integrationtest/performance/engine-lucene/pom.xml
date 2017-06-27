@@ -15,9 +15,9 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-performance-engine</artifactId>
-    <name>Hibernate Search Engine Performance Testing</name>
-    <description>Performance testing for the Hibernate Search engine module</description>
+    <artifactId>hibernate-search-performance-engine-lucene</artifactId>
+    <name>Hibernate Search Engine-Lucene Performance Testing</name>
+    <description>Performance testing for the Hibernate Search engine module with an embedded Lucene backend</description>
  
     <dependencies>
         <dependency>
