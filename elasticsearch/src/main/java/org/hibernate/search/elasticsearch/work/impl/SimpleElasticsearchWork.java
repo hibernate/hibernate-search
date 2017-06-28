@@ -12,9 +12,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -53,7 +51,6 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
-		GsonProvider gsonProvider = executionContext.getGsonProvider();
 		ElasticsearchResponse response = null;
 		R result;
 
@@ -61,7 +58,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 			beforeExecute( executionContext, request );
 			response = executionContext.getClient().execute( request );
 
-			resultAssessor.checkSuccess( executionContext, request, response );
+			resultAssessor.checkSuccess( request, response );
 
 			result = generateResult( executionContext, response );
 		}
@@ -69,10 +66,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
 		catch (RuntimeException e) {
-			throw LOG.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-					e );
+			throw LOG.elasticsearchRequestFailed( request, response, e );
 		}
 
 		if ( markIndexDirty ) {

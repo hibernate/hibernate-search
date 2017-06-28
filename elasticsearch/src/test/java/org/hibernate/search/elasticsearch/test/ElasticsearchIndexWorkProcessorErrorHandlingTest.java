@@ -44,8 +44,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 /**
@@ -81,9 +79,6 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 					(List<BulkableElasticsearchWork<?>>) EasyMock.getCurrentArguments()[0];
 			return new BulkWork.Builder( bulkableWorks );
 		} ).anyTimes();
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		expect( gsonProviderMock.getGsonPrettyPrinting() ).andReturn( gson ).anyTimes();
 
 		replay( buildContextMock, clientMock, gsonProviderMock, workFactoryMock );
 

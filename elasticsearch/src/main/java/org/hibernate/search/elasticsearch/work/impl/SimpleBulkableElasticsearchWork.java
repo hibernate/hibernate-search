@@ -53,7 +53,7 @@ public abstract class SimpleBulkableElasticsearchWork<R>
 
 	@Override
 	public boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		if ( resultAssessor.isSuccess( context, bulkResponseItem ) ) {
+		if ( resultAssessor.isSuccess( bulkResponseItem ) ) {
 			afterSuccess( context );
 
 			if ( markIndexDirty ) {

@@ -14,6 +14,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
@@ -63,13 +65,18 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
-	SearchException elasticsearchRequestFailed(String request, String response, @Cause Exception cause);
+	SearchException elasticsearchRequestFailed(
+			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
+			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
+			@Cause Exception cause);
 
 	// The bounds on wildcards below are necessary for the logger code generation to work
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 8,
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
-	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response,
+	BulkRequestFailedException elasticsearchBulkRequestFailed(
+			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
+			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
 			@Param Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems, @Param List<BulkableElasticsearchWork<?>> erroneousItems);
 
 	@LogMessage(level = Level.WARN)
@@ -79,7 +86,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 10,
 			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green';\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
-	SearchException elasticsearchRequestTimeout(String request, String response);
+	SearchException elasticsearchRequestTimeout(
+			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
+			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 11,
 			value = "Projection of non-JSON-primitive field values is not supported: '%1$s'")
@@ -293,7 +302,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 53,
 			value = "Executing Elasticsearch query on '%s' with parameters '%s' :\n%s" )
-	void executingElasticsearchQuery(String path, Map<String, String> parameters, String queryAsString);
+	void executingElasticsearchQuery(String path, Map<String, String> parameters,
+			@FormatWith(ElasticsearchJsonObjectIterableFormatter.class) Iterable<JsonObject> bodyParts);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 54,
 			value = "Invalid field path detected for field '%2$s' on entity '%1$s':"
@@ -399,7 +409,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ "\n Request:\n========\n%1$s"
 					+ "Response:\n=========\n%2$s"
 			)
-	SearchException elasticsearch2RequestDeleteByQueryNotFound(String request, String response);
+	SearchException elasticsearch2RequestDeleteByQueryNotFound(
+			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
+			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 73,
