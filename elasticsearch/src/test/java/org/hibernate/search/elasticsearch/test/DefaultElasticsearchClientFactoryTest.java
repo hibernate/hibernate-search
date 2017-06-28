@@ -303,8 +303,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	public void multipleHosts_failover_fault() throws Exception {
 		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI,
-						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) )
-				.addProperty( ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
+						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
