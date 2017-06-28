@@ -19,19 +19,17 @@ public interface ElasticsearchRequestSuccessAssessor {
 
 	/**
 	 * Check the given response, throwing an exception if the reponse indicates a failure.
-	 * @param context The context in which the request was executed.
 	 * @param request The request whose success is to be assessed.
 	 * @param response The response, containing information about the outcome of the request.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException;
+	void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException;
 
 	/**
 	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.
-	 * @param context The context in which the request was executed.
 	 * @param bulkResponseItem The part of the response body concerning the request whose success is to be assessed.
 	 * @return {@code true} if the result is successful, {@code false} otherwise.
 	 */
-	boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
+	boolean isSuccess(JsonObject bulkResponseItem);
 
 }

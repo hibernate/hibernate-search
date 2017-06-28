@@ -22,9 +22,10 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
+import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.AssertionFailure;
@@ -50,7 +51,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	 *
 	 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
 	 * as any test-created SearchFactory, allowing to support things like testing on AWS
-	 * (using a {@link AWSElasticsearchHttpClientConfigurer}).
+	 * (using the hibernate-search-elasticsearch-aws module).
 	 */
 	private final DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
@@ -505,7 +506,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		return new AssertionFailure( "Elasticsearch request in TestElasticsearchClient failed:"
 				+ "Request:\n"
 				+ "========\n"
-				+ ElasticsearchClientUtils.formatRequest( DialectIndependentGsonProvider.INSTANCE, request ),
+				+ new ElasticsearchRequestFormatter( request ),
 				e );
 	}
 
@@ -513,10 +514,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		return new AssertionFailure( "Elasticsearch request in TestElasticsearchClient failed:\n"
 				+ "Request:\n"
 				+ "========\n"
-				+ ElasticsearchClientUtils.formatRequest( DialectIndependentGsonProvider.INSTANCE, request )
+				+ new ElasticsearchRequestFormatter( request )
 				+ "\nResponse:\n"
 				+ "========\n"
-				+ ElasticsearchClientUtils.formatResponse( DialectIndependentGsonProvider.INSTANCE, response )
+				+ new ElasticsearchResponseFormatter( response )
 				);
 	}
 

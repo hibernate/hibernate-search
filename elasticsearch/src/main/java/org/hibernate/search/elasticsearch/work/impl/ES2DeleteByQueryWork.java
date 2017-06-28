@@ -13,9 +13,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
@@ -116,20 +114,15 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request,
-				ElasticsearchResponse response) throws SearchException {
-			this.delegate.checkSuccess( context, request, response );
+		public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
+			this.delegate.checkSuccess( request, response );
 			if ( response.getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
-				GsonProvider gsonProvider = context.getGsonProvider();
-				throw LOG.elasticsearch2RequestDeleteByQueryNotFound(
-						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response )
-						);
+				throw LOG.elasticsearch2RequestDeleteByQueryNotFound( request, response );
 			}
 		}
 
 		@Override
-		public boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		public boolean isSuccess(JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because DeleteByQuery actions are not Bulkable" );
 		}
 	}
