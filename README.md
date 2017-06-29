@@ -83,9 +83,9 @@ You can then find the freshly built documentation in the following location:
 The Elasticsearch module tests against one single version of Elasticsearch at a time,
 launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
-`test.elasticsearch.host.version` property:
+`test.elasticsearch.host.version` property, while disabling the default profile:
 
-    > mvn clean install -Pelasticsearch-2.0 -Dtest.elasticsearch.host.version=2.1.0
+    > mvn clean install -P!elasticsearch-5.2,elasticsearch-2.0 -Dtest.elasticsearch.host.version=2.1.0
 
 The following profiles are available:
 
