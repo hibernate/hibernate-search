@@ -6,36 +6,28 @@
  */
 package org.hibernate.search.test.projection;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.junit.Assert;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,14 +48,15 @@ import org.junit.rules.ExpectedException;
 public class ProjectionConversionTest {
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+	public final ExpectedException thrown = ExpectedException.none();
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( ExampleEntity.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( ExampleEntity.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Before
 	public void storeTestData() {
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		ExampleEntity entity = new ExampleEntity();
 		entity.id = 1l;
 		entity.someInteger = 5;
@@ -87,10 +80,7 @@ public class ProjectionConversionTest {
 		entity.embedded = embedded;
 		entity.second = second;
 
-		Work work = new Work( entity, entity.id, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( entity );
 	}
 
 	@Test
@@ -211,17 +201,10 @@ public class ProjectionConversionTest {
 	}
 
 	void projectionTestHelper(String projectionField, Object expectedValue) {
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( ExampleEntity.class ).get();
-		Query queryAllGuests = queryBuilder.all().createQuery();
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( queryAllGuests, ExampleEntity.class )
-				.projection( projectionField )
-				.queryEntityInfos();
-
-		Assert.assertEquals( 1, queryEntityInfos.size() );
-		EntityInfo entityInfo = queryEntityInfos.get( 0 );
-		Object projectedValue = entityInfo.getProjection()[0];
-		Assert.assertEquals( expectedValue, projectedValue );
+		helper.assertThat()
+				.from( ExampleEntity.class )
+				.projecting( projectionField )
+				.matchesExactlySingleProjections( expectedValue );
 	}
 
 	@Indexed

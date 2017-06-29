@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.sorting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,19 +32,15 @@ import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -66,67 +59,65 @@ public class SortingTest {
 	public final ExpectedException thrown = ExpectedException.none();
 
 	@Rule
-	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class, UnsortableToy.class );
+	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class, UnsortableToy.class );
+
+	private final SearchITHelper helper = new SearchITHelper( factoryHolder );
 
 	@Test
 	public void testSortingOnNumericInt() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person( 0, 3, "Three" ),
 				new Person( 1, 10, "Ten" ),
 				new Person( 2, 9, "Nine" ),
 				new Person( 3, 5, "Five" )
-			);
-
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		);
 
 		// Sorting Age as string:
 		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
-		assertSortedResults( query, sortAsString, 1, 0, 3, 2 );
+		assertSortedResults( sortAsString, 1, 0, 3, 2 );
 		// Also check reverse, to ensure this wasn't just luck
 		sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING, true ) );
-		assertSortedResults( query, sortAsString, 2, 3, 0, 1 );
+		assertSortedResults( sortAsString, 2, 3, 0, 1 );
 
 		// Sorting Age as Int (numeric):
 		Sort sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT ) );
-		assertSortedResults( query, sortAsInt, 0, 3, 2, 1 );
+		assertSortedResults( sortAsInt, 0, 3, 2, 1 );
 		// Also check reverse, to ensure this wasn't just luck
 		sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT, true ) );
-		assertSortedResults( query, sortAsInt, 1, 2, 3, 0 );
+		assertSortedResults( sortAsInt, 1, 2, 3, 0 );
 	}
 
 	@Test
 	public void testSortingOnString() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person( 0, 3, "Three" ),
 				new Person( 1, 10, "Ten" ),
 				new Person( 2, 9, "Nine" ),
 				new Person( 3, 5, "Five" )
-			);
+		);
 
 		// Sorting Name
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "name", SortField.Type.STRING ) );
-		assertSortedResults( query, sortAsString, 3, 2, 1, 0 );
+		assertSortedResults( sortAsString, 3, 2, 1, 0 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2376")
 	public void testSortingOnCollatedString() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person( 0, 3, "Éléonore" ),
 				new Person( 1, 10, "édouard" ),
 				new Person( 2, 9, "Edric" ),
 				new Person( 3, 5, "aaron" ),
 				new Person( 4, 7, " zach" )
-			);
+		);
 
 		// Sorting by collated name
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "collatedName", SortField.Type.STRING ) );
-		assertSortedResults( query, sortAsString, 4, 3, 1, 2, 0 );
+		assertSortedResults( sortAsString, 4, 3, 1, 2, 0 );
 	}
 
 	@Test
@@ -135,7 +126,7 @@ public class SortingTest {
 		Person person = new Person( 0, 3, "Éléonore" );
 
 		// Index all testData:
-		storeTestingData( person );
+		helper.index( person );
 
 		/*
 		 * Check the stored value is the value *before* analysis
@@ -154,36 +145,34 @@ public class SortingTest {
 	@Category(SkipOnElasticsearch.class) // Elasticsearch handles sorts on multi-value fields differently (the default is unclear, but it provides "sort modes" like min, max, avg, etc.)
 	public void testSortingOnTokenizedString() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person( 0, 3, "elizabeth" ),
 				new Person( 1, 10, "zach other" ),
 				new Person( 2, 9, " edric" ),
 				new Person( 3, 5, "bob" ),
 				new Person( 4, 10, "zach Aaron" )
-			);
+		);
 
 		// Sorting by tokenized name: ensure only the first token is taken into account
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort(
 				new SortField( "tokenizedName", SortField.Type.STRING ),
 				SortField.FIELD_DOC // Stabilize the sort for the two zachs
 				);
-		assertSortedResults( query, sortAsString, 3, 2, 0, 1, 4 );
+		assertSortedResults( sortAsString, 3, 2, 0, 1, 4 );
 	}
 
 	@Test
 	public void testSortingOnEmbeddedString() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person( 0, 3, "Three", new CuddlyToy( "Hippo" ) ),
 				new Person( 1, 10, "Ten", new CuddlyToy( "Giraffe" ) ),
 				new Person( 2, 9, "Nine", new CuddlyToy( "Gorilla" ) ),
 				new Person( 3, 5, "Five" , new CuddlyToy( "Alligator" ) )
-			);
+		);
 
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "favoriteCuddlyToy.type", SortField.Type.STRING ) );
-		assertSortedResults( query, sortAsString, 3, 1, 2, 0 );
+		assertSortedResults( sortAsString, 3, 1, 2, 0 );
 	}
 
 	/**
@@ -194,7 +183,7 @@ public class SortingTest {
 	@TestForIssue(jiraKey = "HSEARCH-2000")
 	public void testSortingForTypeWithSortableFieldWithinEmbeddedToManyAssociation() {
 		// Index all testData:
-		storeTestingData(
+		helper.index(
 				new Person(
 						0,
 						3,
@@ -213,26 +202,25 @@ public class SortingTest {
 								new Friend( new CuddlyToy( "Alligator" ) )
 						)
 				)
-			);
+		);
 
-		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
-		assertSortedResults( query, sortAsString, 1, 0 );
+		assertSortedResults( sortAsString, 1, 0 );
 	}
 
 	@Test
 	public void testSortOnNullableNumericField() throws Exception {
-		storeTestingData(
+		helper.index(
 				new Person( 1, 25, "name1" ),
 				new Person( 2, 22, null ),
 				new Person( 3, null, "name3" )
-			);
+		);
 
 		HSQuery nameQuery = queryForValueNullAndSorting( "name", SortField.Type.STRING );
-		assertEquals( nameQuery.queryEntityInfos().size(), 1 );
+		helper.assertThat( nameQuery ).hasResultSize( 1 );
 
 		HSQuery ageQuery = queryForValueNullAndSorting( "ageForNullChecks", SortField.Type.INT );
-		assertEquals( ageQuery.queryEntityInfos().size(), 1 );
+		helper.assertThat( ageQuery ).hasResultSize( 1 );
 	}
 
 	@Test
@@ -240,7 +228,7 @@ public class SortingTest {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
 
-		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
@@ -262,7 +250,7 @@ public class SortingTest {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
 
-		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
@@ -284,7 +272,7 @@ public class SortingTest {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
 
-		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
@@ -303,24 +291,18 @@ public class SortingTest {
 
 	@Test
 	public void testSortOnNullableNumericFieldArray() throws Exception {
-		storeTestingData(
+		helper.index(
 				new Person( 1, 25, "name1", 1, 2, 3 ),
 				new Person( 2, 22, "name2", 1, null, 3 ),
 				new Person( 3, 23, "name3", null, null, null )
-			);
+		);
 
 		Query rangeQuery = queryForRangeOnFieldSorted( 0, 2, "array" );
 		Sort sortAsInt = new Sort( new SortField( "array", SortField.Type.INT ) );
-		assertNumberOfResults( 2, rangeQuery, sortAsInt );
-	}
-
-	private void assertNumberOfResults(int expectedResultsNumber, Query query, Sort sort) {
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
-		if ( sort != null ) {
-			hsQuery.sort( sort );
-		}
-		assertEquals( expectedResultsNumber, hsQuery.queryResultSize() );
+		helper.assertThat( rangeQuery )
+				.from( Person.class )
+				.sort( sortAsInt )
+				.hasResultSize( 2 );
 	}
 
 	private Query queryForRangeOnFieldSorted(int min, int max, String fieldName) {
@@ -334,50 +316,18 @@ public class SortingTest {
 				.createQuery();
 	}
 
-	private void storeTestingData(Person... testData) {
-		Worker worker = factoryHolder.getSearchFactory().getWorker();
-		TransactionContextForTest tc = new TransactionContextForTest();
-		for ( int i = 0; i < testData.length; i++ ) {
-			Person p = testData[i];
-			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc );
-		}
-		tc.end();
-	}
-
-	private void storeTestingData(UnsortableToy... testData) {
-		Worker worker = factoryHolder.getSearchFactory().getWorker();
-		TransactionContextForTest tc = new TransactionContextForTest();
-		for ( int i = 0; i < testData.length; i++ ) {
-			UnsortableToy toy = testData[i];
-			worker.performWork( new Work( toy, toy.id, WorkType.INDEX ), tc );
-		}
-		tc.end();
-	}
-
-	private void assertSortedResults(Query query, Sort sort, int... expectedIds) {
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
-		if ( sort != null ) {
-			hsQuery.sort( sort );
-		}
-		assertEquals( expectedIds.length, hsQuery.queryResultSize() );
-		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
-		assertEquals( expectedIds.length, queryEntityInfos.size() );
-		for ( int i = 0; i < expectedIds.length; i++ ) {
-			EntityInfo entityInfo = queryEntityInfos.get( i );
-			assertNotNull( entityInfo );
-			assertEquals( expectedIds[i], entityInfo.getId() );
-		}
+	private void assertSortedResults(Sort sort, int... expectedIds) {
+		helper.assertThat()
+				.from( Person.class )
+				.sort( sort )
+				.matchesExactlyIds( expectedIds );
 	}
 
 	private void assertStoredValueEquals(Query query, String fieldName, Object expectedValue) {
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
-		hsQuery.projection( fieldName );
-		assertEquals( 1, hsQuery.queryResultSize() );
-		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
-		assertEquals( 1, queryEntityInfos.size() );
-		assertEquals( expectedValue, queryEntityInfos.get( 0 ).getProjection()[0] );
+		helper.assertThat( query )
+				.from( Person.class )
+				.projecting( fieldName )
+				.matchesExactlySingleProjections( expectedValue );
 	}
 
 	private HSQuery queryForValueNullAndSorting(String fieldName, SortField.Type sortType) {

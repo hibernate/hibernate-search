@@ -79,6 +79,13 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 		return this;
 	}
 
+	public SearchConfigurationForTest addClasses(Class<?> ... classes) {
+		for ( Class<?> clazz : classes ) {
+			addClass( clazz );
+		}
+		return this;
+	}
+
 	@Override
 	public Iterator<Class<?>> getClassMappings() {
 		return classes.values().iterator();

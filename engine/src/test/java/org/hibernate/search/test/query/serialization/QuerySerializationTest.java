@@ -13,16 +13,14 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +37,9 @@ import org.junit.experimental.categories.Category;
 public class QuerySerializationTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void serializeDeserializeLuceneHSQuery() throws ClassNotFoundException, IOException {
@@ -48,11 +48,7 @@ public class QuerySerializationTest {
 		Book book = new Book();
 		book.title = "Java Serialization";
 		book.text = "The black art of object serialization is full of pitfalls even for experienced developers";
-
-		Work work = new Work( book, book.title, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		integrator.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( book );
 
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Book.class ).get();
 

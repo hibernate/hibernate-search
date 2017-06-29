@@ -215,7 +215,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	}
 
 	@Indexed
-	@Entity
+	@Entity(name = "Foo")
 	public static class Foo {
 		@Id
 		@GeneratedValue

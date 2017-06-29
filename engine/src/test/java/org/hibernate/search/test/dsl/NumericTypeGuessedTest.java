@@ -6,27 +6,20 @@
  */
 package org.hibernate.search.test.dsl;
 
-import java.util.List;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.junit.Assert;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -40,20 +33,17 @@ import org.junit.Test;
 public class NumericTypeGuessedTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( CustomBridgedNumbers.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( CustomBridgedNumbers.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void numericRangeQueryOnCustomField() {
-		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-
 		storeData( "title-one", "1" );
 		storeData( "title-two", "2" );
 		storeData( "title-three", "3" );
 
-		QueryBuilder queryBuilder = searchFactory
-				.buildQueryBuilder()
-				.forEntity( CustomBridgedNumbers.class )
-				.get();
+		QueryBuilder queryBuilder = helper.queryBuilder( CustomBridgedNumbers.class );
 
 		Query query = queryBuilder
 					.range()
@@ -62,24 +52,17 @@ public class NumericTypeGuessedTest {
 						.to( 3 ).excludeLimit()
 						.createQuery();
 
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( query, CustomBridgedNumbers.class )
-				.projection( "title" )
-				.queryEntityInfos();
-
-		Assert.assertEquals( 1, queryEntityInfos.size() );
-		EntityInfo entityInfo = queryEntityInfos.get( 0 );
-		Assert.assertEquals( "title-two", entityInfo.getProjection()[0] );
+		helper.assertThat( query )
+				.from( CustomBridgedNumbers.class )
+				.projecting( "title" )
+				.matchesExactlySingleProjections( "title-two" );
 	}
 
 	private void storeData(String title, String value) {
 		CustomBridgedNumbers entry = new CustomBridgedNumbers();
 		entry.title = title;
 		entry.textEncodedInt = value;
-
-		Work work = new Work( entry, entry.title, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		sfHolder.getSearchFactory().getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( entry );
 	}
 
 	@Indexed
@@ -104,10 +87,8 @@ public class NumericTypeGuessedTest {
 				Integer i = Integer.parseInt( (String) value );
 				luceneOptions.addNumericFieldToDocument( "customField", i, document );
 			}
-
 		}
 
 	}
-
 
 }

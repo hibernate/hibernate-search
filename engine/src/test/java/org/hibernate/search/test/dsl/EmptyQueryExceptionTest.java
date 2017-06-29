@@ -9,14 +9,12 @@ package org.hibernate.search.test.dsl;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,7 +29,9 @@ import org.junit.rules.ExpectedException;
 public class EmptyQueryExceptionTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Rule
 	public ExpectedException exceptions = ExpectedException.none();
@@ -45,10 +45,7 @@ public class EmptyQueryExceptionTest {
 		book.title = "Empty Book";
 		book.text = "The question is, does an empty book have 'space' tokens in it?";
 
-		Work work = new Work( book, book.title, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( book );
 
 		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( Book.class ).get();
 

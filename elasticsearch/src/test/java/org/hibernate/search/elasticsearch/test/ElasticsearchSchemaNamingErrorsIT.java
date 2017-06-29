@@ -8,21 +8,11 @@ package org.hibernate.search.elasticsearch.test;
 
 import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.Function;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -36,8 +26,10 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.test.SearchInitializationTestBase;
-import org.hibernate.search.test.util.ImmutableTestConfiguration;
+import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.testing.TestForIssue;
 import org.junit.Assume;
 import org.junit.Rule;
@@ -53,7 +45,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
-public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestBase {
+public class ElasticsearchSchemaNamingErrorsIT {
 
 	private static final String COMPOSITE_CONCRETE_CONFLICT_MESSAGE_ID = "HSEARCH400036";
 	private static final String INDEXED_EMBEDDED_BYPASS_MESSAGE_ID = "HSEARCH400054";
@@ -73,7 +65,14 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+
+	private SearchIntegrator integrator;
+
+	private SearchITHelper helper = new SearchITHelper( () -> this.integrator );
 
 	private IndexSchemaManagementStrategy strategy;
 
@@ -114,16 +113,16 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_indexing_compositeOnConcrete() throws Exception {
-		testDetectConflictDuringIndexing( CompositeOnConcreteEntity.class );
+		testDetectConflictDuringIndexing( CompositeOnConcreteEntity.class, CompositeOnConcreteEntity::new );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_indexing_concreteOnComposite() throws Exception {
-		testDetectConflictDuringIndexing( ConcreteOnCompositeEntity.class );
+		testDetectConflictDuringIndexing( ConcreteOnCompositeEntity.class, ConcreteOnCompositeEntity::new );
 	}
 
-	private void testDetectConflictDuringIndexing(Class<?> entityClass) throws Exception {
+	private <T> void testDetectConflictDuringIndexing(Class<T> entityClass, Function<Long, T> constructor) throws Exception {
 		Assume.assumeFalse( "The strategy " + strategy + " involves schema generation,"
 				+ " which means conflicts prevent search factory initialization"
 				+ " and thus prevent indexing. No point running this test.",
@@ -133,21 +132,15 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 		init( strategy, entityClass );
 
 		thrown.expect(
-				isException( AssertionFailure.class )
-				.causedBy( HibernateException.class )
-				.causedBy( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( COMPOSITE_CONCRETE_CONFLICT_MESSAGE_ID )
 						.withMessage( CONFLICTING_FIELD_NAME + "'" )
 						.withMessage( entityClass.getName() )
 				.build()
 		);
 
-		Object newEntity = entityClass.newInstance();
-		try ( Session session = getTestResourceManager().openSession() ) {
-			Transaction tx = session.beginTransaction();
-			session.save( newEntity );
-			tx.commit();
-		}
+		Object newEntity = constructor.apply( 0L );
+		helper.add( newEntity );
 	}
 
 	@Test
@@ -186,9 +179,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 		init( strategy, entityClass );
 
 		thrown.expect(
-				isException( AssertionFailure.class )
-				.causedBy( HibernateException.class )
-				.causedBy( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( INDEXED_EMBEDDED_BYPASS_MESSAGE_ID )
 						.withMessage( "'" + BYPASSING_FIELD_NAME + "'" )
 						.withMessage( "'" + BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX + "'" )
@@ -196,12 +187,8 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 				.build()
 		);
 
-		Object newEntity = entityClass.newInstance();
-		try ( Session session = getTestResourceManager().openSession() ) {
-			Transaction tx = session.beginTransaction();
-			session.save( newEntity );
-			tx.commit();
-		}
+		Object newEntity = new BypassingIndexedEmbeddedPrefixEntity( 0 );
+		helper.add( newEntity );
 	}
 
 	private boolean generatesSchema(IndexSchemaManagementStrategy strategy) {
@@ -209,23 +196,24 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	}
 
 	private void init(IndexSchemaManagementStrategy strategy, Class<?> ... entityClasses) {
-		Map<String, Object> settings = new HashMap<>();
-		settings.put(
-				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				strategy.getExternalName()
-		);
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
+				.addClasses( entityClasses )
+				.addProperty(
+						"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
+						strategy.getExternalName()
+				);
 
-		init( new ImmutableTestConfiguration( settings, entityClasses ) );
+		this.integrator = integratorResource.create( cfg );
 	}
 
 	@Embeddable
-	static class EmbeddedTypeWithNonConflictingField {
+	private static class EmbeddedTypeWithNonConflictingField {
 		@Field
 		int nonConflictingField = 0;
 	}
 
 	@Embeddable
-	static class EmbeddedTypeWithConflictingField {
+	private static class EmbeddedTypeWithConflictingField {
 		@Field(name = CONFLICTING_FIELD_NAME)
 		int conflictingField = 0;
 	}
@@ -234,19 +222,19 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	 * A class for which Hibernate Search will first handle the mapping for the "concrete"
 	 * (non-composite) field, and then the mapping for the composite field.
 	 */
-	@Entity
 	@Indexed
-	static class CompositeOnConcreteEntity {
+	private static class CompositeOnConcreteEntity {
 		@DocumentId
-		@Id
-		@GeneratedValue
 		Long id;
 
 		@IndexedEmbedded(prefix = CONFLICTING_FIELD_NAME + ".")
 		@Field(name = CONFLICTING_FIELD_NAME, bridge = @FieldBridge(impl = SimpleToStringBridge.class))
-		@Embedded
 		EmbeddedTypeWithNonConflictingField embedded =
 				new EmbeddedTypeWithNonConflictingField();
+
+		public CompositeOnConcreteEntity(Long id) {
+			this.id = id;
+		}
 
 		public static class SimpleToStringBridge implements MetadataProvidingFieldBridge {
 
@@ -266,18 +254,17 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	 * A class for which Hibernate Search will first handle the mapping for the composite
 	 * field, and then the mapping for the "concrete" (non-composite) field.
 	 */
-	@Entity
 	@Indexed
-	@Table(name = "ConcreteOnCompositeEntity")
-	static class ConcreteOnCompositeEntity {
+	private static class ConcreteOnCompositeEntity {
 		@DocumentId
-		@Id
-		@GeneratedValue
 		Long id;
 
-		@Embedded
 		EmbeddedTypeWithNonConflictingField embedded =
 				new EmbeddedTypeWithNonConflictingField();
+
+		public ConcreteOnCompositeEntity(Long id) {
+			this.id = id;
+		}
 
 		// Hack: methods are handled first, so take advantage of that.
 		@IndexedEmbedded(prefix = CONFLICTING_FIELD_NAME + ".")
@@ -286,27 +273,26 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 		}
 
 		@IndexedEmbedded(prefix = "")
-		@Embedded
 		EmbeddedTypeWithConflictingField otherEmbedded =
 				new EmbeddedTypeWithConflictingField();
 	}
 
 	@Indexed
-	@Entity
-	@Table(name = "BypassingIndexedEmbeddedPrefixEntity")
-	static class BypassingIndexedEmbeddedPrefixEntity {
-		@Id
-		@GeneratedValue
+	private static class BypassingIndexedEmbeddedPrefixEntity {
+		@DocumentId
 		private Integer id;
 
 		@IndexedEmbedded(prefix = BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX)
 		private BypassingIndexedEmbeddedPrefixEmbedded embedded =
 				new BypassingIndexedEmbeddedPrefixEmbedded();
 
+		public BypassingIndexedEmbeddedPrefixEntity(Integer id) {
+			super();
+			this.id = id;
+		}
 	}
 
-	@Embeddable
-	static class BypassingIndexedEmbeddedPrefixEmbedded {
+	private static class BypassingIndexedEmbeddedPrefixEmbedded {
 		@Field(name = BYPASSING_FIELD_DEFAULT_FIELD_NAME, bridge = @FieldBridge(impl = BypassingIndexedEmbeddedPrefixFieldBridge.class))
 		private String field = "fieldValue";
 	}

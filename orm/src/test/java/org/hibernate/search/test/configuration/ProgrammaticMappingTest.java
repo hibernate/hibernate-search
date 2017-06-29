@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -32,8 +37,6 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
@@ -43,7 +46,6 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
@@ -51,18 +53,13 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
@@ -538,28 +535,21 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		TransactionContextForTest tc = new TransactionContextForTest();
+		SearchITHelper helper = new SearchITHelper( () -> sf );
 
-		Work work = new Work( person1, 1, WorkType.INDEX );
-		sf.getWorker().performWork( work, tc );
-		work = new Work( person2, 2, WorkType.INDEX );
-		sf.getWorker().performWork( work, tc );
-		Work work2 = new Work( person3, 3, WorkType.INDEX );
-		sf.getWorker().performWork( work2, tc );
-
-		tc.end();
+		helper.index()
+				.push( person1, 1 )
+				.push( person2, 2 )
+				.push( person3, 3 )
+				.execute();
 
 		Transaction transaction = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( "providedidentry.name", TestConstants.standardAnalyzer );
-		Query luceneQuery = parser.parse( "Goat" );
-
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
 		//needs it. So we use plain HSQuery
-
-		HSQuery query = getExtendedSearchIntegrator().createHSQuery( luceneQuery, ProvidedIdEntry.class );
-
-		assertEquals( 3, query.queryResultSize() );
+		helper.assertThat( "providedidentry.name", "goat" )
+				.from( ProvidedIdEntry.class )
+				.hasResultSize( 3 );
 
 		transaction.commit();
 		getSession().close();

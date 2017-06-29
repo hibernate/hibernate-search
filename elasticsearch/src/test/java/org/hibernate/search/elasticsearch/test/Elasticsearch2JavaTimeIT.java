@@ -25,11 +25,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import org.hibernate.Transaction;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -38,7 +33,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearch2Client;
 import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -54,17 +50,12 @@ import com.google.gson.JsonObject;
 public class Elasticsearch2JavaTimeIT extends SearchTestBase {
 
 	@Rule
-	public TestElasticsearch2Client elasticsearchClient = new TestElasticsearch2Client();
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
 
-	@After
-	public void deleteEntity() {
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.delete( s.load( Sample.class, 1L ) );
-			s.flush();
-			tx.commit();
-		}
-	}
+	@Rule
+	public final TestElasticsearch2Client elasticsearchClient = new TestElasticsearch2Client();
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testLocalDate() throws Exception {
@@ -259,40 +250,29 @@ public class Elasticsearch2JavaTimeIT extends SearchTestBase {
 
 	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceAndFieldValue) throws IOException {
 		assertThatFieldIsFormatted( sample, field, expectedSourceAndFieldValue, expectedSourceAndFieldValue );
-
 	}
 
 	private void assertThatFieldIsFormatted(Sample sample, String fieldName, String expectedSourceValue, String expectedFieldValue) throws IOException {
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.persist( sample );
-			s.flush();
-			tx.commit();
+		helper.add( sample, sample.id );
 
-			String documentId = String.valueOf( sample.id );
-			JsonObject source = elasticsearchClient.type( Sample.class ).document( documentId ).getSource();
-			JsonElement storedField = elasticsearchClient.type( Sample.class ).document( documentId ).getStoredField( fieldName );
+		String documentId = String.valueOf( sample.id );
+		JsonObject source = elasticsearchClient.type( Sample.class ).document( documentId ).getSource();
+		JsonElement storedField = elasticsearchClient.type( Sample.class ).document( documentId ).getStoredField( fieldName );
 
-			assertEquals( "Unexpected '_source' value", expectedSourceValue,
-					source.get( fieldName ).getAsString() );
-			assertEquals( "Unexpected 'fields' value", expectedFieldValue,
-					storedField.getAsJsonArray().get( 0 ).getAsString() );
-		}
+		assertEquals( "Unexpected '_source' value", expectedSourceValue,
+				source.get( fieldName ).getAsString() );
+		assertEquals( "Unexpected 'fields' value", expectedFieldValue,
+				storedField.getAsJsonArray().get( 0 ).getAsString() );
 	}
 
-	@Entity
 	@Indexed
-	static class Sample {
-
-		public Sample() {
-		}
+	private static class Sample {
 
 		public Sample(long id, String description) {
 			this.id = id;
 			this.description = description;
 		}
 
-		@Id
 		@DocumentId
 		long id;
 
@@ -302,7 +282,6 @@ public class Elasticsearch2JavaTimeIT extends SearchTestBase {
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalDate localDate;
 
-		@Column(name = "LOCAL_TIME") // localTime is a special keywork for some db
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalTime localTime;
 

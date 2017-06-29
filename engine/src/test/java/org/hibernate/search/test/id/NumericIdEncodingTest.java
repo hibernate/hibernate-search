@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.test.id;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
 import org.apache.lucene.search.NumericRangeQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -17,15 +13,11 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -37,15 +29,18 @@ import org.junit.Test;
 public class NumericIdEncodingTest {
 
 	@Rule
-	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Staff.class );
+	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Staff.class );
+
+	private final SearchITHelper helper = new SearchITHelper( factoryHolder );
 
 	@Test
 	public void testNumericIdRangeQuery() {
-		storeTestingData( new Staff( 1l, "One" ),
+		helper.index(
+				new Staff( 1l, "One" ),
 				new Staff( 2l, "Two" ),
 				new Staff( 3l, "Three" ),
 				new Staff( 4l, "Four" )
-			);
+		);
 
 		NumericRangeQuery<Long> smallRangeQuery = NumericRangeQuery.newLongRange( "id", 1l, 3l, false, false );
 		expectedProjections( smallRangeQuery, "Two" );
@@ -56,26 +51,13 @@ public class NumericIdEncodingTest {
 
 	private void expectedProjections(NumericRangeQuery<Long> numericRangeQuery, String... expectedProjections) {
 		SearchIntegrator searchFactory = factoryHolder.getSearchFactory();
-		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( Staff.class ).get();
+		QueryBuilder queryBuilder = helper.queryBuilder( Staff.class );
 		HSQuery hsQuery = searchFactory.createHSQuery( numericRangeQuery, Staff.class )
 				.projection( "name" )
 				.sort( queryBuilder.sort().byField( "idSort" ).createSort() );
-		List<EntityInfo> result = hsQuery.queryEntityInfos();
-		assertEquals( expectedProjections.length, result.size() );
-		assertEquals( expectedProjections.length, hsQuery.queryResultSize() );
-		for ( int i = 0; i < expectedProjections.length; i++ ) {
-			assertEquals( expectedProjections[i], result.get( i ).getProjection()[0] );
-		}
-	}
-
-	private void storeTestingData(Staff... testData) {
-		Worker worker = factoryHolder.getSearchFactory().getWorker();
-		TransactionContextForTest tc = new TransactionContextForTest();
-		for ( int i = 0; i < testData.length; i++ ) {
-			Staff p = testData[i];
-			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc );
-		}
-		tc.end();
+		helper.assertThat( hsQuery )
+				.matchesExactlySingleProjections( expectedProjections )
+				.hasResultSize( expectedProjections.length );
 	}
 
 	@Indexed

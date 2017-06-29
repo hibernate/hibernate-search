@@ -18,8 +18,6 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -28,7 +26,8 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SearchITHelper.EntityInstanceWorkContext;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,7 +44,9 @@ public class ElasticsearchScrollingIT {
 	private static final int DEFAULT_MAX_RESULT_WINDOW = 10000;
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedObject.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedObject.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void searchBeforeMaxResultWindow() throws Exception {
@@ -120,7 +121,7 @@ public class ElasticsearchScrollingIT {
 	}
 
 	private QueryBuilder builder() {
-		return sfHolder.getSearchFactory().buildQueryBuilder().forEntity( IndexedObject.class ).get();
+		return helper.queryBuilder( IndexedObject.class );
 	}
 
 	private HSQuery getQuery(Query luceneQuery) {
@@ -132,12 +133,11 @@ public class ElasticsearchScrollingIT {
 	}
 
 	private void generateData(int firstId, int count) throws Exception {
-		TransactionContextForTest tc = new TransactionContextForTest();
+		EntityInstanceWorkContext executor = helper.add();
 		for ( int id = firstId; id < firstId + count; ++id ) {
-			Work work = new Work( new IndexedObject( id ), id, WorkType.ADD, false );
-			sfHolder.getSearchFactory().getWorker().performWork( work, tc );
+			executor.push( new IndexedObject( id ), id );
 		}
-		tc.end();
+		executor.execute();
 	}
 
 	@Indexed

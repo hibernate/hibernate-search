@@ -86,7 +86,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 	}
 
 	@Indexed
-	@Entity
+	@Entity(name = "containing")
 	private static class Containing {
 		@Id
 		@GeneratedValue
@@ -111,7 +111,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 	 * This entity doesn't carry any Search specific annotation,
 	 * but its superclass does.
 	 */
-	@Entity
+	@Entity(name = "contained")
 	private static class Contained extends AbstractContained {
 		@Id
 		@GeneratedValue

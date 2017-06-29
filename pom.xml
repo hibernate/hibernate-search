@@ -1887,13 +1887,14 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             ###################################################################
         -->
 
-        <!-- The MySQL 5.1 test envionment -->
+        <!-- The MySQL 5.1 test environment -->
         <profile>
             <id>mysql51</id>
             <dependencies>
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
+                    <!-- Version 6.0.5 fails with a ArrayIndexOutOfBoundsException during connection, so we'll stick to 5.x for now -->
                     <version>5.1.13</version>
                     <scope>test</scope>
                 </dependency>
@@ -1913,14 +1914,14 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <id>postgresql84</id>
             <dependencies>
                 <dependency>
-                    <groupId>postgresql</groupId>
+                    <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>9.0-801.jdbc4</version>
+                    <version>42.1.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
-                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.PostgreSQL82Dialect</db.dialect>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
@@ -1936,7 +1937,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <dependency>
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>9.3-1103-jdbc41</version>
+                    <version>42.1.1</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
@@ -1975,11 +1977,19 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             Then, those with commercial drivers
             ###################################################################
         -->
+        <!--
+             Those drivers are not available on public repos.
+             In CI jobs, we use internal build tools to fetch the drivers
+             and make the jars available to the build.
+             Thus, the maven coordinates of the drivers below are fake.
+             See https://svn.devel.redhat.com/repos/jboss-qa/hudson/config_repository/scripts/groovy.classes/hudson/util/JDBCLoader.groovy
+        -->
 
-        <!-- The DB2 9.7 test envionment (using 9x drivers)-->
+        <!-- The DB2 9.7 test environment (using 9x drivers)-->
         <profile>
             <id>db2-97</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>db2-97</artifactId>
@@ -1997,10 +2007,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </properties>
         </profile>
 
-        <!-- The Oracle11g test envionment -->
+        <!-- The Oracle11g test environment -->
         <profile>
             <id>oracle11gR1</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>oracle</artifactId>
@@ -2021,6 +2032,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>oracle11gR2</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>oracle</artifactId>
@@ -2038,10 +2050,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </properties>
         </profile>
 
-        <!-- The Oracle11gRAC test envionment -->
+        <!-- The Oracle11gRAC test environment -->
         <profile>
             <id>oracle11gR1RAC</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>oracle</artifactId>
@@ -2063,6 +2076,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>oracle11gR2RAC</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>oracle</artifactId>
@@ -2086,6 +2100,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>sybase155</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>sybase</artifactId>
@@ -2105,6 +2120,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>sybase155-jtds</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
@@ -2126,6 +2142,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>mssql2008R1</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>mssql</artifactId>
@@ -2147,6 +2164,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>mssql2008R2</id>
             <dependencies>
+                <!-- These maven coordinates are fake (see above) -->
                 <dependency>
                     <groupId>jdbcdrivers</groupId>
                     <artifactId>mssql</artifactId>

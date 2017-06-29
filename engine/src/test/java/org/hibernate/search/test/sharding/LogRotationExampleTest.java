@@ -15,26 +15,24 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.junit.Assert;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.store.ShardIdentifierProvider;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SearchITHelper.AssertHSQueryContext;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -67,8 +65,10 @@ import org.junit.Test;
 public class LogRotationExampleTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( LogMessage.class )
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( LogMessage.class )
 		.withProperty( "hibernate.search.logs.sharding_strategy", LogMessageShardingStrategy.class.getName() );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void filtersTest() {
@@ -87,24 +87,22 @@ public class LogRotationExampleTest {
 		storeLog( makeTimestamp( 2013, 10, 7, 10, 30 ), "Check my Infinispan pull requests from the weekend, cleanup git branches" );
 		storeLog( makeTimestamp( 2013, 10, 7, 22, 00 ), "Implementing LogMessageShardingStrategy" );
 
-		QueryBuilder logsQueryBuilder = searchFactory.buildQueryBuilder()
-				.forEntity( LogMessage.class )
-				.get();
+		QueryBuilder logsQueryBuilder = helper.queryBuilder( LogMessage.class );
 
 		Query allLogs = logsQueryBuilder.all().createQuery();
 
-		Assert.assertEquals( 11, queryAndFilter( allLogs, 0, 24 ) );
-		Assert.assertEquals( 0, queryAndFilter( allLogs, 2, 5 ) );
-		Assert.assertEquals( 1, queryAndFilter( allLogs, 2, 8 ) );
-		Assert.assertEquals( 3, queryAndFilter( allLogs, 0, 10 ) );
+		assertQuery( allLogs, 0, 24 ).hasResultSize( 11 );
+		assertQuery( allLogs, 2, 5 ).hasResultSize( 0 );
+		assertQuery( allLogs, 2, 8 ).hasResultSize( 1 );
+		assertQuery( allLogs, 0, 10 ).hasResultSize( 3 );
 
 		deleteLog( makeTimestamp( 2013, 10, 7, 9, 00 ) );
-		Assert.assertEquals( 10, queryAndFilter( allLogs, 0, 24 ) );
+		assertQuery( allLogs, 0, 24 ).hasResultSize( 10 );
 
 		Assert.assertEquals( 24, searchFactory.getIndexManagerHolder().getIndexManagers().size() );
 	}
 
-	private int queryAndFilter(Query luceneQuery, int fromHour, int toHour) {
+	private AssertHSQueryContext assertQuery(Query luceneQuery, int fromHour, int toHour) {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		HSQuery hsQuery = searchFactory.createHSQuery( luceneQuery, LogMessage.class );
 		hsQuery
@@ -112,30 +110,21 @@ public class LogRotationExampleTest {
 				.setParameter( "from", Integer.valueOf( fromHour ) )
 				.setParameter( "to", Integer.valueOf( toHour ) )
 			;
-		return hsQuery.queryResultSize();
+
+		return helper.assertThat( hsQuery );
 	}
 
 	private void storeLog(long timestamp, String message) {
 		LogMessage log = new LogMessage();
 		log.timestamp = timestamp;
 		log.message = message;
-
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		Work work = new Work( log, log.timestamp, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( log );
 	}
 
 	private void deleteLog(long timestamp) {
 		LogMessage log = new LogMessage();
 		log.timestamp = timestamp;
-
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		Work work = new Work( new PojoIndexedTypeIdentifier( LogMessage.class ), log.timestamp, WorkType.DELETE );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.delete( LogMessage.class, log.timestamp );
 	}
 
 	/**

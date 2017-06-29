@@ -6,26 +6,15 @@
  */
 package org.hibernate.search.test.embedded.path;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.junit.Rule;
 import org.junit.Test;
 
 
@@ -36,69 +25,53 @@ import org.junit.Test;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-2547")
-public class DefaultPathsWithNestedIndexedEmbeddedTest extends SearchTestBase {
+public class DefaultPathsWithNestedIndexedEmbeddedTest {
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { A.class, B.class, C.class };
-	}
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( A.class, B.class, C.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testIndexAndSearch() {
-		try (Session session = openSession()) {
-			FullTextSession fts = Search.getFullTextSession( session );
+		A a = new A();
+		a.id = 0L;
+		a.foo = "someValue";
+		B b = new B();
+		b.a = a;
+		b.id = 1L;
+		C c = new C();
+		c.b = b;
+		c.id = 2L;
+		helper.add( c );
 
-			Transaction tx = fts.beginTransaction();
-			A a = new A();
-			a.foo = "someValue";
-			B b = new B();
-			b.a = a;
-			C c = new C();
-			c.b = b;
-			fts.persist( a );
-			fts.persist( b );
-			fts.persist( c );
-			tx.commit();
-			fts.clear();
-
-			tx = fts.beginTransaction();
-			Query query = new TermQuery( new Term( "b.a.foo", a.foo ) );
-			assertEquals( 1, fts.createFullTextQuery( query, C.class ).getResultSize() );
-			tx.commit();
-			fts.clear();
-		}
+		helper.assertThat( "b.a.foo", a.foo )
+				.from( C.class )
+				.hasResultSize( 1 );
 	}
 
-	@Entity
 	@Indexed
 	private static class A {
-		@Id
-		@GeneratedValue
+		@DocumentId
 		private Long id;
 
 		@Field(analyze = Analyze.NO)
 		private String foo;
 	}
 
-	@Entity
 	private static class B {
-		@Id
-		@GeneratedValue
+		@DocumentId
 		private Long id;
 
-		@OneToOne
 		@IndexedEmbedded(includePaths = "foo") // Include only "a.foo"
 		private A a;
 	}
 
-	@Entity
 	@Indexed
 	private static class C {
-		@Id
-		@GeneratedValue
+		@DocumentId
 		private Long id;
 
-		@OneToOne
 		@IndexedEmbedded // Include every field of "b"
 		private B b;
 	}

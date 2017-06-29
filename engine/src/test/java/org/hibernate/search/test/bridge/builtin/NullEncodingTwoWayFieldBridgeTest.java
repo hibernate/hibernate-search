@@ -12,19 +12,15 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.junit.Assert;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,26 +34,23 @@ import org.junit.Test;
 public class NullEncodingTwoWayFieldBridgeTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class )
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class )
 		.withProperty( org.hibernate.search.cfg.Environment.DEFAULT_NULL_TOKEN, "-1" );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testIndexingWithNullEncodingFieldBridge() {
-		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Sample entity = new Sample();
 		entity.id = 1;
 		entity.description = "null date";
 		entity.deletionDate = null; // should trigger the marker token
-		Work work = new Work( entity, entity.id, WorkType.ADD, false );
-		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
-		tc.end();
+		helper.add( entity );
 
 		Query termQuery = NumericFieldUtils.createExactMatchQuery( "deletionDate", Long.parseLong( "-1" ) );
-		int queryResultSize = searchFactory
-					.createHSQuery( termQuery, Sample.class )
-					.queryResultSize();
-		Assert.assertEquals( 1, queryResultSize );
+		helper.assertThat( termQuery )
+				.from( Sample.class )
+				.hasResultSize( 1 );
 	}
 
 	@Indexed

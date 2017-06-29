@@ -23,9 +23,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -35,8 +32,8 @@ import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,9 +56,11 @@ public class CustomTypeMetadataSortingTest {
 	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( PropertySet.class, ExtendedPropertySet.class, Person.class )
 			.withProperty( Environment.INDEX_UNINVERTING_ALLOWED, "true" );
 
+	private final SearchITHelper helper = new SearchITHelper( factoryHolder );
+
 	@Test
 	public void undeclaredSortableField_defaultMetadata() {
-		storeTestingData(
+		helper.index(
 				new PropertySet( 0 )
 						.put( "firstName", "Aaron" )
 						.put( "lastName", "Zahnd" )
@@ -90,7 +89,7 @@ public class CustomTypeMetadataSortingTest {
 
 	@Test
 	public void undeclaredSortableField_incorrectCustomMetadata() {
-		storeTestingData(
+		helper.index(
 				new PropertySet( 0 )
 						.put( "firstName", "Aaron" )
 						.put( "lastName", "Zahnd" )
@@ -125,7 +124,7 @@ public class CustomTypeMetadataSortingTest {
 
 	@Test
 	public void undeclaredSortableField_correctCustomMetadata() {
-		storeTestingData(
+		helper.index(
 				new PropertySet( 0 )
 						.put( "firstName", "Aaron" )
 						.put( "lastName", "Zahnd" )
@@ -153,22 +152,8 @@ public class CustomTypeMetadataSortingTest {
 				.containsExactly( 2, 1, 0 );
 	}
 
-	private void storeTestingData(Identifiable... testData) {
-		Worker worker = factoryHolder.getSearchFactory().getWorker();
-		TransactionContextForTest tc = new TransactionContextForTest();
-		for ( int i = 0; i < testData.length; i++ ) {
-			Identifiable identifiable = testData[i];
-			worker.performWork( new Work( identifiable, identifiable.getId(), WorkType.INDEX ), tc );
-		}
-		tc.end();
-	}
-
-	private interface Identifiable {
-		int getId();
-	}
-
 	@Indexed(index = "propertySet")
-	private static class PropertySet implements Identifiable {
+	private static class PropertySet {
 
 		@DocumentId
 		int id;
@@ -178,11 +163,6 @@ public class CustomTypeMetadataSortingTest {
 
 		public PropertySet(int id) {
 			this.id = id;
-		}
-
-		@Override
-		public int getId() {
-			return id;
 		}
 
 		public PropertySet put(String name, String value) {
@@ -199,7 +179,7 @@ public class CustomTypeMetadataSortingTest {
 	}
 
 	@Indexed(index = "person")
-	private static class Person implements Identifiable {
+	private static class Person {
 		@DocumentId
 		int id;
 
@@ -210,11 +190,6 @@ public class CustomTypeMetadataSortingTest {
 		public Person(int id, String firstName) {
 			this.id = id;
 			this.firstName = firstName;
-		}
-
-		@Override
-		public int getId() {
-			return id;
 		}
 	}
 
