@@ -37,7 +37,7 @@ public class Elasticsearch52SchemaTranslator extends Elasticsearch50SchemaTransl
 		// Keyword fields cannot be analyzed, but they can still be normalized
 		if ( DataType.KEYWORD.equals( type ) && analyzerReference != null ) {
 			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
-				log.analyzerIsNotElasticsearch( mappingBuilder.getBeanClass(), propertyPath, analyzerReference );
+				log.analyzerIsNotElasticsearch( mappingBuilder.getTypeIdentifier(), propertyPath, analyzerReference );
 			}
 			else {
 				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );

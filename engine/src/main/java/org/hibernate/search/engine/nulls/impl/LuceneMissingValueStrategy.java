@@ -51,7 +51,7 @@ public class LuceneMissingValueStrategy implements MissingValueStrategy {
 			return new LuceneDoubleNullMarkerCodec( nullMarker );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( entityType.getName(), fieldMetadata.getPath().getAbsoluteName(),
+			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getAbsoluteName(),
 					nullEncoded.getClass() );
 		}
 	}

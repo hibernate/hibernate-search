@@ -238,7 +238,7 @@ public class MoreLikeThisBuilder<T> {
 			if ( fieldMetadata == null ) {
 				throw log.unknownFieldNameForMoreLikeThisQuery(
 						fieldContext.getField(),
-						documentBuilder.getBeanClass().getName()
+						documentBuilder.getTypeIdentifier()
 				);
 			}
 			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;

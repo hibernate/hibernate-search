@@ -18,7 +18,9 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidat
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
+import org.hibernate.search.util.logging.impl.IndexedTypeIdentifierFormatter;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -40,7 +42,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 1,
 			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is not mapped to an Elasticsearch index")
-	SearchException cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(@FormatWith(ClassFormatter.class) Class<?> entityType, String query);
+	SearchException cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String query);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 2,
 			value = "Lucene query '%1$s' cannot be transformed into equivalent Elasticsearch query" )
@@ -73,7 +75,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
 			value = "Field '%2$s' in '%1$s' requires an Elasticsearch analyzer reference (got '%3$s' instead). The analyzer will be ignored.")
-	void analyzerIsNotElasticsearch(@FormatWith(ClassFormatter.class) Class<?> entityType, String fieldName, AnalyzerReference analyzerReference);
+	void analyzerIsNotElasticsearch(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldName, AnalyzerReference analyzerReference);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 10,
 			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green';\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
@@ -118,7 +120,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ "If you used a custom field bridge, make sure it implements MetadataProvidingFieldBridge"
 					+ " and provides metadata for this field."
 	)
-	SearchException unexpectedNumericEncodingType(String entityType, String fieldName);
+	SearchException unexpectedNumericEncodingType(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 20,
 			value = "Could not create mapping for entity type %1$s"
@@ -183,7 +185,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 32,
 			value = "@DynamicBoost is not supported with Elasticsearch. Ignoring boost strategy '%1$s' for entity '%2$s' (field path '%3$s')."
 	)
-	void unsupportedDynamicBoost(Class<?> boostStrategyType, Class<?> entityType, String fieldPath);
+	void unsupportedDynamicBoost(Class<?> boostStrategyType, @FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldPath);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 33,
 			value = "An Elasticsearch schema validation failed: %1$s"
@@ -209,7 +211,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " if that's the case, please set either @IndexedEmbedded.prefix or @Field.name to a custom value"
 					+ " different from the default to resolve the conflict."
 	)
-	SearchException fieldIsBothCompositeAndConcrete(Class<?> entityType, String fieldPath);
+	SearchException fieldIsBothCompositeAndConcrete(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldPath);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 37,
 			value = "The 'indexNullAs' property for Period fields must represent a date interval in ISO-8601"
@@ -301,7 +303,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " This is not supported with the Elasticsearch indexing service: please only add suffixes to the name"
 					+ " passed as a parameter to the various bridge methods and never ignore this name."
 	)
-	SearchException indexedEmbeddedPrefixBypass(Class<?> entityType, String fieldPath, String expectedParent);
+	SearchException indexedEmbeddedPrefixBypass(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldPath, String expectedParent);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 55,
 			value = "The same tokenizer name '%1$s' is assigned to multiple definitions. The tokenizer names must be unique."

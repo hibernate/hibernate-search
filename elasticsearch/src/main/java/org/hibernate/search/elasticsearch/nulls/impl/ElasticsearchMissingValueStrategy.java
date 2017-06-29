@@ -65,7 +65,7 @@ public final class ElasticsearchMissingValueStrategy implements MissingValueStra
 			return new ElasticsearchBooleanNullMarkerCodec( nullMarker );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( entityType.getName(), fieldMetadata.getPath().getRelativeName(),
+			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getRelativeName(),
 					nullEncoded.getClass() );
 		}
 	}

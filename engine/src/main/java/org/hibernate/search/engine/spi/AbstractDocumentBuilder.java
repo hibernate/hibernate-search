@@ -116,14 +116,6 @@ public abstract class AbstractDocumentBuilder {
 	 * @deprecated use {@link #getTypeMetadata()}
 	 */
 	@Deprecated
-	public Class<?> getBeanClass() {
-		return beanClass;
-	}
-
-	/**
-	 * @deprecated use {@link #getTypeMetadata()}
-	 */
-	@Deprecated
 	public XClass getBeanXClass() {
 		return beanXClass;
 	}

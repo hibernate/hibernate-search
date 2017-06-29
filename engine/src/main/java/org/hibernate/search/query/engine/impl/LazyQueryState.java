@@ -127,7 +127,7 @@ public final class LazyQueryState implements Closeable {
 		Set<String> numericEncodedFieldNames = new HashSet<>();
 		for ( EntityIndexBinding binding : targetedEntityBindings ) {
 			IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor(
-					binding.getDocumentBuilder().getBeanClass()
+					binding.getDocumentBuilder().getTypeIdentifier()
 			);
 			// get the field contributions from the type (class bridges)
 			for ( FieldDescriptor fieldDescriptor : indexedTypeDescriptor.getIndexedFields() ) {

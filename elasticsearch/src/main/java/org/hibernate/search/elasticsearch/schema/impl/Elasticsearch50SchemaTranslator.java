@@ -99,7 +99,7 @@ public class Elasticsearch50SchemaTranslator extends Elasticsearch2SchemaTransla
 		// Only text fields can be analyzed
 		if ( DataType.TEXT.equals( type ) && analyzerReference != null ) {
 			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
-				log.analyzerIsNotElasticsearch( mappingBuilder.getBeanClass(), propertyPath, analyzerReference );
+				log.analyzerIsNotElasticsearch( mappingBuilder.getTypeIdentifier(), propertyPath, analyzerReference );
 			}
 			else {
 				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );

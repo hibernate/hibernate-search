@@ -420,7 +420,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		for ( EntityIndexBinding entityIndexBinding : targetedEntityBindingsByName.values() ) {
 			DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-			Class<?> clazz = builder.getBeanClass();
+			Class<?> clazz = builder.getTypeIdentifier().getPojoType();
 			searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 			if ( builder.getIdFieldName() != null ) {
 				idFieldNames.add( builder.getIdFieldName() );

@@ -18,6 +18,7 @@ import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor.Consu
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -109,7 +110,7 @@ final class ElasticsearchMappingBuilder {
 			}
 
 			if ( ! DataType.OBJECT.equals( childPropertyMapping.getType() ) ) {
-				throw LOG.fieldIsBothCompositeAndConcrete( getBeanClass(), extractor.getLastComponentAbsolutePath() );
+				throw LOG.fieldIsBothCompositeAndConcrete( getTypeIdentifier(), extractor.getLastComponentAbsolutePath() );
 			}
 
 			currentElasticsearchMapping = childPropertyMapping;
@@ -164,7 +165,7 @@ final class ElasticsearchMappingBuilder {
 			DataType conflictingPropertyType = conflictingProperty.getType();
 			DataType newPropertyType = propertyMapping.getType();
 			if ( conflictingPropertyType.isComposite() != newPropertyType.isComposite() ) {
-				throw LOG.fieldIsBothCompositeAndConcrete( getBeanClass(), absolutePath );
+				throw LOG.fieldIsBothCompositeAndConcrete( getTypeIdentifier(), absolutePath );
 			}
 			/*
 			 * Other conflicts are ignored because the users *may* make them work if
@@ -192,7 +193,7 @@ final class ElasticsearchMappingBuilder {
 			return newExtractor;
 		}
 		catch (ParentPathMismatchException e) {
-			throw LOG.indexedEmbeddedPrefixBypass( getBeanClass(), e.getMismatchingPath(), e.getExpectedParentPath() );
+			throw LOG.indexedEmbeddedPrefixBypass( getTypeIdentifier(), e.getMismatchingPath(), e.getExpectedParentPath() );
 		}
 	}
 
@@ -218,7 +219,8 @@ final class ElasticsearchMappingBuilder {
 		}
 	}
 
-	public Class<?> getBeanClass() {
-		return binding.getDocumentBuilder().getBeanClass();
+	public IndexedTypeIdentifier getTypeIdentifier() {
+		return binding.getDocumentBuilder().getTypeIdentifier();
 	}
+
 }

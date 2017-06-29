@@ -295,7 +295,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		for ( IndexManager indexManager : indexManagers ) {
 			if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 				throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
-					binding.getDocumentBuilder().getBeanClass(),
+					binding.getDocumentBuilder().getTypeIdentifier(),
 					rawSearchPayload.toString()
 				);
 			}
@@ -936,7 +936,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					tmp.add( new DoubleField( absoluteName, jsonValue.getAsDouble(), Store.NO ) );
 					break;
 				case UNKNOWN_NUMERIC:
-					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType().getName(), absoluteName );
+					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType(), absoluteName );
 				case BOOLEAN:
 					tmp.add( new StringField( absoluteName, String.valueOf( jsonValue.getAsBoolean() ), Store.NO ) );
 					break;
@@ -962,7 +962,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				case DOUBLE:
 					return jsonValue.getAsDouble();
 				case UNKNOWN_NUMERIC:
-					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType().getName(), absoluteName );
+					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType(), absoluteName );
 				case BOOLEAN:
 					return jsonValue.getAsBoolean();
 				default:

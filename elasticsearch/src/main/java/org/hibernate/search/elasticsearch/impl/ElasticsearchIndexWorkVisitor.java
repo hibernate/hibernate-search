@@ -338,7 +338,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 			}
 		}
 		catch (ParentPathMismatchException e) {
-			throw LOG.indexedEmbeddedPrefixBypass( indexBinding.getDocumentBuilder().getBeanClass(),
+			throw LOG.indexedEmbeddedPrefixBypass( indexBinding.getDocumentBuilder().getTypeIdentifier(),
 					e.getMismatchingPath(), e.getExpectedParentPath() );
 		}
 		catch (UnexpectedJsonElementTypeException e) {
@@ -347,7 +347,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 			JsonElement actualValue = e.getActualElement();
 
 			if ( expectedTypes.contains( JsonElementType.OBJECT ) || JsonElementType.OBJECT.isInstance( actualValue ) ) {
-				throw LOG.fieldIsBothCompositeAndConcrete( indexBinding.getDocumentBuilder().getBeanClass(), accessor.getStaticAbsolutePath() );
+				throw LOG.fieldIsBothCompositeAndConcrete( indexBinding.getDocumentBuilder().getTypeIdentifier(), accessor.getStaticAbsolutePath() );
 			}
 			else {
 				throw new AssertionFailure( "Unexpected field naming conflict when indexing;"

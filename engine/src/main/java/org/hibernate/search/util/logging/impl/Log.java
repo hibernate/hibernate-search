@@ -631,7 +631,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidPropertyValue(String value, String property);
 
 	@Message(id = 218, value = "More like this query cannot be created, because the index does not contain a field '%s' for the type '%s" )
-	SearchException unknownFieldNameForMoreLikeThisQuery(String field, String type);
+	SearchException unknownFieldNameForMoreLikeThisQuery(String field, @FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier type);
 
 	@Message(id = 219, value = "Could not lookup initial JNDI context for the JMS ConnectionFactory named '%s' for the index '%s" )
 	SearchException jmsInitialContextException(String jmsConnectionFactoryName, String indexName, @Cause Exception e);
@@ -974,7 +974,7 @@ public interface Log extends BasicLogger {
 	SearchException indexNamesCollisionDetected(String string);
 
 	@Message(id = 327, value = "Unsupported indexNullAs token type '%3$s' on field '%2$s' of entity '%1$s'." )
-	SearchException unsupportedNullTokenType(String entityName, String fieldName, Class<?> tokenType);
+	SearchException unsupportedNullTokenType(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityName, String fieldName, Class<?> tokenType);
 
 	@Message(id = 328, value = "Cannot create context for class: %1$s" )
 	SearchException cannotCreateBridgeDefinedField(@FormatWith(ClassFormatter.class) Class<?> backend, @Cause Exception e);
