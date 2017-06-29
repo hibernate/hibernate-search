@@ -14,7 +14,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * Launches all the JMH benchmarks within this project.
  * <p>
  * In order to run the benchmarks, generate the JMH benchmark classes by running
- * {@code mvn compile -pl :hibernate-search-engine-performance} from the root dir.
+ * {@code mvn compile -pl :hibernate-search-performance-engine} from the root dir.
  * <p>
  * Refer to the <a href="http://openjdk.java.net/projects/code-tools/jmh/">JMH documentation</a> to learn more about the
  * Java Micro-benchmark Harness in general.
