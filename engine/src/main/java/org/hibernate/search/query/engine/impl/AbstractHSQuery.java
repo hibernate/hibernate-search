@@ -76,9 +76,9 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected transient TimeoutExceptionFactory timeoutExceptionFactory;
 	protected transient TimeoutManagerImpl timeoutManager;
 
-	protected IndexedTypeSet targetedEntities;
-	protected IndexedTypeSet indexedTargetedEntities;
-	private List<CustomTypeMetadata> customTypeMetadata = Collections.emptyList();
+	protected final IndexedTypeSet targetedEntities;
+	protected final IndexedTypeSet indexedTargetedEntities;
+	private final List<CustomTypeMetadata> customTypeMetadata;
 
 	protected Sort sort;
 	protected String tenantId;
@@ -99,9 +99,39 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	 */
 	protected final Map<String, FullTextFilterImpl> filterDefinitions = newHashMap();
 
-	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
+	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet types) {
+		this( extendedIntegrator, types, Collections.emptyList() );
+	}
+
+	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, List<CustomTypeMetadata> types) {
+		this(
+				extendedIntegrator,
+				types.stream()
+						.map( CustomTypeMetadata::getEntityType )
+						.collect( IndexedTypeSets.streamCollector() ),
+				types
+		);
+	}
+
+	private AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet targetedEntities,
+			List<CustomTypeMetadata> customTypeMetadata) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
+		if ( targetedEntities == null ) {
+			targetedEntities = IndexedTypeSets.empty();
+		}
+		this.targetedEntities = targetedEntities;
+		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( targetedEntities );
+		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
+			IndexedTypeSet configuredTargetEntities = extendedIntegrator.getConfiguredTypesPolymorphic( targetedEntities );
+			if ( configuredTargetEntities.isEmpty() ) {
+				throw LOG.targetedEntityTypesNotConfigured( StringHelper.join( targetedEntities, "," ) );
+			}
+			else {
+				throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
+			}
+		}
+		this.customTypeMetadata = customTypeMetadata == null ? Collections.emptyList() : new ArrayList<>( customTypeMetadata );
 	}
 
 	@Override
@@ -121,43 +151,6 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	@Override
 	public HSQuery tenantIdentifier(String tenantId) {
 		this.tenantId = tenantId;
-		return this;
-	}
-
-	@Override
-	public final HSQuery targetedEntities(IndexedTypeSet types) {
-		setTargetedEntities( types == null ? IndexedTypeSets.empty() : types );
-		this.customTypeMetadata = Collections.emptyList();
-		return this;
-	}
-
-	private void setTargetedEntities(IndexedTypeSet queryTarget) {
-		clearCachedResults();
-		this.targetedEntities = queryTarget;
-		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( queryTarget );
-		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
-			IndexedTypeSet configuredTargetEntities = extendedIntegrator.getConfiguredTypesPolymorphic( queryTarget );
-			if ( configuredTargetEntities.isEmpty() ) {
-				throw LOG.targetedEntityTypesNotConfigured( StringHelper.join( targetedEntities, "," ) );
-			}
-			else {
-				throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
-			}
-		}
-	}
-
-	@Override
-	public final HSQuery targetedTypes(List<CustomTypeMetadata> types) {
-		if ( types == null ) {
-			return targetedEntities( null );
-		}
-
-		IndexedTypeSet typesSet = types.stream()
-				.map( CustomTypeMetadata::getEntityType )
-				.collect( IndexedTypeSets.streamCollector() );
-		setTargetedEntities( typesSet );
-		this.customTypeMetadata = new ArrayList<>( types );
-
 		return this;
 	}
 

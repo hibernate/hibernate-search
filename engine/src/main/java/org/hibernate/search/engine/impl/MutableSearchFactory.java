@@ -420,11 +420,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public HSQuery createLuceneBasedHSQuery() {
-		return delegate.createLuceneBasedHSQuery();
-	}
-
-	@Override
 	public OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> indexManagerFilter) {
 		return delegate.createRemoteOperationDispatcher( indexManagerFilter );
 	}

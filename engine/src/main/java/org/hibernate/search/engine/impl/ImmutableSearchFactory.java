@@ -58,7 +58,6 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
-import org.hibernate.search.query.engine.impl.LuceneHSQuery;
 import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
@@ -294,7 +293,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes) {
 		IndexedTypeSet newtypes = IndexedTypeSets.fromClasses( entityTypes );
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, newtypes );
-		return descriptor.createHSQuery( this ).targetedEntities( newtypes );
+		return descriptor.createHSQuery( this, newtypes );
 	}
 
 	@Override
@@ -304,7 +303,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 				.map( CustomTypeMetadata::getEntityType )
 				.collect( IndexedTypeSets.streamCollector() );
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
-		return descriptor.createHSQuery( this ).targetedTypes( typeList );
+		return descriptor.createHSQuery( this, typeList );
 	}
 
 	private QueryDescriptor createQueryDescriptor(Query luceneQuery, IndexedTypeSet entityTypes) {
@@ -752,11 +751,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public LuceneWorkSerializer getWorkSerializerState() {
 		return workSerializer;
-	}
-
-	@Override
-	public HSQuery createLuceneBasedHSQuery() {
-		return new LuceneHSQuery( this );
 	}
 
 	@Override

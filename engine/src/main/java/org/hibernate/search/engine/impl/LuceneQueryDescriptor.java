@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.List;
+
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.query.engine.impl.LuceneHSQuery;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 
 /**
@@ -26,12 +31,15 @@ public class LuceneQueryDescriptor implements QueryDescriptor {
 	}
 
 	@Override
-	public HSQuery createHSQuery(SearchIntegrator integrator) {
+	public HSQuery createHSQuery(SearchIntegrator integrator, IndexedTypeSet types) {
 		ExtendedSearchIntegrator extendedIntegrator = integrator.unwrap( ExtendedSearchIntegrator.class );
-		HSQuery hsQuery = extendedIntegrator.createLuceneBasedHSQuery();
-		hsQuery.luceneQuery( luceneQuery );
+		return new LuceneHSQuery( luceneQuery, extendedIntegrator, types );
+	}
 
-		return hsQuery;
+	@Override
+	public HSQuery createHSQuery(SearchIntegrator integrator, List<CustomTypeMetadata> types) {
+		ExtendedSearchIntegrator extendedIntegrator = integrator.unwrap( ExtendedSearchIntegrator.class );
+		return new LuceneHSQuery( luceneQuery, extendedIntegrator, types );
 	}
 
 	@Override
