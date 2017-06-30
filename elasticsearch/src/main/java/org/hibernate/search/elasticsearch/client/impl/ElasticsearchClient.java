@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.client.impl;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * An Elasticsearch client, allowing to perform requests to a remote cluster.
@@ -15,6 +16,6 @@ import java.io.Closeable;
  */
 public interface ElasticsearchClient extends Closeable {
 
-	ElasticsearchResponse execute(ElasticsearchRequest request);
+	ElasticsearchResponse execute(ElasticsearchRequest request) throws IOException;
 
 }

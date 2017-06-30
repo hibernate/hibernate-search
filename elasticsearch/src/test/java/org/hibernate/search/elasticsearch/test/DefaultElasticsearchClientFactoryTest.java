@@ -51,6 +51,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * @author Yoann Rodiere
@@ -131,6 +132,32 @@ public class DefaultElasticsearchClientFactoryTest {
 	}
 
 	@Test
+	public void unparseable() throws Exception {
+		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
+				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn(
+						elasticsearchResponse()
+						.withBody( "'unparseable" )
+						.withFixedDelay( 2000 )
+				) );
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( "HSEARCH400089" )
+						.causedBy( JsonSyntaxException.class )
+				.build()
+		);
+
+		try ( ElasticsearchClient client = createClient( configuration ) ) {
+			doPost( client, "/myIndex/myType", payload );
+		}
+	}
+
+	@Test
 	public void timeout_read() throws Exception {
 		SearchConfigurationForTest configuration = SearchConfigurationForTest.noTestDefaults()
 				.addProperty( ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
@@ -146,8 +173,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		thrown.expect(
-				isException( SearchException.class )
-						.causedBy( IOException.class )
+				isException( IOException.class )
 				.build()
 		);
 
@@ -172,8 +198,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		thrown.expect(
-				isException( SearchException.class )
-						.causedBy( IOException.class )
+				isException( IOException.class )
 				.build()
 		);
 
@@ -501,7 +526,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		return clientFactory.create( configuration.getProperties() );
 	}
 
-	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
+	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) throws Exception {
 		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.exception.SearchException;
 
@@ -19,11 +18,10 @@ public interface ElasticsearchRequestSuccessAssessor {
 
 	/**
 	 * Check the given response, throwing an exception if the reponse indicates a failure.
-	 * @param request The request whose success is to be assessed.
 	 * @param response The response, containing information about the outcome of the request.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException;
+	void checkSuccess(ElasticsearchResponse response) throws SearchException;
 
 	/**
 	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.

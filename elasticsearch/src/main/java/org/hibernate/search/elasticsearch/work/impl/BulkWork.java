@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -86,10 +86,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 
 			return null;
 		}
-		catch (SearchException e) {
-			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
-		}
-		catch (RuntimeException e) {
+		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed( request, response, e );
 		}
 	}
