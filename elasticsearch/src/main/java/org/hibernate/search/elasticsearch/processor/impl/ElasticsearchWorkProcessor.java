@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
+import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -87,8 +89,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @return The result of the given work.
 	 */
 	public <T> T executeSyncUnsafe(ElasticsearchWork<T> work) {
-		return work.execute( parallelWorkExecutionContext );
+		return doExecuteSyncUnsafe( work, parallelWorkExecutionContext );
 	}
+
 
 	/**
 	 * Execute a set of works synchronously.
@@ -104,7 +107,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
 				client, gsonProvider, workFactory, this, errorHandler );
-		executeSafe( context, works, true );
+		doExecuteSyncSafe( context, works, true );
 		context.flush();
 	}
 
@@ -152,13 +155,13 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param nonBulkedWorks The works to be bulked (as much as possible) and executed
 	 * @param refreshInBulkAPICall The parameter to pass to {@link #createRequestGroups(Iterable, boolean)}.
 	 */
-	private void executeSafe(SequentialWorkExecutionContext context, Iterable<ElasticsearchWork<?>> nonBulkedWorks,
+	private void doExecuteSyncSafe(SequentialWorkExecutionContext context, Iterable<ElasticsearchWork<?>> nonBulkedWorks,
 			boolean refreshInBulkAPICall) {
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( nonBulkedWorks, refreshInBulkAPICall ) ) {
 			try {
-				executeUnsafe( work, context );
+				doExecuteSyncUnsafe( work, context );
 				work.getLuceneWorks().forEach( errorContextBuilder::workCompleted );
 			}
 			catch (BulkRequestFailedException brfe) {
@@ -187,12 +190,18 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		}
 	}
 
-	private void executeUnsafe(ElasticsearchWork<?> work, ElasticsearchWorkExecutionContext context) {
+	private <T> T doExecuteSyncUnsafe(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
 		if ( LOG.isTraceEnabled() ) {
 			LOG.tracef( "Processing %s", work );
 		}
 
-		work.execute( context );
+		// Note: timeout is handled by the client, so this "join" will not last forever
+		try {
+			return work.execute( context ).join();
+		}
+		catch (CompletionException e) {
+			throw Throwables.expectRuntimeException( e.getCause() );
+		}
 	}
 
 	private void handleError(ErrorContextBuilder errorContextBuilder, Throwable e,
@@ -344,7 +353,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 						return;
 					}
 					Iterable<ElasticsearchWork<?>> flattenedWorks = CollectionHelper.flatten( works );
-					executeSafe( context, flattenedWorks, false );
+					doExecuteSyncSafe( context, flattenedWorks, false );
 				}
 			}
 		}

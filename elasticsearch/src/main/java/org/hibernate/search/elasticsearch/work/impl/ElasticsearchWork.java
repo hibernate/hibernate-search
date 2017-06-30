@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -20,7 +21,7 @@ import org.hibernate.search.backend.LuceneWork;
  */
 public interface ElasticsearchWork<T> {
 
-	T execute(ElasticsearchWorkExecutionContext executionContext);
+	CompletableFuture<T> execute(ElasticsearchWorkExecutionContext executionContext);
 
 	void aggregate(ElasticsearchWorkAggregator aggregator);
 

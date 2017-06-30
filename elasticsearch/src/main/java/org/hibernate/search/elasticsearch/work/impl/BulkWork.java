@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -21,6 +21,8 @@ import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
 import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.util.impl.Futures;
+import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -69,26 +71,26 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	}
 
 	@Override
-	public Void execute(ElasticsearchWorkExecutionContext context) {
+	public CompletableFuture<Void> execute(ElasticsearchWorkExecutionContext context) {
+		ElasticsearchWorkExecutionContext actualContext;
 		if ( refreshInAPICall ) {
 			/*
 			 * Prevent bulked works to mark indexes as dirty,
 			 * since we refresh all indexes as part of the Bulk API call.
 			 */
-			context = new NoIndexDirtyBulkExecutionContext( context );
+			actualContext = new NoIndexDirtyBulkExecutionContext( context );
 		}
-
-		ElasticsearchResponse response = null;
-		try {
-			response = context.getClient().execute( request );
-
-			handleResults( context, response );
-
-			return null;
+		else {
+			actualContext = context;
 		}
-		catch (IOException | RuntimeException e) {
-			throw LOG.elasticsearchRequestFailed( request, response, e );
-		}
+		return Futures.create( () -> actualContext.getClient().submit( request ) )
+				.exceptionally( Futures.handler(
+						throwable -> { throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
+				) )
+				.thenApply( response -> {
+					handleResults( actualContext, response );
+					return (Void) null;
+				} );
 	}
 
 	@Override

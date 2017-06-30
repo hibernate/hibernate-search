@@ -475,7 +475,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	protected ElasticsearchResponse performRequest(ElasticsearchRequest request) {
 		ElasticsearchResponse response;
 		try {
-			response = client.execute( request );
+			response = client.submit( request ).join();
 		}
 		catch (Exception e) {
 			throw requestFailed( request, e );
@@ -490,7 +490,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	protected ElasticsearchResponse performRequestIgnore404(ElasticsearchRequest request) {
 		ElasticsearchResponse response;
 		try {
-			response = client.execute( request );
+			response = client.submit( request ).join();
 		}
 		catch (Exception e) {
 			throw requestFailed( request, e );

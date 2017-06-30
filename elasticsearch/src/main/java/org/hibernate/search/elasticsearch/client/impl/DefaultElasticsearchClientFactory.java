@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.client.impl;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -50,7 +51,14 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 	public ElasticsearchClientImplementor create(Properties properties) {
 		RestClient restClient = createClient( properties );
 		Sniffer sniffer = createSniffer( restClient, properties );
-		return new DefaultElasticsearchClient( restClient, sniffer );
+
+		int requestTimeout = ConfigurationParseHelper.getIntValue(
+				properties,
+				ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
+				ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
+		);
+
+		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeout, TimeUnit.MILLISECONDS );
 	}
 
 	private RestClient createClient(Properties properties) {
@@ -62,16 +70,6 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		ServerUris hosts = ServerUris.fromString( serverUrisString );
 
 		return RestClient.builder( hosts.asHostsArray() )
-				/*
-				 * Note: this timeout is not only used on retries,
-				 * but also when executing requests synchronously.
-				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
-				 */
-				.setMaxRetryTimeoutMillis( ConfigurationParseHelper.getIntValue(
-						properties,
-						ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
-						ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
-				) )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( properties, b ) )
 				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( properties, hosts, b ) )
 				.build();

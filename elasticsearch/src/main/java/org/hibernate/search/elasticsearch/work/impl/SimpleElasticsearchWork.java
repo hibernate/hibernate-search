@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -14,6 +14,8 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.impl.Futures;
+import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -23,6 +25,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final CompletableFuture<Void> SUCCESSFUL_FUTURE = CompletableFuture.completedFuture( null );
 
 	protected final ElasticsearchRequest request;
 	private final LuceneWork luceneWork;
@@ -50,37 +54,23 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 	}
 
 	@Override
-	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
-		ElasticsearchResponse response = null;
-		R result;
-
-		try {
-			beforeExecute( executionContext, request );
-			response = executionContext.getClient().execute( request );
-
-			resultAssessor.checkSuccess( response );
-
-			result = generateResult( executionContext, response );
-		}
-		catch (IOException | RuntimeException e) {
-			throw LOG.elasticsearchRequestFailed( request, response, e );
-		}
-
-		if ( markIndexDirty ) {
-			executionContext.setIndexDirty( dirtiedIndexName );
-		}
-
-		afterSuccess( executionContext );
-
-		return result;
+	public final CompletableFuture<R> execute(ElasticsearchWorkExecutionContext executionContext) {
+		return Futures.create( () -> beforeExecute( executionContext, request ) )
+				.thenCompose( ignored -> executionContext.getClient().submit( request ) )
+				.exceptionally( Futures.handler(
+						throwable -> { throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
+				) )
+				.thenCompose( response -> handleResult( executionContext, response ) );
 	}
 
-	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		// Do nothing by default
+		return SUCCESSFUL_FUTURE;
 	}
 
-	protected void afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
+	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
 		// Do nothing by default
+		return SUCCESSFUL_FUTURE;
 	}
 
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response);
@@ -99,6 +89,28 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		else {
 			return Stream.empty();
 		}
+	}
+
+	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {
+		R result;
+		try {
+			resultAssessor.checkSuccess( response );
+
+			result = generateResult( executionContext, response );
+
+			if ( markIndexDirty ) {
+				executionContext.setIndexDirty( dirtiedIndexName );
+			}
+		}
+		catch (RuntimeException e) {
+			throw LOG.elasticsearchRequestFailed( request, response, e );
+		}
+
+		return afterSuccess( executionContext )
+				.exceptionally( Futures.handler(
+						throwable -> { throw LOG.elasticsearchRequestFailed( request, response, Throwables.expectException( throwable ) ); }
+				) )
+				.thenApply( ignored -> result );
 	}
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
