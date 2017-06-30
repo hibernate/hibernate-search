@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
@@ -17,7 +18,6 @@ import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Diale
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -66,15 +66,12 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 			response = client.execute( request );
 
 			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
-				throw log.elasticsearchRequestFailed( request, response, null );
+				throw log.elasticsearchResponseIndicatesFailure();
 			}
 
 			return VERSION_ACCESSOR.get( response.getBody() ).get();
 		}
-		catch (SearchException e) {
-			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
-		}
-		catch (RuntimeException e) {
+		catch (IOException | RuntimeException e) {
 			throw log.elasticsearchRequestFailed( request, response, e );
 		}
 	}

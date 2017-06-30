@@ -58,14 +58,8 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	}
 
 	@Override
-	public ElasticsearchResponse execute(ElasticsearchRequest request) {
-		Response response;
-		try {
-			response = doExecute( request );
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.elasticsearchRequestFailed( request, null, e );
-		}
+	public ElasticsearchResponse execute(ElasticsearchRequest request) throws IOException {
+		Response response = doExecute( request );
 
 		try {
 			JsonObject body = parseBody( response );
@@ -75,11 +69,10 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 					body );
 		}
 		catch (IOException | RuntimeException e) {
-			ElasticsearchResponse partialResponse = new ElasticsearchResponse(
+			throw log.failedToParseElasticsearchResponse(
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
-					null );
-			throw log.elasticsearchRequestFailed( request, partialResponse, e );
+					e );
 		}
 	}
 

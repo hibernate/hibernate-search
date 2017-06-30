@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -13,7 +14,6 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -58,14 +58,11 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 			beforeExecute( executionContext, request );
 			response = executionContext.getClient().execute( request );
 
-			resultAssessor.checkSuccess( request, response );
+			resultAssessor.checkSuccess( response );
 
 			result = generateResult( executionContext, response );
 		}
-		catch (SearchException e) {
-			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
-		}
-		catch (RuntimeException e) {
+		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed( request, response, e );
 		}
 

@@ -63,7 +63,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException cannotQueryOnEmptyPhraseQuery();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
-			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
+			value = "Elasticsearch request failed\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
 	SearchException elasticsearchRequestFailed(
 			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
@@ -85,10 +85,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	void analyzerIsNotElasticsearch(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityType, String fieldName, AnalyzerReference analyzerReference);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 10,
-			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green';\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
-	SearchException elasticsearchRequestTimeout(
-			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
-			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response);
+			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green'" )
+	SearchException elasticsearchRequestTimeout();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 11,
 			value = "Projection of non-JSON-primitive field values is not supported: '%1$s'")
@@ -406,12 +404,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "DeleteByQuery request to Elasticsearch failed with 404 result code."
 					+ "\nPlease check that 1. you installed the delete-by-query plugin on your Elasticsearch nodes"
 					+ " and 2. the targeted index exists"
-					+ "\n Request:\n========\n%1$s"
-					+ "Response:\n=========\n%2$s"
 			)
-	SearchException elasticsearch2RequestDeleteByQueryNotFound(
-			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
-			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response);
+	SearchException elasticsearch2RequestDeleteByQueryNotFound();
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 73,
@@ -490,4 +484,12 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " there are no built-in normalizers in Elasticsearch."
 					+ " Use @Normalizer(definition = \"...\") instead." )
 	SearchException cannotUseNormalizerImpl(@FormatWith(ClassFormatter.class) Class<?> analyzerType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 89,
+			value = "Failed to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'." )
+	SearchException failedToParseElasticsearchResponse(int statusCode, String statusPhrase, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 90,
+			value = "Elasticsearch response indicates a failure." )
+	SearchException elasticsearchResponseIndicatesFailure();
 }
