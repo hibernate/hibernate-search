@@ -51,7 +51,7 @@ public class DefaultElasticsearchDialectFactoryTest {
 	private ElasticsearchClient clientMock;
 
 	@Test
-	public void es0() {
+	public void es0() throws Exception {
 		doMock( "0.90.12" );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400081" );
@@ -60,7 +60,7 @@ public class DefaultElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	public void es10() {
+	public void es10() throws Exception {
 		doMock( "1.0.0" );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400081" );
@@ -69,41 +69,41 @@ public class DefaultElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	public void es20() {
+	public void es20() throws Exception {
 		testSuccess( "2.0.0", Elasticsearch2Dialect.class );
 	}
 
 	@Test
-	public void es24() {
+	public void es24() throws Exception {
 		testSuccess( "2.4.4", Elasticsearch2Dialect.class );
 	}
 
 	@Test
-	public void es50() {
+	public void es50() throws Exception {
 		testSuccess( "5.0.0", Elasticsearch50Dialect.class );
 	}
 
 	@Test
-	public void es52() {
+	public void es52() throws Exception {
 		testSuccess( "5.2.0", Elasticsearch52Dialect.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2748")
-	public void es60() {
+	public void es60() throws Exception {
 		doMock( "6.0.0" );
 		logged.expectMessage( "HSEARCH400085", "'6.0.0'" );
 		ElasticsearchDialect dialect = dialectFactory.createDialect( clientMock, new Properties() );
 		assertThat( dialect ).isInstanceOf( Elasticsearch52Dialect.class );
 	}
 
-	private void testSuccess(String versionString, Class<?> expectedDialectClass) {
+	private void testSuccess(String versionString, Class<?> expectedDialectClass) throws Exception {
 		doMock( versionString );
 		ElasticsearchDialect dialect = dialectFactory.createDialect( clientMock, new Properties() );
 		assertThat( dialect ).isInstanceOf( expectedDialectClass );
 	}
 
-	private void doMock(String versionString) {
+	private void doMock(String versionString) throws Exception {
 		JsonObject responseBody = JsonBuilder.object()
 				.add( "version", JsonBuilder.object()
 						.addProperty( "number", versionString )
