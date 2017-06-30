@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -34,11 +35,11 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		/*
 		 * Refresh the index so as to minimize the risk of version conflict
 		 */
-		refreshWork.execute( executionContext );
+		return refreshWork.execute( executionContext );
 	}
 
 	@Override

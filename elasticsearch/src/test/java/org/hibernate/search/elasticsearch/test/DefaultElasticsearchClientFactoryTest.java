@@ -16,6 +16,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;
 
 import java.io.IOException;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jetty.http.HttpHeader;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
@@ -146,8 +148,9 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( "HSEARCH400089" )
+				isException( CompletionException.class )
+						.causedBy( SearchException.class )
+								.withMessage( "HSEARCH400089" )
 						.causedBy( JsonSyntaxException.class )
 				.build()
 		);
@@ -173,7 +176,8 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		thrown.expect(
-				isException( IOException.class )
+				isException( CompletionException.class )
+						.causedBy( IOException.class )
 				.build()
 		);
 
@@ -198,7 +202,8 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		thrown.expect(
-				isException( IOException.class )
+				isException( CompletionException.class )
+						.causedBy( TimeoutException.class )
 				.build()
 		);
 
@@ -526,8 +531,8 @@ public class DefaultElasticsearchClientFactoryTest {
 		return clientFactory.create( configuration.getProperties() );
 	}
 
-	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) throws Exception {
-		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
+	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
+		return client.submit( buildRequest( ElasticsearchRequest.post(), path, payload ) ).join();
 	}
 
 	private ElasticsearchRequest buildRequest(Builder builder, String path, String payload) {
