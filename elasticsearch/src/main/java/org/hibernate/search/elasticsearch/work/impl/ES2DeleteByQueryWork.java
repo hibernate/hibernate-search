@@ -114,10 +114,10 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
-			this.delegate.checkSuccess( request, response );
+		public void checkSuccess(ElasticsearchResponse response) throws SearchException {
+			this.delegate.checkSuccess( response );
 			if ( response.getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
-				throw LOG.elasticsearch2RequestDeleteByQueryNotFound( request, response );
+				throw LOG.elasticsearch2RequestDeleteByQueryNotFound();
 			}
 		}
 

@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -83,14 +82,14 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	}
 
 	@Override
-	public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
+	public void checkSuccess(ElasticsearchResponse response) throws SearchException {
 		JsonObject body = response.getBody();
 		if ( !isSuccess( response, body ) ) {
 			if ( response.getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
-				throw LOG.elasticsearchRequestTimeout( request, response );
+				throw LOG.elasticsearchRequestTimeout();
 			}
 			else {
-				throw LOG.elasticsearchRequestFailed( request, response, null );
+				throw LOG.elasticsearchResponseIndicatesFailure();
 			}
 		}
 	}
