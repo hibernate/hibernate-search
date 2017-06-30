@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.easymock.Capture;
@@ -70,7 +71,8 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 
 		expect( buildContextMock.getErrorHandler() ).andReturn( errorHandlerMock );
 
-		expect( clientMock.execute( anyObject() ) ).andReturn( new ElasticsearchResponse( 200, "OK", new JsonObject() ) )
+		expect( clientMock.submit( anyObject() ) )
+				.andReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "OK", new JsonObject() ) ) )
 				.anyTimes();
 
 		expect( workFactoryMock.bulk( anyObject() ) ).andAnswer( () -> {
@@ -98,7 +100,7 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		expectLastCall().once();
 
 		ElasticsearchWork<?> work = work( 1 );
-		expect( work.execute( anyObject() ) ).andThrow( new SearchException() );
+		expect( work.execute( anyObject() ) ).andReturn( failedFuture() );
 
 		replay( errorHandlerMock, work );
 
@@ -124,8 +126,8 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		ElasticsearchWork<?> work2 = work( 2 );
 		ElasticsearchWork<?> work3 = work( 3 );
 		ElasticsearchWork<?> work4 = work( 4 );
-		expect( work1.execute( anyObject() ) ).andReturn( null );
-		expect( work2.execute( anyObject() ) ).andThrow( new SearchException() );
+		expect( work1.execute( anyObject() ) ).andReturn( completedFuture() );
+		expect( work2.execute( anyObject() ) ).andReturn( failedFuture() );
 
 		replay( errorHandlerMock, work1, work2, work3, work4 );
 
@@ -176,7 +178,7 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		expectLastCall().once();
 
 		ElasticsearchWork<?> work = work( 1 );
-		expect( work.execute( anyObject() ) ).andThrow( new SearchException() );
+		expect( work.execute( anyObject() ) ).andReturn( failedFuture() );
 
 		replay( errorHandlerMock, work );
 
@@ -199,7 +201,7 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		expectLastCall().once();
 
 		ElasticsearchWork<?> work = work( 1 );
-		expect( work.execute( anyObject() ) ).andThrow( new SearchException() );
+		expect( work.execute( anyObject() ) ).andReturn( failedFuture() );
 
 		replay( errorHandlerMock, work );
 
@@ -226,8 +228,8 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		ElasticsearchWork<?> work2 = work( 2 );
 		ElasticsearchWork<?> work3 = work( 3 );
 		ElasticsearchWork<?> work4 = work( 4 );
-		expect( work1.execute( anyObject() ) ).andReturn( null );
-		expect( work2.execute( anyObject() ) ).andThrow( new SearchException() );
+		expect( work1.execute( anyObject() ) ).andReturn( completedFuture() );
+		expect( work2.execute( anyObject() ) ).andReturn( failedFuture() );
 
 		replay( errorHandlerMock, work1, work2, work3, work4 );
 
@@ -273,6 +275,16 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		assertThat( errorContext.getFailingOperations() )
 				// work4 shouldn't be marked as failed: bulk execution doesn't stop after a failure
 				.containsOnly( luceneWork( 3 ), luceneWork( 5 ) );
+	}
+
+	private <T> CompletableFuture<T> completedFuture() {
+		return CompletableFuture.completedFuture( null );
+	}
+
+	private <T> CompletableFuture<T> failedFuture() {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		future.completeExceptionally( new SearchException() );
+		return future.thenApply( (r) -> { throw new SearchException(); } );
 	}
 
 	private ElasticsearchWork<?> work(int index) {

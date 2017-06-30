@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
@@ -63,7 +62,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 		ElasticsearchRequest request = ElasticsearchRequest.get().build();
 		ElasticsearchResponse response = null;
 		try {
-			response = client.execute( request );
+			response = client.submit( request ).join();
 
 			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
 				throw log.elasticsearchResponseIndicatesFailure();
@@ -71,7 +70,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 
 			return VERSION_ACCESSOR.get( response.getBody() ).get();
 		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw log.elasticsearchRequestFailed( request, response, e );
 		}
 	}

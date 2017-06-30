@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.client.impl;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -48,12 +49,19 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 
 	@Override
 	public ElasticsearchClientImplementor create(Properties properties) {
-		RestClient restClient = createClient( properties );
+		int requestTimeoutMs = ConfigurationParseHelper.getIntValue(
+				properties,
+				ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
+				ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
+		);
+
+		RestClient restClient = createClient( properties, requestTimeoutMs );
 		Sniffer sniffer = createSniffer( restClient, properties );
-		return new DefaultElasticsearchClient( restClient, sniffer );
+
+		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS );
 	}
 
-	private RestClient createClient(Properties properties) {
+	private RestClient createClient(Properties properties, int maxRetryTimeoutMillis) {
 		String serverUrisString = ConfigurationParseHelper.getString(
 				properties,
 				ElasticsearchEnvironment.SERVER_URI,
@@ -63,15 +71,12 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 
 		return RestClient.builder( hosts.asHostsArray() )
 				/*
-				 * Note: this timeout is not only used on retries,
-				 * but also when executing requests synchronously.
+				 * Note: this timeout is currently only used on retries,
+				 * but should we start using the synchronous methods of RestClient,
+				 * it would be applied to synchronous requests too.
 				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
 				 */
-				.setMaxRetryTimeoutMillis( ConfigurationParseHelper.getIntValue(
-						properties,
-						ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
-						ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
-				) )
+				.setMaxRetryTimeoutMillis( maxRetryTimeoutMillis )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( properties, b ) )
 				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( properties, hosts, b ) )
 				.build();
