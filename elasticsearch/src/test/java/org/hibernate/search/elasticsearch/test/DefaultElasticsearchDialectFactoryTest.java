@@ -11,6 +11,7 @@ import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 import org.easymock.EasyMock;
 import org.easymock.EasyMockRunner;
@@ -108,8 +109,8 @@ public class DefaultElasticsearchDialectFactoryTest {
 				.add( "version", JsonBuilder.object()
 						.addProperty( "number", versionString )
 				).build();
-		expect( clientMock.execute( EasyMock.anyObject() ) )
-				.andReturn( new ElasticsearchResponse( 200, "", responseBody ) );
+		expect( clientMock.submit( EasyMock.anyObject() ) )
+				.andReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "", responseBody ) ) );
 		replay( clientMock );
 	}
 

@@ -12,12 +12,17 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
@@ -26,6 +31,8 @@ import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchLogCategorie
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.util.impl.Closer;
+import org.hibernate.search.util.impl.Executors;
+import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -44,11 +51,19 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	private final Sniffer sniffer;
 
+	private final ScheduledExecutorService timeoutExecutorService;
+
+	private final int requestTimeoutValue;
+	private final TimeUnit requestTimeoutUnit;
+
 	private volatile GsonProvider gsonProvider;
 
-	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer) {
+	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
+		this.timeoutExecutorService = Executors.newScheduledThreadPool( "Elasticsearch request timeout executor" );
+		this.requestTimeoutValue = requestTimeoutValue;
+		this.requestTimeoutUnit = requestTimeoutUnit;
 		this.gsonProvider = DialectIndependentGsonProvider.INSTANCE;
 	}
 
@@ -58,9 +73,67 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	}
 
 	@Override
-	public ElasticsearchResponse execute(ElasticsearchRequest request) throws IOException {
-		Response response = doExecute( request );
+	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
+		return Futures.create( () -> send( request ) )
+				.thenApply( response -> convertResponse( request, response ) );
+	}
 
+	private CompletableFuture<Response> send(ElasticsearchRequest request) {
+		Gson gson = gsonProvider.getGson();
+		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
+		long start = System.nanoTime();
+		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+		restClient.performRequestAsync(
+				request.getMethod(),
+				request.getPath(),
+				request.getParameters(),
+				entity,
+				new ResponseListener() {
+					@Override
+					public void onSuccess(Response response) {
+						completableFuture.complete( response );
+					}
+					@Override
+					public void onFailure(Exception exception) {
+						if ( exception instanceof ResponseException ) {
+							requestLog.debug( "ES client issued a ResponseException - not necessarily a problem", exception );
+							/*
+							 * The client tries to guess what's an error and what's not, but it's too naive.
+							 * A 404 on DELETE is not always important to us, for instance.
+							 * Thus we ignore the exception and do our own checks afterwards.
+							 */
+							completableFuture.complete( ( (ResponseException) exception ).getResponse() );
+						}
+						else {
+							completableFuture.completeExceptionally( exception );
+						}
+					}
+				}
+				);
+
+		/*
+		 * TODO maybe the callback should also cancel the request?
+		 * In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
+		 * so we can't do much until this changes.
+		 */
+		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
+				() -> {
+					if ( !completableFuture.isDone() ) {
+						completableFuture.completeExceptionally( new TimeoutException() );
+					}
+				},
+				requestTimeoutValue, requestTimeoutUnit
+				);
+		completableFuture.thenRun( () -> timeout.cancel( false ) );
+
+		return completableFuture.thenApply( response -> {
+					long executionTime = System.nanoTime() - start;
+					requestLog.executedRequest( request.getPath(), request.getParameters(), TimeUnit.NANOSECONDS.toMillis( executionTime ) );
+					return response;
+				} );
+	}
+
+	private ElasticsearchResponse convertResponse(ElasticsearchRequest request, Response response) {
 		try {
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
@@ -73,33 +146,6 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
 					e );
-		}
-	}
-
-	private Response doExecute(ElasticsearchRequest request) throws IOException {
-		Gson gson = gsonProvider.getGson();
-		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
-		long start = System.nanoTime();
-		try {
-			return restClient.performRequest(
-					request.getMethod(),
-					request.getPath(),
-					request.getParameters(),
-					entity
-			);
-		}
-		catch (ResponseException e) {
-			requestLog.debug( "ES client issued a ResponseException - not necessarily a problem", e );
-			/*
-			 * The client tries to guess what's an error and what's not, but it's too naive.
-			 * A 404 on DELETE is not always important to us, for instance.
-			 * Thus we ignore the exception and do our own checks afterwards.
-			 */
-			return e.getResponse();
-		}
-		finally {
-			long executionTime = System.nanoTime() - start;
-			requestLog.executedRequest( request.getPath(), request.getParameters(), TimeUnit.NANOSECONDS.toMillis( executionTime ) );
 		}
 	}
 
@@ -126,6 +172,12 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
+			/*
+			 * There's no point waiting for timeouts: we'll just cancel
+			 * all timeouts and expect the RestClient to cancel all
+			 * currently running requests when closing.
+			 */
+			closer.push( this.timeoutExecutorService::shutdownNow );
 			if ( this.sniffer != null ) {
 				closer.push( this.sniffer::close );
 			}

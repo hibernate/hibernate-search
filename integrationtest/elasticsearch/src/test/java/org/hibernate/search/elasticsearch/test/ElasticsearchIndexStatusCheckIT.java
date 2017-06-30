@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
+import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,9 +98,14 @@ public class ElasticsearchIndexStatusCheckIT extends SearchInitializationTestBas
 
 		elasticSearchClient.index( SimpleEntity.class ).ensureDoesNotExist();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400024" );
-		thrown.expectMessage( "100ms" );
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( "HSEARCH400007" )
+				.causedBy( SearchException.class )
+						.withMessage( "HSEARCH400024" )
+						.withMessage( "100ms" )
+				.build()
+		);
 
 		init( SimpleEntity.class );
 	}
@@ -118,9 +125,14 @@ public class ElasticsearchIndexStatusCheckIT extends SearchInitializationTestBas
 
 		elasticSearchClient.index( SimpleEntity.class ).deleteAndCreate();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400024" );
-		thrown.expectMessage( "100ms" );
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( "HSEARCH400007" )
+				.causedBy( SearchException.class )
+						.withMessage( "HSEARCH400024" )
+						.withMessage( "100ms" )
+				.build()
+		);
 
 		init( SimpleEntity.class );
 	}

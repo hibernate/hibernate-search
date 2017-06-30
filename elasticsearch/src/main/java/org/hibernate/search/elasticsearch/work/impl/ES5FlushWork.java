@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -35,9 +36,8 @@ public class ES5FlushWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected void afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
-		super.afterSuccess( executionContext );
-		refreshWork.execute( executionContext );
+	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
+		return refreshWork.execute( executionContext );
 	}
 
 	@Override
