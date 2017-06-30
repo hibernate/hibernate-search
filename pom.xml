@@ -1790,9 +1790,9 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>elasticsearch-5.2</id>
             <activation>
-                <!-- Activate by default, i.e. if testElasticsearchVersion has not been defined explicitly -->
+                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
                 <property>
-                    <name>!test.elasticsearch.mavenPlugin.version</name>
+                    <name>!test.elasticsearch.host.version</name>
                 </property>
             </activation>
             <properties>
