@@ -21,10 +21,7 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
@@ -132,7 +129,6 @@ public class EntityReader extends AbstractItemReader {
 	private Session session;
 	private StatelessSession ss;
 	private ScrollableResults scroll;
-	private SessionFactory sessionFactory;
 
 	public EntityReader() {
 	}
@@ -209,7 +205,7 @@ public class EntityReader extends AbstractItemReader {
 	 * Initialize the environment. If checkpoint does not exist, then it should be the first open. If checkpoint exists,
 	 * then it isn't the first open, re-use the input object "checkpoint" as the last ID already read.
 	 *
-	 * @param checkpoint The last checkpoint info persisted in the batch runtime, previously given by checkpointInfo().
+	 * @param checkpointId The last checkpoint info persisted in the batch runtime, previously given by checkpointInfo().
 	 * If this is the first start, then the checkpoint will be null.
 	 * @throws Exception thrown for any errors.
 	 */
@@ -218,16 +214,18 @@ public class EntityReader extends AbstractItemReader {
 		log.openingReader( serializedPartitionId, entityName );
 
 		final int partitionId = SerializationUtil.parseIntegerParameter( PARTITION_ID, serializedPartitionId );
-
+		boolean isRestarted = checkpointId != null;
 		JobContextData jobData = getJobContextData();
 
 		PartitionBound bound = getPartitionBound( jobData );
+		if ( isRestarted ) {
+			bound.setLowerBound( checkpointId );
+		}
 		log.printBound( bound );
 
 		emf = jobData.getEntityManagerFactory();
 		ss = PersistenceUtil.openStatelessSession( emf, tenantId );
 		session = PersistenceUtil.openSession( emf, tenantId );
-		sessionFactory = emf.unwrap( SessionFactory.class );
 
 		PartitionContextData partitionData;
 		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
@@ -239,12 +237,12 @@ public class EntityReader extends AbstractItemReader {
 
 			case CRITERIA:
 			case FULL_ENTITY:
-				scroll = buildScrollUsingCriteria( ss, bound, checkpointId, jobData );
-				if ( checkpointId == null ) {
-					partitionData = new PartitionContextData( partitionId, entityName, indexScope );
+				scroll = buildScrollUsingCriteria( ss, bound, jobData );
+				if ( isRestarted ) {
+					partitionData = (PartitionContextData) stepContext.getPersistentUserData();
 				}
 				else {
-					partitionData = (PartitionContextData) stepContext.getPersistentUserData();
+					partitionData = new PartitionContextData( partitionId, entityName, indexScope );
 				}
 				break;
 
@@ -294,34 +292,17 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
-			PartitionBound unit, Object checkpointId, JobContextData jobData) {
+			PartitionBound unit, JobContextData jobData) throws Exception {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		Class<?> entityType = unit.getEntityType();
-		String idName = sessionFactory.getClassMetadata( entityType )
-				.getIdentifierPropertyName();
+		Class<?> entity = unit.getEntityType();
+		Criteria criteria = ss.createCriteria( entity );
 
-		Criteria criteria = ss.createCriteria( entityType );
-
-		// build criteria using checkpoint ID
-		if ( checkpointId != null ) {
-			criteria.add( Restrictions.ge( idName, checkpointId ) );
-		}
+		// build orders for this entity
+		PersistenceUtil.createIdOrders( emf, entity ).forEach( criteria::addOrder );
 
 		// build criteria using partition unit
-		if ( unit.isUniquePartition() ) {
-			// no bounds if the partition unit is unique
-		}
-		else if ( unit.isFirstPartition() ) {
-			criteria.add( Restrictions.lt( idName, unit.getUpperBound() ) );
-		}
-		else if ( unit.isLastPartition() ) {
-			criteria.add( Restrictions.ge( idName, unit.getLowerBound() ) );
-		}
-		else {
-			criteria.add( Restrictions.ge( idName, unit.getLowerBound() ) )
-					.add( Restrictions.lt( idName, unit.getUpperBound() ) );
-		}
+		PersistenceUtil.createCriterionList( emf, unit ).forEach( criteria::add );
 
 		// build criteria using job context data
 		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
@@ -330,8 +311,8 @@ public class EntityReader extends AbstractItemReader {
 			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
 			criteria.setMaxResults( maxResults );
 		}
-		return criteria.addOrder( Order.asc( idName ) )
-				.setReadOnly( true )
+
+		return criteria.setReadOnly( true )
 				.setCacheable( cacheable )
 				.setFetchSize( fetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
