@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,6 +36,7 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
+import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -89,7 +91,13 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @return The result of the given work.
 	 */
 	public <T> T executeSyncUnsafe(ElasticsearchWork<T> work) {
-		return doExecuteSyncUnsafe( work, parallelWorkExecutionContext );
+		try {
+			// Note: timeout is handled by the client, so this "join" will not last forever
+			return executeAsyncUnsafe( work ).join();
+		}
+		catch (CompletionException e) {
+			throw Throwables.expectRuntimeException( e.getCause() );
+		}
 	}
 
 
@@ -112,7 +120,20 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Execute a single work asynchronously.
+	 * Execute a single work asynchronously,
+	 * without bulking it with other asynchronous works,
+	 * and potentially throwing exceptions (the error handler isn't used).
+	 *
+	 * @param work The work to be executed.
+	 * @return The result of the given work.
+	 */
+	public <T> CompletableFuture<T> executeAsyncUnsafe(ElasticsearchWork<T> work) {
+		return start( work, parallelWorkExecutionContext );
+	}
+
+	/**
+	 * Execute a single work asynchronously,
+	 * potentially bulking it with other asynchronous works.
 	 * <p>
 	 * If the work throws an exception, this exception will be passed
 	 * to the error handler with an {@link ErrorContext} spanning at least this work.
@@ -124,7 +145,8 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Execute a set of works asynchronously.
+	 * Execute a set of works asynchronously,
+	 * potentially bulking it with other asynchronous works.
 	 * <p>
 	 * Works submitted in the same list will be executed in the given order.
 	 * <p>
@@ -146,65 +168,93 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		asyncProcessor.awaitCompletion();
 	}
 
-	/**
+	/*
 	 * Execute a list of works, bulking them as necessary, and passing any exception to the error handler.
-	 * <p>
+	 *
 	 * After an exception, the remaining works in the list are not executed,
 	 * though some may have already been executed if they were bulked with the failing work.
-	 *
-	 * @param nonBulkedWorks The works to be bulked (as much as possible) and executed
-	 * @param refreshInBulkAPICall The parameter to pass to {@link #createRequestGroups(Iterable, boolean)}.
 	 */
-	private void doExecuteSyncSafe(SequentialWorkExecutionContext context, Iterable<ElasticsearchWork<?>> nonBulkedWorks,
-			boolean refreshInBulkAPICall) {
+	private void doExecuteSyncSafe(SequentialWorkExecutionContext context,
+			Iterable<ElasticsearchWork<?>> nonBulkedWorks, boolean refreshInBulkAPICall) {
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 
+		CompletableFuture<?> workListFuture = CompletableFuture.completedFuture( null );
+
 		for ( ElasticsearchWork<?> work : createRequestGroups( nonBulkedWorks, refreshInBulkAPICall ) ) {
-			try {
-				doExecuteSyncUnsafe( work, context );
-				work.getLuceneWorks().forEach( errorContextBuilder::workCompleted );
-			}
-			catch (BulkRequestFailedException brfe) {
-				brfe.getSuccessfulItems().keySet().stream()
-						.flatMap( ElasticsearchWork::getLuceneWorks )
-						.forEach( errorContextBuilder::workCompleted );
+			workListFuture = workListFuture.thenCompose( ignored ->
+					start( work, context )
+							/*
+							 * Note that the handler is applied to the "inner" (to be composed) work,
+							 * so that the handler is only executed if *this* work fails,
+							 * not if a previous one fails.
+							 */
+							.handle( Futures.handler(
+									(result, throwable) -> {
+										handleWorkCompletion( errorContextBuilder, throwable, nonBulkedWorks, work );
+										return result;
+									}
+							) )
+			);
+		}
 
-				handleError(
-						errorContextBuilder,
-						brfe,
-						nonBulkedWorks,
-						brfe.getErroneousItems().stream()
-								.flatMap( ElasticsearchWork::getLuceneWorks )
-						);
-				break;
-			}
-			catch (RuntimeException e) {
-				handleError(
-						errorContextBuilder,
-						e,
-						nonBulkedWorks,
-						work.getLuceneWorks()
-						);
-				break;
-			}
+		/*
+		 * Ignore SequenceAbortedExceptions: if we get such an exception,
+		 * it means the cause was correctly reported to the handler.
+		 */
+		workListFuture.exceptionally( Futures.handler( e -> {
+					if ( e instanceof SequenceAbortedException ) {
+						return null;
+					}
+					else {
+						throw Throwables.expectRuntimeException( e );
+					}
+				} ) )
+				// Note: timeout is handled by the client, so this "join" will not last forever
+				.join();
+	}
+
+	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
+		LOG.tracef( "Processing %s", work );
+		return work.execute( context );
+	}
+
+	private void handleWorkCompletion(ErrorContextBuilder errorContextBuilder, Throwable throwable,
+			Iterable<ElasticsearchWork<?>> nonBulkedWorks, ElasticsearchWork<?> workThatFailed) {
+		if ( throwable instanceof BulkRequestFailedException ) {
+			BulkRequestFailedException brfe = (BulkRequestFailedException) throwable;
+			brfe.getSuccessfulItems().keySet().stream()
+					.flatMap( ElasticsearchWork::getLuceneWorks )
+					.forEach( errorContextBuilder::workCompleted );
+
+			handleError(
+					errorContextBuilder,
+					brfe,
+					nonBulkedWorks,
+					brfe.getErroneousItems().stream()
+							.flatMap( ElasticsearchWork::getLuceneWorks )
+					);
+			/*
+			 * Note that we re-throw the throwable,
+			 * so that the following works are not executed if this work failed.
+			 */
+			throw new SequenceAbortedException( throwable );
+		}
+		else if ( throwable != null ) {
+			handleError(
+					errorContextBuilder,
+					throwable,
+					nonBulkedWorks,
+					workThatFailed.getLuceneWorks()
+					);
+			// Same as above
+			throw new SequenceAbortedException( throwable );
+		}
+		else {
+			workThatFailed.getLuceneWorks().forEach( errorContextBuilder::workCompleted );
 		}
 	}
 
-	private <T> T doExecuteSyncUnsafe(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
-		if ( LOG.isTraceEnabled() ) {
-			LOG.tracef( "Processing %s", work );
-		}
-
-		// Note: timeout is handled by the client, so this "join" will not last forever
-		try {
-			return work.execute( context ).join();
-		}
-		catch (CompletionException e) {
-			throw Throwables.expectRuntimeException( e.getCause() );
-		}
-	}
-
-	private void handleError(ErrorContextBuilder errorContextBuilder, Throwable e,
+	private void handleError(ErrorContextBuilder errorContextBuilder, Throwable throwable,
 			Iterable<ElasticsearchWork<?>> allWorks, Stream<LuceneWork> worksThatFailed) {
 		errorContextBuilder.allWorkToBeDone(
 				StreamSupport.stream( allWorks.spliterator(), false )
@@ -214,7 +264,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		worksThatFailed.forEach( errorContextBuilder::addWorkThatFailed );
 
-		errorContextBuilder.errorThatOccurred( e );
+		errorContextBuilder.errorThatOccurred( throwable );
 
 		errorHandler.handle( errorContextBuilder.createErrorContext() );
 	}

@@ -8,6 +8,8 @@ package org.hibernate.search.util.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -52,6 +54,43 @@ public final class Futures {
 				throwable = throwable.getCause();
 			}
 			return delegate.apply( throwable );
+		};
+	}
+
+
+	/**
+	 * Creates a future handler that will delegate to the given {@link BiFunction}
+	 * after having unwrapped the throwable passed as input if it is a {@link CompletionException}.
+	 * <p>
+	 * This method is meant to be used in conjunction with {@link CompletableFuture#handle(BiFunction)}.
+	 *
+	 * @param delegate The handler to delegate to
+	 * @return The new, delegating handler.
+	 */
+	public static <T, R> BiFunction<T, Throwable, R> handler(BiFunction<T, Throwable, R> delegate) {
+		return (result, throwable) -> {
+			if ( throwable instanceof CompletionException ) {
+				throwable = throwable.getCause();
+			}
+			return delegate.apply( result, throwable );
+		};
+	}
+
+	/**
+	 * Creates a future handler that will delegate to the given {@link BiConsumer}
+	 * after having unwrapped the throwable passed as input if it is a {@link CompletionException}.
+	 * <p>
+	 * This method is meant to be used in conjunction with {@link CompletableFuture#whenComplete(BiConsumer)}.
+	 *
+	 * @param delegate The handler to delegate to
+	 * @return The new, delegating handler.
+	 */
+	public static <T> BiConsumer<T, Throwable> handler(BiConsumer<T, Throwable> delegate) {
+		return (result, throwable) -> {
+			if ( throwable instanceof CompletionException ) {
+				throwable = throwable.getCause();
+			}
+			delegate.accept( result, throwable );
 		};
 	}
 
