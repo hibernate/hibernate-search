@@ -17,10 +17,10 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.IndexedTypeMap;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * A transactional dispatcher, sending works to the
@@ -75,9 +75,9 @@ public class TransactionalOperationDispatcher implements OperationDispatcher {
 	private void appendWork(WorkQueuePerIndexSplitter context, LuceneWork work) {
 		final IndexedTypeIdentifier entityType = work.getEntityType();
 		EntityIndexBinding entityIndexBinding = bindingLookup.apply( entityType );
-		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
+		IndexManagerSelector selector = entityIndexBinding.getIndexManagerSelector();
 		TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );
-		executor.performOperation( work, shardingStrategy, context );
+		executor.performOperation( work, selector, context );
 	}
 
 }

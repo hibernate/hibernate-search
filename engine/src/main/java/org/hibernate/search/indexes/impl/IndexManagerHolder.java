@@ -37,7 +37,6 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -415,7 +414,7 @@ public class IndexManagerHolder {
 		String shardingStrategyName = indexProps[0].getProperty( SHARDING_STRATEGY );
 		if ( shardingStrategyName == null ) {
 			if ( indexProps.length == 1 ) {
-				shardingStrategyClass = NotShardedStrategy.class;
+				return new NotShardedEntityIndexBinder( indexProps[0] );
 			}
 			else {
 				shardingStrategyClass = IdHashShardingStrategy.class;

@@ -13,9 +13,9 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * A streaming dispatcher, sending works to the
@@ -49,10 +49,10 @@ public class StreamingOperationDispatcher implements OperationDispatcher {
 	private void executeWork(LuceneWork work, IndexingMonitor progressMonitor) {
 		final IndexedTypeIdentifier entityType = work.getEntityType();
 		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( entityType );
-		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
+		IndexManagerSelector selector = entityIndexBinding.getIndexManagerSelector();
 		StreamingOperationExecutor executor =
 				work.acceptIndexWorkVisitor( StreamingOperationExecutorSelector.INSTANCE, null );
-		executor.performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
+		executor.performStreamOperation( work, selector, progressMonitor, forceAsync );
 	}
 
 }

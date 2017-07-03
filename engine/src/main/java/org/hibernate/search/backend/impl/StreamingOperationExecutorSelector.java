@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -17,7 +19,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 
 /**
  * This visitor applies the selection logic from the plugged IndexShardingStrategies to stream operations, as used by
@@ -83,9 +85,9 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 	private static class DeleteByQuerySelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
-		public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(), work.getId(), work.getIdInString() );
+		public void performStreamOperation(LuceneWork work, IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync) {
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(), work.getId(), work.getIdInString() );
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
@@ -97,9 +99,9 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
-					work.getEntityType().getPojoType(),
+				IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync) {
+			IndexManager indexManager = selector.forNew(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
@@ -113,9 +115,9 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(),
+				IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync) {
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -130,8 +132,8 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
+				IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync) {
+			Set<IndexManager> indexManagers = selector.all();
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
@@ -143,9 +145,9 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityType().getPojoType(),
+				IndexManagerSelector selector, IndexingMonitor monitor, boolean forceAsync) {
+			Set<IndexManager> indexManagers = selector.forExisting(
+					work.getEntityType(),
 					work.getId(),
 					work.getIdInString()
 			);

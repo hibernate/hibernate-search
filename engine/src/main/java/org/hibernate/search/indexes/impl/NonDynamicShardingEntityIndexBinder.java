@@ -9,7 +9,6 @@ package org.hibernate.search.indexes.impl;
 import java.util.Properties;
 
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
-import org.hibernate.search.engine.impl.NonDynamicShardingEntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
@@ -51,7 +50,10 @@ class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		Properties maskedProperties = new MaskedProperty( properties[0], IndexManagerHolder.SHARDING_STRATEGY );
 		shardingStrategy.initialize( maskedProperties, indexManagers );
 
-		return new NonDynamicShardingEntityIndexBinding( holder, shardingStrategy, indexManagers, interceptor );
+		IndexShardingStrategyIndexManagerSelector selector =
+				new IndexShardingStrategyIndexManagerSelector( shardingStrategy, indexManagers );
+
+		return new MutableEntityIndexBinding( holder, selector, null, interceptor );
 	}
 
 	@Override
