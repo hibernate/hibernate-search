@@ -25,22 +25,17 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public class IndexShardingStrategyIndexManagerSelector implements IndexManagerSelector {
 
 	private final IndexShardingStrategy shardingStrategy;
-	private final IndexManager[] allIndexManagers;
+	private final Set<IndexManager> allIndexManagers;
 
 	public IndexShardingStrategyIndexManagerSelector(IndexShardingStrategy shardingStrategy, IndexManager[] allIndexManagers) {
 		super();
 		this.shardingStrategy = shardingStrategy;
-		this.allIndexManagers = allIndexManagers;
+		this.allIndexManagers = convertAll( shardingStrategy, allIndexManagers );
 	}
 
 	@Override
 	public Set<IndexManager> all() {
-		IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
-		if ( indexManagers == null ) {
-			// This is legacy behavior
-			indexManagers = allIndexManagers;
-		}
-		return toSet( indexManagers );
+		return allIndexManagers;
 	}
 
 	@Override
@@ -58,7 +53,7 @@ public class IndexShardingStrategyIndexManagerSelector implements IndexManagerSe
 		return toSet( shardingStrategy.getIndexManagersForQuery( fullTextFilters ) );
 	}
 
-	private Set<IndexManager> toSet(IndexManager[] indexManagers) {
+	private static Set<IndexManager> toSet(IndexManager[] indexManagers) {
 		if ( indexManagers == null ) {
 			return Collections.emptySet();
 		}
@@ -69,6 +64,15 @@ public class IndexShardingStrategyIndexManagerSelector implements IndexManagerSe
 		Set<IndexManager> set = new LinkedHashSet<>( indexManagers.length );
 		Collections.addAll( set, indexManagers );
 		return set;
+	}
+
+	private static Set<IndexManager> convertAll(IndexShardingStrategy shardingStrategy, IndexManager[] allIndexManagers) {
+		IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
+		if ( indexManagers == null ) {
+			// This is legacy behavior
+			indexManagers = allIndexManagers;
+		}
+		return toSet( indexManagers );
 	}
 
 }
