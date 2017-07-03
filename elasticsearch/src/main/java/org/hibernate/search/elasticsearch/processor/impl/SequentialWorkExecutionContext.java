@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
@@ -21,6 +22,7 @@ import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionCo
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -86,25 +88,32 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	}
 
 	public void flush() {
+		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
+
 		// Refresh dirty indexes
 		if ( !dirtyIndexes.isEmpty() ) {
-			refreshDirtyIndexes();
-			dirtyIndexes.clear();
+			future = future.thenCompose( ignored -> refreshDirtyIndexes() )
+					.thenRun( () -> dirtyIndexes.clear() );
 		}
 
 		// Flush the indexing monitors
-		for ( BufferedIndexingMonitor buffer : bufferedIndexMonitors.values() ) {
-			try {
-				buffer.flush();
-			}
-			catch (RuntimeException e) {
-				errorHandler.handleException( "Flushing an indexing monitor failed", e );
-			}
-		}
-		bufferedIndexMonitors.clear();
+		future = future.thenRun( () -> {
+				for ( BufferedIndexingMonitor buffer : bufferedIndexMonitors.values() ) {
+					try {
+						buffer.flush();
+					}
+					catch (RuntimeException e) {
+						errorHandler.handleException( "Flushing an indexing monitor failed", e );
+					}
+				}
+				bufferedIndexMonitors.clear();
+		} );
+
+		// Note: timeout is handled by the client, so this "join" will not last forever
+		future.join();
 	}
 
-	private void refreshDirtyIndexes() {
+	private CompletableFuture<?> refreshDirtyIndexes() {
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
 		}
@@ -115,12 +124,15 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 		}
 		ElasticsearchWork<?> work = builder.build();
 
-		try {
-			workProcessor.executeSyncUnsafe( work );
-		}
-		catch (RuntimeException e) {
-			errorHandler.handleException( "Refresh failed", e );
-		}
+		return workProcessor.executeAsyncUnsafe( work )
+				.handle( Futures.handler(
+						(result, throwable) -> {
+							if ( throwable != null ) {
+								errorHandler.handleException( "Refresh failed", throwable );
+							}
+							return null;
+						}
+				) );
 	}
 
 	private static final class BufferedIndexingMonitor implements IndexingMonitor {
