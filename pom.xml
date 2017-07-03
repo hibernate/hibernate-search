@@ -244,8 +244,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <!-- Version 7.5 suffers from a bug that affects us: https://github.com/checkstyle/checkstyle/issues/3776 -->
-        <puppycrawl.checkstyle.version>7.4</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>8.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
         <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
