@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.aws.impl;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Yoann Rodiere
  */
@@ -15,10 +17,10 @@ class AWSNormalization {
 		// Private, this is a utils class
 	}
 
-	private static final String HOST_PORT_REGEX = ":\\d+$";
+	private static final Pattern HOST_PORT_REGEX = Pattern.compile( ":\\d+$" );
 
 	public static String normalizeHost(String value) {
-		return value.replaceAll( HOST_PORT_REGEX, "" );
+		return HOST_PORT_REGEX.matcher( value ).replaceAll( "" );
 	}
 
 }
