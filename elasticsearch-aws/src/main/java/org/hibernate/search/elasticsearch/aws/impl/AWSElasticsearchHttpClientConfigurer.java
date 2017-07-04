@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.hibernate.search.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -49,7 +50,7 @@ public class AWSElasticsearchHttpClientConfigurer implements ElasticsearchHttpCl
 
 	private void requireNonEmpty(String value, String name) {
 		if ( StringHelper.isEmpty( value ) ) {
-			throw new IllegalStateException( "Missing value for property '" + name + "'." );
+			throw new SearchException( "Missing value for property '" + name + "'." );
 		}
 	}
 
