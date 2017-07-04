@@ -848,12 +848,12 @@ public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
 --
 
 [NOTE]
----
+--
 Dynamic mapping involves Elasticsearch guessing the type and attributes of fields automatically,
 and has its own limitations.
-See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-mapping.html[the reference documentation]
+See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic-mapping.html[the Elasticsearch documentation]
 for more information. 
----
+--
 
 ==== Tika bridges
 
