@@ -47,7 +47,6 @@ import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -171,12 +170,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		addNullValue( propertyMapping, mappingBuilder, fieldMetadata );
 
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-			try {
-				addSubfieldMapping( propertyMapping, mappingBuilder, facetMetadata );
-			}
-			catch (IncompleteDataException e) {
-				LOG.debug( "Not adding a mapping for facet " + facetMetadata.getAbsoluteName() + " because of incomplete data", e );
-			}
+			addSubfieldMapping( propertyMapping, mappingBuilder, facetMetadata );
 		}
 
 		// Do this last, when we're sure no exception will be thrown for this mapping
@@ -519,9 +513,4 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		return bridgeDefinedFields;
 	}
 
-	private static class IncompleteDataException extends SearchException {
-		public IncompleteDataException(String message) {
-			super( message );
-		}
-	}
 }
