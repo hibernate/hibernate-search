@@ -148,6 +148,30 @@ public class DSLTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2785")
+	public void testTermQueryOnNormalizer() throws Exception {
+		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
+
+		Query query = monthQb.keyword().onField( "name" ).matching( "February" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "name" ).matching( "february" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_normalized" ).matching( "Month of fake spring" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_normalized" ).matching( "month of fake spring" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_normalized" ).matching( "Month" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_normalized" ).matching( "month" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+	}
+
+	@Test
 	public void testFuzzyQuery() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
@@ -651,6 +675,42 @@ public class DSLTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2785")
+	public void testPhraseQueryWithNormalizer() throws Exception {
+		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
+
+		// Phrase queries on a normalized (non-tokenized) field will only work with single-word queries
+
+		Query query = monthQb
+				.phrase()
+					.onField( "name" )
+					.sentence( "February" )
+					.createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb
+				.phrase()
+					.onField( "name" )
+					.sentence( "february" )
+					.createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb
+				.phrase()
+					.onField( "mythology_normalized" )
+					.sentence( "Month whitening" )
+					.createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb
+				.phrase()
+					.onField( "mythology_normalized" )
+					.sentence( "month whitening" )
+					.createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2479")
 	public void testPhraseQueryTermCreation() throws Exception {
 		String testCaseText = "Test the Test test of your test test to test test test of test and Test budgeting.";
@@ -1006,6 +1066,8 @@ public class DSLTest {
 					.analyzerDef( "htmlStrip", StandardTokenizerFactory.class )
 							.charFilter( HTMLStripCharFilterFactory.class )
 									.param( "escapedTags", "escaped" )
+							.filter( LowerCaseFilterFactory.class )
+					.normalizerDef( "lower" )
 							.filter( LowerCaseFilterFactory.class );
 			return mapping;
 		}

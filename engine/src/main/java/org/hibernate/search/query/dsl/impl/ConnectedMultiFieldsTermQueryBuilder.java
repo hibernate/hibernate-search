@@ -215,12 +215,11 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		RemoteMatchQuery.Builder queryBuilder = new RemoteMatchQuery.Builder();
 		queryBuilder
 				.field( fieldContext.getField() )
-				.searchTerms( searchTerm );
-
-		RemoteAnalyzerReference analyzerReference = queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class );
-		if ( analyzerReference != null ) {
-			queryBuilder.analyzerReference( analyzerReference );
-		}
+				.searchTerms( searchTerm )
+				.analyzerReference(
+						queryContext.getOriginalAnalyzerReference().unwrap( RemoteAnalyzerReference.class ),
+						queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class )
+				);
 
 		if ( termContext.getApproximation() == TermQueryContext.Approximation.FUZZY ) {
 			// TODO: remove the threshold method as it's deprecated and not accurate
