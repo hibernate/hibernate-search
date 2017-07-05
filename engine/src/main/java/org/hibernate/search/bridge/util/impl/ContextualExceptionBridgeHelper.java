@@ -18,7 +18,6 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -44,12 +43,6 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private final OneWayConversionContextImpl oneWayAdapter = new OneWayConversionContextImpl();
 	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
-
-	@Override
-	@Deprecated
-	public ConversionContext setClass(Class<?> clazz) {
-		return setConvertedTypeId( new PojoIndexedTypeIdentifier( clazz ) );
-	}
 
 	@Override
 	public ConversionContext setConvertedTypeId(IndexedTypeIdentifier type) {

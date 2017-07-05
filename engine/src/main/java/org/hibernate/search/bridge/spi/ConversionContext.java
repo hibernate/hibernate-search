@@ -49,16 +49,6 @@ public interface ConversionContext {
 
 	/**
 	 * In case the next conversion fails, the error message will point to this type.
-	 * @deprecated Use {@link #setConvertedTypeId(IndexedTypeIdentifier)}
-	 *
-	 * @param beanClass the class type which is going to be converted
-	 * @return this for method chaining.
-	 */
-	@Deprecated
-	ConversionContext setClass(Class<?> beanClass);
-
-	/**
-	 * In case the next conversion fails, the error message will point to this type.
 	 *
 	 * @param type the type which is going to be converted
 	 * @return this for method chaining.
