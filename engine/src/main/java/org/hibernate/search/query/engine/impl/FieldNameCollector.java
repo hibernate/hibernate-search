@@ -66,7 +66,7 @@ public class FieldNameCollector {
 	private static void collectComposingQueries(Query query, Set<Query> composingQueries) {
 		if ( query instanceof BooleanQuery ) {
 			BooleanQuery booleanQuery = (BooleanQuery) query;
-			for ( BooleanClause clause : booleanQuery.getClauses() ) {
+			for ( BooleanClause clause : booleanQuery.clauses() ) {
 				collectComposingQueries( clause.getQuery(), composingQueries );
 			}
 		}

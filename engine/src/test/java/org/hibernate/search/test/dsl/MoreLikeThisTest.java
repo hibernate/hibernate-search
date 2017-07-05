@@ -104,7 +104,7 @@ public class MoreLikeThisTest {
 		assertThat( mltQuery instanceof BooleanQuery );
 		BooleanQuery topMltQuery = (BooleanQuery) mltQuery;
 		// FIXME: I'd prefer a test that uses data instead of how the query is actually built
-		assertThat( topMltQuery.getClauses() ).onProperty( "query.boost" ).contains( 1f, 10f );
+		assertThat( topMltQuery.clauses() ).onProperty( "query.boost" ).contains( 1f, 10f );
 
 		outputQueryAndResults( decaffInstance, mltQuery, results );
 
