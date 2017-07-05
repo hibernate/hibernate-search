@@ -129,12 +129,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public String getIndexingStrategy() {
-		return delegate.getIndexingMode().toExternalRepresentation();
-	}
-
-	@Override
 	public IndexingMode getIndexingMode() {
 		return delegate.getIndexingMode();
 	}

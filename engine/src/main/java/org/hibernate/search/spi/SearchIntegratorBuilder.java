@@ -638,12 +638,6 @@ public class SearchIntegratorBuilder {
 		}
 
 		@Override
-		@Deprecated
-		public String getIndexingStrategy() {
-			return factoryState.getIndexingMode().toExternalRepresentation();
-		}
-
-		@Override
 		public IndexingMode getIndexingMode() {
 			return factoryState.getIndexingMode();
 		}

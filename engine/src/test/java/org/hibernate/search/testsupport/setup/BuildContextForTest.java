@@ -35,11 +35,6 @@ public class BuildContextForTest implements BuildContext {
 	}
 
 	@Override
-	public String getIndexingStrategy() {
-		return IndexingMode.EVENT.toExternalRepresentation();
-	}
-
-	@Override
 	public IndexingMode getIndexingMode() {
 		return IndexingMode.EVENT;
 	}

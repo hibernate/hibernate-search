@@ -249,12 +249,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public String getIndexingStrategy() {
-		return indexingMode.toExternalRepresentation();
-	}
-
-	@Override
 	public IndexingMode getIndexingMode() {
 		return indexingMode;
 	}

@@ -45,13 +45,6 @@ public interface BuildContext {
 	ExtendedSearchIntegrator getUninitializedSearchIntegrator();
 
 	/**
-	 * @deprecated Scheduled for removal. Use {@link #getIndexingMode()} instead.
-	 * @return the indexing strategy
-	 */
-	@Deprecated
-	String getIndexingStrategy();
-
-	/**
 	 * @return the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
 	 */
 	IndexingMode getIndexingMode();

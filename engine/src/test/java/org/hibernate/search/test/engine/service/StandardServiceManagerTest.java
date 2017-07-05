@@ -169,11 +169,6 @@ public class StandardServiceManagerTest {
 		}
 
 		@Override
-		public String getIndexingStrategy() {
-			return null;
-		}
-
-		@Override
 		public IndexingMode getIndexingMode() {
 			return null;
 		}
