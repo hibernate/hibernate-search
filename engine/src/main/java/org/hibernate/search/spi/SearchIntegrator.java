@@ -128,15 +128,6 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Optimize the index holding {@code entityType}
-	 * @deprecated Use {@link #optimize(IndexedTypeIdentifier)}
-	 *
-	 * @param entityType the entity type (index) to optimize
-	 */
-	@Deprecated
-	void optimize(Class entityType);
-
-	/**
-	 * Optimize the index holding {@code entityType}
 	 *
 	 * @param entityType the entity type (index) to optimize
 	 */

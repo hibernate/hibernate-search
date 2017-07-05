@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * This OptimizerStrategy will only optimize the index when forced to,
  * using an explicit invocation to {@link org.hibernate.search.spi.SearchIntegrator#optimize()} or
- * {@link org.hibernate.search.spi.SearchIntegrator#optimize(Class)}
+ * {@link org.hibernate.search.spi.SearchIntegrator#optimize(org.hibernate.search.spi.IndexedTypeIdentifier)}
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero

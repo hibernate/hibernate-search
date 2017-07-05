@@ -26,7 +26,7 @@ public interface OptimizerStrategy {
 	/**
 	 * Invokes optimize on the IndexWriter; This is invoked when
 	 * an optimization has been explicitly requested by the user API
-	 * using {@link org.hibernate.search.spi.SearchIntegrator#optimize()} or {@link org.hibernate.search.spi.SearchIntegrator#optimize(Class)},
+	 * using {@link org.hibernate.search.spi.SearchIntegrator#optimize()} or {@link org.hibernate.search.spi.SearchIntegrator#optimize(org.hibernate.search.spi.IndexedTypeIdentifier)},
 	 * or at the start or end of a MassIndexer's work.
 	 *
 	 * @param writer the index writer

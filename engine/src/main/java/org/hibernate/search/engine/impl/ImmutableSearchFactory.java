@@ -375,15 +375,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public void optimize(Class entityType) {
-		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( entityType );
-		for ( IndexManager im : entityIndexBinding.getIndexManagers() ) {
-			im.optimize();
-		}
-	}
-
-	@Override
 	public void optimize(IndexedTypeIdentifier entityType) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( entityType );
 		for ( IndexManager im : entityIndexBinding.getIndexManagers() ) {

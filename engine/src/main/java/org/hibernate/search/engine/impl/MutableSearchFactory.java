@@ -222,12 +222,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public void optimize(Class entityType) {
-		delegate.optimize( entityType );
-	}
-
-	@Override
 	public void optimize(IndexedTypeIdentifier entityType) {
 		delegate.optimize( entityType );
 	}
