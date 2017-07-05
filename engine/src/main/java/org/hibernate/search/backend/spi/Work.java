@@ -9,7 +9,6 @@ package org.hibernate.search.backend.spi;
 import java.io.Serializable;
 
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * A unit of work. Only make sense inside the same session since it uses the scope principle.
@@ -33,11 +32,6 @@ public class Work {
 		this( null, entity, (IndexedTypeIdentifier) null, id, type, identifierRollbackEnabled );
 	}
 
-	@Deprecated
-	public Work(Class<?> entityType, Serializable id, WorkType type) {
-		this( null, null, entityType, id, type, false );
-	}
-
 	public Work(IndexedTypeIdentifier entityType, Serializable id, WorkType type) {
 		this( null, null, entityType, id, type, false );
 	}
@@ -54,24 +48,12 @@ public class Work {
 		this( tenantId, entity, (IndexedTypeIdentifier) null, id, type, identifierRollbackEnabled );
 	}
 
-	@Deprecated
-	public Work(String tenantId, Class<?> entityType, Serializable id, WorkType type) {
-		this( tenantId, null, entityType, id, type, false );
-	}
-
 	public Work(String tenantId, IndexedTypeIdentifier entityType, Serializable id, WorkType type) {
 		this( tenantId, null, entityType, id, type, false );
 	}
 
 	public Work(String tenantId, Object entity, WorkType type) {
 		this( tenantId, entity, (IndexedTypeIdentifier) null, null, type, false );
-	}
-
-	@Deprecated
-	private Work(String tenantId, Object entity, Class<?> entityClass, Serializable id, WorkType type, boolean identifierWasRolledBack) {
-		this( tenantId, entity,
-				entityClass == null ? null : new PojoIndexedTypeIdentifier( entityClass ),
-						id, type, identifierWasRolledBack );
 	}
 
 	private Work(String tenantId, Object entity, IndexedTypeIdentifier entityTypeId, Serializable id, WorkType type, boolean identifierWasRolledBack) {
@@ -81,11 +63,6 @@ public class Work {
 		this.type = type;
 		this.identifierWasRolledBack = identifierWasRolledBack;
 		this.tenantIdentifier = tenantId;
-	}
-
-	@Deprecated
-	public Class<?> getEntityClass() {
-		return entityTypeId != null ? entityTypeId.getPojoType() : null;
 	}
 
 	public IndexedTypeIdentifier getTypeIdentifier() {

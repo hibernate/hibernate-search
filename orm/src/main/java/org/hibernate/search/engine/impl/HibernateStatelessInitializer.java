@@ -60,11 +60,6 @@ public class HibernateStatelessInitializer implements InstanceInitializer {
 	}
 
 	@Override
-	public Class<?> getClassFromWork(Work work) {
-		return HibernateHelper.getClassFromWork( work );
-	}
-
-	@Override
 	public IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
 		return HibernateHelper.getIndexedTypeIdFromWork( work );
 	}

@@ -32,14 +32,6 @@ public final class SimpleInitializer implements InstanceInitializer {
 		return entity;
 	}
 
-	@Deprecated
-	@Override
-	public Class<?> getClassFromWork(Work work) {
-		return work.getEntityClass() != null ?
-				work.getEntityClass() :
-				getClass( work.getEntity() );
-	}
-
 	@Override
 	public IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
 		return work.getTypeIdentifier() != null ?

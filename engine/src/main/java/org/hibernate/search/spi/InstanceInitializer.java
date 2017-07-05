@@ -23,14 +23,6 @@ import org.hibernate.search.backend.spi.Work;
 public interface InstanceInitializer {
 
 	/**
-	 * @deprecated Use {@link #getIndexedTypeIdFromWork(Work)}
-	 * @param work
-	 * @return
-	 */
-	@Deprecated
-	Class<?> getClassFromWork(Work work);
-
-	/**
 	 * @param <T> the type of the entity
 	 * @param entity an instance or proxy of T
 	 * @return the class from the instance, or the underlying class from a proxy.

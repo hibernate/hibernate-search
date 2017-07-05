@@ -40,13 +40,6 @@ public final class HibernateHelper {
 		return Hibernate.isInitialized( entity );
 	}
 
-	@Deprecated
-	public static Class<?> getClassFromWork(Work work) {
-		return work.getEntityClass() != null ?
-				work.getEntityClass() :
-				getClass( work.getEntity() );
-	}
-
 	public static IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
 		return work.getTypeIdentifier() != null ?
 				work.getTypeIdentifier() :
