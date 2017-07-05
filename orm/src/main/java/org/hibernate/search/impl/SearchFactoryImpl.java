@@ -40,8 +40,7 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	@Override
 	public void optimize(Class<?> clazz) {
-		IndexedTypeIdentifier typeId = searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
-		searchIntegrator.optimize( typeId );
+		searchIntegrator.optimize( convertTypeIdentifier( clazz ) );
 	}
 
 	@Override
@@ -51,8 +50,7 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		IndexedTypeIdentifier typeId = searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
-		return searchIntegrator.getAnalyzer( typeId );
+		return searchIntegrator.getAnalyzer( convertTypeIdentifier( clazz ) );
 	}
 
 	@Override
@@ -71,13 +69,17 @@ final class SearchFactoryImpl implements SearchFactory {
 	}
 
 	@Override
-	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
-		return searchIntegrator.getIndexedTypeDescriptor( entityType );
+	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> clazz) {
+		return searchIntegrator.getIndexedTypeDescriptor( convertTypeIdentifier( clazz ) );
 	}
 
 	@Override
 	public Set<Class<?>> getIndexedTypes() {
 		return searchIntegrator.getIndexedTypes();
+	}
+
+	private IndexedTypeIdentifier convertTypeIdentifier(Class<?> clazz) {
+		return searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
 	}
 
 	@Override

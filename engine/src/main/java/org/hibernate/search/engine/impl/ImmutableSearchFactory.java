@@ -614,13 +614,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> classType) {
-		final IndexedTypeIdentifier type = new PojoIndexedTypeIdentifier( classType );
-		return getIndexedTypeDescriptor( type );
-	}
-
-	@Override
 	public IndexedTypeDescriptor getIndexedTypeDescriptor(IndexedTypeIdentifier type) {
 		IndexedTypeDescriptor typeDescriptor = indexedTypeDescriptors.get( type );
 		if ( typeDescriptor == null ) {

@@ -313,11 +313,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
-		return delegate.getIndexedTypeDescriptor( entityType );
-	}
-
-	@Override
 	public Set<Class<?>> getIndexedTypes() {
 		return delegate.getIndexedTypes();
 	}

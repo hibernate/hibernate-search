@@ -30,6 +30,7 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -171,7 +172,7 @@ public class NumericFieldTest {
 	@TestForIssue(jiraKey = "HSEARCH-1987")
 	public void testSomeOfSeveralFieldsAreNumeric() {
 		Set<FieldDescriptor> fields = sfHolder.getSearchFactory()
-				.getIndexedTypeDescriptor( TouristAttraction.class )
+				.getIndexedTypeDescriptor( new PojoIndexedTypeIdentifier( TouristAttraction.class ) )
 				.getProperty( "rating" )
 				.getIndexedFields();
 

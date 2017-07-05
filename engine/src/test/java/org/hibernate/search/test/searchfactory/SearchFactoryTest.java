@@ -250,7 +250,7 @@ public class SearchFactoryTest {
 		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchIntegrator si = integratorResource.create( cfg );
-		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
+		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( new PojoIndexedTypeIdentifier( Foo.class ) );
 		assertNotNull( indexedTypeDescriptor );
 		assertFalse( indexedTypeDescriptor.isIndexed() );
 	}
@@ -267,7 +267,7 @@ public class SearchFactoryTest {
 		cfg.setProgrammaticMapping( mapping );
 
 		SearchIntegrator si = integratorResource.create( cfg );
-		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
+		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( new PojoIndexedTypeIdentifier( Foo.class ) );
 		assertNotNull( indexedTypeDescriptor );
 		assertTrue( indexedTypeDescriptor.isIndexed() );
 	}
