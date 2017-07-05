@@ -237,12 +237,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public Analyzer getAnalyzer(Class<?> clazz) {
-		return delegate.getAnalyzer( clazz );
-	}
-
-	@Override
 	public Analyzer getAnalyzer(IndexedTypeIdentifier type) {
 		return delegate.getAnalyzer( type );
 	}

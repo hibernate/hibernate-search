@@ -145,21 +145,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * Retrieves the scoped analyzer for a given class.
-	 *
-	 * @deprecated Use {@link #getAnalyzer(IndexedTypeIdentifier)}
-	 *
-	 * @param clazz The class for which to retrieve the analyzer.
-	 *
-	 * @return The scoped analyzer for the specified class.
-	 *
-	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
-	 * class is not an indexed entity.
-	 */
-	@Deprecated
-	Analyzer getAnalyzer(Class<?> clazz);
-
-	/**
 	 * Retrieves the scoped analyzer for a given indexed type.
 	 *
 	 * @param typeId The indexed type identifier for which to retrieve the analyzer.

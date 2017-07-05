@@ -412,12 +412,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public Analyzer getAnalyzer(Class<?> clazz) {
-		return getAnalyzerReference( clazz ).unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
-	}
-
-	@Override
 	public Analyzer getAnalyzer(IndexedTypeIdentifier type) {
 		return getAnalyzerReference( type ).unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 	}
