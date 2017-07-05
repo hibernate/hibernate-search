@@ -48,12 +48,9 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * "Configured" types are types that Hibernate Search was instructed to take into consideration,
 	 * i.e. types returned by {@link SearchConfiguration#getClassMappings()}.
 	 *
-	 * @param classes an array of types
+	 * @param types
 	 * @return the set of configured subtypes
 	 */
-	@Deprecated
-	IndexedTypeSet getConfiguredTypesPolymorphic(Class<?>[] classes);
-
 	IndexedTypeSet getConfiguredTypesPolymorphic(IndexedTypeSet types);
 
 	/**
