@@ -219,12 +219,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz) {
-		return delegate.getAnalyzerReference( clazz );
-	}
-
-	@Override
 	public QueryContextBuilder buildQueryBuilder() {
 		return delegate.buildQueryBuilder();
 	}

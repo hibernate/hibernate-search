@@ -165,10 +165,4 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 */
 	ScopedAnalyzerReference getAnalyzerReference(IndexedTypeIdentifier type);
 
-	/**
-	 * @deprecated use {@link #getAnalyzerReference(IndexedTypeIdentifier)}
-	 */
-	@Deprecated
-	ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz);
-
 }

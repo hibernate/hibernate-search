@@ -405,14 +405,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz) {
-		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
-		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-		return builder.getAnalyzerReference();
-	}
-
-	@Override
 	public ScopedAnalyzerReference getAnalyzerReference(IndexedTypeIdentifier type) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( type );
 		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
