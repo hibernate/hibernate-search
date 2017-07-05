@@ -470,12 +470,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public IndexedTypeSet getIndexedTypesPolymorphic(Class<?>[] types) {
-		return getIndexedTypesPolymorphic( IndexedTypeSets.fromClasses( types ) );
-	}
-
-	@Override
 	public IndexedTypeSet getIndexedTypesPolymorphic(IndexedTypeSet types) {
 		return indexedTypeHierarchy.getConfiguredClasses( types );
 	}

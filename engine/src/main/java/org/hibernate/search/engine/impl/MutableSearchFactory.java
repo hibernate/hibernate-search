@@ -154,12 +154,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public IndexedTypeSet getIndexedTypesPolymorphic(Class<?>[] classes) {
-		return delegate.getIndexedTypesPolymorphic( classes );
-	}
-
-	@Override
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		return delegate.makeBatchBackend( progressMonitor );
 	}

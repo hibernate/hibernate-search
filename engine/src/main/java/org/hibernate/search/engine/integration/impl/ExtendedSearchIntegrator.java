@@ -65,13 +65,10 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * Note: the fact that a given type is configured or indexed doesn't mean that its subtypes are, too.
 	 * Each type must be configured explicitly.
 	 *
-	 * @param classes an array of types
+	 * @param types the target set
 	 * @return the set of configured subtypes that are indexed
 	 */
-	@Deprecated
-	IndexedTypeSet getIndexedTypesPolymorphic(Class<?>[] classes);
-
-	IndexedTypeSet getIndexedTypesPolymorphic(IndexedTypeSet queryTarget);
+	IndexedTypeSet getIndexedTypesPolymorphic(IndexedTypeSet types);
 
 	/**
 	 * @return {@code true} if JMX is enabled
