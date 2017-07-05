@@ -646,7 +646,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			}
 			else {
 				indexedTypeDescriptor = new IndexedTypeDescriptorImpl(
-						indexBinder.getDocumentBuilder().getMetadata(),
+						indexBinder.getDocumentBuilder().getTypeMetadata(),
 						indexBinder.getIndexManagers()
 				);
 			}

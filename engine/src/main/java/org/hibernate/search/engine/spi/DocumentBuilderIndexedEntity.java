@@ -356,7 +356,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		Document doc = new Document();
 		FacetHandling faceting = new FacetHandling();
 		Class<?> entityType = objectInitializer.getClass( instance );
-		float documentLevelBoost = getMetadata().getClassBoost( instance );
+		float documentLevelBoost = getTypeMetadata().getClassBoost( instance );
 
 		// add the class name of the entity to the document
 		if ( containsFieldName( ProjectionConstants.OBJECT_CLASS, includedFieldNames ) ) {
@@ -402,7 +402,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				instance,
 				doc,
 				faceting,
-				getMetadata(),
+				getTypeMetadata(),
 				fieldToAnalyzerMap,
 				processedFieldNames,
 				conversionContext,
@@ -1042,7 +1042,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		final FieldBridge bridge = fieldName.equals( getIdFieldName() ) ?
 				getIdBridge() :
-				getBridge( getMetadata(), fieldName );
+				getBridge( getTypeMetadata(), fieldName );
 
 		if ( bridge != null ) {
 			return objectToString( fieldName, bridge, value, conversionContext );
@@ -1082,7 +1082,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	public FieldBridge getBridge(String fieldName) {
-		return getBridge( getMetadata(), fieldName );
+		return getBridge( getTypeMetadata(), fieldName );
 	}
 
 	private FieldBridge getBridge(TypeMetadata typeMetadata, String fieldName) {
@@ -1126,7 +1126,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			allowFieldSelectionInProjection = false;
 			return;
 		}
-		for ( PropertyMetadata propertyMetadata : getMetadata().getAllPropertyMetadata() ) {
+		for ( PropertyMetadata propertyMetadata : getTypeMetadata().getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 				FieldBridge bridge = documentFieldMetadata.getFieldBridge();
 				if ( fieldBridgeProhibitsFieldSelectionInProjection( bridge ) ) {
@@ -1135,7 +1135,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				}
 			}
 		}
-		for ( DocumentFieldMetadata fieldMetadata : getMetadata().getClassBridgeMetadata() ) {
+		for ( DocumentFieldMetadata fieldMetadata : getTypeMetadata().getClassBridgeMetadata() ) {
 			FieldBridge bridge = fieldMetadata.getFieldBridge();
 			if ( fieldBridgeProhibitsFieldSelectionInProjection( bridge ) ) {
 				allowFieldSelectionInProjection = false;

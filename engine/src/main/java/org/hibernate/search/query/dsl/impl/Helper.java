@@ -106,7 +106,7 @@ final class Helper {
 		 * a way to disable metadata inspection...
 		 */
 		if ( overriddenFieldBridge == null && !fieldContext.isIgnoreFieldBridge() ) {
-			DocumentFieldMetadata metadata = documentBuilder.getMetadata().getDocumentFieldMetadataFor( fieldName );
+			DocumentFieldMetadata metadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( fieldName );
 			if ( metadata != null ) {
 				return metadata.isNumeric();
 			}

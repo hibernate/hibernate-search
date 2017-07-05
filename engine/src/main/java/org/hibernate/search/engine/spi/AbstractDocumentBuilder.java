@@ -112,20 +112,9 @@ public abstract class AbstractDocumentBuilder {
 		return isRoot;
 	}
 
-	/**
-	 * @deprecated use {@link #getTypeMetadata()}
-	 */
 	@Deprecated
 	public XClass getBeanXClass() {
 		return beanXClass;
-	}
-
-	/**
-	 * @deprecated use {@link #getTypeMetadata()}
-	 */
-	@Deprecated
-	public TypeMetadata getMetadata() {
-		return typeMetadata;
 	}
 
 	public ScopedAnalyzerReference getAnalyzerReference() {

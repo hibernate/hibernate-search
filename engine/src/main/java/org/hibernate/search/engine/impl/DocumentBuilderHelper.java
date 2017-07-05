@@ -126,7 +126,7 @@ public final class DocumentBuilderHelper {
 	}
 
 	private static void processFieldsForProjection(DocumentBuilderIndexedEntity builderIndexedEntity, String[] fields, Object[] result, Document document, ConversionContext conversionContext) {
-		final TypeMetadata metadata = builderIndexedEntity.getMetadata();
+		final TypeMetadata metadata = builderIndexedEntity.getTypeMetadata();
 
 		//First try setting each projected field considering mapping metadata to apply (inverse) field bridges:
 		processMetadataRecursivelyForProjections( metadata, fields, result, document, conversionContext );

@@ -117,7 +117,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 	private Object getUnwrappedBridge(Class<?> clazz, String string, Class<?> expectedBridgeClass) {
 		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
-				.getMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
+				.getTypeMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
 		return unwrapBridge( bridge, expectedBridgeClass );
 	}
 
@@ -139,7 +139,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		 * create another, duplicate field, erasing all previous information.
 		 */
 		TypeMetadata metadata = getExtendedSearchIntegrator().getIndexBinding( Item.class )
-				.getDocumentBuilder().getMetadata();
+				.getDocumentBuilder().getTypeMetadata();
 
 		assertTrue( metadata.getDocumentFieldMetadataFor( "price" ).isNumeric() );
 		assertEquals( Store.YES, metadata.getDocumentFieldMetadataFor( "price" ).getStore() );
