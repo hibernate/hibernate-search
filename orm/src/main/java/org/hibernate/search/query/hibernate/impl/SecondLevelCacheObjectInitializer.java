@@ -46,15 +46,16 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		// check the second-level cache
 		List<EntityInfo> remainingEntityInfos = new ArrayList<>( entityInfos.size() );
 		for ( EntityInfo entityInfo : entityInfos ) {
+			Class<?> pojoType = entityInfo.getType().getPojoType();
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, objectInitializationContext.getSession() ) ) {
 				final boolean isIn2LCache = objectInitializationContext.getSession()
-						.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
+						.getSessionFactory().getCache().containsEntity( pojoType, entityInfo.getId() );
 				if ( isIn2LCache ) {
 					try {
 						// load the object from the second level cache
-						Object o = objectInitializationContext.getSession().get( entityInfo.getClazz(), entityInfo.getId() );
+						Object o = objectInitializationContext.getSession().get( pojoType, entityInfo.getId() );
 						if ( o != null ) {
-							EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+							EntityInfoLoadKey key = new EntityInfoLoadKey( pojoType, entityInfo.getId() );
 							idToObjectMap.put( key, o );
 						}
 					}

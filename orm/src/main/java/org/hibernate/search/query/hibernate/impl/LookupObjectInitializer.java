@@ -49,7 +49,7 @@ public class LookupObjectInitializer implements ObjectInitializer {
 		for ( EntityInfo entityInfo : entityInfos ) {
 			Object o = ObjectLoaderHelper.load( entityInfo, objectInitializationContext.getSession() );
 			if ( o != null ) {
-				EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+				EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getType().getPojoType(), entityInfo.getId() );
 				idToObjectMap.put( key, o );
 			}
 		}

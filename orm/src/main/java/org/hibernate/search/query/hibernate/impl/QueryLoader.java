@@ -76,7 +76,7 @@ public class QueryLoader extends AbstractLoader {
 		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.size() / 0.75 ) + 1 );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			idToObjectMap.put(
-					new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() ),
+					new EntityInfoLoadKey( entityInfo.getType().getPojoType(), entityInfo.getId() ),
 					ObjectInitializer.ENTITY_NOT_YET_INITIALIZED
 			);
 		}

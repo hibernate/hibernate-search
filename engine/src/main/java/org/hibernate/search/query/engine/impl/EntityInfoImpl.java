@@ -64,19 +64,6 @@ public class EntityInfoImpl implements EntityInfo {
 	}
 
 	@Override
-	@Deprecated
-	public Class<?> getClazz() {
-		if ( type == null ) {
-			/*
-			 * Only throw an exception here, not in the constructor,
-			 * because in some cases we don't need the class at all (e.g. projections).
-			 */
-			throw log.incompleteEntityInfo( null, id );
-		}
-		return type.getPojoType();
-	}
-
-	@Override
 	public Serializable getId() {
 		if ( id == null ) {
 			/*

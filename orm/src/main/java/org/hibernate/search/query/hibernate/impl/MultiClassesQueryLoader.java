@@ -88,7 +88,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		Map<RootEntityMetadata, List<EntityInfo>> entityInfoBuckets = new HashMap<>( entityMetadata.size() );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			boolean found = false;
-			final Class<?> clazz = entityInfo.getClazz();
+			final Class<?> clazz = entityInfo.getType().getPojoType();
 			for ( RootEntityMetadata rootEntityInfo : entityMetadata ) {
 				if ( rootEntityInfo.rootEntity == clazz || rootEntityInfo.mappedSubclasses.contains( clazz ) ) {
 					List<EntityInfo> bucket = entityInfoBuckets.get( rootEntityInfo );
@@ -99,7 +99,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					bucket.add( entityInfo );
 					found = true;
 					idToObjectMap.put(
-							new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() ),
+							new EntityInfoLoadKey( entityInfo.getType().getPojoType(), entityInfo.getId() ),
 							ObjectInitializer.ENTITY_NOT_YET_INITIALIZED
 					);
 					break; //we stop looping for the right bucket

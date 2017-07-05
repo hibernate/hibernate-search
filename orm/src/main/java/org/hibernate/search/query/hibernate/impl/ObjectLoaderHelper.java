@@ -40,7 +40,7 @@ public final class ObjectLoaderHelper {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
 				log.debugf(
 						"Object found in Search index but not in database: %s with id %s",
-						entityInfo.getClazz(), entityInfo.getId()
+						entityInfo.getType().getName(), entityInfo.getId()
 				);
 				session.evict( maybeProxy );
 				maybeProxy = null;
@@ -56,10 +56,10 @@ public final class ObjectLoaderHelper {
 		Object maybeProxy;
 		if ( areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 			// be sure to get an initialized object but save from ObjectNotFoundException and EntityNotFoundException
-			maybeProxy = session.byId( entityInfo.getClazz() ).load( entityInfo.getId() );
+			maybeProxy = session.byId( entityInfo.getType().getPojoType() ).load( entityInfo.getId() );
 		}
 		else {
-			Criteria criteria = new CriteriaImpl( entityInfo.getClazz().getName(), (SharedSessionContractImplementor) session );
+			Criteria criteria = new CriteriaImpl( entityInfo.getType().getName(), (SharedSessionContractImplementor) session );
 			criteria.add( Restrictions.eq( entityInfo.getIdName(), entityInfo.getId() ) );
 			try {
 				maybeProxy = criteria.uniqueResult();
@@ -68,7 +68,7 @@ public final class ObjectLoaderHelper {
 				// FIXME should not raise an exception but return something like null
 				// FIXME this happens when the index is out of sync with the db)
 				throw new SearchException(
-						"Loading entity of type " + entityInfo.getClazz().getName() + " using '"
+						"Loading entity of type " + entityInfo.getType().getName() + " using '"
 								+ entityInfo.getIdName()
 								+ "' as document id and '"
 								+ entityInfo.getId()
@@ -82,7 +82,7 @@ public final class ObjectLoaderHelper {
 	// TODO should we cache that result?
 	public static boolean areDocIdAndEntityIdIdentical(EntityInfo entityInfo, Session session) {
 		String hibernateIdentifierProperty = session.getSessionFactory()
-				.getClassMetadata( entityInfo.getClazz() )
+				.getClassMetadata( entityInfo.getType().getName() )
 				.getIdentifierPropertyName();
 		return entityInfo.getIdName().equals( hibernateIdentifierProperty );
 	}

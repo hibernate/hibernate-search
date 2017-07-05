@@ -28,14 +28,6 @@ public interface EntityInfo {
 	};
 
 	/**
-	 * @deprecated Use {@link #getType()}
-	 * @return The entity class.
-	 * @throws SearchException If the entity class could not be retrieved from the indexed document.
-	 */
-	@Deprecated
-	Class<?> getClazz();
-
-	/**
 	 * @return The entity type.
 	 * @throws SearchException If the entity class could not be retrieved from the indexed document.
 	 */

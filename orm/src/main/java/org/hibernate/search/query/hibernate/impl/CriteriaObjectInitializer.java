@@ -271,12 +271,12 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		private EntityInfoIdSpace(Class<?> rootType, EntityInfo entityInfo) {
 			this.rootType = rootType;
 			this.entityInfos.add( entityInfo );
-			this.mostSpecificEntityType = entityInfo.getClazz();
+			this.mostSpecificEntityType = entityInfo.getType().getPojoType();
 		}
 
 		private void add(EntityInfo entityInfo) {
 			entityInfos.add( entityInfo );
-			mostSpecificEntityType = getMostSpecificCommonSuperClass( mostSpecificEntityType, entityInfo.getClazz() );
+			mostSpecificEntityType = getMostSpecificCommonSuperClass( mostSpecificEntityType, entityInfo.getType().getPojoType() );
 		}
 
 		private Class<?> getMostSpecificCommonSuperClass(Class<?> class1, Class<?> class2) {
