@@ -20,7 +20,6 @@ import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * Provides information about the sortable fields configured for given entities.
@@ -123,11 +122,6 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 				builtConfigurations.put( indexName, currentIndexBucket );
 			}
 			return this;
-		}
-
-		@Deprecated
-		public Builder setEntityType(Class<?> pojotype) {
-			return setEntityType( new PojoIndexedTypeIdentifier( pojotype ) );
 		}
 
 		public Builder setEntityType(IndexedTypeIdentifier indexedTypeIdentifier) {

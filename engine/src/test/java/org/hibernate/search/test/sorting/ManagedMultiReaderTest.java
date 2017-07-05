@@ -25,6 +25,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.impl.SortConfigurations;
 import org.hibernate.search.reader.impl.ManagedMultiReader;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Rule;
@@ -41,13 +43,16 @@ import static org.fest.assertions.Assertions.assertThat;
 @Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class ManagedMultiReaderTest {
 
+	private static final IndexedTypeIdentifier PERSON_TYPE = new PojoIndexedTypeIdentifier( Person.class );
+	private static final IndexedTypeIdentifier CUSTOMER_TYPE = new PojoIndexedTypeIdentifier( Customer.class );
+
 	@Rule
 	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class, Customer.class );
 
 	@Test
 	public void testStandardReaderIsUsedIfAllSortsAreCovered() throws Exception {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
+		EntityIndexBinding binding = integrator.getIndexBinding( PERSON_TYPE );
 
 		Set<IndexManager> indexManagers = binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] );
 
@@ -58,7 +63,7 @@ public class ManagedMultiReaderTest {
 
 		SortConfigurations configuredSorts = new SortConfigurations.Builder()
 			.setIndex( "test" )
-			.setEntityType( Person.class )
+			.setEntityType( PERSON_TYPE )
 			.addSortableFields(
 					Arrays.asList(
 							new SortableFieldMetadata.Builder( "ageForIntSorting" ).build(),
@@ -79,7 +84,7 @@ public class ManagedMultiReaderTest {
 	@Test
 	public void testUninvertingReaderIsUsedIfNotAllSortsAreCovered() throws Exception {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
+		EntityIndexBinding binding = integrator.getIndexBinding( PERSON_TYPE );
 
 		Set<IndexManager> indexManagers = binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] );
 
@@ -90,7 +95,7 @@ public class ManagedMultiReaderTest {
 
 		SortConfigurations configuredSorts = new SortConfigurations.Builder()
 			.setIndex( "person" )
-			.setEntityType( Person.class )
+			.setEntityType( PERSON_TYPE )
 			.addSortableFields(
 					Arrays.asList(
 							new SortableFieldMetadata.Builder( "ageForStringSorting" ).build()
@@ -111,10 +116,10 @@ public class ManagedMultiReaderTest {
 	public void testCombinationOfStandardAndUninvertingReaderAsRequiredToSortOnInvolvedIndexes() throws Exception {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
 
-		EntityIndexBinding binding = integrator.getIndexBinding( Person.class );
+		EntityIndexBinding binding = integrator.getIndexBinding( PERSON_TYPE );
 		List<IndexManager> indexManagers = new ArrayList<>( binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] ) );
 
-		binding = integrator.getIndexBinding( Customer.class );
+		binding = integrator.getIndexBinding( CUSTOMER_TYPE );
 		indexManagers.addAll( binding.getIndexManagerSelector().forFilters( new FullTextFilterImpl[0] ) );
 
 		Sort sort = new Sort(
@@ -124,12 +129,12 @@ public class ManagedMultiReaderTest {
 
 		SortConfigurations configuredSorts = new SortConfigurations.Builder()
 			.setIndex( "person" )
-				.setEntityType( Person.class )
+				.setEntityType( PERSON_TYPE )
 					.addSortableFields(
 							Arrays.asList( new SortableFieldMetadata.Builder( "ageForStringSorting" ).build() )
 					)
 			.setIndex( "customer" )
-				.setEntityType( Customer.class )
+				.setEntityType( CUSTOMER_TYPE )
 					.addSortableFields(
 							Arrays.asList(
 									new SortableFieldMetadata.Builder( "ageForStringSorting" ).build(),
