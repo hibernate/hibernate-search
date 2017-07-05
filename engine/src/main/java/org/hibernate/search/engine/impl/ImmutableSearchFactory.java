@@ -347,12 +347,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class entityType) {
-		return documentBuildersContainedEntities.get( entityType );
-	}
-
-	@Override
 	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(IndexedTypeIdentifier entityType) {
 		return documentBuildersContainedEntities.get( entityType );
 	}

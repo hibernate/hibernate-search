@@ -34,9 +34,6 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  */
 public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
-	@Deprecated
-	DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class<?> entityType);
-
 	DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(IndexedTypeIdentifier entityType);
 
 	FilterCachingStrategy getFilterCachingStrategy();

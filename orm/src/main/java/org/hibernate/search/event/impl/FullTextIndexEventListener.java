@@ -40,6 +40,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
@@ -280,12 +281,13 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object instance) {
 		ExtendedSearchIntegrator integrator = getExtendedSearchFactoryIntegrator();
 		Class<?> clazz = instance.getClass();
-		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( clazz );
+		IndexedTypeIdentifier type = integrator.getIndexBindings().keyFromPojoType( clazz );
+		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( type );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
 		}
 		else {
-			return integrator.getDocumentBuilderContainedEntity( clazz );
+			return integrator.getDocumentBuilderContainedEntity( type );
 		}
 	}
 

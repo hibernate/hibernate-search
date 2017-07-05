@@ -94,11 +94,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class<?> entityType) {
-		return delegate.getDocumentBuilderContainedEntity( entityType );
-	}
-
-	@Override
 	public Worker getWorker() {
 		return delegate.getWorker();
 	}

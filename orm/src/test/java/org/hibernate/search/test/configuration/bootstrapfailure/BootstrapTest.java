@@ -9,6 +9,7 @@ package org.hibernate.search.test.configuration.bootstrapfailure;
 import java.util.Set;
 
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class BootstrapTest extends SearchTestBase {
 				"NoSearchEntity should not have a DocumentBuilderContainedEntity",
 				getExtendedSearchIntegrator()
 				.unwrap( ExtendedSearchIntegrator.class )
-				.getDocumentBuilderContainedEntity( NoSearchEntity.class )
+				.getDocumentBuilderContainedEntity( new PojoIndexedTypeIdentifier( NoSearchEntity.class ) )
 		);
 	}
 
