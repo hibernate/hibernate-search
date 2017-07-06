@@ -9,9 +9,12 @@ package org.hibernate.search.engineperformance.elasticsearch;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.DatasetCreation;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorCreation;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -25,6 +28,9 @@ public class EngineHolder extends BaseIndexSetup {
 	@Param( { "true", "false" } )
 	private boolean refreshAfterWrite;
 
+	@Param( { "sync", "async" } )
+	private String workerExecution;
+
 	@Param( { "100000" } )
 	private int indexSize;
 
@@ -33,6 +39,9 @@ public class EngineHolder extends BaseIndexSetup {
 
 	@Param( { DatasetCreation.HIBERNATE_DEV_ML_2016_01 } )
 	private String dataset;
+
+	@Param( { "50000" } )
+	private int changesetsPerFlush;
 
 	/**
 	 * Format: (number of add/remove) + "," + (number of updates)
@@ -55,7 +64,7 @@ public class EngineHolder extends BaseIndexSetup {
 
 	@Setup
 	public void initializeState() throws IOException, URISyntaxException {
-		si = SearchIntegratorCreation.createIntegrator( getConnectionInfo(), refreshAfterWrite );
+		si = SearchIntegratorCreation.createIntegrator( getConnectionInfo(), refreshAfterWrite, workerExecution );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
 		SearchIntegratorCreation.preindexEntities( si, data, indexSize );
 
@@ -76,6 +85,10 @@ public class EngineHolder extends BaseIndexSetup {
 		return indexSize;
 	}
 
+	public int getChangesetsPerFlush() {
+		return changesetsPerFlush;
+	}
+
 	public int getAddsDeletesPerChangeset() {
 		return addsDeletesPerChangeset;
 	}
@@ -86,6 +99,12 @@ public class EngineHolder extends BaseIndexSetup {
 
 	public int getQueryMaxResults() {
 		return maxResults;
+	}
+
+	public void flush(IndexedTypeIdentifier typeId) {
+		for ( IndexManager indexManager : si.getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
+			indexManager.performStreamOperation( new FlushLuceneWork( null, typeId ), null, false );
+		}
 	}
 
 	@TearDown

@@ -30,10 +30,11 @@ public class Launcher {
 	public static void main(String... args) throws Exception {
 		Options opts = new OptionsBuilder()
 			.include( ".*" )
-			.warmupIterations( 10 )
+			.warmupIterations( 1 )
 			.measurementIterations( 10 )
 			.param( "indexSize", "100" )
 			.param( "maxResults", "10" )
+			.param( "changesetsPerFlush", "500" )
 			.forks( 0 ) //To simplify debugging; Remember this implies JVM parameters via @Fork won't be applied.
 			.build();
 
