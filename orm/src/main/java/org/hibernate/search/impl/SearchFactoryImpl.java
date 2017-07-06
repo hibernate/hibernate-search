@@ -75,7 +75,7 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	@Override
 	public Set<Class<?>> getIndexedTypes() {
-		return searchIntegrator.getIndexedTypes();
+		return searchIntegrator.getIndexBindings().keySet().toPojosSet();
 	}
 
 	private IndexedTypeIdentifier convertTypeIdentifier(Class<?> clazz) {

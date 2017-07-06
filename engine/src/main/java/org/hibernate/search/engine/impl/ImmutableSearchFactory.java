@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -593,12 +592,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			typeDescriptor = indexedTypeDescriptor;
 		}
 		return typeDescriptor;
-	}
-
-	@Deprecated
-	@Override
-	public Set<Class<?>> getIndexedTypes() {
-		return indexBindingForEntities.keySet().toPojosSet();
 	}
 
 	@Override

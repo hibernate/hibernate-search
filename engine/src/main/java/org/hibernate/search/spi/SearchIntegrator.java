@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.spi;
 
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -173,16 +172,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
 	 */
 	IndexedTypeDescriptor getIndexedTypeDescriptor(IndexedTypeIdentifier typeId);
-
-	/**
-	 * Returns the set of currently indexed types.
-	 *
-	 * @deprecated Use {@link #getIndexedTypeIdentifiers()}
-	 *
-	 * @return the set of currently indexed types. If no types are indexed the empty set is returned.
-	 */
-	@Deprecated
-	Set<Class<?>> getIndexedTypes();
 
 	/**
 	 * Returns the set of currently indexed types.

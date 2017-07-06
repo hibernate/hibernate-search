@@ -8,7 +8,6 @@ package org.hibernate.search.engine.impl;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -275,11 +274,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return delegate.getIndexReaderAccessor();
-	}
-
-	@Override
-	public Set<Class<?>> getIndexedTypes() {
-		return delegate.getIndexedTypes();
 	}
 
 	@Override
