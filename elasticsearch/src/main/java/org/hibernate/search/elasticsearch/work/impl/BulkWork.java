@@ -17,6 +17,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
@@ -33,6 +34,8 @@ import com.google.gson.JsonObject;
 public class BulkWork implements ElasticsearchWork<Void> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 
 	private final ElasticsearchRequest request;
 
@@ -128,14 +131,16 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		int i = 0;
 
 		JsonObject parsedResponseBody = response.getBody();
-		JsonArray resultItems = parsedResponseBody.has( "items" ) ? parsedResponseBody.get( "items" ).getAsJsonArray() : null;
+		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
+		int resultItemsSize = resultItems.size();
 
 		List<RuntimeException> resultHandlingExceptions = null;
 		for ( BulkableElasticsearchWork<?> work : works ) {
-			JsonObject resultItem = resultItems != null ? resultItems.get( i ).getAsJsonObject() : null;
+			JsonObject resultItem = null;
 
 			boolean success;
 			try {
+				resultItem = i < resultItemsSize ? resultItems.get( i ).getAsJsonObject() : null;
 				success = work.handleBulkResult( context, resultItem );
 			}
 			catch (RuntimeException e) {
