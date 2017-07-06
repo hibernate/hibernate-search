@@ -82,7 +82,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			// but we should not move the responsibility to figure out the proper id to the engine
 			boolean identifierRollbackEnabled = event.getSession()
 					.getFactory()
-					.getSettings()
+					.getSessionFactoryOptions()
 					.isIdentifierRollbackEnabled();
 			processWork( tenantIdentifier( event ), entity, event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
 		}

@@ -23,6 +23,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -221,10 +222,10 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	}
 
 	private Class<?> getRootEntityType(SessionFactoryImplementor sessionFactory, IndexedTypeIdentifier indexedTypeIdentifier) {
-		String entityName = sessionFactory.getClassMetadata( indexedTypeIdentifier.getPojoType() ).getEntityName();
-		String rootEntityName = sessionFactory.getMetamodel().entityPersister( entityName ).getRootEntityName();
-
-		return sessionFactory.getEntityPersister( rootEntityName ).getMappedClass();
+		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		String entityName = indexedTypeIdentifier.getName();
+		String rootEntityName = metamodel.entityPersister( entityName ).getRootEntityName();
+		return metamodel.entityPersister( rootEntityName ).getMappedClass();
 	}
 
 	private void addToIdSpace(Map<Class<?>, EntityInfoIdSpace> idSpaces, EntityInfo entityInfo, IdUniquenessResolver resolver, SessionFactoryImplementor sessionFactory) {

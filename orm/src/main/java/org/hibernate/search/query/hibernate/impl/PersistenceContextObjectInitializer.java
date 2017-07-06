@@ -13,6 +13,7 @@ import java.util.List;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.Log;
@@ -41,11 +42,10 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 			return;
 		}
 
-		SessionImplementor sessionImplementor = (SessionImplementor) objectInitializationContext.getSession();
-		String entityName = objectInitializationContext.getSession()
-				.getSessionFactory().getClassMetadata( objectInitializationContext.getEntityType() ).getEntityName();
-		EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
-		PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
+		final SessionImplementor sessionImplementor = (SessionImplementor) objectInitializationContext.getSession();
+		final MetamodelImplementor metamodelImplementor = sessionImplementor.getSessionFactory().getMetamodel();
+		final EntityPersister persister = metamodelImplementor.entityPersister( objectInitializationContext.getEntityType() );
+		final PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
 
 		//check the persistence context
 		List<EntityInfo> remainingEntityInfos = new ArrayList<>( numberOfObjectsToInitialize );
