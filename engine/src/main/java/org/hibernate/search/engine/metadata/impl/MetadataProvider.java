@@ -25,12 +25,6 @@ public interface MetadataProvider {
 	TypeMetadata getTypeMetadataFor(IndexedTypeIdentifier type, IndexManagerType indexManagerType);
 
 	/**
-	 * @deprecated use {@link #getTypeMetadataFor(IndexedTypeIdentifier, IndexManagerType)}
-	 */
-	@Deprecated
-	TypeMetadata getTypeMetadataFor(Class<?> clazz, IndexManagerType indexManagerType);
-
-	/**
 	 * Returns the {@code ContainedIn} related metadata for the specified type.
 	 *
 	 * <p>The metadata for {@code ContainedIn} are not comprehensive: they do not

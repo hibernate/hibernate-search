@@ -24,6 +24,8 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.spi.DefaultInstanceInitializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -62,7 +64,9 @@ public class UnorderedIdScanTest {
 		SearchConfiguration searchConfiguration = new HibernateManualConfiguration();
 		ConfigContext context = new ConfigContext( searchConfiguration, new BuildContextForTest( searchConfiguration ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ),
+		Class mappedClazz = reflectionManager.toClass( mappedXClass );
+		IndexedTypeIdentifier type = new PojoIndexedTypeIdentifier( mappedClazz );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( type,
 				LuceneEmbeddedIndexManagerType.INSTANCE );
 		new DocumentBuilderIndexedEntity( mappedXClass,
 				typeMetadata,
