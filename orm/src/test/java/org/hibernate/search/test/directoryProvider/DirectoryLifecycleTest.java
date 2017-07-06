@@ -43,7 +43,7 @@ public class DirectoryLifecycleTest {
 		CloseCheckingDirectoryProvider directoryProvider;
 		try {
 			SearchIntegrator integrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
-			EntityIndexBinding snowIndexBinder = integrator.getIndexBinding( SnowStorm.class );
+			EntityIndexBinding snowIndexBinder = integrator.getIndexBindings().get( SnowStorm.class );
 			IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 			assertThat( indexManagers.length ).isEqualTo( 1 );
 			assertThat( indexManagers[0] ).isInstanceOf( DirectoryBasedIndexManager.class );

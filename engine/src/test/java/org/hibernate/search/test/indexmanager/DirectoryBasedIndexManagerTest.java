@@ -42,7 +42,7 @@ public class DirectoryBasedIndexManagerTest {
 	@Test
 	public void testUnlockIndexWriter() throws Exception {
 		ExtendedSearchIntegrator searchIntegrator = sfh.getSearchFactory();
-		IndexManager indexManager = searchIntegrator.getIndexBinding( Entity.class ).getIndexManagers()[0];
+		IndexManager indexManager = searchIntegrator.getIndexBindings().get( Entity.class ).getIndexManagers()[0];
 		helper.add( new Entity(), 1 );
 		assertTrue( isIndexWriterLocked( indexManager ) );
 

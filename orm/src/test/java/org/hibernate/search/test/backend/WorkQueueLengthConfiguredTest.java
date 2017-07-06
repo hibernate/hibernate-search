@@ -38,7 +38,7 @@ public class WorkQueueLengthConfiguredTest extends SearchTestBase {
 	@Test
 	public void testNothingTest() {
 		SearchIntegrator searchFactory = getSearchFactory().unwrap( SearchIntegrator.class );
-		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( Clock.class );
+		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBindings().get( Clock.class );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

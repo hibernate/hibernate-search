@@ -116,7 +116,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	private Object getUnwrappedBridge(Class<?> clazz, String string, Class<?> expectedBridgeClass) {
-		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
+		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBindings().get( clazz ).getDocumentBuilder()
 				.getTypeMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
 		return unwrapBridge( bridge, expectedBridgeClass );
 	}
@@ -138,7 +138,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		 * it used not to be, because the call to numericField used to
 		 * create another, duplicate field, erasing all previous information.
 		 */
-		TypeMetadata metadata = getExtendedSearchIntegrator().getIndexBinding( Item.class )
+		TypeMetadata metadata = getExtendedSearchIntegrator().getIndexBindings().get( Item.class )
 				.getDocumentBuilder().getTypeMetadata();
 
 		assertTrue( metadata.getDocumentFieldMetadataFor( "price" ).isNumeric() );

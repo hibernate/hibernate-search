@@ -174,7 +174,7 @@ public class IndexingGeneratedCorpusTest {
 
 	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
 		SearchIntegrator searchIntegrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
-		IndexManager indexManager = searchIntegrator.getIndexBinding( type ).getIndexManagers()[0];
+		IndexManager indexManager = searchIntegrator.getIndexBindings().get( type ).getIndexManagers()[0];
 
 		// No need to check for alternative implementations such as ES
 		if ( indexManager instanceof DirectoryBasedIndexManager ) {

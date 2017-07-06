@@ -70,7 +70,7 @@ public class AnalyzerDefAnnotationTest {
 	@Category(SkipOnElasticsearch.class) // Unused AnalyzerDefs are always bound to the Lucene registry, making this test fail on ES
 	public void shouldContainOnlyTheDefinedAnalyzers() throws Exception {
 		ExtendedSearchIntegrator factory = sfHolder.getSearchFactory();
-		IndexManagerType indexManagerType = factory.getIndexBinding( Sample.class ).getIndexManagerType();
+		IndexManagerType indexManagerType = factory.getIndexBindings().get( Sample.class ).getIndexManagerType();
 		Map<String, AnalyzerReference> analyzerReferences =
 				factory.getIntegration( indexManagerType ).getAnalyzerRegistry().getNamedAnalyzerReferences();
 		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );

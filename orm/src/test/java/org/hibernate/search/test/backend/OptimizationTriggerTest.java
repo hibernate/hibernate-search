@@ -99,7 +99,7 @@ public class OptimizationTriggerTest extends SearchTestBase {
 
 	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
 		SearchIntegrator searchIntegrator = getSearchFactory().unwrap( SearchIntegrator.class );
-		EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBinding( clazz );
+		EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBindings().get( clazz );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		return (DirectoryBasedIndexManager) indexManagers[0];

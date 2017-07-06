@@ -65,11 +65,11 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Test
 	public void testCorrectNumberOfShardsDetected() {
-		EntityIndexBinding indexBindingForDocument = getExtendedSearchIntegrator().getIndexBinding( Document.class );
+		EntityIndexBinding indexBindingForDocument = getExtendedSearchIntegrator().getIndexBindings().get( Document.class );
 		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
 		assertNotNull( documentManagers );
 		assertEquals( 4, documentManagers.length );
-		EntityIndexBinding indexBindingForBooks = getExtendedSearchIntegrator().getIndexBinding( Book.class );
+		EntityIndexBinding indexBindingForBooks = getExtendedSearchIntegrator().getIndexBindings().get( Book.class );
 		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
 		assertNotNull( bookManagers );
 		assertEquals( 2, bookManagers.length );
@@ -77,7 +77,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Test
 	public void testSelectionOfShardingStrategy() {
-		IndexManagerSelector selector = getExtendedSearchIntegrator().getIndexBinding( Document.class ).getIndexManagerSelector();
+		IndexManagerSelector selector = getExtendedSearchIntegrator().getIndexBindings().get( Document.class ).getIndexManagerSelector();
 		assertNotNull( selector );
 		assertEquals( selector.getClass(), IndexShardingStrategyIndexManagerSelector.class );
 		assertEquals( 4, selector.all().size() );

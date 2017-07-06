@@ -154,7 +154,7 @@ public class NumericFieldTest {
 	}
 
 	private Object getUnwrappedBridge(Class<?> clazz, String string, Class<?> expectedBridgeClass) {
-		FieldBridge bridge = sfHolder.getSearchFactory().getIndexBinding( clazz ).getDocumentBuilder()
+		FieldBridge bridge = sfHolder.getSearchFactory().getIndexBindings().get( clazz ).getDocumentBuilder()
 				.getTypeMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
 		return unwrapBridge( bridge, expectedBridgeClass );
 	}

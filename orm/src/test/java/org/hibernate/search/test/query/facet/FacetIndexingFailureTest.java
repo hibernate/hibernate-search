@@ -41,7 +41,7 @@ public class FacetIndexingFailureTest {
 			name = "buildError")
 	public void testFailureToIndexFacetThrowsSearchException() throws Exception {
 		DocumentBuilderIndexedEntity documentBuilder = factoryHolder.getSearchFactory()
-				.getIndexBinding( Car.class ).getDocumentBuilder();
+				.getIndexBindings().get( Car.class ).getDocumentBuilder();
 		try {
 			Car car = new Car( "Honda", "yellow", 2407 );
 			documentBuilder.getDocument(

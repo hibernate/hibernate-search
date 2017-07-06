@@ -179,12 +179,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the IndexManager interface
-	@Deprecated
-	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
-		return boundSearchIntegrator.getIndexBinding( entityType );
-	}
-
-	//Not exposed on the IndexManager interface
 	public EntityIndexBinding getIndexBinding(IndexedTypeIdentifier type) {
 		return boundSearchIntegrator.getIndexBinding( type );
 	}

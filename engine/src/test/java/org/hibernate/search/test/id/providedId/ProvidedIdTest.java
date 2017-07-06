@@ -108,8 +108,8 @@ public class ProvidedIdTest {
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
 		Map<String, EntityIndexBinding> targetedEntityBindings = new HashMap<>();
-		targetedEntityBindings.put( ProvidedIdPerson.class.getName(), extendedIntegrator.getIndexBinding( ProvidedIdPerson.class ) );
-		targetedEntityBindings.put( ProvidedIdPersonSub.class.getName(), extendedIntegrator.getIndexBinding( ProvidedIdPersonSub.class ) );
+		targetedEntityBindings.put( ProvidedIdPerson.class.getName(), extendedIntegrator.getIndexBindings().get( ProvidedIdPerson.class ) );
+		targetedEntityBindings.put( ProvidedIdPersonSub.class.getName(), extendedIntegrator.getIndexBindings().get( ProvidedIdPersonSub.class ) );
 		DocumentExtractor extractor = new DocumentExtractorImpl(
 				queryHits, extendedIntegrator, new String[] { "name" },
 				identifiers, false,

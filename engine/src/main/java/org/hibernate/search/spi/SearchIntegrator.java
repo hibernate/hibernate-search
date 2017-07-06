@@ -49,19 +49,6 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Returns the entity to index binding for the given type.
-	 *
-	 * @deprecated Use {@link #getIndexBinding(IndexedTypeIdentifier)} instead.
-	 *
-	 * @param entityType the type for which to retrieve the binding
-	 *
-	 * @return the entity to index binding for the given type. {@code null} is returned for types which are unindexed or
-	 *         unknown.
-	 */
-	@Deprecated
-	EntityIndexBinding getIndexBinding(Class<?> entityType);
-
-	/**
-	 * Returns the entity to index binding for the given type.
 	 * @param entityType the type for which to retrieve the binding
 	 * @return the entity to index binding for the given type. {@code null} is returned for types which are unindexed or
 	 *         unknown.

@@ -88,12 +88,6 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	@Deprecated
-	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
-		return delegate.getIndexBinding( entityType );
-	}
-
-	@Override
 	public Worker getWorker() {
 		return delegate.getWorker();
 	}

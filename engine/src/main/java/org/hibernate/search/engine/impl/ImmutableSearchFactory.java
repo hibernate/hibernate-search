@@ -73,7 +73,6 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.ConcurrentIndexedTypeMap;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
@@ -330,12 +329,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	@Deprecated
-	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
-		return indexBindingForEntities.get( new PojoIndexedTypeIdentifier( entityType ) );
-	}
-
-	@Override
 	public EntityIndexBinding getIndexBinding(IndexedTypeIdentifier entityType) {
 		return indexBindingForEntities.get( entityType );
 	}
@@ -553,7 +546,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		if ( entityType == null ) {
 			throw log.nullIsInvalidIndexedType();
 		}
-		EntityIndexBinding entityIndexBinding = getIndexBinding( entityType );
+		EntityIndexBinding entityIndexBinding = getIndexBindings().get( entityType );
 		if ( entityIndexBinding == null ) {
 			throw log.notAnIndexedType( entityType.getName() );
 		}

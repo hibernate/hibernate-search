@@ -185,7 +185,7 @@ public class MutableFactoryTest {
 						.newInstance( index, name );
 				helper.index( entity, index );
 
-				EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBinding( aClass );
+				EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBindings().get( aClass );
 				assertNotNull( indexBindingForEntity );
 
 				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();

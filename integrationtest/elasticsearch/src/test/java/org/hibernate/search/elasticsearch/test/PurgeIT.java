@@ -178,7 +178,7 @@ public class PurgeIT extends SearchTestBase {
 	 * Perform a flush, which implies a refresh
 	 */
 	private void flush() {
-		IndexManager indexManager = getExtendedSearchIntegrator().getIndexBinding( Level1.class ).getIndexManagers()[0];
+		IndexManager indexManager = getExtendedSearchIntegrator().getIndexBindings().get( Level1.class ).getIndexManagers()[0];
 		indexManager.performOperations( Collections.singletonList( FlushLuceneWork.INSTANCE ), null );
 	}
 

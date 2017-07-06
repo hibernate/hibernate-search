@@ -82,7 +82,7 @@ public class RetryInitializeTest {
 
 		SearchIntegrator integrator = slave.getSearchFactory().unwrap( SearchIntegrator.class );
 
-		EntityIndexBinding snowIndexBinder = integrator.getIndexBinding( SnowStorm.class );
+		EntityIndexBinding snowIndexBinder = integrator.getIndexBindings().get( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

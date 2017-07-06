@@ -44,7 +44,7 @@ public class IndexNameOverrideTest {
 
 		integrator = init( cfg );
 		assertThat(
-				integrator.getIndexBinding( NoAnnotationIndexNameOverrideEntity.class ).getIndexManagers()
+				integrator.getIndexBindings().get( NoAnnotationIndexNameOverrideEntity.class ).getIndexManagers()
 				)
 				.onProperty( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
@@ -63,7 +63,7 @@ public class IndexNameOverrideTest {
 
 		integrator = init( cfg );
 		assertThat(
-				integrator.getIndexBinding( IndexedAnnotationIndexNameOverriddeEntity.class ).getIndexManagers()
+				integrator.getIndexBindings().get( IndexedAnnotationIndexNameOverriddeEntity.class ).getIndexManagers()
 				)
 				.onProperty( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )
@@ -91,7 +91,7 @@ public class IndexNameOverrideTest {
 		 * the declared index name.
 		 */
 		assertThat(
-				integrator.getIndexBinding( NoAnnotationIndexNameOverrideEntity.class ).getIndexManagers()
+				integrator.getIndexBindings().get( NoAnnotationIndexNameOverrideEntity.class ).getIndexManagers()
 				)
 				.onProperty( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
@@ -119,7 +119,7 @@ public class IndexNameOverrideTest {
 		 * the declared index name.
 		 */
 		assertThat(
-				integrator.getIndexBinding( IndexedAnnotationIndexNameOverriddeEntity.class ).getIndexManagers()
+				integrator.getIndexBindings().get( IndexedAnnotationIndexNameOverriddeEntity.class ).getIndexManagers()
 				)
 				.onProperty( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )

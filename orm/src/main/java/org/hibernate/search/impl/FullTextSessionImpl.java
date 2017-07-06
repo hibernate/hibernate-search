@@ -148,7 +148,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		//TODO cache that at the FTSession level
 		ExtendedSearchIntegrator extendedIntegrator = getSearchIntegrator();
 		//not strictly necessary but a small optimization
-		if ( extendedIntegrator.getIndexBinding( clazz ) == null ) {
+		if ( extendedIntegrator.getIndexBindings().get( clazz ) == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}

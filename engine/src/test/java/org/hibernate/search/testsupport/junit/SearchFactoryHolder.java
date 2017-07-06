@@ -142,7 +142,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public IndexManager extractIndexManager(Class indexedType) {
-		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBinding( indexedType );
+		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBindings().get( indexedType );
 		IndexManager indexManager = (IndexManager) indexBindingForEntity.getIndexManagers()[0];
 		return indexManager;
 	}

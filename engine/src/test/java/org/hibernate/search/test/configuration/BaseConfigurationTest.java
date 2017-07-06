@@ -30,7 +30,7 @@ public class BaseConfigurationTest {
 	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	protected static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
-		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( type );
+		EntityIndexBinding indexBindingForEntity = sf.getIndexBindings().get( type );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();

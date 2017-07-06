@@ -68,7 +68,7 @@ public class ShardingConfigurationTest {
 	public void testNoShardingIsUsedPerDefault() {
 		MutableSearchFactory searchFactory = getSearchFactory( Collections.<String, String>emptyMap() );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 
 		IndexManagerSelector selector = entityIndexBinding.getIndexManagerSelector();
 
@@ -91,7 +91,7 @@ public class ShardingConfigurationTest {
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 
 		IndexManagerSelector selector = entityIndexBinding.getIndexManagerSelector();
 
@@ -156,7 +156,7 @@ public class ShardingConfigurationTest {
 
 		logged.expectMessage( "HSEARCH000193", "IdHashShardingStrategy" );
 
-		EntityIndexBinding entityIndexBinding = getSearchFactory( shardingProperties ).getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = getSearchFactory( shardingProperties ).getIndexBindings().get( Foo.class );
 
 		// 1 is assumed for legacy reasons. IMO not setting the number of shards should throw an exception
 		assertTrue(
@@ -176,7 +176,7 @@ public class ShardingConfigurationTest {
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 
 		IndexManagerSelector selector = entityIndexBinding.getIndexManagerSelector();
 
@@ -209,7 +209,7 @@ public class ShardingConfigurationTest {
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 
 		assertEquals(
 				"Explicitly set shard id provider ignored",
@@ -242,7 +242,7 @@ public class ShardingConfigurationTest {
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 
 		assertEquals(
 				"Explicitly set shard id provider ignored",
@@ -266,7 +266,7 @@ public class ShardingConfigurationTest {
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
-		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
 		IndexManager indexManagers[] = entityIndexBinding.getIndexManagers();
 
 		assertTrue( "There should be two index managers", indexManagers.length == 1 );

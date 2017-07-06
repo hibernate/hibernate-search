@@ -144,7 +144,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 		RootEntityMetadata(Class<?> rootEntity, ExtendedSearchIntegrator extendedIntegrator) {
 			this.rootEntity = rootEntity;
-			EntityIndexBinding provider = extendedIntegrator.getIndexBinding( rootEntity );
+			EntityIndexBinding provider = extendedIntegrator.getIndexBindings().get( rootEntity );
 			if ( provider == null ) {
 				throw new AssertionFailure( "Provider not found for class: " + rootEntity );
 			}
