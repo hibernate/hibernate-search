@@ -29,15 +29,28 @@ import org.openjdk.jmh.annotations.Group;
 import org.openjdk.jmh.annotations.GroupThreads;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.infra.ThreadParams;
 
 @Fork(1)
+/*
+ * Write methods already performs multiple operations,
+ * so we could simply run those once,
+ * but we don't have individual control over how many times
+ * each method is run, and in the concurrent test we want the
+ * read methods to be run as long as the writes continue.
+ * Thus we don't set "batchSize" here.
+ *
+ * Note that the single-shot mode won't work,
+ * since it doesn't handle auxiliary counters
+ * (which are the only meaningful counters).
+ */
 public class JMHBenchmarks {
 
 	private static final IndexedTypeIdentifier BOOK_TYPE = new PojoIndexedTypeIdentifier( BookEntity.class );
 
 	@Benchmark
 	@Threads(20)
-	public void changeset(EngineHolder eh, RandomHolder rh) {
+	public void write(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
 		Worker worker = eh.getSearchIntegrator().getWorker();
 		Dataset dataset = eh.getDataset();
 
@@ -45,27 +58,40 @@ public class JMHBenchmarks {
 		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
 		int updatesPerChangeset = eh.getUpdatesPerChangeset();
 
+		int changesets = eh.getChangesetsPerFlush();
+
+		int threadIndex = threadParams.getSubgroupThreadIndex();
+		int threadIdIntervalSize = changesets * addDeletesPerChangeset;
+		int threadIdIntervalStart = initialIndexSize + threadIndex * threadIdIntervalSize;
+		int threadIdIntervalEnd = threadIdIntervalStart + threadIdIntervalSize;
+
 		Random random = rh.get();
 
-		TransactionContextForTest tc = new TransactionContextForTest();
-		random.ints( addDeletesPerChangeset, initialIndexSize, Integer.MAX_VALUE )
-				.forEach( id -> {
-					BookEntity book = dataset.create( id );
-					Work work = new Work( book, id, WorkType.ADD );
-					worker.performWork( work, tc );
-				} );
-		random.ints( updatesPerChangeset, 0, initialIndexSize )
-				.forEach( id -> {
-					BookEntity book = dataset.create( id );
-					Work work = new Work( book, id, WorkType.UPDATE );
-					worker.performWork( work, tc );
-				});
-		random.ints( addDeletesPerChangeset, 0, initialIndexSize )
-				.forEach( id -> {
-					Work work = new Work( BOOK_TYPE, id, WorkType.DELETE );
-					worker.performWork( work, tc );
-				});
-		tc.end();
+		for ( int i = 0 ; i < changesets ; ++i ) {
+			TransactionContextForTest tc = new TransactionContextForTest();
+			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
+					.forEach( id -> {
+						BookEntity book = dataset.create( id );
+						Work work = new Work( book, id, WorkType.ADD );
+						worker.performWork( work, tc );
+					} );
+			random.ints( updatesPerChangeset, 0, initialIndexSize )
+					.forEach( id -> {
+						BookEntity book = dataset.create( id );
+						Work work = new Work( book, id, WorkType.UPDATE );
+						worker.performWork( work, tc );
+					});
+			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
+					.forEach( id -> {
+						Work work = new Work( BOOK_TYPE, id, WorkType.DELETE );
+						worker.performWork( work, tc );
+					});
+			tc.end();
+			++counters.changeset;
+		}
+
+		// Ensure that we'll block until all works have been performed
+		eh.flush( BOOK_TYPE );
 	}
 
 	@Benchmark
@@ -85,9 +111,6 @@ public class JMHBenchmarks {
 		hsQuery.maxResults( maxResults );
 		int queryResultSize = hsQuery.queryResultSize();
 		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
-		if ( maxResults != queryEntityInfos.size() ) {
-			throw new RuntimeException( "Unexpected resultset size" );
-		}
 		bh.consume( queryResultSize );
 		bh.consume( queryEntityInfos );
 	}
@@ -95,8 +118,8 @@ public class JMHBenchmarks {
 	@Benchmark
 	@GroupThreads(5)
 	@Group("concurrentReadWriteTest")
-	public void readWriteTestWriter(EngineHolder eh, RandomHolder rh) {
-		changeset( eh, rh );
+	public void readWriteTestWriter(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
+		write( eh, rh, counters, threadParams );
 	}
 
 	@Benchmark
