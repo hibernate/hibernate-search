@@ -69,4 +69,22 @@ public final class PojoIndexedTypeIdentifier implements IndexedTypeIdentifier, S
 		return getName();
 	}
 
+	public static IndexedTypeIdentifier convertFromLegacy(Class<?> clazz) {
+		if ( clazz == null ) {
+			return null;
+		}
+		else {
+			return new PojoIndexedTypeIdentifier( clazz );
+		}
+	}
+
+	public static Class<?> convertToLegacy(IndexedTypeIdentifier type) {
+		if ( type == null ) {
+			return null;
+		}
+		else {
+			return ((PojoIndexedTypeIdentifier) type).pojoType;
+		}
+	}
+
 }
