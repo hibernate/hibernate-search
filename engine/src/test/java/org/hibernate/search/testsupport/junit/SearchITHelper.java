@@ -309,6 +309,19 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
+		public final AssertHSQueryContext matchesUnorderedIds(Serializable ... expectedIds) {
+			Object[] objectArray = Arrays.stream( expectedIds ).toArray();
+			asResultIds().containsOnly( objectArray );
+			return this;
+		}
+
+		public final AssertHSQueryContext matchesUnorderedIds(int[] expectedIds) {
+			Object[] objectArray = Arrays.stream( expectedIds ).mapToObj( i -> i ).toArray();
+			asResultIds().containsOnly( objectArray );
+			return this;
+		}
+
+		@SafeVarargs
 		public final AssertHSQueryContext matchesExactlyProjections(Object[] ... expectedProjections) {
 			Object[] objectArray = Arrays.stream( expectedProjections )
 					.map( Arrays::asList ) // Take advantage of List.equals
@@ -323,6 +336,24 @@ public class SearchITHelper {
 					.map( p -> Arrays.asList( p ) ) // Take advantage of List.equals
 					.toArray();
 			asResultProjectionsAsLists().containsExactly( objectArray );
+			return this;
+		}
+
+		@SafeVarargs
+		public final AssertHSQueryContext matchesUnorderedProjections(Object[] ... expectedProjections) {
+			Object[] objectArray = Arrays.stream( expectedProjections )
+					.map( Arrays::asList ) // Take advantage of List.equals
+					.toArray();
+			asResultProjectionsAsLists().containsOnly( objectArray );
+			return this;
+		}
+
+		@SafeVarargs
+		public final <T> AssertHSQueryContext matchesUnorderedSingleProjections(T ... expectedSingleElementProjections) {
+			Object[] objectArray = Arrays.stream( expectedSingleElementProjections )
+					.map( p -> Arrays.asList( p ) ) // Take advantage of List.equals
+					.toArray();
+			asResultProjectionsAsLists().containsOnly( objectArray );
 			return this;
 		}
 

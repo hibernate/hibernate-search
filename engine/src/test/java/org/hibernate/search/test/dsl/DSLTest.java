@@ -615,7 +615,7 @@ public class DSLTest {
 						.ignoreFieldBridge().ignoreAnalyzer()
 					.below( 1 ).excludeLimit()
 					.createQuery();
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1 );
 	}
 
 	@Test
@@ -629,7 +629,7 @@ public class DSLTest {
 						.ignoreFieldBridge().ignoreAnalyzer()
 					.matching( 0 )
 					.createQuery();
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1 );
 	}
 
 	@Test
@@ -785,7 +785,7 @@ public class DSLTest {
 
 		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1, 2, 3 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
 		//exclusive
 		query = monthQb
@@ -795,7 +795,7 @@ public class DSLTest {
 					.excludeLimit()
 					.createQuery();
 
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2, 3 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 2, 3 );
 	}
 
 	@Test
@@ -812,7 +812,7 @@ public class DSLTest {
 
 		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1, 2, 3 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
 		//exclusive
 		query = monthQb
@@ -822,7 +822,7 @@ public class DSLTest {
 					.excludeLimit()
 					.createQuery();
 
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1 );
+		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1 );
 	}
 
 	@Test
