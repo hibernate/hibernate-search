@@ -25,6 +25,9 @@ import org.openjdk.jmh.annotations.TearDown;
 @State(Scope.Benchmark)
 public class EngineHolder extends BaseIndexSetup {
 
+	@Param( { "default", "blackhole-5.4.0" } )
+	private String client;
+
 	@Param( { "true", "false" } )
 	private boolean refreshAfterWrite;
 
@@ -64,7 +67,7 @@ public class EngineHolder extends BaseIndexSetup {
 
 	@Setup
 	public void initializeState() throws IOException, URISyntaxException {
-		si = SearchIntegratorCreation.createIntegrator( getConnectionInfo(), refreshAfterWrite, workerExecution );
+		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
 		SearchIntegratorCreation.preindexEntities( si, data, indexSize );
 

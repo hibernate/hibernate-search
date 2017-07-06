@@ -9,8 +9,10 @@ package org.hibernate.search.engineperformance.elasticsearch.setuputilities;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.stub.BlackholeElasticsearchClientFactory;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -22,20 +24,30 @@ public class SearchIntegratorCreation {
 		//do not construct
 	}
 
-	public static SearchIntegrator createIntegrator(ConnectionInfo connectionInfo, boolean refreshAfterWrite, String workerExecution) {
+	public static SearchIntegrator createIntegrator(String client, ConnectionInfo connectionInfo, boolean refreshAfterWrite, String workerExecution) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 
 		cfg.addProperty( "hibernate.search.default.indexmanager", "elasticsearch" );
-		cfg.addProperty( "hibernate.search.default.elasticsearch.host", connectionInfo.getHost() );
-		addIfNonNull( cfg, "hibernate.search.default.elasticsearch.username", connectionInfo.getUsername() );
-		addIfNonNull( cfg, "hibernate.search.default.elasticsearch.password", connectionInfo.getPassword() );
-		addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.access_key", connectionInfo.getAwsAccessKey() );
-		addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.secret_key", connectionInfo.getAwsSecretKey() );
-		addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.region", connectionInfo.getAwsRegion() );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.required_index_status", "yellow" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.index_schema_management_strategy", "drop-and-create-and-drop" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.refresh_after_write", String.valueOf( refreshAfterWrite ) );
 		cfg.addProperty( "hibernate.search.default.worker.execution", workerExecution );
+
+		if ( "default".equals( client ) ) {
+			cfg.addProperty( "hibernate.search.default.elasticsearch.host", connectionInfo.getHost() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.username", connectionInfo.getUsername() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.password", connectionInfo.getPassword() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.access_key", connectionInfo.getAwsAccessKey() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.secret_key", connectionInfo.getAwsSecretKey() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.region", connectionInfo.getAwsRegion() );
+		}
+		else if ( client.startsWith( "blackhole-" ) ) {
+			String elasticsearchVersion = client.replaceFirst( "^blackhole-", "" );
+			cfg.addProvidedService( ElasticsearchClientFactory.class, new BlackholeElasticsearchClientFactory( elasticsearchVersion ) );
+		}
+		else {
+			throw new IllegalArgumentException( "Illegal value for parameter 'client': '" + client + "'." );
+		}
 
 		cfg.addClass( BookEntity.class );
 
