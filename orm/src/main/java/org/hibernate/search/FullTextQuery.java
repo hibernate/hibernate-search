@@ -33,6 +33,7 @@ public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, Q
 	/**
 	 * defines a result transformer used during projection, the Aliases provided are the projection aliases.
 	 */
+	@Deprecated
 	@Override
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 

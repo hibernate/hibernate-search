@@ -22,18 +22,21 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder connection();
 
+	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder connectionReleaseMode();
 
 	@Override
 	FullTextSharedSessionBuilder autoJoinTransactions();
 
-	@Override @Deprecated
+	@Override
 	FullTextSharedSessionBuilder autoClose();
 
+	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder flushBeforeCompletion();
 
+	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder transactionContext();
 
@@ -46,15 +49,18 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder connection(Connection connection);
 
+	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder connectionReleaseMode(ConnectionReleaseMode connectionReleaseMode);
 
 	@Override
 	FullTextSharedSessionBuilder autoJoinTransactions(boolean autoJoinTransactions);
 
-	@Override @Deprecated
+	@Deprecated
+	@Override
 	FullTextSharedSessionBuilder autoClose(boolean autoClose);
 
+	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder flushBeforeCompletion(boolean flushBeforeCompletion);
 

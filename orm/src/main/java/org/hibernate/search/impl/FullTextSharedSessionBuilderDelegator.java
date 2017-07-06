@@ -44,6 +44,7 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder connectionReleaseMode() {
 		builder.connectionReleaseMode();
@@ -62,12 +63,14 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder flushBeforeCompletion() {
 		builder.flushBeforeCompletion();
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder transactionContext() {
 		builder.transactionContext();
@@ -92,6 +95,7 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder connectionReleaseMode(ConnectionReleaseMode connectionReleaseMode) {
 		builder.connectionReleaseMode( connectionReleaseMode );
@@ -104,12 +108,14 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder autoClose(boolean autoClose) {
 		builder.autoClose( autoClose );
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public FullTextSharedSessionBuilder flushBeforeCompletion(boolean flushBeforeCompletion) {
 		builder.flushBeforeCompletion( flushBeforeCompletion );

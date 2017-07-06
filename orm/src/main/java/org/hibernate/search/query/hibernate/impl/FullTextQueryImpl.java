@@ -471,6 +471,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
+	@Deprecated
 	@Override
 	public FullTextQueryImpl setResultTransformer(ResultTransformer transformer) {
 		super.setResultTransformer( transformer );
@@ -588,21 +589,25 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		return false;
 	}
 
+	@Deprecated
 	@Override
 	public Type[] getReturnTypes() {
 		throw new UnsupportedOperationException( "getReturnTypes() is not implemented in Hibernate Search queries" );
 	}
 
+	@Deprecated
 	@Override
 	public String[] getReturnAliases() {
 		throw new UnsupportedOperationException( "getReturnAliases() is not implemented in Hibernate Search queries" );
 	}
 
+	@Deprecated
 	@Override
 	public FullTextQueryImpl setEntity(int position, Object val) {
 		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
 	}
 
+	@Deprecated
 	@Override
 	public FullTextQueryImpl setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
