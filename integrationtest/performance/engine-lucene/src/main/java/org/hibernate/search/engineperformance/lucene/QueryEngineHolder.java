@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engineperformance;
+package org.hibernate.search.engineperformance.lucene;
 
 import java.io.IOException;
 
-import org.hibernate.search.engineperformance.setuputilities.SearchIntegratorCreation;
+import org.hibernate.search.engineperformance.lucene.setuputilities.SearchIntegratorCreation;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;

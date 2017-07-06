@@ -12,17 +12,25 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-parent</artifactId>
         <version>5.8.0-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+	<relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-performance-engine</artifactId>
-    <name>Hibernate Search Engine Performance Testing</name>
-    <description>Performance testing for the Hibernate Search engine module</description>
+    <artifactId>hibernate-search-performance-engine-elasticsearch</artifactId>
+    <name>Hibernate Search Engine-Elasticsearch Performance Testing</name>
+    <description>Performance testing for the Hibernate Search engine module with an Elasticsearch backend</description>
  
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-elasticsearch-aws</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
