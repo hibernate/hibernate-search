@@ -9,7 +9,7 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -31,13 +31,13 @@ public class ProjectionLoader implements Loader {
 	private ObjectLoaderBuilder loaderBuilder;
 
 	@Override
-	public void init(Session session,
+	public void init(SessionImplementor session,
 					ExtendedSearchIntegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
 	}
 
-	public void init(Session session,
+	public void init(SessionImplementor session,
 					ExtendedSearchIntegrator extendedIntegrator,
 					ResultTransformer transformer,
 					ObjectLoaderBuilder loaderBuilder,

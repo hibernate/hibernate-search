@@ -8,7 +8,7 @@ package org.hibernate.search.query.hibernate.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -22,7 +22,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
  */
 public interface Loader {
 	void init(
-			Session session,
+			SessionImplementor session,
 			ExtendedSearchIntegrator extendedIntegrator,
 			ObjectInitializer objectInitializer,
 			TimeoutManager timeoutManager);

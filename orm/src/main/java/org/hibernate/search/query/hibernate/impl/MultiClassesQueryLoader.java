@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
@@ -28,14 +28,14 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
  * @author Emmanuel Bernard
  */
 public class MultiClassesQueryLoader extends AbstractLoader {
-	private Session session;
+	private SessionImplementor session;
 	private ExtendedSearchIntegrator extendedIntegrator;
 	private List<RootEntityMetadata> entityMetadata;
 	private TimeoutManager timeoutManager;
 	private ObjectInitializer objectInitializer;
 
 	@Override
-	public void init(Session session,
+	public void init(SessionImplementor session,
 					ExtendedSearchIntegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {

@@ -29,7 +29,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
-import org.hibernate.Session;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
@@ -181,7 +180,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
 		ProjectionLoader loader = new ProjectionLoader();
 		loader.init(
-				(Session) session,
+				session,
 				hSearchQuery.getExtendedSearchIntegrator(),
 				resultTransformer,
 				loaderBuilder,
@@ -620,7 +619,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	private static final Loader noLoader = new Loader() {
 		@Override
-		public void init(Session session,
+		public void init(SessionImplementor session,
 						ExtendedSearchIntegrator extendedIntegrator,
 						ObjectInitializer objectInitializer,
 						TimeoutManager timeoutManager) {

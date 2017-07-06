@@ -12,8 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
-
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
@@ -26,7 +25,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
  */
 public class QueryLoader extends AbstractLoader {
 
-	private Session session;
+	private SessionImplementor session;
 	private Class entityType;
 	private ExtendedSearchIntegrator extendedIntegrator;
 	private Criteria criteria;
@@ -36,7 +35,7 @@ public class QueryLoader extends AbstractLoader {
 	private boolean sizeSafe = true;
 
 	@Override
-	public void init(Session session,
+	public void init(SessionImplementor session,
 			ExtendedSearchIntegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {

@@ -9,7 +9,6 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.Set;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.exception.SearchException;
@@ -73,14 +72,14 @@ public class ObjectLoaderBuilder {
 
 	private Loader getMultipleEntitiesLoader() {
 		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
-		multiClassesLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
+		multiClassesLoader.init( session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
 		return multiClassesLoader;
 	}
 
 	private Loader getSingleEntityLoader() {
 		final QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
+		queryLoader.init( session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( targetedEntities.iterator().next().getPojoType() );
 		return queryLoader;
 	}
@@ -109,7 +108,7 @@ public class ObjectLoaderBuilder {
 			}
 		}
 		QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
+		queryLoader.init( session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( entityType );
 		queryLoader.setCriteria( criteria );
 		return queryLoader;

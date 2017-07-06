@@ -7,7 +7,7 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
@@ -21,7 +21,7 @@ public class ObjectInitializationContext {
 	private final Class<?> entityType;
 	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final TimeoutManager timeoutManager;
-	private final Session session;
+	private final SessionImplementor session;
 
 	/**
 	 * @param criteria A user specified {@code Criteria query} or {@code null}.
@@ -35,7 +35,7 @@ public class ObjectInitializationContext {
 			Class<?> targetedEntityType,
 			ExtendedSearchIntegrator extendedIntegrator,
 			TimeoutManager timeoutManager,
-			Session session) {
+			SessionImplementor session) {
 		this.criteria = criteria;
 		this.entityType = targetedEntityType;
 		this.extendedIntegrator = extendedIntegrator;
@@ -59,7 +59,7 @@ public class ObjectInitializationContext {
 		return timeoutManager;
 	}
 
-	public Session getSession() {
+	public SessionImplementor getSession() {
 		return session;
 	}
 }

@@ -9,7 +9,7 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -24,7 +24,7 @@ public abstract class AbstractLoader implements Loader {
 	private StatisticsImplementor statisticsImplementor;
 	private boolean takeTimings;
 
-	public void init(Session session, ExtendedSearchIntegrator extendedIntegrator) {
+	public void init(SessionImplementor session, ExtendedSearchIntegrator extendedIntegrator) {
 		statisticsImplementor = extendedIntegrator.getStatisticsImplementor();
 		takeTimings = extendedIntegrator.getStatistics().isStatisticsEnabled();
 	}
