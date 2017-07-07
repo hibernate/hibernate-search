@@ -127,11 +127,13 @@ public class FileMonitoringDirectory extends RAMDirectory {
 			delegate.copyBytes( input, numBytes );
 		}
 
+		@Deprecated
 		@Override
 		public void writeStringStringMap(Map<String, String> map) throws IOException {
 			delegate.writeStringStringMap( map );
 		}
 
+		@Deprecated
 		@Override
 		public void writeStringSet(Set<String> set) throws IOException {
 			delegate.writeStringSet( set );
@@ -227,11 +229,13 @@ public class FileMonitoringDirectory extends RAMDirectory {
 			return delegate.readString();
 		}
 
+		@Deprecated
 		@Override
 		public Map<String, String> readStringStringMap() throws IOException {
 			return delegate.readStringStringMap();
 		}
 
+		@Deprecated
 		@Override
 		public Set<String> readStringSet() throws IOException {
 			return delegate.readStringSet();
