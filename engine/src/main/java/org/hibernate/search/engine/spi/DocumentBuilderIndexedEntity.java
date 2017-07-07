@@ -1048,7 +1048,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			return objectToString( fieldName, bridge, value, conversionContext );
 		}
 
-		throw new SearchException( "Unable to find field " + fieldName + " in " + getBeanXClass() );
+		throw new SearchException( "Unable to find field " + fieldName + " in " + getTypeIdentifier().getName() );
 	}
 
 	public String objectToString(String fieldName, FieldBridge bridge, Object value, ConversionContext conversionContext) {
@@ -1068,7 +1068,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
 		}
 		else {
-			throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getBeanXClass() );
+			throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getTypeIdentifier().getName() );
 		}
 	}
 

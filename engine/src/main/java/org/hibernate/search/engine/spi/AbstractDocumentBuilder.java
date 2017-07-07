@@ -45,7 +45,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public abstract class AbstractDocumentBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private final XClass beanXClass;
 	private final Class<?> beanClass;
 	private final TypeMetadata typeMetadata;
 	private final InstanceInitializer instanceInitializer;
@@ -76,7 +75,6 @@ public abstract class AbstractDocumentBuilder {
 
 		this.instanceInitializer = instanceInitializer;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
-		this.beanXClass = xClass;
 		this.beanClass = reflectionManager.toClass( xClass );
 		this.typeMetadata = typeMetadata;
 
@@ -110,11 +108,6 @@ public abstract class AbstractDocumentBuilder {
 
 	public boolean isRoot() {
 		return isRoot;
-	}
-
-	@Deprecated
-	public XClass getBeanXClass() {
-		return beanXClass;
 	}
 
 	public ScopedAnalyzerReference getAnalyzerReference() {

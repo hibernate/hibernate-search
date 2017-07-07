@@ -519,7 +519,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query")
-	SearchException fieldBridgeNotTwoWay(@FormatWith(ClassFormatter.class) Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
+	SearchException fieldBridgeNotTwoWay(@FormatWith(ClassFormatter.class) Class<? extends FieldBridge> bridgeClass, String fieldName, String typeName);
 
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
