@@ -8,11 +8,13 @@ package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -31,7 +33,7 @@ public final class ObjectLoaderHelper {
 		// not allowed
 	}
 
-	public static Object load(EntityInfo entityInfo, Session session) {
+	public static Object load(EntityInfo entityInfo, SessionImplementor session) {
 		Object maybeProxy = executeLoad( entityInfo, session );
 		try {
 			HibernateHelper.initialize( maybeProxy );
@@ -52,7 +54,7 @@ public final class ObjectLoaderHelper {
 		return maybeProxy;
 	}
 
-	private static Object executeLoad(EntityInfo entityInfo, Session session) {
+	private static Object executeLoad(EntityInfo entityInfo, SessionImplementor session) {
 		Object maybeProxy;
 		if ( areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 			// be sure to get an initialized object but save from ObjectNotFoundException and EntityNotFoundException
@@ -80,10 +82,10 @@ public final class ObjectLoaderHelper {
 	}
 
 	// TODO should we cache that result?
-	public static boolean areDocIdAndEntityIdIdentical(EntityInfo entityInfo, Session session) {
-		String hibernateIdentifierProperty = session.getSessionFactory()
-				.getClassMetadata( entityInfo.getType().getName() )
-				.getIdentifierPropertyName();
+	public static boolean areDocIdAndEntityIdIdentical(EntityInfo entityInfo, SessionImplementor session) {
+		SessionFactoryImplementor sessionFactoryImplementor = session.getSessionFactory();
+		ClassMetadata cm = sessionFactoryImplementor.getMetamodel().entityPersister( entityInfo.getType().getName() ).getClassMetadata();
+		String hibernateIdentifierProperty = cm.getIdentifierPropertyName();
 		return entityInfo.getIdName().equals( hibernateIdentifierProperty );
 	}
 }

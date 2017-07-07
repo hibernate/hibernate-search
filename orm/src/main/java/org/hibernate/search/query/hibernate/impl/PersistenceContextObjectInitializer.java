@@ -42,7 +42,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 			return;
 		}
 
-		final SessionImplementor sessionImplementor = (SessionImplementor) objectInitializationContext.getSession();
+		final SessionImplementor sessionImplementor = objectInitializationContext.getSession();
 		final MetamodelImplementor metamodelImplementor = sessionImplementor.getSessionFactory().getMetamodel();
 		final EntityPersister persister = metamodelImplementor.entityPersister( objectInitializationContext.getEntityType() );
 		final PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
