@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
@@ -30,6 +29,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.backend.LuceneBackendTestHelpers;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -179,7 +179,7 @@ public class IndexingGeneratedCorpusTest {
 		// No need to check for alternative implementations such as ES
 		if ( indexManager instanceof DirectoryBasedIndexManager ) {
 			Directory directory = ( (DirectoryBasedIndexManager) indexManager ).getDirectoryProvider().getDirectory();
-			Assert.assertEquals( isLocked, IndexWriter.isLocked( directory ) );
+			Assert.assertEquals( isLocked, LuceneBackendTestHelpers.isLocked( directory ) );
 		}
 	}
 

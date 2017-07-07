@@ -8,7 +8,6 @@ package org.hibernate.search.test.backend.lucene;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -16,6 +15,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.backend.LuceneBackendTestHelpers;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -56,7 +56,7 @@ public class SharedReleasesLocksTest {
 		IndexManager indexManager = sfHolder.getSearchFactory().getIndexManagerHolder().getIndexManager( "books" );
 		DirectoryBasedIndexManager dbim = (DirectoryBasedIndexManager) indexManager;
 		Directory directory = dbim.getDirectoryProvider().getDirectory();
-		Assert.assertFalse( "Index lock leaked!", IndexWriter.isLocked( directory ) );
+		Assert.assertFalse( "Index lock leaked!", LuceneBackendTestHelpers.isLocked( directory ) );
 	}
 
 	private void writeABook(long id, String bookTitle) {
