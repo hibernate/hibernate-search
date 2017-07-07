@@ -99,8 +99,9 @@ public class FieldNameCollectorTest {
 
 	@Test
 	public void testExtractFieldNameFromPhraseQuery() {
-		PhraseQuery phraseQuery = new PhraseQuery();
-		phraseQuery.add( new Term( "stringField", "hello world" ) );
+		PhraseQuery.Builder phraseQBuilder = new PhraseQuery.Builder();
+		phraseQBuilder.add( new Term( "stringField", "hello world" ) );
+		PhraseQuery phraseQuery = phraseQBuilder.build();
 		assertFieldNames( phraseQuery, FieldType.STRING, "stringField" );
 	}
 
