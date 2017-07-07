@@ -111,7 +111,6 @@ public class DefaultClassLoaderService implements ClassLoaderService {
 
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <S> LinkedHashSet<S> loadJavaServices(Class<S> serviceContract) {
 		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
 		final LinkedHashSet<S> services = new LinkedHashSet<S>();

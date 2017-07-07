@@ -1690,7 +1690,7 @@ class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 			if ( !( o instanceof Map.Entry ) ) {
 				return false;
 			}
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			Map.Entry e = (Map.Entry) o;
 			return eq( key, e.getKey() ) && eq( value, e.getValue() );
 		}

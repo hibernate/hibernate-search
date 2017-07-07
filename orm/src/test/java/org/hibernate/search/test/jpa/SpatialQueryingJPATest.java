@@ -258,7 +258,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				hibQuery.setMaxResults( 1000 );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-				@SuppressWarnings( "unchecked" )
+				@SuppressWarnings("unchecked")
 				List<Object[]> results = hibQuery.getResultList();
 
 				for ( Object[] result : results ) {

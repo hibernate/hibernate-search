@@ -31,7 +31,6 @@ public class Resources {
 	@PersistenceContext
 	private EntityManager em;
 
-	@SuppressWarnings("unused")
 	@Produces
 	private FullTextEntityManager getFullTextEntityManager() {
 		return Search.getFullTextEntityManager( em );

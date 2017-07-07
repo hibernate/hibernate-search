@@ -94,7 +94,6 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,
