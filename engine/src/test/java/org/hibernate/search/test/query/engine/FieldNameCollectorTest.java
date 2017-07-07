@@ -153,13 +153,15 @@ public class FieldNameCollectorTest {
 
 	@Test
 	public void testDisjunctionMaxQuery() {
-		DisjunctionMaxQuery disjunctionMaxQuery = new DisjunctionMaxQuery( 0.0f );
+		Set<Query> queriesToCombine = new HashSet<>();
 
 		TermQuery termQuery = new TermQuery( new Term( "stringField", "foobar" ) );
-		disjunctionMaxQuery.add( termQuery );
+		queriesToCombine.add( termQuery );
 
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newIntRange( "intField", 0, 0, true, true );
-		disjunctionMaxQuery.add( numericRangeQuery );
+		queriesToCombine.add( numericRangeQuery );
+
+		DisjunctionMaxQuery disjunctionMaxQuery = new DisjunctionMaxQuery( queriesToCombine, 0.0f );
 
 		assertFieldNames( disjunctionMaxQuery, FieldType.NUMBER, "intField" );
 		assertFieldNames( disjunctionMaxQuery, FieldType.STRING, "stringField" );
