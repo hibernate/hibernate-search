@@ -1325,11 +1325,9 @@ group: says which pattern group to extract into tokens|`lucene-analyzers-common`
                 `IndexableBinaryStringTools`, to allow it
                 to be stored as an index term.|`custom`, `language`,
                 `country`, `variant`,
-                `strength`, `decomposition
-                `see Lucene's
-                CollationKeyFilter javadocs for more
-                info|`lucene-analyzers-common` and
-                `commons-io`
+                `strength`, `decomposition`
+                see Lucene's CollationKeyFilter javadocs for more info
+		|`lucene-analyzers-common` and `commons-io`
 
 |===============
 

@@ -1845,7 +1845,7 @@ Last but not least, `@Facet` contains a
 * String fields are encoded as `FacetEncodingType.STRING`
 * `byte`, `short`, `int`, `long` (including corresponding wrapper types) and `Date`
 as `FacetEncodingType.LONG`
-* and `float` and `double` (including corresponding wrapper types) as FacetEncodingType.DOUBLE`
+* and `float` and `double` (including corresponding wrapper types) as `FacetEncodingType.DOUBLE`
 
 In some cases it can make sense, however, to explicitly set the encoding.
 <<discrete-faceting-request,Discrete faceting request>>s for example only work for string encoded

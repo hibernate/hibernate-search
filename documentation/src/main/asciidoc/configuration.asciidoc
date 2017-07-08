@@ -273,7 +273,7 @@ index changes visible to all elements of the cluster very quickly. Also see
 <<infinispan-directories>> for additional requirements and configuration settings.
 Infinispan needs a global configuration and additional dependencies; the
 settings defined here apply to each different index.
-|`locking_cachename`: name of the Infinispan cache to use to store locks. `
+|`locking_cachename`: name of the Infinispan cache to use to store locks.
 `data_cachename` : name of the Infinispan cache to use to store the largest data chunks; this area
 will contain the largest objects, use replication if you have enough memory or switch to
 distribution.
