@@ -16,9 +16,9 @@
             <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
             <property name="hibernate.connection.url" value="jdbc:h2:mem:company" />
             <property name="hibernate.connection.user" value="sa" />
-            <property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.show_sql" value="true" />
             <property name="hibernate.flushMode" value="FLUSH_AUTO" />
-            <property name="hibernate.format_sql" value="false" />
+            <property name="hibernate.format_sql" value="true" />
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
             <property name="hibernate.search.default.directory_provider" value="ram" />
             <property name="hibernate.search.indexing_strategy" value="manual" />
