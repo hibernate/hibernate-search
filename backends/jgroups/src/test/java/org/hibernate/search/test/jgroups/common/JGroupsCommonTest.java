@@ -14,6 +14,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
@@ -71,7 +72,7 @@ public class JGroupsCommonTest extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				masterSession.getTransaction().begin();
 				Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
-				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
 
@@ -89,7 +90,7 @@ public class JGroupsCommonTest extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				Query luceneQuery = parser.parse( "logo:Peter pan" );
 				masterSession.getTransaction().begin();
-				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
 				Assert.assertEquals( "Waited for long and still Peter Pan didn't fly in!", 1, result.size() );
@@ -105,7 +106,7 @@ public class JGroupsCommonTest extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 				masterSession.getTransaction().begin();
-				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
 				Assert.assertEquals( "Waited for long and elements where still not deleted!", 0, result.size() );

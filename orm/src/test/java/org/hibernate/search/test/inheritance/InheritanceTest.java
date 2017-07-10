@@ -46,7 +46,7 @@ public class InheritanceTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		try {
-			org.hibernate.Query hibQuery = s.createFullTextQuery( query, String.class );
+			org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, String.class );
 			hibQuery.list();
 			tx.commit();
 			fail();
@@ -57,7 +57,7 @@ public class InheritanceTest extends SearchTestBase {
 		}
 
 		tx = s.beginTransaction();
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
+		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
 		tx.commit();
 
@@ -73,7 +73,7 @@ public class InheritanceTest extends SearchTestBase {
 
 		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
+		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
 
 		query = parser.parse( "Elephant" );
@@ -112,7 +112,7 @@ public class InheritanceTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
+		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
 
 		hibQuery = s.createFullTextQuery( query, Animal.class );
@@ -144,7 +144,7 @@ public class InheritanceTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		Query query = NumericRangeQuery.newIntRange( "numberOfEggs", 2, 2, true, true );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Eagle.class );
+		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Eagle.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of hits. There should be two birds.", 1, result.size() );

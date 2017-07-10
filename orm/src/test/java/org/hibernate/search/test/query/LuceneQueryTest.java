@@ -53,7 +53,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( 0, result.size() );
@@ -127,7 +127,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 1 );
 		List result = hibQuery.list();
 		assertNotNull( result );
@@ -144,7 +144,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 1 );
 		List result = hibQuery.list();
@@ -162,7 +162,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 3 );
 		List result = hibQuery.list();
@@ -180,7 +180,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 
 		hibQuery.setFirstResult( 2 );
 		hibQuery.setMaxResults( 3 );
@@ -199,7 +199,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		Iterator result = hibQuery.iterate();
 		assertNotNull( result );
 		assertFalse( result.hasNext() );
@@ -234,7 +234,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		ScrollableResults result = hibQuery.scroll();
 		assertNotNull( result );
 		assertEquals( -1, result.getRowNumber() );
@@ -488,7 +488,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit class filter", 1, result.size() );
@@ -535,7 +535,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no explicit criteria", 1, result.size() );

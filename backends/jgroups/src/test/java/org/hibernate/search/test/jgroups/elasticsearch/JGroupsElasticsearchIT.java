@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
@@ -72,7 +73,7 @@ public class JGroupsElasticsearchIT extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				masterSession.getTransaction().begin();
 				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
-				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
 				masterSession.getTransaction().commit();
 
@@ -90,7 +91,7 @@ public class JGroupsElasticsearchIT extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Peter pan" );
 				masterSession.getTransaction().begin();
-				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
 				masterSession.getTransaction().commit();
 				assertEquals( "Waited for long and still Peter Pan didn't fly in!",
@@ -107,7 +108,7 @@ public class JGroupsElasticsearchIT extends StaticMasterSlaveSearchTestCase {
 			POLLER.pollAssertion( () -> {
 				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
 				masterSession.getTransaction().begin();
-				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
+				FullTextQuery query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
 				masterSession.getTransaction().commit();
 				assertEquals( "Waited for long and elements where still not deleted!",

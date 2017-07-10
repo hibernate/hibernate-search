@@ -48,7 +48,7 @@ import org.hibernate.type.Type;
  * <li>first()</li>
  * </ul>
  *
- * @see org.hibernate.Query
+ * @see org.hibernate.query.Query#scroll()
  *
  * @author Emmanuel Bernard
  * @author John Griffin

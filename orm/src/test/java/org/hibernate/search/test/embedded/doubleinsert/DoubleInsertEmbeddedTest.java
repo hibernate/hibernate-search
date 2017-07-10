@@ -11,7 +11,7 @@ import java.util.Date;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;

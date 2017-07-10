@@ -166,7 +166,7 @@ public class PurgeTest extends SearchTestBase {
 		try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
 			Transaction tx = fullTextSession.beginTransaction();
 
-			org.hibernate.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
+			org.hibernate.query.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
 			@SuppressWarnings("unchecked")
 			List<Object> results = (List<Object>) query.list();
 			assertEquals( "Incorrect document count for type: " + Arrays.toString( types ), expectedCount, results.size() );

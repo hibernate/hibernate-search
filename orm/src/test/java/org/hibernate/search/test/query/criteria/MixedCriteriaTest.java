@@ -50,7 +50,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		Criteria criteria = session.createCriteria( AbstractCar.class );
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class )
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class )
 				.setCriteriaQuery( criteria );
 		List result = hibQuery.list();
 		assertEquals( 2, result.size() );
@@ -73,7 +73,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		Criteria criteria = session.createCriteria( AbstractCar.class );
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query )
+		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query )
 				.setCriteriaQuery( criteria );
 		List result = hibQuery.list();
 		assertEquals( 2, result.size() );
@@ -99,7 +99,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
 		try {
-			org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class, Bike.class )
+			org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class, Bike.class )
 					.setCriteriaQuery( criteria );
 			hibQuery.list();
 			fail();

@@ -18,6 +18,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -86,7 +87,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 			ftSess.getTransaction().begin();
 			try {
 				Query luceneQuery = parser.parse( luceneQueryString );
-				org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
+				FullTextQuery query = ftSess.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				return result.size();
 			}
