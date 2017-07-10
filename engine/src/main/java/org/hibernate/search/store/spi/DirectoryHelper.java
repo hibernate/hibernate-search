@@ -18,6 +18,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.store.SleepingLockWrapper;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
@@ -53,8 +54,8 @@ public class DirectoryHelper {
 					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE_OR_APPEND );
 					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
 					//for distributed indexes (Infinispan but probably also NFS and similar)
-					iwriterConfig.setWriteLockTimeout( 2000 );
-					IndexWriter iw = new IndexWriter( directory, iwriterConfig );
+					SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
+					IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
 					iw.close();
 				}
 				catch (LockObtainFailedException lofe) {
