@@ -15,7 +15,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -29,8 +28,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @DiscriminatorValue("SpecialPerson")
 public class SpecialPerson extends Person {
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
 	@JoinColumn(name = "SPECIALPERSON_FK")
 	@IndexedEmbedded
 	private Set<EmailAddress> emailAddressSet = new HashSet<EmailAddress>();
