@@ -171,7 +171,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 							// the boolean evaluation in important: only call areIdsUniqueForClasses if absolutely necessary
 							boolean uniqueIdEqualityMeansEntityEquality =
 									firstEntityIsUsingJPAId && secondEntityIsUsingJPAId &&
-									idUniquenessResolver.areIdsUniqueForClasses( firstEntity.getPojoType(), secondEntity.getPojoType() );
+									idUniquenessResolver.areIdsUniqueForClasses( firstEntity, secondEntity );
 							if ( !uniqueIdEqualityMeansEntityEquality ) {
 								return false;
 							}

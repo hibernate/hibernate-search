@@ -8,6 +8,7 @@
 package org.hibernate.search.cfg.spi.impl;
 
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Default implementation that is conservative and always answers that ids may not be unique.
@@ -15,8 +16,10 @@ import org.hibernate.search.cfg.spi.IdUniquenessResolver;
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class DefaultIdUniquenessResolver implements IdUniquenessResolver {
+
 	@Override
-	public boolean areIdsUniqueForClasses(Class<?> entityInIndex, Class<?> otherEntityInIndex) {
+	public boolean areIdsUniqueForClasses(IndexedTypeIdentifier firstEntity, IndexedTypeIdentifier secondEntity) {
 		return false;
 	}
+
 }

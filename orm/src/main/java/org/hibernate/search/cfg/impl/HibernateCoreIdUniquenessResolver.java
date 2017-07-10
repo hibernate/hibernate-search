@@ -14,6 +14,7 @@ import java.util.Set;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Implementation extracting entity classes from the configuration
@@ -37,7 +38,7 @@ public class HibernateCoreIdUniquenessResolver implements IdUniquenessResolver {
 	}
 
 	@Override
-	public boolean areIdsUniqueForClasses(Class<?> entityInIndex, Class<?> otherEntityInIndex) {
+	public boolean areIdsUniqueForClasses(IndexedTypeIdentifier entityInIndex, IndexedTypeIdentifier otherEntityInIndex) {
 		/*
 		 * Look for the top most superclass of each that is also a mapped entity
 		 * That should be the root entity for that given class.
@@ -47,7 +48,8 @@ public class HibernateCoreIdUniquenessResolver implements IdUniquenessResolver {
 		return rootOfEntityInIndex == rootOfOtherEntityInIndex;
 	}
 
-	private Class<?> getRootEntity(Class<?> entityInIndex) {
+	private Class<?> getRootEntity(IndexedTypeIdentifier indexedType) {
+		Class entityInIndex = indexedType.getPojoType();
 		if ( ! entities.contains( entityInIndex ) ) {
 			// the entity is not a mapped entity ?
 			// should not happen so we return the entity class itself
