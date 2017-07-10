@@ -54,7 +54,7 @@ public class CompressionTest extends SearchTestBase {
 		IndexReader indexReader = getSearchFactory().getIndexReaderAccessor().open( LargeDocument.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), null, 10 );
+			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 10 );
 			Assert.assertEquals( 1, topDocs.totalHits );
 
 			ScoreDoc doc = topDocs.scoreDocs[0];
