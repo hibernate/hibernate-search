@@ -8,12 +8,14 @@ package org.hibernate.search.elasticsearch.aws.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -23,6 +25,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.RequestLine;
 import org.apache.http.protocol.HttpContext;
+import org.hibernate.search.elasticsearch.spi.DigestSelfSigningCapable;
 import org.hibernate.search.util.impl.CollectionHelper;
 
 import uk.co.lucasweb.aws.v4.signer.Signer;
@@ -61,15 +64,23 @@ class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 	}
 
 	private String computeContentHash(HttpRequest request) throws IOException {
-		HttpEntity entity = getEntity(request);
+		HttpEntity entity = getEntity( request );
 		if ( entity == null ) {
 			return DigestUtils.sha256Hex( "" );
 		}
-		if ( !entity.isRepeatable() ) {
-			throw new IllegalStateException( "Cannot sign AWS requests with non-repeatable entities" );
+		if ( entity instanceof DigestSelfSigningCapable ) {
+			DigestSelfSigningCapable e = (DigestSelfSigningCapable) entity;
+			MessageDigest digest = DigestUtils.getSha256Digest();
+			e.fillDigest( digest );
+			return Hex.encodeHexString( digest.digest() );
 		}
-		try ( InputStream content = entity.getContent() ) {
-			return DigestUtils.sha256Hex( content );
+		else {
+			if ( !entity.isRepeatable() ) {
+				throw new IllegalStateException( "Cannot sign AWS requests with non-repeatable entities" );
+			}
+			try ( InputStream content = entity.getContent() ) {
+				return DigestUtils.sha256Hex( content );
+			}
 		}
 	}
 

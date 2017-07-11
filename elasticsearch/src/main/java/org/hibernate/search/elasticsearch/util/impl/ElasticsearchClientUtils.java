@@ -9,8 +9,6 @@ package org.hibernate.search.elasticsearch.util.impl;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 
 import com.google.gson.Gson;
@@ -21,8 +19,6 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchClientUtils {
 
-	private static final ContentType JSON_CONTENT_TYPE = ContentType.APPLICATION_JSON.withCharset("utf-8");
-
 	private ElasticsearchClientUtils() {
 		// Private constructor
 	}
@@ -32,16 +28,11 @@ public class ElasticsearchClientUtils {
 	}
 
 	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) {
-		List<JsonObject> bodyParts = request.getBodyParts();
+		final List<JsonObject> bodyParts = request.getBodyParts();
 		if ( bodyParts.isEmpty() ) {
 			return null;
 		}
-		StringBuilder builder = new StringBuilder();
-		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, builder );
-			builder.append("\n");
-		}
-		return new StringEntity( builder.toString(), JSON_CONTENT_TYPE );
+		return new GsonHttpEntity( gson, bodyParts );
 	}
 
 }
