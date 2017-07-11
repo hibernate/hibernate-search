@@ -22,10 +22,19 @@ import com.google.gson.JsonObject;
  */
 public class BlackholeElasticsearchClient implements ElasticsearchClientImplementor {
 
-	private final String elasticsearchVersion;
+	private final ElasticsearchResponse getResponse;
+	private final ElasticsearchResponse okResponse;
 
 	public BlackholeElasticsearchClient(String elasticsearchVersion) {
-		this.elasticsearchVersion = elasticsearchVersion;
+		this.getResponse = new ElasticsearchResponse(
+				200, "OK",
+				JsonBuilder.object()
+						.add( "version", JsonBuilder.object()
+								.addProperty( "number", elasticsearchVersion )
+						)
+						.build()
+				);
+		this.okResponse = new ElasticsearchResponse( 200, "OK", new JsonObject() );
 	}
 
 	@Override
@@ -44,14 +53,7 @@ public class BlackholeElasticsearchClient implements ElasticsearchClientImplemen
 		String path = request.getPath();
 
 		if ( "GET".equals( method ) && ( StringHelper.isEmpty( path ) || "/".equals( path ) ) ) {
-			return new ElasticsearchResponse(
-					200, "OK",
-					JsonBuilder.object()
-							.add( "version", JsonBuilder.object()
-									.addProperty( "number", elasticsearchVersion )
-							)
-							.build()
-					);
+			return getResponse;
 		}
 		else if ( "POST".equals( method ) && path.endsWith( "/_bulk/" ) ) {
 			JsonBuilder.Array builder = JsonBuilder.array();
@@ -71,7 +73,7 @@ public class BlackholeElasticsearchClient implements ElasticsearchClientImplemen
 			return new ElasticsearchResponse( 200, "OK", responseJson );
 		}
 		else {
-			return new ElasticsearchResponse( 200, "OK", new JsonObject() );
+			return okResponse;
 		}
 	}
 
