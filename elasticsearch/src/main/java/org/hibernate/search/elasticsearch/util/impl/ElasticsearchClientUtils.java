@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -25,8 +23,6 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchClientUtils {
 
-	private static final ContentType JSON_CONTENT_TYPE = ContentType.APPLICATION_JSON.withCharset("utf-8");
-
 	private ElasticsearchClientUtils() {
 		// Private constructor
 	}
@@ -36,16 +32,11 @@ public class ElasticsearchClientUtils {
 	}
 
 	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) {
-		List<JsonObject> bodyParts = request.getBodyParts();
+		final List<JsonObject> bodyParts = request.getBodyParts();
 		if ( bodyParts.isEmpty() ) {
 			return null;
 		}
-		StringBuilder builder = new StringBuilder();
-		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, builder );
-			builder.append("\n");
-		}
-		return new StringEntity( builder.toString(), JSON_CONTENT_TYPE );
+		return new GsonHttpEntity( gson, bodyParts );
 	}
 
 	public static String formatRequest(GsonProvider gsonProvider, ElasticsearchRequest request) {
