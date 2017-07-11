@@ -310,7 +310,12 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	private String getMapping(URLEncodedString indexName, URLEncodedString mappingName) {
-		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
+		/*
+		 * Elasticsearch 5.5+ triggers a 404 error when mappings are missing,
+		 * while 5.4 and below just return an empty mapping.
+		 * In our case, an empty mapping is fine, so we'll just ignore 404.
+		 */
+		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING ).pathComponent( mappingName )
 				.build() );
 		JsonObject result = response.getBody();
