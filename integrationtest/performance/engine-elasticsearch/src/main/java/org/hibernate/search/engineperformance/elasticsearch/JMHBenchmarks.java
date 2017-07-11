@@ -1,0 +1,146 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.engineperformance.elasticsearch;
+
+import java.util.List;
+import java.util.Random;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
+import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Group;
+import org.openjdk.jmh.annotations.GroupThreads;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.infra.ThreadParams;
+
+@Fork(1)
+/*
+ * Write methods already performs multiple operations,
+ * so we could simply run those once,
+ * but we don't have individual control over how many times
+ * each method is run, and in the concurrent test we want the
+ * read methods to be run as long as the writes continue.
+ * Thus we don't set "batchSize" here.
+ *
+ * Note that the single-shot mode won't work,
+ * since it doesn't handle auxiliary counters
+ * (which are the only meaningful counters).
+ */
+public class JMHBenchmarks {
+
+	private static final IndexedTypeIdentifier BOOK_TYPE = new PojoIndexedTypeIdentifier( BookEntity.class );
+
+	@Benchmark
+	@Threads(20)
+	public void write(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
+		Worker worker = eh.getSearchIntegrator().getWorker();
+		Dataset dataset = eh.getDataset();
+
+		int initialIndexSize = eh.getInitialIndexSize();
+		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
+		int updatesPerChangeset = eh.getUpdatesPerChangeset();
+
+		int changesets = eh.getChangesetsPerFlush();
+
+		int threadIndex = threadParams.getSubgroupThreadIndex();
+		int threadIdIntervalSize = changesets * addDeletesPerChangeset;
+		int threadIdIntervalStart = initialIndexSize + threadIndex * threadIdIntervalSize;
+		int threadIdIntervalEnd = threadIdIntervalStart + threadIdIntervalSize;
+
+		Random random = rh.get();
+
+		for ( int i = 0 ; i < changesets ; ++i ) {
+			TransactionContextForTest tc = new TransactionContextForTest();
+			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
+					.forEach( id -> {
+						BookEntity book = dataset.create( id );
+						Work work = new Work( book, id, WorkType.ADD );
+						worker.performWork( work, tc );
+					} );
+			random.ints( updatesPerChangeset, 0, initialIndexSize )
+					.forEach( id -> {
+						BookEntity book = dataset.create( id );
+						Work work = new Work( book, id, WorkType.UPDATE );
+						worker.performWork( work, tc );
+					});
+			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
+					.forEach( id -> {
+						Work work = new Work( BOOK_TYPE, id, WorkType.DELETE );
+						worker.performWork( work, tc );
+					});
+			tc.end();
+			++counters.changeset;
+		}
+
+		// Ensure that we'll block until all works have been performed
+		eh.flush( BOOK_TYPE );
+	}
+
+	@Benchmark
+	@Threads(20)
+	public void queryBooksByBestRating(EngineHolder eh, Blackhole bh) {
+		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
+		Query luceneQuery = searchIntegrator.buildQueryBuilder()
+				.forEntity( BookEntity.class )
+				.get()
+				.all()
+				.createQuery();
+
+		int maxResults = eh.getQueryMaxResults();
+
+		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
+		hsQuery.sort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) );
+		hsQuery.maxResults( maxResults );
+		int queryResultSize = hsQuery.queryResultSize();
+		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
+		bh.consume( queryResultSize );
+		bh.consume( queryEntityInfos );
+	}
+
+	@Benchmark
+	@GroupThreads(5)
+	@Group("concurrentReadWriteTest")
+	public void readWriteTestWriter(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
+		write( eh, rh, counters, threadParams );
+	}
+
+	@Benchmark
+	@GroupThreads(5)
+	@Group("concurrentReadWriteTest")
+	public void readWriteTestReader(EngineHolder eh, Blackhole bh) {
+		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
+		Query luceneQuery = searchIntegrator.buildQueryBuilder()
+				.forEntity( BookEntity.class )
+				.get()
+				.all()
+				.createQuery();
+
+		int maxResults = eh.getQueryMaxResults();
+
+		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
+		hsQuery.maxResults( maxResults );
+		int queryResultSize = hsQuery.queryResultSize();
+		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
+		bh.consume( queryEntityInfos );
+		bh.consume( queryResultSize );
+	}
+
+}
