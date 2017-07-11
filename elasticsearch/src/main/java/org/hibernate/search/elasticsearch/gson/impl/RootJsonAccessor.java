@@ -26,16 +26,7 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 
 	@Override
 	public Optional<JsonObject> get(JsonObject root) {
-		return Optional.of( requireRoot( root ) );
-	}
-
-	private JsonObject requireRoot(JsonObject root) {
-		if ( root == null ) {
-			throw new AssertionFailure( "A null root was encountered" );
-		}
-		else {
-			return root;
-		}
+		return Optional.ofNullable( root );
 	}
 
 	@Override
@@ -71,5 +62,14 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 	@Override
 	public UnknownTypeJsonAccessor property(String propertyName) {
 		return new ObjectPropertyJsonAccessor( this, propertyName );
+	}
+
+	private JsonObject requireRoot(JsonObject root) {
+		if ( root == null ) {
+			throw new AssertionFailure( "A null root was encountered" );
+		}
+		else {
+			return root;
+		}
 	}
 }
