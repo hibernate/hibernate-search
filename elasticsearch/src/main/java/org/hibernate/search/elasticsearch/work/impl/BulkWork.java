@@ -16,10 +16,8 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -80,8 +78,6 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			context = new NoIndexDirtyBulkExecutionContext( context );
 		}
 
-		GsonProvider gsonProvider = context.getGsonProvider();
-
 		ElasticsearchResponse response = null;
 		try {
 			response = context.getClient().execute( request );
@@ -94,10 +90,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
 		catch (RuntimeException e) {
-			throw LOG.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-					e );
+			throw LOG.elasticsearchRequestFailed( request, response, e );
 		}
 	}
 
@@ -162,12 +155,8 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		}
 
 		if ( !erroneousItems.isEmpty() ) {
-			GsonProvider gsonProvider = context.getGsonProvider();
 			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-					successfulItems,
-					erroneousItems
+					request, response, successfulItems, erroneousItems
 			);
 			if ( resultHandlingExceptions != null ) {
 				for ( Exception resultHandlingException : resultHandlingExceptions ) {

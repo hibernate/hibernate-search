@@ -28,28 +28,17 @@ public class DefaultGsonProvider implements GsonProvider {
 				.serializeNulls()
 				.create();
 
-		gsonPrettyPrinting = builderBaseSupplier.get()
-				.setPrettyPrinting()
-				.create();
-
 		gsonNoSerializeNulls = builderBaseSupplier.get()
 				.create();
 	}
 
 	private final Gson gson;
 
-	private final Gson gsonPrettyPrinting;
-
 	private final Gson gsonNoSerializeNulls;
 
 	@Override
 	public Gson getGson() {
 		return gson;
-	}
-
-	@Override
-	public Gson getGsonPrettyPrinting() {
-		return gsonPrettyPrinting;
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
-import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -84,27 +83,20 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	}
 
 	@Override
-	public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
+	public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
 		JsonObject body = response.getBody();
 		if ( !isSuccess( response, body ) ) {
-			GsonProvider gsonProvider = context.getGsonProvider();
 			if ( response.getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
-				throw LOG.elasticsearchRequestTimeout(
-						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response )
-						);
+				throw LOG.elasticsearchRequestTimeout( request, response );
 			}
 			else {
-				throw LOG.elasticsearchRequestFailed(
-						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-						null );
+				throw LOG.elasticsearchRequestFailed( request, response, null );
 			}
 		}
 	}
 
 	@Override
-	public boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject resultItem) {
+	public boolean isSuccess(JsonObject resultItem) {
 		if ( resultItem == null ) {
 			return false;
 		}

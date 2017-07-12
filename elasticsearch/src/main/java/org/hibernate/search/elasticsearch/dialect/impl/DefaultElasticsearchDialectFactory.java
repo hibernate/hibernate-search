@@ -14,7 +14,6 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
-import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -62,16 +61,12 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 
 	private String getVersion(ElasticsearchClient client) {
 		ElasticsearchRequest request = ElasticsearchRequest.get().build();
-		GsonProvider gsonProvider = DialectIndependentGsonProvider.INSTANCE;
 		ElasticsearchResponse response = null;
 		try {
 			response = client.execute( request );
 
 			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
-				throw log.elasticsearchRequestFailed(
-						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-						null );
+				throw log.elasticsearchRequestFailed( request, response, null );
 			}
 
 			return VERSION_ACCESSOR.get( response.getBody() ).get();
@@ -80,10 +75,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
-					e );
+			throw log.elasticsearchRequestFailed( request, response, e );
 		}
 	}
 }

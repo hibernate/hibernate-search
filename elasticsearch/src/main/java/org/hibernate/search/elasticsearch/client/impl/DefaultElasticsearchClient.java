@@ -63,10 +63,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 			response = doExecute( request );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					null,
-					e );
+			throw log.elasticsearchRequestFailed( request, null, e );
 		}
 
 		try {
@@ -81,10 +78,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
 					null );
-			throw log.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, partialResponse ),
-					e );
+			throw log.elasticsearchRequestFailed( request, partialResponse, e );
 		}
 	}
 
