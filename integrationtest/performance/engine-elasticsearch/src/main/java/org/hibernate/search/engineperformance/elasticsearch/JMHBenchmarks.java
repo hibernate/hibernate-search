@@ -7,7 +7,6 @@
 package org.hibernate.search.engineperformance.elasticsearch;
 
 import java.util.List;
-import java.util.Random;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -29,9 +28,7 @@ import org.openjdk.jmh.annotations.Group;
 import org.openjdk.jmh.annotations.GroupThreads;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.infra.Blackhole;
-import org.openjdk.jmh.infra.ThreadParams;
 
-@Fork(1)
 /*
  * Write methods already performs multiple operations,
  * so we could simply run those once,
@@ -44,51 +41,36 @@ import org.openjdk.jmh.infra.ThreadParams;
  * since it doesn't handle auxiliary counters
  * (which are the only meaningful counters).
  */
+@Fork(1)
 public class JMHBenchmarks {
 
 	private static final IndexedTypeIdentifier BOOK_TYPE = new PojoIndexedTypeIdentifier( BookEntity.class );
 
 	@Benchmark
 	@Threads(20)
-	public void write(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
+	public void write(EngineHolder eh, ChangesetGenerator changesetGenerator, WriteCounters counters) {
 		Worker worker = eh.getSearchIntegrator().getWorker();
 		Dataset dataset = eh.getDataset();
 
-		int initialIndexSize = eh.getInitialIndexSize();
-		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
-		int updatesPerChangeset = eh.getUpdatesPerChangeset();
-
-		int changesets = eh.getChangesetsPerFlush();
-
-		int threadIndex = threadParams.getSubgroupThreadIndex();
-		int threadIdIntervalSize = changesets * addDeletesPerChangeset;
-		int threadIdIntervalStart = initialIndexSize + threadIndex * threadIdIntervalSize;
-		int threadIdIntervalEnd = threadIdIntervalStart + threadIdIntervalSize;
-
-		Random random = rh.get();
-
-		for ( int i = 0 ; i < changesets ; ++i ) {
+		changesetGenerator.stream().forEach( changeset -> {
 			TransactionContextForTest tc = new TransactionContextForTest();
-			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
-					.forEach( id -> {
+			changeset.toAdd().forEach( id -> {
 						BookEntity book = dataset.create( id );
 						Work work = new Work( book, id, WorkType.ADD );
 						worker.performWork( work, tc );
 					} );
-			random.ints( updatesPerChangeset, 0, initialIndexSize )
-					.forEach( id -> {
+			changeset.toUpdate().forEach( id -> {
 						BookEntity book = dataset.create( id );
 						Work work = new Work( book, id, WorkType.UPDATE );
 						worker.performWork( work, tc );
 					});
-			random.ints( addDeletesPerChangeset, threadIdIntervalStart, threadIdIntervalEnd )
-					.forEach( id -> {
+			changeset.toDelete().forEach( id -> {
 						Work work = new Work( BOOK_TYPE, id, WorkType.DELETE );
 						worker.performWork( work, tc );
 					});
 			tc.end();
 			++counters.changeset;
-		}
+		} );
 
 		// Ensure that we'll block until all works have been performed
 		eh.flush( BOOK_TYPE );
@@ -118,8 +100,8 @@ public class JMHBenchmarks {
 	@Benchmark
 	@GroupThreads(5)
 	@Group("concurrentReadWriteTest")
-	public void readWriteTestWriter(EngineHolder eh, RandomHolder rh, WriteCounters counters, ThreadParams threadParams) {
-		write( eh, rh, counters, threadParams );
+	public void readWriteTestWriter(EngineHolder eh, ChangesetGenerator changesetGenerator, WriteCounters counters) {
+		write( eh, changesetGenerator, counters );
 	}
 
 	@Benchmark

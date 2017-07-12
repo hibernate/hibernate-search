@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engineperformance.elasticsearch.setuputilities;
 
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
+
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
@@ -54,29 +57,47 @@ public class SearchIntegratorCreation {
 		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
-	public static void preindexEntities(SearchIntegrator si, Dataset data, int numEntities) {
-		println( "Starting index creation..." );
-		Worker worker = si.getWorker();
-		TransactionContextForTest tc = new TransactionContextForTest();
-		boolean needsFlush = false;
-		int i = 1;
-		for ( ; i <= numEntities; i++ ) {
-			BookEntity book = data.create( i );
+	public static void preindexEntities(SearchIntegrator si, Dataset data, IntStream idStream) {
+		println( "Starting entity pre-indexing..." );
+		Indexer indexer = new Indexer( si, data );
+		idStream.forEach( indexer );
+		indexer.flush();
+		println( " ... added " + indexer.count + " entities to the index." );
+	}
+
+	private static class Indexer implements IntConsumer {
+		private final Worker worker;
+		private final Dataset data;
+		private TransactionContextForTest tc = new TransactionContextForTest();
+		private boolean needsFlush = false;
+		private int count = 0;
+
+		public Indexer(SearchIntegrator si, Dataset data) {
+			this.worker = si.getWorker();
+			this.data = data;
+		}
+
+		@Override
+		public void accept(int id) {
+			BookEntity book = data.create( id );
 			Work work = new Work( book, book.getId(), WorkType.ADD, false );
 			worker.performWork( work, tc );
 			needsFlush = true;
-			if ( i % 1000 == 0 ) {
+			++count;
+			if ( count % 1000 == 0 ) {
 				//commit in batches of 1000:
+				flush();
+			}
+		}
+
+		public void flush() {
+			if ( needsFlush ) {
+				//commit remaining work
 				tc.end();
 				needsFlush = false;
 				tc = new TransactionContextForTest();
 			}
 		}
-		if ( needsFlush ) {
-			//commit remaining work
-			tc.end();
-		}
-		println( " ... created an index of " + numEntities + " entities." );
 	}
 
 	private static void addIfNonNull(SearchConfigurationForTest cfg, String propertyName, String propertyValue) {
