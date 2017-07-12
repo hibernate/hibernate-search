@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -25,8 +23,6 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchClientUtils {
 
-	private static final ContentType JSON_CONTENT_TYPE = ContentType.APPLICATION_JSON.withCharset("utf-8");
-
 	private ElasticsearchClientUtils() {
 		// Private constructor
 	}
@@ -36,44 +32,38 @@ public class ElasticsearchClientUtils {
 	}
 
 	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) {
-		List<JsonObject> bodyParts = request.getBodyParts();
+		final List<JsonObject> bodyParts = request.getBodyParts();
 		if ( bodyParts.isEmpty() ) {
 			return null;
 		}
-		StringBuilder builder = new StringBuilder();
-		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, builder );
-			builder.append("\n");
-		}
-		return new StringEntity( builder.toString(), JSON_CONTENT_TYPE );
+		return new GsonHttpEntity( gson, bodyParts );
 	}
 
 	public static String formatRequest(GsonProvider gsonProvider, ElasticsearchRequest request) {
-		StringBuilder sb = new StringBuilder();
+		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
+		StringBuilder sb = new StringBuilder( 180 );
 
-		sb.append( "Method: " ).append( request.getMethod() ).append( "\n" );
-		sb.append( "Path: " ).append( request.getPath() ).append( "\n" );
-
-		sb.append( "Data:\n" );
-		sb.append( formatRequestData( gsonProvider, request ) );
+		sb.append( "Method: " ).append( request.getMethod() );
+		sb.append( "\nPath: " ).append( request.getPath() );
+		sb.append( "\nData:\n" );
+		appendRequestData( sb, gsonProvider, request );
 		sb.append( "\n" );
 		return sb.toString();
 	}
 
-	public static String formatRequestData(GsonProvider gsonProvider, ElasticsearchRequest request) {
+	private static void appendRequestData(StringBuilder sb, GsonProvider gsonProvider, ElasticsearchRequest request) {
 		List<JsonObject> bodyParts = request.getBodyParts();
 		Gson gson = gsonProvider.getGsonPrettyPrinting();
-		StringBuilder builder = new StringBuilder();
 		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, builder );
-			builder.append("\n");
+			gson.toJson( bodyPart, sb );
+			sb.append("\n");
 		}
-		return builder.toString();
 	}
 
-	public static String formatRequestData(GsonProvider gsonProvider, JsonObject body) {
-		Gson gson = gsonProvider.getGsonPrettyPrinting();
-		return gson.toJson( body );
+	public static String formatRequestData(GsonProvider gsonProvider, ElasticsearchRequest request) {
+		StringBuilder sb = new StringBuilder( 180 );
+		appendRequestData( sb, gsonProvider, request );
+		return sb.toString();
 	}
 
 	public static String formatResponse(GsonProvider gsonProvider, ElasticsearchResponse response) {
@@ -81,24 +71,27 @@ public class ElasticsearchClientUtils {
 			return null;
 		}
 		JsonObject body = response.getBody();
-		StringBuilder sb = new StringBuilder();
-		sb.append( "Status: " ).append( response.getStatusCode() ).append( " " ).append( response.getStatusMessage() ).append( "\n" );
-		sb.append( "Error message: " ).append( propertyAsString( body, "error" ) ).append( "\n" );
-		sb.append( "Cluster name: " ).append( propertyAsString( body, "cluster_name" ) ).append( "\n" );
-		sb.append( "Cluster status: " ).append( propertyAsString( body, "status" ) ).append( "\n" );
-		sb.append( "\n" );
+		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
+		//Also useful to hint the builder to use larger increment steps.
+		StringBuilder sb = new StringBuilder( 180 );
+		sb.append( "Status: " ).append( response.getStatusCode() ).append( " " ).append( response.getStatusMessage() );
+		sb.append( "\nError message: " ).append( propertyAsString( body, "error" ) );
+		sb.append( "\nCluster name: " ).append( propertyAsString( body, "cluster_name" ) );
+		sb.append( "\nCluster status: " ).append( propertyAsString( body, "status" ) );
+		sb.append( "\n\n" );
 
 		JsonElement items = property( body, "items" );
 		if ( items != null && items.isJsonArray() ) {
 			for ( JsonElement item : items.getAsJsonArray() ) {
 				for ( Map.Entry<String, JsonElement> entry : item.getAsJsonObject().entrySet() ) {
-					sb.append( "Operation: " ).append( entry.getKey() ).append( "\n" );
+					sb.append( "Operation: " ).append( entry.getKey() );
 					JsonElement value = entry.getValue();
-					sb.append( "  Index: " ).append( propertyAsString( value, "_index" ) ).append( "\n" );
-					sb.append( "  Type: " ).append( propertyAsString( value, "_type" ) ).append( "\n" );
-					sb.append( "  Id: " ).append( propertyAsString( value, "_id" ) ).append( "\n" );
-					sb.append( "  Status: " ).append( propertyAsString( value, "status" ) ).append( "\n" );
-					sb.append( "  Error: " ).append( propertyAsString( value, "error" ) ).append( "\n" );
+					sb.append( "\n  Index: " ).append( propertyAsString( value, "_index" ) );
+					sb.append( "\n  Type: " ).append( propertyAsString( value, "_type" ) );
+					sb.append( "\n  Id: " ).append( propertyAsString( value, "_id" ) );
+					sb.append( "\n  Status: " ).append( propertyAsString( value, "status" ) );
+					sb.append( "\n  Error: " ).append( propertyAsString( value, "error" ) );
+					sb.append( "\n" );
 				}
 			}
 		}
@@ -117,10 +110,10 @@ public class ElasticsearchClientUtils {
 		if ( parent == null || !parent.isJsonObject() ) {
 			return null;
 		}
-		JsonElement propretyValue = property( parent.getAsJsonObject(), name );
-		if ( propretyValue == null ) {
+		JsonElement propertyValue = property( parent.getAsJsonObject(), name );
+		if ( propertyValue == null ) {
 			return null;
 		}
-		return propretyValue.toString(); // Also support non-string properties
+		return propertyValue.toString(); // Also support non-string properties
 	}
 }
