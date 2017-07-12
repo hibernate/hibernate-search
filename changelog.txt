@@ -1,6 +1,50 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.0.Beta4 (12-07-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2785 Phrase/match queries on normalized fields built using the DSL fail on Elasticsearch
+    * HSEARCH-2777 javax.persistence is no longer an optional dependency of hibernate-search-orm in OSGi environments
+    * HSEARCH-2776 javax.transaction is not an optional dependency of hibernate-search-engine in OSGi environments
+
+** Improvement
+    * HSEARCH-2783 Deprecate no longer useful buffer_size_on_copy configuration property
+    * HSEARCH-2774 The default build should include documentation
+    * HSEARCH-2700 Decide how simpleQueryString() should behave with null or empty input
+    * HSEARCH-2682 Unit test DefaultElasticsearchClientFactoryTest.multipleHosts_failover_fault fails randomly because the timeout is too low
+
+** New Feature
+    * HSEARCH-2772 Add an elasticsearch-aws module
+
+** Patch
+    * HSEARCH-2810 Micro formatting issues in the documentation
+
+** Task
+    * HSEARCH-2813 Add Elasticsearch performance tests
+    * HSEARCH-2812 IdUniquenessResolver SPI needs to migrate to new type system
+    * HSEARCH-2811 Avoid using Lucene deprecated methods when not essential for 5.8 API
+    * HSEARCH-2809 Upgrade to Elasticsearch 5.5.0
+    * HSEARCH-2808 Avoid using deprecated methods from Hibernate ORM 5.2
+    * HSEARCH-2807 DSLTest numeric tests use order-sensitive assertions on queries without a sort
+    * HSEARCH-2805 Upgrade to Checkstyle 8.0
+    * HSEARCH-2804 Prepare for Checkstyle 8 updates
+    * HSEARCH-2802 Make sure the default elasticsearch profile will only be enabled if the ES version is not provided
+    * HSEARCH-2794 Reorganize/rename performance testing modules
+    * HSEARCH-2793 Upgrade Elasticsearch version used for 2.x tests to 2.4.5
+    * HSEARCH-2792 Rename DslCrossHierarchyTest to ObjectLoadingCrossHierarchyTest
+    * HSEARCH-2791 Fix integration tests failing on non-H2 databases due to mapping specifics
+    * HSEARCH-2790 Upgrade to Elasticsearch 5.4.2
+    * HSEARCH-2789 Test that the CREATE strategy actually doesn't create mappings when the index already exists
+    * HSEARCH-2788 Remove unnecessary calls to Thread.sleep in CDI/Wildfly tests
+    * HSEARCH-2787 Replace INFO blocks in the documentation with valid styles
+    * HSEARCH-2781 Rework internals of sharding to make it possible for backends not to rely on Class<?>
+    * HSEARCH-2775 Migrate internal file helpers and SPIs from File to NIO APIs
+    * HSEARCH-2770 Remove (deprecated) methods using Class<?> as indexed type identifier in the engine SPIs
+    * HSEARCH-2528 Document the dynamic mapping feature
+    * HSEARCH-2369 HSQuery.targetedEntities(List<Class<?>>) won't always work when using multiple backends 
+
 5.8.0.Beta3 (13-06-2017)
 -------------------------
 
