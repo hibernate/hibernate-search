@@ -13,9 +13,12 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -24,6 +27,7 @@ import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.entity.HttpAsyncContentProducer;
 import org.apache.http.protocol.HTTP;
+import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -46,7 +50,7 @@ import com.google.gson.stream.JsonWriter;
  *
  * @author Sanne Grinovero (C) 2017 Red Hat Inc.
  */
-final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
+final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer, DigestSelfSigningCapable {
 
 	/**
 	 * A conservative guess at the size of the buffer (in characters!)
@@ -81,7 +85,8 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	@Override
 	public long getContentLength() {
-		//Can't compute the size in advance using this strategy
+		//We could compute the size in advance but if would be very expensive,
+		//defeating the point of this design.
 		return -1;
 	}
 
@@ -133,15 +138,26 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 		// when the page is full rather than growing and copying, we transfer that section
 		// into the network buffers.
 		// TODO verify if this causes actual network chunking - and if so which sizes we should suggest using.
-		BoundedCharBuffer sink = new BoundedCharBuffer( encoder );
-		JsonWriter writer = createGsonWriter( sink );
+		pushContentToBuffers( encoder::write );
+		encoder.complete();
+	}
+
+	@Override
+	public byte[] getSha256DigestSignature() throws IOException {
+		MessageDigest digest = createSha256Digest();
+		pushContentToBuffers( digest::update );
+		return digest.digest();
+	}
+
+	private void pushContentToBuffers(ByteBufferConsumer out) throws IOException {
+		final BoundedCharBuffer sink = new BoundedCharBuffer( out );
+		final JsonWriter writer = createGsonWriter( sink );
 
 		for ( JsonObject bodyPart : bodyParts ) {
 			gson.toJson( bodyPart, writer );
 			sink.appendNewline();
 		}
 		sink.flush();
-		encoder.complete();
 	}
 
 	private JsonWriter createGsonWriter(Writer builder) {
@@ -158,15 +174,17 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	private static final class BoundedCharBuffer extends Writer {
 
 		final CharBuffer buffer = CharBuffer.allocate( WRITE_BUFFER_SIZE );
-		final ContentEncoder out;
+		final ByteBufferConsumer out;
 
-		BoundedCharBuffer(ContentEncoder underlying) {
-			this.out = underlying;
+		BoundedCharBuffer(ByteBufferConsumer out) {
+			this.out = out;
 		}
 
 		public void appendNewline() throws IOException {
 			if ( buffer.remaining() < 1 ) {
 				flush();
+				//We assume there's always space after this:
+				//No need to check we have a positively sized buffer
 			}
 			buffer.put( '\n' );
 		}
@@ -190,10 +208,10 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 		@Override
 		public void flush() throws IOException {
-			buffer.flip();
+			buffer.flip(); // Re-wind to read what we've written so far
 			ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode( buffer );
-			out.write( byteBuffer );
-			buffer.clear();
+			out.consume( byteBuffer );
+			buffer.clear(); // Reset so that we can reuse it
 		}
 
 		@Override
@@ -201,6 +219,21 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 			//Nothing to close
 		}
 
+	}
+
+	@FunctionalInterface
+	public interface ByteBufferConsumer {
+		void consume(ByteBuffer out) throws IOException;
+	}
+
+	private static MessageDigest createSha256Digest() {
+		final String name = MessageDigestAlgorithms.SHA_256;
+		try {
+			return MessageDigest.getInstance( name );
+		}
+		catch (NoSuchAlgorithmException e) {
+			throw new AssertionFailure( "Digest Algorithm '" + name + "' not found in the platform", e );
+		}
 	}
 
 }
