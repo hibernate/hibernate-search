@@ -8,6 +8,7 @@ package org.hibernate.search.engineperformance.elasticsearch;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
@@ -69,7 +70,7 @@ public class EngineHolder extends BaseIndexSetup {
 	public void initializeState() throws IOException, URISyntaxException {
 		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
-		SearchIntegratorCreation.preindexEntities( si, data, indexSize );
+		SearchIntegratorCreation.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
 
 		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
 		addsDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );

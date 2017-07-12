@@ -34,7 +34,8 @@ public class Launcher {
 			.measurementIterations( 10 )
 			.param( "indexSize", "100" )
 			.param( "maxResults", "10" )
-			.param( "changesetsPerFlush", "500" )
+			.param( "worksPerChangeset", "2;4" )
+			.param( "changesetsPerFlush", "50" )
 			.forks( 0 ) //To simplify debugging; Remember this implies JVM parameters via @Fork won't be applied.
 			.build();
 
