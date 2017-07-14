@@ -153,7 +153,7 @@ public class RestartIT {
 	}
 
 	@Test
-	public void testJob_usingHQL() throws InterruptedException, IOException, ParseException {
+	public void testJob_usingHQL() throws Exception {
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
 
@@ -164,15 +164,24 @@ public class RestartIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Message.class )
-						.restrictedBy( "select m from Message m where day( m.date ) = 31" )
+						.restrictedBy( "select m from Message m where day( m.date ) = 1" )
 						.build()
 				);
 		JobExecution jobExec1 = BatchRuntime.getJobOperator().getJobExecution( execId1 );
 		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		JobInterruptorUtil.disable();
 
-		assertEquals( BatchStatus.COMPLETED, jobExec1.getBatchStatus() );
-		assertEquals( DB_DAY1_ROWS, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
-		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
+		assertEquals( BatchStatus.FAILED, jobExec1.getBatchStatus() );
+
+		// Restart the job.
+		long execId2 = jobOperator.restart( execId1, null );
+		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
+		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
+
+		// FIXME The job should finish correctly
+		assertEquals( BatchStatus.COMPLETED, jobExec2.getBatchStatus() );
+		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
+		assertEquals( DB_DAY2_ROWS, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
 	}
+
 }
