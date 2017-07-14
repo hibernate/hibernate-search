@@ -38,6 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
 
 /**
@@ -82,6 +83,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MAX_THREADS)
 	private String serializedMaxThreads;
+
+	@Inject
+	@BatchProperty(name = MAX_RESULTS_PER_ENTITY)
+	private String serializedMaxResultsPerEntity;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
@@ -247,6 +252,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		Criteria criteria = ss.createCriteria( clazz );
 		if ( criterions != null ) {
 			criterions.forEach( c -> criteria.add( c ) );
+		}
+		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
+			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
+			criteria.setMaxResults( maxResults );
 		}
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
 		ScrollableResults scroll = criteria

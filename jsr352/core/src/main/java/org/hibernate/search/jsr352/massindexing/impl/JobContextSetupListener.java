@@ -25,11 +25,11 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_LIMIT;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_TYPES;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
@@ -72,6 +72,10 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedMaxThreads;
 
 	@Inject
+	@BatchProperty(name = MAX_RESULTS_PER_ENTITY)
+	private String serializedMaxResultsPerEntity;
+
+	@Inject
 	@BatchProperty(name = FETCH_SIZE)
 	private String serializedFetchSize;
 
@@ -102,10 +106,6 @@ public class JobContextSetupListener extends AbstractJobListener {
 	@Inject
 	@BatchProperty(name = CUSTOM_QUERY_CRITERIA)
 	private String serializedCustomQueryCriteria;
-
-	@Inject
-	@BatchProperty(name = CUSTOM_QUERY_LIMIT)
-	private String serializedCustomQueryLimit;
 
 	@Inject
 	private EntityManagerFactoryRegistry emfRegistry;
@@ -164,12 +164,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
 		ValidationUtil.validatePositive( FETCH_SIZE, fetchSize );
 
-		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
-			int customQueryLimit = SerializationUtil.parseIntegerParameter(
-					CUSTOM_QUERY_LIMIT,
-					serializedCustomQueryLimit
+		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
+			int maxResultsPerEntity = SerializationUtil.parseIntegerParameter(
+					MAX_RESULTS_PER_ENTITY,
+					serializedMaxResultsPerEntity
 			);
-			ValidationUtil.validatePositive( CUSTOM_QUERY_LIMIT, customQueryLimit );
+			ValidationUtil.validatePositive( MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 		}
 
 		SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
