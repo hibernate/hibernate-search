@@ -47,21 +47,43 @@ public class StepProgress implements Serializable {
 	}
 
 	/**
-	 * Update the step-level indexing progress using the partition-level indexing progress. (step-level is higher, one
-	 * step contains multiple partitions)
+	 * Update the step-level indexing progress using the partition-level indexing progress.
+	 * Compared to partition-level, step-level is a higher level: one step contains multiple
+	 * partitions.
+	 * <p>
+	 * Please notice that the update logic is different between {@link IndexScope#HQL} and other
+	 * {@link IndexScope} values:
+	 * <ul>
+	 * <li>When using {@link IndexScope#HQL}, the value of {@link #entityProgress} is the mirror of
+	 * value given by partition progress, because {@link IndexScope#HQL} ignores checkpoints:
+	 * the entire progress is lost when the job restarts.
+	 * <li>When using {@link IndexScope#CRITERIA} and {@link IndexScope#FULL_ENTITY}, the value of
+	 * {@link #entityProgress} is incremented: the progress is kept when the job restarts.
+	 * </ul>
 	 *
 	 * @param pp partition-level indexing progress
 	 */
 	public void updateProgress(PartitionProgress pp) {
-		long prevDone = partitionProgress.getOrDefault( pp.getPartitionId(), 0L );
-		long currDone = pp.getWorkDone();
-		if ( currDone < prevDone ) {
-			throw new ArithmeticException( "Current indexed works (" + currDone
-					+ " indexed) is smaller than previous indexed works ("
-					+ prevDone + " indexed)." );
+		if ( pp.getIndexScope() == IndexScope.HQL ) {
+			/*
+			 * In HQL index scope, there's only one partition,
+			 * and checkpoints are ignored, so progress can actually
+			 * go backward upon restarts.
+			 */
+			partitionProgress.put( pp.getPartitionId(), pp.getWorkDone() );
+			entityProgress.put( pp.getEntityName(), pp.getWorkDone() );
 		}
-		increment( pp.getEntityName(), currDone - prevDone );
-		increment( pp.getPartitionId(), currDone - prevDone );
+		else {
+			long prevDone = partitionProgress.getOrDefault( pp.getPartitionId(), 0L );
+			long currDone = pp.getWorkDone();
+			if ( currDone < prevDone ) {
+				throw new ArithmeticException( "Current indexed works (" + currDone
+						+ " indexed) is smaller than previous indexed works ("
+						+ prevDone + " indexed)." );
+			}
+			increment( pp.getEntityName(), currDone - prevDone );
+			increment( pp.getPartitionId(), currDone - prevDone );
+		}
 	}
 
 	private void increment(String entityName, long increment) {

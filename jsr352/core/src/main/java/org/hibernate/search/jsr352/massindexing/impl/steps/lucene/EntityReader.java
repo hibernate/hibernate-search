@@ -230,17 +230,18 @@ public class EntityReader extends AbstractItemReader {
 		sessionFactory = emf.unwrap( SessionFactory.class );
 
 		PartitionContextData partitionData;
-		switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
+		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
+		switch ( indexScope ) {
 			case HQL:
 				scroll = buildScrollUsingHQL( ss, customQueryHql );
-				partitionData = new PartitionContextData( partitionId, entityName );
+				partitionData = new PartitionContextData( partitionId, entityName, indexScope );
 				break;
 
 			case CRITERIA:
 			case FULL_ENTITY:
 				scroll = buildScrollUsingCriteria( ss, bound, checkpointId, jobData );
 				if ( checkpointId == null ) {
-					partitionData = new PartitionContextData( partitionId, entityName );
+					partitionData = new PartitionContextData( partitionId, entityName, indexScope );
 				}
 				else {
 					partitionData = (PartitionContextData) stepContext.getPersistentUserData();

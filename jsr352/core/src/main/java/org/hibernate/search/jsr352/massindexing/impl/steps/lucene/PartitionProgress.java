@@ -17,11 +17,13 @@ public class PartitionProgress implements Serializable {
 	private String entityName;
 	private int partitionId;
 	private long workDone;
+	private IndexScope indexScope;
 
-	public PartitionProgress(int partitionId, String entityName) {
+	public PartitionProgress(int partitionId, String entityName, IndexScope indexScope) {
 		this.partitionId = partitionId;
 		this.entityName = entityName;
 		this.workDone = 0L;
+		this.indexScope = indexScope;
 	}
 
 	/**
@@ -57,9 +59,13 @@ public class PartitionProgress implements Serializable {
 		this.workDone = workDone;
 	}
 
+	public IndexScope getIndexScope() {
+		return indexScope;
+	}
+
 	@Override
 	public String toString() {
 		return "PartitionProgress [workDone=" + workDone + ", entityName=" + entityName
-				+ ", partitionId=" + partitionId + "]";
+				+ ", partitionId=" + partitionId + ", indexScope=" + indexScope + "]";
 	}
 }
