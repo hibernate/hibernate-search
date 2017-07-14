@@ -1288,7 +1288,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <artifactId>elasticsearch</artifactId>
                             <version>${testElasticsearchVersion}</version>
                         </dependency>
-                        
+
                         <!-- The next is used to get ES log output into the Maven console -->
                         <dependency>
                             <groupId>org.hibernate</groupId>
@@ -1427,6 +1427,36 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <properties>
                 <org.hibernate.search.enable_performance_tests>true</org.hibernate.search.enable_performance_tests>
             </properties>
+        </profile>
+
+        <profile>
+            <id>IDEA</id>
+            <!--
+            Dependencies to allow easy project import in IntelliJ IDEA.
+            These should not be listed as project dependencies to users
+            but are necessary during compile time as they include the
+            JBoss Logger annotation processor.
+            -->
+            <activation>
+                <!-- This is a trick to have the profile automatically activated by IDEA -->
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-processor</artifactId>
+                    <version>${jbossLoggingProcessorVersion}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>jsr250-api</artifactId>
+                    <version>1.0</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <!-- =============================== -->
