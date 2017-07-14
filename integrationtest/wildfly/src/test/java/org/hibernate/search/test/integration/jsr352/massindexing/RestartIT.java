@@ -178,7 +178,6 @@ public class RestartIT {
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 
-		// FIXME The job should finish correctly
 		assertEquals( BatchStatus.COMPLETED, jobExec2.getBatchStatus() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( DB_DAY2_ROWS, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );

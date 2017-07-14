@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
@@ -52,6 +52,10 @@ public class LuceneDocProducer implements ItemProcessor {
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
 	private String tenantId;
 
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
+	private String indexScopeName;
+
 	private EntityManagerFactory emf;
 
 	private ExtendedSearchIntegrator searchIntegrator;
@@ -59,6 +63,7 @@ public class LuceneDocProducer implements ItemProcessor {
 	private DocumentBuilderIndexedEntity docBuilder;
 	private boolean isSetup = false;
 	private IndexedTypeIdentifier entityTypeIdentifier;
+	private IndexScope indexScope;
 
 	@Override
 	public Object processItem(Object item) throws Exception {
@@ -67,8 +72,7 @@ public class LuceneDocProducer implements ItemProcessor {
 			setup();
 			isSetup = true;
 		}
-		AddLuceneWork addWork = buildAddLuceneWork( item );
-		return addWork;
+		return buildWork( item );
 	}
 
 	/**
@@ -85,22 +89,17 @@ public class LuceneDocProducer implements ItemProcessor {
 		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityTypeIdentifier );
 		docBuilder = entityIndexBinding.getDocumentBuilder();
 		emf = jobContextData.getEntityManagerFactory();
+		indexScope = IndexScope.valueOf( indexScopeName );
 	}
 
-	/**
-	 * Build addLuceneWork using input entity. This method is inspired by the current mass indexer implementation.
-	 *
-	 * @param entity selected entity, obtained from JPA entity manager. It is used to build Lucene work.
-	 * @return an addLuceneWork
-	 */
-	private AddLuceneWork buildAddLuceneWork(Object entity) {
+	private LuceneWork buildWork(Object entity) {
 		ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 
 		Serializable id = (Serializable) emf.getPersistenceUnitUtil()
 				.getIdentifier( entity );
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
 		conversionContext.pushIdentifierProperty();
-		String idInString = null;
+		String idInString;
 		try {
 			idInString = conversionContext
 					.setConvertedTypeId( entityTypeIdentifier )
@@ -115,19 +114,35 @@ public class LuceneDocProducer implements ItemProcessor {
 		if ( StringHelper.isEmpty( tenantId ) ) {
 			tenantId = null;
 		}
-		return docBuilder.createAddWork(
-				tenantId,
-				entityTypeIdentifier,
-				entity,
-				id,
-				idInString,
-				/*
-				 * Use the default instance initializer (likely HibernateStatelessInitializer),
-				 * because we don't need the fancy features provided by HibernateSessionLoadingInitializer:
-				 * in our case, we never mix entities from different sessions, since
-				 * each partition uses its own session.
-				 */
-				null,
-				conversionContext );
+
+		/*
+		 * Use the default instance initializer (likely HibernateStatelessInitializer),
+		 * because we don't need the fancy features provided by HibernateSessionLoadingInitializer:
+		 * in our case, we never mix entities from different sessions, since
+		 * each partition uses its own session.
+		 */
+		switch ( indexScope ) {
+			case HQL:
+				return docBuilder.createUpdateWork(
+						tenantId,
+						entityTypeIdentifier,
+						entity,
+						id,
+						idInString,
+						null,
+						conversionContext );
+			case CRITERIA:
+			case FULL_ENTITY:
+				return docBuilder.createAddWork(
+						tenantId,
+						entityTypeIdentifier,
+						entity,
+						id,
+						idInString,
+						null,
+						conversionContext );
+			default:
+				throw new IllegalStateException( "Unknown IndexScope: " + indexScope );
+		}
 	}
 }

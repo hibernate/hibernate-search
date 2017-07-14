@@ -135,19 +135,19 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
 					entityType = entityTypes.get( 0 );
-					partitionBounds.add( new PartitionBound( entityType, null, null ) );
+					partitionBounds.add( new PartitionBound( entityType, null, null, IndexScope.HQL ) );
 					break;
 
 				case CRITERIA:
 					entityType = entityTypes.get( 0 );
 					scroll = buildScrollableResults( ss, session, entityType, jobData.getCustomQueryCriteria() );
-					partitionBounds = buildPartitionUnitsFrom( scroll, entityType );
+					partitionBounds = buildPartitionUnitsFrom( scroll, entityType, IndexScope.CRITERIA );
 					break;
 
 				case FULL_ENTITY:
 					for ( Class<?> clz : entityTypes ) {
 						scroll = buildScrollableResults( ss, session, clz, null );
-						partitionBounds.addAll( buildPartitionUnitsFrom( scroll, clz ) );
+						partitionBounds.addAll( buildPartitionUnitsFrom( scroll, clz, IndexScope.FULL_ENTITY ) );
 					}
 					break;
 			}
@@ -163,6 +163,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				props[i].setProperty( MassIndexingPartitionProperties.PARTITION_ID, String.valueOf( i ) );
 				props[i].setProperty( MassIndexingPartitionProperties.LOWER_BOUND, SerializationUtil.serialize( bound.getLowerBound() ) );
 				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND, SerializationUtil.serialize( bound.getUpperBound() ) );
+				props[i].setProperty( MassIndexingPartitionProperties.INDEX_SCOPE, bound.getIndexScope().name() );
 			}
 
 			log.infof( "Partitions: %s", (Object) props );
@@ -202,7 +203,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		}
 	}
 
-	private List<PartitionBound> buildPartitionUnitsFrom(ScrollableResults scroll, Class<?> clazz) {
+	private List<PartitionBound> buildPartitionUnitsFrom(ScrollableResults scroll, Class<?> clazz, IndexScope indexScope) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
 
@@ -221,13 +222,13 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		while ( scroll.scroll( rowsPerPartition ) ) {
 			lowerID = upperID;
 			upperID = scroll.get( 0 );
-			partitionUnits.add( new PartitionBound( clazz, lowerID, upperID ) );
+			partitionUnits.add( new PartitionBound( clazz, lowerID, upperID, indexScope ) );
 		}
 
 		// add an additional partition on the tail
 		lowerID = upperID;
 		upperID = null;
-		partitionUnits.add( new PartitionBound( clazz, lowerID, upperID ) );
+		partitionUnits.add( new PartitionBound( clazz, lowerID, upperID, indexScope ) );
 		return partitionUnits;
 	}
 
