@@ -24,6 +24,8 @@ public final class MassIndexingJobParameters {
 
 	public static final String MAX_THREADS = "maxThreads";
 
+	public static final String MAX_RESULTS_PER_ENTITY = "maxResultsPerEntity";
+
 	public static final String FETCH_SIZE = "fetchSize";
 
 	public static final String CACHEABLE = "cacheable";
@@ -41,8 +43,6 @@ public final class MassIndexingJobParameters {
 	public static final String CUSTOM_QUERY_HQL = "customQueryHQL";
 
 	public static final String CUSTOM_QUERY_CRITERIA = "customQueryCriteria";
-
-	public static final String CUSTOM_QUERY_LIMIT = "customQueryLimit";
 
 	public static final String TENANT_ID = "tenantId";
 }

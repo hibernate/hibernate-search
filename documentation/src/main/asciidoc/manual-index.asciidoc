@@ -480,12 +480,13 @@ can call this method multiple times to add multiple criteria: only entities matc
 will be indexed. However, mixing this approach with the HQL restriction is not allowed.
 See <<jsr-352-index-scope>> for more detail and limitations.
 
-|`customQueryLimit`
-|`customQueryLimit(int)`
+|`maxResultsPerEntity`
+|`maxResultsPerEntity(int)`
 |Optional
 |-
-|The limit of number of entities read in a custom query. This parameter is only used under
-custom query approaches (HQL and criteria). The value defined must be greater than 0.
+|The maximum number of results to load per entity type. This parameter let you define a threshold
+value to avoid loading too many entities accidentally. The value defined must be greater than 0.
+The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL.
 
 |`checkpointInterval`
 |`checkpointInterval(int)`

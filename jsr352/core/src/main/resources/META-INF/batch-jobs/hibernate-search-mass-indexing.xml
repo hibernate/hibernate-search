@@ -16,6 +16,7 @@
                 <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 
                 <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
+                <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                 <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
@@ -25,7 +26,6 @@
                 <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:1000;" />
 
                 <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
-                <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}" />
             </properties>
         </listener>
     </listeners>
@@ -65,7 +65,7 @@
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}" />
+                    <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>
             </reader>
             <processor ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
@@ -88,6 +88,7 @@
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
+                    <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:1000;" />
                 </properties>
             </mapper>

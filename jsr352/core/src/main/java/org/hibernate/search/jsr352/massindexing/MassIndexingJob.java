@@ -9,6 +9,7 @@ package org.hibernate.search.jsr352.massindexing;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,7 +108,7 @@ public final class MassIndexingJob {
 		private Integer maxThreads;
 		private Set<Criterion> customQueryCriteria;
 		private String customQueryHql;
-		private Integer customQueryLimit;
+		private Integer maxResultsPerEntity;
 		private String tenantId;
 
 		private ParametersBuilder(Class<?> entityType, Class<?>... entityTypes) {
@@ -196,18 +197,26 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * The maximum number of results will be returned from the HQL / criteria. It is equivalent to keyword
+		 * The maximum number of results to load per entity type. This parameter let you define a
+		 * threshold value to avoid loading too many entities accidentally. The value defined must
+		 * be greater than 0. The parameter is not used by default. It is equivalent to keyword
 		 * {@literal LIMIT} in SQL.
 		 *
-		 * @param customQueryLimit the custom query limit.
+		 * @param maxResultsPerEntity the maximum number of results returned per entity type.
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder customQueryLimit(int customQueryLimit) {
-			if ( customQueryLimit < 1 ) {
-				throw new IllegalArgumentException( "customQueryLimit must be at least 1" );
+		public ParametersBuilder maxResultsPerEntity(int maxResultsPerEntity) {
+			if ( maxResultsPerEntity < 1 ) {
+				String msg = String.format(
+						Locale.ROOT,
+						"The value of parameter '%s' must be at least 1 (value=%d).",
+						MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY,
+						maxResultsPerEntity
+				);
+				throw new IllegalArgumentException( msg );
 			}
-			this.customQueryLimit = customQueryLimit;
+			this.maxResultsPerEntity = maxResultsPerEntity;
 			return this;
 		}
 
@@ -360,7 +369,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.FETCH_SIZE, fetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
-			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_LIMIT, customQueryLimit );
+			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, optimizeAfterPurge );
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_ON_FINISH, optimizeOnFinish );

@@ -38,7 +38,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final boolean OPTIMIZE_ON_FINISH = true;
 	private static final boolean PURGE_ALL_ON_START = true;
 	private static final int FETCH_SIZE = 100000;
-	private static final int CUSTOM_QUERY_LIMIT = 1000000;
+	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
 	private static final int MAX_THREADS = 2;
 	private static final int ROWS_PER_PARTITION = 500;
 
@@ -48,7 +48,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.forEntities( String.class, Integer.class )
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 				.fetchSize( FETCH_SIZE )
-				.customQueryLimit( CUSTOM_QUERY_LIMIT )
+				.maxResultsPerEntity( MAX_RESULTS_PER_ENTITY )
 				.maxThreads( MAX_THREADS )
 				.optimizeAfterPurge( OPTIMIZE_AFTER_PURGE )
 				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
@@ -59,7 +59,7 @@ public class MassIndexingJobParametersBuilderTest {
 
 		assertEquals( SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
 		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.FETCH_SIZE ) ) );
-		assertEquals( CUSTOM_QUERY_LIMIT, Integer.parseInt( props.getProperty( MassIndexingJobParameters.CUSTOM_QUERY_LIMIT ) ) );
+		assertEquals( MAX_RESULTS_PER_ENTITY, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY ) ) );
 		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE ) ) );
 		assertEquals( OPTIMIZE_ON_FINISH, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_ON_FINISH ) ) );
 		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );

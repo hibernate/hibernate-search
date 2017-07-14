@@ -40,7 +40,7 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_LIMIT;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties.PARTITION_ID;
 
@@ -103,8 +103,8 @@ public class EntityReader extends AbstractItemReader {
 	private String customQueryHql;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_LIMIT)
-	private String serializedCustomQueryLimit;
+	@BatchProperty(name = MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY)
+	private String serializedMaxResultsPerEntity;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -140,7 +140,7 @@ public class EntityReader extends AbstractItemReader {
 			String entityName,
 			String serializedFetchSize,
 			String hql,
-			String serializedCustomQueryLimit,
+			String serializedMaxResultsPerEntity,
 			String partitionIdStr,
 			String serializedLowerBound,
 			String serializedUpperBound) {
@@ -148,7 +148,7 @@ public class EntityReader extends AbstractItemReader {
 		this.entityName = entityName;
 		this.serializedFetchSize = serializedFetchSize;
 		this.customQueryHql = hql;
-		this.serializedCustomQueryLimit = serializedCustomQueryLimit;
+		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedPartitionId = partitionIdStr;
 		this.serializedLowerBound = serializedLowerBound;
 		this.serializedUpperBound = serializedUpperBound;
@@ -275,8 +275,8 @@ public class EntityReader extends AbstractItemReader {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
 
-		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
-			int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
+		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
+			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
 			query.setMaxResults( maxResults );
 		}
 		return query.setReadOnly( true )
@@ -318,8 +318,8 @@ public class EntityReader extends AbstractItemReader {
 		// build criteria using job context data
 		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
 
-		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
-			int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
+		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
+			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
 			criteria.setMaxResults( maxResults );
 		}
 		return criteria.addOrder( Order.asc( idName ) )
