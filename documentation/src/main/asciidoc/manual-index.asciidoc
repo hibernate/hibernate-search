@@ -469,7 +469,7 @@ entity reader class. Set it to true when reading a complex graph with relations.
 |-
 |Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity
 type. Mixing this approach with the criteria restriction is not allowed. Please notice that there's
-no query validation for your input.
+no query validation for your input. See <<jsr-352-index-scope>> for more detail and limitations.
 
 |`customQueryCriteria` (Not available, query builder only)
 |`restrictedBy(Criterion)`
@@ -478,6 +478,7 @@ no query validation for your input.
 |Add criterion to construct a customized selection of mass-indexing under the criteria approach. You
 can call this method multiple times to add multiple criteria: only entities matching every criterion
 will be indexed. However, mixing this approach with the HQL restriction is not allowed.
+See <<jsr-352-index-scope>> for more detail and limitations.
 
 |`customQueryLimit`
 |`customQueryLimit(int)`
@@ -521,7 +522,7 @@ request maximum.
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
 |===
 
-==== Define entities to be indexed
+==== [[jsr-352-index-scope]] Define index scope for each entity
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
 indexation or a partial indexation through 3 different methods: selecting the desired entity types,
@@ -561,9 +562,9 @@ use-case is to index the new entities appeared since yesterday.
 
 Note that, as detailed below, some features may not be supported depending on the restrictions.
 
-.Comparaison of each method
+.Comparaison of each index scope
 |===
-| Method | Indexation | Parallel Indexing | Checkpoint
+| Index Scope | Indexation | Parallel Indexing | Checkpoint
 
 | Full Indexation
 | Full Indexation
@@ -580,6 +581,18 @@ Note that, as detailed below, some features may not be supported depending on th
 | Supported
 | Supported
 |===
+
+[NOTE]
+====
+When using the HQL approach, there isn't any query validation before the job's start.
+If the query is invalid, the job will start and fail.
+
+Also, parallel indexing and recovery from failure are disabled when using an HQL-defined scope,
+because our current parallelism and failure recovery implementations rely on selection order,
+which might not be provided by the HQL given by user.
+
+Because of those limitations, we suggest you use this approach only for indexing small numbers of entities.
+====
 
 ==== Parallel indexing
 
