@@ -223,28 +223,28 @@ public class EntityReader extends AbstractItemReader {
 		session = PersistenceUtil.openSession( emf, tenantId );
 		sessionFactory = emf.unwrap( SessionFactory.class );
 
-		PartitionContextData partitionData = null;
-		// HQL approach
-		// In this approach, the checkpoint mechanism is disabled, because we
-		// don't know if the selection is ordered by ID ascendingly in the query.
-		if ( customQueryHql != null && !customQueryHql.isEmpty() ) {
-			// TODO should I worry about the Lucene AddWork? If this is a
-			// restart, will it create duplicate index for the same entity,
-			// since there's no purge?
-			scroll = buildScrollUsingHQL( ss, customQueryHql );
-			partitionData = new PartitionContextData( partitionId, entityName );
-		}
-		// Criteria approach
-		else {
-			scroll = buildScrollUsingCriteria( ss, bound, checkpointId, jobData );
-			if ( checkpointId == null ) {
+		PartitionContextData partitionData;
+		switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
+			case HQL:
+				scroll = buildScrollUsingHQL( ss, customQueryHql );
 				partitionData = new PartitionContextData( partitionId, entityName );
-			}
-			else {
-				partitionData = (PartitionContextData) stepContext.getPersistentUserData();
-			}
-		}
+				break;
 
+			case CRITERIA:
+			case FULL_ENTITY:
+				scroll = buildScrollUsingCriteria( ss, bound, checkpointId, jobData );
+				if ( checkpointId == null ) {
+					partitionData = new PartitionContextData( partitionId, entityName );
+				}
+				else {
+					partitionData = (PartitionContextData) stepContext.getPersistentUserData();
+				}
+				break;
+
+			default:
+				// This should never happen.
+				throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
+		}
 		stepContext.setTransientUserData( partitionData );
 	}
 

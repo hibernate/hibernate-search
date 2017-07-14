@@ -65,10 +65,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private enum Type {
-		HQL, CRITERIA, FULL_ENTITY
-	}
-
 	@Inject
 	private JobContext jobContext;
 
@@ -136,7 +132,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 			Class<?> entityType;
 
-			switch ( typeOfSelection( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
+			switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
 					entityType = entityTypes.get( 0 );
 					partitionBounds.add( new PartitionBound( entityType, null, null ) );
@@ -203,18 +199,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			catch (Exception e) {
 				log.unableToCloseSession( e );
 			}
-		}
-	}
-
-	private Type typeOfSelection(String hql, Set<Criterion> criterions) {
-		if ( hql != null && !hql.isEmpty() ) {
-			return Type.HQL;
-		}
-		else if ( criterions != null && criterions.size() > 0 ) {
-			return Type.CRITERIA;
-		}
-		else {
-			return Type.FULL_ENTITY;
 		}
 	}
 

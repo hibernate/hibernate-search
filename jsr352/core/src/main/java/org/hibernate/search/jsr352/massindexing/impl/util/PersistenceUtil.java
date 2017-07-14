@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
+import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.IndexScope;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -69,6 +72,23 @@ public final class PersistenceUtil {
 					.openStatelessSession();
 		}
 		return statelessSession;
+	}
+
+	/**
+	 * Determines the index scope using the input parameters.
+	 *
+	 * @see IndexScope
+	 */
+	public static IndexScope getIndexScope(String hql, Set<Criterion> criterionSet) {
+		if ( StringHelper.isNotEmpty( hql ) ) {
+			return IndexScope.HQL;
+		}
+		else if ( criterionSet != null && criterionSet.size() > 0 ) {
+			return IndexScope.CRITERIA;
+		}
+		else {
+			return IndexScope.FULL_ENTITY;
+		}
 	}
 
 }
