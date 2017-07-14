@@ -15,8 +15,8 @@ import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
-import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingOperationExecutor;
 import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -81,16 +81,17 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	 * Execute {@code LuceneWork}
 	 *
 	 * @param items a list of items, where each item is a list of Lucene works.
-	 * @throw Exception is thrown for any errors.
+	 *
+	 * @throws Exception is thrown for any errors.
 	 */
 	@Override
 	public void writeItems(List<Object> items) throws Exception {
 		for ( Object item : items ) {
-			AddLuceneWork addWork = (AddLuceneWork) item;
-			StreamingOperationExecutor executor = addWork.acceptIndexWorkVisitor(
+			LuceneWork work = (LuceneWork) item;
+			StreamingOperationExecutor executor = work.acceptIndexWorkVisitor(
 					StreamingOperationExecutorSelector.INSTANCE, null );
 			executor.performStreamOperation(
-					addWork,
+					work,
 					indexManagerSelector,
 					null, // monitor,
 					FORCE_ASYNC );

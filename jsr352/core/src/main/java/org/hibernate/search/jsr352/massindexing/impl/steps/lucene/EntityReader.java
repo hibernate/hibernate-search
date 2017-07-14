@@ -122,6 +122,10 @@ public class EntityReader extends AbstractItemReader {
 	@BatchProperty(name = MassIndexingPartitionProperties.UPPER_BOUND)
 	private String serializedUpperBound;
 
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
+	private String indexScopeName;
+
 	private EntityManagerFactory emf;
 
 	private Serializable checkpointId;
@@ -143,7 +147,8 @@ public class EntityReader extends AbstractItemReader {
 			String serializedMaxResultsPerEntity,
 			String partitionIdStr,
 			String serializedLowerBound,
-			String serializedUpperBound) {
+			String serializedUpperBound,
+			String indexScopeName) {
 		this.serializedCacheable = serializedCacheable;
 		this.entityName = entityName;
 		this.serializedFetchSize = serializedFetchSize;
@@ -152,6 +157,7 @@ public class EntityReader extends AbstractItemReader {
 		this.serializedPartitionId = partitionIdStr;
 		this.serializedLowerBound = serializedLowerBound;
 		this.serializedUpperBound = serializedUpperBound;
+		this.indexScopeName = indexScopeName;
 	}
 
 	/**
@@ -266,7 +272,8 @@ public class EntityReader extends AbstractItemReader {
 		Class<?> entityType = jobContextData.getIndexedType( entityName );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
-		return new PartitionBound( entityType, lowerBound, upperBound );
+		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
+		return new PartitionBound( entityType, lowerBound, upperBound, indexScope );
 	}
 
 	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {

@@ -88,8 +88,8 @@ public class EntityReaderTest {
 				maxResults,
 				partitionId,
 				null,
-				null
-				);
+				null,
+				IndexScope.FULL_ENTITY.name() );
 
 		MockitoAnnotations.initMocks( this );
 	}
