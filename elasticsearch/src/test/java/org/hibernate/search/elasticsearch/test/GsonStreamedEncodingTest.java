@@ -9,9 +9,11 @@ package org.hibernate.search.elasticsearch.test;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
@@ -119,27 +121,18 @@ public class GsonStreamedEncodingTest {
 		list.add( buildEmptyJSON() );
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
 			assertEquals( -1l, entity.getContentLength() );
-			final MessageDigest digest = getSha256Digest();
-			entity.fillDigest( digest );
-			assertNotEquals( -1l, entity.getContentLength() );
-			final byte[] content = produceContentWithCustomEncoder( entity );
-			assertEquals( content.length, entity.getContentLength() );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( "We're mocking IO operations, this should not happen?", e );
 		}
-	}
-
-	@Test
-	public void testContentProductionTriggersLenghtComputation() {
-		final List<JsonObject> list = new ArrayList<>( 3 );
-		list.add( buildEmptyJSON() );
-		list.add( buildVersionJSON() );
-		list.add( buildEmptyJSON() );
+		//Need to discard the entity and get a new one, as the getContentLenght()
+		//invocation will have frozen the value: we can't report inconsistent values
+		//to the Apache HTTP client or it gets confused.
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
-			assertEquals( -1l, entity.getContentLength() );
-			final byte[] content = produceContentWithCustomEncoder( entity );
+			final MessageDigest digest = getSha256Digest();
+			entity.fillDigest( digest );
 			assertNotEquals( -1l, entity.getContentLength() );
+			final byte[] content = produceContentWithCustomEncoder( entity );
 			assertEquals( content.length, entity.getContentLength() );
 		}
 		catch (IOException e) {
@@ -174,9 +167,15 @@ public class GsonStreamedEncodingTest {
 	}
 
 	private void verifyProducedContent(final List<JsonObject> jsonObjects) {
-		assertArrayEquals(
-				traditionalEncoding( jsonObjects ),
-				optimisedEncoding( jsonObjects ) );
+		byte[] expected = traditionalEncoding( jsonObjects );
+		byte[] optimised = optimisedEncoding( jsonObjects );
+		if ( Arrays.equals( expected, optimised ) == false ) {
+			CharBuffer decodedExpected = StandardCharsets.UTF_8.decode( ByteBuffer.wrap( expected ) );
+			CharBuffer decodedOptimised = StandardCharsets.UTF_8.decode( ByteBuffer.wrap( optimised ) );
+			System.out.println( "Rendered :\n" + decodedOptimised );
+			System.out.println( "Should be:\n" + decodedExpected );
+		}
+		assertArrayEquals( expected, optimised );
 	}
 
 	byte[] optimisedEncoding(List<JsonObject> bodyParts) {
@@ -195,7 +194,9 @@ public class GsonStreamedEncodingTest {
 		int loopCounter = 0;
 		while ( sink.isCompleted() == false ) {
 			entity.produceContent( sink, fakeIO );
-			sink.setNextAcceptedBytesSize( loopCounter++ );
+			//For testing, be really aggressive on the need to
+			//manage small write windows the right way.
+			sink.setNextAcceptedBytesSize( loopCounter++ % 3 );
 		}
 		return sink.flipAndRead();
 	}
@@ -266,7 +267,17 @@ public class GsonStreamedEncodingTest {
 			byte[] currentRead = new byte[toRead];
 			byteBuffer.get( currentRead );
 			buf.put( currentRead );
+//			debugReadSoFar( currentRead );
 			return toRead;
+		}
+
+		private void debugReadSoFar(byte[] currentRead) {
+			if ( currentRead.length > 0 ) {
+				CharBuffer decodedExpected = StandardCharsets.UTF_8.decode( ByteBuffer.wrap( currentRead ) );
+				String easy = decodedExpected.toString();
+				System.out.println( easy );
+				return;
+			}
 		}
 
 		@Override
