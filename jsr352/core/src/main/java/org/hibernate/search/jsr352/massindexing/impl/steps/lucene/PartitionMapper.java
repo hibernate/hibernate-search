@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
@@ -70,8 +70,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
-	private String serializedFetchSize;
+	@BatchProperty(name = ID_FETCH_SIZE)
+	private String serializedIdFetchSize;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
@@ -105,12 +105,12 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	 * @param customQueryHql
 	 */
 	PartitionMapper(EntityManagerFactory emf,
-			String serializedFetchSize,
+			String serializedIdFetchSize,
 			String customQueryHql,
 			String serializedRowsPerPartition,
 			String serializedMaxThreads) {
 		this.emf = emf;
-		this.serializedFetchSize = serializedFetchSize;
+		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.customQueryHql = customQueryHql;
 		this.serializedMaxThreads = serializedMaxThreads;
 		this.serializedRowsPerPartition = serializedRowsPerPartition;
@@ -127,12 +127,13 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			emf = jobData.getEntityManagerFactory();
 			session = PersistenceUtil.openSession( emf, tenantId );
 			ss = PersistenceUtil.openStatelessSession( emf, tenantId );
-			int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
+
 			Integer maxResults = null;
 			if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 				maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
 			}
 			int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
+			int idFetchSize = SerializationUtil.parseIntegerParameter( ID_FETCH_SIZE, serializedIdFetchSize );
 
 			List<EntityTypeDescriptor> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
@@ -145,14 +146,14 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 				case CRITERIA:
 					partitionBounds = buildPartitionUnitsFrom( ss, entityTypeDescriptors.get( 0 ),
-							jobData.getCustomQueryCriteria(), maxResults, fetchSize, rowsPerPartition,
+							jobData.getCustomQueryCriteria(), maxResults, idFetchSize, rowsPerPartition,
 							IndexScope.CRITERIA );
 					break;
 
 				case FULL_ENTITY:
 					for ( EntityTypeDescriptor entityTypeDescriptor : entityTypeDescriptors ) {
 						partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
-								Collections.emptySet(), maxResults, fetchSize, rowsPerPartition,
+								Collections.emptySet(), maxResults, idFetchSize, rowsPerPartition,
 								IndexScope.FULL_ENTITY ) );
 					}
 					break;

@@ -100,7 +100,8 @@ public final class MassIndexingJob {
 		private Boolean optimizeAfterPurge;
 		private Boolean optimizeOnFinish;
 		private Boolean purgeAllOnStart;
-		private Integer fetchSize;
+		private Integer idFetchSize;
+		private Integer entityFetchSize;
 		private Integer checkpointInterval;
 		private Integer rowsPerPartition;
 		private Integer maxThreads;
@@ -179,18 +180,37 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * The number of rows to retrieve for each database query. This is an optional method, its default value is
-		 * {@literal 200,000}.
+		 * Specifies the fetch size to be used when loading primary keys at the
+		 * step-level. Some databases accept special values, for example MySQL
+		 * might benefit from using {@link Integer#MIN_VALUE}, otherwise it
+		 * will attempt to preload everything in memory.
+		 * <p>
+		 * This is an optional parameter.
 		 *
-		 * @param fetchSize the number of rows to retrieve for each database query.
+		 * @param idFetchSize the fetch size to be used when loading primary keys
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder fetchSize(int fetchSize) {
-			if ( fetchSize < 1 ) {
-				throw new IllegalArgumentException( "fetchSize must be at least 1" );
-			}
-			this.fetchSize = fetchSize;
+		public ParametersBuilder idFetchSize(int idFetchSize) {
+			this.idFetchSize = idFetchSize;
+			return this;
+		}
+
+		/**
+		 * Specifies the fetch size to be used when loading entities from
+		 * database. Some databases accept special values, for example MySQL
+		 * might benefit from using {@link Integer#MIN_VALUE}, otherwise it
+		 * will attempt to preload everything in memory.
+		 * <p>
+		 * This is an optional parameter. The default value is the value of
+		 * checkpoint interval.
+		 *
+		 * @param entityFetchSize the fetch size to be used when loading entities
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder entityFetchSize(int entityFetchSize) {
+			this.entityFetchSize = entityFetchSize;
 			return this;
 		}
 
@@ -364,7 +384,8 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE, entityManagerFactoryNamespace );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CACHEABLE, cacheable );
-			addIfNotNull( jobParams, MassIndexingJobParameters.FETCH_SIZE, fetchSize );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ID_FETCH_SIZE, idFetchSize );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_FETCH_SIZE, entityFetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );

@@ -457,11 +457,21 @@ place after indexing.
 |Specify whether the Hibernate queries are cacheable. This setting will be applied to the internal
 entity reader class. Set it to true when reading a complex graph with relations.
 
-|`fetchSize`
-|`fetchSize(int)`
+|`idFetchSize`
+|`idFetchSize(int)`
 |Optional
-|100
-|The number of rows to retrieve for each database query.
+|1000
+|Specifies the fetch size to be used when loading primary keys. Some databases
+accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
+will attempt to preload everything in memory.
+
+|`entityFetchSize`
+|`entityFetchSize(int)`
+|Optional
+|The value of `checkpointInterval`
+|Specifies the fetch size to be used when loading entities from database. Some databases
+accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
+will attempt to preload everything in memory.
 
 |`customQueryHQL`
 |`restrictedBy(String)`
