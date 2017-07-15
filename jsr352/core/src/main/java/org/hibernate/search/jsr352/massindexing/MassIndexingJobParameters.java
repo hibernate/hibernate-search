@@ -16,7 +16,7 @@ public final class MassIndexingJobParameters {
 		// Private constructor, do not use
 	}
 
-	public static final String ENTITY_MANAGER_FACTORY_SCOPE = "entityManagerFactoryScope";
+	public static final String ENTITY_MANAGER_FACTORY_NAMESPACE = "entityManagerFactoryNamespace";
 
 	public static final String ENTITY_MANAGER_FACTORY_REFERENCE = "entityManagerFactoryReference";
 

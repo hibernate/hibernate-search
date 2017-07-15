@@ -51,11 +51,11 @@ public final class JobContextUtil {
 
 	public static JobContextData getOrCreateData(JobContext jobContext,
 			EntityManagerFactoryRegistry emfRegistry,
-			String entityManagerFactoryScope, String entityManagerFactoryReference,
+			String entityManagerFactoryNamespace, String entityManagerFactoryReference,
 			String entityTypes, String serializedCustomQueryCriteria) throws ClassNotFoundException, IOException {
 		JobContextData data = (JobContextData) jobContext.getTransientUserData();
 		if ( data == null ) {
-			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference );
+			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference );
 			data = createData( emf, entityTypes, serializedCustomQueryCriteria );
 			jobContext.setTransientUserData( data );
 		}
@@ -72,11 +72,11 @@ public final class JobContextUtil {
 	}
 
 	static EntityManagerFactory getEntityManagerFactory(EntityManagerFactoryRegistry emfRegistry,
-			String entityManagerFactoryScope, String entityManagerFactoryReference) {
+			String entityManagerFactoryNamespace, String entityManagerFactoryReference) {
 		EntityManagerFactoryRegistry registry =
 				emfRegistry != null ? emfRegistry : ActiveSessionFactoryRegistry.getInstance();
 
-		if ( StringHelper.isEmpty( entityManagerFactoryScope ) ) {
+		if ( StringHelper.isEmpty( entityManagerFactoryNamespace ) ) {
 			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
 				return registry.getDefault();
 			}
@@ -89,7 +89,7 @@ public final class JobContextUtil {
 				throw log.entityManagerFactoryReferenceIsEmpty();
 			}
 			else {
-				return registry.get( entityManagerFactoryScope, entityManagerFactoryReference );
+				return registry.get( entityManagerFactoryNamespace, entityManagerFactoryReference );
 			}
 		}
 	}

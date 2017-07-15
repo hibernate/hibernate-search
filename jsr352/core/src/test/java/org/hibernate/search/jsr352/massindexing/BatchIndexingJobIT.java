@@ -140,8 +140,7 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void entityManagerFactoryScope_persistenceUnitName() throws InterruptedException,
-			IOException {
+	public void entityManagerFactoryNamespace_persistenceUnitName() throws Exception {
 		EntityManager em = emf.createEntityManager();
 		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
 		ftem.purgeAll( Company.class );
@@ -152,7 +151,7 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
-						.entityManagerFactoryScope( "persistence-unit-name" )
+						.entityManagerFactoryNamespace( "persistence-unit-name" )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
@@ -164,8 +163,7 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void entityManagerFactoryScope_sessionFactoryName() throws InterruptedException,
-			IOException {
+	public void entityManagerFactoryNamespace_sessionFactoryName() throws Exception {
 		EntityManager em = emf.createEntityManager();
 		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
 		ftem.purgeAll( Company.class );
@@ -176,7 +174,7 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
-						.entityManagerFactoryScope( "session-factory-name" )
+						.entityManagerFactoryNamespace( "session-factory-name" )
 						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 						.build()
 				);

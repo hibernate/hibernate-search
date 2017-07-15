@@ -86,7 +86,7 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final String CDI_SCOPE_NAME = "cdi";
+	private static final String CDI_NAMESPACE_NAME = "cdi";
 
 	@Inject
 	private Instance<EntityManagerFactory> entityManagerFactoryInstance;
@@ -114,15 +114,15 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 
 	@Override
 	public EntityManagerFactory get(String reference) {
-		return get( CDI_SCOPE_NAME, reference );
+		return get( CDI_NAMESPACE_NAME, reference );
 	}
 
 	@Override
-	public EntityManagerFactory get(String scopeName, String reference) {
+	public EntityManagerFactory get(String namespace, String reference) {
 		EntityManagerFactory factory;
 
-		switch ( scopeName ) {
-			case CDI_SCOPE_NAME:
+		switch ( namespace ) {
+			case CDI_NAMESPACE_NAME:
 				Instance<EntityManagerFactory> instance = entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
 				if ( instance.isUnsatisfied() ) {
 					throw log.noAvailableEntityManagerFactoryInCDI( reference );
@@ -130,7 +130,7 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 				factory = instance.get();
 				break;
 			default:
-				throw log.unknownEntityManagerFactoryScope( scopeName );
+				throw log.unknownEntityManagerFactoryNamespace( namespace );
 		}
 
 		return factory;

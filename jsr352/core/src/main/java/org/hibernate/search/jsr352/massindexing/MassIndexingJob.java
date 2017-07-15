@@ -13,6 +13,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
@@ -93,7 +95,7 @@ public final class MassIndexingJob {
 	public static class ParametersBuilder {
 
 		private final Set<Class<?>> entityTypes;
-		private String entityManagerFactoryScope;
+		private String entityManagerFactoryNamespace;
 		private String entityManagerFactoryReference;
 		private Boolean cacheable;
 		private Boolean optimizeAfterPurge;
@@ -118,8 +120,22 @@ public final class MassIndexingJob {
 			customQueryCriteria = new HashSet<>();
 		}
 
-		public ParametersBuilder entityManagerFactoryScope(String scope) {
-			this.entityManagerFactoryScope = scope;
+		/**
+		 * The string that allows to select how you want to reference the {@link EntityManagerFactory}.
+		 * Possible values are:
+		 * <ul>
+		 * <li><tt>persistence-unit-name</tt> (the default): use the persistence unit name defined
+		 * in <tt>persistence.xml</tt>.
+		 * <li><tt>session-factory-name</tt>: use the session factory name defined in the Hibernate
+		 * configuration by the <tt>hibernate.session_factory_name</tt> configuration property.
+		 * </ul>
+		 *
+		 * @param namespace the name of namespace to use
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder entityManagerFactoryNamespace(String namespace) {
+			this.entityManagerFactoryNamespace = namespace;
 			return this;
 		}
 
@@ -338,7 +354,7 @@ public final class MassIndexingJob {
 
 			Properties jobParams = new Properties();
 
-			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE, entityManagerFactoryNamespace );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CACHEABLE, cacheable );
 			addIfNotNull( jobParams, MassIndexingJobParameters.FETCH_SIZE, fetchSize );

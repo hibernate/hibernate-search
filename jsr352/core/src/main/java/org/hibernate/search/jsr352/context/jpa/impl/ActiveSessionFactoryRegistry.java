@@ -40,8 +40,8 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 
 	private static final MutableSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
 
-	private static final String PERSISTENCE_UNIT_NAME_SCOPE_NAME = "persistence-unit-name";
-	private static final String SESSION_FACTORY_NAME_SCOPE_NAME = "session-factory-name";
+	private static final String PERSISTENCE_UNIT_NAME_NAMESPACE = "persistence-unit-name";
+	private static final String SESSION_FACTORY_NAME_NAMESPACE = "session-factory-name";
 
 	public static MutableSessionFactoryRegistry getInstance() {
 		return INSTANCE;
@@ -96,28 +96,28 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 
 	@Override
 	public EntityManagerFactory get(String reference) {
-		return get( PERSISTENCE_UNIT_NAME_SCOPE_NAME, reference );
+		return get( PERSISTENCE_UNIT_NAME_NAMESPACE, reference );
 	}
 
 	@Override
-	public EntityManagerFactory get(String scopeName, String reference) {
+	public EntityManagerFactory get(String namespace, String reference) {
 		SessionFactory factory;
 
-		switch ( scopeName ) {
-			case PERSISTENCE_UNIT_NAME_SCOPE_NAME:
+		switch ( namespace ) {
+			case PERSISTENCE_UNIT_NAME_NAMESPACE:
 				factory = sessionFactoriesByPUName.get( reference );
 				if ( factory == null ) {
 					throw log.cannotFindEntityManagerFactoryByPUName( reference );
 				}
 				break;
-			case SESSION_FACTORY_NAME_SCOPE_NAME:
+			case SESSION_FACTORY_NAME_NAMESPACE:
 				factory = sessionFactoriesByName.get( reference );
 				if ( factory == null ) {
 					throw log.cannotFindEntityManagerFactoryByName( reference );
 				}
 				break;
 			default:
-				throw log.unknownEntityManagerFactoryScope( scopeName );
+				throw log.unknownEntityManagerFactoryNamespace( namespace );
 		}
 
 		return factory;
