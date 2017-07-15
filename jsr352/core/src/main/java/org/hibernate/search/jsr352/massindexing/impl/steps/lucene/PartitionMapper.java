@@ -33,6 +33,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionP
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
@@ -151,10 +152,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			}
 
 			// Build partition plan
-			final int threads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
 			final int partitions = partitionBounds.size();
 			final Properties[] props = new Properties[partitions];
-			log.partitionsPlan( partitions, threads );
 
 			for ( int i = 0; i < partitionBounds.size(); i++ ) {
 				PartitionBound bound = partitionBounds.get( i );
@@ -170,7 +169,12 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );
 			partitionPlan.setPartitions( partitions );
-			partitionPlan.setThreads( threads );
+			if ( StringHelper.isNotEmpty( serializedMaxThreads ) ) {
+				final int threads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
+				partitionPlan.setThreads( threads );
+			}
+
+			log.partitionsPlan( partitionPlan.getPartitions(), partitionPlan.getThreads() );
 			return partitionPlan;
 		}
 		finally {

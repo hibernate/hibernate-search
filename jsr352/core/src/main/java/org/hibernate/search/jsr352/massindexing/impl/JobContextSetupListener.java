@@ -149,8 +149,10 @@ public class JobContextSetupListener extends AbstractJobListener {
 	}
 
 	private void validateJobSettings() {
-		int maxThreads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
-		ValidationUtil.validatePositive( MAX_THREADS, maxThreads );
+		if ( StringHelper.isNotEmpty( serializedMaxThreads ) ) {
+			int maxThreads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
+			ValidationUtil.validatePositive( MAX_THREADS, maxThreads );
+		}
 
 		// A boolean parameter is validated if its deserialization is successful.
 		SerializationUtil.parseBooleanParameter( OPTIMIZE_ON_FINISH , serializedOptimizedOnFinish );

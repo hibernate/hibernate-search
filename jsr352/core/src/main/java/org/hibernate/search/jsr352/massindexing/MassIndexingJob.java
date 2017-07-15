@@ -198,7 +198,7 @@ public final class MassIndexingJob {
 		/**
 		 * The maximum number of threads to use for processing the job. Note the batch runtime cannot guarantee the
 		 * request number of threads are available; it will use as many as it can up to the request maximum. This
-		 * method is optional, its default value is {@literal 8}.
+		 * method is optional, its default value is the number of partitions.
 		 *
 		 * @param maxThreads the maximum number of threads.
 		 *

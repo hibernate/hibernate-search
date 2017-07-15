@@ -15,7 +15,7 @@
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
                 <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 
-                <property name="maxThreads" value="#{jobParameters['maxThreads']}?:10;" />
+                <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
                 <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                 <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
@@ -87,7 +87,7 @@
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="maxThreads" value="#{jobParameters['maxThreads']}?:10;" />
+                    <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:1000;" />
                 </properties>
             </mapper>

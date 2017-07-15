@@ -503,7 +503,7 @@ greater than the value of `checkpointInterval`.
 |`maxThreads`
 |`maxThreads(int)`
 |Optional
-|10
+|The number of partitions
 |The maximum number of threads to use for processing the job. Note the batch runtime cannot
 guarantee the request number of threads are available; it will use as many as it can up to the
 request maximum.
