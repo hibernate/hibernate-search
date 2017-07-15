@@ -11,7 +11,7 @@
     <listeners>
         <listener ref="org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener">
             <properties>
-                <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />
+                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
                 <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 
@@ -52,7 +52,7 @@
             <reader ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader">
                 <properties>
                 	<!-- Used to re-create the job context data as necessary -->
-	                <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />
+	                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
 	                <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
 	                <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 	                <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />

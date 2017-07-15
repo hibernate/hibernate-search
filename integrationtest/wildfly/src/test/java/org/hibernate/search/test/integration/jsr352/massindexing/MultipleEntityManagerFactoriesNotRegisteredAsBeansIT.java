@@ -68,7 +68,7 @@ public class MultipleEntityManagerFactoriesNotRegisteredAsBeansIT {
 
 		/*
 		 * We expect failure, because we can only retrieve the default PU by default
-		 * (unless a non-default scope is used, but that requires user configuration).
+		 * (unless a non-default namespace is used, but that requires user configuration).
 		 */
 		assertEquals( BatchStatus.FAILED, jobExec1.getBatchStatus() );
 	}

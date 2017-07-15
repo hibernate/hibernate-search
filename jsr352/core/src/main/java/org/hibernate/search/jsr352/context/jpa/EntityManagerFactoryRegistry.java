@@ -31,12 +31,13 @@ public interface EntityManagerFactoryRegistry {
 	/**
 	 * Retrieve a factory using the given scope.
 	 *
-	 * @param scope The scope of the reference; accepted scopes are implementation-dependent. Must be non-null and non-empty.
-	 * For instance an implementation could accept the scope 'persistence-unit-name', meaning
+	 * @param namespace The namespace of the reference; accepted namespaces are implementation-dependent.
+	 * Must be non-null and non-empty.
+	 * For instance an implementation could accept the namespace 'persistence-unit-name', meaning
 	 * that the reference will be interpreted as a persistence unit name.
 	 * @param reference The reference allowing to identify the factory uniquely. Must be non-null and non-empty.
 	 * @return The {@link EntityManagerFactory} for the given reference string.
 	 */
-	EntityManagerFactory get(String scope, String reference);
+	EntityManagerFactory get(String namespace, String reference);
 
 }

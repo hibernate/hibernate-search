@@ -514,8 +514,8 @@ request maximum.
 |-
 |The string that will identify the `EntityManagerFactory`.
 
-|`entityManagerFactoryScope`
-|`entityManagerFactoryScope(String)`
+|`entityManagerFactoryNamespace`
+|`entityManagerFactoryNamespace(String)`
 |-
 |-
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
@@ -769,7 +769,7 @@ If you want to use multiple persistence units, you will have to add two paramete
 mass indexer:
 
 * `entityManagerFactoryReference`: this is the string that will identify the `EntityManagerFactory`.
-* `entityManagerFactoryScope`: this allows to select how you want to reference the
+* `entityManagerFactoryNamespace`: this allows to select how you want to reference the
   `EntityManagerFactory`. Possible values are:
 
 ** `persistence-unit-name` (the default): use the persistence unit name defined in

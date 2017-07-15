@@ -26,8 +26,8 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_LIMIT;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_TYPES;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
@@ -56,8 +56,8 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = ENTITY_MANAGER_FACTORY_SCOPE)
-	private String entityManagerFactoryScope;
+	@BatchProperty(name = ENTITY_MANAGER_FACTORY_NAMESPACE)
+	private String entityManagerFactoryNamespace;
 
 	@Inject
 	@BatchProperty(name = ENTITY_MANAGER_FACTORY_REFERENCE)
@@ -114,7 +114,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 	public void beforeJob() throws Exception {
 		validateParameters();
 		JobContextUtil.getOrCreateData( jobContext,
-				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
+				emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference,
 				serializedEntityTypes, serializedCustomQueryCriteria );
 	}
 
@@ -133,7 +133,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private void validateEntityTypes() {
 		ValidationUtil.validateEntityTypes(
 				emfRegistry,
-				entityManagerFactoryScope,
+				entityManagerFactoryNamespace,
 				entityManagerFactoryReference,
 				serializedEntityTypes
 		);

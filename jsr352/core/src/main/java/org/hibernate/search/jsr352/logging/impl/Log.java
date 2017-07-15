@@ -35,10 +35,10 @@ public interface Log extends BaseHibernateSearchLogger {
 	int JSR_352_MESSAGES_START_ID = 500000;
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 1,
-			value = "An '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE + "' parameter was defined,"
+			value = "An '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE + "' parameter was defined,"
 					+ " but the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter is empty."
 					+ " Please also set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
-					+ " to select an entity manager factory, or do not set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE
+					+ " to select an entity manager factory, or do not set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
 					+ "' parameter to try to use a default entity manager factory."
 	)
 	SearchException entityManagerFactoryReferenceIsEmpty();
@@ -50,8 +50,8 @@ public interface Log extends BaseHibernateSearchLogger {
 	SearchException noAvailableEntityManagerFactoryInCDI(String reference);
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 3,
-			value = "Unknown entity manager factory scope: '%1$s'. Please use a supported scope.")
-	SearchException unknownEntityManagerFactoryScope(String scopeName);
+			value = "Unknown entity manager factory namespace: '%1$s'. Please use a supported namespace.")
+	SearchException unknownEntityManagerFactoryNamespace(String namespace);
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 4,
 			value = "Exception while retrieving the EntityManagerFactory using @PersistenceUnit."
@@ -94,7 +94,7 @@ public interface Log extends BaseHibernateSearchLogger {
 			value = "Multiple entity manager factories are currently active."
 					+ " Please provide the name of the selected persistence unit to the batch indexing job through"
 					+ " the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE
-					+ "' parameter (you may also use the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE
+					+ "' parameter (you may also use the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
 					+ "' parameter for more referencing options)."
 	)
 	SearchException tooManyActiveEntityManagerFactories();

@@ -65,8 +65,8 @@ public class EntityReader extends AbstractItemReader {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE)
-	private String entityManagerFactoryScope;
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE)
+	private String entityManagerFactoryNamespace;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE)
@@ -258,7 +258,7 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	private JobContextData getJobContextData() throws ClassNotFoundException, IOException {
 		return JobContextUtil.getOrCreateData( jobContext,
-				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
+				emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference,
 				serializedEntityTypes, serializedCustomQueryCriteria );
 	}
 
