@@ -37,7 +37,8 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final boolean OPTIMIZE_AFTER_PURGE = true;
 	private static final boolean OPTIMIZE_ON_FINISH = true;
 	private static final boolean PURGE_ALL_ON_START = true;
-	private static final int FETCH_SIZE = 100000;
+	private static final int ID_FETCH_SIZE = Integer.MIN_VALUE;
+	private static final int ENTITY_FETCH_SIZE = Integer.MIN_VALUE + 1;
 	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
 	private static final int MAX_THREADS = 2;
 	private static final int ROWS_PER_PARTITION = 500;
@@ -47,7 +48,8 @@ public class MassIndexingJobParametersBuilderTest {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( String.class, Integer.class )
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
-				.fetchSize( FETCH_SIZE )
+				.idFetchSize( ID_FETCH_SIZE )
+				.entityFetchSize( ENTITY_FETCH_SIZE )
 				.maxResultsPerEntity( MAX_RESULTS_PER_ENTITY )
 				.maxThreads( MAX_THREADS )
 				.optimizeAfterPurge( OPTIMIZE_AFTER_PURGE )
@@ -58,7 +60,8 @@ public class MassIndexingJobParametersBuilderTest {
 				.build();
 
 		assertEquals( SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
-		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.FETCH_SIZE ) ) );
+		assertEquals( ID_FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ID_FETCH_SIZE ) ) );
+		assertEquals( ENTITY_FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ENTITY_FETCH_SIZE ) ) );
 		assertEquals( MAX_RESULTS_PER_ENTITY, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY ) ) );
 		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE ) ) );
 		assertEquals( OPTIMIZE_ON_FINISH, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_ON_FINISH ) ) );
@@ -163,6 +166,24 @@ public class MassIndexingJobParametersBuilderTest {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.tenantId( "" );
+	}
+
+	@Test
+	public void testIdFetchSize() throws Exception {
+		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 0, Integer.MIN_VALUE ) ) {
+			MassIndexingJob.parameters()
+					.forEntity( UnusedEntity.class )
+					.idFetchSize( allowedValue );
+		}
+	}
+
+	@Test
+	public void testEntityFetchSize() throws Exception {
+		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 0, Integer.MIN_VALUE ) ) {
+			MassIndexingJob.parameters()
+					.forEntity( UnusedEntity.class )
+					.entityFetchSize( allowedValue );
+		}
 	}
 
 	private static class UnusedEntity {

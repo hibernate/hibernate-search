@@ -17,7 +17,8 @@
 
                 <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
                 <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
-                <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
+                <property name="idFetchSize" value="#{jobParameters['idFetchSize']}?:1000;" />
+                <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
                 <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:true;" />
@@ -64,7 +65,8 @@
                     <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
-                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
+                    <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
+                    <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>
@@ -87,7 +89,7 @@
             <mapper ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
+                    <property name="idFetchSize" value="#{jobParameters['idFetchSize']}?:1000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />

@@ -26,7 +26,9 @@ public final class MassIndexingJobParameters {
 
 	public static final String MAX_RESULTS_PER_ENTITY = "maxResultsPerEntity";
 
-	public static final String FETCH_SIZE = "fetchSize";
+	public static final String ID_FETCH_SIZE = "idFetchSize";
+
+	public static final String ENTITY_FETCH_SIZE = "entityFetchSize";
 
 	public static final String CACHEABLE = "cacheable";
 

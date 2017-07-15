@@ -79,13 +79,15 @@ public class EntityReaderTest {
 
 		final String cacheable = String.valueOf( false );
 		final String entityName = Company.class.getName();
-		final String fetchSize = String.valueOf( 1000 );
+		final String entityFetchSize = String.valueOf( 1000 );
+		final String checkpointInterval = String.valueOf( 1000 );
 		final String hql = null;
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
 		entityReader = new EntityReader( cacheable,
 				entityName,
-				fetchSize,
+				entityFetchSize,
+				checkpointInterval,
 				hql,
 				maxResults,
 				partitionId,

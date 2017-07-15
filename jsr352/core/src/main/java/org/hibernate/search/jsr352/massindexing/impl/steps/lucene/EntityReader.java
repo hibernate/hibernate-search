@@ -39,8 +39,9 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties.PARTITION_ID;
 
 /**
@@ -94,8 +95,12 @@ public class EntityReader extends AbstractItemReader {
 	private String entityName;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
-	private String serializedFetchSize;
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_FETCH_SIZE)
+	private String serializedEntityFetchSize;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
+	private String serializedCheckpointInterval;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
@@ -140,7 +145,8 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	EntityReader(String serializedCacheable,
 			String entityName,
-			String serializedFetchSize,
+			String serializedEntityFetchSize,
+			String serializedCheckpointInterval,
 			String hql,
 			String serializedMaxResultsPerEntity,
 			String partitionIdStr,
@@ -149,7 +155,8 @@ public class EntityReader extends AbstractItemReader {
 			String indexScopeName) {
 		this.serializedCacheable = serializedCacheable;
 		this.entityName = entityName;
-		this.serializedFetchSize = serializedFetchSize;
+		this.serializedEntityFetchSize = serializedEntityFetchSize;
+		this.serializedCheckpointInterval = serializedCheckpointInterval;
 		this.customQueryHql = hql;
 		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedPartitionId = partitionIdStr;
@@ -281,7 +288,13 @@ public class EntityReader extends AbstractItemReader {
 		Query query = ss.createQuery( HQL );
 
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
-		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
+		int entityFetchSize;
+		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
+			entityFetchSize = SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
+		}
+		else {
+			entityFetchSize = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
+		}
 
 		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
@@ -289,14 +302,13 @@ public class EntityReader extends AbstractItemReader {
 		}
 		return query.setReadOnly( true )
 				.setCacheable( cacheable )
-				.setFetchSize( fetchSize )
+				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
 	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
 			PartitionBound bound, JobContextData jobData) throws Exception {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
-		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
 		Class<?> entity = bound.getEntityType();
 		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entity );
 		IdOrder idOrder = typeDescriptor.getIdOrder();
@@ -316,9 +328,17 @@ public class EntityReader extends AbstractItemReader {
 			criteria.setMaxResults( maxResults );
 		}
 
+		int entityFetchSize;
+		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
+			entityFetchSize = SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
+		}
+		else {
+			entityFetchSize = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
+		}
+
 		return criteria.setReadOnly( true )
 				.setCacheable( cacheable )
-				.setFetchSize( fetchSize )
+				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 

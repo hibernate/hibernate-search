@@ -25,11 +25,12 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_TYPES;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
@@ -76,8 +77,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedMaxResultsPerEntity;
 
 	@Inject
-	@BatchProperty(name = FETCH_SIZE)
-	private String serializedFetchSize;
+	@BatchProperty(name = ID_FETCH_SIZE)
+	private String serializedIdFetchSize;
+
+	@Inject
+	@BatchProperty(name = ENTITY_FETCH_SIZE)
+	private String serializedEntityFetchSize;
 
 	@Inject
 	@BatchProperty(name = CACHEABLE)
@@ -161,8 +166,11 @@ public class JobContextSetupListener extends AbstractJobListener {
 	}
 
 	private void validateQuerying() {
-		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		ValidationUtil.validatePositive( FETCH_SIZE, fetchSize );
+		SerializationUtil.parseIntegerParameter( ID_FETCH_SIZE, serializedIdFetchSize );
+
+		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
+			SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
+		}
 
 		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 			int maxResultsPerEntity = SerializationUtil.parseIntegerParameter(
