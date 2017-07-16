@@ -29,9 +29,9 @@ import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.entity.HttpAsyncContentProducer;
 import org.apache.http.protocol.HTTP;
+import org.hibernate.search.exception.SearchException;
 
 import org.hibernate.search.elasticsearch.spi.DigestSelfSigningCapable;
-import org.hibernate.search.exception.SearchException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -54,7 +54,13 @@ import com.google.gson.JsonObject;
  * be written when the flow control is re-enabled.
  *
  * A side effect of this strategy is that the total content length which
- * is being produced is not known in advance.
+ * is being produced is not known in advance. Not reporting the length
+ * in advance to the Apache Http client causes it to use chunked-encoding,
+ * which is great for large blocks but not optimal for small messages.
+ * For this reason we attempt to start encoding into a small buffer
+ * upfront: if all data we need to produce fits into that then we can
+ * report the content length; if not the encoding completion will be deferred
+ * but not resetting so to avoid repeating encoding work.
  *
  * @author Sanne Grinovero (C) 2017 Red Hat Inc.
  */
@@ -82,11 +88,13 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	private final List<JsonObject> bodyParts;
 
 	/**
-	 * We don't want to compute the length in advance as it would defeat all optimisations.
+	 * We don't want to compute the length in advance as it would defeat the optimisations
+	 * for large bulks.
 	 * Still it's possible that we happen to find out, for example if a Digest from all
-	 * content needs to be computed.
+	 * content needs to be computed, or if the content is small enough as we attempt
+	 * to serialise at least one page.
 	 */
-	private long contentLength = -1l;
+	private long contentLength;
 
 	/**
 	 * We can lazily compute the contentLenght, but we need to avoid changing the value
@@ -127,6 +135,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		Objects.requireNonNull( bodyParts );
 		this.gson = gson;
 		this.bodyParts = bodyParts;
+		this.contentLength = attemptOnePassEncoding();
 	}
 
 	@Override
@@ -185,6 +194,55 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		//Nothing to close
 	}
 
+	/**
+	 * Let's see if we can fully encode the content without ever needing to rotate
+	 * output buffers. This will allow us to keep the memory consumption reasonable
+	 * while also being able to hint the client about the {@link #getContentLength()}.
+	 * Incidentally, having this information would avoid chunked output encoding
+	 * which is ideal precisely for small messages which can fit into a single buffer.
+	 * @return the size of the content, if all was written, or -1.
+	 */
+	private long attemptOnePassEncoding() {
+		// Essentially attempt to use the writer without going NPE on the output sink
+		// as it's not set yet.
+		try {
+			triggerFullWrite();
+		}
+		catch (IOException e) {
+			// Unlikely: there's no output buffer yet!
+			throw new SearchException( e );
+		}
+		if ( writer.flowControlPushingBack == false ) {
+			//Can't flip the buffer yet but the position is final,
+			//as we know the entire content has been rendered already.
+			return writer.availableBuffer.position();
+		}
+		else {
+			return -1l;
+		}
+	}
+
+	/**
+	 * Higher level write loop. It will start writing the JSON objects
+	 * from either the  beginning or the next object which wasn't written yet
+	 * but simply stop and return as soon as the sink can't accept more data.
+	 * Checking state of writer.flowControlPushingBack will reveal if everything
+	 * was written.
+	 * @throws IOException
+	 */
+	private void triggerFullWrite() throws IOException {
+		while ( nextBodyToEncodeIndex < bodyParts.size() ) {
+			JsonObject bodyPart = bodyParts.get( nextBodyToEncodeIndex++ );
+			gson.toJson( bodyPart, bufferedWriter );
+			bufferedWriter.append( '\n' );
+			bufferedWriter.flush();
+			if ( writer.flowControlPushingBack ) {
+				//Just quit: return control to the caller and trust we'll be called again.
+				return;
+			}
+		}
+	}
+
 	@Override
 	public void produceContent(ContentEncoder encoder, IOControl ioctrl) throws IOException {
 		Objects.requireNonNull( encoder );
@@ -202,22 +260,17 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			return;
 		}
 
-		while ( nextBodyToEncodeIndex < bodyParts.size() ) {
-			JsonObject bodyPart = bodyParts.get( nextBodyToEncodeIndex++ );
-			gson.toJson( bodyPart, bufferedWriter );
-			bufferedWriter.append( '\n' );
-			bufferedWriter.flush();
-			if ( writer.flowControlPushingBack ) {
-				//Just quit: return control to the caller and trust we'll be called again.
-				return;
-			}
-		}
-		writer.flush();
+		triggerFullWrite();
+
 		if ( writer.flowControlPushingBack ) {
 			//Just quit: return control to the caller and trust we'll be called again.
 			return;
 		}
-
+		writer.flushToOutput();
+		if ( writer.flowControlPushingBack ) {
+			//Just quit: return control to the caller and trust we'll be called again.
+			return;
+		}
 		// If we haven't aborted yet, we finished!
 		encoder.complete();
 
@@ -238,7 +291,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			digestWriter.insertNewline();
 		}
 		//Now we finally know the content size in bytes:
-		hintContentLenght( digestWriter.getContentLenght() );
+		hintContentLenght( digestWriter.getContentLength() );
 	}
 
 	private void hintContentLenght(long contentLenght) {
@@ -369,6 +422,10 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		}
 
 		private boolean fullyWrite(ByteBuffer buffer) throws IOException {
+			if ( out == null ) {
+				flowControlPushingBack = true;
+				return false;
+			}
 			final int toWrite = buffer.remaining();
 			final int actuallyWritten = out.write( buffer );
 			if ( toWrite == actuallyWritten ) {
@@ -382,6 +439,12 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 
 		@Override
 		public void flush() throws IOException {
+			// don't flush for real as this is invoked by the
+			// wrapping BufferedWriter when we flush that one:
+			// we want to control actual flushing independently.
+		}
+
+		public void flushToOutput() throws IOException {
 			attemptFlushPendingBuffers( true );
 		}
 
@@ -424,7 +487,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			this.digest.update( NEWLINE );
 		}
 
-		public long getContentLenght() {
+		public long getContentLength() {
 			return this.totalWrittenBytes;
 		}
 

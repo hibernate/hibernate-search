@@ -114,11 +114,8 @@ public class GsonStreamedEncodingTest {
 	}
 
 	@Test
-	public void testDigestToTriggerLenghtComputation() {
-		final List<JsonObject> list = new ArrayList<>( 3 );
-		list.add( buildEmptyJSON() );
-		list.add( buildVersionJSON() );
-		list.add( buildEmptyJSON() );
+	public void testDigestToTriggerLengthComputation() {
+		final List<JsonObject> list = produceLargeBulkJSON();
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
 			assertEquals( -1l, entity.getContentLength() );
 		}
@@ -134,6 +131,21 @@ public class GsonStreamedEncodingTest {
 			assertNotEquals( -1l, entity.getContentLength() );
 			final byte[] content = produceContentWithCustomEncoder( entity );
 			assertEquals( content.length, entity.getContentLength() );
+		}
+		catch (IOException e) {
+			throw new RuntimeException( "We're mocking IO operations, this should not happen?", e );
+		}
+	}
+
+	@Test
+	public void testShortMessageIsNotChunked() {
+		final List<JsonObject> list = new ArrayList<>( 3 );
+		list.add( buildEmptyJSON() );
+		list.add( buildVersionJSON() );
+		list.add( buildEmptyJSON() );
+		final byte[] traditionalEncoding = traditionalEncoding( list );
+		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
+			assertEquals( traditionalEncoding.length, entity.getContentLength() );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( "We're mocking IO operations, this should not happen?", e );
