@@ -97,6 +97,8 @@ public class MassIndexingJobWithCompositeIdTest {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
 				.restrictedBy( Restrictions.gt( "month", 6 ) )
+				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
+				.checkpointInterval( 20 )
 				.build();
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
@@ -125,6 +127,8 @@ public class MassIndexingJobWithCompositeIdTest {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
 				.restrictedBy( Restrictions.gt( "embeddableDateId.month", 6 ) )
+				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
+				.checkpointInterval( 20 )
 				.build();
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
