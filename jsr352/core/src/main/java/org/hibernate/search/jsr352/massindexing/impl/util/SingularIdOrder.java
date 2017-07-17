@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -23,26 +21,26 @@ import org.hibernate.criterion.Restrictions;
  */
 public class SingularIdOrder implements IdOrder {
 
-	private final String idAttributeName;
+	private final String idPropertyName;
 
-	public SingularIdOrder(SingularAttribute<?, ?> idAttribute) {
+	public SingularIdOrder(String idPropertyName) {
 		super();
-		this.idAttributeName = idAttribute.getName();
+		this.idPropertyName = idPropertyName;
 	}
 
 	@Override
 	public Criterion idGreaterOrEqual(Object idObj) {
-		return Restrictions.ge( idAttributeName, idObj );
+		return Restrictions.ge( idPropertyName, idObj );
 	}
 
 	@Override
 	public Criterion idLesser(Object idObj) {
-		return Restrictions.lt( idAttributeName, idObj );
+		return Restrictions.lt( idPropertyName, idObj );
 	}
 
 	@Override
 	public void addAscOrder(Criteria criteria) {
-		criteria.addOrder( Order.asc( idAttributeName ) );
+		criteria.addOrder( Order.asc( idPropertyName ) );
 	}
 
 }

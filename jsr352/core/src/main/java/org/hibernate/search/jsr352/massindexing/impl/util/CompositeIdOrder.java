@@ -6,17 +6,15 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.BiFunction;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.IdClass;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Conjunction;
@@ -25,6 +23,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.type.ComponentType;
 
 /**
  * Order over multiple ID attributes.
@@ -38,42 +37,53 @@ import org.hibernate.search.util.impl.CollectionHelper;
  */
 public class CompositeIdOrder implements IdOrder {
 
-	private final String prefix;
+	private final ComponentType componentType;
 
-	private final List<String> idAttributeNames;
+	private final List<String> propertyPaths;
 
-	public CompositeIdOrder(String prefix, Collection<? extends SingularAttribute<?, ?>> idAttributes) {
+	private final List<Integer> propertyIndices;
+
+	public CompositeIdOrder(String componentPath, ComponentType componentType) {
 		super();
-		this.prefix = prefix;
-		this.idAttributeNames = CollectionHelper.newArrayList( idAttributes.size() );
-		for ( SingularAttribute<?, ?> idAttribute : idAttributes ) {
-			String name = idAttribute.getName();
-			idAttributeNames.add( name );
-		}
-		idAttributeNames.sort( Comparator.naturalOrder() );
+		this.componentType = componentType;
 
+		// Initialize with relative paths, but prepend a prefix below
+		this.propertyPaths = new ArrayList<>( Arrays.asList( componentType.getPropertyNames() ) );
+		this.propertyPaths.sort( Comparator.naturalOrder() );
+
+		String pathPrefix = componentPath == null ? "" : componentPath + ".";
+		this.propertyIndices = CollectionHelper.newArrayList( propertyPaths.size() );
+		ListIterator<String> iterator = this.propertyPaths.listIterator();
+		while ( iterator.hasNext() ) {
+			String propertyName = iterator.next();
+
+			// We need the relative path of the property here
+			propertyIndices.add( componentType.getPropertyIndex( propertyName ) );
+
+			// Prepend the path prefix to each property; we will only use absolute path from now on
+			iterator.set( pathPrefix + propertyName );
+		}
 	}
 
 	@Override
-	public Criterion idGreaterOrEqual(Object idObj) throws Exception {
+	public Criterion idGreaterOrEqual(Object idObj) {
 		return restrictLexicographically( Restrictions::ge, idObj );
 	}
 
 	@Override
-	public Criterion idLesser(Object idObj) throws Exception {
+	public Criterion idLesser(Object idObj) {
 		return restrictLexicographically( Restrictions::lt, idObj );
 	}
 
 	@Override
 	public void addAscOrder(Criteria criteria) {
-		for ( String name : idAttributeNames ) {
-			criteria.addOrder( Order.asc( prefix + name ) );
+		for ( String path : propertyPaths ) {
+			criteria.addOrder( Order.asc( path ) );
 		}
 	}
 
-	private Criterion restrictLexicographically(BiFunction<String, Object, SimpleExpression> lastRestriction, Object idObj)
-			throws InvocationTargetException, IllegalAccessException, IntrospectionException {
-		Conjunction[] or = new Conjunction[idAttributeNames.size()];
+	private Criterion restrictLexicographically(BiFunction<String, Object, SimpleExpression> lastRestriction, Object idObj) {
+		Conjunction[] or = new Conjunction[propertyPaths.size()];
 
 		for ( int i = 0; i < or.length; i++ ) {
 			// Group expressions together in a single conjunction (A and B and C...).
@@ -81,14 +91,14 @@ public class CompositeIdOrder implements IdOrder {
 			int j = 0;
 			for ( ; j < and.length - 1; j++ ) {
 				// The first N-1 expressions have symbol `=`
-				String key = idAttributeNames.get( j );
-				Object val = getPropertyValue( idObj, key );
-				and[j] = Restrictions.eq( prefix + key, val );
+				String path = propertyPaths.get( j );
+				Object val = getPropertyValue( idObj, j );
+				and[j] = Restrictions.eq( path, val );
 			}
 			// The last expression has whatever symbol is defined by "lastRestriction"
-			String key = idAttributeNames.get( j );
-			Object val = getPropertyValue( idObj, key );
-			and[j] = lastRestriction.apply( prefix + key, val );
+			String path = propertyPaths.get( j );
+			Object val = getPropertyValue( idObj, j );
+			and[j] = lastRestriction.apply( path, val );
 
 			or[i] = Restrictions.conjunction( and );
 		}
@@ -96,8 +106,8 @@ public class CompositeIdOrder implements IdOrder {
 		return Restrictions.or( or );
 	}
 
-	private static Object getPropertyValue(Object obj, String propertyName)
-			throws IntrospectionException, InvocationTargetException, IllegalAccessException {
-		return new PropertyDescriptor( propertyName, obj.getClass() ).getReadMethod().invoke( obj );
+	private Object getPropertyValue(Object obj, int ourIndex) {
+		int theirIndex = propertyIndices.get( ourIndex );
+		return componentType.getPropertyValue( obj, theirIndex );
 	}
 }

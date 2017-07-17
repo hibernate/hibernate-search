@@ -322,8 +322,7 @@ public class EntityReader extends AbstractItemReader {
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
-	private static void applyBound(Criteria criteria,
-			IdOrder idOrder, PartitionBound partitionBound) throws Exception {
+	private static void applyBound(Criteria criteria, IdOrder idOrder, PartitionBound partitionBound) {
 		if ( partitionBound.hasUpperBound() ) {
 			Object upperBound = partitionBound.getUpperBound();
 			criteria.add( idOrder.idLesser( upperBound ) );

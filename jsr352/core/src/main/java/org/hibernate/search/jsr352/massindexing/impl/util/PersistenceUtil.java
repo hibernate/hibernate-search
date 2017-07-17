@@ -6,25 +6,23 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.metamodel.EmbeddableType;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.IndexScope;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.type.ComponentType;
+import org.hibernate.type.Type;
 
 /**
  * Internal utility class for persistence usage.
@@ -100,59 +98,31 @@ public final class PersistenceUtil {
 	}
 
 	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
+		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		List<EntityTypeDescriptor> result = CollectionHelper.newArrayList( types.size() );
-		Metamodel metamodel = entityManagerFactory.getMetamodel();
+		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		for ( Class<?> type : types ) {
 			result.add( createDescriptor( metamodel, type ) );
 		}
 		return result;
 	}
 
-	private static <T> EntityTypeDescriptor createDescriptor(Metamodel metamodel, Class<T> type) {
-		EntityType<T> entityType = metamodel.entity( type );
-		IdOrder idOrder = createIdOrder( metamodel, entityType );
+	private static <T> EntityTypeDescriptor createDescriptor(MetamodelImplementor metamodel, Class<T> type) {
+		EntityPersister entityPersister = metamodel.entityPersister( type );
+		IdOrder idOrder = createIdOrder( entityPersister );
 		return new EntityTypeDescriptor( type, idOrder );
 	}
 
-	private static IdOrder createIdOrder(Metamodel metamodel, EntityType<?> entityType) {
-		try {
-			if ( entityType.hasSingleIdAttribute() ) {
-				if ( entityType.getIdType().getPersistenceType() == Type.PersistenceType.EMBEDDABLE ) {
-					Class<?> embeddable = entityType.getIdType().getJavaType();
-					EmbeddableType<?> embeddableType = metamodel.embeddable( embeddable );
-					String embeddableName = entityType.getId( embeddable ).getName();
-					return new CompositeIdOrder( embeddableName + ".", embeddableType.getSingularAttributes() );
-				}
-				else {
-					Class<?> idJavaType = entityType.getIdType().getJavaType();
-					SingularAttribute<?, ?> idAttribute = entityType.getId( idJavaType );
-					return new SingularIdOrder( idAttribute );
-				}
-			}
-			else {
-				return new CompositeIdOrder( "", entityType.getIdClassAttributes() );
-			}
+	private static IdOrder createIdOrder(EntityPersister entityPersister) {
+		final String identifierPropertyName = entityPersister.getIdentifierPropertyName();
+		final Type identifierType = entityPersister.getIdentifierType();
+		if ( identifierType instanceof ComponentType ) {
+			final ComponentType componentType = (ComponentType) identifierType;
+			return new CompositeIdOrder( identifierPropertyName, componentType );
 		}
-		catch (IllegalArgumentException e) {
-			throw new AssertionFailure( "Cannot determine the identifier type: this should never happen.", e );
+		else {
+			return new SingularIdOrder( identifierPropertyName );
 		}
-	}
-
-	public static List<Criterion> createCriterionList(
-			EntityTypeDescriptor typeDescriptor,
-			PartitionBound partitionBound) throws Exception {
-		IdOrder idOrder = typeDescriptor.getIdOrder();
-		List<Criterion> result = new ArrayList<>();
-
-		if ( partitionBound.hasUpperBound() ) {
-			Object upperBound = partitionBound.getUpperBound();
-			result.add( idOrder.idLesser( upperBound ) );
-		}
-		if ( partitionBound.hasLowerBound() ) {
-			Object lowerBound = partitionBound.getLowerBound();
-			result.add( idOrder.idGreaterOrEqual( lowerBound ) );
-		}
-		return result;
 	}
 
 }
