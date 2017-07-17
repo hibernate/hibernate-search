@@ -22,16 +22,14 @@ public interface IdOrder {
 	/**
 	 * @param idObj The ID all results should be greater than or equal to.
 	 * @return A "greater or equal" restriction on the ID.
-	 * @throws Exception
 	 */
-	Criterion idGreaterOrEqual(Object idObj) throws Exception;
+	Criterion idGreaterOrEqual(Object idObj);
 
 	/**
 	 * @param idObj The ID all results should be lesser than.
 	 * @return A "lesser than" restriction on the ID.
-	 * @throws Exception
 	 */
-	Criterion idLesser(Object idObj) throws Exception;
+	Criterion idLesser(Object idObj);
 
 	void addAscOrder(Criteria criteria);
 

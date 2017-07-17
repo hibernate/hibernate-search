@@ -112,7 +112,7 @@ public final class JobTestUtil {
 	public static EntityTypeDescriptor createSimpleEntityTypeDescriptor(EntityManagerFactory emf, Class<?> clazz) {
 		EntityType<?> entityType = emf.getMetamodel().entity( clazz );
 		SingularAttribute<?, ?> idAttribute = entityType.getId( entityType.getIdType().getJavaType() );
-		return new EntityTypeDescriptor( clazz, new SingularIdOrder( idAttribute ) );
+		return new EntityTypeDescriptor( clazz, new SingularIdOrder( idAttribute.getName() ) );
 	}
 
 }
