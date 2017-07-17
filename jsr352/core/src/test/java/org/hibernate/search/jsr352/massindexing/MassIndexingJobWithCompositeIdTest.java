@@ -7,13 +7,11 @@
 package org.hibernate.search.jsr352.massindexing;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResults;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 
-import javax.persistence.EmbeddedId;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -22,7 +20,6 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithEmbeddedId;
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithIdClass;
-import org.hibernate.search.jsr352.massindexing.test.id.EmbeddableDateId;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
@@ -123,31 +120,17 @@ public class MassIndexingJobWithCompositeIdTest {
 		assertThat( actualDays ).isEqualTo( expectedDays );
 	}
 
-	/**
-	 * Tests that entity having {@link EmbeddedId} can NOT be handled properly
-	 * when adding a restriction on {@link EmbeddedId} field. This is the limit
-	 * of our customized solution: we use our own comparator—a lexicographical
-	 * order of attribute's name—for ID attributes sorting. We assume that this
-	 * order is always true during the entire indexing process, but it can't be
-	 * when user adds his own restriction on the ID field.
-	 */
 	@Test
-	public void cannotHandleEmbeddedId_restrictedById() throws Exception {
+	public void canHandleEmbeddedId_strategyCriteria() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
-				.restrictedBy( Restrictions.ge(
-						"embeddableDateId",
-						new EmbeddableDateId( LocalDate.of( 2017, 6, 20 ) )
-				) )
+				.restrictedBy( Restrictions.gt( "embeddableDateId.month", 6 ) )
 				.build();
-
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
-		assertThat( findIndexedResults( emf, EntityWithEmbeddedId.class, "value", "20170701" ) ).hasSize( 0 );
-		int missingDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), LocalDate.of( 2017, 7, 20 ) );
-		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 6, 20 ), END );
+		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class );
-		assertThat( actualDays ).isEqualTo( expectedDays - missingDays );
+		assertThat( actualDays ).isEqualTo( expectedDays );
 	}
 
 }
