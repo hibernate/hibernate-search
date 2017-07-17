@@ -8,6 +8,7 @@ package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -21,6 +22,7 @@ import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
+import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.After;
@@ -103,7 +105,10 @@ public class PartitionMapperTest {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setCustomQueryCriteria( new HashSet<>() );
-		jobData.setEntityTypes( Company.class, Person.class );
+		jobData.setEntityTypeDescriptors( Arrays.asList(
+				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
+				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )
+				) );
 		Mockito.when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();

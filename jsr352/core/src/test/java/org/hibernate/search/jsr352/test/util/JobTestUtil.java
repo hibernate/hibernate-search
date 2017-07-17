@@ -13,6 +13,8 @@ import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,6 +23,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
+import org.hibernate.search.jsr352.massindexing.impl.util.SingularIdOrder;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -103,6 +107,12 @@ public final class JobTestUtil {
 		@SuppressWarnings("unchecked")
 		List<T> result = fts.createFullTextQuery( luceneQuery ).getResultList();
 		return result;
+	}
+
+	public static EntityTypeDescriptor createSimpleEntityTypeDescriptor(EntityManagerFactory emf, Class<?> clazz) {
+		EntityType<?> entityType = emf.getMetamodel().entity( clazz );
+		SingularAttribute<?, ?> idAttribute = entityType.getId( entityType.getIdType().getJavaType() );
+		return new EntityTypeDescriptor( clazz, new SingularIdOrder( idAttribute ) );
 	}
 
 }

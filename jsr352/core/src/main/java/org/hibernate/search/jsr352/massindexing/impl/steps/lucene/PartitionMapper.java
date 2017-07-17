@@ -6,9 +6,16 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionPlan;
@@ -22,21 +29,18 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
 
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
@@ -118,8 +122,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 		Session session = null;
 		StatelessSession ss = null;
-		ScrollableResults scroll = null;
-		Criteria criteria;
 
 		try {
 			emf = jobData.getEntityManagerFactory();
@@ -130,44 +132,28 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 				maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
 			}
+			int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
 
-			List<Class<?>> entityTypes = jobData.getEntityTypes();
+			List<EntityTypeDescriptor> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
-			Class<?> entityType;
 
 			switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
-					entityType = entityTypes.get( 0 );
-					partitionBounds.add( new PartitionBound( entityType, null, null, IndexScope.HQL ) );
+					Class<?> clazz = entityTypeDescriptors.get( 0 ).getJavaClass();
+					partitionBounds.add( new PartitionBound( clazz, null, null, IndexScope.HQL ) );
 					break;
 
 				case CRITERIA:
-					entityType = entityTypes.get( 0 );
-					criteria = ss.createCriteria( entityType );
-					PersistenceUtil.createIdOrders( emf, entityType ).forEach( criteria::addOrder );
-					jobData.getCustomQueryCriteria().forEach( criteria::add );
-					if ( maxResults != null ) {
-						criteria.setMaxResults( maxResults );
-					}
-					scroll = criteria.setProjection( Projections.id() )
-							.setFetchSize( fetchSize )
-							.setReadOnly( true )
-							.scroll( ScrollMode.FORWARD_ONLY );
-					partitionBounds = buildPartitionUnitsFrom( scroll, entityType, IndexScope.CRITERIA );
+					partitionBounds = buildPartitionUnitsFrom( ss, entityTypeDescriptors.get( 0 ),
+							jobData.getCustomQueryCriteria(), maxResults, fetchSize, rowsPerPartition,
+							IndexScope.CRITERIA );
 					break;
 
 				case FULL_ENTITY:
-					for ( Class<?> clz : entityTypes ) {
-						criteria = ss.createCriteria( clz );
-						PersistenceUtil.createIdOrders( emf, clz ).forEach( criteria::addOrder );
-						if ( maxResults != null ) {
-							criteria.setMaxResults( maxResults );
-						}
-						scroll = criteria.setProjection( Projections.id() )
-								.setFetchSize( fetchSize )
-								.setReadOnly( true )
-								.scroll( ScrollMode.FORWARD_ONLY );
-						partitionBounds.addAll( buildPartitionUnitsFrom( scroll, clz, IndexScope.FULL_ENTITY ) );
+					for ( EntityTypeDescriptor entityTypeDescriptor : entityTypeDescriptors ) {
+						partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
+								Collections.emptySet(), maxResults, fetchSize, rowsPerPartition,
+								IndexScope.FULL_ENTITY ) );
 					}
 					break;
 			}
@@ -201,14 +187,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		}
 		finally {
 			try {
-				if ( scroll != null ) {
-					scroll.close();
-				}
-			}
-			catch (Exception e) {
-				log.unableToCloseScrollableResults( e );
-			}
-			try {
 				ss.close();
 			}
 			catch (Exception e) {
@@ -223,33 +201,60 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		}
 	}
 
-	private List<PartitionBound> buildPartitionUnitsFrom(ScrollableResults scroll, Class<?> clazz, IndexScope indexScope) {
+	private List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
+			EntityTypeDescriptor entityTypeDescriptor, Set<Criterion> customQueryCriteria,
+			Integer maxResults, int fetchSize, int rowsPerPartition,
+			IndexScope indexScope) {
+		Class<?> javaClass = entityTypeDescriptor.getJavaClass();
 		List<PartitionBound> partitionUnits = new ArrayList<>();
-		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
 
 		Object lowerID = null;
 		Object upperID = null;
 
-		/*
-		 * The scroll results are originally positioned *before* the first element,
-		 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
-		 * upper bound of the first partition, whereas for the next partitions
-		 * we only need to advance rowsPerPartition positions.
-		 * This handle the special case of the first partition.
-		 */
-		scroll.next();
+		Criteria criteria = ss.createCriteria( javaClass );
+		entityTypeDescriptor.getIdOrder().addAscOrder( criteria );
 
-		while ( scroll.scroll( rowsPerPartition ) ) {
-			lowerID = upperID;
-			upperID = scroll.get( 0 );
-			partitionUnits.add( new PartitionBound( clazz, lowerID, upperID, indexScope ) );
+		if ( maxResults != null ) {
+			criteria.setMaxResults( maxResults );
 		}
 
-		// add an additional partition on the tail
-		lowerID = upperID;
-		upperID = null;
-		partitionUnits.add( new PartitionBound( clazz, lowerID, upperID, indexScope ) );
-		return partitionUnits;
+		ScrollableResults scroll = criteria.setProjection( Projections.id() )
+				.setFetchSize( fetchSize )
+				.setReadOnly( true )
+				.scroll( ScrollMode.FORWARD_ONLY );
+
+		try {
+			/*
+			 * The scroll results are originally positioned *before* the first element,
+			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
+			 * upper bound of the first partition, whereas for the next partitions
+			 * we only need to advance rowsPerPartition positions.
+			 * This handle the special case of the first partition.
+			 */
+			scroll.next();
+
+			while ( scroll.scroll( rowsPerPartition ) ) {
+				lowerID = upperID;
+				upperID = scroll.get( 0 );
+				partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
+			}
+
+			// add an additional partition on the tail
+			lowerID = upperID;
+			upperID = null;
+			partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
+			return partitionUnits;
+		}
+		finally {
+			try {
+				if ( scroll != null ) {
+					scroll.close();
+				}
+			}
+			catch (Exception e) {
+				log.unableToCloseScrollableResults( e );
+			}
+		}
 	}
 
 }

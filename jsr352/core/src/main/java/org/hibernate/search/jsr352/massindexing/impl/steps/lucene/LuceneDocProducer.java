@@ -83,7 +83,7 @@ public class LuceneDocProducer implements ItemProcessor {
 	 */
 	private void setup() throws ClassNotFoundException, NamingException {
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
-		Class<?> entityType = jobContextData.getIndexedType( entityName );
+		Class<?> entityType = jobContextData.getEntityType( entityName );
 		entityTypeIdentifier = new PojoIndexedTypeIdentifier( entityType );
 		searchIntegrator = jobContextData.getSearchIntegrator();
 		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityTypeIdentifier );

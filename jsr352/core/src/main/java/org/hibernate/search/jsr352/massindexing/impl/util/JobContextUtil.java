@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,8 +30,6 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 
 /**
  * Utility allowing to set up and retrieve the job context data, shared by all the steps.
@@ -107,6 +107,8 @@ public final class JobContextUtil {
 			}
 		}
 
+		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
+
 		@SuppressWarnings("unchecked")
 		Set<Criterion> criteria = SerializationUtil.parseParameter( Set.class, CUSTOM_QUERY_CRITERIA, serializedCustomQueryCriteria );
 		if ( criteria == null ) {
@@ -117,7 +119,7 @@ public final class JobContextUtil {
 		JobContextData jobContextData = new JobContextData();
 		jobContextData.setEntityManagerFactory( emf );
 		jobContextData.setCustomQueryCriteria( criteria );
-		jobContextData.setEntityTypes( entityTypesToIndex );
+		jobContextData.setEntityTypeDescriptors( descriptors );
 		return jobContextData;
 	}
 
