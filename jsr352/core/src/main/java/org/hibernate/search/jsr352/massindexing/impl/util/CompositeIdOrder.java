@@ -32,6 +32,21 @@ import org.hibernate.type.ComponentType;
  * e.g. an entity annotated {@link IdClass}, or an entity having an
  * {@link EmbeddedId}.
  *
+ * <h4>Why this class?</h4>
+ * By default, {@code Restrictions.ge} and similar on
+ * a composite property will generate a non-lexicographical "greater or equal" condition.
+ * <p>
+ * For instance, a condition such as
+ * {@code Restrictions.ge("myEmbeddedDate", MyEmbeddedDate.yearMonthDay( 2017, 6, 20 )}
+ * will generate {@code year >= 2017 AND month >= 6 AND day >= 20}
+ * which is obviously not what any sane person would expect,
+ * since this will exclude July 1st to July 19th (among others).
+ * <p>
+ * This class fixes the issue by properly implementing lexicographical
+ * "greater or equal" and "lesser" conditions.
+ *
+ * @see <a href="https://hibernate.atlassian.net/browse/HSEARCH-2615">HSEARCH-2615</a>
+ *
  * @author Mincong Huang
  * @author Yoann Rodiere
  */
