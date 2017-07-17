@@ -9,6 +9,7 @@ package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import javax.batch.runtime.context.JobContext;
@@ -20,6 +21,7 @@ import javax.persistence.Persistence;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
+import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Before;
@@ -100,7 +102,7 @@ public class EntityReaderTest {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setCustomQueryCriteria( new HashSet<>() );
-		jobData.setEntityTypes( Company.class );
+		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );
 		Mockito.when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		// mock step context

@@ -28,6 +28,8 @@ import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
+import org.hibernate.search.jsr352.massindexing.impl.util.IdOrder;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
@@ -268,7 +270,7 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	private PartitionBound getPartitionBound(JobContextData jobContextData) throws IOException, ClassNotFoundException {
-		Class<?> entityType = jobContextData.getIndexedType( entityName );
+		Class<?> entityType = jobContextData.getEntityType( entityName );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
 		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
@@ -292,17 +294,19 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
-			PartitionBound unit, JobContextData jobData) throws Exception {
+			PartitionBound bound, JobContextData jobData) throws Exception {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		Class<?> entity = unit.getEntityType();
+		Class<?> entity = bound.getEntityType();
+		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entity );
+		IdOrder idOrder = typeDescriptor.getIdOrder();
 		Criteria criteria = ss.createCriteria( entity );
 
 		// build orders for this entity
-		PersistenceUtil.createIdOrders( emf, entity ).forEach( criteria::addOrder );
+		idOrder.addAscOrder( criteria );
 
 		// build criteria using partition unit
-		PersistenceUtil.createCriterionList( emf, unit ).forEach( criteria::add );
+		applyBound( criteria, idOrder, bound );
 
 		// build criteria using job context data
 		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
@@ -316,6 +320,18 @@ public class EntityReader extends AbstractItemReader {
 				.setCacheable( cacheable )
 				.setFetchSize( fetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
+	}
+
+	private static void applyBound(Criteria criteria,
+			IdOrder idOrder, PartitionBound partitionBound) throws Exception {
+		if ( partitionBound.hasUpperBound() ) {
+			Object upperBound = partitionBound.getUpperBound();
+			criteria.add( idOrder.idLesser( upperBound ) );
+		}
+		if ( partitionBound.hasLowerBound() ) {
+			Object lowerBound = partitionBound.getLowerBound();
+			criteria.add( idOrder.idGreaterOrEqual( lowerBound ) );
+		}
 	}
 
 	/**

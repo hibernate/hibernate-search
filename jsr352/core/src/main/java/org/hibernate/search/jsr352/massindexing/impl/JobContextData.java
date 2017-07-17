@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
 
 /**
  * Container for data shared across the entire batch job.
@@ -31,17 +32,16 @@ public class JobContextData {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	/**
-	 * The map of key value pair (string, class-type), designed for storage of name and class type of all root entities.
+	/*
 	 * In JSR 352 standard, only string values can be propagated using job properties, but class types are frequently
-	 * used too. So this map facilitates this kind of lookup.
+	 * used too. So this map has string keys to facilitate lookup for values extracted from job properties.
 	 */
-	private Map<String, Class<?>> entityTypeMap;
+	private Map<String, EntityTypeDescriptor> entityTypeDescriptorMap;
 
 	private Set<Criterion> customQueryCriteria;
 
 	public JobContextData() {
-		entityTypeMap = new HashMap<>();
+		entityTypeDescriptorMap = new HashMap<>();
 	}
 
 	public EntityManagerFactory getEntityManagerFactory() {
@@ -56,28 +56,36 @@ public class JobContextData {
 		return ContextHelper.getSearchIntegratorBySF( entityManagerFactory.unwrap( SessionFactory.class ) );
 	}
 
-	public void setEntityTypes(Collection<Class<?>> entityTypes) {
-		entityTypes.forEach( clz -> entityTypeMap.put( clz.getName(), clz ) );
+	public void setEntityTypeDescriptors(Iterable<EntityTypeDescriptor> descriptors) {
+		descriptors.forEach( descriptor -> entityTypeDescriptorMap.put( descriptor.getJavaClass().getName(), descriptor ) );
 	}
 
-	public void setEntityTypes(Class<?> firstEntityType, Class<?>... otherEntityTypes) {
-		entityTypeMap.put( firstEntityType.getName(), firstEntityType );
-		for ( Class<?> type : otherEntityTypes ) {
-			entityTypeMap.put( type.getName(), type );
+	public EntityTypeDescriptor getEntityTypeDescriptor(String entityName) {
+		EntityTypeDescriptor descriptor = entityTypeDescriptorMap.get( entityName );
+		if ( descriptor == null ) {
+			String msg = String.format( Locale.ROOT, "entity type %s not found.", entityName );
+			throw new NoSuchElementException( msg );
 		}
+		return descriptor;
+	}
+
+	public EntityTypeDescriptor getEntityTypeDescriptor(Class<?> entityType) {
+		return getEntityTypeDescriptor( entityType.getName() );
+	}
+
+	public List<EntityTypeDescriptor> getEntityTypeDescriptors() {
+		return entityTypeDescriptorMap.values().stream()
+				.collect( Collectors.toList() );
 	}
 
 	public List<Class<?>> getEntityTypes() {
-		return new ArrayList<Class<?>>( entityTypeMap.values() );
+		return entityTypeDescriptorMap.values().stream()
+				.map( EntityTypeDescriptor::getJavaClass )
+				.collect( Collectors.toList() );
 	}
 
-	public Class<?> getIndexedType(String entityName) throws ClassNotFoundException {
-		Class<?> entityType = entityTypeMap.get( entityName );
-		if ( entityType == null ) {
-			String msg = String.format( Locale.ROOT, "entityName %s not found.", entityName );
-			throw new ClassNotFoundException( msg );
-		}
-		return entityType;
+	public Class<?> getEntityType(String entityName) {
+		return getEntityTypeDescriptor( entityName ).getJavaClass();
 	}
 
 	public Set<Criterion> getCustomQueryCriteria() {
@@ -93,7 +101,7 @@ public class JobContextData {
 		return new StringBuilder()
 				.append( "JobContextData [" )
 				.append( "entityManagerFactory=" ).append( entityManagerFactory )
-				.append( ", entityTypeMap=" ).append( entityTypeMap )
+				.append( ", entityTypeDescriptorMap=" ).append( entityTypeDescriptorMap )
 				.append( ", customQueryCriteria=" ).append( customQueryCriteria )
 				.append( "]" )
 				.toString();
