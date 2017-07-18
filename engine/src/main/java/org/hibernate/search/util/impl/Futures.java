@@ -96,6 +96,26 @@ public final class Futures {
 	}
 
 	/**
+	 * Creates a future handler that will copy the state of the handled future
+	 * to the given future.
+	 * <p>
+	 * This method is meant to be used in conjunction with {@link CompletableFuture#whenComplete(BiConsumer)}.
+	 *
+	 * @param copyFuture The future to copy to
+	 * @return the copy handler
+	 */
+	public static <T> BiConsumer<T, Throwable> copyHandler(CompletableFuture<T> copyFuture) {
+		return (result, throwable) -> {
+			if ( throwable != null ) {
+				copyFuture.completeExceptionally( throwable );
+			}
+			else {
+				copyFuture.complete( result );
+			}
+		};
+	}
+
+	/**
 	 * Creates a composition function that will delegate to the given {@link Function}
 	 * but will catch any exception during composition to return a future completed exceptionally.
 	 * <p>
