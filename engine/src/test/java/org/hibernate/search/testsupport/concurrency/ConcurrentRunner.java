@@ -31,12 +31,14 @@ public class ConcurrentRunner {
 	public static final int DEFAULT_REPEAT = 300;
 	public static final int DEFAULT_THREADS = 30;
 
-	private final ConcurrentMap<Integer, Throwable> failures = new ConcurrentHashMap<>( 0 );
+	private final ConcurrentMap<String, Throwable> failures = new ConcurrentHashMap<>( 0 );
 	private final ExecutorService executor;
 	private final CountDownLatch startLatch = new CountDownLatch( 1 );
-	private final CountDownLatch endLatch;
+	private final CountDownLatch mainTasksEndLatch;
 	private final TaskFactory factory;
 	private final int repetitions;
+	private final CountDownLatch finalizingTaskEndLatch = new CountDownLatch( 1 );
+	private Runnable finalizingTask = () -> { };
 
 	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
@@ -62,7 +64,22 @@ public class ConcurrentRunner {
 		this.repetitions = repetitions;
 		this.factory = factory;
 		executor = Executors.newFixedThreadPool( threads );
-		endLatch = new CountDownLatch( repetitions );
+		mainTasksEndLatch = new CountDownLatch( repetitions );
+	}
+
+	/**
+	 * Add a runnable to be executed regardless of the tasks produced by the factory.
+	 * <p>
+	 * Used to wait for asynchronous tasks to finish, for instance.
+	 * <p>
+	 * Execution time will be accounted for when assessing timeouts.
+	 *
+	 * @param finalizingTask The runnable to execute
+	 * @return The runner, for chained calls.
+	 */
+	public ConcurrentRunner setFinalizingTask(Runnable finalizingTask) {
+		this.finalizingTask = finalizingTask;
+		return this;
 	}
 
 	public ConcurrentRunner setTimeout(long timeoutValue, TimeUnit timeoutUnit) {
@@ -80,27 +97,31 @@ public class ConcurrentRunner {
 	public void execute() throws Exception, AssertionError {
 		for ( int i = 0; i < repetitions; i++ ) {
 			Runnable userRunnable = factory.createRunnable( i );
-			executor.execute( new WrapRunnable( startLatch, endLatch, i, userRunnable ) );
+			executor.execute( new WrapRunnable( startLatch, mainTasksEndLatch, "#" + i, userRunnable ) );
 		}
+		// When all other tasks finished executing, execute the finalizing task
+		executor.execute( new WrapRunnable(
+				mainTasksEndLatch, finalizingTaskEndLatch, "'finalizing task'", finalizingTask
+				) );
 		executor.shutdown();
 		startLatch.countDown();
 
 		boolean timedOut = false;
 		try {
 			if ( timeoutValue != null ) {
-				if ( ! endLatch.await( timeoutValue, timeoutUnit ) ) {
+				if ( ! finalizingTaskEndLatch.await( timeoutValue, timeoutUnit ) ) {
 					executor.shutdownNow();
 					timedOut = true;
 				}
 			}
 			else {
-				endLatch.await();
+				finalizingTaskEndLatch.await();
 			}
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			e.printStackTrace();
-			Assert.fail( "Interrupted while awaiting for end of execution" );
+			Assert.fail( "Interrupted while waiting for end of execution" );
 		}
 
 		AssertionError reportedError = null;
@@ -110,9 +131,9 @@ public class ConcurrentRunner {
 			// Go on and also add errors (if any) as suppressed exceptions
 		}
 
-		for ( Map.Entry<Integer, Throwable> entry : failures.entrySet() ) {
+		for ( Map.Entry<String, Throwable> entry : failures.entrySet() ) {
 			if ( reportedError == null ) {
-				reportedError = new AssertionError( "Unexpected failure on task #" + entry.getKey(), entry.getValue() );
+				reportedError = new AssertionError( "Unexpected failure on task " + entry.getKey(), entry.getValue() );
 			}
 			else {
 				reportedError.addSuppressed( entry.getValue() );
@@ -128,13 +149,13 @@ public class ConcurrentRunner {
 
 		private final CountDownLatch startLatch;
 		private final CountDownLatch endLatch;
-		private final Integer taskIndex;
+		private final String taskName;
 		private final Runnable userRunnable;
 
-		public WrapRunnable(CountDownLatch startLatch, CountDownLatch endLatch, Integer taskIndex, Runnable userRunnable) {
+		public WrapRunnable(CountDownLatch startLatch, CountDownLatch endLatch, String taskName, Runnable userRunnable) {
 			this.startLatch = startLatch;
 			this.endLatch = endLatch;
-			this.taskIndex = taskIndex;
+			this.taskName = taskName;
 			this.userRunnable = userRunnable;
 		}
 
@@ -148,7 +169,7 @@ public class ConcurrentRunner {
 				}
 			}
 			catch (InterruptedException | RuntimeException | AssertionError e) {
-				failures.put( taskIndex, e );
+				failures.put( taskName, e );
 			}
 			endLatch.countDown();
 		}
