@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -26,6 +25,7 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.processor.impl.BarrierElasticsearchWorkOrchestrator;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaDropper;
@@ -420,8 +420,10 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		ElasticsearchWork<?> flushWork = elasticsearchService.getWorkFactory().flush()
 				.index( actualIndexName )
 				.build();
-		workProcessor.awaitAsyncProcessingCompletion();
-		workProcessor.executeSyncSafe( Collections.singletonList( flushWork ) );
+		awaitAsyncProcessingCompletion();
+		workProcessor.getSyncNonStreamOrchestrator()
+				.submit( flushWork )
+				.join();
 	}
 
 	@Override
@@ -443,10 +445,13 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		}
 
 		if ( sync ) {
-			workProcessor.executeSyncSafe( elasticsearchWorks );
+			workProcessor.getSyncNonStreamOrchestrator()
+					.submit( elasticsearchWorks )
+					.join();
 		}
 		else {
-			workProcessor.executeAsync( elasticsearchWorks );
+			workProcessor.getAsyncNonStreamOrchestrator()
+					.submit( elasticsearchWorks );
 		}
 	}
 
@@ -454,17 +459,31 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
 		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
-			workProcessor.awaitAsyncProcessingCompletion();
-			workProcessor.executeSyncSafe( Collections.singleton( elasticsearchWork ) );
+			awaitAsyncProcessingCompletion();
+			workProcessor.getSyncNonStreamOrchestrator()
+					.submit( elasticsearchWork )
+					.join();
 		}
 		else {
-			workProcessor.executeAsync( elasticsearchWork );
+			workProcessor.getStreamOrchestrator()
+					.submit( elasticsearchWork );
 		}
 	}
 
 	@Override
 	public void awaitAsyncProcessingCompletion() {
-		workProcessor.awaitAsyncProcessingCompletion();
+		awaitCompletion( workProcessor.getAsyncNonStreamOrchestrator() );
+		awaitCompletion( workProcessor.getStreamOrchestrator() );
+	}
+
+	private void awaitCompletion(BarrierElasticsearchWorkOrchestrator orchestrator) {
+		try {
+			orchestrator.awaitCompletion();
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw LOG.interruptedWhileWaitingForRequestCompletion( e );
+		}
 	}
 
 	@Override
