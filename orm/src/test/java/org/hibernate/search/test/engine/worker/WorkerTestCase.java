@@ -8,6 +8,7 @@ package org.hibernate.search.test.engine.worker;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -17,15 +18,23 @@ import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
+@RunWith(JUnit4.class) // CustomRunner messes with @Rule
 public class WorkerTestCase extends SearchTestBase {
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void testConcurrency() throws Exception {
@@ -36,6 +45,9 @@ public class WorkerTestCase extends SearchTestBase {
 		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 
 		long start = System.nanoTime();
+
+		// Expect 0 failure in the backend threads
+		logged.expectLevelMissing( Level.ERROR );
 
 		new ConcurrentRunner(
 				iteration * 2,

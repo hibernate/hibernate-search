@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.hamcrest.CoreMatchers;
@@ -62,6 +63,22 @@ public class ExpectedLog4jLog implements TestRule {
 	 */
 	public void expectEventMissing(Matcher<? extends LoggingEvent> matcher) {
 		absenceExpectations.add( matcher );
+	}
+
+	/**
+	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given level or higher.
+	 */
+	public void expectLevelMissing(Level level) {
+		expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" );
+			}
+			@Override
+			protected boolean matchesSafely(LoggingEvent item) {
+				return item.getLevel().isGreaterOrEqual( level );
+			}
+		} );
 	}
 
 	/**
