@@ -7,9 +7,15 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.Futures;
+import org.hibernate.search.util.impl.Throwables;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -19,6 +25,8 @@ import com.google.gson.JsonObject;
 public abstract class SimpleBulkableElasticsearchWork<R>
 		extends SimpleElasticsearchWork<R>
 		implements BulkableElasticsearchWork<R> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final JsonObject bulkableActionMetadata;
 
@@ -52,19 +60,46 @@ public abstract class SimpleBulkableElasticsearchWork<R>
 	}
 
 	@Override
-	public boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		if ( resultAssessor.isSuccess( bulkResponseItem ) ) {
-			afterSuccess( context );
+	public CompletableFuture<R> handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		return Futures.create( () -> handleResult( context, bulkResponseItem ) );
+	}
+
+	@Override
+	protected final CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+		/*
+		 * Making this method final so that it won't be overridden:
+		 * this method is not used when the work is bulked
+		 */
+		return super.beforeExecute( executionContext, request );
+	}
+
+	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
+
+	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, JsonObject bulkResponseItem) {
+		R result;
+		try {
+			resultAssessor.checkSuccess( bulkResponseItem );
+
+			result = generateResult( executionContext, bulkResponseItem );
 
 			if ( markIndexDirty ) {
-				context.setIndexDirty( dirtiedIndexName );
+				executionContext.setIndexDirty( dirtiedIndexName );
 			}
+		}
+		catch (RuntimeException e) {
+			throw LOG.elasticsearchBulkedRequestFailed( getBulkableActionMetadata(), getBulkableActionBody(), bulkResponseItem, e );
+		}
 
-			return true;
-		}
-		else {
-			return false;
-		}
+		return afterSuccess( executionContext )
+				.exceptionally( Futures.handler(
+						throwable -> {
+							throw LOG.elasticsearchBulkedRequestFailed(
+									getBulkableActionMetadata(), getBulkableActionBody(),
+									bulkResponseItem, Throwables.expectException( throwable )
+									);
+						}
+				) )
+				.thenApply( ignored -> result );
 	}
 
 	protected abstract static class Builder<B>

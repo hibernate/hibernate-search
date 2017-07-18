@@ -12,6 +12,15 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 /**
+ * Offers access to the execution context:
+ * <ul>
+ * <li>objects supporting the execution, such as the Elasticsearch client
+ * <li>mutable data relating to the execution, such as buffered
+ * index monitors or the list of dirty indexes.
+ * </ul>
+ * <p>
+ * Implementation may not be thread-safe.
+ *
  * @author Yoann Rodiere
  */
 public interface ElasticsearchWorkExecutionContext {

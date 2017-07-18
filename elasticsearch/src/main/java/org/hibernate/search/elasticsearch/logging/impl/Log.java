@@ -17,8 +17,6 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
-import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
-import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
@@ -29,7 +27,6 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-import org.jboss.logging.annotations.Param;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -63,21 +60,21 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException cannotQueryOnEmptyPhraseQuery();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
-			value = "Elasticsearch request failed\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
+			value = "Elasticsearch request failed\nRequest:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
 	SearchException elasticsearchRequestFailed(
 			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
 			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
 			@Cause Exception cause);
 
-	// The bounds on wildcards below are necessary for the logger code generation to work
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 8,
-			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
+			value = "Elasticsearch bulked request failed\nRequest:\n========\n%1$s\n%2$sResponse:\n=========\n%3$s"
 	)
-	BulkRequestFailedException elasticsearchBulkRequestFailed(
-			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
-			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
-			@Param Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems, @Param List<BulkableElasticsearchWork<?>> erroneousItems);
+	SearchException elasticsearchBulkedRequestFailed(
+			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestMetadata,
+			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestBody,
+			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject response,
+			@Cause Exception cause);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
