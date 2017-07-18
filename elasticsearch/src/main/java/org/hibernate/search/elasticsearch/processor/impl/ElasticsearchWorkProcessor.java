@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -44,6 +45,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
+	private final ElasticsearchWorkOrchestrator syncOrchestrator;
 	private final BatchingSharedElasticsearchWorkOrchestrator asyncOrchestrator;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
@@ -55,6 +57,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		this.parallelWorkExecutionContext =
 				new ParallelWorkExecutionContext( client, gsonProvider );
+		this.syncOrchestrator = createIsolatedSharedOrchestrator( () -> this.createSerialOrchestrator() );
 		this.asyncOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async work orchestrator", createSerialOrchestrator() );
 	}
 
@@ -94,9 +97,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		FlushableElasticsearchWorkOrchestrator orchestrator = this.createSerialOrchestrator();
-		orchestrator.submit( works );
-		orchestrator.flush()
+		syncOrchestrator.submit( works )
 				// Note: timeout is handled by the client, so this "join" will not last forever
 				.join();
 	}
@@ -163,6 +164,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
 		LOG.tracef( "Processing %s", work );
 		return work.execute( context );
+	}
+
+	private IsolatedSharedElasticsearchWorkOrchestrator createIsolatedSharedOrchestrator(Supplier<FlushableElasticsearchWorkOrchestrator> delegateSupplier) {
+		return new IsolatedSharedElasticsearchWorkOrchestrator( delegateSupplier );
 	}
 
 	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, FlushableElasticsearchWorkOrchestrator delegate) {
