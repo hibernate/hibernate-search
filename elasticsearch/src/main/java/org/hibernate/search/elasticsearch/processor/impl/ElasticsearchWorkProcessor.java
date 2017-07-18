@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.processor.impl;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
@@ -45,8 +43,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
-	private final ElasticsearchWorkOrchestrator syncOrchestrator;
-	private final BatchingSharedElasticsearchWorkOrchestrator asyncOrchestrator;
+	private final ElasticsearchWorkOrchestrator syncNonStreamOrchestrator;
+	private final BatchingSharedElasticsearchWorkOrchestrator asyncNonStreamOrchestrator;
+	private final BatchingSharedElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
 			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
@@ -57,14 +56,29 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		this.parallelWorkExecutionContext =
 				new ParallelWorkExecutionContext( client, gsonProvider );
-		this.syncOrchestrator = createIsolatedSharedOrchestrator( () -> this.createSerialOrchestrator() );
-		this.asyncOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async work orchestrator", createSerialOrchestrator() );
+		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator( () -> this.createSerialOrchestrator() );
+		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async non-stream work orchestrator", createSerialOrchestrator() );
+		this.streamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async stream work orchestrator", createParallelOrchestrator() );
 	}
 
 	@Override
 	public void close() {
-		awaitProcessingCompletion( asyncOrchestrator );
-		asyncOrchestrator.close();
+		try {
+			asyncNonStreamOrchestrator.awaitCompletion();
+			streamOrchestrator.awaitCompletion();
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw LOG.interruptedWhileWaitingForRequestCompletion( e );
+		}
+		finally {
+			try {
+				asyncNonStreamOrchestrator.close();
+			}
+			finally {
+				streamOrchestrator.close();
+			}
+		}
 	}
 
 	/**
@@ -84,24 +98,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		}
 	}
 
-
-	/**
-	 * Execute a set of works synchronously.
-	 * <p>
-	 * Works submitted in the same list will be executed in the given order.
-	 * <p>
-	 * If any work throws an exception, this exception will be passed
-	 * to the error handler with an {@link ErrorContext} spanning at least the given works,
-	 * and the remaining works will not be executed.
-	 *
-	 * @param works The works to be executed.
-	 */
-	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		syncOrchestrator.submit( works )
-				// Note: timeout is handled by the client, so this "join" will not last forever
-				.join();
-	}
-
 	/**
 	 * Execute a single work asynchronously,
 	 * without bulking it with other asynchronous works,
@@ -115,50 +111,61 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Execute a single work asynchronously,
-	 * potentially bulking it with other asynchronous works.
+	 * Return the orchestrator for synchronous, non-stream background works.
 	 * <p>
-	 * If the work throws an exception, this exception will be passed
-	 * to the error handler with an {@link ErrorContext} spanning at least this work.
-	 *
-	 * @param work The work to be executed.
-	 */
-	public void executeAsync(ElasticsearchWork<?> work) {
-		asyncOrchestrator.submit( Collections.singleton( work ) );
-	}
-
-	/**
-	 * Execute a set of works asynchronously,
-	 * potentially bulking it with other asynchronous works.
+	 * Works submitted in the same changeset will be executed in the given order.
+	 * Relative execution order between changesets is undefined.
 	 * <p>
-	 * Works submitted in the same list will be executed in the given order.
+	 * Works submitted to this orchestrator
+	 * will only be bulked with subsequent works of the same changeset.
 	 * <p>
 	 * If any work throws an exception, this exception will be passed
-	 * to the error handler with an {@link ErrorContext} spanning at least the given works,
+	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
 	 * and the remaining works will not be executed.
 	 *
-	 * @param works The works to be executed.
+	 * @return the orchestrator for synchronous, non-stream background works.
 	 */
-	public void executeAsync(List<ElasticsearchWork<?>> works) {
-		asyncOrchestrator.submit( works );
+	public ElasticsearchWorkOrchestrator getSyncNonStreamOrchestrator() {
+		return syncNonStreamOrchestrator;
 	}
 
 	/**
-	 * Blocks until the queue of requests scheduled for asynchronous processing has been fully processed.
-	 * N.B. if more work is added to the queue in the meantime, this might delay the wait.
+	 * Return the orchestrator for asynchronous, non-stream background works.
+	 * <p>
+	 * Works submitted in the same changeset will be executed in the given order.
+	 * Changesets will be executed in the order they are submitted.
+	 * <p>
+	 * Works submitted to this orchestrator
+	 * will only be bulked with subsequent works (possibly of a different changeset).
+	 * <p>
+	 * If any work throws an exception, this exception will be passed
+	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
+	 * and the remaining works will not be executed.
+	 *
+	 * @return the orchestrator for asynchronous, non-stream background works.
 	 */
-	public void awaitAsyncProcessingCompletion() {
-		awaitProcessingCompletion( asyncOrchestrator );
+	public BarrierElasticsearchWorkOrchestrator getAsyncNonStreamOrchestrator() {
+		return asyncNonStreamOrchestrator;
 	}
 
-	private void awaitProcessingCompletion(BatchingSharedElasticsearchWorkOrchestrator orchestrator) {
-		try {
-			asyncOrchestrator.awaitCompletion();
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw LOG.interruptedWhileWaitingForRequestCompletion( e );
-		}
+	/**
+	 * Return the orchestrator for asynchronous, non-stream background works.
+	 * <p>
+	 * Works submitted in the same changeset will be executed in the given order.
+	 * Relative execution order between changesets is undefined.
+	 * <p>
+	 * Works submitted to this orchestrator
+	 * will only be bulked with subsequent works from the same changeset
+	 * or with works from a different changeset.
+	 * <p>
+	 * If any work throws an exception, this exception will be passed
+	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
+	 * and the remaining works will not be executed.
+	 *
+	 * @return the orchestrator for stream background works.
+	 */
+	public BarrierElasticsearchWorkOrchestrator getStreamOrchestrator() {
+		return streamOrchestrator;
 	}
 
 	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
@@ -178,6 +185,12 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, true );
 		return new SerialChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
+	}
+
+	private FlushableElasticsearchWorkOrchestrator createParallelOrchestrator() {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, false );
+		return new ParallelChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder() {

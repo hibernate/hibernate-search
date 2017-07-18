@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOrchestrator, AutoCloseable {
+class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearchWorkOrchestrator, AutoCloseable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -131,6 +131,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOr
 		}
 	}
 
+	@Override
 	public void awaitCompletion() throws InterruptedException {
 		int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
 		if ( phaser.getUnarrivedParties() > 0 ) {
