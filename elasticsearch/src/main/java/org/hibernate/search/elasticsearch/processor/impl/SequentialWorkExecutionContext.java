@@ -87,7 +87,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 		return bufferedIndexMonitors.computeIfAbsent( originalMonitor, BufferedIndexingMonitor::new );
 	}
 
-	public void flush() {
+	public CompletableFuture<Void> flush() {
 		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
 
 		// Refresh dirty indexes
@@ -97,7 +97,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 		}
 
 		// Flush the indexing monitors
-		future = future.thenRun( () -> {
+		return future.thenRun( () -> {
 				for ( BufferedIndexingMonitor buffer : bufferedIndexMonitors.values() ) {
 					try {
 						buffer.flush();
@@ -108,9 +108,6 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 				}
 				bufferedIndexMonitors.clear();
 		} );
-
-		// Note: timeout is handled by the client, so this "join" will not last forever
-		future.join();
 	}
 
 	private CompletableFuture<?> refreshDirtyIndexes() {

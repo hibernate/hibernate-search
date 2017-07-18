@@ -31,6 +31,11 @@ public class DeleteWork extends SimpleBulkableElasticsearchWork<Void> {
 		return null;
 	}
 
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		return null;
+	}
+
 	public static class Builder
 			extends SimpleBulkableElasticsearchWork.Builder<Builder>
 			implements DeleteWorkBuilder {

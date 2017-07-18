@@ -21,6 +21,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 public class ErrorContextBuilder {
 
 	private Throwable th;
+	private LuceneWork operationAtFault;
 	private Iterable<LuceneWork> workToBeDone;
 	private List<LuceneWork> failingOperations;
 	private List<LuceneWork> operationsThatWorked;
@@ -28,6 +29,11 @@ public class ErrorContextBuilder {
 
 	public ErrorContextBuilder errorThatOccurred(Throwable th) {
 		this.th = th;
+		return this;
+	}
+
+	public ErrorContextBuilder operationAtFault(LuceneWork operationAtFault) {
+		this.operationAtFault = operationAtFault;
 		return this;
 	}
 
@@ -63,7 +69,10 @@ public class ErrorContextBuilder {
 		context.setThrowable( th );
 
 		// for situation when there is a primary failure
-		if ( workToBeDone != null ) {
+		if ( operationAtFault != null ) {
+			context.setOperationAtFault( operationAtFault );
+		}
+		else if ( workToBeDone != null ) {
 			List<LuceneWork> workLeft = new ArrayList<LuceneWork>();
 			for ( LuceneWork work : workToBeDone ) {
 				workLeft.add( work );
