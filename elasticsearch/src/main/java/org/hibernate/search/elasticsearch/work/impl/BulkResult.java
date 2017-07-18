@@ -4,18 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.processor.impl;
-
-import org.hibernate.search.exception.SearchException;
-
+package org.hibernate.search.elasticsearch.work.impl;
 
 /**
  * @author Yoann Rodiere
  */
-public class SequenceAbortedException extends SearchException {
+public interface BulkResult {
 
-	public SequenceAbortedException(Throwable cause) {
-		super( cause );
-	}
+	BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context);
 
 }

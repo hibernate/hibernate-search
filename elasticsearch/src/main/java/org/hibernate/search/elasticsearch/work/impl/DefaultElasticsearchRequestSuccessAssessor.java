@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -28,9 +30,8 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private static final JsonAccessor<String> ROOT_ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" ).asString();
 	private static final JsonAccessor<Integer> BULK_ITEM_STATUS_CODE = JsonAccessor.root().property( "status" ).asInteger();
-	private static final JsonAccessor<String> BULK_ITEM_ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" ).asString();
+	private static final JsonAccessor<String> ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" ).asString();
 
 	private static final int TIME_OUT_HTTP_STATUS_CODE = 408;
 
@@ -83,9 +84,22 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 
 	@Override
 	public void checkSuccess(ElasticsearchResponse response) throws SearchException {
-		JsonObject body = response.getBody();
-		if ( !isSuccess( response, body ) ) {
-			if ( response.getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
+		JsonObject responseBody = response.getBody();
+		Optional<Integer> statusCode = Optional.of( response.getStatusCode() );
+		checkSuccess( statusCode, responseBody );
+	}
+
+	@Override
+	public void checkSuccess(JsonObject bulkResponseItem) {
+		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
+		JsonObject responseBody = bulkResponseItem == null ? null : bulkResponseItem.entrySet().iterator().next().getValue().getAsJsonObject();
+		Optional<Integer> statusCode = BULK_ITEM_STATUS_CODE.get( responseBody );
+		checkSuccess( statusCode, responseBody );
+	}
+
+	private void checkSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
+		if ( !isSuccess( statusCode, responseBody ) ) {
+			if ( statusCode.filter( isEqual( TIME_OUT_HTTP_STATUS_CODE ) ).isPresent() ) {
 				throw LOG.elasticsearchRequestTimeout();
 			}
 			else {
@@ -94,25 +108,11 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 		}
 	}
 
-	@Override
-	public boolean isSuccess(JsonObject resultItem) {
-		if ( resultItem == null ) {
-			return false;
-		}
-		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
-		JsonObject content = resultItem.entrySet().iterator().next().getValue().getAsJsonObject();
-		Optional<Integer> statusCode = BULK_ITEM_STATUS_CODE.get( content );
+	private boolean isSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
 		return statusCode.map( (c) ->
 						ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
 				).orElse( false )
-				|| BULK_ITEM_ERROR_TYPE.get( content ).map( ignoredErrorTypes::contains ).orElse( false );
-	}
-
-	private boolean isSuccess(ElasticsearchResponse response, JsonObject parsedResponseBody) {
-		int code = response.getStatusCode();
-		return ElasticsearchClientUtils.isSuccessCode( code )
-				|| ignoredErrorStatuses.contains( code )
-				|| ROOT_ERROR_TYPE.get( parsedResponseBody ).map( ignoredErrorTypes::contains ).orElse( false );
+				|| ERROR_TYPE.get( responseBody ).map( ignoredErrorTypes::contains ).orElse( false );
 	}
 
 }

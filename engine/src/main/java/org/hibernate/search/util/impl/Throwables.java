@@ -50,4 +50,17 @@ public final class Throwables {
 		}
 	}
 
+	public static <T extends Throwable> T combine(T throwable, T otherThrowable) {
+		T toThrow = throwable;
+		if ( otherThrowable != null ) {
+			if ( toThrow != null ) {
+				toThrow.addSuppressed( otherThrowable );
+			}
+			else {
+				toThrow = otherThrowable;
+			}
+		}
+		return toThrow;
+	}
+
 }
