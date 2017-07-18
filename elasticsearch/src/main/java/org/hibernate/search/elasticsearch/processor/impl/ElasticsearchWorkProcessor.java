@@ -10,24 +10,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -36,8 +28,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * <p>
  * When processing multiple requests, bulk requests will be formed and executed as far as possible.
  * <p>
- * Requests can be processed synchronously or asynchronously. In the latter case, incoming requests are added to a queue
- * via {@link AsyncBackendRequestProcessor} from where a worker runnable will process them in bulks.
+ * Requests can be processed synchronously or asynchronously.
+ * In the latter case, incoming requests are added to a queue
+ * via a {@link BatchingSharedElasticsearchWorkOrchestrator} and processed in bulks.
  *
  * @author Gunnar Morling
  */
@@ -45,17 +38,16 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private final AsyncBackendRequestProcessor asyncProcessor;
 	private final ErrorHandler errorHandler;
 	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
+	private final BatchingSharedElasticsearchWorkOrchestrator asyncOrchestrator;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
 			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
-		asyncProcessor = new AsyncBackendRequestProcessor();
 		this.errorHandler = context.getErrorHandler();
 		this.client = client;
 		this.gsonProvider = gsonProvider;
@@ -63,12 +55,13 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		this.parallelWorkExecutionContext =
 				new ParallelWorkExecutionContext( client, gsonProvider );
+		this.asyncOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async work orchestrator", createSerialOrchestrator() );
 	}
 
 	@Override
 	public void close() {
-		awaitAsyncProcessingCompletion();
-		asyncProcessor.shutdown();
+		awaitProcessingCompletion( asyncOrchestrator );
+		asyncOrchestrator.close();
 	}
 
 	/**
@@ -101,8 +94,11 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		BulkAndSequenceAggregator aggregator = createBulkAndSequenceAggregator( true );
-		doExecuteSyncSafe( aggregator, Collections.singleton( works ) );
+		FlushableElasticsearchWorkOrchestrator orchestrator = this.createSerialOrchestrator();
+		orchestrator.submit( works );
+		orchestrator.flush()
+				// Note: timeout is handled by the client, so this "join" will not last forever
+				.join();
 	}
 
 	/**
@@ -127,7 +123,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param work The work to be executed.
 	 */
 	public void executeAsync(ElasticsearchWork<?> work) {
-		asyncProcessor.submit( Collections.singleton( work ) );
+		asyncOrchestrator.submit( Collections.singleton( work ) );
 	}
 
 	/**
@@ -143,7 +139,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeAsync(List<ElasticsearchWork<?>> works) {
-		asyncProcessor.submit( works );
+		asyncOrchestrator.submit( works );
 	}
 
 	/**
@@ -151,33 +147,17 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * N.B. if more work is added to the queue in the meantime, this might delay the wait.
 	 */
 	public void awaitAsyncProcessingCompletion() {
-		asyncProcessor.awaitCompletion();
+		awaitProcessingCompletion( asyncOrchestrator );
 	}
 
-	/*
-	 * Execute a list of changesets, bulking them as necessary, and passing any exception to the error handler.
-	 *
-	 * After an exception, the remaining works in the list are not executed,
-	 * though some may have already been executed if they were bulked with the failing work.
-	 */
-	private void doExecuteSyncSafe(BulkAndSequenceAggregator aggregator,
-			Iterable<Iterable<ElasticsearchWork<?>>> changesets) {
-		CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
-
-		for ( Iterable<ElasticsearchWork<?>> changeset : changesets ) {
-			aggregator.init( future );
-			for ( ElasticsearchWork<?> work : changeset ) {
-				work.aggregate( aggregator );
-			}
-			CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
-			future = sequenceFuture;
+	private void awaitProcessingCompletion(BatchingSharedElasticsearchWorkOrchestrator orchestrator) {
+		try {
+			asyncOrchestrator.awaitCompletion();
 		}
-
-		aggregator.flushBulk();
-
-		// Note: timeout is handled by the client, so this "join" will not last forever
-		future.join();
-
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw LOG.interruptedWhileWaitingForRequestCompletion( e );
+		}
 	}
 
 	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
@@ -185,10 +165,14 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return work.execute( context );
 	}
 
-	private BulkAndSequenceAggregator createBulkAndSequenceAggregator(boolean refreshInBulkAPICall) {
+	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, FlushableElasticsearchWorkOrchestrator delegate) {
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, delegate );
+	}
+
+	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
-		return new BulkAndSequenceAggregator( sequenceBuilder, bulker );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, true );
+		return new SerialChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder() {
@@ -207,178 +191,4 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 				);
 	}
 
-	/**
-	 * Processes requests asynchronously.
-	 * <p>
-	 * Incoming messages are submitted to a queue. A worker runnable takes all messages in the queue at a given time and
-	 * processes them as a bulk as far as possible. The worker is started upon first message arrival after the queue has
-	 * been emptied and remains active until the queue is empty again.
-	 *
-	 * @author Gunnar Morling
-	 */
-	private class AsyncBackendRequestProcessor {
-
-		private final ScheduledExecutorService scheduler;
-		private final BulkAndSequenceAggregator aggregator;
-		private final MultiWriteDrainableLinkedList<Iterable<ElasticsearchWork<?>>> asyncWorkQueue;
-		private final AtomicBoolean asyncWorkerWasStarted;
-
-		private volatile CountDownLatch lastAsyncWorkLatch;
-
-		private AsyncBackendRequestProcessor() {
-			asyncWorkQueue = new MultiWriteDrainableLinkedList<>();
-			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
-			aggregator = createBulkAndSequenceAggregator( true );
-			asyncWorkerWasStarted = new AtomicBoolean( false );
-		}
-
-		public void submit(Iterable<ElasticsearchWork<?>> works) {
-			asyncWorkQueue.add( works );
-			ensureStarted();
-		}
-
-		private void ensureStarted() {
-			// Set up worker if needed
-			if ( !asyncWorkerWasStarted.get() ) {
-				synchronized ( AsyncBackendRequestProcessor.this ) {
-					if ( asyncWorkerWasStarted.compareAndSet( false, true ) ) {
-						try {
-							RequestProcessingRunnable runnable = new RequestProcessingRunnable( this );
-							scheduler.schedule( runnable, 100, TimeUnit.MILLISECONDS );
-							//only assign this when the job was successfully scheduled:
-							lastAsyncWorkLatch = runnable.latch;
-						}
-						catch (Exception e) {
-							// Make sure a failure to setup the worker doesn't leave other threads waiting indefinitely:
-							asyncWorkerWasStarted.set( false );
-							final CountDownLatch latch = lastAsyncWorkLatch;
-							if ( latch != null ) {
-								latch.countDown();
-							}
-							throw e;
-						}
-					}
-				}
-			}
-		}
-
-		public void awaitCompletion() {
-			final CountDownLatch localLatch = lastAsyncWorkLatch;
-			if ( localLatch != null ) {
-				try {
-					localLatch.await();
-				}
-				catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					throw LOG.interruptedWhileWaitingForRequestCompletion( e );
-				}
-			}
-		}
-
-		public void shutdown() {
-			scheduler.shutdown();
-			try {
-				scheduler.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
-			}
-			catch (InterruptedException e) {
-				LOG.interruptedWhileWaitingForIndexActivity( e );
-			}
-			finally {
-				final CountDownLatch localLatch = lastAsyncWorkLatch;
-				if ( localLatch != null ) {
-					//It's possible that a task was successfully scheduled but had no chance to run,
-					//so we need to release waiting threads:
-					localLatch.countDown();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Takes requests from the queue and processes them.
-	 */
-	private class RequestProcessingRunnable implements Runnable {
-
-		private final AsyncBackendRequestProcessor asyncProcessor;
-		private final CountDownLatch latch = new CountDownLatch( 1 );
-
-		public RequestProcessingRunnable(AsyncBackendRequestProcessor asyncProcessor) {
-			this.asyncProcessor = asyncProcessor;
-		}
-
-		@Override
-		public void run() {
-			try {
-				processAsyncWork();
-			}
-			finally {
-				latch.countDown();
-			}
-		}
-
-		private void processAsyncWork() {
-			synchronized ( asyncProcessor ) {
-				asyncProcessor.aggregator.reset();
-				while ( true ) {
-					Iterable<Iterable<ElasticsearchWork<?>>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
-					if ( works == null ) {
-						// Allow other async processors to be setup
-						asyncProcessor.asyncWorkerWasStarted.set( false );
-						return;
-					}
-					doExecuteSyncSafe( asyncProcessor.aggregator, works );
-				}
-			}
-		}
-	}
-
-	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {
-
-		private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
-		private final ElasticsearchWorkBulker bulker;
-
-		public BulkAndSequenceAggregator(ElasticsearchWorkSequenceBuilder sequenceBuilder,
-				ElasticsearchWorkBulker bulker) {
-			super();
-			this.sequenceBuilder = sequenceBuilder;
-			this.bulker = bulker;
-		}
-
-		public void init(CompletableFuture<?> previous) {
-			sequenceBuilder.init( previous );
-		}
-
-		@Override
-		public void addBulkable(BulkableElasticsearchWork<?> work) {
-			bulker.add( work );
-		}
-
-		@Override
-		public void addNonBulkable(ElasticsearchWork<?> work) {
-			if ( bulker.flushBulked() ) {
-				/*
-				 * We want to execute works in the exact order they were received,
-				 * so if a non-bulkable work is about to be added,
-				 * we can't add any more works to the current bulk
-				 * (otherwise the next bulked works may be executed
-				 * before the current non-bulkable work).
-				 */
-				bulker.flushBulk();
-			}
-			sequenceBuilder.addNonBulkExecution( work );
-		}
-
-		public CompletableFuture<Void> flushSequence() {
-			bulker.flushBulked();
-			return sequenceBuilder.build();
-		}
-
-		public void flushBulk() {
-			bulker.flushBulk();
-		}
-
-		public void reset() {
-			bulker.reset();
-		}
-	}
 }
