@@ -123,7 +123,7 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public boolean isSuccess(JsonObject bulkResponseItem) {
+		public void checkSuccess(JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because DeleteByQuery actions are not Bulkable" );
 		}
 	}

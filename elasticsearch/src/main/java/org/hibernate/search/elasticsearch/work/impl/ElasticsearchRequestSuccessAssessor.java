@@ -24,10 +24,10 @@ public interface ElasticsearchRequestSuccessAssessor {
 	void checkSuccess(ElasticsearchResponse response) throws SearchException;
 
 	/**
-	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.
+	 * Check the given bulk response item, return {@code true} if it is successful, {@code false} otherwise.
 	 * @param bulkResponseItem The part of the response body concerning the request whose success is to be assessed.
-	 * @return {@code true} if the result is successful, {@code false} otherwise.
+	 * @throws SearchException If the result is a failure.
 	 */
-	boolean isSuccess(JsonObject bulkResponseItem);
+	void checkSuccess(JsonObject bulkResponseItem);
 
 }

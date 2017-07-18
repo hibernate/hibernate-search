@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.processor.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,16 +14,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
@@ -32,11 +26,8 @@ import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionCo
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
-import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -54,16 +45,12 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	/**
-	 * Maximum number of requests sent in a single bulk. Could be made an option if needed.
-	 */
-	private static final int MAX_BULK_SIZE = 250;
-
 	private final AsyncBackendRequestProcessor asyncProcessor;
 	private final ErrorHandler errorHandler;
 	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkFactory workFactory;
+
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
@@ -73,6 +60,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.workFactory = workFactory;
+
 		this.parallelWorkExecutionContext =
 				new ParallelWorkExecutionContext( client, gsonProvider );
 	}
@@ -113,10 +101,8 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				client, gsonProvider, workFactory, this, errorHandler );
-		doExecuteSyncSafe( context, works, true );
-		context.flush();
+		BulkAndSequenceAggregator aggregator = createBulkAndSequenceAggregator( true );
+		doExecuteSyncSafe( aggregator, Collections.singleton( works ) );
 	}
 
 	/**
@@ -169,48 +155,29 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/*
-	 * Execute a list of works, bulking them as necessary, and passing any exception to the error handler.
+	 * Execute a list of changesets, bulking them as necessary, and passing any exception to the error handler.
 	 *
 	 * After an exception, the remaining works in the list are not executed,
 	 * though some may have already been executed if they were bulked with the failing work.
 	 */
-	private void doExecuteSyncSafe(SequentialWorkExecutionContext context,
-			Iterable<ElasticsearchWork<?>> nonBulkedWorks, boolean refreshInBulkAPICall) {
-		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
+	private void doExecuteSyncSafe(BulkAndSequenceAggregator aggregator,
+			Iterable<Iterable<ElasticsearchWork<?>>> changesets) {
+		CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
 
-		CompletableFuture<?> workListFuture = CompletableFuture.completedFuture( null );
-
-		for ( ElasticsearchWork<?> work : createRequestGroups( nonBulkedWorks, refreshInBulkAPICall ) ) {
-			workListFuture = workListFuture.thenCompose( ignored ->
-					start( work, context )
-							/*
-							 * Note that the handler is applied to the "inner" (to be composed) work,
-							 * so that the handler is only executed if *this* work fails,
-							 * not if a previous one fails.
-							 */
-							.handle( Futures.handler(
-									(result, throwable) -> {
-										handleWorkCompletion( errorContextBuilder, throwable, nonBulkedWorks, work );
-										return result;
-									}
-							) )
-			);
+		for ( Iterable<ElasticsearchWork<?>> changeset : changesets ) {
+			aggregator.init( future );
+			for ( ElasticsearchWork<?> work : changeset ) {
+				work.aggregate( aggregator );
+			}
+			CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
+			future = sequenceFuture;
 		}
 
-		/*
-		 * Ignore SequenceAbortedExceptions: if we get such an exception,
-		 * it means the cause was correctly reported to the handler.
-		 */
-		workListFuture.exceptionally( Futures.handler( e -> {
-					if ( e instanceof SequenceAbortedException ) {
-						return null;
-					}
-					else {
-						throw Throwables.expectRuntimeException( e );
-					}
-				} ) )
-				// Note: timeout is handled by the client, so this "join" will not last forever
-				.join();
+		aggregator.flushBulk();
+
+		// Note: timeout is handled by the client, so this "join" will not last forever
+		future.join();
+
 	}
 
 	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {
@@ -218,68 +185,26 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return work.execute( context );
 	}
 
-	private void handleWorkCompletion(ErrorContextBuilder errorContextBuilder, Throwable throwable,
-			Iterable<ElasticsearchWork<?>> nonBulkedWorks, ElasticsearchWork<?> workThatFailed) {
-		if ( throwable instanceof BulkRequestFailedException ) {
-			BulkRequestFailedException brfe = (BulkRequestFailedException) throwable;
-			brfe.getSuccessfulItems().keySet().stream()
-					.flatMap( ElasticsearchWork::getLuceneWorks )
-					.forEach( errorContextBuilder::workCompleted );
-
-			handleError(
-					errorContextBuilder,
-					brfe,
-					nonBulkedWorks,
-					brfe.getErroneousItems().stream()
-							.flatMap( ElasticsearchWork::getLuceneWorks )
-					);
-			/*
-			 * Note that we re-throw the throwable,
-			 * so that the following works are not executed if this work failed.
-			 */
-			throw new SequenceAbortedException( throwable );
-		}
-		else if ( throwable != null ) {
-			handleError(
-					errorContextBuilder,
-					throwable,
-					nonBulkedWorks,
-					workThatFailed.getLuceneWorks()
-					);
-			// Same as above
-			throw new SequenceAbortedException( throwable );
-		}
-		else {
-			workThatFailed.getLuceneWorks().forEach( errorContextBuilder::workCompleted );
-		}
+	private BulkAndSequenceAggregator createBulkAndSequenceAggregator(boolean refreshInBulkAPICall) {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
+		return new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}
 
-	private void handleError(ErrorContextBuilder errorContextBuilder, Throwable throwable,
-			Iterable<ElasticsearchWork<?>> allWorks, Stream<LuceneWork> worksThatFailed) {
-		errorContextBuilder.allWorkToBeDone(
-				StreamSupport.stream( allWorks.spliterator(), false )
-						.flatMap( w -> w.getLuceneWorks() )
-						.collect( Collectors.toList() )
+	private ElasticsearchWorkSequenceBuilder createSequenceBuilder() {
+		return new DefaultElasticsearchWorkSequenceBuilder(
+				this::start,
+				() -> new SequentialWorkExecutionContext(
+						client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler ),
+				() -> new DefaultContextualErrorHandler( errorHandler )
 				);
-
-		worksThatFailed.forEach( errorContextBuilder::addWorkThatFailed );
-
-		errorContextBuilder.errorThatOccurred( throwable );
-
-		errorHandler.handle( errorContextBuilder.createErrorContext() );
 	}
 
-	/**
-	 * Organizes the given work list into {@link ProcessorWork}s to be executed.
-	 */
-	private List<ElasticsearchWork<?>> createRequestGroups(Iterable<ElasticsearchWork<?>> requests, boolean refreshInBulkAPICall) {
-		ProcessorWorkGroupBuilder bulkBuilder = new ProcessorWorkGroupBuilder( refreshInBulkAPICall );
-
-		for ( ElasticsearchWork<?> request : requests ) {
-			request.aggregate( bulkBuilder );
-		}
-
-		return bulkBuilder.build();
+	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, boolean refreshInBulkAPICall) {
+		return new DefaultElasticsearchWorkBulker(
+				sequenceBuilder,
+				worksToBulk -> workFactory.bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build()
+				);
 	}
 
 	/**
@@ -294,6 +219,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private class AsyncBackendRequestProcessor {
 
 		private final ScheduledExecutorService scheduler;
+		private final BulkAndSequenceAggregator aggregator;
 		private final MultiWriteDrainableLinkedList<Iterable<ElasticsearchWork<?>>> asyncWorkQueue;
 		private final AtomicBoolean asyncWorkerWasStarted;
 
@@ -302,6 +228,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		private AsyncBackendRequestProcessor() {
 			asyncWorkQueue = new MultiWriteDrainableLinkedList<>();
 			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
+			aggregator = createBulkAndSequenceAggregator( true );
 			asyncWorkerWasStarted = new AtomicBoolean( false );
 		}
 
@@ -390,69 +317,68 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		}
 
 		private void processAsyncWork() {
-			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
 			synchronized ( asyncProcessor ) {
+				asyncProcessor.aggregator.reset();
 				while ( true ) {
 					Iterable<Iterable<ElasticsearchWork<?>>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
 					if ( works == null ) {
-						// Allow other async processors to be setup already as we're on our way to termination:
+						// Allow other async processors to be setup
 						asyncProcessor.asyncWorkerWasStarted.set( false );
-						// Nothing more to do, flush and terminate:
-						context.flush();
 						return;
 					}
-					Iterable<ElasticsearchWork<?>> flattenedWorks = CollectionHelper.flatten( works );
-					doExecuteSyncSafe( context, flattenedWorks, false );
+					doExecuteSyncSafe( asyncProcessor.aggregator, works );
 				}
 			}
 		}
 	}
 
-	private class ProcessorWorkGroupBuilder implements ElasticsearchWorkAggregator {
+	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {
 
-		private final boolean refreshInBulkAPICall;
+		private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
+		private final ElasticsearchWorkBulker bulker;
 
-		private final List<ElasticsearchWork<?>> result = new ArrayList<>();
-		private final List<BulkableElasticsearchWork<?>> bulkInProgress = new ArrayList<>();
-
-		public ProcessorWorkGroupBuilder(boolean refreshInBulkAPICall) {
+		public BulkAndSequenceAggregator(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+				ElasticsearchWorkBulker bulker) {
 			super();
-			this.refreshInBulkAPICall = refreshInBulkAPICall;
+			this.sequenceBuilder = sequenceBuilder;
+			this.bulker = bulker;
+		}
+
+		public void init(CompletableFuture<?> previous) {
+			sequenceBuilder.init( previous );
 		}
 
 		@Override
 		public void addBulkable(BulkableElasticsearchWork<?> work) {
-			bulkInProgress.add( work );
-			if ( bulkInProgress.size() >= MAX_BULK_SIZE ) {
-				flushBulkInProgress();
-			}
+			bulker.add( work );
 		}
 
 		@Override
 		public void addNonBulkable(ElasticsearchWork<?> work) {
-			flushBulkInProgress();
-			result.add( work );
+			if ( bulker.flushBulked() ) {
+				/*
+				 * We want to execute works in the exact order they were received,
+				 * so if a non-bulkable work is about to be added,
+				 * we can't add any more works to the current bulk
+				 * (otherwise the next bulked works may be executed
+				 * before the current non-bulkable work).
+				 */
+				bulker.flushBulk();
+			}
+			sequenceBuilder.addNonBulkExecution( work );
 		}
 
-		private void flushBulkInProgress() {
-			if ( bulkInProgress.isEmpty() ) {
-				return;
-			}
-
-			if ( bulkInProgress.size() == 1 ) {
-				ElasticsearchWork<?> work = bulkInProgress.iterator().next();
-				result.add( work );
-			}
-			else {
-				result.add( workFactory.bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
-			}
-			bulkInProgress.clear();
+		public CompletableFuture<Void> flushSequence() {
+			bulker.flushBulked();
+			return sequenceBuilder.build();
 		}
 
-		private List<ElasticsearchWork<?>> build() {
-			flushBulkInProgress();
-			return result;
+		public void flushBulk() {
+			bulker.flushBulk();
+		}
+
+		public void reset() {
+			bulker.reset();
 		}
 	}
 }

@@ -35,6 +35,11 @@ public class IndexWork extends SimpleBulkableElasticsearchWork<Void> {
 	}
 
 	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		return null;
+	}
+
+	@Override
 	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext context) {
 		if ( indexingMonitor != null ) {
 			IndexingMonitor bufferedIndexingMonitor = context.getBufferedIndexingMonitor( indexingMonitor );

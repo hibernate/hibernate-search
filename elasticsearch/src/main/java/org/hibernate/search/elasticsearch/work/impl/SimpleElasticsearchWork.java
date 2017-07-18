@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
@@ -82,13 +81,8 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 	}
 
 	@Override
-	public Stream<LuceneWork> getLuceneWorks() {
-		if ( luceneWork != null ) {
-			return Stream.of( luceneWork );
-		}
-		else {
-			return Stream.empty();
-		}
+	public LuceneWork getLuceneWork() {
+		return luceneWork;
 	}
 
 	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {

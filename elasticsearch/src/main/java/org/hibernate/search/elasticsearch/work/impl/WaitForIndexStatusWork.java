@@ -101,7 +101,7 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public boolean isSuccess(JsonObject bulkResponseItem) {
+		public void checkSuccess(JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because WaitForIndexStatusWork is not bulkable." );
 		}
 

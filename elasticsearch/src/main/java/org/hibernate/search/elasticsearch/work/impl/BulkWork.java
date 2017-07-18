@@ -8,9 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
@@ -20,7 +18,6 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
-import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -31,7 +28,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class BulkWork implements ElasticsearchWork<Void> {
+public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -71,26 +68,12 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	}
 
 	@Override
-	public CompletableFuture<Void> execute(ElasticsearchWorkExecutionContext context) {
-		ElasticsearchWorkExecutionContext actualContext;
-		if ( refreshInAPICall ) {
-			/*
-			 * Prevent bulked works to mark indexes as dirty,
-			 * since we refresh all indexes as part of the Bulk API call.
-			 */
-			actualContext = new NoIndexDirtyBulkExecutionContext( context );
-		}
-		else {
-			actualContext = context;
-		}
-		return Futures.create( () -> actualContext.getClient().submit( request ) )
+	public CompletableFuture<BulkResult> execute(ElasticsearchWorkExecutionContext context) {
+		return Futures.create( () -> context.getClient().submit( request ) )
+				.thenApply( this::generateResult )
 				.exceptionally( Futures.handler(
 						throwable -> { throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
-				) )
-				.thenApply( response -> {
-					handleResults( actualContext, response );
-					return (Void) null;
-				} );
+				) );
 	}
 
 	@Override
@@ -99,71 +82,14 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	}
 
 	@Override
-	public Stream<LuceneWork> getLuceneWorks() {
-		Stream<LuceneWork> result = Stream.empty();
-		for ( BulkableElasticsearchWork<?> work : works ) {
-			result = Stream.concat( result, work.getLuceneWorks() );
-		}
-		return result;
+	public LuceneWork getLuceneWork() {
+		return null;
 	}
 
-	/*
-	 * Give the chance for every work to handle the result,
-	 * making sure that exceptions are handled properly
-	 * so that one failing handler will not prevent others from being called.
-	 *
-	 * If at least one work or its result handler failed,
-	 * an exception will be thrown after every result has been handled.
-	 */
-	private void handleResults(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems =
-				CollectionHelper.newHashMap( works.size() );
-
-		List<BulkableElasticsearchWork<?>> erroneousItems = new ArrayList<>();
-		int i = 0;
-
+	private BulkResult generateResult(ElasticsearchResponse response) {
 		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
-		int resultItemsSize = resultItems.size();
-
-		List<RuntimeException> resultHandlingExceptions = null;
-		for ( BulkableElasticsearchWork<?> work : works ) {
-			JsonObject resultItem = null;
-
-			boolean success;
-			try {
-				resultItem = i < resultItemsSize ? resultItems.get( i ).getAsJsonObject() : null;
-				success = work.handleBulkResult( context, resultItem );
-			}
-			catch (RuntimeException e) {
-				if ( resultHandlingExceptions == null ) {
-					resultHandlingExceptions = new ArrayList<>();
-				}
-				resultHandlingExceptions.add( e );
-				success = false;
-			}
-
-			if ( success ) {
-				successfulItems.put( work, resultItem );
-			}
-			else {
-				erroneousItems.add( work );
-			}
-
-			++i;
-		}
-
-		if ( !erroneousItems.isEmpty() ) {
-			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
-					request, response, successfulItems, erroneousItems
-			);
-			if ( resultHandlingExceptions != null ) {
-				for ( Exception resultHandlingException : resultHandlingExceptions ) {
-					exception.addSuppressed( resultHandlingException );
-				}
-			}
-			throw exception;
-		}
+		return new BulkResultImpl( resultItems, refreshInAPICall );
 	}
 
 	private static class NoIndexDirtyBulkExecutionContext extends ForwardingElasticsearchWorkExecutionContext {
@@ -214,4 +140,52 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			return new BulkWork( this );
 		}
 	}
+
+	private static class BulkResultImpl implements BulkResult {
+		private final JsonArray results;
+		private final boolean refreshInAPICall;
+
+		public BulkResultImpl(JsonArray results, boolean refreshInAPICall) {
+			super();
+			this.results = results;
+			this.refreshInAPICall = refreshInAPICall;
+		}
+
+		@Override
+		public BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context) {
+			ElasticsearchWorkExecutionContext actualContext;
+			if ( refreshInAPICall ) {
+				/*
+				 * Prevent bulked works to mark indexes as dirty,
+				 * since we refresh all indexes as part of the Bulk API call.
+				 */
+				actualContext = new NoIndexDirtyBulkExecutionContext( context );
+			}
+			else {
+				actualContext = context;
+			}
+			return new BulkItemResultExtractorImpl( results, actualContext );
+		}
+	}
+
+	private static class BulkItemResultExtractorImpl implements BulkResultItemExtractor {
+		private final JsonArray results;
+
+		private final ElasticsearchWorkExecutionContext context;
+
+
+		public BulkItemResultExtractorImpl(JsonArray results, ElasticsearchWorkExecutionContext context) {
+			super();
+			this.results = results;
+			this.context = context;
+		}
+
+		@Override
+		public <T> CompletableFuture<T> extract(BulkableElasticsearchWork<T> work, int index) {
+			JsonObject bulkItemResponse = results.get( index ).getAsJsonObject();
+			return work.handleBulkResult( context, bulkItemResponse );
+		}
+
+	}
+
 }
