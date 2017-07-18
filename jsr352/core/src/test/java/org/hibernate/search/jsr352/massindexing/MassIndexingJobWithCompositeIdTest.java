@@ -83,8 +83,8 @@ public class MassIndexingJobWithCompositeIdTest {
 	public void canHandleIdClass_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
-				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
-				.checkpointInterval( 20 )
+				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
+				.checkpointInterval( 4 )
 				.build();
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
@@ -97,8 +97,8 @@ public class MassIndexingJobWithCompositeIdTest {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
 				.restrictedBy( Restrictions.gt( "month", 6 ) )
-				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
-				.checkpointInterval( 20 )
+				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
+				.checkpointInterval( 4 )
 				.build();
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
@@ -111,8 +111,8 @@ public class MassIndexingJobWithCompositeIdTest {
 	public void canHandleEmbeddedId_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
-				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
-				.checkpointInterval( 20 )
+				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
+				.checkpointInterval( 4 )
 				.build();
 
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
@@ -127,8 +127,8 @@ public class MassIndexingJobWithCompositeIdTest {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
 				.restrictedBy( Restrictions.gt( "embeddableDateId.month", 6 ) )
-				.rowsPerPartition( 40 ) // Ensure there're more than 1 partitions, so that WHERE clause is applied.
-				.checkpointInterval( 20 )
+				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
+				.checkpointInterval( 4 )
 				.build();
 		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
 
