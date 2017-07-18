@@ -18,11 +18,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -83,18 +80,7 @@ public class PurgeIT extends SearchTestBase {
 		assertEquals( "Wrong total number of entries", 3, all.size() );
 
 		// Expect 0 failure in the backend threads
-		logged.expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText( "a LoggingEvent with ERROR level or higher" );
-			}
-
-			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
-				return item.getLevel().isGreaterOrEqual( Level.ERROR );
-			}
-		} );
+		logged.expectLevelMissing( Level.ERROR );
 
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -132,18 +118,7 @@ public class PurgeIT extends SearchTestBase {
 		assertEquals( "Wrong total number of entries", 3, all.size() );
 
 		// Expect 0 failure in the backend threads
-		logged.expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText( "a LoggingEvent with ERROR level or higher" );
-			}
-
-			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
-				return item.getLevel().isGreaterOrEqual( Level.ERROR );
-			}
-		} );
+		logged.expectLevelMissing( Level.ERROR );
 
 		Transaction tx = fullTextSession.beginTransaction();
 
