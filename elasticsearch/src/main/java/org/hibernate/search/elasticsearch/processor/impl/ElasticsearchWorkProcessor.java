@@ -166,7 +166,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, FlushableElasticsearchWorkOrchestrator delegate) {
-		return new BatchingSharedElasticsearchWorkOrchestrator( name, delegate );
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, delegate, errorHandler );
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator() {
