@@ -13,7 +13,7 @@ import org.openjdk.jmh.annotations.State;
 
 @State(Scope.Thread)
 @AuxCounters(Type.OPERATIONS)
-public class WriteCounters {
+public class NonStreamWriteCounters {
 
 	public int changeset;
 

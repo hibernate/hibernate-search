@@ -17,6 +17,7 @@ import org.hibernate.search.engineperformance.elasticsearch.setuputilities.Searc
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -24,7 +25,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
 @State(Scope.Benchmark)
-public class EngineHolder extends BaseIndexSetup {
+public class StreamWriteEngineHolder extends BaseIndexSetup {
 
 	@Param( { "default", "blackhole-5.4.0" } )
 	private String client;
@@ -32,49 +33,35 @@ public class EngineHolder extends BaseIndexSetup {
 	@Param( { "true", "false" } )
 	private boolean refreshAfterWrite;
 
-	@Param( { "sync", "async" } )
-	private String workerExecution;
-
 	@Param( { "100000" } )
 	private int indexSize;
-
-	@Param( { "100" } )
-	private int maxResults;
 
 	@Param( { DatasetCreation.HIBERNATE_DEV_ML_2016_01 } )
 	private String dataset;
 
-	@Param( { "1000" } )
-	private int changesetsPerFlush;
-
-	/**
-	 * Format: (number of add/remove) + "," + (number of updates)
-	 * <p>
-	 * The two values are squeezed into one parameter so as to
-	 * give more control over which combinations will be executed.
-	 * For instance you may want to test 5;5 then 500;500,
-	 * but 5;500 and 500;5 may not be of interest.
-	 */
-	@Param( { "10;20" } )
-	private String worksPerChangeset;
+	@Param( { "10000" } )
+	private int streamedAddsPerFlush;
 
 	private SearchIntegrator si;
 
 	private Dataset data;
 
-	private int addsDeletesPerChangeset;
-
-	private int updatesPerChangeset;
-
-	@Setup
+	/*
+	 * We spawn one engine per iteration,
+	 * to ensure we won't end up with huge indexes on iteration 10.
+	 */
+	@Setup(Level.Iteration)
 	public void initializeState() throws IOException, URISyntaxException {
-		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
+		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, null /* irrelevant */ );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
 		SearchIntegratorCreation.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
+	}
 
-		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
-		addsDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );
-		updatesPerChangeset = Integer.parseInt( worksPerChangesetSplit[1] );
+	@TearDown(Level.Iteration)
+	public void shutdownIndexingEngine() throws IOException {
+		if ( si != null ) {
+			si.close();
+		}
 	}
 
 	public SearchIntegrator getSearchIntegrator() {
@@ -89,32 +76,13 @@ public class EngineHolder extends BaseIndexSetup {
 		return indexSize;
 	}
 
-	public int getChangesetsPerFlush() {
-		return changesetsPerFlush;
-	}
-
-	public int getAddsDeletesPerChangeset() {
-		return addsDeletesPerChangeset;
-	}
-
-	public int getUpdatesPerChangeset() {
-		return updatesPerChangeset;
-	}
-
-	public int getQueryMaxResults() {
-		return maxResults;
+	public int getStreamedAddsPerFlush() {
+		return streamedAddsPerFlush;
 	}
 
 	public void flush(IndexedTypeIdentifier typeId) {
 		for ( IndexManager indexManager : si.getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
 			indexManager.performStreamOperation( new FlushLuceneWork( null, typeId ), null, false );
-		}
-	}
-
-	@TearDown
-	public void shutdownIndexingEngine() throws IOException {
-		if ( si != null ) {
-			si.close();
 		}
 	}
 

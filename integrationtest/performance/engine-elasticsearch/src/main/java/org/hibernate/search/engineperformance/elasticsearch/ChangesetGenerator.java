@@ -54,7 +54,7 @@ public class ChangesetGenerator {
 	private BitSet consumedToUpdate;
 
 	@Setup(Level.Trial)
-	public void setup(EngineHolder eh, ThreadParams threadParams) {
+	public void setup(NonStreamWriteEngineHolder eh, ThreadParams threadParams) {
 		int initialIndexSize = eh.getInitialIndexSize();
 		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
 		int updatesPerChangeset = eh.getUpdatesPerChangeset();
