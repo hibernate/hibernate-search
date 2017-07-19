@@ -10,12 +10,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.stream.IntStream;
 
-import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.DatasetCreation;
-import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorCreation;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -68,9 +65,9 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	@Setup
 	public void initializeState() throws IOException, URISyntaxException {
-		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
+		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
-		SearchIntegratorCreation.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
+		SearchIntegratorHelper.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
 
 		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
 		addsDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );
@@ -103,12 +100,6 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	public int getQueryMaxResults() {
 		return maxResults;
-	}
-
-	public void flush(IndexedTypeIdentifier typeId) {
-		for ( IndexManager indexManager : si.getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
-			indexManager.performStreamOperation( new FlushLuceneWork( null, typeId ), null, false );
-		}
 	}
 
 	@TearDown

@@ -9,6 +9,7 @@ package org.hibernate.search.engineperformance.elasticsearch.setuputilities;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
@@ -16,14 +17,16 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
 import org.hibernate.search.engineperformance.elasticsearch.stub.BlackholeElasticsearchClientFactory;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 
-public class SearchIntegratorCreation {
+public class SearchIntegratorHelper {
 
-	private SearchIntegratorCreation() {
+	private SearchIntegratorHelper() {
 		//do not construct
 	}
 
@@ -62,7 +65,14 @@ public class SearchIntegratorCreation {
 		Indexer indexer = new Indexer( si, data );
 		idStream.forEach( indexer );
 		indexer.flush();
+		flush( si, BookEntity.TYPE_ID );
 		println( " ... added " + indexer.count + " entities to the index." );
+	}
+
+	public static void flush(SearchIntegrator si, IndexedTypeIdentifier typeId) {
+		for ( IndexManager indexManager : si.getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
+			indexManager.performStreamOperation( new FlushLuceneWork( null, typeId ), null, false );
+		}
 	}
 
 	private static class Indexer implements IntConsumer {

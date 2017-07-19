@@ -16,6 +16,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -52,7 +53,8 @@ public class NonStreamWriteJMHBenchmarks {
 	@Benchmark
 	@Threads(20)
 	public void write(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
-		Worker worker = eh.getSearchIntegrator().getWorker();
+		SearchIntegrator si = eh.getSearchIntegrator();
+		Worker worker = si.getWorker();
 		Dataset dataset = eh.getDataset();
 
 		changesetGenerator.stream().forEach( changeset -> {
@@ -76,7 +78,7 @@ public class NonStreamWriteJMHBenchmarks {
 		} );
 
 		// Ensure that we'll block until all works have been performed
-		eh.flush( BookEntity.TYPE_ID );
+		SearchIntegratorHelper.flush( si, BookEntity.TYPE_ID );
 	}
 
 	@Benchmark

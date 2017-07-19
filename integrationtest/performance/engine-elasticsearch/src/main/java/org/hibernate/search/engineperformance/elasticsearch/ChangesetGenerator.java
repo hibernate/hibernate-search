@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorCreation;
+import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.openjdk.jmh.annotations.Level;
@@ -88,7 +88,7 @@ public class ChangesetGenerator {
 			toUpdate.set( shuffledIds.get( i ) );
 		}
 
-		SearchIntegratorCreation.preindexEntities(
+		SearchIntegratorHelper.preindexEntities(
 				eh.getSearchIntegrator(),
 				eh.getDataset(),
 				IntStream.concat( toDelete.stream(), toUpdate.stream() )

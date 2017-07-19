@@ -10,12 +10,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.stream.IntStream;
 
-import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.DatasetCreation;
-import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorCreation;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
@@ -52,9 +49,9 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 	 */
 	@Setup(Level.Iteration)
 	public void initializeState() throws IOException, URISyntaxException {
-		si = SearchIntegratorCreation.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, null /* irrelevant */ );
+		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, null /* irrelevant */ );
 		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
-		SearchIntegratorCreation.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
+		SearchIntegratorHelper.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
 	}
 
 	@TearDown(Level.Iteration)
@@ -78,12 +75,6 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 
 	public int getStreamedAddsPerFlush() {
 		return streamedAddsPerFlush;
-	}
-
-	public void flush(IndexedTypeIdentifier typeId) {
-		for ( IndexManager indexManager : si.getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
-			indexManager.performStreamOperation( new FlushLuceneWork( null, typeId ), null, false );
-		}
 	}
 
 }
