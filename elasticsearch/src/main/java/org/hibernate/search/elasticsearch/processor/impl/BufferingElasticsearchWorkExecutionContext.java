@@ -18,7 +18,6 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
@@ -27,13 +26,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The execution context used in {@link ElasticsearchWorkProcessor}
- * when multiple works are executed one after another.
+ * when there's a need for indexing monitor buffering and dirty index refresh.
  * <p>
  * This context is mutable and is not thread-safe.
  *
  * @author Yoann Rodiere
  */
-class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContext {
+class BufferingElasticsearchWorkExecutionContext implements FlushableElasticsearchWorkExecutionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -55,7 +54,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final Set<URLEncodedString> dirtyIndexes = new HashSet<>();
 
-	public SequentialWorkExecutionContext(ElasticsearchClient client,
+	public BufferingElasticsearchWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkProcessor workProcessor,
 			ErrorHandler errorHandler) {
@@ -87,6 +86,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 		return bufferedIndexMonitors.computeIfAbsent( originalMonitor, BufferedIndexingMonitor::new );
 	}
 
+	@Override
 	public CompletableFuture<Void> flush() {
 		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
 
