@@ -24,23 +24,23 @@ import org.hibernate.search.util.impl.Futures;
  * Execution of works will not be performed by this class;
  * instead, it delegates to an "executor" passed to the constructor.
  * <p>
- * Works will be executed inside a sequence-scoped context (a {@link SequentialWorkExecutionContext}),
- * ultimately leading to a {@link SequentialWorkExecutionContext#flush()}.
+ * Works will be executed inside a sequence-scoped context (a {@link FlushableElasticsearchWorkExecutionContext}),
+ * ultimately leading to a {@link FlushableElasticsearchWorkExecutionContext#flush()}.
  */
 class DefaultElasticsearchWorkSequenceBuilder implements ElasticsearchWorkSequenceBuilder {
 
 	private final ElasticsearchWorkExecutor executor;
-	private final Supplier<SequentialWorkExecutionContext> contextSupplier;
+	private final Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier;
 	private final Supplier<ContextualErrorHandler> errorHandlerSupplier;
 	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
 	private CompletableFuture<Void> rootSequenceFuture;
 	private CompletableFuture<?> sequenceFuture;
-	private SequentialWorkExecutionContext executionContext;
+	private FlushableElasticsearchWorkExecutionContext executionContext;
 	private ContextualErrorHandler errorHandler;
 
 	public DefaultElasticsearchWorkSequenceBuilder(ElasticsearchWorkExecutor executor,
-			Supplier<SequentialWorkExecutionContext> contextSupplier,
+			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier,
 			Supplier<ContextualErrorHandler> errorHandlerSupplier) {
 		this.executor = executor;
 		this.contextSupplier = contextSupplier;
@@ -67,7 +67,7 @@ class DefaultElasticsearchWorkSequenceBuilder implements ElasticsearchWorkSequen
 	@Override
 	public <T> void addNonBulkExecution(ElasticsearchWork<T> work) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
-		final SequentialWorkExecutionContext context = this.executionContext;
+		final FlushableElasticsearchWorkExecutionContext context = this.executionContext;
 		this.sequenceFuture = chain( this.sequenceFuture, work, ignored -> executor.submit( work, context ) );
 	}
 
@@ -82,7 +82,7 @@ class DefaultElasticsearchWorkSequenceBuilder implements ElasticsearchWorkSequen
 	@Override
 	public CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends ElasticsearchWork<BulkResult>> workFuture) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
-		final SequentialWorkExecutionContext context = this.executionContext;
+		final FlushableElasticsearchWorkExecutionContext context = this.executionContext;
 		CompletableFuture<BulkResult> bulkWorkResultFuture =
 				// When the previous work completes successfully *and* the bulk work is available...
 				sequenceFuture.thenCombine( workFuture, (ignored, work) -> work )
@@ -95,7 +95,7 @@ class DefaultElasticsearchWorkSequenceBuilder implements ElasticsearchWorkSequen
 	@Override
 	public BulkResultExtractionStep startBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
-		final SequentialWorkExecutionContext context = this.executionContext;
+		final FlushableElasticsearchWorkExecutionContext context = this.executionContext;
 		CompletableFuture<BulkResultItemExtractor> extractorFuture =
 				bulkResultFuture.thenApply( bulkResult -> bulkResult.withContext( context ) );
 		bulkResultExtractionStep.init( extractorFuture );
@@ -105,7 +105,7 @@ class DefaultElasticsearchWorkSequenceBuilder implements ElasticsearchWorkSequen
 	@Override
 	public CompletableFuture<Void> build() {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
-		final SequentialWorkExecutionContext context = this.executionContext;
+		final FlushableElasticsearchWorkExecutionContext context = this.executionContext;
 		final ContextualErrorHandler errorHandler = this.errorHandler;
 		CompletableFuture<Void> futureWithFlush = Futures.whenCompleteExecute(
 						sequenceFuture,

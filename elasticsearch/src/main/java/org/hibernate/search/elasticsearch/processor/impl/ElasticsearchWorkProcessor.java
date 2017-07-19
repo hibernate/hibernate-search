@@ -55,7 +55,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		this.workFactory = workFactory;
 
 		this.parallelWorkExecutionContext =
-				new ParallelWorkExecutionContext( client, gsonProvider );
+				new ImmutableElasticsearchWorkExecutionContext( client, gsonProvider );
 		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator( () -> this.createSerialOrchestrator() );
 		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async non-stream work orchestrator", createSerialOrchestrator() );
 		this.streamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async stream work orchestrator", createParallelOrchestrator() );
@@ -196,7 +196,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder() {
 		return new DefaultElasticsearchWorkSequenceBuilder(
 				this::start,
-				() -> new SequentialWorkExecutionContext(
+				() -> new BufferingElasticsearchWorkExecutionContext(
 						client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler ),
 				() -> new DefaultContextualErrorHandler( errorHandler )
 				);

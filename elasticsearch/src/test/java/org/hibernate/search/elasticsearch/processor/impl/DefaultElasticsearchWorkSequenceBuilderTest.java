@@ -33,8 +33,8 @@ public class DefaultElasticsearchWorkSequenceBuilderTest {
 	private final List<Object> mocks = new ArrayList<>();
 
 	private ElasticsearchWorkExecutor executorMock;
-	private SequentialWorkExecutionContext contextMock;
-	private Supplier<SequentialWorkExecutionContext> contextSupplierMock;
+	private FlushableElasticsearchWorkExecutionContext contextMock;
+	private Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplierMock;
 	private ContextualErrorHandler errorHandlerMock;
 	private Supplier<ContextualErrorHandler> errorHandlerSupplierMock;
 
@@ -42,7 +42,7 @@ public class DefaultElasticsearchWorkSequenceBuilderTest {
 	@SuppressWarnings("unchecked")
 	public void initMocks() {
 		executorMock = EasyMock.createStrictMock( ElasticsearchWorkExecutor.class );
-		contextMock = EasyMock.createStrictMock( SequentialWorkExecutionContext.class );
+		contextMock = EasyMock.createStrictMock( FlushableElasticsearchWorkExecutionContext.class );
 		contextSupplierMock = EasyMock.createStrictMock( Supplier.class );
 		errorHandlerMock = EasyMock.createStrictMock( ContextualErrorHandler.class );
 		errorHandlerSupplierMock = EasyMock.createStrictMock( Supplier.class );
