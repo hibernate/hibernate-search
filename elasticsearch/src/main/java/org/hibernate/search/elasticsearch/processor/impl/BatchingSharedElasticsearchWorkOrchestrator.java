@@ -8,14 +8,15 @@ package org.hibernate.search.elasticsearch.processor.impl;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.impl.Futures;
@@ -39,16 +40,25 @@ class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOr
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final FlushableElasticsearchWorkOrchestrator delegate;
+	private final ErrorHandler errorHandler;
 
 	private final ScheduledExecutorService scheduler;
 	private final BlockingDeque<Changeset> changesetQueue;
 	private final AtomicBoolean processingScheduled;
 
-	private volatile CountDownLatch lastAsyncWorkLatch;
+	private final Phaser phaser = new Phaser() {
+		@Override
+		protected boolean onAdvance(int phase, int registeredParties) {
+			// This phaser never terminates on its own, allowing re-use
+			return false;
+		}
+	};
 
 	public BatchingSharedElasticsearchWorkOrchestrator(String name,
-			FlushableElasticsearchWorkOrchestrator delegate) {
+			FlushableElasticsearchWorkOrchestrator delegate,
+			ErrorHandler errorHandler) {
 		this.delegate = delegate;
+		this.errorHandler = errorHandler;
 		changesetQueue = new LinkedBlockingDeque<>();
 		scheduler = Executors.newScheduledThreadPool( name );
 		processingScheduled = new AtomicBoolean( false );
@@ -65,29 +75,66 @@ class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOr
 	private void ensureProcessingScheduled() {
 		// Set up worker if needed
 		if ( !processingScheduled.get() ) {
-			synchronized ( this ) {
+			/*
+			 * Register to the phaser exactly here:
+			 *  * registering after scheduling would mean running the risk
+			 *  of finishing the work processing before we even registered to the phaser,
+			 *  likely resulting in an exception when de-registering from the phaser;
+			 *  * registering after compareAndSet would mean running the risk
+			 *  of another thread calling this method just after we called compareAndSet,
+			 *  then moving on to a call to awaitCompletion() before we had the chance to
+			 *  register to the phaser. This other thread would thus believe that the submitted
+			 *  work was executed while in fact it wasn't.
+			 */
+			phaser.register();
+			try {
 				if ( processingScheduled.compareAndSet( false, true ) ) {
-					CountDownLatch latch = new CountDownLatch( 1 );
 					try {
-						scheduler.schedule( () -> processChangesets( latch ), 100, TimeUnit.MILLISECONDS );
-						//only assign this when the job was successfully scheduled:
-						lastAsyncWorkLatch = latch;
+						scheduler.schedule( this::processChangesets, 100, TimeUnit.MILLISECONDS );
 					}
-					catch (Exception e) {
-						// Make sure a failure to setup the worker doesn't leave other threads waiting indefinitely:
-						processingScheduled.set( false );
-						latch.countDown();
+					catch (Throwable e) {
+						/*
+						 * Make sure a failure to schedule the processing
+						 * doesn't leave other threads waiting indefinitely
+						 */
+						try {
+							processingScheduled.set( false );
+						}
+						catch (Throwable e2) {
+							e.addSuppressed( e2 );
+						}
 						throw e;
 					}
 				}
+				else {
+					/*
+					 * Corner case: another thread scheduled processing
+					 * just after we registered the phaser.
+					 * Cancel our own registration.
+					 */
+					phaser.arriveAndDeregister();
+				}
+			}
+			catch (Throwable e) {
+				/*
+				 * Make sure a failure to schedule the processing
+				 * doesn't leave other threads waiting indefinitely
+				 */
+				try {
+					phaser.arriveAndDeregister();
+				}
+				catch (Throwable e2) {
+					e.addSuppressed( e2 );
+				}
+				throw e;
 			}
 		}
 	}
 
 	public void awaitCompletion() throws InterruptedException {
-		final CountDownLatch localLatch = lastAsyncWorkLatch;
-		if ( localLatch != null ) {
-			localLatch.await();
+		int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
+		if ( phaser.getUnarrivedParties() > 0 ) {
+			phaser.awaitAdvanceInterruptibly( phaseBeforeUnarrivedPartiesCheck );
 		}
 	}
 
@@ -97,29 +144,27 @@ class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOr
 			closer.push( () -> {
 				scheduler.shutdown();
 				try {
-					scheduler.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
+					awaitCompletion();
 				}
 				catch (InterruptedException e) {
 					LOG.interruptedWhileWaitingForIndexActivity( e );
 					Thread.currentThread().interrupt();
 				}
 			} );
-			final CountDownLatch localLatch = lastAsyncWorkLatch;
-			if ( localLatch != null ) {
-				//It's possible that a task was successfully scheduled but had no chance to run,
-				//so we need to release waiting threads:
-				closer.push( localLatch::countDown );
-			}
+			//It's possible that a task was successfully scheduled but had no chance to run,
+			//so we need to release waiting threads:
+			closer.push( phaser::forceTermination );
 		}
 	}
 
 	/**
 	 * Takes changesets from the queue and processes them.
 	 */
-	private void processChangesets(CountDownLatch latch) {
+	private void processChangesets() {
 		try {
-			synchronized ( this ) {
-				try {
+			CompletableFuture<?> future;
+			try {
+				synchronized ( delegate ) {
 					delegate.reset();
 
 					for ( Changeset changeset = changesetQueue.poll();
@@ -134,21 +179,62 @@ class BatchingSharedElasticsearchWorkOrchestrator implements ElasticsearchWorkOr
 							throw e;
 						}
 					}
-				}
-				finally {
-					// Allow other async processors to be setup
-					processingScheduled.set( false );
-				}
 
-				// Nothing more to do, flush and terminate
-				CompletableFuture<?> future = delegate.flush();
-
-				// Note: timeout is handled by the client, so this "join" will not last forever
-				future.join();
+					// Nothing more to do, flush and terminate
+					future = delegate.flush();
+				}
 			}
+			finally {
+				try {
+					/*
+					 * Allow processing to be scheduled immediately,
+					 * even if we didn't finish executing yet (see the join below).
+					 * This won't lead to concurrent processing,
+					 * since there's only one thread in the pool,
+					 * but it will make sure the processing delay runs from one
+					 * queue drain to the next, instead of from one batch to
+					 * the next, allowing higher throughput when batches take more
+					 * than 100ms to process.
+					 */
+					processingScheduled.set( false );
+
+					/*
+					 * Just in case changesets were added to the queue between
+					 * when we last checked the queue and the resetting of
+					 * processingScheduled above.
+					 * This must be executed before we arrive at the phaser to ensure that
+					 * threads calling submit(), then awaitCompletion() will not be unblocked
+					 * before we called ensureProcessingScheduled() below.
+					 */
+					if ( !changesetQueue.isEmpty() ) {
+						ensureProcessingScheduled();
+					}
+				}
+				catch (Throwable e) {
+					errorHandler.handleException(
+							"Error while ensuring the next submitted asynchronous Elasticsearch works will be processed",
+							e );
+				}
+			}
+
+			// Note: timeout is handled by the client, so this "join" will not last forever
+			future.join();
+		}
+		catch (Throwable e) {
+			errorHandler.handleException( "Error while processing Elasticsearch works", e );
 		}
 		finally {
-			latch.countDown();
+			/*
+			 * Regardless of the outcome (exception or not),
+			 * arrive at the phaser after all the works completed.
+			 * Note that all works have a timeout, so this will be executed eventually.
+			 *
+			 * Also note this must be executed *after* the finally block above,
+			 * so we are sure we won't arrive at the phaser before ensuring we're not
+			 * in a situation where no processing is scheduled even though
+			 * the queue is not empty.
+			 */
+			phaser.arriveAndDeregister();
 		}
 	}
 
