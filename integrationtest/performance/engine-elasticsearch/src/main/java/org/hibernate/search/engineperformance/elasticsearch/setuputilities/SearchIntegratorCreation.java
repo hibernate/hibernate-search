@@ -34,7 +34,7 @@ public class SearchIntegratorCreation {
 		cfg.addProperty( "hibernate.search.default.elasticsearch.required_index_status", "yellow" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.index_schema_management_strategy", "drop-and-create-and-drop" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.refresh_after_write", String.valueOf( refreshAfterWrite ) );
-		cfg.addProperty( "hibernate.search.default.worker.execution", workerExecution );
+		addIfNonNull( cfg, "hibernate.search.default.worker.execution", workerExecution );
 
 		if ( "default".equals( client ) ) {
 			cfg.addProperty( "hibernate.search.default.elasticsearch.host", connectionInfo.getHost() );

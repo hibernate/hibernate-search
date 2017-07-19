@@ -19,7 +19,7 @@ node ('AWS&&Slave') {
 					" -jar integrationtest/performance/engine-elasticsearch/target/benchmarks.jar " +
 					" -wi 1 -i 10" +
 					" -rff output/elasticsearch-benchmark-results.csv" +
-					" -p indexSize=1000 -p maxResults=100 -p changesetsPerFlush=100"
+					" -p indexSize=1000 -p maxResults=100 -p changesetsPerFlush=100 -p streamedAddsPerFlush=10000"
 		}
 		archiveArtifacts artifacts: 'output/*'
 	}

@@ -13,6 +13,8 @@ import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
@@ -27,6 +29,8 @@ import org.hibernate.search.annotations.Field;
 		@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
 				@Parameter(name = "language", value = "English") }) })
 public class BookEntity {
+
+	public static final IndexedTypeIdentifier TYPE_ID = new PojoIndexedTypeIdentifier( BookEntity.class );
 
 	private Long id;
 	private String title;

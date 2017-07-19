@@ -18,9 +18,7 @@ import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -29,8 +27,15 @@ import org.openjdk.jmh.annotations.GroupThreads;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.infra.Blackhole;
 
+/**
+ * JMH benchmarks for non-stream work execution,
+ * which is primarily used when doing CRUD operations on the database
+ * in the ORM integration.
+ *
+ * @author Yoann Rodiere
+ */
 /*
- * Write methods already performs multiple operations,
+ * Write methods already perform multiple operations,
  * so we could simply run those once,
  * but we don't have individual control over how many times
  * each method is run, and in the concurrent test we want the
@@ -42,13 +47,11 @@ import org.openjdk.jmh.infra.Blackhole;
  * (which are the only meaningful counters).
  */
 @Fork(1)
-public class JMHBenchmarks {
-
-	private static final IndexedTypeIdentifier BOOK_TYPE = new PojoIndexedTypeIdentifier( BookEntity.class );
+public class NonStreamWriteJMHBenchmarks {
 
 	@Benchmark
 	@Threads(20)
-	public void write(EngineHolder eh, ChangesetGenerator changesetGenerator, WriteCounters counters) {
+	public void write(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
 		Worker worker = eh.getSearchIntegrator().getWorker();
 		Dataset dataset = eh.getDataset();
 
@@ -65,7 +68,7 @@ public class JMHBenchmarks {
 						worker.performWork( work, tc );
 					});
 			changeset.toDelete().forEach( id -> {
-						Work work = new Work( BOOK_TYPE, id, WorkType.DELETE );
+						Work work = new Work( BookEntity.TYPE_ID, id, WorkType.DELETE );
 						worker.performWork( work, tc );
 					});
 			tc.end();
@@ -73,12 +76,12 @@ public class JMHBenchmarks {
 		} );
 
 		// Ensure that we'll block until all works have been performed
-		eh.flush( BOOK_TYPE );
+		eh.flush( BookEntity.TYPE_ID );
 	}
 
 	@Benchmark
 	@Threads(20)
-	public void queryBooksByBestRating(EngineHolder eh, Blackhole bh) {
+	public void queryBooksByBestRating(NonStreamWriteEngineHolder eh, Blackhole bh) {
 		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
 		Query luceneQuery = searchIntegrator.buildQueryBuilder()
 				.forEntity( BookEntity.class )
@@ -100,14 +103,14 @@ public class JMHBenchmarks {
 	@Benchmark
 	@GroupThreads(5)
 	@Group("concurrentReadWriteTest")
-	public void readWriteTestWriter(EngineHolder eh, ChangesetGenerator changesetGenerator, WriteCounters counters) {
+	public void readWriteTestWriter(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
 		write( eh, changesetGenerator, counters );
 	}
 
 	@Benchmark
 	@GroupThreads(5)
 	@Group("concurrentReadWriteTest")
-	public void readWriteTestReader(EngineHolder eh, Blackhole bh) {
+	public void readWriteTestReader(NonStreamWriteEngineHolder eh, Blackhole bh) {
 		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
 		Query luceneQuery = searchIntegrator.buildQueryBuilder()
 				.forEntity( BookEntity.class )
