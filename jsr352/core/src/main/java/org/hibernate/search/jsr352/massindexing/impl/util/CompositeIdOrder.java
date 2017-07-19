@@ -102,9 +102,9 @@ public class CompositeIdOrder implements IdOrder {
 
 	private Criterion restrictLexicographically(BiFunction<String, Object, SimpleExpression> strictOperator, Object idObj, boolean orEquals) {
 		int propertyPathsSize = propertyPaths.size();
-		int experessionsInOr = propertyPathsSize + ( orEquals ? 1 : 0 );
+		int expressionsInOr = propertyPathsSize + ( orEquals ? 1 : 0 );
 
-		Criterion[] or = new Criterion[experessionsInOr];
+		Criterion[] or = new Criterion[expressionsInOr];
 
 		for ( int i = 0; i < propertyPathsSize; i++ ) {
 			// Group expressions together in a single conjunction (A and B and C...).
@@ -116,7 +116,7 @@ public class CompositeIdOrder implements IdOrder {
 				Object val = getPropertyValue( idObj, j );
 				and[j] = Restrictions.eq( path, val );
 			}
-			// The last expression has whatever symbol is defined by "lastRestriction"
+			// The last expression has whatever symbol is defined by "strictOperator"
 			String path = propertyPaths.get( j );
 			Object val = getPropertyValue( idObj, j );
 			and[j] = strictOperator.apply( path, val );
