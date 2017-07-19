@@ -56,9 +56,37 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		this.parallelWorkExecutionContext =
 				new ImmutableElasticsearchWorkExecutionContext( client, gsonProvider );
-		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator( () -> this.createSerialOrchestrator() );
-		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async non-stream work orchestrator", createSerialOrchestrator() );
-		this.streamOrchestrator = createBatchingSharedOrchestrator( "Elasticsearch async stream work orchestrator", createParallelOrchestrator() );
+
+		/*
+		 * The following orchestrators require a strict execution ordering,
+		 * because subsequent changesets may be inter-dependent (an addition in one changeset
+		 * followed by a deletion in the next, for instance).
+		 * To make sure we apply works in order, we use serial orchestrators.
+		 * Also, since works are applied in order, refreshing the index after changesets
+		 * is actually an option, so we use refreshing execution contexts.
+		 * In order to reduce the cost of those refreshes, we try to batch together
+		 * refreshes for works bulked in the same API call. Non-bulked works will have
+		 * their refresh executed at the end of each changeset.
+		 */
+		// TODO ensure synchronous works from different threads are executed in order, too
+		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator(
+				() -> this.createSerialOrchestrator( this::createRefreshingWorkExecutionContext, true ) );
+		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator(
+				"Elasticsearch async non-stream work orchestrator",
+				createSerialOrchestrator( this::createRefreshingWorkExecutionContext, true ) );
+
+		/*
+		 * The following orchestrator doesn't require a strict execution ordering
+		 * (because it's mainly used by the mass indexer, which already takes care of
+		 * ordering works properly and waiting for pending works when necessary).
+		 * Thus we use a parallel orchestrator to maximize throughput.
+		 * Also, since works are not applied in order, and since API users have no way
+		 * to determine whether a work finished or not, explicit refreshes are useless,
+		 * so we disable refreshes both in the bulk API call and in the execution contexts.
+		 */
+		this.streamOrchestrator = createBatchingSharedOrchestrator(
+				"Elasticsearch async stream work orchestrator",
+				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, false ) );
 	}
 
 	@Override
@@ -181,23 +209,24 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return new BatchingSharedElasticsearchWorkOrchestrator( name, delegate, errorHandler );
 	}
 
-	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator() {
-		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, true );
+	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator(
+			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, boolean refreshInBulkAPICall) {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
 		return new SerialChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
-	private FlushableElasticsearchWorkOrchestrator createParallelOrchestrator() {
-		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder();
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, false );
+	private FlushableElasticsearchWorkOrchestrator createParallelOrchestrator(
+			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, boolean refreshInBulkAPICall) {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
 		return new ParallelChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchWorkSequenceBuilder createSequenceBuilder() {
+	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier) {
 		return new DefaultElasticsearchWorkSequenceBuilder(
 				this::start,
-				() -> new BufferingElasticsearchWorkExecutionContext(
-						client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler ),
+				contextSupplier,
 				() -> new DefaultContextualErrorHandler( errorHandler )
 				);
 	}
@@ -207,6 +236,15 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 				sequenceBuilder,
 				worksToBulk -> workFactory.bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build()
 				);
+	}
+
+	private FlushableElasticsearchWorkExecutionContext createIndexMonitorBufferingWorkExecutionContext() {
+		return new IndexMonitorBufferingElasticsearchWorkExecutionContext( client, gsonProvider, errorHandler );
+	}
+
+	private FlushableElasticsearchWorkExecutionContext createRefreshingWorkExecutionContext() {
+		return new RefreshingElasticsearchWorkExecutionContext(
+				client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
 	}
 
 }
