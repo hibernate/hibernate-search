@@ -36,6 +36,7 @@ public class Launcher {
 			.param( "maxResults", "10" )
 			.param( "worksPerChangeset", "2;4" )
 			.param( "changesetsPerFlush", "50" )
+			.param( "streamedAddsPerFlush", "300" )
 			.forks( 0 ) //To simplify debugging; Remember this implies JVM parameters via @Fork won't be applied.
 			.build();
 

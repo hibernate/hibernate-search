@@ -16,6 +16,7 @@ import org.hibernate.search.engine.impl.SimpleInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -60,7 +61,7 @@ public class StreamWriteJMHBenchmarks {
 		} );
 
 		// Ensure that we'll block until all works have been performed
-		eh.flush( BookEntity.TYPE_ID );
+		SearchIntegratorHelper.flush( si, BookEntity.TYPE_ID );
 	}
 
 }
