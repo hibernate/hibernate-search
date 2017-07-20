@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
@@ -101,6 +102,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private ElasticsearchService elasticsearchService;
 	private ElasticsearchIndexWorkVisitor visitor;
 	private ElasticsearchWorkProcessor workProcessor;
+	private BarrierElasticsearchWorkOrchestrator streamOrchestrator;
 
 	// Lifecycle
 
@@ -152,6 +154,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				elasticsearchService.getWorkFactory()
 		);
 		this.workProcessor = elasticsearchService.getWorkProcessor();
+
+		this.streamOrchestrator = workProcessor.createNonStreamOrchestrator( indexName, sync, refreshAfterWrite );
 	}
 
 	/**
@@ -224,8 +228,14 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void destroy() {
-		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
-			elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
+		try {
+			awaitCompletion( streamOrchestrator );
+			if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
+				elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
+			}
+		}
+		finally {
+			streamOrchestrator.close();
 		}
 
 		workProcessor = null;
@@ -416,8 +426,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		ElasticsearchWork<?> flushWork = elasticsearchService.getWorkFactory().flush()
 				.index( actualIndexName )
 				.build();
-		awaitAsyncProcessingCompletion();
-		workProcessor.getSyncNonStreamOrchestrator()
+		awaitCompletion( streamOrchestrator );
+		awaitCompletion( workProcessor.getStreamOrchestrator() );
+		streamOrchestrator
 				.submit( flushWork )
 				.join();
 	}
@@ -425,10 +436,6 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	@Override
 	public String getActualIndexName() {
 		return actualIndexName.original;
-	}
-
-	public boolean needsRefreshAfterWrite() {
-		return refreshAfterWrite;
 	}
 
 	// Runtime ops
@@ -440,14 +447,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			elasticsearchWorks.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
 		}
 
+		CompletableFuture<?> future = streamOrchestrator.submit( elasticsearchWorks );
 		if ( sync ) {
-			workProcessor.getSyncNonStreamOrchestrator()
-					.submit( elasticsearchWorks )
-					.join();
-		}
-		else {
-			workProcessor.getAsyncNonStreamOrchestrator()
-					.submit( elasticsearchWorks );
+			future.join();
 		}
 	}
 
@@ -456,7 +458,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
 			awaitAsyncProcessingCompletion();
-			workProcessor.getSyncNonStreamOrchestrator()
+			workProcessor.getStreamOrchestrator()
 					.submit( elasticsearchWork )
 					.join();
 		}
@@ -468,7 +470,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void awaitAsyncProcessingCompletion() {
-		awaitCompletion( workProcessor.getAsyncNonStreamOrchestrator() );
+		if ( !sync ) {
+			awaitCompletion( streamOrchestrator );
+		}
 		awaitCompletion( workProcessor.getStreamOrchestrator() );
 	}
 
