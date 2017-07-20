@@ -15,8 +15,11 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -27,6 +30,7 @@ import org.openjdk.jmh.infra.ThreadParams;
 
 /**
  * Holds the list of documents currently present in the index
+ * and generates changesets accordingly.
  * <p>
  * Note that we cannot reuse IDs during an iteration, for instance
  * adding a document for an ID that just got deleted,
@@ -53,14 +57,18 @@ public class ChangesetGenerator {
 	private BitSet toUpdate;
 	private BitSet consumedToUpdate;
 
+	private Dataset<? extends AbstractBookEntity> dataset;
+
 	@Setup(Level.Trial)
-	public void setup(NonStreamWriteEngineHolder eh, ThreadParams threadParams) {
+	public void setup(NonStreamWriteEngineHolder eh, NonStreamDatasetHolder dh, ThreadParams threadParams) {
 		int initialIndexSize = eh.getInitialIndexSize();
 		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
 		int updatesPerChangeset = eh.getUpdatesPerChangeset();
 		changesets = eh.getChangesetsPerFlush();
 
-		int threadIndex = threadParams.getSubgroupThreadIndex();
+		int threadIndex = threadParams.getThreadIndex();
+
+		dataset = dh.getDataset( threadIndex );
 
 		addDeletesPerInvocation = changesets * addDeletesPerChangeset;
 		updatesPerInvocation = changesets * updatesPerChangeset;
@@ -90,7 +98,7 @@ public class ChangesetGenerator {
 
 		SearchIntegratorHelper.preindexEntities(
 				eh.getSearchIntegrator(),
-				eh.getDataset(),
+				dataset,
 				IntStream.concat( toDelete.stream(), toUpdate.stream() )
 				);
 	}
@@ -140,21 +148,21 @@ public class ChangesetGenerator {
 		consumedToUpdate.clear();
 	}
 
-	public static class Changeset {
+	public class Changeset {
 		private final List<Integer> toAdd = new ArrayList<>();
 		private final List<Integer> toDelete = new ArrayList<>();
 		private final List<Integer> toUpdate = new ArrayList<>();
 
-		public Iterable<Integer> toAdd() {
-			return toAdd;
+		public Stream<AbstractBookEntity> toAdd() {
+			return toAdd.stream().map( dataset::create );
 		}
 
-		public Iterable<Integer> toDelete() {
-			return toDelete;
+		public Stream<Integer> toDelete() {
+			return toDelete.stream();
 		}
 
-		public Iterable<Integer> toUpdate() {
-			return toUpdate;
+		public Stream<AbstractBookEntity> toUpdate() {
+			return toUpdate.stream().map( dataset::create );
 		}
 	}
 
@@ -167,6 +175,10 @@ public class ChangesetGenerator {
 		Changeset sample = new Changeset();
 		consume( sample );
 		return Stream.iterate( sample, this::consume ).limit( changesets );
+	}
+
+	public IndexedTypeIdentifier getTypeId() {
+		return dataset.getTypeId();
 	}
 
 	private Changeset consume(Changeset target) {

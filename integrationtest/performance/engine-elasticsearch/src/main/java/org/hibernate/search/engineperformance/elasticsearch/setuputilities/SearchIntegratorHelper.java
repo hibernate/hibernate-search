@@ -15,7 +15,10 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity1;
+import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity2;
+import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity3;
 import org.hibernate.search.engineperformance.elasticsearch.stub.BlackholeElasticsearchClientFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
@@ -55,17 +58,20 @@ public class SearchIntegratorHelper {
 			throw new IllegalArgumentException( "Illegal value for parameter 'client': '" + client + "'." );
 		}
 
-		cfg.addClass( BookEntity.class );
+		cfg.addClass( BookEntity1.class );
+		cfg.addClass( BookEntity2.class );
+		cfg.addClass( BookEntity3.class );
 
 		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
-	public static void preindexEntities(SearchIntegrator si, Dataset data, IntStream idStream) {
+	public static void preindexEntities(SearchIntegrator si, Dataset<? extends AbstractBookEntity> dataset,
+			IntStream idStream) {
 		println( "Starting entity pre-indexing..." );
-		Indexer indexer = new Indexer( si, data );
+		Indexer indexer = new Indexer( si, dataset );
 		idStream.forEach( indexer );
 		indexer.flush();
-		flush( si, BookEntity.TYPE_ID );
+		flush( si, dataset.getTypeId() );
 		println( " ... added " + indexer.count + " entities to the index." );
 	}
 
@@ -77,20 +83,20 @@ public class SearchIntegratorHelper {
 
 	private static class Indexer implements IntConsumer {
 		private final Worker worker;
-		private final Dataset data;
+		private final Dataset<? extends AbstractBookEntity> dataset;
 		private TransactionContextForTest tc = new TransactionContextForTest();
 		private boolean needsFlush = false;
 		private int count = 0;
 
-		public Indexer(SearchIntegrator si, Dataset data) {
+		public Indexer(SearchIntegrator si, Dataset<? extends AbstractBookEntity> data) {
 			this.worker = si.getWorker();
-			this.data = data;
+			this.dataset = data;
 		}
 
 		@Override
 		public void accept(int id) {
-			BookEntity book = data.create( id );
-			Work work = new Work( book, book.getId(), WorkType.ADD, false );
+			AbstractBookEntity book = dataset.create( id );
+			Work work = new Work( book, id, WorkType.ADD, false );
 			worker.performWork( work, tc );
 			needsFlush = true;
 			++count;

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.engineperformance.elasticsearch.datasets;
 
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
-public interface Dataset {
+public interface Dataset<T> {
 
-	BookEntity create(int id);
+	T create(int id);
+
+	IndexedTypeIdentifier getTypeId();
 
 }

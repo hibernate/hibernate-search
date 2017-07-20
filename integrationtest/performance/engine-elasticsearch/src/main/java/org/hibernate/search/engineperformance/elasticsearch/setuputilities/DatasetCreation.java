@@ -18,11 +18,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engineperformance.elasticsearch.datasets.ConstantTextDataset;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.TextSampleDataset;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.TextSampleDataset.TextSample;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 public class DatasetCreation {
 
@@ -39,13 +42,15 @@ public class DatasetCreation {
 		//do not construct
 	}
 
-	public static Dataset createDataset(String name, Path cacheDirectory) throws IOException, URISyntaxException {
+	public static <T extends AbstractBookEntity> Dataset<T> createDataset(Supplier<T> constructor, IndexedTypeIdentifier typeId,
+			String name, Path cacheDirectory)
+			throws IOException, URISyntaxException {
 		switch ( name ) {
 			case "constant-text":
-				return new ConstantTextDataset();
+				return new ConstantTextDataset<T>( constructor, typeId );
 			case "hibernate-dev-ml-2016-01":
 				Path path = fetch( name, HIBERNATE_DEV_MAILING_LIST_URI, cacheDirectory );
-				return parseMailingListDigest( path );
+				return new TextSampleDataset<>( constructor, typeId, parseMailingListDigest( path ) );
 			default:
 				throw new IllegalArgumentException( "Unknown dataset: " + name );
 		}
@@ -70,10 +75,9 @@ public class DatasetCreation {
 		return outputPath;
 	}
 
-	private static Dataset parseMailingListDigest(Path path) throws IOException {
+	private static List<TextSample> parseMailingListDigest(Path path) throws IOException {
 		try ( BufferedReader reader = Files.newBufferedReader( path ) ) {
-			List<TextSample> samples = new MailingListDigestParser( reader ).parse();
-			return new TextSampleDataset( samples );
+			return new MailingListDigestParser( reader ).parse();
 		}
 	}
 
