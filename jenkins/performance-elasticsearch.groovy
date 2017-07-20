@@ -4,7 +4,7 @@ node ('AWS&&Slave') {
 	}
 	
 	stage ('Build') {
-		sh "mvn clean package" +
+		sh "mvn clean install" +
 				" -U -am -pl :hibernate-search-performance-engine-elasticsearch" +
 				" -DskipTests -Dtest.elasticsearch.host.provided=true"
 	}
