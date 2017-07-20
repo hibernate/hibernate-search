@@ -39,6 +39,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private final int delayMs;
 	private final FlushableElasticsearchWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
 
@@ -54,9 +55,18 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 		}
 	};
 
-	public BatchingSharedElasticsearchWorkOrchestrator(String name,
+	/**
+	 * @param name The name of the orchestrator thread
+	 * @param delayMs A delay before creating a batch when a work is submitted.
+	 * Higher values mean bigger batch sizes, but higher latency.
+	 * @param delegate A delegate orchestrator. May not be thread-safe.
+	 * @param errorHandler An error handler to send orchestration errors to.
+	 */
+	public BatchingSharedElasticsearchWorkOrchestrator(
+			String name, int delayMs,
 			FlushableElasticsearchWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
+		this.delayMs = delayMs;
 		this.delegate = delegate;
 		this.errorHandler = errorHandler;
 		changesetQueue = new LinkedBlockingDeque<>();
@@ -90,7 +100,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			try {
 				if ( processingScheduled.compareAndSet( false, true ) ) {
 					try {
-						scheduler.schedule( this::processChangesets, 100, TimeUnit.MILLISECONDS );
+						scheduler.schedule( this::processChangesets, delayMs, TimeUnit.MILLISECONDS );
 					}
 					catch (Throwable e) {
 						/*
