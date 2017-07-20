@@ -32,15 +32,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * jobOperator.start(
  * 		MassIndexingJob.NAME,
  * 		MassIndexingJob.parameters()
- * 			.forEntities( String.class, Integer.class )
- * 			.fetchSize( 1000 )
- * 			.rowsPerPartition( 10_000 )
- * 			.maxResults( 1000 )
- * 			.maxThreads( 30 )
- * 			.purgeAtStart( true )
+ * 			.forEntities( EntityA.class, EntityB.class )
  * 			.build()
  * );
  * </pre></code>
+ *
+ * You can also add optional parameters to tune your job execution. See our
+ * documentation for more detail.
  *
  * @author Mincong Huang
  */
