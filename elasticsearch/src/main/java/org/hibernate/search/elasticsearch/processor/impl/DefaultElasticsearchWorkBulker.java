@@ -19,23 +19,33 @@ import org.hibernate.search.exception.AssertionFailure;
 
 class DefaultElasticsearchWorkBulker implements ElasticsearchWorkBulker {
 
-	/**
-	 * Maximum number of requests sent in a single bulk. Could be made an option if needed.
-	 */
-	static final int MAX_BULK_SIZE = 250;
-
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
 	private final Function<List<BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory;
+	private final int minBulkSize;
+	private final int maxBulkSize;
 
 	private final List<BulkableElasticsearchWork<?>> currentBulkWorks;
 	private int currentBulkFirstUnflushedWork;
 	private CompletableFuture<ElasticsearchWork<BulkResult>> currentBulkWorkFuture;
 	private CompletableFuture<BulkResult> currentBulkResultFuture;
 
+	/**
+	 * @param sequenceBuilder The sequence builder to send flushed works to
+	 * @param bulkWorkFactory The factory for bulk works
+	 * @param minBulkSize Minimum number of works in a single bulk.
+	 * If a {@link #flushBulked() flush of bulked works} is requested before
+	 * this threshold has been reached, works will not be bulked.
+	 * @param maxBulkSize Maximum number of works in a single bulk.
+	 * If a bulk reaches this size, it will be automatically {@link #flushBulk() flushed}
+	 * to the underlying sequence builder.
+	 */
 	public DefaultElasticsearchWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
-			Function<List<BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory) {
+			Function<List<BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory,
+			int minBulkSize, int maxBulkSize) {
 		this.sequenceBuilder = sequenceBuilder;
 		this.bulkWorkFactory = bulkWorkFactory;
+		this.minBulkSize = minBulkSize;
+		this.maxBulkSize = maxBulkSize;
 
 		this.currentBulkWorks = new ArrayList<>();
 		this.currentBulkFirstUnflushedWork = 0;
@@ -46,7 +56,7 @@ class DefaultElasticsearchWorkBulker implements ElasticsearchWorkBulker {
 	@Override
 	public void add(BulkableElasticsearchWork<?> work) {
 		currentBulkWorks.add( work );
-		if ( currentBulkWorks.size() >= MAX_BULK_SIZE ) {
+		if ( currentBulkWorks.size() >= maxBulkSize ) {
 			flushBulked();
 			flushBulk();
 		}
@@ -59,14 +69,15 @@ class DefaultElasticsearchWorkBulker implements ElasticsearchWorkBulker {
 			// No work to flush
 			return false;
 		}
-		else if ( currentBulkWorksSize == 1 ) {
+		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstUnflushedWork == 0 ) {
 			/*
-			 * Only one work in the bulk, and it hasn't been flushed yet.
-			 * We'll just flush it without bulking it,
-			 * and start a new bulk, to avoid single-element bulks.
+			 * Not enough works in the bulk, and no work has been flushed yet.
+			 * We'll just flush the works without bulking them,
+			 * and start a new bulk.
 			 */
-			ElasticsearchWork<?> work = currentBulkWorks.iterator().next();
-			sequenceBuilder.addNonBulkExecution( work );
+			for ( ElasticsearchWork<?> work : currentBulkWorks ) {
+				sequenceBuilder.addNonBulkExecution( work );
+			}
 			reset();
 			return false;
 		}
