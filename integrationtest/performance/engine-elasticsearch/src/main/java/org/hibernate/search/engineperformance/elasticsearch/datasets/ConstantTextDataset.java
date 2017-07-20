@@ -6,18 +6,36 @@
  */
 package org.hibernate.search.engineperformance.elasticsearch.datasets;
 
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import java.util.function.Supplier;
 
-public class ConstantTextDataset implements Dataset {
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+
+public class ConstantTextDataset<T extends AbstractBookEntity> implements Dataset<T> {
+
+	private final Supplier<T> constructor;
+
+	private final IndexedTypeIdentifier typeId;
+
+	public ConstantTextDataset(Supplier<T> constructor, IndexedTypeIdentifier typeId) {
+		super();
+		this.constructor = constructor;
+		this.typeId = typeId;
+	}
 
 	@Override
-	public BookEntity create(int id) {
-		BookEntity book = new BookEntity();
+	public T create(int id) {
+		T book = constructor.get();
 		book.setId( (long) id );
 		book.setText( "Some very long text should be stored here. No, I mean long as in a book." );
 		book.setTitle( "Naaa" );
 		book.setRating( DatasetUtils.intToFloat( id ) );
 		return book;
+	}
+
+	@Override
+	public IndexedTypeIdentifier getTypeId() {
+		return typeId;
 	}
 
 }

@@ -10,35 +10,48 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
-public final class TextSampleDataset implements Dataset {
+public final class TextSampleDataset<T extends AbstractBookEntity> implements Dataset<T> {
+
+	private final Supplier<T> constructor;
+
+	private final IndexedTypeIdentifier typeId;
 
 	private final List<TextSample> samples;
 
 	private final int size;
 
-	public TextSampleDataset(Collection<TextSample> samples) {
+	public TextSampleDataset(Supplier<T> constructor, IndexedTypeIdentifier typeId, Collection<TextSample> samples) {
 		super();
+		this.constructor = constructor;
+		this.typeId = typeId;
 		this.samples = new ArrayList<>( samples );
 		this.size = this.samples.size();
 	}
 
 	@Override
-	public BookEntity create(int id) {
+	public T create(int id) {
 		/*
 		 * Choose samples randomly, so that updates actually change
 		 * indexed data most of the time.
 		 */
 		int sampleIndex = ThreadLocalRandom.current().nextInt( 0, size );
 		TextSample sample = samples.get( sampleIndex );
-		BookEntity entity = new BookEntity();
+		T entity = constructor.get();
 		entity.setId( (long) id );
 		entity.setTitle( sample.title );
 		entity.setText( sample.text );
 		entity.setRating( DatasetUtils.intToFloat( id ) );
 		return entity;
+	}
+
+	@Override
+	public IndexedTypeIdentifier getTypeId() {
+		return typeId;
 	}
 
 	public static class TextSample {

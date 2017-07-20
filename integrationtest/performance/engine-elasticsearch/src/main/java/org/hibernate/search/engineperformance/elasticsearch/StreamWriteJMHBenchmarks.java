@@ -14,9 +14,9 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.SimpleInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -34,19 +34,19 @@ import org.openjdk.jmh.infra.Blackhole;
 public class StreamWriteJMHBenchmarks {
 
 	@Benchmark
-	@GroupThreads(10)
-	public void write(StreamWriteEngineHolder eh, StreamAddIdGenerator idGenerator, StreamWriteCounters counters, Blackhole blackhole) {
+	@GroupThreads(3 * AbstractBookEntity.TYPE_COUNT)
+	public void write(StreamWriteEngineHolder eh, StreamAddEntityGenerator generator, StreamWriteCounters counters, Blackhole blackhole) {
 		SearchIntegrator si = eh.getSearchIntegrator();
 		OperationDispatcher streamingDispatcher = new StreamingOperationDispatcher( si, true /* forceAsync */ );
-		DocumentBuilderIndexedEntity docBuilder = si.getIndexBinding( BookEntity.TYPE_ID ).getDocumentBuilder();
-		Dataset dataset = eh.getDataset();
+		IndexedTypeIdentifier typeId = generator.getTypeId();
+		DocumentBuilderIndexedEntity docBuilder = si.getIndexBinding( typeId ).getDocumentBuilder();
 
 		InstanceInitializer initializer = SimpleInitializer.INSTANCE;
 		ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		IndexingMonitor monitor = blackhole::consume;
 
-		idGenerator.stream().forEach( id -> {
-			BookEntity book = dataset.create( id );
+		generator.stream().forEach( book -> {
+			Long id = book.getId();
 			AddLuceneWork addWork = docBuilder.createAddWork(
 					null,
 					docBuilder.getTypeIdentifier(),
@@ -61,7 +61,7 @@ public class StreamWriteJMHBenchmarks {
 		} );
 
 		// Ensure that we'll block until all works have been performed
-		SearchIntegratorHelper.flush( si, BookEntity.TYPE_ID );
+		SearchIntegratorHelper.flush( si, typeId );
 	}
 
 }

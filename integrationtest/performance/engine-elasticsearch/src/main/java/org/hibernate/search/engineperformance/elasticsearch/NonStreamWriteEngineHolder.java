@@ -7,11 +7,7 @@
 package org.hibernate.search.engineperformance.elasticsearch;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.stream.IntStream;
 
-import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
-import org.hibernate.search.engineperformance.elasticsearch.setuputilities.DatasetCreation;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Param;
@@ -35,12 +31,6 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "100000" } )
 	private int indexSize;
 
-	@Param( { "100" } )
-	private int maxResults;
-
-	@Param( { DatasetCreation.HIBERNATE_DEV_ML_2016_01 } )
-	private String dataset;
-
 	@Param( { "1000" } )
 	private int changesetsPerFlush;
 
@@ -57,17 +47,13 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	private SearchIntegrator si;
 
-	private Dataset data;
-
 	private int addsDeletesPerChangeset;
 
 	private int updatesPerChangeset;
 
 	@Setup
-	public void initializeState() throws IOException, URISyntaxException {
+	public void initializeState() {
 		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
-		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
-		SearchIntegratorHelper.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
 
 		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
 		addsDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );
@@ -76,10 +62,6 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	public SearchIntegrator getSearchIntegrator() {
 		return si;
-	}
-
-	public Dataset getDataset() {
-		return data;
 	}
 
 	public int getInitialIndexSize() {
@@ -96,10 +78,6 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	public int getUpdatesPerChangeset() {
 		return updatesPerChangeset;
-	}
-
-	public int getQueryMaxResults() {
-		return maxResults;
 	}
 
 	@TearDown

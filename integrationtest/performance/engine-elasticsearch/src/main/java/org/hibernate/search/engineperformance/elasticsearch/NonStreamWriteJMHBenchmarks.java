@@ -14,11 +14,11 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
-import org.hibernate.search.engineperformance.elasticsearch.model.BookEntity;
+import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -51,26 +51,24 @@ import org.openjdk.jmh.infra.Blackhole;
 public class NonStreamWriteJMHBenchmarks {
 
 	@Benchmark
-	@Threads(20)
+	@Threads(6 * AbstractBookEntity.TYPE_COUNT)
 	public void write(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
 		SearchIntegrator si = eh.getSearchIntegrator();
 		Worker worker = si.getWorker();
-		Dataset dataset = eh.getDataset();
+		IndexedTypeIdentifier typeId = changesetGenerator.getTypeId();
 
 		changesetGenerator.stream().forEach( changeset -> {
 			TransactionContextForTest tc = new TransactionContextForTest();
-			changeset.toAdd().forEach( id -> {
-						BookEntity book = dataset.create( id );
-						Work work = new Work( book, id, WorkType.ADD );
+			changeset.toAdd().forEach( book -> {
+						Work work = new Work( book, book.getId(), WorkType.ADD );
 						worker.performWork( work, tc );
 					} );
-			changeset.toUpdate().forEach( id -> {
-						BookEntity book = dataset.create( id );
-						Work work = new Work( book, id, WorkType.UPDATE );
+			changeset.toUpdate().forEach( book -> {
+						Work work = new Work( book, book.getId(), WorkType.UPDATE );
 						worker.performWork( work, tc );
 					});
 			changeset.toDelete().forEach( id -> {
-						Work work = new Work( BookEntity.TYPE_ID, id, WorkType.DELETE );
+						Work work = new Work( typeId, id, WorkType.DELETE );
 						worker.performWork( work, tc );
 					});
 			tc.end();
@@ -78,22 +76,23 @@ public class NonStreamWriteJMHBenchmarks {
 		} );
 
 		// Ensure that we'll block until all works have been performed
-		SearchIntegratorHelper.flush( si, BookEntity.TYPE_ID );
+		SearchIntegratorHelper.flush( si, typeId );
 	}
 
 	@Benchmark
-	@Threads(20)
-	public void queryBooksByBestRating(NonStreamWriteEngineHolder eh, Blackhole bh) {
+	@Threads(6 * AbstractBookEntity.TYPE_COUNT)
+	public void queryBooksByBestRating(NonStreamWriteEngineHolder eh, NonStreamQueryParams qp, Blackhole bh) {
 		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
+		Class<?> entityType = qp.getEntityType();
 		Query luceneQuery = searchIntegrator.buildQueryBuilder()
-				.forEntity( BookEntity.class )
+				.forEntity( entityType )
 				.get()
 				.all()
 				.createQuery();
 
-		int maxResults = eh.getQueryMaxResults();
+		int maxResults = qp.getQueryMaxResults();
 
-		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
+		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, entityType );
 		hsQuery.sort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) );
 		hsQuery.maxResults( maxResults );
 		int queryResultSize = hsQuery.queryResultSize();
@@ -103,26 +102,27 @@ public class NonStreamWriteJMHBenchmarks {
 	}
 
 	@Benchmark
-	@GroupThreads(5)
+	@GroupThreads(2 * AbstractBookEntity.TYPE_COUNT)
 	@Group("concurrentReadWriteTest")
 	public void readWriteTestWriter(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
 		write( eh, changesetGenerator, counters );
 	}
 
 	@Benchmark
-	@GroupThreads(5)
+	@GroupThreads(2 * AbstractBookEntity.TYPE_COUNT)
 	@Group("concurrentReadWriteTest")
-	public void readWriteTestReader(NonStreamWriteEngineHolder eh, Blackhole bh) {
+	public void readWriteTestReader(NonStreamWriteEngineHolder eh, NonStreamQueryParams qp, Blackhole bh) {
 		SearchIntegrator searchIntegrator = eh.getSearchIntegrator();
+		Class<?> entityType = qp.getEntityType();
 		Query luceneQuery = searchIntegrator.buildQueryBuilder()
-				.forEntity( BookEntity.class )
+				.forEntity( entityType )
 				.get()
 				.all()
 				.createQuery();
 
-		int maxResults = eh.getQueryMaxResults();
+		int maxResults = qp.getQueryMaxResults();
 
-		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
+		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, entityType );
 		hsQuery.maxResults( maxResults );
 		int queryResultSize = hsQuery.queryResultSize();
 		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();

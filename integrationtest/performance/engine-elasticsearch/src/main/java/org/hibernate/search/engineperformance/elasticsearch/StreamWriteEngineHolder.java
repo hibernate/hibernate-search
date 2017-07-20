@@ -7,11 +7,7 @@
 package org.hibernate.search.engineperformance.elasticsearch;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.stream.IntStream;
 
-import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
-import org.hibernate.search.engineperformance.elasticsearch.setuputilities.DatasetCreation;
 import org.hibernate.search.engineperformance.elasticsearch.setuputilities.SearchIntegratorHelper;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.openjdk.jmh.annotations.Level;
@@ -30,28 +26,18 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "true", "false" } )
 	private boolean refreshAfterWrite;
 
-	@Param( { "100000" } )
-	private int indexSize;
-
-	@Param( { DatasetCreation.HIBERNATE_DEV_ML_2016_01 } )
-	private String dataset;
-
 	@Param( { "10000" } )
 	private int streamedAddsPerFlush;
 
 	private SearchIntegrator si;
-
-	private Dataset data;
 
 	/*
 	 * We spawn one engine per iteration,
 	 * to ensure we won't end up with huge indexes on iteration 10.
 	 */
 	@Setup(Level.Iteration)
-	public void initializeState() throws IOException, URISyntaxException {
+	public void initializeState() {
 		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, null /* irrelevant */ );
-		data = DatasetCreation.createDataset( dataset, pickCacheDirectory() );
-		SearchIntegratorHelper.preindexEntities( si, data, IntStream.range( 0, indexSize ) );
 	}
 
 	@TearDown(Level.Iteration)
@@ -63,14 +49,6 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 
 	public SearchIntegrator getSearchIntegrator() {
 		return si;
-	}
-
-	public Dataset getDataset() {
-		return data;
-	}
-
-	public int getInitialIndexSize() {
-		return indexSize;
 	}
 
 	public int getStreamedAddsPerFlush() {
