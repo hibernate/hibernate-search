@@ -35,6 +35,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ElasticsearchWorkProcessor implements AutoCloseable {
 
+	private static final int NON_STREAM_MIN_BULK_SIZE = 2;
+	private static final int MAX_BULK_SIZE = 250;
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final ErrorHandler errorHandler;
@@ -70,10 +73,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 */
 		// TODO ensure synchronous works from different threads are executed in order, too
 		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator(
-				() -> this.createSerialOrchestrator( this::createRefreshingWorkExecutionContext, true ) );
+				() -> this.createSerialOrchestrator( this::createRefreshingWorkExecutionContext, MIN_BULK_SIZE, true ) );
 		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator(
 				"Elasticsearch async non-stream work orchestrator",
-				createSerialOrchestrator( this::createRefreshingWorkExecutionContext, true ) );
+				createSerialOrchestrator( this::createRefreshingWorkExecutionContext, MIN_BULK_SIZE, true ) );
 
 		/*
 		 * The following orchestrator doesn't require a strict execution ordering
@@ -83,10 +86,16 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * Also, since works are not applied in order, and since API users have no way
 		 * to determine whether a work finished or not, explicit refreshes are useless,
 		 * so we disable refreshes both in the bulk API call and in the execution contexts.
+		 *
+		 * Note that we use a minimum bulk size of 1, and thus allow bulks with only one work.
+		 * This is only because work will be submitted to this orchestrator in single-work changesets,
+		 * and we decide whether to use a bulk or not at the end of each sequence. Thus if we chose a
+		 * minimum higher than 1, we would end up never starting a bulk, which would result in
+		 * terrible performance.
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
 				"Elasticsearch async stream work orchestrator",
-				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, false ) );
+				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, 1 /* this in on purpose, see above */, false ) );
 	}
 
 	@Override
@@ -210,16 +219,16 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator(
-			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, boolean refreshInBulkAPICall) {
+			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, int minBulkSize, boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, minBulkSize, refreshInBulkAPICall );
 		return new SerialChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createParallelOrchestrator(
-			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, boolean refreshInBulkAPICall) {
+			Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier, int minBulkSize, boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, refreshInBulkAPICall );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, minBulkSize, refreshInBulkAPICall );
 		return new ParallelChangesetsElasticsearchWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
@@ -231,10 +240,11 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 				);
 	}
 
-	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, boolean refreshInBulkAPICall) {
+	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, int minBulkSize, boolean refreshInBulkAPICall) {
 		return new DefaultElasticsearchWorkBulker(
 				sequenceBuilder,
-				worksToBulk -> workFactory.bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build()
+				worksToBulk -> workFactory.bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build(),
+				minBulkSize, MAX_BULK_SIZE
 				);
 	}
 
