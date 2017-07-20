@@ -49,6 +49,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int STREAM_MIN_BULK_SIZE = 1;
 	private static final int MAX_BULK_SIZE = 250;
 
+	private static final int SYNC_ORCHESTRATION_DELAY_MS = 0;
+
+	private static final int ASYNC_ORCHESTRATION_DELAY_MS = 100;
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final ErrorHandler errorHandler;
@@ -83,10 +87,11 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * their refresh executed at the end of each changeset.
 		 */
 		// TODO ensure synchronous works from different threads are executed in order, too
-		this.syncNonStreamOrchestrator = createIsolatedSharedOrchestrator(
-				() -> this.createSerialOrchestrator( this::createRefreshingWorkExecutionContext, NON_STREAM_MIN_BULK_SIZE, true ) );
+		this.syncNonStreamOrchestrator = createBatchingSharedOrchestrator(
+				"Elasticsearch sync non-stream work orchestrator", SYNC_ORCHESTRATION_DELAY_MS,
+				createParallelOrchestrator( this::createRefreshingWorkExecutionContext, NON_STREAM_MIN_BULK_SIZE, true ) );
 		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async non-stream work orchestrator",
+				"Elasticsearch async non-stream work orchestrator", ASYNC_ORCHESTRATION_DELAY_MS,
 				createSerialOrchestrator( this::createRefreshingWorkExecutionContext, NON_STREAM_MIN_BULK_SIZE, true ) );
 
 		/*
@@ -99,7 +104,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * so we disable refreshes both in the bulk API call and in the execution contexts.
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async stream work orchestrator",
+				"Elasticsearch async stream work orchestrator", ASYNC_ORCHESTRATION_DELAY_MS,
 				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, STREAM_MIN_BULK_SIZE, false ) );
 	}
 
@@ -215,12 +220,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return work.execute( context );
 	}
 
-	private IsolatedSharedElasticsearchWorkOrchestrator createIsolatedSharedOrchestrator(Supplier<FlushableElasticsearchWorkOrchestrator> delegateSupplier) {
-		return new IsolatedSharedElasticsearchWorkOrchestrator( delegateSupplier );
-	}
-
-	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, FlushableElasticsearchWorkOrchestrator delegate) {
-		return new BatchingSharedElasticsearchWorkOrchestrator( name, delegate, errorHandler );
+	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, int delayMs,
+			FlushableElasticsearchWorkOrchestrator delegate) {
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, delegate, errorHandler );
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator(
