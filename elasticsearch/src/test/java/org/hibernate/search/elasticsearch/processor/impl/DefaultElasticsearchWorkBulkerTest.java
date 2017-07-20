@@ -30,6 +30,10 @@ import org.junit.Test;
  */
 public class DefaultElasticsearchWorkBulkerTest {
 
+	private static final int DEFAULT_MIN_BULK_SIZE = 1;
+
+	private static final int DEFAULT_MAX_BULK_SIZE = 10;
+
 	private final List<Object> mocks = new ArrayList<>();
 
 	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
@@ -57,7 +61,8 @@ public class DefaultElasticsearchWorkBulkerTest {
 
 		replay();
 		DefaultElasticsearchWorkBulker bulker =
-				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock );
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
 		verify();
 
 		reset();
@@ -89,12 +94,14 @@ public class DefaultElasticsearchWorkBulkerTest {
 	}
 
 	@Test
-	public void noBulkIfSingle() {
-		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
+	public void noBulkIfBelowThreshold() {
+		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 
 		replay();
 		DefaultElasticsearchWorkBulker bulker =
-				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock );
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						2 /* Mandate minimum 2 works per bulk */,
+						DEFAULT_MAX_BULK_SIZE );
 		verify();
 
 		reset();
@@ -114,6 +121,45 @@ public class DefaultElasticsearchWorkBulkerTest {
 		verify();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void alwaysBulkIfAboveThreshold() {
+		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
+		ElasticsearchWork<BulkResult> bulkWork = work( 2 );
+
+		Capture<CompletableFuture<ElasticsearchWork<BulkResult>>> bulkWorkFutureCapture = new Capture<>();
+		CompletableFuture<BulkResult> bulkWorkResultFuture = new CompletableFuture<>();
+
+		replay();
+		DefaultElasticsearchWorkBulker bulker =
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						1 /* No threshold, even 1 work per bulk is okay */,
+						DEFAULT_MAX_BULK_SIZE );
+		verify();
+
+		reset();
+		replay();
+		bulker.add( work1 );
+		verify();
+
+
+		reset();
+		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWorkFutureCapture ) ) ).andReturn( bulkWorkResultFuture );
+		expect( sequenceBuilderMock.startBulkResultExtraction( bulkWorkResultFuture ) ).andReturn( bulkResultExtractionStepMock );
+		bulkResultExtractionStepMock.add( work1, 0 );
+		replay();
+		bulker.flushBulked();
+		verify();
+		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
+
+		reset();
+		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1 ) ) ).andReturn( (ElasticsearchWork) bulkWork );
+		replay();
+		bulker.flushBulk();
+		verify();
+		assertThat( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
+	}
+
 	@Test
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void sameBulkOnFlushBulked() {
@@ -128,7 +174,8 @@ public class DefaultElasticsearchWorkBulkerTest {
 
 		replay();
 		DefaultElasticsearchWorkBulker bulker =
-				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock );
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
 		verify();
 
 		reset();
@@ -188,7 +235,8 @@ public class DefaultElasticsearchWorkBulkerTest {
 
 		replay();
 		DefaultElasticsearchWorkBulker bulker =
-				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock );
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
 		verify();
 
 		reset();
@@ -242,13 +290,13 @@ public class DefaultElasticsearchWorkBulkerTest {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void newBulkOnTooManyBulkedWorks() {
 		List<BulkableElasticsearchWork<?>> firstBulkWorks = new ArrayList<>();
-		for ( int i = 0 ; i < DefaultElasticsearchWorkBulker.MAX_BULK_SIZE ; ++i ) {
+		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
 			firstBulkWorks.add( bulkableWork( i ) );
 		}
-		BulkableElasticsearchWork<Void> additionalWork1 = bulkableWork( DefaultElasticsearchWorkBulker.MAX_BULK_SIZE );
-		BulkableElasticsearchWork<Void> additionalWork2 = bulkableWork( DefaultElasticsearchWorkBulker.MAX_BULK_SIZE + 1 );
-		ElasticsearchWork<BulkResult> bulkWork1 = work( DefaultElasticsearchWorkBulker.MAX_BULK_SIZE + 2 );
-		ElasticsearchWork<BulkResult> bulkWork2 = work( DefaultElasticsearchWorkBulker.MAX_BULK_SIZE + 3 );
+		BulkableElasticsearchWork<Void> additionalWork1 = bulkableWork( DEFAULT_MAX_BULK_SIZE );
+		BulkableElasticsearchWork<Void> additionalWork2 = bulkableWork( DEFAULT_MAX_BULK_SIZE + 1 );
+		ElasticsearchWork<BulkResult> bulkWork1 = work( DEFAULT_MAX_BULK_SIZE + 2 );
+		ElasticsearchWork<BulkResult> bulkWork2 = work( DEFAULT_MAX_BULK_SIZE + 3 );
 
 		CompletableFuture<BulkResult> bulkWork1ResultFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork2ResultFuture = new CompletableFuture<>();
@@ -257,13 +305,14 @@ public class DefaultElasticsearchWorkBulkerTest {
 
 		replay();
 		DefaultElasticsearchWorkBulker bulker =
-				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock );
+				new DefaultElasticsearchWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
+						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
 		verify();
 
 		reset();
 		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork1FutureCapture ) ) ).andReturn( bulkWork1ResultFuture );
 		expect( sequenceBuilderMock.startBulkResultExtraction( bulkWork1ResultFuture ) ).andReturn( bulkResultExtractionStepMock );
-		for ( int i = 0 ; i < DefaultElasticsearchWorkBulker.MAX_BULK_SIZE ; ++i ) {
+		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
 			BulkableElasticsearchWork<?> work = firstBulkWorks.get( i );
 			bulkResultExtractionStepMock.add( work, i );
 		}
