@@ -12,7 +12,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
  *
  * @author Yoann Rodiere
  */
-public interface BarrierElasticsearchWorkOrchestrator extends ElasticsearchWorkOrchestrator {
+public interface BarrierElasticsearchWorkOrchestrator extends ElasticsearchWorkOrchestrator, AutoCloseable {
 
 	/**
 	 * Block until there is no more work to execute.
@@ -22,5 +22,8 @@ public interface BarrierElasticsearchWorkOrchestrator extends ElasticsearchWorkO
 	 * @throws InterruptedException if thread interrupted while waiting
 	 */
 	void awaitCompletion() throws InterruptedException;
+
+	@Override
+	void close();
 
 }
