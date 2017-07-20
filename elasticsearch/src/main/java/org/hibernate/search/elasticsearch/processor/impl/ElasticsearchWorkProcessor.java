@@ -50,7 +50,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int MAX_BULK_SIZE = 250;
 
 	private static final int SYNC_ORCHESTRATION_DELAY_MS = 0;
-
 	private static final int ASYNC_ORCHESTRATION_DELAY_MS = 100;
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
@@ -61,9 +60,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
-	private final ElasticsearchWorkOrchestrator syncNonStreamOrchestrator;
-	private final BatchingSharedElasticsearchWorkOrchestrator asyncNonStreamOrchestrator;
-	private final BatchingSharedElasticsearchWorkOrchestrator streamOrchestrator;
+	private final BarrierElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
 			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
@@ -74,25 +71,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		this.parallelWorkExecutionContext =
 				new ImmutableElasticsearchWorkExecutionContext( client, gsonProvider );
-
-		/*
-		 * The following orchestrators require a strict execution ordering,
-		 * because subsequent changesets may be inter-dependent (an addition in one changeset
-		 * followed by a deletion in the next, for instance).
-		 * To make sure we apply works in order, we use serial orchestrators.
-		 * Also, since works are applied in order, refreshing the index after changesets
-		 * is actually an option, so we use refreshing execution contexts.
-		 * In order to reduce the cost of those refreshes, we try to batch together
-		 * refreshes for works bulked in the same API call. Non-bulked works will have
-		 * their refresh executed at the end of each changeset.
-		 */
-		// TODO ensure synchronous works from different threads are executed in order, too
-		this.syncNonStreamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch sync non-stream work orchestrator", SYNC_ORCHESTRATION_DELAY_MS,
-				createParallelOrchestrator( this::createRefreshingWorkExecutionContext, NON_STREAM_MIN_BULK_SIZE, true ) );
-		this.asyncNonStreamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async non-stream work orchestrator", ASYNC_ORCHESTRATION_DELAY_MS,
-				createSerialOrchestrator( this::createRefreshingWorkExecutionContext, NON_STREAM_MIN_BULK_SIZE, true ) );
 
 		/*
 		 * The following orchestrator doesn't require a strict execution ordering
@@ -111,7 +89,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	@Override
 	public void close() {
 		try {
-			asyncNonStreamOrchestrator.awaitCompletion();
 			streamOrchestrator.awaitCompletion();
 		}
 		catch (InterruptedException e) {
@@ -119,12 +96,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 			throw LOG.interruptedWhileWaitingForRequestCompletion( e );
 		}
 		finally {
-			try {
-				asyncNonStreamOrchestrator.close();
-			}
-			finally {
-				streamOrchestrator.close();
-			}
+			streamOrchestrator.close();
 		}
 	}
 
@@ -158,29 +130,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Return the orchestrator for synchronous, non-stream background works.
+	 * Return an orchestrator for non-stream background works.
 	 * <p>
 	 * Works submitted in the same changeset will be executed in the given order.
 	 * Relative execution order between changesets is undefined.
-	 * <p>
-	 * Works submitted to this orchestrator
-	 * will only be bulked with subsequent works of the same changeset.
-	 * <p>
-	 * If any work throws an exception, this exception will be passed
-	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
-	 * and the remaining works will not be executed.
-	 *
-	 * @return the orchestrator for synchronous, non-stream background works.
-	 */
-	public ElasticsearchWorkOrchestrator getSyncNonStreamOrchestrator() {
-		return syncNonStreamOrchestrator;
-	}
-
-	/**
-	 * Return the orchestrator for asynchronous, non-stream background works.
-	 * <p>
-	 * Works submitted in the same changeset will be executed in the given order.
-	 * Changesets will be executed in the order they are submitted.
 	 * <p>
 	 * Works submitted to this orchestrator
 	 * will only be bulked with subsequent works (possibly of a different changeset).
@@ -189,10 +142,48 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
 	 * and the remaining works will not be executed.
 	 *
-	 * @return the orchestrator for asynchronous, non-stream background works.
+	 * @return the orchestrator for synchronous, non-stream background works.
 	 */
-	public BarrierElasticsearchWorkOrchestrator getAsyncNonStreamOrchestrator() {
-		return asyncNonStreamOrchestrator;
+	public BarrierElasticsearchWorkOrchestrator createNonStreamOrchestrator(String indexName, boolean sync, boolean refreshAfterWrite) {
+		/*
+		 * Since works are applied in order, refreshing the index after changesets
+		 * is actually an option, and if enabled we use refreshing execution contexts.
+		 * In order to reduce the cost of those refreshes, we also try to batch together
+		 * refreshes for works bulked in the same bulk API call. Non-bulked works will have
+		 * their refresh executed at the end of each changeset.
+		 */
+		Supplier<FlushableElasticsearchWorkExecutionContext> contextSupplier;
+		boolean refreshInBulkApiCall;
+		if ( refreshAfterWrite ) {
+			contextSupplier = this::createRefreshingWorkExecutionContext;
+			refreshInBulkApiCall = true;
+		}
+		else {
+			contextSupplier = this::createIndexMonitorBufferingWorkExecutionContext;
+			refreshInBulkApiCall = false;
+		}
+
+		/*
+		 * The non-stream orchestrator requires a strict execution ordering,
+		 * because subsequent changesets may be inter-dependent (an addition in one changeset
+		 * followed by a deletion in the next, for instance).
+		 * To make sure we apply works in order, we use serial orchestrators.
+		 */
+		FlushableElasticsearchWorkOrchestrator delegate =
+				createSerialOrchestrator( contextSupplier, NON_STREAM_MIN_BULK_SIZE, refreshInBulkApiCall );
+
+		if ( sync ) {
+			return createBatchingSharedOrchestrator(
+					"Elasticsearch sync non-stream work orchestrator for index " + indexName,
+					SYNC_ORCHESTRATION_DELAY_MS, delegate
+					);
+		}
+		else {
+			return createBatchingSharedOrchestrator(
+					"Elasticsearch async non-stream work orchestrator for index " + indexName,
+					ASYNC_ORCHESTRATION_DELAY_MS, delegate
+					);
+		}
 	}
 
 	/**
