@@ -1,4 +1,4 @@
-node ('!AWS&&Slave') {
+node ('Performance') {
 	stage ('Checkout') {
 		checkout scm
 	}
