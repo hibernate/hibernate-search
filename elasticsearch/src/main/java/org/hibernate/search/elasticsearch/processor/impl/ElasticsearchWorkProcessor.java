@@ -41,6 +41,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int SYNC_ORCHESTRATION_DELAY_MS = 0;
 	private static final int ASYNC_ORCHESTRATION_DELAY_MS = 100;
 
+	private static final int NON_STREAM_MAX_CHANGESETS_PER_BATCH = 1000;
+	private static final int STREAM_MAX_CHANGESETS_PER_BATCH = 10000;
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final ErrorHandler errorHandler;
@@ -77,7 +80,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * terrible performance.
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async stream work orchestrator", ASYNC_ORCHESTRATION_DELAY_MS,
+				"Elasticsearch async stream work orchestrator",
+				ASYNC_ORCHESTRATION_DELAY_MS,
+				STREAM_MAX_CHANGESETS_PER_BATCH,
+				false, // Do not care about ordering when queuing changesets
 				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, 1 /* this in on purpose, see above */, false ) );
 	}
 
@@ -170,13 +176,19 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		if ( sync ) {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch sync non-stream work orchestrator for index " + indexName,
-					SYNC_ORCHESTRATION_DELAY_MS, delegate
+					SYNC_ORCHESTRATION_DELAY_MS,
+					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
+					true /* enqueue changesets in the order they were submitted */,
+					delegate
 					);
 		}
 		else {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch async non-stream work orchestrator for index " + indexName,
-					ASYNC_ORCHESTRATION_DELAY_MS, delegate
+					ASYNC_ORCHESTRATION_DELAY_MS,
+					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
+					true /* enqueue changesets in the order they were submitted */,
+					delegate
 					);
 		}
 	}
@@ -206,9 +218,11 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return work.execute( context );
 	}
 
-	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, int delayMs,
+	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(
+			String name, int delayMs, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate) {
-		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, delegate, errorHandler );
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, maxChangesetsPerBatch, fair,
+				delegate, errorHandler );
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator(
