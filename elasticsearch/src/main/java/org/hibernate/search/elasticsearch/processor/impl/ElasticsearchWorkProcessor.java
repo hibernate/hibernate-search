@@ -52,6 +52,20 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int SYNC_ORCHESTRATION_DELAY_MS = 0;
 	private static final int ASYNC_ORCHESTRATION_DELAY_MS = 100;
 
+	/*
+	 * Setting the following constants involves a bit of guesswork.
+	 * Basically we want the number to be large enough for the orchestrator
+	 * to create bulks of the maximum size defined above most of the time,
+	 * but we also want to keep the number as low as possible to avoid
+	 * consuming too much memory with pending changesets.
+	 * Here we set the number for stream works higher than the number
+	 * for non-stream works, because stream works will only ever be grouped
+	 * in single-work changesets, and also because the stream work
+	 * orchestrator is shared between all index managers.
+	 */
+	private static final int NON_STREAM_MAX_CHANGESETS_PER_BATCH = 10 * MAX_BULK_SIZE;
+	private static final int STREAM_MAX_CHANGESETS_PER_BATCH = 20 * MAX_BULK_SIZE;
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final ErrorHandler errorHandler;
@@ -82,7 +96,10 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * so we disable refreshes both in the bulk API call and in the execution contexts.
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async stream work orchestrator", ASYNC_ORCHESTRATION_DELAY_MS,
+				"Elasticsearch async stream work orchestrator",
+				ASYNC_ORCHESTRATION_DELAY_MS,
+				STREAM_MAX_CHANGESETS_PER_BATCH,
+				false, // Do not care about ordering when queuing changesets
 				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, STREAM_MIN_BULK_SIZE, false ) );
 	}
 
@@ -175,13 +192,19 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		if ( sync ) {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch sync non-stream work orchestrator for index " + indexName,
-					SYNC_ORCHESTRATION_DELAY_MS, delegate
+					SYNC_ORCHESTRATION_DELAY_MS,
+					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
+					true /* enqueue changesets in the order they were submitted */,
+					delegate
 					);
 		}
 		else {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch async non-stream work orchestrator for index " + indexName,
-					ASYNC_ORCHESTRATION_DELAY_MS, delegate
+					ASYNC_ORCHESTRATION_DELAY_MS,
+					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
+					true /* enqueue changesets in the order they were submitted */,
+					delegate
 					);
 		}
 	}
@@ -211,9 +234,11 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		return work.execute( context );
 	}
 
-	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(String name, int delayMs,
+	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(
+			String name, int delayMs, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate) {
-		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, delegate, errorHandler );
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, maxChangesetsPerBatch, fair,
+				delegate, errorHandler );
 	}
 
 	private FlushableElasticsearchWorkOrchestrator createSerialOrchestrator(
