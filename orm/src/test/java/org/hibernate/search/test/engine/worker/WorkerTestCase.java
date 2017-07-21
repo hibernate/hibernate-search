@@ -8,6 +8,7 @@ package org.hibernate.search.test.engine.worker;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -16,16 +17,27 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.Search;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
+@RunWith(JUnit4.class) // CustomRunner messes with @Rule
 public class WorkerTestCase extends SearchTestBase {
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void testConcurrency() throws Exception {
@@ -37,18 +49,35 @@ public class WorkerTestCase extends SearchTestBase {
 
 		long start = System.nanoTime();
 
+		// Expect 0 failure in the backend threads
+		logged.expectLevelMissing( Level.ERROR );
+
 		new ConcurrentRunner(
 				iteration * 2,
 				numberOfThreads,
 				i -> ( i % 2 == 0 ) ? work : reverseWork
 			)
-			.setTimeout( 1, TimeUnit.MINUTES )
-			.execute();
+				.setFinalizingTask( () -> {
+					if ( !isWorkerSync() ) {
+						awaitProcessingCompletion();
+					}
+				} )
+				.setTimeout( 1, TimeUnit.MINUTES )
+				.execute();
 
 		System.out.println(
 				iteration + " iterations (8 tx per iteration) in " + numberOfThreads + " threads: "
-						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start )
+						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) + "ms"
 		);
+	}
+
+	protected void awaitProcessingCompletion() {
+		for ( Class<?> clazz : getAnnotatedClasses() ) {
+			IndexedTypeIdentifier typeId = PojoIndexedTypeIdentifier.convertFromLegacy( clazz );
+			for ( IndexManager indexManager : getExtendedSearchIntegrator().getIndexBinding( typeId ).getIndexManagerSelector().all() ) {
+				indexManager.awaitAsyncProcessingCompletion();
+			}
+		}
 	}
 
 	protected static final class Work implements Runnable {

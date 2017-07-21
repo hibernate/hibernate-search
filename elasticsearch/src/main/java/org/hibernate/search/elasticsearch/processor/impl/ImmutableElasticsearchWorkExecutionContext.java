@@ -15,21 +15,20 @@ import org.hibernate.search.exception.AssertionFailure;
 
 
 /**
-/**
  * The execution context used in {@link ElasticsearchWorkProcessor}
- * when multiple works are executed in parallel.
+ * when the context must be shared by multiple threads.
  * <p>
  * This context is immutable and thread-safe, but doesn't support
  * {@link #getBufferedIndexingMonitor(IndexingMonitor)} nor {@link #setIndexDirty(String)}.
  *
  * @author Yoann Rodiere
  */
-class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext {
+class ImmutableElasticsearchWorkExecutionContext implements ElasticsearchWorkExecutionContext {
 
 	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
 
-	public ParallelWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
+	public ImmutableElasticsearchWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
 		super();
 		this.client = client;
 		this.gsonProvider = gsonProvider;
@@ -49,14 +48,16 @@ class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext 
 	public void setIndexDirty(URLEncodedString indexName) {
 		throw new AssertionFailure( "Unexpected dirty index with a default context."
 				+ " Works that may alter index content should be executed"
-				+ " through the BackendRequestProcessor, using an appropriate context." );
+				+ " through the " + ElasticsearchWorkProcessor.class.getName()
+				+ ", using an appropriate context." );
 	}
 
 	@Override
 	public IndexingMonitor getBufferedIndexingMonitor(IndexingMonitor indexingMonitor) {
 		throw new AssertionFailure( "Unexpected indexing monitor request with a default context."
 				+ " Works that may alter index content should be executed"
-				+ " through the BackendRequestProcessor, using an appropriate context." );
+				+ " through the " + ElasticsearchWorkProcessor.class.getName()
+				+ ", using an appropriate context." );
 	}
 
 }

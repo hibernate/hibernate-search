@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -33,11 +35,17 @@ public class IndexWork extends SimpleBulkableElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected void afterSuccess(ElasticsearchWorkExecutionContext context) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		return null;
+	}
+
+	@Override
+	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext context) {
 		if ( indexingMonitor != null ) {
 			IndexingMonitor bufferedIndexingMonitor = context.getBufferedIndexingMonitor( indexingMonitor );
 			bufferedIndexingMonitor.documentsAdded( 1 );
 		}
+		return super.afterSuccess( context );
 	}
 
 	public static class Builder

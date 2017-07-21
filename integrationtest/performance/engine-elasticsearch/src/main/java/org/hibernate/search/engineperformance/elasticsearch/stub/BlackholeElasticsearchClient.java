@@ -7,6 +7,7 @@
 package org.hibernate.search.engineperformance.elasticsearch.stub;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImplementor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
@@ -48,7 +49,11 @@ public class BlackholeElasticsearchClient implements ElasticsearchClientImplemen
 	}
 
 	@Override
-	public ElasticsearchResponse execute(ElasticsearchRequest request) {
+	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
+		return CompletableFuture.completedFuture( generateResponse( request ) );
+	}
+
+	public ElasticsearchResponse generateResponse(ElasticsearchRequest request) {
 		String method = request.getMethod();
 		String path = request.getPath();
 

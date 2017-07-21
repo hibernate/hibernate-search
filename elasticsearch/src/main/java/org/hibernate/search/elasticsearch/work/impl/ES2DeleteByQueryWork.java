@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -38,11 +39,11 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		/*
 		 * Refresh the index so as to minimize the risk of version conflict
 		 */
-		refreshWork.execute( executionContext );
+		return refreshWork.execute( executionContext );
 	}
 
 	@Override
@@ -114,15 +115,15 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
-			this.delegate.checkSuccess( request, response );
+		public void checkSuccess(ElasticsearchResponse response) throws SearchException {
+			this.delegate.checkSuccess( response );
 			if ( response.getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
-				throw LOG.elasticsearch2RequestDeleteByQueryNotFound( request, response );
+				throw LOG.elasticsearch2RequestDeleteByQueryNotFound();
 			}
 		}
 
 		@Override
-		public boolean isSuccess(JsonObject bulkResponseItem) {
+		public void checkSuccess(JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because DeleteByQuery actions are not Bulkable" );
 		}
 	}
