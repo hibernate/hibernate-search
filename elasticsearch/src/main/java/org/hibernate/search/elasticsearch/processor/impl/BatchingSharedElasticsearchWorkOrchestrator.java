@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.processor.impl;
 
-import java.util.concurrent.BlockingDeque;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.Closer;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -42,9 +45,11 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	private final int delayMs;
 	private final FlushableElasticsearchWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
+	private final int changesetsPerBatch;
 
 	private final ScheduledExecutorService scheduler;
-	private final BlockingDeque<Changeset> changesetQueue;
+	private final BlockingQueue<Changeset> changesetQueue;
+	private final List<Changeset> changesetBuffer;
 	private final AtomicBoolean processingScheduled;
 
 	private final Phaser phaser = new Phaser() {
@@ -59,17 +64,25 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	 * @param name The name of the orchestrator thread
 	 * @param delayMs A delay before creating a batch when a work is submitted.
 	 * Higher values mean bigger batch sizes, but higher latency.
+	 * @param maxChangesetsPerBatch The maximum number of changesets to
+	 * process in a single batch. Higher values mean lesser chance of transport
+	 * thread starvation, but higher heap consumption.
+	 * @param fair if {@code true} changesets are always submitted to the
+	 * delegate in FIFO order, if {@code false} changesets submitted
+	 * when the internal queue is full may be submitted out of order.
 	 * @param delegate A delegate orchestrator. May not be thread-safe.
 	 * @param errorHandler An error handler to send orchestration errors to.
 	 */
 	public BatchingSharedElasticsearchWorkOrchestrator(
-			String name, int delayMs,
+			String name, int delayMs, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
 		this.delayMs = delayMs;
 		this.delegate = delegate;
 		this.errorHandler = errorHandler;
-		changesetQueue = new LinkedBlockingDeque<>();
+		this.changesetsPerBatch = maxChangesetsPerBatch;
+		changesetQueue = new ArrayBlockingQueue<>( maxChangesetsPerBatch, fair );
+		changesetBuffer = CollectionHelper.newArrayList( maxChangesetsPerBatch );
 		scheduler = Executors.newScheduledThreadPool( name );
 		processingScheduled = new AtomicBoolean( false );
 	}
@@ -77,7 +90,13 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	@Override
 	public CompletableFuture<Void> submit(Iterable<ElasticsearchWork<?>> works) {
 		CompletableFuture<Void> future = new CompletableFuture<>();
-		changesetQueue.add( new Changeset( works, future ) );
+		try {
+			changesetQueue.put( new Changeset( works, future ) );
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new SearchException( "Interrupted while submitting a changeset to the queue", e );
+		}
 		ensureProcessingScheduled();
 		return future;
 	}
@@ -100,7 +119,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			try {
 				if ( processingScheduled.compareAndSet( false, true ) ) {
 					try {
-						scheduler.schedule( this::processChangesets, delayMs, TimeUnit.MILLISECONDS );
+						scheduler.schedule( this::processBatch, delayMs, TimeUnit.MILLISECONDS );
 					}
 					catch (Throwable e) {
 						/*
@@ -169,18 +188,19 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	}
 
 	/**
-	 * Takes changesets from the queue and processes them.
+	 * Takes a batch of changesets from the queue and processes them.
 	 */
-	private void processChangesets() {
+	private void processBatch() {
 		try {
 			CompletableFuture<?> future;
 			try {
 				synchronized ( delegate ) {
 					delegate.reset();
+					changesetBuffer.clear();
 
-					for ( Changeset changeset = changesetQueue.poll();
-							changeset != null;
-							changeset = changesetQueue.poll() ) {
+					changesetQueue.drainTo( changesetBuffer, changesetsPerBatch );
+
+					for ( Changeset changeset : changesetBuffer ) {
 						try {
 							delegate.submit( changeset.works )
 									.whenComplete( Futures.copyHandler( changeset.future ) );
@@ -211,7 +231,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 					/*
 					 * Just in case changesets were added to the queue between
-					 * when we last checked the queue and the resetting of
+					 * when we drained the queue and the resetting of
 					 * processingScheduled above.
 					 * This must be executed before we arrive at the phaser to ensure that
 					 * threads calling submit(), then awaitCompletion() will not be unblocked
