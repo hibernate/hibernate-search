@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -69,8 +67,8 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.ConcurrentIndexedTypeMap;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.IndexedTypeMaps;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -187,7 +185,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		}
 
 		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
-		this.indexedTypeDescriptors = new ConcurrentIndexedTypeMap<>();
+		this.indexedTypeDescriptors = IndexedTypeMaps.concurrentHashMap();
 
 		this.defaultObjectLookupMethod = determineDefaultObjectLookupMethod();
 		this.defaultDatabaseRetrievalMethod = determineDefaultDatabaseRetrievalMethod();
@@ -289,13 +287,10 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public HSQuery createHSQuery(Query luceneQuery, CustomTypeMetadata... types) {
-		List<CustomTypeMetadata> typeList = Arrays.asList( types );
-		IndexedTypeSet entityTypes = typeList.stream()
-				.map( CustomTypeMetadata::getEntityType )
-				.collect( IndexedTypeSets.streamCollector() );
+	public HSQuery createHSQuery(Query luceneQuery, IndexedTypeMap<CustomTypeMetadata> types) {
+		IndexedTypeSet entityTypes = types.keySet();
 		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
-		return descriptor.createHSQuery( this, typeList );
+		return descriptor.createHSQuery( this, types );
 	}
 
 	private QueryDescriptor createQueryDescriptor(Query luceneQuery, IndexedTypeSet entityTypes) {

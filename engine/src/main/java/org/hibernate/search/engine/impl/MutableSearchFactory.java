@@ -137,7 +137,7 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public HSQuery createHSQuery(Query luceneQuery, CustomTypeMetadata... types) {
+	public HSQuery createHSQuery(Query luceneQuery, IndexedTypeMap<CustomTypeMetadata> types) {
 		return delegate.createHSQuery( luceneQuery, types );
 	}
 

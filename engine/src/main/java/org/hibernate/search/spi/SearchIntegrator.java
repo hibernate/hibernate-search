@@ -82,10 +82,10 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * in which case the query provided here cannot be overridden.
 	 *
 	 * @param fullTextQuery the full-text engine query
-	 * @param types the targeted entity types
+	 * @param types the targeted entity types, mapped to (potentially null) overridden metadata
 	 * @return an Hibernate Search query object
 	 */
-	HSQuery createHSQuery(Query fullTextQuery, CustomTypeMetadata... types);
+	HSQuery createHSQuery(Query fullTextQuery, IndexedTypeMap<CustomTypeMetadata> types);
 
 	/**
 	 * @return true if the SearchIntegrator was stopped
