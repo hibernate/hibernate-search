@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.spi.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeMap;
@@ -16,13 +18,24 @@ import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-public class ConcurrentIndexedTypeMap<V> implements IndexedTypeMap<V> {
+// Must be serializable to support query serialization
+public class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializable {
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static final IndexedTypeMap EMPTY = new DelegatingIndexedTypeMap( Collections.EMPTY_MAP, Collections.EMPTY_MAP );
 
 	private static final Log log = LoggerFactory.make();
 	private static final IndexedTypeIdentifier ROOT_OBJECT = new PojoIndexedTypeIdentifier( Object.class );
 
-	private final ConcurrentHashMap<IndexedTypeIdentifier,V> map = new ConcurrentHashMap<>();
-	private final ConcurrentHashMap<String,IndexedTypeIdentifier> name2keyMapping = new ConcurrentHashMap<>();
+	private final Map<IndexedTypeIdentifier,V> map;
+	private final Map<String,IndexedTypeIdentifier> name2keyMapping;
+
+	public DelegatingIndexedTypeMap(Map<IndexedTypeIdentifier, V> map,
+			Map<String, IndexedTypeIdentifier> name2keyMapping) {
+		super();
+		this.map = map;
+		this.name2keyMapping = name2keyMapping;
+	}
 
 	@Override
 	public V get(IndexedTypeIdentifier key) {
