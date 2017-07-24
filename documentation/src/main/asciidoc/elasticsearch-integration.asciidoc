@@ -139,7 +139,7 @@ you will need the new `hibernate-search-elasticsearch` jar.
 ----
 ====
 
-If you use Amazon's proprietary IAM authentication mechanism to access Elasticsearch,
+If you use Amazon's proprietary IAM authentication through request signing to access Elasticsearch,
 you will need an additional dependency to handle authentication:
 `hibernate-search-elasticsearch-aws`.
 
@@ -324,9 +324,13 @@ Excluded properties are `host`, `username`, `password`, `read_timeout`, `connect
 [[elasticsearch-integration-configuration-aws]]
 ===== Authentication on Amazon Web Services
 
-Amazon's proprietary IAM authentication <<elasticsearch-integration-dependencies,requires additional dependencies>>.
+Amazon's proprietary IAM authentication through request signing <<elasticsearch-integration-dependencies,requires additional dependencies>>.
 With these dependencies, you will be able to use the following configuration options.
 
+Enable or disable AWS request signing:: `hibernate.search.default.elasticsearch.aws.signing.enabled false` (default)
++
+The value must be either `true` or `false`.
++
 AWS access key:: `hibernate.search.default.elasticsearch.aws.access_key AKIDEXAMPLE`
 +
 This property has no default and must be provided for the AWS authentication to work.

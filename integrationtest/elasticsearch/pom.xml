@@ -403,7 +403,8 @@
             <id>aws</id>
             <activation>
                 <property>
-                    <name>test.elasticsearch.host.aws.access_key</name>
+                    <name>test.elasticsearch.host.aws.signing.enabled</name>
+                    <value>true</value>
                 </property>
             </activation>
             <properties>
@@ -411,6 +412,7 @@
                     ,
                     org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS
                 </test.elasticsearch.failsafe.excludedGroups.aws>
+                <test.elasticsearch.host.aws.signing.enabled>true</test.elasticsearch.host.aws.signing.enabled>
             </properties>
             <dependencies>
                 <dependency>
