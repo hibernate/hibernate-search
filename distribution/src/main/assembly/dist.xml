@@ -101,7 +101,22 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-elasticsearch</include>
+                <!--
+                    The ':*' suffix is necessary to not include elasticsearch-aws,
+                    because of a bug in maven-assembly-plugin.
+                    See https://issues.apache.org/jira/browse/MASSEMBLY-865
+                 -->
+                <include>org.hibernate:hibernate-search-elasticsearch:*</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/elasticsearch-aws</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
             </includes>
         </dependencySet>
 
