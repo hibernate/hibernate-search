@@ -60,6 +60,10 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-elasticsearch-aws</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-backend-jms</artifactId>
         </dependency>
         <dependency>
@@ -103,6 +107,7 @@
                         ${basedir}/../backends/jgroups/src/main/java;
                         ${basedir}/../backends/jms/src/main/java;
                         ${basedir}/../elasticsearch/src/main/java;
+                        ${basedir}/../elasticsearch-aws/src/main/java;
                     </sourcepath>
                     <docfilessubdirs>true</docfilessubdirs>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
