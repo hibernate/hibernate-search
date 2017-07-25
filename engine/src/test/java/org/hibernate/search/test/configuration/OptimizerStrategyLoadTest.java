@@ -83,7 +83,8 @@ public class OptimizerStrategyLoadTest {
 		cfg.addClass( Document.class );
 		SearchIntegrator sf = integratorResource.create( cfg );
 		EntityIndexBinding indexBindingForEntity = sf.getIndexBindings().get( Document.class );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
+		DirectoryBasedIndexManager indexManager =
+				(DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagerSelector().all().iterator().next();
 		OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
 		Assert.assertTrue( type.isAssignableFrom( optimizerStrategy.getClass() ) );
 	}

@@ -83,16 +83,16 @@ public class DynamicShardingTest extends SearchTestBase {
 	@Test
 	public void testDynamicCreationOfShards() throws Exception {
 		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 0 );
 
 		insert( elephant );
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 1 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 1 );
 
 		insert( spider );
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 2 );
 
 		insert( bear );
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 2 );
 
 		assertEquals( 2, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
 		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
@@ -116,11 +116,11 @@ public class DynamicShardingTest extends SearchTestBase {
 	@Test
 	public void testInitialiseDynamicShardsOnStartup() throws Exception {
 		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 0 );
 
 		insert( elephant, spider, bear );
 
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+		assertThat( entityIndexBinding.getIndexManagerSelector().all() ).hasSize( 2 );
 
 		assertThat( getIndexManagersAfterReopening() ).hasSize( 2 );
 	}
@@ -186,7 +186,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		}
 	}
 
-	private IndexManager[] getIndexManagersAfterReopening() {
+	private Set<IndexManager> getIndexManagersAfterReopening() {
 		// build a new independent SessionFactory to verify that the shards are available at restart
 		Configuration config = new Configuration();
 
@@ -205,7 +205,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		try ( SessionFactory newSessionFactory = config.buildSessionFactory() ) {
 			try ( FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() ) ) {
 				ExtendedSearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
-				return integrator.getIndexBindings().get( Animal.class ).getIndexManagers();
+				return integrator.getIndexBindings().get( Animal.class ).getIndexManagerSelector().all();
 			}
 		}
 	}

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.impl.batch;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -55,7 +56,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	public void awaitAsyncProcessingCompletion() {
 		IndexedTypeMap<EntityIndexBinding> indexBindings = integrator.getIndexBindings();
 		for ( EntityIndexBinding indexBinding : indexBindings.values() ) {
-			for ( IndexManager indexManager : indexBinding.getIndexManagers() ) {
+			for ( IndexManager indexManager : indexBinding.getIndexManagerSelector().all() ) {
 				indexManager.awaitAsyncProcessingCompletion();
 			}
 		}
@@ -88,7 +89,7 @@ public class DefaultBatchBackend implements BatchBackend {
 		for ( IndexedTypeIdentifier type : entityTypes ) {
 			EntityIndexBinding indexBindingForEntity = integrator.getIndexBinding( type );
 			if ( indexBindingForEntity != null ) {
-				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
+				Set<IndexManager> indexManagers = indexBindingForEntity.getIndexManagerSelector().all();
 				for ( IndexManager im : indexManagers ) {
 					uniqueBackends.put( im.getIndexName(), im );
 				}

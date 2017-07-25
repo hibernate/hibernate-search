@@ -357,7 +357,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public void optimize(IndexedTypeIdentifier entityType) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( entityType );
-		for ( IndexManager im : entityIndexBinding.getIndexManagers() ) {
+		for ( IndexManager im : entityIndexBinding.getIndexManagerSelector().all() ) {
 			im.optimize();
 		}
 	}
@@ -585,7 +585,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			else {
 				indexedTypeDescriptor = new IndexedTypeDescriptorImpl(
 						indexBinder.getDocumentBuilder().getTypeMetadata(),
-						indexBinder.getIndexManagers()
+						indexBinder.getIndexManagerSelector().all()
 				);
 			}
 			indexedTypeDescriptors.put( type, indexedTypeDescriptor );

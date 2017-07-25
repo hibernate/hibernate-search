@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -83,9 +84,9 @@ public class RetryInitializeTest {
 		SearchIntegrator integrator = slave.getSearchFactory().unwrap( SearchIntegrator.class );
 
 		EntityIndexBinding snowIndexBinder = integrator.getIndexBindings().get( SnowStorm.class );
-		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
-		assertEquals( 1, indexManagers.length );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		Set<IndexManager> indexManagers = snowIndexBinder.getIndexManagerSelector().all();
+		assertEquals( 1, indexManagers.size() );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers.iterator().next();
 		FSSlaveDirectoryProviderTestingExtension dp = (FSSlaveDirectoryProviderTestingExtension) indexManager.getDirectoryProvider();
 		// now as master wasn't started yet, it should return a "dummy" index a RAMDirectory
 		Directory directory = dp.getDirectory();

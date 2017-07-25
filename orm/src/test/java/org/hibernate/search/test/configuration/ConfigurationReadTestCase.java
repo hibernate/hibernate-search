@@ -7,6 +7,7 @@
 package org.hibernate.search.test.configuration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
@@ -17,6 +18,7 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Before;
 
@@ -58,17 +60,32 @@ public abstract class ConfigurationReadTestCase extends SearchTestBase {
 	}
 
 	protected final void assertValueIsSet(Class testEntity, int shard, IndexWriterSetting setting, int expectedValue) {
-		assertNotNull( "shard:" + shard + " setting:" + setting.getKey(),
-				getParameter( shard, setting, testEntity ) );
-		assertEquals( "shard:" + shard + " setting:" + setting.getKey(), expectedValue,
-				(int) getParameter( shard, setting, testEntity ) );
+		Integer actualValue = getParameter( shard, setting, testEntity );
+		assertNotNull( "shard:" + shard + " setting:" + setting.getKey(), actualValue );
+		assertEquals( "shard:" + shard + " setting:" + setting.getKey(), expectedValue, (int) actualValue );
 	}
 
 	private Integer getParameter(int shard, IndexWriterSetting setting, Class testEntity) {
 		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBindings().get( testEntity );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mappingForEntity.getIndexManagers()[shard];
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) getIndexManager( mappingForEntity, shard );
 		LuceneIndexingParameters luceneIndexingParameters = indexManager.getIndexingParameters();
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );
+	}
+
+	protected final IndexManager getIndexManager(EntityIndexBinding mappingForEntity, int shardIndex) {
+		Set<IndexManager> indexManagers = mappingForEntity.getIndexManagerSelector().all();
+		if ( shardIndex == 0 && indexManagers.size() == 1 ) {
+			return indexManagers.iterator().next();
+		}
+		else {
+			for ( IndexManager indexManager : mappingForEntity.getIndexManagerSelector().all() ) {
+				if ( indexManager.getIndexName().endsWith( "." + shardIndex ) ) {
+					return indexManager;
+				}
+			}
+			throw new IllegalStateException( "Could not find IndexManager for shard " + shardIndex
+					+ " for binding " + mappingForEntity );
+		}
 	}
 
 	@Override

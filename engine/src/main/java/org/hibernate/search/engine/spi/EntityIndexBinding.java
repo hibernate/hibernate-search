@@ -8,7 +8,6 @@ package org.hibernate.search.engine.spi;
 
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.IndexedTypeSet;
@@ -53,13 +52,6 @@ public interface EntityIndexBinding {
 	 * @return the type of index managers
 	 */
 	IndexManagerType getIndexManagerType();
-
-	/**
-	 * @return the array of index managers
-	 * @deprecated Use {@link #getIndexManagerSelector()} instead.
-	 */
-	@Deprecated
-	IndexManager[] getIndexManagers();
 
 	/**
 	 * @return the interceptor for indexing operations. Can be {@code null}

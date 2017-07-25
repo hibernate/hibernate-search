@@ -6,18 +6,15 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.util.Set;
-
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.IndexManagerGroupHolder;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.store.ShardIdentifierProvider;
-import org.hibernate.search.indexes.impl.IndexManagerGroupHolder;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
@@ -78,12 +75,6 @@ public class MutableEntityIndexBinding implements EntityIndexBinding {
 	@Override
 	public IndexManagerType getIndexManagerType() {
 		return indexManagerGroupHolder.getIndexManagerType();
-	}
-
-	@Override
-	public IndexManager[] getIndexManagers() {
-		Set<IndexManager> set = indexManagerSelector.all();
-		return set.toArray( new IndexManager[set.size()] );
 	}
 
 	@Override

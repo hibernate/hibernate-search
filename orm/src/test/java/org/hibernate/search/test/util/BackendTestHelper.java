@@ -7,6 +7,7 @@
 package org.hibernate.search.test.util;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -79,8 +80,8 @@ public abstract class BackendTestHelper {
 
 		public Directory getDirectory(IndexedTypeIdentifier entityType) {
 			ExtendedSearchIntegrator integrator = resourceManager.getExtendedSearchIntegrator();
-			IndexManager[] indexManagers = integrator.getIndexBinding( entityType ).getIndexManagers();
-			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+			Set<IndexManager> indexManagers = integrator.getIndexBinding( entityType ).getIndexManagerSelector().all();
+			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers.iterator().next();
 			return indexManager.getDirectoryProvider().getDirectory();
 		}
 
