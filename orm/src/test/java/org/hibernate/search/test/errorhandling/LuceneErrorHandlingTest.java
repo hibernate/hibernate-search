@@ -55,7 +55,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	public void testErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
 		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( testTypeId );
-		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
+		IndexManager indexManager = mappingForEntity.getIndexManagerSelector().all().iterator().next();
 
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
@@ -99,7 +99,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	public void testNoEntityErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
 		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( testTypeId );
-		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
+		IndexManager indexManager = mappingForEntity.getIndexManagerSelector().all().iterator().next();
 
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 

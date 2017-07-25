@@ -107,7 +107,7 @@ public class WorkSequencesTest extends SearchTestBase {
 	//helper method to verify how many instances are found in the index by doing a simple FT query
 	private int countDomainsByFullText(String name) throws IOException {
 		String indexName = getExtendedSearchIntegrator().getIndexBindings().get( Domain.class )
-				.getIndexManagers()[0].getIndexName();
+				.getIndexManagerSelector().all().iterator().next().getIndexName();
 
 		return getNumberOfDocumentsInIndexByQuery( indexName, "name", name );
 	}

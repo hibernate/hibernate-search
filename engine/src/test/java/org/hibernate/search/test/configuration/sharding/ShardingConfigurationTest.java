@@ -267,12 +267,12 @@ public class ShardingConfigurationTest {
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
 
 		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBindings().get( Foo.class );
-		IndexManager indexManagers[] = entityIndexBinding.getIndexManagers();
+		Set<IndexManager> indexManagers = entityIndexBinding.getIndexManagerSelector().all();
 
-		assertTrue( "There should be two index managers", indexManagers.length == 1 );
-		assertTrue( "Unexpected index manager type", indexManagers[0] instanceof DirectoryBasedIndexManager );
+		assertTrue( "There should be two index managers", indexManagers.size() == 1 );
+		assertTrue( "Unexpected index manager type", indexManagers.iterator().next() instanceof DirectoryBasedIndexManager );
 
-		DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManagers.iterator().next();
 		assertTrue(
 				"Unexpected directory provider type: " + directoryBasedIndexManager.getDirectoryProvider().getClass(),
 				directoryBasedIndexManager.getDirectoryProvider() instanceof FSDirectoryProvider

@@ -7,6 +7,7 @@
 package org.hibernate.search.test.backend;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Session;
@@ -100,9 +101,9 @@ public class OptimizationTriggerTest extends SearchTestBase {
 	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
 		SearchIntegrator searchIntegrator = getSearchFactory().unwrap( SearchIntegrator.class );
 		EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBindings().get( clazz );
-		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
-		assertEquals( 1, indexManagers.length );
-		return (DirectoryBasedIndexManager) indexManagers[0];
+		Set<IndexManager> indexManagers = indexBindingForEntity.getIndexManagerSelector().all();
+		assertEquals( 1, indexManagers.size() );
+		return (DirectoryBasedIndexManager) indexManagers.iterator().next();
 	}
 
 	@Override

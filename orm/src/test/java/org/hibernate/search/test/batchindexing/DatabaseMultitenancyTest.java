@@ -204,7 +204,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.close();
 
 		String indexName = getExtendedSearchIntegrator().getIndexBindings().get( entityType )
-				.getIndexManagers()[0].getIndexName();
+				.getIndexManagerSelector().all().iterator().next().getIndexName();
 
 		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isGreaterThan( 0 );
 	}
@@ -216,7 +216,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.close();
 
 		String indexName = getExtendedSearchIntegrator().getIndexBindings().get( entityType )
-				.getIndexManagers()[0].getIndexName();
+				.getIndexManagerSelector().all().iterator().next().getIndexName();
 
 		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isEqualTo( 0 );
 	}

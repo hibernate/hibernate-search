@@ -7,6 +7,7 @@
 package org.hibernate.search.test.configuration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexShardingStrategyIndexManagerSelector;
@@ -66,13 +67,13 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	@Test
 	public void testCorrectNumberOfShardsDetected() {
 		EntityIndexBinding indexBindingForDocument = getExtendedSearchIntegrator().getIndexBindings().get( Document.class );
-		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
+		Set<IndexManager> documentManagers = indexBindingForDocument.getIndexManagerSelector().all();
 		assertNotNull( documentManagers );
-		assertEquals( 4, documentManagers.length );
+		assertEquals( 4, documentManagers.size() );
 		EntityIndexBinding indexBindingForBooks = getExtendedSearchIntegrator().getIndexBindings().get( Book.class );
-		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
+		Set<IndexManager> bookManagers = indexBindingForBooks.getIndexManagerSelector().all();
 		assertNotNull( bookManagers );
-		assertEquals( 2, bookManagers.length );
+		assertEquals( 2, bookManagers.size() );
 	}
 
 	@Test
@@ -91,10 +92,10 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	@Test
 	@Category(SkipOnElasticsearch.class) // DirectoryProviders and IndexWriterSettings are specific to the Lucene backend
 	public void testShardingSettingsInherited() {
-		IndexManager[] indexManagers = getExtendedSearchIntegrator().getIndexBindings().get( Document.class ).getIndexManagers();
-		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
-		assertTrue( getDirectoryProvider( indexManagers[1] ) instanceof FSDirectoryProvider );
-		assertTrue( getDirectoryProvider( indexManagers[2] ) instanceof RAMDirectoryProvider );
+		EntityIndexBinding binding = getExtendedSearchIntegrator().getIndexBindings().get( Document.class );
+		assertTrue( getDirectoryProvider( getIndexManager( binding, 0 ) ) instanceof RAMDirectoryProvider );
+		assertTrue( getDirectoryProvider( getIndexManager( binding, 1 ) ) instanceof FSDirectoryProvider );
+		assertTrue( getDirectoryProvider( getIndexManager( binding, 2 ) ) instanceof RAMDirectoryProvider );
 		assertValueIsSet( Document.class, 0, MAX_BUFFERED_DOCS, 58 );
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
 	}

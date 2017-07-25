@@ -8,7 +8,7 @@ package org.hibernate.search.indexes.impl;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
@@ -57,11 +57,7 @@ public class IndexShardingStrategyIndexManagerSelector implements IndexManagerSe
 		if ( indexManagers == null ) {
 			return Collections.emptySet();
 		}
-		/*
-		 * Using a LinkedHashSet because some APIs expose an ordered sequence of index managers.
-		 * See for example org.hibernate.search.engine.impl.MutableEntityIndexBinding.getIndexManagers().
-		 */
-		Set<IndexManager> set = new LinkedHashSet<>( indexManagers.length );
+		Set<IndexManager> set = new HashSet<>( indexManagers.length );
 		Collections.addAll( set, indexManagers );
 		return set;
 	}

@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
@@ -188,8 +189,8 @@ public class MutableFactoryTest {
 				EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBindings().get( aClass );
 				assertNotNull( indexBindingForEntity );
 
-				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
-				assertEquals( 1, indexManagers.length );
+				Set<IndexManager> indexManagers = indexBindingForEntity.getIndexManagerSelector().all();
+				assertEquals( 1, indexManagers.size() );
 
 				helper.assertThat( "name", "emmanuel" + index )
 						.from( aClass )

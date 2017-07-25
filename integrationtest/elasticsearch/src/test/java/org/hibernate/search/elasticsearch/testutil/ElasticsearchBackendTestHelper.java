@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -49,11 +50,11 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 	public int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType) {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 
-		IndexManager[] indexManagers = resourceManager.getExtendedSearchIntegrator()
+		Set<IndexManager> indexManagers = resourceManager.getExtendedSearchIntegrator()
 				.getIndexBinding( entityType )
-				.getIndexManagers();
+				.getIndexManagerSelector().all();
 
-		List<URLEncodedString> indexNames = new ArrayList<>( indexManagers.length );
+		List<URLEncodedString> indexNames = new ArrayList<>( indexManagers.size() );
 
 		for ( IndexManager indexManager : indexManagers ) {
 			indexNames.add( URLEncodedString.fromString( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() ) );

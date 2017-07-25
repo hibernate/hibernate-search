@@ -31,7 +31,8 @@ public class BaseConfigurationTest {
 
 	protected static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
 		EntityIndexBinding indexBindingForEntity = sf.getIndexBindings().get( type );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
+		DirectoryBasedIndexManager indexManager =
+				(DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagerSelector().all().iterator().next();
 		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();
 	}

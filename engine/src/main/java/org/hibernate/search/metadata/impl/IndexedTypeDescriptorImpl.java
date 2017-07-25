@@ -43,11 +43,11 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	private final Map<String, FieldDescriptor> allFieldDescriptors;
 	private final boolean sharded;
 
-	public IndexedTypeDescriptorImpl(TypeMetadata typeMetadata, IndexManager[] indexManagers) {
+	public IndexedTypeDescriptorImpl(TypeMetadata typeMetadata, Set<IndexManager> indexManagers) {
 		this.indexedType = typeMetadata.getType();
 		this.classBoost = typeMetadata.getStaticBoost();
 		this.boostStrategy = typeMetadata.getDynamicBoost();
-		this.sharded = indexManagers.length > 1;
+		this.sharded = indexManagers.size() > 1;
 
 		// create the class bridge fields
 		Set<FieldDescriptor> fieldDescriptorTmp = new HashSet<FieldDescriptor>();

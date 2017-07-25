@@ -8,7 +8,10 @@
 package org.hibernate.search.test.metadata;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -47,17 +50,16 @@ public final class DescriptorTestHelper {
 		);
 	}
 
-	public static IndexManager[] getDummyUnShardedIndexManager() {
-		IndexManager[] managers = new IndexManager[1];
-		managers[0] = new DummyIndexManager( TEST_INDEX_NAMES.get( 0 ) );
-		return managers;
+	public static Set<IndexManager> getDummyUnShardedIndexManager() {
+		IndexManager indexManager = new DummyIndexManager( TEST_INDEX_NAMES.get( 0 ) );
+		return Collections.singleton( indexManager );
 	}
 
-	public static IndexManager[] getDummyShardedIndexManager() {
-		IndexManager[] managers = new IndexManager[3];
+	public static Set<IndexManager> getDummyShardedIndexManager() {
+		Set<IndexManager> managers = new HashSet<>();
 		int i = 0;
 		for ( String indexName : TEST_INDEX_NAMES ) {
-			managers[i] = new DummyIndexManager( indexName );
+			managers.add( new DummyIndexManager( indexName ) );
 			i++;
 		}
 		return managers;
