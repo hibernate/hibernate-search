@@ -19,7 +19,7 @@ node ('Performance') {
 					" -jar integrationtest/performance/engine-elasticsearch/target/benchmarks.jar " +
 					" -wi 1 -i 10" +
 					" -rff output/elasticsearch-benchmark-results.csv" +
-					" -p indexSize=1000 -p maxResults=100 -p changesetsPerFlush=100 -p streamedAddsPerFlush=10000"
+					" -p indexSize=1000 -p maxResults=100 -p changesetsPerFlush=50 -p streamedAddsPerFlush=5000"
 		}
 		archiveArtifacts artifacts: 'output/*'
 	}
