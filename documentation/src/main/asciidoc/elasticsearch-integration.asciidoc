@@ -885,9 +885,9 @@ you can directly create Elasticsearch queries by using either its String format 
 ====
 [source,java]
 ----
-FullTextSession fullTextSession = Search.getFullTextSession(session);
+FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
 QueryDescriptor query = ElasticsearchQueries.fromQueryString("title:tales");
-List<?> result = fullTextSession.createFullTextQuery(query, ComicBook.class).list();
+List<?> result = fullTextEm.createFullTextQuery(query, ComicBook.class).getResultList();
 ----
 ====
 
@@ -895,10 +895,10 @@ List<?> result = fullTextSession.createFullTextQuery(query, ComicBook.class).lis
 ====
 [source,java]
 ----
-FullTextSession fullTextSession = Search.getFullTextSession(session);
+FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
 QueryDescriptor query = ElasticsearchQueries.fromJson(
       "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }");
-List<?> result = session.createFullTextQuery(query, GolfPlayer.class).list();
+List<?> result = fullTextEm.createFullTextQuery(query, GolfPlayer.class).getResultList();
 ----
 ====
 
@@ -970,16 +970,18 @@ If you happen to need an advanced Elasticsearch sorting feature that is not nati
 ====
 [source, JAVA]
 ----
-QueryBuilder qb = fullTextSession.getSearchFactory()
-    .buildQueryBuilder().forEntity(Book.class).get();
-Query luceneQuery = /* ... */;
-FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
-Sort sort = qb.sort()
-        .byNative( "authors.name", "{'order':'asc', 'mode': 'min'}" )
+FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+org.hibernate.search.query.dsl.QueryBuilder queryBuilder =
+        fullTextEm.getSearchFactory()
+        .buildQueryBuilder().forEntity(Book.class).get();
+Query luceneQuery = /* ... use the query builder as explained in tje Querying section ... */;
+FullTextQuery query = fullTextEm.createFullTextQuery( luceneQuery, Book.class );
+Sort sort = queryBuilder.sort()
+        .byNative("authors.name", "{'order':'asc', 'mode': 'min'}")
         .andByField("title")
         .createSort();
 query.setSort(sort);
-List results = query.list();
+List results = query.getResultList();
 ----
 ====
 
@@ -994,7 +996,8 @@ You can also retrieve the full JSON document by using `org.hibernate.search.elas
 
 [source,java]
 --
-query = ftem.createFullTextQuery(
+FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextQuery query = fullTextEm.createFullTextQuery(
                     qb.keyword()
                     .onField( "tags" )
                     .matching( "round-based" )
@@ -1003,14 +1006,15 @@ query = ftem.createFullTextQuery(
             )
             .setProjection( ElasticsearchProjectionConstants.SCORE, ElasticsearchProjectionConstants.SOURCE );
 
-projection = (Object[]) query.getSingleResult();
+Object[] projection = (Object[]) query.getSingleResult();
 --
 
 If you're looking for information about execution time, you may also use `org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TOOK` and `org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TIMED_OUT`: 
 
 [source,java]
 --
-query = ftem.createFullTextQuery(
+FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextQuery query = fullTextEm.createFullTextQuery(
                     qb.keyword()
                     .onField( "tags" )
                     .matching( "round-based" )
@@ -1023,7 +1027,7 @@ query = ftem.createFullTextQuery(
                     ElasticsearchProjectionConstants.TIMED_OUT 
             );
 
-projection = (Object[]) query.getSingleResult();
+Object[] projection = (Object[]) query.getSingleResult();
 Integer took = (Integer) projection[1]; // Execution time (milliseconds)
 Boolean timedOut = (Boolean) projection[2]; // Whether the query timed out
 --
@@ -1071,7 +1075,7 @@ public class Driver {
     @Field(analyze = Analyze.YES)
     private String name;
 
-    ...
+    // ...
 }
 --
 
@@ -1079,6 +1083,7 @@ From then you can use it as usual.
 
 [source,java]
 --
+FullTextQuery ftQuery = /* ... */;
 ftQuery.enableFullTextFilter( "namedDriver" ).setParameter( "name", "liz" );
 --
 
