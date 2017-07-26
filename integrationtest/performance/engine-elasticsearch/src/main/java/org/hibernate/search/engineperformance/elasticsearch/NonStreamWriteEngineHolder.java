@@ -28,10 +28,10 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "sync", "async" } )
 	private String workerExecution;
 
-	@Param( { "100000" } )
+	@Param( { "1000" } )
 	private int indexSize;
 
-	@Param( { "1000" } )
+	@Param( { "100" } )
 	private int changesetsPerFlush;
 
 	/**
@@ -39,10 +39,10 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 	 * <p>
 	 * The two values are squeezed into one parameter so as to
 	 * give more control over which combinations will be executed.
-	 * For instance you may want to test 5;5 then 500;500,
-	 * but 5;500 and 500;5 may not be of interest.
+	 * For instance you may want to test 5;5 then 1;1,
+	 * but 1;5 and 5;1 may not be of interest.
 	 */
-	@Param( { "10;20" } )
+	@Param( { "3;6" } )
 	private String worksPerChangeset;
 
 	private SearchIntegrator si;

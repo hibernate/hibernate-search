@@ -51,7 +51,7 @@ import org.openjdk.jmh.infra.Blackhole;
 public class NonStreamWriteJMHBenchmarks {
 
 	@Benchmark
-	@Threads(6 * AbstractBookEntity.TYPE_COUNT)
+	@Threads(3 * AbstractBookEntity.TYPE_COUNT)
 	public void write(NonStreamWriteEngineHolder eh, ChangesetGenerator changesetGenerator, NonStreamWriteCounters counters) {
 		SearchIntegrator si = eh.getSearchIntegrator();
 		Worker worker = si.getWorker();
