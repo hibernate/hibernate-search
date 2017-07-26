@@ -25,6 +25,7 @@ import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -131,13 +132,11 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	@Override
 	public void close() throws IOException {
-		try ( RestClient restClient = this.restClient;
-				Sniffer sniffer = this.sniffer; ) {
-			/*
-			 * Nothing to do: we simply take advantage of Java's auto-closing,
-			 * which adds suppressed exceptions as needed and always tries
-			 * to close every resource.
-			 */
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			if ( this.sniffer != null ) {
+				closer.push( this.sniffer::close );
+			}
+			closer.push( this.restClient::close );
 		}
 	}
 

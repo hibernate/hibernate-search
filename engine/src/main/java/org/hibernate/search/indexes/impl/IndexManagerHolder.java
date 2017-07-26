@@ -41,6 +41,7 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -178,18 +179,15 @@ public class IndexManagerHolder {
 	 * Stops all IndexManager instances
 	 */
 	public synchronized void stop() {
-		for ( BackendQueueProcessor backendQueueProcessor : backendQueueProcessorRegistry.values() ) {
-			backendQueueProcessor.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( BackendQueueProcessor::close, backendQueueProcessorRegistry.values() );
+			backendQueueProcessorRegistry.clear();
+			closer.pushAll( IndexManagerGroupHolder::close, groupHolderRegistry.values() );
+			groupHolderRegistry.clear();
+			groupHolderByIndexManagerNameRegistry.clear();
+			indexManagersRegistry.clear();
+			indexManagerImplementationsRegistry.clear();
 		}
-		backendQueueProcessorRegistry.clear();
-
-		for ( IndexManagerGroupHolder groupHolder : groupHolderRegistry.values() ) {
-			groupHolder.close();
-		}
-		groupHolderRegistry.clear();
-		groupHolderByIndexManagerNameRegistry.clear();
-		indexManagersRegistry.clear();
-		indexManagerImplementationsRegistry.clear();
 	}
 
 	/**
