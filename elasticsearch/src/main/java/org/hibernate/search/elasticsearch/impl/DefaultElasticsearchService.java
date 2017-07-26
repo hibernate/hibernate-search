@@ -39,6 +39,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
+import org.hibernate.search.util.impl.Closer;
 
 /**
  * Provides access to the JEST client.
@@ -121,18 +122,14 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	@Override
 	public void stop() {
-		try ( ElasticsearchClient client = this.client;
-				ElasticsearchWorkProcessor workProcessor = this.workProcessor; ) {
-			/*
-			 * Nothing to do: we simply take advantage of Java's auto-closing,
-			 * which adds suppressed exceptions as needed and always tries
-			 * to close every resource.
-			 */
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( this.workProcessor::close );
+			closer.push( this.client::close );
+			this.client = null;
 		}
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Elasticsearch service", e );
 		}
-		this.client = null;
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -69,11 +70,13 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void destroy() {
-		readers.stop();
-		workspaceHolder.close();
-		directoryProvider.stop();
-		if ( serializer != null ) {
-			serviceManager.releaseService( LuceneWorkSerializer.class );
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( readers::stop );
+			closer.push( workspaceHolder::close );
+			closer.push( directoryProvider::stop );
+			if ( serializer != null ) {
+				closer.push( serviceManager::releaseService, LuceneWorkSerializer.class );
+			}
 		}
 	}
 

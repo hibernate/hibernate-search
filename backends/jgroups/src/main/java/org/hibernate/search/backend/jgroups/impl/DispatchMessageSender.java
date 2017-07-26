@@ -16,6 +16,7 @@ import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -144,17 +145,16 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 
 	@Override
 	public void stop() {
-		serviceManager.releaseService( NodeSelectorService.class );
-		serviceManager.releaseService( LuceneWorkSerializer.class );
-		serviceManager = null;
-		dispatcher.stop();
-		try {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( serviceManager::releaseService, NodeSelectorService.class, LuceneWorkSerializer.class );
+			serviceManager = null;
+			closer.push( dispatcher::stop );
 			if ( channelContainer != null ) {
-				channelContainer.close();
+				closer.push( channelContainer::close );
 				channelContainer = null;
 			}
 		}
-		catch (Exception toLog) {
+		catch (RuntimeException toLog) {
 			log.jGroupsClosingChannelError( toLog );
 		}
 	}

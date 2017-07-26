@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -21,6 +22,38 @@ public final class Closeables {
 
 	private Closeables() {
 		// Private constructor
+	}
+
+	/**
+	 * Close multiple resources, ensuring that all resources get closed
+	 * even if one of them throws a Throwable.
+	 * <p>
+	 * The first caught throwable will be re-thrown, and any additional
+	 * throwable will be {@link Throwable#addSuppressed(Throwable) suppressed}.
+	 *
+	 * @see #close(Iterable)
+	 * @param closeables The resources to close
+	 * @throws E if a closeable throws such an exception
+	 */
+	@SuppressWarnings("unchecked")
+	public static <E extends Exception> void close(GenericCloseable<? extends E> ... closeables) throws E {
+		close( Arrays.asList( closeables ) );
+	}
+
+	/**
+	 * Close multiple resources, ensuring that all resources get closed
+	 * even if one of them throws a Throwable.
+	 * <p>
+	 * The first caught throwable will be re-thrown, and any additional
+	 * throwable will be {@link Throwable#addSuppressed(Throwable) suppressed}.
+	 *
+	 * @param closeables The resources to close
+	 * @throws E if a closeable throws such an exception
+	 */
+	public static <E extends Exception> void close(Iterable<? extends GenericCloseable<? extends E>> closeables) throws E {
+		try ( Closer<E> closer = new Closer<>() ) {
+			closer.pushAll( GenericCloseable::close, closeables );
+		}
 	}
 
 	/**
