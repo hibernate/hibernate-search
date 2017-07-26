@@ -1713,7 +1713,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <id>elasticsearch-2.2</id>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>2.4.5</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>2.4.6</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
