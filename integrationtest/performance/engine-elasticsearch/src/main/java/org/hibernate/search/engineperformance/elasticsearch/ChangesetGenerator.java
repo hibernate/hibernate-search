@@ -22,6 +22,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -43,10 +44,26 @@ public class ChangesetGenerator {
 
 	private static final long SEED = 3210140441369L;
 
-	private int changesets;
+	@Param( { "100" } )
+	private int changesetsPerFlush;
+
+	/**
+	 * Format: (number of add/remove) + "," + (number of updates)
+	 * <p>
+	 * The two values are squeezed into one parameter so as to
+	 * give more control over which combinations will be executed.
+	 * For instance you may want to test 5;5 then 1;1,
+	 * but 1;5 and 5;1 may not be of interest.
+	 */
+	@Param( { "3;6" } )
+	private String worksPerChangeset;
+
+	private int addDeletesPerChangeset;
+	private int updatesPerChangeset;
+	private int threadIdIntervalFirst;
+
 	private int addDeletesPerInvocation;
 	private int updatesPerInvocation;
-	private int threadIdIntervalFirst;
 
 	private BitSet toAdd;
 	private BitSet consumedToAdd;
@@ -62,16 +79,17 @@ public class ChangesetGenerator {
 	@Setup(Level.Trial)
 	public void setup(NonStreamWriteEngineHolder eh, NonStreamDatasetHolder dh, ThreadParams threadParams) {
 		int initialIndexSize = eh.getInitialIndexSize();
-		int addDeletesPerChangeset = eh.getAddsDeletesPerChangeset();
-		int updatesPerChangeset = eh.getUpdatesPerChangeset();
-		changesets = eh.getChangesetsPerFlush();
+
+		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
+		addDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );
+		updatesPerChangeset = Integer.parseInt( worksPerChangesetSplit[1] );
 
 		int threadIndex = threadParams.getThreadIndex();
 
 		dataset = dh.getDataset( threadIndex );
 
-		addDeletesPerInvocation = changesets * addDeletesPerChangeset;
-		updatesPerInvocation = changesets * updatesPerChangeset;
+		addDeletesPerInvocation = changesetsPerFlush * addDeletesPerChangeset;
+		updatesPerInvocation = changesetsPerFlush * updatesPerChangeset;
 		int threadIdIntervalSize = addDeletesPerInvocation + addDeletesPerInvocation + updatesPerInvocation;
 		threadIdIntervalFirst = initialIndexSize + threadIndex * threadIdIntervalSize;
 
@@ -126,7 +144,7 @@ public class ChangesetGenerator {
 	@TearDown(Level.Invocation)
 	public void updateBitSets() {
 		if ( addDeletesPerInvocation != consumedToAdd.cardinality() ) {
-			throw new AssertionFailure( "Wrong number of adds: expected " + addDeletesPerInvocation + ", got " + toAdd.cardinality() );
+			throw new AssertionFailure( "Wrong number of adds: expected " + addDeletesPerInvocation + ", got " + consumedToAdd.cardinality() );
 		}
 		if ( addDeletesPerInvocation != consumedToDelete.cardinality() ) {
 			throw new AssertionFailure( "Wrong number of deletes: expected " + addDeletesPerInvocation + ", got " + consumedToDelete.cardinality() );
@@ -174,7 +192,7 @@ public class ChangesetGenerator {
 		 */
 		Changeset sample = new Changeset();
 		consume( sample );
-		return Stream.iterate( sample, this::consume ).limit( changesets );
+		return Stream.iterate( sample, this::consume ).limit( changesetsPerFlush );
 	}
 
 	public IndexedTypeIdentifier getTypeId() {
@@ -182,9 +200,9 @@ public class ChangesetGenerator {
 	}
 
 	private Changeset consume(Changeset target) {
-		consumeIds( target.toAdd, addDeletesPerInvocation, toAdd, consumedToAdd );
-		consumeIds( target.toDelete, addDeletesPerInvocation, toDelete, consumedToDelete );
-		consumeIds( target.toUpdate, updatesPerInvocation, toUpdate, consumedToUpdate);
+		consumeIds( target.toAdd, addDeletesPerChangeset, toAdd, consumedToAdd );
+		consumeIds( target.toDelete, addDeletesPerChangeset, toDelete, consumedToDelete );
+		consumeIds( target.toUpdate, updatesPerChangeset, toUpdate, consumedToUpdate);
 		return target;
 	}
 
