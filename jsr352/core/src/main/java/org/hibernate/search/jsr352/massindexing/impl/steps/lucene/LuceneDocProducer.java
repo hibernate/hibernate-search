@@ -52,10 +52,6 @@ public class LuceneDocProducer implements ItemProcessor {
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
 	private String tenantId;
 
-	@Inject
-	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
-	private String indexScopeName;
-
 	private EntityManagerFactory emf;
 
 	private ExtendedSearchIntegrator searchIntegrator;
@@ -63,7 +59,6 @@ public class LuceneDocProducer implements ItemProcessor {
 	private DocumentBuilderIndexedEntity docBuilder;
 	private boolean isSetup = false;
 	private IndexedTypeIdentifier entityTypeIdentifier;
-	private IndexScope indexScope;
 
 	@Override
 	public Object processItem(Object item) throws Exception {
@@ -89,7 +84,6 @@ public class LuceneDocProducer implements ItemProcessor {
 		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityTypeIdentifier );
 		docBuilder = entityIndexBinding.getDocumentBuilder();
 		emf = jobContextData.getEntityManagerFactory();
-		indexScope = IndexScope.valueOf( indexScopeName );
 	}
 
 	private LuceneWork buildWork(Object entity) {
@@ -116,33 +110,22 @@ public class LuceneDocProducer implements ItemProcessor {
 		}
 
 		/*
-		 * Use the default instance initializer (likely HibernateStatelessInitializer),
-		 * because we don't need the fancy features provided by HibernateSessionLoadingInitializer:
-		 * in our case, we never mix entities from different sessions, since
-		 * each partition uses its own session.
+		 * Always create an add work, and let the writer decide whether
+		 * an update work should be executed instead.
 		 */
-		switch ( indexScope ) {
-			case HQL:
-				return docBuilder.createUpdateWork(
-						tenantId,
-						entityTypeIdentifier,
-						entity,
-						id,
-						idInString,
-						null,
-						conversionContext );
-			case CRITERIA:
-			case FULL_ENTITY:
-				return docBuilder.createAddWork(
-						tenantId,
-						entityTypeIdentifier,
-						entity,
-						id,
-						idInString,
-						null,
-						conversionContext );
-			default:
-				throw new IllegalStateException( "Unknown IndexScope: " + indexScope );
-		}
+		return docBuilder.createAddWork(
+				tenantId,
+				entityTypeIdentifier,
+				entity,
+				id,
+				idInString,
+				/*
+				 * Use the default instance initializer (likely HibernateStatelessInitializer),
+				 * because we don't need the fancy features provided by HibernateSessionLoadingInitializer:
+				 * in our case, we never mix entities from different sessions, since
+				 * each partition uses its own session.
+				 */
+				null,
+				conversionContext );
 	}
 }
