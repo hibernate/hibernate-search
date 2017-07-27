@@ -30,6 +30,8 @@ public class BytemanHelper extends Helper {
 
 	private static final Log log = LoggerFactory.make();
 
+	public static final String NAME = "org.hibernate.search.testsupport.BytemanHelper";
+
 	private static final AtomicInteger counter = new AtomicInteger();
 	private static final Deque<String> concurrentStack = new ConcurrentLinkedDeque<>();
 

@@ -22,6 +22,7 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.hibernate.search.testsupport.BytemanHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -37,7 +38,7 @@ public class JPATimeoutTest extends JPATestCase {
 	@Test
 	@BMRule(targetClass = "QueryHits",
 		targetMethod = "updateTopDocs",
-		helper = "org.hibernate.search.testsupport.BytemanHelper",
+		helper = BytemanHelper.NAME,
 		action = "sleepASecond();",
 		name = "Enable QueryHits slow down")
 	public void testQueryTimeoutException() throws Exception {

@@ -75,14 +75,14 @@ public class SearchFactoryTest {
 					isInterface = true,
 					targetClass = "org.hibernate.search.indexes.spi.IndexManager",
 					targetMethod = "initialize(String, Properties, Similarity, WorkerBuildContext)",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "simulateFailure()"
 			),
 			@BMRule(
 					name = "Track calls to ServiceManager.releaseAllServices",
 					targetClass = "org.hibernate.search.engine.service.impl.StandardServiceManager",
 					targetMethod = "releaseAllServices()",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "countInvocation()"
 			)
 	} )
@@ -107,7 +107,7 @@ public class SearchFactoryTest {
 					isInterface = true,
 					targetClass = "org.hibernate.search.indexes.spi.IndexManager",
 					targetMethod = "initialize(String, Properties, Similarity, WorkerBuildContext)",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					// Only fail after at least one index manager was successfully initialized
 					condition = "incrementCounter(\"indexManagerInitialize\") >= 2",
 					action = "simulateFailure()"
@@ -117,7 +117,7 @@ public class SearchFactoryTest {
 					isInterface = true,
 					targetClass = "org.hibernate.search.indexes.spi.IndexManager",
 					targetMethod = "destroy()",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "countInvocation()"
 			)
 	} )
@@ -145,14 +145,14 @@ public class SearchFactoryTest {
 					name = "Simulate failure on index manager search factory setup",
 					targetClass = "org.hibernate.search.engine.impl.MutableSearchFactoryState",
 					targetMethod = "setActiveSearchIntegrator(ExtendedSearchIntegratorWithShareableState)",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "simulateFailure()"
 			),
 			@BMRule(
 					name = "Track calls to ServiceManager.releaseAllServices",
 					targetClass = "org.hibernate.search.engine.service.impl.StandardServiceManager",
 					targetMethod = "releaseAllServices()",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "countInvocation()"
 			)
 	} )
@@ -175,7 +175,7 @@ public class SearchFactoryTest {
 					name = "Simulate failure on index manager search factory setup",
 					targetClass = "org.hibernate.search.engine.impl.MutableSearchFactoryState",
 					targetMethod = "setActiveSearchIntegrator(ExtendedSearchIntegratorWithShareableState)",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "simulateFailure()"
 			),
 			@BMRule(
@@ -183,7 +183,7 @@ public class SearchFactoryTest {
 					isInterface = true,
 					targetClass = "org.hibernate.search.indexes.spi.IndexManager",
 					targetMethod = "destroy()",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "countInvocation()"
 			)
 	} )
