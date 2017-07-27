@@ -47,7 +47,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.CriteriaObjectInitializer",
 			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testDefaultLookupMethod() throws Exception {
@@ -71,7 +71,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.PersistenceContextObjectInitializer",
 			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetLookupMethodPersistenceContextUpperCase() throws Exception {
@@ -95,7 +95,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.PersistenceContextObjectInitializer",
 			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetLookupMethodPersistenceContextLowerCase() throws Exception {
@@ -119,7 +119,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.LookupObjectInitializer",
 			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetDatabaseRetrievalMethodUpperCase() throws Exception {
@@ -143,7 +143,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.LookupObjectInitializer",
 			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetDatabaseRetrievalMethodLoweCase() throws Exception {

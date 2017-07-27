@@ -68,7 +68,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 			targetClass = "org.hibernate.search.query.hibernate.impl.CriteriaObjectInitializer",
 			targetMethod = "buildUpCriteria(java.util.List, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			targetLocation = "EXIT",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
+			helper = BytemanHelper.NAME,
 			binding = "c : org.hibernate.internal.CriteriaImpl = $!.get(0);",
 			action = "pushEvent(c.getEntityOrClassName())"
 		)

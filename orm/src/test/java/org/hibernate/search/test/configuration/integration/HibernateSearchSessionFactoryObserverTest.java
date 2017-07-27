@@ -36,7 +36,7 @@ public class HibernateSearchSessionFactoryObserverTest {
 	@BMRules(rules = {
 			@BMRule(targetClass = "org.hibernate.internal.SessionFactoryImpl",
 					targetMethod = "close",
-					helper = "org.hibernate.search.testsupport.BytemanHelper",
+					helper = BytemanHelper.NAME,
 					action = "countInvocation()",
 					name = "Session close counter"),
 			@BMRule(targetClass = "org.hibernate.search.spi.SearchIntegratorBuilder",

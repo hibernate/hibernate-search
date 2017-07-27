@@ -31,21 +31,21 @@ import org.junit.runner.RunWith;
 				name = "trackIndexWriterCommit",
 				targetClass = "org.apache.lucene.index.IndexWriter",
 				targetMethod = "commit()",
-				helper = "org.hibernate.search.testsupport.BytemanHelper",
+				helper = BytemanHelper.NAME,
 				action = "pushEvent(\"commit\")"
 			),
 		@BMRule(
 				name = "trackIndexWriterClose",
 				targetClass = "org.apache.lucene.index.IndexWriter",
 				targetMethod = "close()",
-				helper = "org.hibernate.search.testsupport.BytemanHelper",
+				helper = BytemanHelper.NAME,
 				action = "pushEvent(\"close\")"
 			),
 		@BMRule(
 				name = "trackUpdatesBeingApplied",
 				targetClass = "org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask",
 				targetMethod = "applyUpdates()",
-				helper = "org.hibernate.search.testsupport.BytemanHelper",
+				helper = BytemanHelper.NAME,
 				action = "pushEvent(\"applyUpdates\")"
 			),
 		} )

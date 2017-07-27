@@ -416,7 +416,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		name = "trackHttpsHostsDiscovery",
 		targetClass = "org.elasticsearch.client.RestClient",
 		targetMethod = "setHosts(HttpHost[])",
-		helper = "org.hibernate.search.testsupport.BytemanHelper",
+		helper = BytemanHelper.NAME,
 		binding = "host0 : HttpHost = $1.length >= 1 ? $1[0] : null, host1 : HttpHost = $1.length >= 2 ? $1[1] : null;",
 		condition = "host0 != null && host0.getSchemeName().equals( \"https\" )"
 				+ " || host1 != null && host1.getSchemeName().equals( \"https\" )",
