@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.batch.operations.JobOperator;
@@ -22,10 +21,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJob.ParametersBuilder;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
-import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
-
+import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 
@@ -38,45 +40,27 @@ import org.junit.runner.RunWith;
  * @author Mincong Huang
  */
 @RunWith(org.jboss.byteman.contrib.bmunit.BMUnitRunner.class)
-@BMRules(rules = {
-		@BMRule(
-				name = "Create count-down before the step partitioning",
-				targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
-				targetMethod = "mapPartitions",
-				targetLocation = "AT EXIT",
-				action = "createCountDown(\"beforeRestart\", " + RestartChunkIT.ITEMS_BEFORE_SIMULATED_FAILURE + ")"
-		),
-		@BMRule(
-				name = "Count down for each item read, interrupt the job when counter is 0",
-				targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader",
-				targetMethod = "readItem",
-				targetLocation = "AT ENTRY",
-				condition = "countDown(\"beforeRestart\")",
-				action = "throw new java.lang.InterruptedException(\"Job is interrupted by Byteman.\")"
-		)
-})
 public class RestartChunkIT {
 
-	static final int ITEMS_BEFORE_SIMULATED_FAILURE = 100;
+	static final int CHECKPOINT_INTERVAL = 10;
 
 	private static final String PERSISTENCE_UNIT_NAME = "h2";
 
-	private static final int JOB_TIMEOUT_MS = 10_000;
+	private static final int JOB_TIMEOUT_MS = 1_000;
 
-	private static final long DB_COMP_ROWS = 100;
-	private static final long DB_PERS_ROWS = 50;
+	protected static final long DB_COMP_ROWS = 150;
 
 	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 	private EntityManagerFactory emf;
 
 	@Before
 	public void setup() {
-		String[][] str = new String[][] {
-				{ "Google", "Sundar", "Pichai" },
-				{ "Red Hat", "James", "M. Whitehurst" },
-				{ "Microsoft", "Satya", "Nadella" },
-				{ "Facebook", "Mark", "Zuckerberg" },
-				{ "Amazon", "Jeff", "Bezos" }
+		String[] str = new String[] {
+				"Google",
+				"Red Hat",
+				"Microsoft",
+				"Facebook",
+				"Amazon"
 		};
 
 		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
@@ -84,13 +68,7 @@ public class RestartChunkIT {
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
 		for ( int i = 0; i < DB_COMP_ROWS; i++ ) {
-			em.persist( new Company( str[i % 5][0] ) );
-		}
-		for ( int i = 0; i < DB_PERS_ROWS; i++ ) {
-			String firstName = str[i % 5][1];
-			String lastName = str[i % 5][2];
-			String id = String.format( Locale.ROOT, "%2d%c", i, firstName.charAt( 0 ) );
-			em.persist( new Person( id, firstName, lastName ) );
+			em.persist( new Company( str[i % 5] + "-" + i ) );
 		}
 		em.getTransaction().commit();
 		em.close();
@@ -102,18 +80,157 @@ public class RestartChunkIT {
 	}
 
 	@Test
-	public void testJob() throws InterruptedException, IOException {
-		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Sundar" );
-		assertEquals( 0, companies.size() );
-		assertEquals( 0, people.size() );
+	@BMRule(
+			name = "Fail before the first read",
+			targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader",
+			targetMethod = "readItem",
+			targetLocation = "AT ENTRY",
+			helper = BytemanHelper.NAME,
+			condition = "flag(\"failureBeforeFirstRead_fullScope.failed\")",
+			action = "simulateFailure()"
+	)
+	public void failureBeforeFirstRead_fullScope() throws InterruptedException, IOException {
+		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2616")
+	@BMRules(rules = {
+			@BMRule(
+					name = "Create count-down before the step partitioning",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
+					targetMethod = "mapPartitions",
+					targetLocation = "AT EXIT",
+					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
+					action = "createCountDown(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 0.5 ) + ")"
+			),
+			@BMRule(
+					name = "Count down for each item written, simulate failure when counter is 0",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter",
+					targetMethod = "writeItem",
+					targetLocation = "AT EXIT",
+					helper = BytemanHelper.NAME,
+					condition = "countDown(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.countDown\")"
+							+ " && flag(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.failed\")",
+					action = "simulateFailure()"
+			)
+	})
+	public void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2616")
+	@BMRules(rules = {
+			@BMRule(
+					name = "Create count-down before the step partitioning",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
+					targetMethod = "mapPartitions",
+					targetLocation = "AT EXIT",
+					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL
+					action = "createCountDown(\"failureDuringCheckpointBetweenTwoWrites_fullScope.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 2.5 ) + ")"
+			),
+			@BMRule(
+					name = "Count down for each item written, simulate failure when counter is 0",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter",
+					targetMethod = "writeItem",
+					targetLocation = "AT EXIT",
+					helper = BytemanHelper.NAME,
+					condition = "countDown(\"failureDuringCheckpointBetweenTwoWrites_fullScope.countDown\")"
+							+ " && flag(\"failureDuringCheckpointBetweenTwoWrites_fullScope.failed\")",
+					action = "simulateFailure()"
+			)
+	})
+	public void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
+	}
+
+	@Test
+	@BMRule(
+			name = "Fail before the first read",
+			targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader",
+			targetMethod = "readItem",
+			targetLocation = "AT ENTRY",
+			helper = BytemanHelper.NAME,
+			condition = "flag(\"failureBeforeFirstRead_hql.failed\")",
+			action = "simulateFailure()"
+	)
+	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
+		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2616")
+	@BMRules(rules = {
+			@BMRule(
+					name = "Create count-down before the step partitioning",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
+					targetMethod = "mapPartitions",
+					targetLocation = "AT EXIT",
+					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
+					action = "createCountDown(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 0.5 ) + ")"
+			),
+			@BMRule(
+					name = "Count down for each item written, simulate failure when counter is 0",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter",
+					targetMethod = "writeItem",
+					targetLocation = "AT EXIT",
+					helper = BytemanHelper.NAME,
+					condition = "countDown(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.countDown\")"
+							+ " && flag(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.failed\")",
+					action = "simulateFailure()"
+			)
+	})
+	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2616")
+	@BMRules(rules = {
+			@BMRule(
+					name = "Create count-down before the step partitioning",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
+					targetMethod = "mapPartitions",
+					targetLocation = "AT EXIT",
+					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL
+					action = "createCountDown(\"failureDuringCheckpointBetweenTwoWrites_hql.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 2.5 ) + ")"
+			),
+			@BMRule(
+					name = "Count down for each item written, simulate failure when counter is 0",
+					targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter",
+					targetMethod = "writeItem",
+					targetLocation = "AT EXIT",
+					helper = BytemanHelper.NAME,
+					condition = "countDown(\"failureDuringCheckpointBetweenTwoWrites_hql.countDown\")"
+							+ " && flag(\"failureDuringCheckpointBetweenTwoWrites_hql.failed\")",
+					action = "simulateFailure()"
+			)
+	})
+	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+	}
+
+	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
+		EntityManager em = emf.createEntityManager();
+		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
+		ftem.purgeAll( Company.class );
+		ftem.flushToIndexes();
+		ftem.close();
+
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+		List<Company> google = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		assertEquals( 0, google.size() );
 
 		// start the job
-		Properties parameters = MassIndexingJob.parameters()
-				.forEntities( Company.class, Person.class )
+		ParametersBuilder builder = MassIndexingJob.parameters()
+				.forEntities( Company.class );
+		if ( hql != null ) {
+			builder = builder.restrictedBy( hql );
+		}
+		Properties parameters = builder
 				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				// must be smaller than ITEMS_BEFORE_SIMULATED_FAILURE to trigger the restart
-				.checkpointInterval( 10 )
+				.checkpointInterval( CHECKPOINT_INTERVAL )
 				.build();
 		long execId1 = jobOperator.start(
 				MassIndexingJob.NAME,
@@ -122,11 +239,7 @@ public class RestartChunkIT {
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		// job will be stopped by the byteman
-		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId1 ) ) {
-			if ( stepExec.getStepName().equals( "produceLuceneDoc" ) ) {
-				assertEquals( BatchStatus.FAILED, stepExec.getBatchStatus() );
-			}
-		}
+		assertEquals( BatchStatus.FAILED, getMainStepStatus( execId1 ) );
 
 		// restart the job
 		/*
@@ -136,15 +249,21 @@ public class RestartChunkIT {
 		long execId2 = jobOperator.restart( execId1, parameters );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
-		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId2 ) ) {
-			assertEquals( BatchStatus.COMPLETED, stepExec.getBatchStatus() );
-		}
+		assertEquals( BatchStatus.COMPLETED, getMainStepStatus( execId2 ) );
 
 		// search again
-		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "google" );
-		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Sundar" );
-		assertEquals( DB_COMP_ROWS / 5, companies.size() );
-		assertEquals( DB_PERS_ROWS / 5, people.size() );
+		assertEquals( expectedTotal, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+		google = JobTestUtil.findIndexedResults( emf, Company.class, "name", "google" );
+		assertEquals( expectedGoogle, google.size() );
+	}
+
+	private Object getMainStepStatus(long execId1) {
+		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId1 ) ) {
+			if ( stepExec.getStepName().equals( "produceLuceneDoc" ) ) {
+				return stepExec.getBatchStatus();
+			}
+		}
+		return null;
 	}
 
 }
