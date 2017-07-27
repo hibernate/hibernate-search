@@ -15,11 +15,14 @@ import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
+import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.impl.StreamingOperationExecutor;
 import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.jsr352.logging.impl.Log;
@@ -56,8 +59,15 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
 	private String partitionIdStr;
 
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
+	private String indexScopeName;
+
+	private IndexScope indexScope;
 
 	private IndexManagerSelector indexManagerSelector;
+
+	private WriteMode writeMode;
 
 	/**
 	 * The open method prepares the writer to write items.
@@ -67,6 +77,18 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@Override
 	public void open(Serializable checkpoint) throws Exception {
 		log.openingDocWriter( partitionIdStr, entityName );
+
+		this.indexScope = IndexScope.valueOf( indexScopeName );
+
+		/*
+		 * Always execute works as updates on the first checkpoint interval,
+		 * because we may be recovering from a failure, and there's no way
+		 * to accurately detect that situation.
+		 * Indeed, JSR-352 only specify that checkpoint state will be
+		 * saved *after* each chunk, so when we fail during the very first checkpoint,
+		 * we have no way of detecting this failure.
+		 */
+		this.writeMode = WriteMode.UPDATE;
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 
@@ -80,24 +102,22 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	/**
 	 * Execute {@code LuceneWork}
 	 *
-	 * @param items a list of items, where each item is a list of Lucene works.
+	 * @param items a list of LuceneWork, either AddLuceneWork or UpdateLuceneWork.
 	 *
 	 * @throws Exception is thrown for any errors.
 	 */
 	@Override
 	public void writeItems(List<Object> items) throws Exception {
 		for ( Object item : items ) {
-			LuceneWork work = (LuceneWork) item;
-			StreamingOperationExecutor executor = work.acceptIndexWorkVisitor(
-					StreamingOperationExecutorSelector.INSTANCE, null );
-			executor.performStreamOperation(
-					work,
-					indexManagerSelector,
-					null, // monitor,
-					FORCE_ASYNC );
+			writeItem( item );
 		}
 
-		// flush after write operation
+		/*
+		 * Flush after each write operation
+		 * This ensures the writes have actually been persisted,
+		 * which is necessary because the runtime will perform a checkpoint
+		 * just after we return from this method.
+		 */
 		Set<IndexManager> indexManagers = indexManagerSelector.all();
 		for ( IndexManager im : indexManagers ) {
 			im.performStreamOperation( FlushLuceneWork.INSTANCE, null, false );
@@ -106,5 +126,45 @@ public class LuceneDocWriter extends AbstractItemWriter {
 		// update work count
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
 		partitionData.documentAdded( items.size() );
+
+		if ( !IndexScope.HQL.equals( indexScope ) ) {
+			/*
+			 * We can switch to a faster mode, without checks, because we know the next items
+			 * we'll write haven't been written to the index yet.
+			 * This is not possible when using HQL, because checkpoints are ignored in that case.
+			 */
+			this.writeMode = WriteMode.ADD;
+		}
+	}
+
+	private void writeItem(Object item) {
+		LuceneWork work = extractWork( item);
+		StreamingOperationExecutor executor = work.acceptIndexWorkVisitor(
+				StreamingOperationExecutorSelector.INSTANCE, null );
+		executor.performStreamOperation(
+				work,
+				indexManagerSelector,
+				null, // monitor,
+				FORCE_ASYNC );
+	}
+
+	private LuceneWork extractWork(Object item) {
+		AddLuceneWork addWork = (AddLuceneWork) item;
+		switch ( writeMode ) {
+			case ADD:
+				return (AddLuceneWork) item;
+			case UPDATE:
+				return new UpdateLuceneWork(
+						addWork.getId(), addWork.getIdInString(), addWork.getEntityType(),
+						addWork.getDocument(), addWork.getFieldToAnalyzerMap()
+				);
+			default:
+				throw new AssertionFailure( "Invalid WriteMode: " + writeMode );
+		}
+	}
+
+	private enum WriteMode {
+		ADD,
+		UPDATE;
 	}
 }

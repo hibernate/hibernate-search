@@ -75,13 +75,13 @@
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                 </properties>
             </processor>
             <writer ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
+                    <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                 </properties>
             </writer>
         </chunk>
