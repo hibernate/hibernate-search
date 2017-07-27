@@ -450,12 +450,14 @@ takes place after the purge operation and before indexing.
 |Specify whether the mass indexer should be optimized at the end of the job. This operation takes
 place after indexing.
 
-|`cacheable`
-|`cacheable(boolean)`
+|`cacheMode`
+|`cacheMode(CacheMode)`
 |Optional
-|False
-|Specify whether the Hibernate queries are cacheable. This setting will be applied to the internal
-entity reader class. Set it to true when reading a complex graph with relations.
+|`IGNORE`
+|Specify the Hibernate `CacheMode` when loading entities.
+The default is `IGNORE`, and it will be the most efficient choice in most cases,
+but using another mode such as `GET` may be more efficient if many of the entities being indexed
+refer to a small set of other entities. 
 
 |`idFetchSize`
 |`idFetchSize(int)`

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.hibernate.CacheMode;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.exception.SearchException;
@@ -42,6 +43,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
 	private static final int MAX_THREADS = 2;
 	private static final int ROWS_PER_PARTITION = 500;
+	private static final CacheMode CACHE_MODE = CacheMode.GET;
 
 	@Test
 	public void testJobParamsAll() throws IOException {
@@ -56,6 +58,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
 				.rowsPerPartition( ROWS_PER_PARTITION )
 				.purgeAllOnStart( PURGE_ALL_ON_START )
+				.cacheMode( CACHE_MODE )
 				.tenantId( TENANT_ID )
 				.build();
 
@@ -68,6 +71,7 @@ public class MassIndexingJobParametersBuilderTest {
 		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );
 		assertEquals( PURGE_ALL_ON_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) );
 		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
+		assertEquals( CACHE_MODE, CacheMode.valueOf( props.getProperty( MassIndexingJobParameters.CACHE_MODE ) ) );
 		assertEquals( TENANT_ID, props.getProperty( MassIndexingJobParameters.TENANT_ID ) );
 
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );

@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -37,7 +38,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHE_MODE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
@@ -86,8 +87,8 @@ public class EntityReader extends AbstractItemReader {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CACHEABLE)
-	private String serializedCacheable;
+	@BatchProperty(name = MassIndexingJobParameters.CACHE_MODE)
+	private String serializedCacheMode;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
@@ -141,7 +142,7 @@ public class EntityReader extends AbstractItemReader {
 	/**
 	 * Constructor for unit test TODO should it be done in this way?
 	 */
-	EntityReader(String serializedCacheable,
+	EntityReader(String serializedCacheMode,
 			String entityName,
 			String serializedEntityFetchSize,
 			String serializedCheckpointInterval,
@@ -151,7 +152,7 @@ public class EntityReader extends AbstractItemReader {
 			String serializedLowerBound,
 			String serializedUpperBound,
 			String indexScopeName) {
-		this.serializedCacheable = serializedCacheable;
+		this.serializedCacheMode = serializedCacheMode;
 		this.entityName = entityName;
 		this.serializedEntityFetchSize = serializedEntityFetchSize;
 		this.serializedCheckpointInterval = serializedCheckpointInterval;
@@ -278,7 +279,8 @@ public class EntityReader extends AbstractItemReader {
 	private ScrollableResults buildScrollUsingHQL(Session session, String HQL) {
 		Query query = session.createQuery( HQL );
 
-		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
+		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode );
+
 		int entityFetchSize;
 		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
 			entityFetchSize = SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
@@ -292,14 +294,13 @@ public class EntityReader extends AbstractItemReader {
 			query.setMaxResults( maxResults );
 		}
 		return query.setReadOnly( true )
-				.setCacheable( cacheable )
+				.setCacheMode( cacheMode )
 				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
 	private ScrollableResults buildScrollUsingCriteria(Session session,
 			PartitionBound bound, JobContextData jobData) throws Exception {
-		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		Class<?> entity = bound.getEntityType();
 		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entity );
 		IdOrder idOrder = typeDescriptor.getIdOrder();
@@ -313,6 +314,8 @@ public class EntityReader extends AbstractItemReader {
 
 		// build criteria using job context data
 		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
+
+		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode );
 
 		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 			int maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
@@ -328,7 +331,7 @@ public class EntityReader extends AbstractItemReader {
 		}
 
 		return criteria.setReadOnly( true )
-				.setCacheable( cacheable )
+				.setCacheMode( cacheMode )
 				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}

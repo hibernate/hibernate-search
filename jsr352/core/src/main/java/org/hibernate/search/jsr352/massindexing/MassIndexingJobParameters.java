@@ -30,7 +30,7 @@ public final class MassIndexingJobParameters {
 
 	public static final String ENTITY_FETCH_SIZE = "entityFetchSize";
 
-	public static final String CACHEABLE = "cacheable";
+	public static final String CACHE_MODE = "cacheMode";
 
 	public static final String OPTIMIZE_ON_FINISH = "optimizeOnFinish";
 

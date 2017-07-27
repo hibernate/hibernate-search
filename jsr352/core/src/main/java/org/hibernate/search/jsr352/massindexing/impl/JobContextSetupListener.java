@@ -21,7 +21,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
 import org.hibernate.search.util.StringHelper;
 
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHE_MODE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
@@ -85,8 +85,8 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedEntityFetchSize;
 
 	@Inject
-	@BatchProperty(name = CACHEABLE)
-	private String serializedCacheable;
+	@BatchProperty(name = CACHE_MODE)
+	private String serializedCacheMode;
 
 	@Inject
 	@BatchProperty(name = OPTIMIZE_ON_FINISH)
@@ -180,7 +180,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 			ValidationUtil.validatePositive( MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 		}
 
-		SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
+		SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode );
 
 		if ( StringHelper.isNotEmpty( serializedCustomQueryCriteria ) ) {
 			SerializationUtil.parseParameter( Criteria.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );
