@@ -21,7 +21,6 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.StatelessSession;
 import org.hibernate.query.Query;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
@@ -134,7 +133,6 @@ public class EntityReader extends AbstractItemReader {
 
 	private Serializable checkpointId;
 	private Session session;
-	private StatelessSession ss;
 	private ScrollableResults scroll;
 
 	public EntityReader() {
@@ -194,12 +192,6 @@ public class EntityReader extends AbstractItemReader {
 			log.unableToCloseScrollableResults( e );
 		}
 		try {
-			ss.close();
-		}
-		catch (Exception e) {
-			log.unableToCloseStatelessSession( e );
-		}
-		try {
 			session.close();
 		}
 		catch (Exception e) {
@@ -233,20 +225,19 @@ public class EntityReader extends AbstractItemReader {
 		log.printBound( bound );
 
 		emf = jobData.getEntityManagerFactory();
-		ss = PersistenceUtil.openStatelessSession( emf, tenantId );
 		session = PersistenceUtil.openSession( emf, tenantId );
 
 		PartitionContextData partitionData;
 		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
 		switch ( indexScope ) {
 			case HQL:
-				scroll = buildScrollUsingHQL( ss, customQueryHql );
+				scroll = buildScrollUsingHQL( session, customQueryHql );
 				partitionData = new PartitionContextData( partitionId, entityName, indexScope );
 				break;
 
 			case CRITERIA:
 			case FULL_ENTITY:
-				scroll = buildScrollUsingCriteria( ss, bound, jobData );
+				scroll = buildScrollUsingCriteria( session, bound, jobData );
 				if ( isRestarted ) {
 					partitionData = (PartitionContextData) stepContext.getPersistentUserData();
 				}
@@ -284,8 +275,8 @@ public class EntityReader extends AbstractItemReader {
 		return new PartitionBound( entityType, lowerBound, upperBound, indexScope );
 	}
 
-	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
-		Query query = ss.createQuery( HQL );
+	private ScrollableResults buildScrollUsingHQL(Session session, String HQL) {
+		Query query = session.createQuery( HQL );
 
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int entityFetchSize;
@@ -306,13 +297,13 @@ public class EntityReader extends AbstractItemReader {
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
-	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
+	private ScrollableResults buildScrollUsingCriteria(Session session,
 			PartitionBound bound, JobContextData jobData) throws Exception {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		Class<?> entity = bound.getEntityType();
 		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entity );
 		IdOrder idOrder = typeDescriptor.getIdOrder();
-		Criteria criteria = ss.createCriteria( entity );
+		Criteria criteria = session.createCriteria( entity );
 
 		// build orders for this entity
 		idOrder.addAscOrder( criteria );

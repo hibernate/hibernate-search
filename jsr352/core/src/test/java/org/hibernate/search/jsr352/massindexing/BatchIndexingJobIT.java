@@ -23,6 +23,7 @@ import javax.batch.runtime.StepExecution;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaQuery;
 
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.exception.AssertionFailure;
@@ -31,9 +32,11 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgress;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
+import org.hibernate.search.jsr352.massindexing.test.entity.CompanyGroup;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.After;
 import org.junit.Before;
@@ -128,8 +131,10 @@ public class BatchIndexingJobIT {
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
-		assertCompletion( stepExecutions );
+		assertCompletion( executionId );
+		assertProgress( executionId, Person.class, 3 );
+		assertProgress( executionId, Company.class, 3 );
+		assertProgress( executionId, WhoAmI.class, 3 );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -137,6 +142,66 @@ public class BatchIndexingJobIT {
 		assertEquals( 1, companies.size() );
 		assertEquals( 1, people.size() );
 		assertEquals( 1, whos.size() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2637")
+	public void indexedEmbeddedCollection() throws InterruptedException,
+			IOException {
+		EntityManager em = null;
+
+		try {
+			em = emf.createEntityManager();
+			em.getTransaction().begin();
+			CriteriaQuery<Company> criteria = em.getCriteriaBuilder().createQuery(Company.class);
+			criteria.from( Company.class );
+			List<Company> companies = em.createQuery( criteria ).getResultList();
+			List<CompanyGroup> groups = Arrays.asList(
+					new CompanyGroup( "group1", companies.get( 0 ) ),
+					new CompanyGroup( "group2", companies.get( 0 ), companies.get( 1 ) ),
+					new CompanyGroup( "group3", companies.get( 2 ) ) );
+			for ( CompanyGroup group : groups ) {
+				em.persist( group );
+			}
+			em.getTransaction().commit();
+		}
+		finally {
+			try {
+				em.close();
+			}
+			catch (Exception e) {
+				log.error( e );
+			}
+		}
+
+		em = emf.createEntityManager();
+		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
+		ftem.purgeAll( CompanyGroup.class );
+		ftem.flushToIndexes();
+		em.close();
+		List<CompanyGroup> groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
+		List<CompanyGroup> groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
+		List<CompanyGroup> groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
+		assertEquals( 0, groupsContainingGoogle.size() );
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( CompanyGroup.class )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		assertCompletion( executionId );
+		assertProgress( executionId, CompanyGroup.class, 3 );
+
+		groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
+		groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
+		groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
+		assertEquals( 2, groupsContainingGoogle.size() );
+		assertEquals( 1, groupsContainingRedHat.size() );
+		assertEquals( 1, groupsContainingMicrosoft.size() );
 	}
 
 	@Test
@@ -283,10 +348,12 @@ public class BatchIndexingJobIT {
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
-		assertCompletion( stepExecutions );
+		assertCompletion( executionId );
+		assertProgress( executionId, Person.class, 3 );
+		assertProgress( executionId, Company.class, 3 );
+		assertProgress( executionId, WhoAmI.class, 3 );
 
-		StepProgress progress = getMainStepProgress( stepExecutions );
+		StepProgress progress = getMainStepProgress( executionId );
 		Map<Integer, Long> partitionProgress = progress.getPartitionProgress();
 		assertThat( partitionProgress )
 				.as( "Entities processed per partition" )
@@ -311,26 +378,28 @@ public class BatchIndexingJobIT {
 		assertEquals( 1, whos.size() );
 	}
 
-	private void assertCompletion(List<StepExecution> stepExecutions) {
+	private void assertCompletion(long executionId) {
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
 		for ( StepExecution stepExecution : stepExecutions ) {
 			BatchStatus batchStatus = stepExecution.getBatchStatus();
 			log.infof( "step %s executed.", stepExecution.getStepName() );
 			assertEquals( BatchStatus.COMPLETED, batchStatus );
 		}
+	}
 
+	private void assertProgress(long executionId, Class<?> entityType, int progressValue) {
 		/*
 		 * We cannot check the metrics, which in JBatch are set to 0
 		 * for partitioned steps (the metrics are handled separately for
 		 * each partition).
 		 * Thus we check our own object.
 		 */
-		StepProgress progress = getMainStepProgress( stepExecutions );
-		assertEquals( (Long) 3L, progress.getEntityProgress().get( Company.class.getName() ) );
-		assertEquals( (Long) 3L, progress.getEntityProgress().get( Person.class.getName() ) );
-		assertEquals( (Long) 3L, progress.getEntityProgress().get( WhoAmI.class.getName() ) );
+		StepProgress progress = getMainStepProgress( executionId );
+		assertEquals( Long.valueOf( progressValue ), progress.getEntityProgress().get( entityType.getName() ) );
 	}
 
-	private StepProgress getMainStepProgress(List<StepExecution> stepExecutions) {
+	private StepProgress getMainStepProgress(long executionId) {
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
 		for ( StepExecution stepExecution : stepExecutions ) {
 			switch ( stepExecution.getStepName() ) {
 				case MAIN_STEP_NAME:
