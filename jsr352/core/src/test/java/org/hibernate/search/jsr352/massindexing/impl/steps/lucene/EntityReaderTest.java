@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.CacheMode;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
@@ -77,14 +78,14 @@ public class EntityReaderTest {
 			}
 		}
 
-		final String cacheable = String.valueOf( false );
+		final String cacheMode = CacheMode.IGNORE.name();
 		final String entityName = Company.class.getName();
 		final String entityFetchSize = String.valueOf( 1000 );
 		final String checkpointInterval = String.valueOf( 1000 );
 		final String hql = null;
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
-		entityReader = new EntityReader( cacheable,
+		entityReader = new EntityReader( cacheMode,
 				entityName,
 				entityFetchSize,
 				checkpointInterval,

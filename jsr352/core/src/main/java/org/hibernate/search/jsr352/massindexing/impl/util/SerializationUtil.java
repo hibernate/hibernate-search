@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
+import java.util.Locale;
 
+import org.hibernate.CacheMode;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.StringHelper;
@@ -84,6 +86,19 @@ public final class SerializationUtil {
 			return (T) SerializationUtil.deserialize( value );
 		}
 		catch (IOException | ClassNotFoundException e) {
+			throw log.unableToParseJobParameter( key, value, e );
+		}
+	}
+
+	public static CacheMode parseCacheModeParameter(String key, String value) {
+		return parseEnumParameter( CacheMode.class, key, value.toUpperCase( Locale.ROOT ) );
+	}
+
+	private static <T extends Enum<T>> T parseEnumParameter(Class<T> clazz, String key, String value) {
+		try {
+			return Enum.valueOf( clazz, value );
+		}
+		catch (IllegalArgumentException e) {
 			throw log.unableToParseJobParameter( key, value, e );
 		}
 	}

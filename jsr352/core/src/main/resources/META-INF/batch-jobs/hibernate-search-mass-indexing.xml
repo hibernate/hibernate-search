@@ -19,7 +19,7 @@
                 <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 <property name="idFetchSize" value="#{jobParameters['idFetchSize']}?:1000;" />
                 <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
-                <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
+                <property name="cacheMode" value="#{jobParameters['cacheMode']}?:IGNORE;" />
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:true;" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:true;" />
@@ -64,7 +64,7 @@
                     <property name="upperBound" value="#{partitionPlan['upperBound']}" />
                     <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
+                    <property name="cacheMode" value="#{jobParameters['cacheMode']}?:IGNORE;" />
                     <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
                     <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />

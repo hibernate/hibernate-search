@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
@@ -96,7 +97,7 @@ public final class MassIndexingJob {
 		private final Set<Class<?>> entityTypes;
 		private String entityManagerFactoryNamespace;
 		private String entityManagerFactoryReference;
-		private Boolean cacheable;
+		private CacheMode cacheMode;
 		private Boolean optimizeAfterPurge;
 		private Boolean optimizeOnFinish;
 		private Boolean purgeAllOnStart;
@@ -153,15 +154,16 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Whether the Hibernate queries in this job should be cached. This method is optional, its default value is
-		 * false. Set it to true when reading a complex graph with relations.
+		 * The Hibernate {@link CacheMode} when loading entities.
+		 * <p>
+		 * This method is optional, its default value is {@link CacheMode#IGNORE}.
 		 *
-		 * @param cacheable cacheable
+		 * @param cacheMode the cache mode
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder cacheable(boolean cacheable) {
-			this.cacheable = cacheable;
+		public ParametersBuilder cacheMode(CacheMode cacheMode) {
+			this.cacheMode = cacheMode;
 			return this;
 		}
 
@@ -383,7 +385,6 @@ public final class MassIndexingJob {
 
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE, entityManagerFactoryNamespace );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
-			addIfNotNull( jobParams, MassIndexingJobParameters.CACHEABLE, cacheable );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ID_FETCH_SIZE, idFetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_FETCH_SIZE, entityFetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
@@ -396,6 +397,9 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
 			addIfNotNull( jobParams, MassIndexingJobParameters.TENANT_ID, tenantId );
+			if ( cacheMode != null ) {
+				jobParams.put( MassIndexingJobParameters.CACHE_MODE, cacheMode.name() );
+			}
 
 			if ( !customQueryCriteria.isEmpty() ) {
 				try {
