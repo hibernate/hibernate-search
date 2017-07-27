@@ -31,33 +31,11 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "1000" } )
 	private int indexSize;
 
-	@Param( { "100" } )
-	private int changesetsPerFlush;
-
-	/**
-	 * Format: (number of add/remove) + "," + (number of updates)
-	 * <p>
-	 * The two values are squeezed into one parameter so as to
-	 * give more control over which combinations will be executed.
-	 * For instance you may want to test 5;5 then 1;1,
-	 * but 1;5 and 5;1 may not be of interest.
-	 */
-	@Param( { "3;6" } )
-	private String worksPerChangeset;
-
 	private SearchIntegrator si;
-
-	private int addsDeletesPerChangeset;
-
-	private int updatesPerChangeset;
 
 	@Setup
 	public void initializeState() {
 		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
-
-		String[] worksPerChangesetSplit = worksPerChangeset.split( ";" );
-		addsDeletesPerChangeset = Integer.parseInt( worksPerChangesetSplit[0] );
-		updatesPerChangeset = Integer.parseInt( worksPerChangesetSplit[1] );
 	}
 
 	public SearchIntegrator getSearchIntegrator() {
@@ -66,18 +44,6 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	public int getInitialIndexSize() {
 		return indexSize;
-	}
-
-	public int getChangesetsPerFlush() {
-		return changesetsPerFlush;
-	}
-
-	public int getAddsDeletesPerChangeset() {
-		return addsDeletesPerChangeset;
-	}
-
-	public int getUpdatesPerChangeset() {
-		return updatesPerChangeset;
 	}
 
 	@TearDown
