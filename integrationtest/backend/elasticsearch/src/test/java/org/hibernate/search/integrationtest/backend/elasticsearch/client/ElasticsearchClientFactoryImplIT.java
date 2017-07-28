@@ -271,6 +271,110 @@ public class ElasticsearchClientFactoryImplIT {
 				.hasMessageContaining( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." );
 	}
 
+	/**
+	 * Verify that by default, even when the client is clogged (many pending requests),
+	 * we don't trigger timeouts just because requests spend a long time waiting;
+	 * timeouts are only related to how long the *server* takes to answer.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2836")
+	public void cloggedClient_noTimeout_read() {
+		SubTest.expectSuccessAfterRetry(
+				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
+				// even though no delay was configured.
+				// The exact reason is unknown though, so just try multiple times...
+				this::try_cloggedClient_noTimeout_read
+		);
+	}
+
+	private void try_cloggedClient_noTimeout_read() throws Exception {
+		wireMockRule1.resetRequests();
+		wireMockRule1.resetMappings();
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
+				.willReturn( elasticsearchResponse()
+						.withFixedDelay( 300 /* 300ms => should not time out, but will still clog up the client */ ) ) );
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withFixedDelay( 100 /* 100ms => should not time out */ ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" /* 1s */ );
+				}
+		) ) {
+			// Clog up the client: put many requests in the queue, to be executed asynchronously,
+			// so that we're sure the next request will have to wait in the queue
+			// for more that the configured timeout before it ends up being executed.
+			for ( int i = 0 ; i < 10 ; ++i ) {
+				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
+			}
+
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			wireMockRule1.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
+		}
+	}
+
+	/**
+	 * Verify that when a request timeout is set, and when the client is clogged (many pending requests),
+	 * we do trigger timeouts just because requests spend a long time waiting.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2836")
+	public void cloggedClient_timeout_request() {
+		SubTest.expectSuccessAfterRetry(
+				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
+				// even though no delay was configured.
+				// The exact reason is unknown though, so just try multiple times...
+				this::try_cloggedClient_timeout_request
+		);
+	}
+
+	private void try_cloggedClient_timeout_request() throws Exception {
+		wireMockRule1.resetRequests();
+		wireMockRule1.resetMappings();
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
+				.willReturn( elasticsearchResponse()
+						.withFixedDelay( 300 /* 300ms => should not time out, but will still clog up the client */ ) ) );
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withFixedDelay( 100 /* 100ms => should not time out */ ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
+					properties.accept( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE, "1" );
+					properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "1000" /* 1s */ );
+				}
+		) ) {
+			// Clog up the client: put many requests in the queue, to be executed asynchronously,
+			// so that we're sure the next request will have to wait in the queue
+			// for more that the configured timeout before it ends up being executed.
+			for ( int i = 0 ; i < 10 ; ++i ) {
+				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
+			}
+
+			assertThatThrownBy( () -> {
+					doPost( client, "/myIndex/myType", payload );
+			} )
+					.isInstanceOf( AssertionFailure.class )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+					.isInstanceOf( CompletionException.class )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." );
+		}
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2235")
 	public void multipleHosts() throws Exception {
