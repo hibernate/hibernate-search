@@ -49,9 +49,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int STREAM_MIN_BULK_SIZE = 1;
 	private static final int MAX_BULK_SIZE = 250;
 
-	private static final int SYNC_ORCHESTRATION_DELAY_MS = 0;
-	private static final int ASYNC_ORCHESTRATION_DELAY_MS = 100;
-
 	/*
 	 * Setting the following constants involves a bit of guesswork.
 	 * Basically we want the number to be large enough for the orchestrator
@@ -97,7 +94,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
 				"Elasticsearch async stream work orchestrator",
-				ASYNC_ORCHESTRATION_DELAY_MS,
 				STREAM_MAX_CHANGESETS_PER_BATCH,
 				false, // Do not care about ordering when queuing changesets
 				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, STREAM_MIN_BULK_SIZE, false ) );
@@ -192,7 +188,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		if ( sync ) {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch sync non-stream work orchestrator for index " + indexName,
-					SYNC_ORCHESTRATION_DELAY_MS,
 					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
 					true /* enqueue changesets in the order they were submitted */,
 					delegate
@@ -201,7 +196,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		else {
 			return createBatchingSharedOrchestrator(
 					"Elasticsearch async non-stream work orchestrator for index " + indexName,
-					ASYNC_ORCHESTRATION_DELAY_MS,
 					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
 					true /* enqueue changesets in the order they were submitted */,
 					delegate
@@ -235,9 +229,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	private BatchingSharedElasticsearchWorkOrchestrator createBatchingSharedOrchestrator(
-			String name, int delayMs, int maxChangesetsPerBatch, boolean fair,
+			String name, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate) {
-		return new BatchingSharedElasticsearchWorkOrchestrator( name, delayMs, maxChangesetsPerBatch, fair,
+		return new BatchingSharedElasticsearchWorkOrchestrator( name, maxChangesetsPerBatch, fair,
 				delegate, errorHandler );
 	}
 
