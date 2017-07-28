@@ -78,6 +78,7 @@ import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -254,29 +255,30 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public void close() {
 		if ( stopped.compareAndSet( false, true ) ) { //make sure we only stop once
-			try {
-				worker.close();
-			}
-			catch (Exception e) {
-				log.workerException( e );
-			}
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.push( () -> {
+					try {
+						worker.close();
+					}
+					catch (Exception e) {
+						log.workerException( e );
+					}
+				} );
 
-			if ( workSerializer != null ) {
-				serviceManager.releaseService( LuceneWorkSerializer.class );
-			}
+				closer.push( allIndexesManager::stop );
+				closer.push( timingSource::stop );
 
-			this.allIndexesManager.stop();
-			this.timingSource.stop();
+				if ( workSerializer != null ) {
+					closer.push( serviceManager::releaseService, LuceneWorkSerializer.class );
+				}
 
-			serviceManager.releaseAllServices();
+				closer.push( serviceManager::releaseAllServices );
+				closer.pushAll( SearchIntegration::close, this.integrations.values() );
 
-			for ( SearchIntegration integration : this.integrations.values() ) {
-				integration.close();
-			}
-
-			// unregister statistic mbean
-			if ( statisticsMBeanName != null ) {
-				JMXRegistrar.unRegisterMBean( statisticsMBeanName );
+				// unregister statistic mbean
+				if ( statisticsMBeanName != null ) {
+					closer.push( JMXRegistrar::unRegisterMBean, statisticsMBeanName );
+				}
 			}
 		}
 	}

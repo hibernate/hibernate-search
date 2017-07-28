@@ -52,6 +52,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -224,18 +225,21 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void destroy() {
-		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
-			elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
+				ElasticsearchSchemaDropper dropper = elasticsearchService.getSchemaDropper();
+				closer.push( () -> dropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions ) );
+			}
+
+			workProcessor = null;
+			visitor = null;
+			elasticsearchService = null;
+			closer.push( serviceManager::releaseService, ElasticsearchService.class );
+
+			schemaManagementExecutionOptions = null;
+
+			serviceManager = null;
 		}
-
-		workProcessor = null;
-		visitor = null;
-		elasticsearchService = null;
-		serviceManager.releaseService( ElasticsearchService.class );
-
-		schemaManagementExecutionOptions = null;
-
-		serviceManager = null;
 	}
 
 	@Override

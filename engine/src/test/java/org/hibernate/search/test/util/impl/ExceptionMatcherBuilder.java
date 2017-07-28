@@ -25,15 +25,27 @@ import org.hibernate.search.util.impl.CollectionHelper;
 public class ExceptionMatcherBuilder {
 
 	public static ExceptionMatcherBuilder isException(Class<? extends Throwable> clazz) {
-		return new ExceptionMatcherBuilder( clazz );
+		return new ExceptionMatcherBuilder( CoreMatchers.<Throwable>instanceOf( clazz ) );
+	}
+
+	public static ExceptionMatcherBuilder isException(Throwable throwable) {
+		return new ExceptionMatcherBuilder( CoreMatchers.sameInstance( throwable ) );
 	}
 
 	private final List<Matcher<?>> matchers = new ArrayList<>();
 
 	private final List<Matcher<?>> suppressedMatchers = new ArrayList<>();
 
-	private ExceptionMatcherBuilder(Class<? extends Throwable> clazz) {
-		matchers.add( CoreMatchers.<Throwable>instanceOf( clazz ) );
+	private ExceptionMatcherBuilder(Matcher<? extends Throwable> matcher) {
+		matchers.add( matcher );
+	}
+
+	public ExceptionMatcherBuilder withMainOrSuppressed(Throwable throwable) {
+		return withMainOrSuppressed( CoreMatchers.sameInstance( throwable ) );
+	}
+
+	public ExceptionMatcherBuilder withSuppressed(Throwable throwable) {
+		return withSuppressed( CoreMatchers.sameInstance( throwable ) );
 	}
 
 	public ExceptionMatcherBuilder withMainOrSuppressed(Matcher<?> matcher) {
@@ -46,7 +58,11 @@ public class ExceptionMatcherBuilder {
 	}
 
 	public ExceptionMatcherBuilder causedBy(Class<? extends Throwable> clazz) {
-		return new NestedExceptionCauseMatcherBuilder( clazz );
+		return new NestedExceptionCauseMatcherBuilder( CoreMatchers.<Throwable>instanceOf( clazz ) );
+	}
+
+	public ExceptionMatcherBuilder causedBy(Throwable throwable) {
+		return new NestedExceptionCauseMatcherBuilder( CoreMatchers.sameInstance( throwable ) );
 	}
 
 	public Matcher<? super Throwable> build() {
@@ -91,8 +107,8 @@ public class ExceptionMatcherBuilder {
 	 * @author Yoann Rodiere
 	 */
 	private class NestedExceptionCauseMatcherBuilder extends ExceptionMatcherBuilder {
-		public NestedExceptionCauseMatcherBuilder(Class<? extends Throwable> clazz) {
-			super( clazz );
+		public NestedExceptionCauseMatcherBuilder(Matcher<? extends Throwable> matcher) {
+			super( matcher );
 		}
 
 		@Override

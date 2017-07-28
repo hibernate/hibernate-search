@@ -78,6 +78,7 @@ import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -268,19 +269,16 @@ public class SearchIntegratorBuilder {
 	}
 
 	private void cleanupFactoryState() {
-		Worker worker = factoryState.getWorker();
-		if ( worker != null ) {
-			worker.close();
-		}
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			Worker worker = factoryState.getWorker();
+			if ( worker != null ) {
+				closer.push( worker::close );
+			}
 
-		factoryState.getAllIndexesManager().stop();
-
-		factoryState.getTimingSource().stop();
-
-		factoryState.getServiceManager().releaseAllServices();
-
-		for ( SearchIntegration integration : factoryState.getIntegrations().values() ) {
-			integration.close();
+			closer.push( factoryState.getAllIndexesManager()::stop );
+			closer.push( factoryState.getTimingSource()::stop );
+			closer.push( factoryState.getServiceManager()::releaseAllServices );
+			closer.pushAll( SearchIntegration::close, factoryState.getIntegrations().values() );
 		}
 	}
 
