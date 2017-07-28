@@ -10,9 +10,8 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -42,12 +41,11 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private final int delayMs;
 	private final FlushableElasticsearchWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
 
-	private final ScheduledExecutorService scheduler;
+	private final ExecutorService executor;
 	private final BlockingQueue<Changeset> changesetQueue;
 	private final List<Changeset> changesetBuffer;
 	private final AtomicBoolean processingScheduled;
@@ -62,8 +60,6 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 	/**
 	 * @param name The name of the orchestrator thread
-	 * @param delayMs A delay before creating a batch when a work is submitted.
-	 * Higher values mean bigger batch sizes, but higher latency.
 	 * @param maxChangesetsPerBatch The maximum number of changesets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
@@ -74,16 +70,15 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	 * @param errorHandler An error handler to send orchestration errors to.
 	 */
 	public BatchingSharedElasticsearchWorkOrchestrator(
-			String name, int delayMs, int maxChangesetsPerBatch, boolean fair,
+			String name, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
-		this.delayMs = delayMs;
 		this.delegate = delegate;
 		this.errorHandler = errorHandler;
 		this.changesetsPerBatch = maxChangesetsPerBatch;
 		changesetQueue = new ArrayBlockingQueue<>( maxChangesetsPerBatch, fair );
 		changesetBuffer = CollectionHelper.newArrayList( maxChangesetsPerBatch );
-		scheduler = Executors.newScheduledThreadPool( name );
+		executor = Executors.newFixedThreadPool( 1, name );
 		processingScheduled = new AtomicBoolean( false );
 	}
 
@@ -119,11 +114,11 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			try {
 				if ( processingScheduled.compareAndSet( false, true ) ) {
 					try {
-						scheduler.schedule( this::processBatch, delayMs, TimeUnit.MILLISECONDS );
+						executor.submit( this::processBatch );
 					}
 					catch (Throwable e) {
 						/*
-						 * Make sure a failure to schedule the processing
+						 * Make sure a failure to submit the processing task
 						 * doesn't leave other threads waiting indefinitely
 						 */
 						try {
@@ -137,7 +132,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 				}
 				else {
 					/*
-					 * Corner case: another thread scheduled processing
+					 * Corner case: another thread submitted a processing task
 					 * just after we registered the phaser.
 					 * Cancel our own registration.
 					 */
@@ -146,7 +141,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			}
 			catch (Throwable e) {
 				/*
-				 * Make sure a failure to schedule the processing
+				 * Make sure a failure to submit the processing task
 				 * doesn't leave other threads waiting indefinitely
 				 */
 				try {
@@ -172,7 +167,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( () -> {
-				scheduler.shutdown();
+				executor.shutdown();
 				try {
 					awaitCompletion();
 				}
