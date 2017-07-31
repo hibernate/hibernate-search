@@ -646,33 +646,10 @@ use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, 
 batch jobs share the same thread pool—so it's a good idea to execute jobs separately.
 ====
 
-===== Row per partitions
+===== Rows per partition
 
 Each partition consists of a fix number of elements to index. You may tune exactly how many elements
 a partition will hold with `rowsPerPartition`.
-
-[NOTE]
-====
-This property has nothing to do with checkpoint algorithms.
-
-Please see the <<jsr-352-checkpoint,Checkpoint section>> to see how to tune checkpoint algorithms.
-====
-
-When `rowsPerPartition` is low, there will be many small partitions,
-so processing threads will be less likely to starve (stay idle because there's no more partition to process),
-but on the other hand you will only be able to use a small fetch size,
-which will increase the number of database accesses.
-
-When `rowsPerPartition` is high, there will be a few big partitions,
-so you will be able to take advantage of a higher fetch size,
-which will reduce the number of database accesses,
-but on the other hand the processing of each partition will require to hold more objects in memory.
-
-[NOTE]
-====
-Each partition deals with one root entity type, so two different entity types will never run under
-the same partition.
-====
 
 ====
 [source, JAVA]
@@ -681,6 +658,36 @@ MassIndexingJob.parameters()
         .rowsPerPartition( 5000 )
         ...
 ----
+====
+
+[NOTE]
+====
+This property has *nothing* to do with "chunk size",
+which is how many elements are processed together between each write.
+That aspect of processing is addressed by checkpoints.
+
+Instead, `rowsPerPartition` is more about how parallel your mass indexing job will be.
+
+Please see the <<jsr-352-checkpoint,Checkpoint section>> to see how to tune checkpoint algorithms.
+====
+
+When `rowsPerPartition` is low, there will be many small partitions,
+so processing threads will be less likely to starve (stay idle because there's no more partition to process),
+but on the other hand you will only be able to use a small fetch size,
+which will increase the number of database accesses.
+Also, due to the failure recovery mechanisms, there is some overhead in starting a new partition,
+so with an unnecessarily large number of partitions, this overhead will add up.
+
+When `rowsPerPartition` is high, there will be a few big partitions,
+so you will be able to take advantage of a higher fetch size,
+which will reduce the number of database accesses,
+and the overhead of starting a new partition will be less noticeable,
+but on the other hand you may not use all the threads available.
+
+[NOTE]
+====
+Each partition deals with one root entity type, so two different entity types will never run under
+the same partition.
 ====
 
 ==== [[jsr-352-checkpoint]] Checkpoint
@@ -701,6 +708,22 @@ MassIndexingJob.parameters()
 
 Checkpoint algorithms are partition-scoped, meaning each partition has its own checkpoint counter
 and it is not shared with other partitions.
+
+[TIP]
+====
+In general the checkpoint interval should be small compared to the number of rows per partition,
+but it shouldn't be too small in absolute terms.
+
+Indeed, due to the failure recovery mechanism,
+the elements before the first checkpoint of each partition will take longer to process than the other,
+so in a 1000-element partition, having a 100-element checkpoint interval will be faster than
+having a 1000-element checkpoint interval.
+
+On the other hand, performing a checkpoint means your JSR-352 runtime
+will write information about the progress of the job execution to its persistent storage,
+which also has a cost.
+So having a 1-element checkpoint interval is definitely not a good idea.
+====
 
 ==== [[jsr-352-emf]] Selecting the persistence unit (EntityManagerFactory)
 
