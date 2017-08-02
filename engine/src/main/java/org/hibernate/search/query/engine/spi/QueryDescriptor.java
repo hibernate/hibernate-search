@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.query.engine.spi;
 
-import java.util.List;
-
 import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 
@@ -32,9 +31,9 @@ public interface QueryDescriptor {
 
 	/**
 	 * @param integrator the {@link SearchIntegrator} used to execute the query
-	 * @param types the targeted types, which may carry custom metadata which should override the supporting entity type's metadata
+	 * @param types the targeted types, mapped to (potentially null) custom metadata which should override the supporting entity type's metadata
 	 * @return the resulting query
 	 */
-	HSQuery createHSQuery(SearchIntegrator integrator, List<CustomTypeMetadata> types);
+	HSQuery createHSQuery(SearchIntegrator integrator, IndexedTypeMap<CustomTypeMetadata> types);
 
 }

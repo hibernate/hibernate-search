@@ -70,8 +70,8 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.IndexNameNormalizer;
-import org.hibernate.search.spi.impl.ConcurrentIndexedTypeMap;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.IndexedTypeMaps;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.spi.impl.TypeHierarchy;
@@ -327,8 +327,8 @@ public class SearchIntegratorBuilder {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
-			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentIndexedTypeMap<>() );
-			factoryState.setDocumentBuildersContainedEntities( new ConcurrentIndexedTypeMap<>() );
+			factoryState.setDocumentBuildersIndexedEntities( IndexedTypeMaps.concurrentHashMap() );
+			factoryState.setDocumentBuildersContainedEntities( IndexedTypeMaps.concurrentHashMap() );
 			factoryState.setConfiguredTypeHierarchy( new TypeHierarchy() );
 			factoryState.setIndexedTypeHierarchy( new TypeHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );

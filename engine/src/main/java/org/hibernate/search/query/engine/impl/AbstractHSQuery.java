@@ -9,10 +9,7 @@ package org.hibernate.search.query.engine.impl;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -48,6 +45,7 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.IndexedTypeMap;
+import org.hibernate.search.spi.impl.IndexedTypeMaps;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -77,7 +75,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	protected final IndexedTypeSet targetedEntities;
 	protected final IndexedTypeSet indexedTargetedEntities;
-	private final List<CustomTypeMetadata> customTypeMetadata;
+	private final IndexedTypeMap<CustomTypeMetadata> customTypeMetadata;
 
 	protected Sort sort;
 	protected String tenantId;
@@ -99,21 +97,15 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected final Map<String, FullTextFilterImpl> filterDefinitions = newHashMap();
 
 	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet types) {
-		this( extendedIntegrator, types, Collections.emptyList() );
+		this( extendedIntegrator, types, IndexedTypeMaps.empty() );
 	}
 
-	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, List<CustomTypeMetadata> types) {
-		this(
-				extendedIntegrator,
-				types.stream()
-						.map( CustomTypeMetadata::getEntityType )
-						.collect( IndexedTypeSets.streamCollector() ),
-				types
-		);
+	public AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeMap<CustomTypeMetadata> types) {
+		this( extendedIntegrator, types.keySet(), types );
 	}
 
 	private AbstractHSQuery(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeSet targetedEntities,
-			List<CustomTypeMetadata> customTypeMetadata) {
+			IndexedTypeMap<CustomTypeMetadata> customTypeMetadata) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
 		if ( targetedEntities == null ) {
@@ -130,7 +122,15 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 				throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
 			}
 		}
-		this.customTypeMetadata = customTypeMetadata == null ? Collections.emptyList() : new ArrayList<>( customTypeMetadata );
+		if ( customTypeMetadata == null ) {
+			this.customTypeMetadata = IndexedTypeMaps.empty();
+		}
+		else {
+			this.customTypeMetadata = IndexedTypeMaps.hashMap();
+			for ( Map.Entry<IndexedTypeIdentifier, CustomTypeMetadata> entry : customTypeMetadata.entrySet() ) {
+				this.customTypeMetadata.put( entry.getKey(), entry.getValue() );
+			}
+		}
 	}
 
 	@Override
@@ -153,10 +153,14 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		return this;
 	}
 
-	protected final Optional<CustomTypeMetadata> getCustomTypeMetadata(Class<?> clazz) {
-		return customTypeMetadata.stream()
-				.filter( metadata -> metadata.getEntityType().getPojoType().isAssignableFrom( clazz ) )
-				.findFirst();
+	protected final Optional<CustomTypeMetadata> getCustomTypeMetadata(IndexedTypeIdentifier target) {
+		Class<?> targetPojoType = target.getPojoType();
+		for ( Map.Entry<IndexedTypeIdentifier, CustomTypeMetadata> entry : customTypeMetadata.entrySet() ) {
+			if ( entry.getKey().getPojoType().isAssignableFrom( targetPojoType ) ) {
+				return Optional.of( entry.getValue() );
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
