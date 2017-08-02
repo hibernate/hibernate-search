@@ -126,10 +126,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 			this.customTypeMetadata = IndexedTypeMaps.empty();
 		}
 		else {
-			this.customTypeMetadata = IndexedTypeMaps.hashMap();
-			for ( Map.Entry<IndexedTypeIdentifier, CustomTypeMetadata> entry : customTypeMetadata.entrySet() ) {
-				this.customTypeMetadata.put( entry.getKey(), entry.getValue() );
-			}
+			this.customTypeMetadata = customTypeMetadata;
 		}
 	}
 
