@@ -123,8 +123,12 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( this.workProcessor::close );
-			closer.push( this.client::close );
+			if ( this.workProcessor != null ) {
+				closer.push( this.workProcessor::close );
+			}
+			if ( this.client != null ) {
+				closer.push( this.client::close );
+			}
 			this.client = null;
 		}
 		catch (IOException | RuntimeException e) {
