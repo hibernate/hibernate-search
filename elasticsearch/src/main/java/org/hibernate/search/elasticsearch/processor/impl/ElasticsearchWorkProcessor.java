@@ -157,7 +157,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 *
 	 * @return the orchestrator for synchronous, non-stream background works.
 	 */
-	public BarrierElasticsearchWorkOrchestrator createNonStreamOrchestrator(String indexName, boolean sync, boolean refreshAfterWrite) {
+	public BarrierElasticsearchWorkOrchestrator createNonStreamOrchestrator(String indexName, boolean refreshAfterWrite) {
 		/*
 		 * Since works are applied in order, refreshing the index after changesets
 		 * is actually an option, and if enabled we use refreshing execution contexts.
@@ -185,22 +185,12 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		FlushableElasticsearchWorkOrchestrator delegate =
 				createSerialOrchestrator( contextSupplier, NON_STREAM_MIN_BULK_SIZE, refreshInBulkApiCall );
 
-		if ( sync ) {
-			return createBatchingSharedOrchestrator(
-					"Elasticsearch sync non-stream work orchestrator for index " + indexName,
-					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
-					true /* enqueue changesets in the order they were submitted */,
-					delegate
-					);
-		}
-		else {
-			return createBatchingSharedOrchestrator(
-					"Elasticsearch async non-stream work orchestrator for index " + indexName,
-					NON_STREAM_MAX_CHANGESETS_PER_BATCH,
-					true /* enqueue changesets in the order they were submitted */,
-					delegate
-					);
-		}
+		return createBatchingSharedOrchestrator(
+				"Elasticsearch non-stream work orchestrator for index " + indexName,
+				NON_STREAM_MAX_CHANGESETS_PER_BATCH,
+				true /* enqueue changesets in the order they were submitted */,
+				delegate
+				);
 	}
 
 	/**
