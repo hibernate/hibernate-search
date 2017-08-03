@@ -18,8 +18,8 @@ public interface BarrierElasticsearchWorkOrchestrator extends ElasticsearchWorkO
 	 * Block until there is no more work to execute.
 	 * <p>
 	 * N.B. if more works are submitted in the meantime, this might delay the wait.
-
-     * @throws InterruptedException if thread interrupted while waiting
+	 *
+	 * @throws InterruptedException if thread interrupted while waiting
 	 */
 	void awaitCompletion() throws InterruptedException;
 
