@@ -156,7 +156,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		);
 		this.workProcessor = elasticsearchService.getWorkProcessor();
 
-		this.nonStreamOrchestrator = workProcessor.createNonStreamOrchestrator( indexName, sync, refreshAfterWrite );
+		this.nonStreamOrchestrator = workProcessor.createNonStreamOrchestrator( indexName, refreshAfterWrite );
 	}
 
 	/**
