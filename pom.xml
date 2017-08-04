@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- ~ Hibernate Search, full-text search for your domain model
- ~
- ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
- ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- ~ Hibernate Search, full-text search for your domain model ~ ~ License: 
+    GNU Lesser General Public License (LGPL), version 2.1 or later ~ See the 
+    lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate.search</groupId>
-    <artifactId>v6poc-parent</artifactId>
+    <artifactId>hibernate-search-parent</artifactId>
     <version>6.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>Hibernate Search 6 POC</name>
     <description>Proof of concept for some of the heavy refactorings planned for Hibernate Search 6.0</description>
@@ -22,6 +21,110 @@
             <comments>See also: http://hibernate.org/license</comments>
         </license>
     </licenses>
+
+    <modules>
+        <module>engine</module>
+        <module>backend/elasticsearch</module>
+        <module>backend/lucene</module>
+        <module>mapper/pojo</module>
+        <module>mapper/protobuf</module>
+        <module>mapper/orm</module>
+        <module>integration-test</module>
+    </modules>
+    
+    <properties>
+        <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
+        <jbossLoggingProcessorVersion>2.0.1.Final</jbossLoggingProcessorVersion>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-engine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-backend-lucene</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-mapper-pojo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-mapper-protobuf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.hibernate.common</groupId>
+                <artifactId>hibernate-commons-annotations</artifactId>
+                <version>5.0.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${jbossLoggingVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging-annotations</artifactId>
+                <version>${jbossLoggingProcessorVersion}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+            
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     
     <build>
         <plugins>
@@ -36,5 +139,44 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <!-- Run annotation processors on src/main/java sources -->
+                        <execution>
+                            <id>process</id>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                            <phase>generate-sources</phase>
+                            <configuration>
+                                <processors>
+                                    <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
+                                </processors>
+                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.8 -target 1.8</compilerArguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging-processor</artifactId>
+                            <version>${jbossLoggingProcessorVersion}</version>
+                            <scope>compile</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>javax.annotation</groupId>
+                            <artifactId>jsr250-api</artifactId>
+                            <version>1.0</version>
+                            <scope>compile</scope>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
