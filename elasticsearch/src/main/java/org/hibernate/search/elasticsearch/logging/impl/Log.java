@@ -489,4 +489,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 90,
 			value = "Elasticsearch response indicates a failure." )
 	SearchException elasticsearchResponseIndicatesFailure();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 91,
+			value = "The thread was interrupted while a changeset was being submitted to '%1$s'."
+					+ " The changeset has been discarded." )
+	SearchException threadInterruptedWhileSubmittingChangeset(String orchestratorName);
 }

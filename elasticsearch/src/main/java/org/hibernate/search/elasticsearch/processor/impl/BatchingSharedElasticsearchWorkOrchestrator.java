@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
@@ -41,6 +40,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private final String name;
 	private final FlushableElasticsearchWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
@@ -73,6 +73,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			String name, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
+		this.name = name;
 		this.delegate = delegate;
 		this.errorHandler = errorHandler;
 		this.changesetsPerBatch = maxChangesetsPerBatch;
@@ -85,14 +86,16 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	@Override
 	public CompletableFuture<Void> submit(Iterable<ElasticsearchWork<?>> works) {
 		CompletableFuture<Void> future = new CompletableFuture<>();
+
 		try {
 			changesetQueue.put( new Changeset( works, future ) );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw new SearchException( "Interrupted while submitting a changeset to the queue", e );
+			throw LOG.threadInterruptedWhileSubmittingChangeset( name );
 		}
 		ensureProcessingScheduled();
+
 		return future;
 	}
 
