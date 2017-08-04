@@ -13,6 +13,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
@@ -49,6 +51,8 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	private final BlockingQueue<Changeset> changesetQueue;
 	private final List<Changeset> changesetBuffer;
 	private final AtomicBoolean processingScheduled;
+	private boolean open;
+	private final ReadWriteLock shutdownLock;
 
 	private final Phaser phaser = new Phaser() {
 		@Override
@@ -81,20 +85,33 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 		changesetBuffer = CollectionHelper.newArrayList( maxChangesetsPerBatch );
 		executor = Executors.newFixedThreadPool( 1, name );
 		processingScheduled = new AtomicBoolean( false );
+		open = true;
+		shutdownLock = new ReentrantReadWriteLock();
 	}
 
 	@Override
 	public CompletableFuture<Void> submit(Iterable<ElasticsearchWork<?>> works) {
 		CompletableFuture<Void> future = new CompletableFuture<>();
 
+		if ( !shutdownLock.readLock().tryLock() ) {
+			// The orchestrator is shutting down: abort.
+			throw LOG.orchestratorShutDownBeforeSubmittingChangeset( name );
+		}
 		try {
+			if ( !open ) {
+				// The orchestrator has shut down: abort.
+				throw LOG.orchestratorShutDownBeforeSubmittingChangeset( name );
+			}
 			changesetQueue.put( new Changeset( works, future ) );
+			ensureProcessingScheduled();
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw LOG.threadInterruptedWhileSubmittingChangeset( name );
 		}
-		ensureProcessingScheduled();
+		finally {
+			shutdownLock.readLock().unlock();
+		}
 
 		return future;
 	}
@@ -168,20 +185,30 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 
 	@Override
 	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( () -> {
-				executor.shutdown();
-				try {
-					awaitCompletion();
-				}
-				catch (InterruptedException e) {
-					LOG.interruptedWhileWaitingForIndexActivity( e );
-					Thread.currentThread().interrupt();
-				}
-			} );
-			//It's possible that a task was successfully scheduled but had no chance to run,
-			//so we need to release waiting threads:
-			closer.push( phaser::forceTermination );
+		shutdownLock.writeLock().lock();
+		try {
+			if ( !open ) {
+				return;
+			}
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				open = false;
+				closer.push( () -> {
+					try {
+						awaitCompletion();
+					}
+					catch (InterruptedException e) {
+						LOG.interruptedWhileWaitingForIndexActivity( e );
+						Thread.currentThread().interrupt();
+					}
+				} );
+				closer.push( executor::shutdownNow );
+				//It's possible that a task was successfully scheduled but had no chance to run,
+				//so we need to release waiting threads:
+				closer.push( phaser::forceTermination );
+			}
+		}
+		finally {
+			shutdownLock.writeLock().unlock();
 		}
 	}
 
