@@ -494,4 +494,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The thread was interrupted while a changeset was being submitted to '%1$s'."
 					+ " The changeset has been discarded." )
 	SearchException threadInterruptedWhileSubmittingChangeset(String orchestratorName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 92,
+			value = "A changeset was submitted after Hibernate Search shutdown was requested to '%1$s'."
+					+ " The changeset has been discarded." )
+	SearchException orchestratorShutDownBeforeSubmittingChangeset(String orchestratorName);
 }
