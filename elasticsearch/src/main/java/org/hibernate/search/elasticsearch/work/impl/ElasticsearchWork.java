@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.LuceneWork;
 
@@ -20,13 +20,13 @@ import org.hibernate.search.backend.LuceneWork;
  */
 public interface ElasticsearchWork<T> {
 
-	T execute(ElasticsearchWorkExecutionContext executionContext);
+	CompletableFuture<T> execute(ElasticsearchWorkExecutionContext executionContext);
 
 	void aggregate(ElasticsearchWorkAggregator aggregator);
 
 	/**
 	 * @return the original Lucene works from which this work was derived.
 	 */
-	Stream<LuceneWork> getLuceneWorks();
+	LuceneWork getLuceneWork();
 
 }

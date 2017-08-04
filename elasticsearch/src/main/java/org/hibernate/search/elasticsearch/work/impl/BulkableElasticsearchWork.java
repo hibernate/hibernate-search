@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import com.google.gson.JsonObject;
 
 /**
@@ -19,9 +21,9 @@ public interface BulkableElasticsearchWork<T> extends ElasticsearchWork<T> {
 
 	/**
 	 * @param context The execution context
-	 * @param resultItem The part of the JSON result relevant to this work
-	 * @return {@code true} if the result is considered a success, {@code false} otherwise.
+	 * @param resultItem A future eventually returning the part of the bulk JSON result relevant to this work
+	 * @return a future eventually returning the result of this work
 	 */
-	boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject resultItem);
+	CompletableFuture<T> handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject resultItem);
 
 }

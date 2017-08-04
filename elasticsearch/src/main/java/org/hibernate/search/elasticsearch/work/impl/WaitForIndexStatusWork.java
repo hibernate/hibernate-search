@@ -92,8 +92,8 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public void checkSuccess(ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
-			this.delegate.checkSuccess( request, response );
+		public void checkSuccess(ElasticsearchResponse response) throws SearchException {
+			this.delegate.checkSuccess( response );
 			if ( response.getStatusCode() == TIMED_OUT_HTTP_STATUS_CODE ) {
 				String status = response.getBody().get( "status" ).getAsString();
 				throw LOG.unexpectedIndexStatus( indexName.original, requiredIndexStatus.getElasticsearchString(), status, timeoutAndUnit );
@@ -101,7 +101,7 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public boolean isSuccess(JsonObject bulkResponseItem) {
+		public void checkSuccess(JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because WaitForIndexStatusWork is not bulkable." );
 		}
 
