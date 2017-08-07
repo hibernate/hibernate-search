@@ -13,6 +13,7 @@ import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.engineperformance.elasticsearch.datasets.Dataset;
 import org.hibernate.search.engineperformance.elasticsearch.model.AbstractBookEntity;
@@ -33,13 +34,24 @@ public class SearchIntegratorHelper {
 		//do not construct
 	}
 
-	public static SearchIntegrator createIntegrator(String client, ConnectionInfo connectionInfo, boolean refreshAfterWrite, String workerExecution) {
+	public static SearchIntegrator createIntegrator(String client, ConnectionInfo connectionInfo, boolean refreshAfterWrite,
+			String workerExecution, String maxConnectionString) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 
 		cfg.addProperty( "hibernate.search.default.indexmanager", "elasticsearch" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.required_index_status", "yellow" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.index_schema_management_strategy", "drop-and-create-and-drop" );
 		cfg.addProperty( "hibernate.search.default.elasticsearch.refresh_after_write", String.valueOf( refreshAfterWrite ) );
+
+		String[] maxConnectionSplit = maxConnectionString.split( ";" );
+		int maxConnectionPerRoute = Integer.parseInt( maxConnectionSplit[0] );
+		int maxConnection = Integer.parseInt( maxConnectionSplit[1] );
+
+		cfg.addProperty( "hibernate.search.default." + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
+				String.valueOf( maxConnection ) );
+		cfg.addProperty( "hibernate.search.default." + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
+				String.valueOf( maxConnectionPerRoute ) );
+
 		addIfNonNull( cfg, "hibernate.search.default.worker.execution", workerExecution );
 
 		if ( "default".equals( client ) ) {

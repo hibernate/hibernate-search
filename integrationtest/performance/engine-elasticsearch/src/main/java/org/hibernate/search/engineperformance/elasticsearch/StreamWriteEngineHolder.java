@@ -26,6 +26,9 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "true", "false" } )
 	private boolean refreshAfterWrite;
 
+	@Param( { "2;10" } )
+	private String maxConnection;
+
 	@Param( { "10000" } )
 	private int streamedAddsPerFlush;
 
@@ -37,7 +40,8 @@ public class StreamWriteEngineHolder extends BaseIndexSetup {
 	 */
 	@Setup(Level.Iteration)
 	public void initializeState() {
-		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, null /* irrelevant */ );
+		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(),
+				refreshAfterWrite, null /* irrelevant */, maxConnection );
 	}
 
 	@TearDown(Level.Iteration)
