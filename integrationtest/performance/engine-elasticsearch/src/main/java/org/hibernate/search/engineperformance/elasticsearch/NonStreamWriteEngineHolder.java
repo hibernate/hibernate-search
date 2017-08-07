@@ -28,6 +28,9 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 	@Param( { "sync", "async" } )
 	private String workerExecution;
 
+	@Param( { "2;10" } )
+	private String maxConnection;
+
 	@Param( { "1000" } )
 	private int indexSize;
 
@@ -35,7 +38,8 @@ public class NonStreamWriteEngineHolder extends BaseIndexSetup {
 
 	@Setup
 	public void initializeState() {
-		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(), refreshAfterWrite, workerExecution );
+		si = SearchIntegratorHelper.createIntegrator( client, getConnectionInfo(),
+				refreshAfterWrite, workerExecution, maxConnection );
 	}
 
 	public SearchIntegrator getSearchIntegrator() {
