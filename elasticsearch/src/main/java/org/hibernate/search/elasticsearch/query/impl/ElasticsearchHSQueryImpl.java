@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.lucene.search.Explanation;
@@ -33,10 +32,8 @@ import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.Window;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ExplainResult;
 import org.hibernate.search.elasticsearch.work.impl.SearchResult;
-import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
@@ -82,11 +79,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	/**
-	 * ES default limit for (firstResult + maxResult)
-	 */
-	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
-
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(
 					ElasticsearchProjectionConstants.ID,
@@ -108,7 +100,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * which will also contain automatically generated data related in particular to sorts
 	 * and projections.
 	 */
-	private final JsonObject rawSearchPayload;
+	final JsonObject rawSearchPayload;
 
 	private Integer resultSize;
 	private IndexSearcher searcher;
@@ -188,22 +180,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.get( documentId )
 				.getAsJsonObject();
 
-		/*
-		 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
-		 * and are not necessary to the explanation.
-		 */
-		JsonObject explainPayload = JsonBuilder.object()
-				.add( "query", searcher.payload.get( "query" ) )
-				.build();
-
-		ElasticsearchWork<ExplainResult> work = searcher.elasticsearchService.getWorkFactory().explain(
-				URLEncodedString.fromJSon( hit.get( "_index" ) ),
-				URLEncodedString.fromJSon( hit.get( "_type" ) ),
-				URLEncodedString.fromJSon( hit.get( "_id" ) ),
-				explainPayload )
-				.build();
-
-		ExplainResult result = searcher.elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
+		ExplainResult result = searcher.explain( hit );
 		JsonObject explanation = result.getJsonObject().get( "explanation" ).getAsJsonObject();
 
 		return convertExplanation( explanation );
@@ -287,7 +264,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private void execute() {
 		IndexSearcher searcher = getOrCreateSearcher();
 		if ( searcher != null ) {
-			searchResult = searcher.search();
+			searchResult = searcher.search( firstResult, maxResults );
 		}
 		else {
 			searchResult = EmptySearchResult.get();
@@ -329,239 +306,125 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return null;
 		}
 
-		this.searcher = new IndexSearcher( elasticsearchService, targetedEntityBindingsByName, indexNames );
+		Collection<FacetingRequest> facetingRequests = getFacetManager().getFacetRequests().values();
+		Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata =
+				buildFacetingRequestsAndMetadata( facetingRequests, targetedEntityBindingsByName.values() );
+
+		if ( sort != null ) {
+			validateSortFields( targetedEntityBindingsByName.values() );
+		}
+
+		// Query filters; always a type filter, possibly a tenant id filter;
+		JsonObject filteredQuery = getFilteredQuery( rawSearchPayload.get( "query" ), targetedEntityBindingsByName.keySet() );
+
+		/*
+		 * Initialize the sortByDistanceIndex to detect if the results are sorted
+		 * by distance and the position
+		 */
+		Integer sortByDistanceIndex = getSortByDistanceIndex();
+
+		QueryHitConverter queryHitConverter = QueryHitConverter.builder( elasticsearchService.getQueryFactory(), targetedEntityBindingsByName )
+				.setProjectedFields( projectedFields )
+				.setSortByDistance( sortByDistanceIndex, spatialSearchCenter, spatialFieldName )
+				.build();
+
+		this.searcher = new IndexSearcher( elasticsearchService, targetedEntityBindingsByName, indexNames,
+				filteredQuery, queryHitConverter, sort,
+				facetingRequestsAndMetadata );
 		return searcher;
 	}
 
-	/**
-	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
-	 */
-	private class IndexSearcher {
-		private final ElasticsearchService elasticsearchService;
-		private final Set<URLEncodedString> indexNames;
+	private JsonObject getFilteredQuery(JsonElement originalQuery, Set<String> typeNames) {
+		JsonArray filters = new JsonArray();
 
-		private final ElasticsearchQueryOptions queryOptions;
-		private final QueryHitConverter queryHitConverter;
-		private final Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata;
-		private final JsonObject payload;
-
-		private IndexSearcher(ElasticsearchService elasticsearchService,
-				Map<String, EntityIndexBinding> targetedEntityBindingsByName, Set<URLEncodedString> indexNames) {
-			this.elasticsearchService = elasticsearchService;
-			this.indexNames = indexNames;
-
-			JsonArray typeFilters = new JsonArray();
-			for ( String typeName : targetedEntityBindingsByName.keySet() ) {
-				typeFilters.add( getEntityTypeFilter( typeName ) );
-			}
-
-			this.queryOptions = elasticsearchService.getQueryOptions();
-
-			// Query filters; always a type filter, possibly a tenant id filter;
-			JsonObject filteredQuery = getFilteredQuery( rawSearchPayload.get( "query" ), typeFilters );
-
-			JsonBuilder.Object payloadBuilder = JsonBuilder.object();
-			payloadBuilder.add( "query", filteredQuery );
-
-			/*
-			 * Initialize the sortByDistanceIndex to detect if the results are sorted
-			 * by distance and the position
-			 */
-			Integer sortByDistanceIndex = getSortByDistanceIndex();
-
-			this.queryHitConverter = QueryHitConverter.builder( elasticsearchService.getQueryFactory(), targetedEntityBindingsByName )
-					.setProjectedFields( projectedFields )
-					.setSortByDistance( sortByDistanceIndex, spatialSearchCenter, spatialFieldName )
-					.build();
-			queryHitConverter.contributeToPayload( payloadBuilder );
-
-			Collection<FacetingRequest> facetingRequests = getFacetManager().getFacetRequests().values();
-			if ( !facetingRequests.isEmpty() ) {
-				JsonBuilder.Object facets = JsonBuilder.object();
-
-				facetingRequestsAndMetadata =
-						buildFacetingRequestsAndMetadata( facetingRequests, targetedEntityBindingsByName.values() );
-				for ( Entry<FacetingRequest, FacetMetadata> facetingRequestEntry : facetingRequestsAndMetadata.entrySet() ) {
-					addFacetingRequest( facets, facetingRequestEntry.getKey(), facetingRequestEntry.getValue() );
-				}
-
-				payloadBuilder.add( "aggregations", facets );
-			}
-			else {
-				facetingRequestsAndMetadata = Collections.emptyMap();
-			}
-
-			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
-			if ( sort != null ) {
-				validateSortFields( targetedEntityBindingsByName.values() );
-				payloadBuilder.add( "sort", ToElasticsearch.fromLuceneSort( sort ) );
-			}
-
-			this.payload = payloadBuilder.build();
+		JsonObject tenantFilter = getTenantIdFilter();
+		if ( tenantFilter != null ) {
+			filters.add( tenantFilter );
 		}
 
-		private JsonObject getFilteredQuery(JsonElement originalQuery, JsonArray typeFilters) {
-			JsonArray filters = new JsonArray();
+		JsonArray typeFilters = new JsonArray();
+		for ( String typeName : typeNames ) {
+			typeFilters.add( getEntityTypeFilter( typeName ) );
+		}
 
-			JsonObject tenantFilter = getTenantIdFilter();
-			if ( tenantFilter != null ) {
-				filters.add( tenantFilter );
-			}
+		// wrap type filters into should if there is more than one
+		filters.add( ToElasticsearch.condition( "should", typeFilters ) );
 
-			// wrap type filters into should if there is more than one
-			filters.add( ToElasticsearch.condition( "should", typeFilters ) );
+		// facet filters
+		for ( Query query : getFacetManager().getFacetFilters().getFilterQueries() ) {
+			filters.add( ToElasticsearch.fromLuceneQuery( query ) );
+		}
 
-			// facet filters
-			for ( Query query : getFacetManager().getFacetFilters().getFilterQueries() ) {
-				filters.add( ToElasticsearch.fromLuceneQuery( query ) );
-			}
+		// user filter
+		if ( userFilter != null ) {
+			filters.add( ToElasticsearch.fromLuceneQuery( userFilter ) );
+		}
 
-			// user filter
-			if ( userFilter != null ) {
-				filters.add( ToElasticsearch.fromLuceneQuery( userFilter ) );
-			}
-
-			if ( !filterDefinitions.isEmpty() ) {
-				for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
-					JsonObject filter = buildFullTextFilter( fullTextFilter );
-					if ( filter != null ) {
-						filters.add( filter );
-					}
+		if ( !filterDefinitions.isEmpty() ) {
+			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
+				JsonObject filter = buildFullTextFilter( fullTextFilter );
+				if ( filter != null ) {
+					filters.add( filter );
 				}
 			}
-
-			JsonBuilder.Object boolBuilder = JsonBuilder.object();
-
-			if ( originalQuery != null && !originalQuery.isJsonNull() ) {
-				boolBuilder.add( "must", originalQuery );
-			}
-
-			if ( filters.size() == 1 ) {
-				boolBuilder.add( "filter", filters.get( 0 ) );
-			}
-			else {
-				boolBuilder.add( "filter", filters );
-			}
-
-			return JsonBuilder.object().add( "bool", boolBuilder.build() ).build();
 		}
 
-		private JsonObject getEntityTypeFilter(String name) {
-			JsonObject value = new JsonObject();
-			value.addProperty( "value", name );
+		JsonBuilder.Object boolBuilder = JsonBuilder.object();
 
-			JsonObject type = new JsonObject();
-			type.add( "type", value );
-
-			return type;
+		if ( originalQuery != null && !originalQuery.isJsonNull() ) {
+			boolBuilder.add( "must", originalQuery );
 		}
 
-		private JsonObject getTenantIdFilter() {
-			if ( tenantId == null ) {
-				return null;
-			}
-
-			JsonObject value = new JsonObject();
-			value.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-
-			JsonObject tenantFilter = new JsonObject();
-			tenantFilter.add( "term", value );
-
-			return tenantFilter;
+		if ( filters.size() == 1 ) {
+			boolBuilder.add( "filter", filters.get( 0 ) );
+		}
+		else {
+			boolBuilder.add( "filter", filters );
 		}
 
-		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest, FacetMetadata facetMetadata) {
-			String sourceFieldAbsoluteName = facetMetadata.getSourceField().getAbsoluteName();
-			String facetSubfieldName = facetMetadata.getPath().getRelativeName();
+		return JsonBuilder.object().add( "bool", boolBuilder.build() ).build();
+	}
 
-			ToElasticsearch.addFacetingRequest( facets, facetingRequest, sourceFieldAbsoluteName, facetSubfieldName );
-		}
+	private JsonObject getEntityTypeFilter(String name) {
+		JsonObject value = new JsonObject();
+		value.addProperty( "value", name );
 
-		/**
-		 * Returns the index of the DistanceSortField in the Sort array.
-		 *
-		 * @return the index, null if no DistanceSortField has been found
-		 */
-		private Integer getSortByDistanceIndex() {
-			int i = 0;
-			if ( sort != null ) {
-				for ( SortField sortField : sort.getSort() ) {
-					if ( sortField instanceof DistanceSortField ) {
-						return i;
-					}
-					i++;
-				}
-			}
+		JsonObject type = new JsonObject();
+		type.add( "type", value );
+
+		return type;
+	}
+
+	private JsonObject getTenantIdFilter() {
+		if ( tenantId == null ) {
 			return null;
 		}
 
-		SearchResult search() {
-			return search( false );
-		}
+		JsonObject value = new JsonObject();
+		value.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 
-		SearchResult searchWithScrollEnabled() {
-			return search( true );
-		}
+		JsonObject tenantFilter = new JsonObject();
+		tenantFilter.add( "term", value );
 
-		private SearchResult search(boolean enableScrolling) {
-			SearchWorkBuilder builder = elasticsearchService.getWorkFactory()
-					.search( payload ).indexes( indexNames );
+		return tenantFilter;
+	}
 
-			if ( enableScrolling ) {
-				/*
-				 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
-				 * See https://github.com/elastic/elasticsearch/issues/9373
-				 * To work this around, we don't use the "from" parameter here, and the document
-				 * extractor will skip the results by scrolling until it gets the right index.
-				 */
-				builder.scrolling(
-						/*
-						 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
-						 * size for the first search *and* for the next calls to the scroll API.
-						 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
-						 * in the document extractor.
-						 */
-						getQueryOptions().getScrollFetchSize(),
-						getQueryOptions().getScrollTimeout()
-				);
+	/**
+	 * Returns the index of the DistanceSortField in the Sort array.
+	 *
+	 * @return the index, -1 if no DistanceSortField has been found
+	 */
+	private Integer getSortByDistanceIndex() {
+		int i = 0;
+		if ( sort != null ) {
+			for ( SortField sortField : sort.getSort() ) {
+				if ( sortField instanceof DistanceSortField ) {
+					return i;
+				}
+				i++;
 			}
-			else {
-				builder.paging(
-						firstResult,
-						// If the user has given a 'size' value, take it as is, let ES itself complain if it's too high; if no value is
-						// given, I take as much as possible, as by default only 10 rows would be returned
-						maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult
-				);
-			}
-
-			ElasticsearchWork<SearchResult> work = builder.build();
-			return elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
 		}
-
-		private ElasticsearchQueryOptions getQueryOptions() {
-			return queryOptions;
-		}
-
-		/**
-		 * Scroll through search results, using a previously obtained scrollId.
-		 */
-		SearchResult scroll(String scrollId) {
-			ElasticsearchQueryOptions queryOptions = getQueryOptions();
-			ElasticsearchWork<SearchResult> work = elasticsearchService.getWorkFactory()
-					.scroll( scrollId, queryOptions.getScrollTimeout() ).build();
-			return elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
-		}
-
-		void clearScroll(String scrollId) {
-			ElasticsearchWork<?> work = elasticsearchService.getWorkFactory()
-					.clearScroll( scrollId ).build();
-			elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
-		}
-
-		EntityInfo convertQueryHit(SearchResult searchResult, JsonObject hit) {
-			return this.queryHitConverter.convert( searchResult, hit );
-		}
-
+		return null;
 	}
 
 	@Override
@@ -573,7 +436,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		Map<String, List<Facet>> results = new HashMap<>();
-		for ( Map.Entry<FacetingRequest, FacetMetadata> entry : searcher.facetingRequestsAndMetadata.entrySet() ) {
+		for ( Map.Entry<FacetingRequest, FacetMetadata> entry : searcher.getFacetingRequestsAndMetadata().entrySet() ) {
 			FacetingRequest facetRequest = entry.getKey();
 			FacetMetadata facetMetadata = entry.getValue();
 			List<Facet> facets;
@@ -641,7 +504,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		return facets;
 	}
 
-	private JsonObject buildFullTextFilter(FullTextFilterImpl fullTextFilter) {
+	JsonObject buildFullTextFilter(FullTextFilterImpl fullTextFilter) {
 
 		/*
 		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
