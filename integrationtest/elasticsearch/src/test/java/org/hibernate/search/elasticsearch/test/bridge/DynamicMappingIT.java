@@ -18,6 +18,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
@@ -80,6 +81,29 @@ public class DynamicMappingIT {
 		assertThat( throwable.getMessage() ).startsWith( "HSEARCH400007" );
 		assertThat( throwable.getMessage() ).contains( "strict_dynamic_mapping_exception" );
 		assertThat( throwable.getMessage() ).contains( "strictField" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2840")
+	public void testProjectionWithDynamicField() {
+		// Store some not defined data:
+		ElasticsearchDynamicIndexedValueHolder holder = new ElasticsearchDynamicIndexedValueHolder( "1" )
+				.dynamicProperty( "age", "227" )
+				.dynamicProperty( "name", "Thorin" )
+				.dynamicProperty( "surname", "Oakenshield" )
+				.dynamicProperty( "race", "dwarf" );
+
+		helper.index( holder );
+
+		helper.assertThat()
+				.from( ElasticsearchDynamicIndexedValueHolder.class )
+				.projecting( "dynamicField.name" )
+				.matchesExactlySingleProjections( "Thorin" );
+
+		helper.assertThat()
+				.from( ElasticsearchDynamicIndexedValueHolder.class )
+				.projecting( "dynamicField" )
+				.matchesExactlySingleProjections( holder.getDynamicFields() );
 	}
 
 	private TestExceptionHandler getErrorHandler() {
