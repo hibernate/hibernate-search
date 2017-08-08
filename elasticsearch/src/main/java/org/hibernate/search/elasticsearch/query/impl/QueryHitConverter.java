@@ -9,8 +9,9 @@ package org.hibernate.search.elasticsearch.query.impl;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -32,7 +33,6 @@ import org.hibernate.search.query.engine.impl.EntityInfoImpl;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -322,7 +322,10 @@ class QueryHitConverter {
 				// We check if it is a field created by a field bridge
 				BridgeDefinedField bridgeDefinedField = rootTypeMetadata.getBridgeDefinedFieldMetadataFor( projectedField );
 				if ( bridgeDefinedField != null ) {
-					return createProjection( rootTypeMetadata, bridgeDefinedField );
+					String absoluteName = bridgeDefinedField.getAbsoluteName();
+					ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
+					sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+					return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 				}
 				else {
 					/*
@@ -347,18 +350,38 @@ class QueryHitConverter {
 				return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 			}
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
-				sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
-
-				PrimitiveProjection defaultFieldProjection = new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
-
 				Collection<BridgeDefinedField> bridgeDefinedFields = fieldMetadata.getBridgeDefinedFields().values();
-				List<PrimitiveProjection> bridgeDefinedFieldsProjections = CollectionHelper.newArrayList( bridgeDefinedFields.size() );
+
+				Set<String> objectFieldNames = new HashSet<>();
+				Map<String, PrimitiveProjection> primitiveProjections = new HashMap<>();
+
 				for ( BridgeDefinedField bridgeDefinedField : bridgeDefinedFields ) {
-					PrimitiveProjection primitiveProjection = createProjection( rootTypeMetadata, bridgeDefinedField );
-					bridgeDefinedFieldsProjections.add( primitiveProjection );
+					String nestedAbsoluteName = bridgeDefinedField.getAbsoluteName();
+					ExtendedFieldType nestedType = FieldHelper.getType( bridgeDefinedField );
+					if ( ExtendedFieldType.OBJECT.equals( nestedType ) ) {
+						objectFieldNames.add( nestedAbsoluteName );
+					}
+					else {
+						PrimitiveProjection projection =
+								new PrimitiveProjection( rootTypeMetadata, nestedAbsoluteName, type );
+						primitiveProjections.put( nestedAbsoluteName, projection );
+					}
+					sourceFilterCollector.add( new JsonPrimitive( nestedAbsoluteName ) );
 				}
+
+				if ( !objectFieldNames.contains( absoluteName )
+						&& !primitiveProjections.containsKey( absoluteName ) ) {
+					/*
+					 * The default field was not overridden: add it to the projection
+					 * just in case we're not dealing with a MetadataProvidingFieldBridge.
+					 */
+					PrimitiveProjection defaultFieldProjection = new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
+					primitiveProjections.put( absoluteName, defaultFieldProjection );
+					sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+				}
+
 				return new TwoWayFieldBridgeProjection(
-						absoluteName, (TwoWayFieldBridge) fieldBridge, defaultFieldProjection, bridgeDefinedFieldsProjections
+						absoluteName, (TwoWayFieldBridge) fieldBridge, objectFieldNames, primitiveProjections
 						);
 			}
 			else {
@@ -369,16 +392,6 @@ class QueryHitConverter {
 				 */
 				return new FailingOneWayFieldBridgeProjection( absoluteName, fieldBridge.getClass() );
 			}
-		}
-
-		private PrimitiveProjection createProjection(TypeMetadata rootTypeMetadata,
-				BridgeDefinedField bridgeDefinedField) {
-			String absoluteName = bridgeDefinedField.getAbsoluteName();
-			ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
-
-			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
-
-			return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 		}
 	}
 
