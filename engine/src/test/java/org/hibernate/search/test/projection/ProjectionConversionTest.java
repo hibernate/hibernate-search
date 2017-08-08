@@ -17,9 +17,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -64,6 +67,7 @@ public class ProjectionConversionTest {
 		entity.unstoredField = "unstoredField";
 		entity.customBridgedKeyword = "lowercase-keyword";
 		entity.customOneWayBridgedKeyword = "lowercase-keyword";
+		entity.customTwoWayBridgedKeywordWithMetadataOverride = "lowercase-keyword";
 
 		ExampleEntity embedded = new ExampleEntity();
 		embedded.id = 2l;
@@ -72,6 +76,7 @@ public class ProjectionConversionTest {
 		embedded.unstoredField = "unstoredFieldEmbedded";
 		embedded.customBridgedKeyword = "another-lowercase-keyword";
 		embedded.customOneWayBridgedKeyword = "another-lowercase-keyword";
+		embedded.customTwoWayBridgedKeywordWithMetadataOverride = "another-lowercase-keyword";
 
 		ConflictingMappedType second = new ConflictingMappedType();
 		second.id = "a string";
@@ -134,6 +139,11 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
+	public void projectionWithCustomBridgeOverridingMetadata() {
+		projectionTestHelper( "customTwoWayBridgedKeywordWithMetadataOverride", "lowercase-keyword" );
+	}
+
+	@Test
 	public void projectingEmbeddedIdByPropertyName() {
 		projectionTestHelper( "embedded.id", Long.valueOf( 2l ) );
 	}
@@ -156,6 +166,11 @@ public class ProjectionConversionTest {
 		thrown.expectMessage( CustomOneWayBridge.class.getName() );
 
 		projectionTestHelper( "embedded.customOneWayBridgedKeyword", "another-lowercase-keyword" );
+	}
+
+	@Test
+	public void projectingEmbeddedWithCustomBridgeOverridingMetadata() {
+		projectionTestHelper( "embedded.customTwoWayBridgedKeywordWithMetadataOverride", "another-lowercase-keyword" );
 	}
 
 	@Test
@@ -222,14 +237,25 @@ public class ProjectionConversionTest {
 		@Field(store = Store.NO)
 		String unstoredField;
 
-		@Field(store = Store.YES) @FieldBridge(impl = CustomTwoWayBridge.class)
+		@Field(store = Store.YES)
+		@FieldBridge(impl = CustomTwoWayBridge.class)
 		String customBridgedKeyword;
 
-		@Field(store = Store.YES) @FieldBridge(impl = CustomOneWayBridge.class)
+		@Field(store = Store.YES)
+		@FieldBridge(impl = CustomOneWayBridge.class)
 		String customOneWayBridgedKeyword;
 
-		@IndexedEmbedded(includePaths = { "id", "stringTypedId", "customBridgedKeyword", "customOneWayBridgedKeyword" },
-				includeEmbeddedObjectId = true)
+		@Field(store = Store.YES)
+		@FieldBridge(impl = CustomTwoWayBridgeOverridingDefaultFieldMetadata.class)
+		String customTwoWayBridgedKeywordWithMetadataOverride;
+
+		@IndexedEmbedded(
+				includePaths = {
+					"id", "stringTypedId", "customBridgedKeyword", "customOneWayBridgedKeyword",
+					"customTwoWayBridgedKeywordWithMetadataOverride"
+				},
+				includeEmbeddedObjectId = true
+		)
 		ExampleEntity embedded;
 
 		@IndexedEmbedded(includeEmbeddedObjectId = true)
@@ -279,6 +305,33 @@ public class ProjectionConversionTest {
 		@Override
 		public String objectToString(Object object) {
 			return String.valueOf( object );
+		}
+
+	}
+
+	public static class CustomTwoWayBridgeOverridingDefaultFieldMetadata implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			luceneOptions.addFieldToDocument( name + ".value", String.valueOf( value ).toUpperCase( Locale.ENGLISH ), document );
+		}
+
+		@Override
+		public Object get(String name, Document document) {
+			IndexableField field = document.getField( name + ".value" );
+			String stringValue = field.stringValue();
+			return stringValue.toLowerCase( Locale.ENGLISH );
+		}
+
+		@Override
+		public String objectToString(Object object) {
+			return String.valueOf( object );
+		}
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( name, FieldType.OBJECT );
+			builder.field( name + ".value", FieldType.STRING );
 		}
 
 	}
