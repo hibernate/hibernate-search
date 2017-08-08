@@ -39,6 +39,10 @@ class PrimitiveProjection extends FieldProjection {
 
 	public void addDocumentField(Document tmp, JsonObject hit, ConversionContext conversionContext) {
 		JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
+		addDocumentField( tmp, jsonValue );
+	}
+
+	public void addDocumentField(Document tmp, JsonElement jsonValue) {
 		if ( jsonValue == null || jsonValue.isJsonNull() ) {
 			return;
 		}
