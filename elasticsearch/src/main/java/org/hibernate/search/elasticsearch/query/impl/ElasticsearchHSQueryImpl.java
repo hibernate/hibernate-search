@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.query.impl;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,17 +20,14 @@ import java.util.Set;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
-import org.hibernate.search.elasticsearch.impl.ElasticsearchQueryOptions;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.Window;
 import org.hibernate.search.elasticsearch.work.impl.ExplainResult;
 import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -147,7 +143,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	public DocumentExtractor queryDocumentExtractor() {
 		IndexSearcher searcher = getOrCreateSearcher();
 		if ( searcher != null ) {
-			return new ElasticsearchScrollAPIDocumentExtractor( searcher );
+			return new ElasticsearchScrollAPIDocumentExtractor( searcher, firstResult, maxResults );
 		}
 		else {
 			return EmptyDocumentExtractor.get();
@@ -562,137 +558,5 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		//TODO HSEARCH-2097 Drive through meta-data
 //		return FieldHelper.isEmbeddedField( facetRequest.getFieldName() );
 		return false;
-	}
-
-	private class ElasticsearchScrollAPIDocumentExtractor implements DocumentExtractor {
-
-		// Search parameters
-		private final IndexSearcher searcher;
-		private final Integer queryIndexLimit;
-
-		// Position
-		private String scrollId;
-
-		// Results
-		private Integer totalResultCount;
-		private final Window<EntityInfo> results;
-
-		private ElasticsearchScrollAPIDocumentExtractor(IndexSearcher searcher) {
-			this.searcher = searcher;
-			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
-					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
-			ElasticsearchQueryOptions queryOptions = searcher.getQueryOptions();
-			results = new Window<>(
-					/*
-					 * The offset is currently ignored by Elasticsearch.
-					 * See https://github.com/elastic/elasticsearch/issues/9373
-					 * To work this around, we don't use the "from" parameter when querying, and the document
-					 * extractor will skip the results by querying until it gets the right index.
-					 */
-					0,
-					/*
-					 * Sizing for the worst-case scenario: we just fetched a batch of elements to
-					 * give access to the result just after the previously fetched results, and
-					 * we still need to keep enough of the previous elements to backtrack.
-					 */
-					queryOptions.getScrollBacktrackingWindowSize() + queryOptions.getScrollFetchSize()
-					);
-		}
-
-		@Override
-		public EntityInfo extract(int index) throws IOException {
-			if ( index < 0 ) {
-				throw new IndexOutOfBoundsException( "Index must be >= 0" );
-			}
-			else if ( index < results.start() ) {
-				throw LOG.backtrackingWindowOverflow( searcher.getQueryOptions().getScrollBacktrackingWindowSize(), results.start(), index );
-			}
-
-			if ( totalResultCount == null ) {
-				initResults();
-			}
-
-			int maxIndex = getMaxIndex();
-			if ( maxIndex < index ) {
-				throw new IndexOutOfBoundsException( "Index must be <= " + maxIndex );
-			}
-
-			boolean fetchMayReturnResults = true;
-			while ( results.start() + results.size() <= index && fetchMayReturnResults ) {
-				fetchMayReturnResults = fetchNextResults();
-			}
-
-			return results.get( index );
-		}
-
-		@Override
-		public int getFirstIndex() {
-			return ElasticsearchHSQueryImpl.this.firstResult;
-		}
-
-		@Override
-		public int getMaxIndex() {
-			if ( totalResultCount == null ) {
-				initResults();
-			}
-
-			if ( queryIndexLimit == null ) {
-				return totalResultCount - 1;
-			}
-			else {
-				return Math.min( totalResultCount, queryIndexLimit ) - 1;
-			}
-		}
-
-		@Override
-		public void close() {
-			if ( scrollId != null ) {
-				searcher.clearScroll( scrollId );
-				scrollId = null;
-				totalResultCount = null;
-				results.clear();
-			}
-		}
-
-		@Override
-		public TopDocs getTopDocs() {
-			throw LOG.documentExtractorTopDocsUnsupported();
-		}
-
-		private void initResults() {
-			SearchResult searchResult = searcher.searchWithScrollEnabled();
-			totalResultCount = searchResult.getTotalHitCount();
-			extractWindow( searchResult );
-		}
-
-		/**
-		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
-		 */
-		private boolean fetchNextResults() {
-			if ( totalResultCount <= results.start() + results.size() ) {
-				// No more results to fetch
-				return false;
-			}
-
-			SearchResult searchResult = searcher.scroll( scrollId );
-			return extractWindow( searchResult );
-		}
-
-		/**
-		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
-		 */
-		private boolean extractWindow(SearchResult searchResult) {
-			boolean fetchedAtLeastOne = false;
-			scrollId = searchResult.getScrollId();
-			JsonArray hits = searchResult.getHits();
-			for ( JsonElement hit : hits ) {
-				EntityInfo converted = searcher.convertQueryHit( searchResult, hit.getAsJsonObject() );
-				if ( converted != null ) {
-					results.add( converted );
-					fetchedAtLeastOne = true;
-				}
-			}
-			return fetchedAtLeastOne;
-		}
 	}
 }
