@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import org.hibernate.search.elasticsearch.query.impl.ElasticsearchHSQueryImpl;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
