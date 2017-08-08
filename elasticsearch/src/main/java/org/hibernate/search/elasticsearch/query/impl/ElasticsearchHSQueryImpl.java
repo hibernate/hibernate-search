@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.query.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,6 +39,11 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchQueryOptions;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
