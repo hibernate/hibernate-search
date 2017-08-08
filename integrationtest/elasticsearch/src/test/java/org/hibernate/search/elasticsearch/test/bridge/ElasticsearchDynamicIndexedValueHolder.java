@@ -49,6 +49,10 @@ public class ElasticsearchDynamicIndexedValueHolder {
 		return this;
 	}
 
+	public Map<String, String> getDynamicFields() {
+		return dynamicFields;
+	}
+
 	/*
 	 * Add fields to a property that does not enable dynamic mapping: it will cause an exception at some point
 	 */
