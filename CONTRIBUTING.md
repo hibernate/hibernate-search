@@ -1,17 +1,31 @@
 Guidelines for contributing to Hibernate Search
 ====
+
 Contributions from the community are essential in keeping Hibernate Search strong and successful.
+
 This guide focuses on how to contribute back to Hibernate Search using GitHub pull requests.
 If you need help with cloning, compiling or setting the project up in an IDE please refer to
 [this page](http://hibernate.org/search/contribute/).
 
+## Legal
+
+All original contributions to Hibernate Search are licensed under the
+[GNU Lesser General Public License (LGPL)](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt),
+version 2.1 or later, or, if another license is specified as governing the file or directory being
+modified, such other license. The LGPL text is included verbatim in the [lgpl.txt](lgpl.txt) file
+in the root directory of the repository.
+
+All contributions are subject to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
+The DCO text is also included verbatim in the [dco.txt](dco.txt) file in the root directory of the repository.
+
 ## Getting Started
+
 If you are just getting started with Git, GitHub and/or contributing to Hibernate Search there are a
 few prerequisite steps:
 
 * Make sure you have a [Hibernate JIRA account](https://hibernate.atlassian.net)
 * Make sure you have a [GitHub account](https://github.com/signup/free)
-* [Fork](http://help.github.com/fork-a-repo) the Hibernate Search [repository](https://github.com/hibernate/hibernate-search).
+* [Fork](https://help.github.com/articles/fork-a-repo/) the Hibernate Search [repository](https://github.com/hibernate/hibernate-search).
 As discussed in the linked page, this also includes:
     * [Setting](https://help.github.com/articles/set-up-git) up your local git install
     * Cloning your fork
@@ -81,4 +95,3 @@ git pull --rebase upstream master
 * Push your changes to a topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/).
 * Update the JIRA issue, using the "Link to pull request" button to include a link to the created pull request.
-* Sign the [Contributor License Agreement](https://cla.jboss.org/) for the **Hibernate** project.
