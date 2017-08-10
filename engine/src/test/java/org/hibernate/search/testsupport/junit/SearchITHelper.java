@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -372,6 +375,12 @@ public class SearchITHelper {
 			return this;
 		}
 
+		public final <T> AssertFacetContext facets(String facetingRequestName) {
+			HSQuery hsQuery = getHSQuery();
+			List<Facet> facets = hsQuery.getFacetManager().getFacets( facetingRequestName );
+			return new AssertFacetContext( this, facetingRequestName, facets );
+		}
+
 		private String toString(HSQuery query) {
 			StringBuilder builder = new StringBuilder();
 			if ( StringHelper.isNotEmpty( description ) ) {
@@ -385,6 +394,54 @@ public class SearchITHelper {
 			}
 			return builder.toString();
 		}
+	}
+
+	public class AssertFacetContext {
+
+		private final AssertHSQueryContext queryContext;
+		private final String facetingRequestName;
+		private final List<Facet> allFacets;
+		private final List<Facet> unmatchedFacets;
+
+		private AssertFacetContext(AssertHSQueryContext queryContext, String facetingRequestName, List<Facet> facets) {
+			this.queryContext = queryContext;
+			this.facetingRequestName = facetingRequestName;
+			this.allFacets = facets;
+			this.unmatchedFacets = new ArrayList<>( facets );
+		}
+
+		public AssertFacetContext isEmpty() {
+			Assertions.assertThat( allFacets )
+					.as( "Facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
+					.isEmpty();
+			return this;
+		}
+
+		public AssertFacetContext includes(String value, int count) {
+			ListIterator<Facet> it = unmatchedFacets.listIterator();
+			while ( it.hasNext() ) {
+				Facet facet = it.next();
+				if ( Objects.equals( value, facet.getValue() ) ) {
+					Assertions.assertThat( facet.getCount() )
+							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query " + queryContext )
+							.isEqualTo( count );
+					it.remove();
+				}
+			}
+			return this;
+		}
+
+		/**
+		 * To be called after "includes", to check that there isn't any other facet.
+		 * @return This object, for chained calls.
+		 */
+		public AssertFacetContext only() {
+			Assertions.assertThat( unmatchedFacets )
+					.as( "Unexpected facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
+					.isEmpty();
+			return this;
+		}
+
 	}
 
 	public class AssertBuildingHSQueryContext extends AssertHSQueryContext {
