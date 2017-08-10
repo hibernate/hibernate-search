@@ -167,6 +167,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	@Override
 	public HSQuery firstResult(int firstResult) {
+		clearCachedResults();
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
 		}
@@ -176,6 +177,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	@Override
 	public HSQuery maxResults(int maxResults) {
+		clearCachedResults();
 		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
 		}
