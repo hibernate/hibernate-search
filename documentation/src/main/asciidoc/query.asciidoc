@@ -1486,8 +1486,9 @@ for (Object[] result : results) {
 Be careful, building the explanation object is quite expensive, it is roughly as expensive as
 running the Lucene query again. Don't do it if you don't need the object
 
-[[query-filter]]
-=== Filters
+=== [[query-filter]] Filters
+
+==== [[query-filter-fulltext]] Full-text filters
 
 Apache Lucene has a powerful feature that allows to filter query results according to a custom
 filtering process. This is a very powerful way to apply additional data restrictions, especially
@@ -1740,7 +1741,7 @@ dedicated to this customer. Otherwise, we return all shards. A given Sharding st
 one or more filters and depends on their parameters.
 
 The second step is simply to activate the filter at query time. While the filter can be a regular
-filter (as defined in <<query-filter>>) which also filters Lucene results after the query, you can
+filter (as defined in <<query-filter-fulltext>>) which also filters Lucene results after the query, you can
 make use of a special filter that will only be passed to the sharding strategy and otherwise ignored
 for the rest of the query. Simply use the `ShardSensitiveOnlyFilter` class when declaring your filter.
 
@@ -1768,6 +1769,23 @@ List<Customer> results = query.getResultList();
 Note that by using the `ShardSensitiveOnlyFilter`, you do not have to implement any Lucene filter.
 Using filters and sharding strategy reacting to these filters is recommended to speed up queries in
 a sharded environment.
+
+==== [[query-filter-orm]] Hibernate ORM filters
+
+Hibernate ORM filters, enabled using `org.hibernate.Session.enableFilter(String)`,
+will only work partially when combined with a full-text query.
+
+The filtered entities will be excluded from the results, but:
+
+ * the result size returned by `FullTextQuery.getResultSize()` will ignore the filters
+   (it will return the size before applying the filters);
+ * if you use paging, the `setFirstResult` and `setMaxResults` modifiers will be applied
+   before the filters, leading to some result pages being smaller than `maxResults`
+   (or even empty) even though they are not the last.
+
+These limitations are necessary to keep performance at a reasonable level.
+If they are not acceptable for your use case,
+you should use <<query-filter-fulltext,full-text filters>> in your full-text queries.
 
 [[query-faceting]]
 === Faceting
