@@ -649,6 +649,11 @@
                 <version>1.4</version>
             </dependency>
             <dependency>
+                <groupId>org.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock</artifactId>
                 <version>2.5.1</version>
@@ -1448,6 +1453,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         <clusterName>hsearchEsTestCluster</clusterName>
                         <httpPort>9200</httpPort>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.bitstrings.maven.plugins</groupId>
+                    <artifactId>dependencypath-maven-plugin</artifactId>
+                    <version>1.1.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
