@@ -202,7 +202,6 @@
                 <!-- Allows to find the absolute path to dependencies -->
                 <groupId>org.bitstrings.maven.plugins</groupId>
                 <artifactId>dependencypath-maven-plugin</artifactId>
-                <version>1.1.1</version>
                 <executions>
                     <execution>
                         <id>set-all</id>
