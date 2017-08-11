@@ -46,11 +46,6 @@ class AutoGrowingPagedBuffer {
 	 */
 	private ByteBuffer currentPage = null;
 
-	/**
-	 * Previously used pages that are available for reuse.
-	 */
-	private final Deque<ByteBuffer> reusablePages = new LinkedList<>();
-
 	public AutoGrowingPagedBuffer(int pageSize) {
 		this.pageSize = pageSize;
 	}
@@ -101,7 +96,7 @@ class AutoGrowingPagedBuffer {
 	 */
 	public void put(CharBuffer input, CharsetEncoder encoder, boolean endOfInput) throws CharacterCodingException {
 		if ( currentPage == null ) {
-			currentPage = fetchPage();
+			currentPage = ByteBuffer.allocate( pageSize );
 		}
 		while ( true ) {
 			CoderResult coderResult = encoder.encode( input, currentPage, endOfInput );
@@ -111,7 +106,7 @@ class AutoGrowingPagedBuffer {
 			else if ( coderResult.equals( CoderResult.OVERFLOW ) ) {
 				currentPage.flip();
 				needWritingPages.add( currentPage );
-				currentPage = fetchPage();
+				currentPage = ByteBuffer.allocate( pageSize );
 				continue;
 			}
 			else {
@@ -135,8 +130,6 @@ class AutoGrowingPagedBuffer {
 			boolean written = writeTo( out, buffer );
 			if ( written ) {
 				iterator.remove();
-				// Keep a reference to the buffer, we might need it later
-				reusablePages.add( buffer );
 			}
 			else {
 				flowControlPushingBack = true;
@@ -146,28 +139,12 @@ class AutoGrowingPagedBuffer {
 			// The encoder still accepts some input, let's use the current buffer
 			currentPage.flip();
 			boolean written = writeTo( out, currentPage );
-			if ( written ) {
-				reusablePages.add( currentPage );
-			}
-			else {
+			if ( !written ) {
 				needWritingPages.add( currentPage );
 			}
 			currentPage = null;
 		}
 		return !flowControlPushingBack;
-	}
-
-	private ByteBuffer fetchPage() {
-		ByteBuffer buffer = reusablePages.pollFirst();
-		if ( buffer != null ) {
-			// If we happen to have an already-allocated buffer, clear it and use it
-			buffer.clear();
-		}
-		else {
-			// Otherwise, allocate a new buffer
-			buffer = ByteBuffer.allocate( pageSize );
-		}
-		return buffer;
 	}
 
 	private static boolean writeTo(ContentEncoder out, ByteBuffer buffer) throws IOException {
