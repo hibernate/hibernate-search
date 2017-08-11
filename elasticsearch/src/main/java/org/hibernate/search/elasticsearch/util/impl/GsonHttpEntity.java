@@ -14,10 +14,8 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,7 +80,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * be a penalty for small requests.
 	 * 1024 has been shown to produce reasonable, TLAB only garbage.
 	 */
-	private static final int BUFFER_SIZES = 1024;
+	private static final int BUFFER_PAGE_SIZE = 1024;
 
 	private final Gson gson;
 	private final List<JsonObject> bodyParts;
@@ -128,7 +126,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * Add a layer of buffering at the char writer level,
 	 * to avoid handling an excessive number of small buffers:
 	 */
-	private BufferedWriter bufferedWriter = new BufferedWriter( writer, BUFFER_SIZES );
+	private BufferedWriter bufferedWriter = new BufferedWriter( writer, BUFFER_PAGE_SIZE );
 
 	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) {
 		Objects.requireNonNull( gson );
@@ -197,16 +195,16 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		this.nextBodyToEncodeIndex = 0;
 		//Discard previous buffers as they might contain in-process content:
 		this.writer = new ProgressiveCharBufferWriter();
-		this.bufferedWriter = new BufferedWriter( writer, BUFFER_SIZES );
+		this.bufferedWriter = new BufferedWriter( writer, BUFFER_PAGE_SIZE );
 	}
 
 	/**
-	 * Let's see if we can fully encode the content without ever needing to rotate
-	 * output buffers. This will allow us to keep the memory consumption reasonable
+	 * Let's see if we can fully encode the content with a minimal write,
+	 * i.e. only one body part.
+	 * This will allow us to keep the memory consumption reasonable
 	 * while also being able to hint the client about the {@link #getContentLength()}.
 	 * Incidentally, having this information would avoid chunked output encoding
 	 * which is ideal precisely for small messages which can fit into a single buffer.
-	 * @return the size of the content, if all was written, or -1.
 	 */
 	private void attemptOnePassEncoding() {
 		// Essentially attempt to use the writer without going NPE on the output sink
@@ -218,10 +216,11 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			// Unlikely: there's no output buffer yet!
 			throw new SearchException( e );
 		}
-		if ( writer.flowControlPushingBack == false ) {
-			//Can't flip the buffer yet but the position is final,
-			//as we know the entire content has been rendered already.
-			hintContentLength( writer.availableBuffer.position() );
+		if ( nextBodyToEncodeIndex == bodyParts.size() ) {
+			// The buffer's current content size is the final content size,
+			// as we know the entire content has been encoded already,
+			// and we also know no content was consumed from the buffer yet.
+			hintContentLength( writer.buffer.contentSize() );
 		}
 	}
 
@@ -308,135 +307,45 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		//Initially null: must be set before writing is starter and each
 		//time it's resumed as it might change between writes during
 		//chunked encoding.
-		ContentEncoder out;
+		private ContentEncoder out;
 
 		//This is to keep the buffers which could not be written to socket
 		//because of flow control. Make sure to eventually push them out.
 		//Initialised only if/when needed.
-		List<CharBuffer> unwrittenLazyBuffers;
+		private AutoGrowingPagedBuffer buffer = new AutoGrowingPagedBuffer( BUFFER_PAGE_SIZE );
 
 		//Set this to true when we detect clogging, so we can stop trying.
 		//Make sure to reset this when the HTTP Client hints so.
 		//It's never dangerous to re-enable, just not efficient to try writing
 		//unnecessarily.
-		boolean flowControlPushingBack = false;
+		private boolean flowControlPushingBack = false;
 
 		private final CharsetEncoder utf8Encoder = StandardCharsets.UTF_8.newEncoder();
-		private ByteBuffer availableBuffer = ByteBuffer.allocate( BUFFER_SIZES );
-		private ByteBuffer needsWritingBuffer;
 
 		@Override
 		public void write(char[] cbuf, int off, int len) throws IOException {
 			CharBuffer toWriteChars = CharBuffer.wrap( cbuf, off, len );
-			if ( flowControlPushingBack == false ) {
-				writeOrStore( toWriteChars, false, true );
-			}
-			else {
-				storeForLater( toWriteChars );
-			}
+			buffer.put( toWriteChars, utf8Encoder, false );
+			attemptFlushPendingBuffers();
 		}
 
 		public void resumePendingWrites() throws IOException {
 			flowControlPushingBack = false;
-			if ( availableBuffer == null ) {
-				attemptFlushPendingBuffers( false );
+			if ( buffer.hasRemaining() ) {
+				attemptFlushPendingBuffers();
 			}
 		}
 
-		private void storeForLater(CharBuffer toWriteLater) {
-			if ( unwrittenLazyBuffers == null ) {
-				unwrittenLazyBuffers = new ArrayList<>( 16 );
-			}
-			//The original CharBuffer is not safe as it's backed by a char array
-			//which happens to be the GSON write buffer: it will get mutated.
-			CharBuffer defensiveCopy = CharBuffer.allocate( toWriteLater.remaining() );
-			defensiveCopy.put( toWriteLater );
-			defensiveCopy.flip();
-			unwrittenLazyBuffers.add( defensiveCopy );
-		}
-
-		private void attemptFlushPendingBuffers(boolean lastWrite) throws IOException {
-			flushCurrentBuffer();
-			if ( flowControlPushingBack == false && needsWritingBuffer != null ) {
-				if ( fullyWrite( needsWritingBuffer ) ) {
-					//No longer needed: make it available for reuse by the next writes
-					needsWritingBuffer.clear();
-					availableBuffer = needsWritingBuffer;
-					needsWritingBuffer = null;
-				}
-			}
-			while ( flowControlPushingBack == false && unwrittenLazyBuffers != null && unwrittenLazyBuffers.isEmpty() == false ) {
-				CharBuffer charBuffer = unwrittenLazyBuffers.get( 0 );
-				if ( writeOrStore( charBuffer, lastWrite, false ) ) {
-					unwrittenLazyBuffers.remove( 0 );
-				}
-			}
-		}
-
-		/**
-		 * Main writer loop: keeps writing until we either run out of data
-		 * to write, or the output buffer signals to back off.
-		 * @param toWriteChars the CharBuffer representing the chars to write
-		 * @param lastWrite set it to true at the end of the data stream (and never before) to detect malformed streams.
-		 * @param saveOnPushback when true an aborted CharBuffer will be enqueued in the write-later buffer. Disable for retries from that same buffer.
-		 * @return
-		 * @throws IOException
-		 */
-		private boolean writeOrStore(CharBuffer toWriteChars, boolean lastWrite, boolean saveOnPushback) throws IOException {
-			while ( true ) {
-				CoderResult coderResult = utf8Encoder.encode( toWriteChars, availableBuffer, lastWrite );
-				if ( coderResult.equals( CoderResult.UNDERFLOW ) ) {
-					//source consumed. All good, had enough space.
-					return true;
-				}
-				else if ( coderResult.equals( CoderResult.OVERFLOW ) ) {
-					//output buffer not large enough. Flush it & repeat:
-					flushCurrentBuffer();
-					if ( flowControlPushingBack ) {
-						//we need to stop pushing data. Save work to continue later & return.
-						if ( saveOnPushback ) {
-							storeForLater( toWriteChars );
-						}
-						return false;
-					}
-					//[else] continue in the while loop to write further data blocks
-				}
-				else {
-					//Encoding exception
-					coderResult.throwException();
-					return false; //Unreachable
-				}
-			}
-		}
-
-		private void flushCurrentBuffer() throws IOException {
-			if ( availableBuffer == null || availableBuffer.position() == 0 ) {
-				//Nothing to flush
-				return;
-			}
-			availableBuffer.flip();
-			if ( fullyWrite( availableBuffer ) ) {
-				availableBuffer.clear();
-			}
-			else {
-				needsWritingBuffer = availableBuffer;
-				availableBuffer = null;
-			}
-		}
-
-		private boolean fullyWrite(ByteBuffer buffer) throws IOException {
+		private void attemptFlushPendingBuffers() throws IOException {
 			if ( out == null ) {
-				flowControlPushingBack = true;
-				return false;
+				if ( buffer.contentPageCount() > 1 ) {
+					// Only allow one page to be filled up when there's no content consumer
+					flowControlPushingBack = true;
+				}
 			}
-			final int toWrite = buffer.remaining();
-			final int actuallyWritten = out.write( buffer );
-			if ( toWrite == actuallyWritten ) {
-				return true;
-			}
-			else {
-				flowControlPushingBack = true;
-				return false;
+			else if ( !flowControlPushingBack ) {
+				boolean written = buffer.writeTo( out );
+				flowControlPushingBack = !written;
 			}
 		}
 
@@ -448,7 +357,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		}
 
 		public void flushToOutput() throws IOException {
-			attemptFlushPendingBuffers( true );
+			attemptFlushPendingBuffers();
 		}
 
 		@Override
