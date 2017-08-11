@@ -296,12 +296,12 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			digestWriter.insertNewline();
 		}
 		//Now we finally know the content size in bytes:
-		hintContentLenght( digestWriter.getContentLength() );
+		hintContentLength( digestWriter.getContentLength() );
 	}
 
-	private void hintContentLenght(long contentLenght) {
+	private void hintContentLength(long contentLength) {
 		if ( contentlengthWasProvided == false ) {
-			this.contentLength = contentLenght;
+			this.contentLength = contentLength;
 		}
 	}
 
