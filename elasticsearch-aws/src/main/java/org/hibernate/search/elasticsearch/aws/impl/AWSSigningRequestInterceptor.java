@@ -13,14 +13,14 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.hibernate.search.util.impl.CollectionHelper;
+
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.RequestLine;
 import org.apache.http.protocol.HttpContext;
-import org.hibernate.search.util.impl.CollectionHelper;
-
 import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
