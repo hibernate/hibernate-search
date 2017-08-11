@@ -135,7 +135,8 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		Objects.requireNonNull( bodyParts );
 		this.gson = gson;
 		this.bodyParts = bodyParts;
-		this.contentLength = attemptOnePassEncoding();
+		this.contentLength = -1;
+		attemptOnePassEncoding();
 	}
 
 	@Override
@@ -207,7 +208,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * which is ideal precisely for small messages which can fit into a single buffer.
 	 * @return the size of the content, if all was written, or -1.
 	 */
-	private long attemptOnePassEncoding() {
+	private void attemptOnePassEncoding() {
 		// Essentially attempt to use the writer without going NPE on the output sink
 		// as it's not set yet.
 		try {
@@ -220,10 +221,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		if ( writer.flowControlPushingBack == false ) {
 			//Can't flip the buffer yet but the position is final,
 			//as we know the entire content has been rendered already.
-			return writer.availableBuffer.position();
-		}
-		else {
-			return -1l;
+			hintContentLength( writer.availableBuffer.position() );
 		}
 	}
 
