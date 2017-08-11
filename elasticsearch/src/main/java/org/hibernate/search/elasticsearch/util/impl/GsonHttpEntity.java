@@ -122,13 +122,13 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * partially rendered JSON stored in its buffers while flow control
 	 * refuses to accept more bytes.
 	 */
-	private final ProgressiveCharBufferWriter writer = new ProgressiveCharBufferWriter();
+	private ProgressiveCharBufferWriter writer = new ProgressiveCharBufferWriter();
 
 	/**
 	 * Add a layer of buffering at the char writer level,
 	 * to avoid handling an excessive number of small buffers:
 	 */
-	private final BufferedWriter bufferedWriter = new BufferedWriter( writer, BUFFER_SIZES );
+	private BufferedWriter bufferedWriter = new BufferedWriter( writer, BUFFER_SIZES );
 
 	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) {
 		Objects.requireNonNull( gson );
@@ -191,7 +191,12 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 
 	@Override
 	public void close() throws IOException {
-		//Nothing to close
+		//Nothing to close but let's make sure we re-wind the stream
+		//so that we can start from the beginning if needed
+		this.nextBodyToEncodeIndex = 0;
+		//Discard previous buffers as they might contain in-process content:
+		this.writer = new ProgressiveCharBufferWriter();
+		this.bufferedWriter = new BufferedWriter( writer, BUFFER_SIZES );
 	}
 
 	/**

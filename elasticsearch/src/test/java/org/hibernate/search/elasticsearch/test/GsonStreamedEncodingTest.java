@@ -21,6 +21,7 @@ import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.util.impl.GsonHttpEntity;
 import org.hibernate.search.testsupport.TestForIssue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -193,7 +194,11 @@ public class GsonStreamedEncodingTest {
 	byte[] optimisedEncoding(List<JsonObject> bodyParts) {
 		notEmpty( bodyParts );
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, bodyParts ) ) {
-			return produceContentWithCustomEncoder( entity );
+			byte[] firstRun = produceContentWithCustomEncoder( entity );
+			entity.close();
+			byte[] secondRun = produceContentWithCustomEncoder( entity );
+			Assert.assertArrayEquals( "Being repeatable, we expect it to be able to reproduce all content even after being closed", firstRun, secondRun );
+			return secondRun;
 		}
 		catch (IOException e) {
 			throw new RuntimeException( "We're mocking IO operations, this should not happen?", e );
