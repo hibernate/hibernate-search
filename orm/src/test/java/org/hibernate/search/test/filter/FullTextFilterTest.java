@@ -47,7 +47,7 @@ import org.junit.experimental.categories.Category;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class FilterTest extends SearchTestBase {
+public class FullTextFilterTest extends SearchTestBase {
 	private QueryCachingPolicy cachingPolicy;
 	private BooleanQuery query;
 	private FullTextSession fullTextSession;
