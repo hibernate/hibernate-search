@@ -1,6 +1,41 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.0.CR1 (15-08-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2843 Changing the limit/offset of a query does not clear the cached results
+    * HSEARCH-2839 Projecting on a default field whose type was overridden in the bridge fails with Elasticsearch
+    * HSEARCH-2823 The elasticsearch-aws JAR and its dependencies are missing from the .tar.gz/zip distributions
+    * HSEARCH-2196 Amazon AWS Elasticsearch Integration Test failures
+
+** Improvement
+    * HSEARCH-2840 Allow Elasticsearch projection on field bridges making use of dynamic object fields
+    * HSEARCH-2837 Clarify errors when interrupted during submission of work to the ES client
+    * HSEARCH-2833 Avoid confusing variable uses (bad naming, no declaration) in the documentation
+    * HSEARCH-2818 Optimise encoding of GSON elements into HTTP client buffers
+    * HSEARCH-2764 Improve orchestration of Elasticsearch works
+    * HSEARCH-2640 Improve resilience of cleanup methods (close, etc.)
+
+** Task
+    * HSEARCH-2846 Update build to be able to test with Java 9 preview build 9+181
+    * HSEARCH-2845 Add dependency management entries for the dependencypath plugin and jsonassert
+    * HSEARCH-2844 Remove requirement for CLA
+    * HSEARCH-2842 Verify and document interaction of full-text queries with an ORM filter
+    * HSEARCH-2841 Clean up the ElasticsearchHSQueryImpl code
+    * HSEARCH-2838 Add a maxConnection parameter to Elasticsearch performance tests
+    * HSEARCH-2834 Upgrade Elasticsearch versions to 5.5.1 and 2.4.6
+    * HSEARCH-2831 Clarify how to disable Elasticsearch/AWS digest signature
+    * HSEARCH-2830 Extend Elasticsearch performance tests for better orchestration testing
+    * HSEARCH-2828 Make WorkerTestCase wait for async works to finish
+    * HSEARCH-2827 Make WorkerTestCase fail if a background error occurs
+    * HSEARCH-2822 Automatically activate the JBoss Logging AP when importing project in IDEA
+    * HSEARCH-2821 Improve JSON rendering: better StringBuilder usage and logging
+    * HSEARCH-2816 Make sure Elasticsearch performance tests apply update/delete works to existing documents and add works to non-existing documents
+    * HSEARCH-2806 Remove method org.hibernate.search.engine.spi.EntityIndexBinding.getIndexManagers
+    * HSEARCH-2801 QueryDescriptor requires a List<CustomTypeParameter> where a Set or Map would make more sense
+
 5.8.0.Beta4 (12-07-2017)
 -------------------------
 
