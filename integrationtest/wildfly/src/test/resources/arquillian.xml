@@ -22,7 +22,7 @@
     <group qualifier="Grid" default="true">
         <container qualifier="container.active-1" mode="suite" default="true">
             <configuration>
-                <property name="jbossHome">${project.build.directory}/node1/wildfly-${wildflyVersion}</property>
+                <property name="jbossHome">${jbossHome.node1}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full.xml</property>
                 <property name="javaVmArguments">-javaagent:${byteman.agent.path}=script:${byteman.script.path} -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
@@ -33,7 +33,7 @@
         <!-- Copy of the above, except a port offset is applied and running from a different copy -->
         <container qualifier="container.active-2" mode="suite">
             <configuration>
-                <property name="jbossHome">${project.build.directory}/node2/wildfly-${wildflyVersion}</property>
+                <property name="jbossHome">${jbossHome.node2}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full.xml</property>
                 <property name="javaVmArguments">-Djboss.socket.binding.port-offset=10000 -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>

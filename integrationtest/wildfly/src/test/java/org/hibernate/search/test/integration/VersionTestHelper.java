@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 public class VersionTestHelper {
 
 	private static String hibernateSearchVersion = null;
+	private static String hibernateSearchVersionBuiltIn = null;
 	private static String hibernateSearchModuleSlot = null;
 	private static String hibernateOrmModuleName = null;
 	private static String luceneFullVersion = null;
@@ -38,9 +39,12 @@ public class VersionTestHelper {
 	 */
 	public static synchronized String getModuleSlotString() {
 		if ( hibernateSearchModuleSlot == null ) {
-			String versionHibernateSearch = getDependencyVersionHibernateSearch();
-			String[] split = versionHibernateSearch.split( "\\." );
-			hibernateSearchModuleSlot = split[0] + '.' + split[1];
+			hibernateSearchModuleSlot = injectVariables( "${test.hibernate.search.module.slot}" );
+			if ( hibernateSearchModuleSlot == null || hibernateSearchModuleSlot.isEmpty() ) {
+				String versionHibernateSearch = getDependencyVersionHibernateSearch();
+				String[] split = versionHibernateSearch.split( "\\." );
+				hibernateSearchModuleSlot = split[0] + '.' + split[1];
+			}
 		}
 		return hibernateSearchModuleSlot;
 	}
@@ -57,6 +61,19 @@ public class VersionTestHelper {
 			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${hibernate-orm.module.slot}" );
 		}
 		return hibernateOrmModuleName;
+	}
+
+	public static synchronized String getDependencyVersionHibernateSearchBuiltIn() {
+		if ( hibernateSearchVersionBuiltIn == null ) {
+			hibernateSearchVersionBuiltIn = injectVariables( "${dependency.version.HibernateSearch.builtin}" );
+			// if no built-in version is specified, default to the version from Maven
+			if ( hibernateSearchVersionBuiltIn == null
+					|| hibernateSearchVersionBuiltIn.isEmpty()
+					|| hibernateSearchVersionBuiltIn.startsWith( "${" ) ) {
+				hibernateSearchVersionBuiltIn = getDependencyVersionHibernateSearch();
+			}
+		}
+		return hibernateSearchVersionBuiltIn;
 	}
 
 	public static synchronized String getDependencyVersionLucene() {
