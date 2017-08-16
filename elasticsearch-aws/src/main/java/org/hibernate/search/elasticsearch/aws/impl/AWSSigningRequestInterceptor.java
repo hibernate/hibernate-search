@@ -7,25 +7,18 @@
 package org.hibernate.search.elasticsearch.aws.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.RequestLine;
 import org.apache.http.protocol.HttpContext;
-import org.hibernate.search.elasticsearch.spi.DigestSelfSigningCapable;
 import org.hibernate.search.util.impl.CollectionHelper;
 
 import uk.co.lucasweb.aws.v4.signer.Signer;
@@ -57,40 +50,10 @@ class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 		LocalDateTime now = LocalDateTime.now( ZoneOffset.UTC );
 		request.addHeader( AWSHeaders.X_AMZ_DATE_HEADER_NAME, AWSHeaders.toAmzDate( now ) );
 
-		String contentHash = computeContentHash( request );
+		String contentHash = (String) context.getAttribute( AWSPayloadHashingRequestInterceptor.CONTEXT_ATTRIBUTE_HASH );
 		request.addHeader( AWSHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME, contentHash );
 
 		request.addHeader( AWSHeaders.AUTHORIZATION, sign( request, contentHash ) );
-	}
-
-	private String computeContentHash(HttpRequest request) throws IOException {
-		HttpEntity entity = getEntity( request );
-		if ( entity == null ) {
-			return DigestUtils.sha256Hex( "" );
-		}
-		if ( entity instanceof DigestSelfSigningCapable ) {
-			DigestSelfSigningCapable e = (DigestSelfSigningCapable) entity;
-			MessageDigest digest = DigestUtils.getSha256Digest();
-			e.fillDigest( digest );
-			return Hex.encodeHexString( digest.digest() );
-		}
-		else {
-			if ( !entity.isRepeatable() ) {
-				throw new IllegalStateException( "Cannot sign AWS requests with non-repeatable entities" );
-			}
-			try ( InputStream content = entity.getContent() ) {
-				return DigestUtils.sha256Hex( content );
-			}
-		}
-	}
-
-	private HttpEntity getEntity(HttpRequest request) throws IOException {
-		if ( request instanceof HttpEntityEnclosingRequest ) {
-			return ( (HttpEntityEnclosingRequest) request ).getEntity();
-		}
-		else {
-			return null;
-		}
 	}
 
 	private String sign(HttpRequest request, String contentHash) {
