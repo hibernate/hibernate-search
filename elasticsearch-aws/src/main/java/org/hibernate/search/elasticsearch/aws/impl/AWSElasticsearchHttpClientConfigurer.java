@@ -37,12 +37,15 @@ public class AWSElasticsearchHttpClientConfigurer implements ElasticsearchHttpCl
 		String secretKey = requireNonEmpty( properties, SECRET_KEY_PROPERTY );
 		String region = requireNonEmpty( properties, REGION_PROPERTY );
 
-		AWSSigningRequestInterceptor interceptor = new AWSSigningRequestInterceptor(
+		AWSPayloadHashingRequestInterceptor payloadHashingInterceptor =
+				new AWSPayloadHashingRequestInterceptor();
+		AWSSigningRequestInterceptor signingInterceptor = new AWSSigningRequestInterceptor(
 				accessKey, secretKey, region,
 				ELASTICSEARCH_SERVICE_NAME
 				);
 
-		builder.addInterceptorLast( interceptor );
+		builder.addInterceptorFirst( payloadHashingInterceptor );
+		builder.addInterceptorLast( signingInterceptor );
 	}
 
 	private String requireNonEmpty(Properties properties, String name) {
