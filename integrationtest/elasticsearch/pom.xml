@@ -23,7 +23,14 @@
 
     <properties>
         <test.elasticsearch.failsafe.excludedGroups.version></test.elasticsearch.failsafe.excludedGroups.version>
-        <test.elasticsearch.failsafe.excludedGroups.aws></test.elasticsearch.failsafe.excludedGroups.aws>
+        <!--
+             By default, the following property skips AWS-related tests;
+             when the aws profile is enabled, it will skip tests that cannot pass on AWS
+         -->
+        <test.elasticsearch.failsafe.excludedGroups.aws>
+            ,
+            org.hibernate.search.elasticsearch.testutil.junit.SkipWithoutAWS
+        </test.elasticsearch.failsafe.excludedGroups.aws>
     </properties>
 
     <dependencies>
@@ -162,6 +169,19 @@
             <classifier>build-resources</classifier>
             <type>zip</type>
             <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Exclude dependencies that conflict with the ES Rest client -->
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
