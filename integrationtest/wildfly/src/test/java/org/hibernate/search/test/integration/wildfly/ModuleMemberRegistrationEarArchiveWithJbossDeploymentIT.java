@@ -85,7 +85,11 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 		String webXml = Descriptors.create( org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor.class )
 			.createEnvEntry()
 				.envEntryName( EXPECTED_SEARCH_VERSION_RESOURCE )
-				.envEntryValue( VersionTestHelper.getDependencyVersionHibernateSearch() )
+				.envEntryValue(
+						"main".equals( VersionTestHelper.getModuleSlotString() ) ?
+								VersionTestHelper.getDependencyVersionHibernateSearchBuiltIn() :
+								VersionTestHelper.getDependencyVersionHibernateSearch()
+				)
 				.envEntryType( "java.lang.String" )
 				.up()
 			.exportAsString();

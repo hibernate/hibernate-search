@@ -30,6 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.script.path>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm</byteman.script.path>
+        <test.hibernate.search.module.slot>main</test.hibernate.search.module.slot>
     </properties>
 
     <dependencyManagement>
@@ -270,74 +271,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildflyVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildflyVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-10-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-10-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${hibernateVersion}</version>
-                                    <classifier>wildfly-10-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${hibernateVersion}</version>
-                                    <classifier>wildfly-10-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -349,7 +282,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
+                            <outputDirectory>${jbossHome.node1}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -365,7 +298,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}</outputDirectory>
+                            <outputDirectory>${jbossHome.node2}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -378,4 +311,150 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!--
+                With this testing profile, the TS will automatically unzip WildFly distributions obtained via
+                Maven's dependency resolution mechanisms, as opposed to the mode where
+                the user is expected to prepare the distributions beforehand.
+                This is active by default, unless you specify a value for jbossHome.node1.
+            -->
+            <id>unzipWildFly</id>
+            <activation>
+                <property>
+                    <name>!jbossHome.node1</name>
+                </property>
+            </activation>
+            <properties>
+                <jbossHome.node1>${project.build.directory}/node1/wildfly-${wildflyVersion}</jbossHome.node1>
+                <jbossHome.node2>${project.build.directory}/node2/wildfly-${wildflyVersion}</jbossHome.node2>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-wildfly</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildflyVersion}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/node1
+                                            </outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildflyVersion}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/node2
+                                            </outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!--
+                With this profile, the TS will create Hibernate Search modules by itself, as opposed to testing the
+                modules already included in WildFly distribution (org.hibernate.search.orm:main).
+                This is active by default.
+             -->
+            <id>createModules</id>
+            <activation>
+                <property>
+                    <name>!useBuiltinModules</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- the slot will be inferred at runtime -->
+                <test.hibernate.search.module.slot/>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-modules</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-search-modules</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-10-dist</classifier>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-search-modules</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-10-dist</classifier>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-orm-modules</artifactId>
+                                            <version>${hibernateVersion}</version>
+                                            <classifier>wildfly-10-dist</classifier>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                             <groupId>org.hibernate</groupId>
+                                             <artifactId>hibernate-orm-modules</artifactId>
+                                             <version>${hibernateVersion}</version>
+                                             <classifier>wildfly-10-dist</classifier>
+                                             <type>zip</type>
+                                             <overWrite>false</overWrite>
+                                             <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
+                                         </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!--
+                When using built-in modules, set the correct Hibernate ORM module slot (main).
+            -->
+            <id>useBuiltinModules</id>
+            <activation>
+                <property>
+                    <name>useBuiltinModules</name>
+                </property>
+            </activation>
+            <properties>
+                <hibernate-orm.module.slot>main</hibernate-orm.module.slot>
+            </properties>
+        </profile>
+    </profiles>
 </project>
