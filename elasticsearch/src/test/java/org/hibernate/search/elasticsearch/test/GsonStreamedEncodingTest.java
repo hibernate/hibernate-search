@@ -191,7 +191,7 @@ public class GsonStreamedEncodingTest {
 		assertArrayEquals( expected, optimised );
 	}
 
-	byte[] optimisedEncoding(List<JsonObject> bodyParts) {
+	private byte[] optimisedEncoding(List<JsonObject> bodyParts) {
 		notEmpty( bodyParts );
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, bodyParts ) ) {
 			byte[] firstRun = produceContentWithCustomEncoder( entity );
@@ -211,8 +211,14 @@ public class GsonStreamedEncodingTest {
 		int loopCounter = 0;
 		while ( sink.isCompleted() == false ) {
 			entity.produceContent( sink, fakeIO );
-			//For testing, be really aggressive on the need to
-			//manage small write windows the right way.
+			/*
+			 * For testing, be really aggressive on the need to
+			 * manage small write windows the right way.
+			 *
+			 * Also, using small write windows helped to reproduce HSEARCH-2854
+			 * almost all the time (we only need the flow control to push
+			 * back at least once).
+			 */
 			sink.setNextAcceptedBytesSize( loopCounter++ % 3 );
 		}
 		return sink.flipAndRead();
@@ -249,7 +255,6 @@ public class GsonStreamedEncodingTest {
 		return list;
 	}
 
-
 	private static JsonObject buildEmptyJSON() {
 		return JsonBuilder.object()
 				.build();
@@ -275,11 +280,15 @@ public class GsonStreamedEncodingTest {
 		private boolean contentComplete = false;
 		private int nextWriteAcceptLimit = 0;
 		private ByteBuffer buf = ByteBuffer.allocate( MAX_TESTING_BUFFER_BYTES );
+		private boolean lastWriteWasZeroLength = false;
 		private boolean closed = false;
 
 		@Override
 		public int write(final ByteBuffer byteBuffer) throws IOException {
 			assertFalse( closed );
+
+			lastWriteWasZeroLength = !byteBuffer.hasRemaining();
+
 			int toRead = Math.min( byteBuffer.remaining(), nextWriteAcceptLimit );
 			byte[] currentRead = new byte[toRead];
 			byteBuffer.get( currentRead );
@@ -299,6 +308,8 @@ public class GsonStreamedEncodingTest {
 
 		@Override
 		public void complete() throws IOException {
+			assertFalse( "A final zero-length write was detected - this should never happen. See HSEARCH-2854.",
+					lastWriteWasZeroLength );
 			assertFalse( closed );
 			assertFalse( "Can't mark it 'complete' multiple times", contentComplete );
 			contentComplete = true;
