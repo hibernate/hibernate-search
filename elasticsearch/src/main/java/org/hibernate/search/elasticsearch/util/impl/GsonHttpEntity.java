@@ -412,7 +412,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		}
 
 		private void flushCurrentBuffer() throws IOException {
-			if ( availableBuffer == null ) {
+			if ( availableBuffer == null || availableBuffer.position() == 0 ) {
 				//Nothing to flush
 				return;
 			}
