@@ -1,6 +1,12 @@
 Hibernate Search Changelog
 ==========================
 
+5.5.8.Final (18-08-2017)
+-------------------------
+
+** Task
+    * HSEARCH-2851 Update 5.5 branch to be compatible with Hibernate ORM 5.1.9.Final
+
 5.5.7.Final (31-05-2017)
 -------------------------
 
