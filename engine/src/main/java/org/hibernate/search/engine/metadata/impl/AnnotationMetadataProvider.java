@@ -856,9 +856,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
-		AnalyzerReference analyzerReference = typeMetadataBuilder.getAnalyzerReference();
-		if ( analyzerReference == null ) {
-			throw new AssertionFailure( "Analyzer should not be undefined" );
+		if ( ! parseContext.skipAnalyzers() ) {
+			AnalyzerReference analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+			if ( analyzerReference == null ) {
+				throw new AssertionFailure( "Analyzer should not be undefined" );
+			}
 		}
 	}
 
