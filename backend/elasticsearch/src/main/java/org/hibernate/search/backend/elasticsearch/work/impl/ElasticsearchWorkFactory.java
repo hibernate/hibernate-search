@@ -13,6 +13,8 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchWorkFactory {
 
+	ElasticsearchWork<?> createIndex(String indexName, JsonObject model);
+
 	ElasticsearchWork<?> add(String indexName, String id, JsonObject document);
 
 	ElasticsearchWork<?> update(String indexName, String id, JsonObject document);

@@ -10,8 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 
 import com.google.gson.JsonObject;
 
@@ -19,8 +18,6 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
-
-	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final String workType;
 
@@ -42,8 +39,7 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 
 	@Override
 	public CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context) {
-		log.executingWork( context.getClient(), workType, parameters, document );
-		return CompletableFuture.completedFuture( null );
+		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document );
 	}
 
 }

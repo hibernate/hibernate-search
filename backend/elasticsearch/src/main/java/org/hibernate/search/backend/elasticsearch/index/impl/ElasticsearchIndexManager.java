@@ -9,22 +9,18 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.spi.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentBuilder> {
-
-	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final String name;
 	private final ElasticsearchIndexModel model;
@@ -38,11 +34,6 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 		this.workFactory = backend.getWorkFactory();
 		this.changesetOrchestrator = backend.createChangesetOrchestrator();
 		this.streamOrchestrator = backend.getStreamOrchestrator();
-
-		// TODO remove this
-		log.creatingIndex( name, model );
-
-		// TODO add index initialization (create/drop/etc.) code somewhere; maybe rather in the backend, so that we can parallelize initialization?
 	}
 
 	@Override

@@ -15,6 +15,12 @@ import com.google.gson.JsonObject;
 public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
+	public ElasticsearchWork<?> createIndex(String indexName, JsonObject model) {
+		return new StubElasticsearchWork<>( "createIndex", model )
+				.addParam( "indexName", indexName );
+	}
+
+	@Override
 	public ElasticsearchWork<?> add(String indexName, String id, JsonObject document) {
 		return new StubElasticsearchWork<>( "add", document )
 				.addParam( "indexName", indexName )

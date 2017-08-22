@@ -10,12 +10,15 @@ import java.util.Properties;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexModelCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModelCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
@@ -46,7 +49,14 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	@Override
 	public ElasticsearchIndexManager build() {
 		ElasticsearchIndexModel model = new ElasticsearchIndexModel( collector );
-		// TODO use the context and properties somehow
+
+		Gson gson = new Gson();
+		JsonObject modelAsJson = gson.toJsonTree( model ).getAsJsonObject();
+
+		// TODO make sure index initialization is performed in parallel for all indexes?
+		ElasticsearchWork<?> work = backend.getWorkFactory().createIndex( indexName, modelAsJson );
+		backend.getStreamOrchestrator().submit( work );
+
 		return new ElasticsearchIndexManager( backend, indexName, model );
 	}
 

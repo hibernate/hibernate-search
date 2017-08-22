@@ -50,6 +50,10 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilde
 		return workFactory;
 	}
 
+	public ElasticsearchClient getClient() {
+		return client;
+	}
+
 	public ElasticsearchWorkOrchestrator createChangesetOrchestrator() {
 		return new StubElasticsearchWorkOrchestrator( client );
 	}

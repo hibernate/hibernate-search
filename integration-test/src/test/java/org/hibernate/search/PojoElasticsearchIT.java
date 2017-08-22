@@ -6,15 +6,21 @@
  */
 package org.hibernate.search;
 
+import static org.hibernate.search.util.StubAssert.assertRequest;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.engine.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.engine.bridge.declaration.spi.BridgeBeanReference;
@@ -31,6 +37,7 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,11 +49,14 @@ public class PojoElasticsearchIT {
 
 	private SearchManagerFactory managerFactory;
 
+	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
+	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
+
 	@Before
-	public void setup() {
+	public void setup() throws JSONException {
 		MappingDefinition mapping = JavaBeanMapper.get().programmaticMapping();
 		mapping.entity( IndexedEntity.class )
-				.indexed( "IndexedEntity" )
+				.indexed( IndexedEntity.INDEX )
 				.bridge(
 						new MyBridgeDefinition()
 						.objectName( "customBridgeOnClass" )
@@ -71,7 +81,7 @@ public class PojoElasticsearchIT {
 								.objectName( "customBridgeOnProperty" )
 						);
 		secondMapping.entity( OtherIndexedEntity.class )
-				.indexed( "OtherIndexedEntity" )
+				.indexed( OtherIndexedEntity.INDEX )
 				.property( "id" )
 						.documentId().bridge( DefaultIntegerIdentifierBridge.class )
 				.property( "numeric" )
@@ -82,12 +92,102 @@ public class PojoElasticsearchIT {
 				.addMapping( mapping )
 				.addMapping( secondMapping )
 				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_1.host", "http://es1.mycompany.com:9200/" )
+				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
 				.setProperty( "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_2.host", "http://es2.mycompany.com:9200/" )
+				.setProperty( "backend.elasticsearchBackend_2.host", HOST_2 )
 				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
 				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
 				.build();
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+
+		assertRequest( requests, OtherIndexedEntity.INDEX, 0, HOST_2, "createIndex", null,
+				"{"
+					+ "'mapping': {"
+						+ "'properties': {"
+							+ "'numeric': {"
+								+ "'type': 'integer'"
+							+ "},"
+							+ "'numericAsString': {"
+								+ "'type': 'keyword'"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "createIndex", null,
+				"{"
+					+ "'mapping': {"
+						+ "'properties': {"
+							+ "'customBridgeOnClass': {"
+								+ "'type': 'object',"
+								+ "'properties': {"
+									+ "'date': {"
+										+ "'type': 'date',"
+										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "},"
+									+ "'text': {"
+										+ "'type': 'keyword'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'customBridgeOnProperty': {"
+								+ "'type': 'object',"
+								+ "'properties': {"
+									+ "'date': {"
+										+ "'type': 'date',"
+										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "},"
+									+ "'text': {"
+										+ "'type': 'keyword'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'embedded': {"
+								+ "'type': 'object',"
+								+ "'properties': {"
+									+ "'customBridgeOnClass': {"
+										+ "'type': 'object',"
+										+ "'properties': {"
+											+ "'date': {"
+												+ "'type': 'date',"
+												+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+											+ "},"
+											+ "'text': {"
+												+ "'type': 'keyword'"
+											+ "}"
+										+ "}"
+									+ "},"
+									+ "'customBridgeOnProperty': {"
+										+ "'type': 'object',"
+										+ "'properties': {"
+											+ "'date': {"
+												+ "'type': 'date',"
+												+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+											+ "},"
+											+ "'text': {"
+												+ "'type': 'keyword'"
+											+ "}"
+										+ "}"
+									+ "},"
+									+ "'myLocalDateField': {"
+										+ "'type': 'date',"
+										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "},"
+									+ "'myTextField': {"
+										+ "'type': 'keyword'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'myLocalDateField': {"
+								+ "'type': 'date',"
+								+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+							+ "},"
+							+ "'myTextField': {"
+								+ "'type': 'keyword'"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
 	}
 
 	@After
@@ -98,7 +198,7 @@ public class PojoElasticsearchIT {
 	}
 
 	@Test
-	public void index() {
+	public void index() throws JSONException {
 		try ( PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() ) ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -125,6 +225,44 @@ public class PojoElasticsearchIT {
 			manager.getWorker().delete( IndexedEntity.class, 1 );
 			manager.getWorker().add( entity3 );
 		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		// We expect the first add to be removed due to the delete
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "2",
+				"{"
+					+ "'customBridgeOnClass': {"
+						+ "'text': 'some more text (2)',"
+						+ "'date': '2017-11-02'"
+					+ "},"
+					+ "'myLocalDateField': '2017-11-02',"
+					+ "'customBridgeOnProperty': {"
+						+ "'text': 'some more text (3)',"
+						+ "'date': '2017-11-03'"
+					+ "},"
+					+ "'embedded': {"
+						+ "'customBridgeOnClass': {"
+							+ "'text': 'some more text (3)',"
+							+ "'date': '2017-11-03'"
+						+ "},"
+						+ "'myLocalDateField': '2017-11-03',"
+						+ "'myTextField': 'some more text (3)'"
+					+ "},"
+					+ "'myTextField': 'some more text (2)'"
+				+ "}" );
+		assertRequest( requests, IndexedEntity.INDEX, 1, HOST_1, "add", "3",
+				"{"
+					+ "'customBridgeOnClass': {"
+						+ "'text': 'some more text (3)',"
+						+ "'date': '2017-11-03'"
+					+ "},"
+					+ "'myLocalDateField': '2017-11-03',"
+					+ "'myTextField': 'some more text (3)'"
+				+ "}" );
+		assertRequest( requests, OtherIndexedEntity.INDEX, 0, HOST_2, "add", "4",
+				"{"
+					+ "'numeric': 404,"
+					+ "'numericAsString': '404'"
+				+ "}" );
 	}
 
 	public static class ParentIndexedEntity {
@@ -153,6 +291,8 @@ public class PojoElasticsearchIT {
 
 	public static final class IndexedEntity extends ParentIndexedEntity {
 
+		public static final String INDEX = "IndexedEntity";
+
 		// TODO make it work with a primitive int too
 		private Integer id;
 
@@ -177,6 +317,8 @@ public class PojoElasticsearchIT {
 	}
 
 	public static final class OtherIndexedEntity {
+
+		public static final String INDEX = "OtherIndexedEntity";
 
 		// TODO make it work with a primitive int too
 		private Integer id;
