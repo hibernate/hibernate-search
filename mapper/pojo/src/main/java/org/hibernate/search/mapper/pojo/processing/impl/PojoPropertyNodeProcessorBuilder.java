@@ -55,35 +55,15 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			defaultedFieldName = property.getName();
 		}
 
-		BeanReference<? extends FunctionBridge<?, ?>> defaultedReference = reference;
-		if ( defaultedReference == null
-				|| defaultedReference.getName() == null && defaultedReference.getType() == null ) {
-			// TODO handle bridge auto-detection based on the current node's type (and annotations?)
-			throw new UnsupportedOperationException( "Automatic bridge detection is not implemented yet" );
-		}
-
 		// TODO check that the bridge is suitable for the current node's type?
 		ValueProcessor processor = indexModelCollector.addFunctionBridge(
-				indexableModel, defaultedReference, defaultedFieldName, fieldModelContributor );
+				indexableModel, javaType, reference, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );
 	}
 
 	@Override
 	public void identifierBridge(BeanReference<IdentifierBridge<?>> converterReference) {
-		IdentifierBridge<?> bridge;
-
-		if ( converterReference == null
-				|| converterReference.getName() == null && converterReference.getType() == null ) {
-			// TODO handle converter auto-detection based on the current node's type (and annotations?)
-			throw new UnsupportedOperationException( "Automatic ID converter detection is not implemented yet" );
-		}
-		else {
-			bridge = indexModelCollector.createIdentifierBridge( converterReference );
-			/*
-			 * TODO check that the converter is suitable for the current node's type
-			 * (use introspection, similarly to what we do for function bridges?)
-			 */
-		}
+		IdentifierBridge<?> bridge = indexModelCollector.createIdentifierBridge( javaType, converterReference );
 		identifierBridgeCollector.collect( property, bridge );
 	}
 

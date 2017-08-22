@@ -27,11 +27,12 @@ import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
  */
 public interface MappingIndexModelCollector {
 
-	IdentifierBridge<?> createIdentifierBridge(BeanReference<? extends IdentifierBridge<?>> reference);
+	<T> IdentifierBridge<T> createIdentifierBridge(Class<T> sourceType, BeanReference<? extends IdentifierBridge<?>> reference);
 
 	ValueProcessor addBridge(IndexableModel indexableModel, BridgeDefinition<?> definition);
 
-	ValueProcessor addFunctionBridge(IndexableModel indexableModel, BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
+	ValueProcessor addFunctionBridge(IndexableModel indexableModel, Class<?> sourceType,
+			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
 			String fieldName, FieldModelContributor contributor);
 
 	/*

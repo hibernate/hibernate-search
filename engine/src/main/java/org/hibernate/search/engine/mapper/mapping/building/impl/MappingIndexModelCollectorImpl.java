@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollecto
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
+import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.engine.bridge.impl.FunctionBridgeUtil;
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.bridge.spi.Bridge;
@@ -38,21 +40,26 @@ import org.hibernate.search.util.SearchException;
 public class MappingIndexModelCollectorImpl implements MappingIndexModelCollector {
 
 	private final BridgeFactory bridgeFactory;
+	private final BridgeReferenceResolver bridgeReferenceResolver;
 
 	private final IndexModelCollectorImplementor collector;
 	private final IndexModelCollector collectorWithContext;
 	private final IndexModelNestingContextImpl nestingContext;
 
 	public MappingIndexModelCollectorImpl(BridgeFactory bridgeFactory,
+			BridgeReferenceResolver bridgeReferenceResolver,
 			IndexModelCollectorImplementor collector,
 			IndexableTypeOrdering typeOrdering) {
-		this( bridgeFactory, collector, new IndexModelNestingContextImpl( typeOrdering ) );
+		this( bridgeFactory, bridgeReferenceResolver,
+				collector, new IndexModelNestingContextImpl( typeOrdering ) );
 	}
 
 	private MappingIndexModelCollectorImpl(BridgeFactory bridgeFactory,
+			BridgeReferenceResolver bridgeReferenceResolver,
 			IndexModelCollectorImplementor collector,
 			IndexModelNestingContextImpl nestingContext) {
 		this.bridgeFactory = bridgeFactory;
+		this.bridgeReferenceResolver = bridgeReferenceResolver;
 		this.collector = collector;
 		this.nestingContext = nestingContext;
 		this.collectorWithContext = collector.withContext( nestingContext );
@@ -69,25 +76,55 @@ public class MappingIndexModelCollectorImpl implements MappingIndexModelCollecto
 	}
 
 	@Override
-	public IdentifierBridge<?> createIdentifierBridge(BeanReference<? extends IdentifierBridge<?>> reference) {
-		return bridgeFactory.createIdentifierBridge( reference );
+	public <T> IdentifierBridge<T> createIdentifierBridge(Class<T> sourceType, BeanReference<? extends IdentifierBridge<?>> reference) {
+		BeanReference<? extends IdentifierBridge<?>> defaultedReference = reference;
+		if ( isEmpty( reference ) ) {
+			defaultedReference = bridgeReferenceResolver.resolveIdentifierBridgeForType( sourceType );
+		}
+		/*
+		 * TODO check that the converter is suitable for the current node's type
+		 * (use introspection, similarly to what we do for function bridges?)
+		 */
+		IdentifierBridge<?> bridge = bridgeFactory.createIdentifierBridge( defaultedReference );
+
+		return (IdentifierBridge<T>) bridge;
 	}
 
 	@Override
 	public ValueProcessor addBridge(IndexableModel indexableModel, BridgeDefinition<?> definition) {
-		Bridge<?> bridge = bridgeFactory.createBridge( definition );
+		return doAddBridge( indexableModel, definition );
+	}
+
+	@Override
+	public ValueProcessor addFunctionBridge(IndexableModel indexableModel, Class<?> sourceType,
+			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
+			String fieldName, FieldModelContributor contributor) {
+
+		BeanReference<? extends FunctionBridge<?, ?>> defaultedReference = bridgeReference;
+		if ( isEmpty( defaultedReference ) ) {
+			defaultedReference = bridgeReferenceResolver.resolveFunctionBridgeForType( sourceType );
+		}
+
+		FunctionBridge<?, ?> bridge = bridgeFactory.createFunctionBridge( defaultedReference );
+		return doAddFunctionBridge( indexableModel, bridge, fieldName, contributor );
+	}
+
+	private boolean isEmpty(BeanReference<?> reference) {
+		return reference == null || reference.getName() == null && reference.getType() == null;
+	}
+
+	private <A extends Annotation> ValueProcessor doAddBridge(IndexableModel indexableModel, BridgeDefinition<A> definition) {
+		A annotation = definition.get();
+		@SuppressWarnings("unchecked")
+		Class<A> annotationType = (Class<A>) annotation.annotationType();
+		BeanReference<? extends Bridge<?>> reference = bridgeReferenceResolver.resolveBridgeForAnnotationType( annotationType );
+
+		Bridge<?> bridge = bridgeFactory.createBridge( reference, annotation );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
 		bridge.bind( indexableModel, collectorWithContext );
 
 		return new BridgeValueProcessor( bridge );
-	}
-
-	@Override
-	public ValueProcessor addFunctionBridge(IndexableModel indexableModel, BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
-			String fieldName, FieldModelContributor contributor) {
-		FunctionBridge<?, ?> bridge = bridgeFactory.createFunctionBridge( bridgeReference );
-		return doAddFunctionBridge( indexableModel, bridge, fieldName, contributor );
 	}
 
 	private <T, R> ValueProcessor doAddFunctionBridge(IndexableModel indexableModel, FunctionBridge<T, R> bridge,
@@ -132,7 +169,8 @@ public class MappingIndexModelCollectorImpl implements MappingIndexModelCollecto
 				f -> f.composeWithNested( parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters ),
 				collector, IndexModelCollectorImplementor::childObject,
 				(indexModelCollector, recursionContext) ->
-						new MappingIndexModelCollectorImpl( bridgeFactory, indexModelCollector, recursionContext )
+						new MappingIndexModelCollectorImpl( bridgeFactory, bridgeReferenceResolver,
+								indexModelCollector, recursionContext )
 				);
 	}
 

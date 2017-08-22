@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
+import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.MappingIndexModelCollectorImpl;
@@ -38,16 +39,19 @@ public class IndexManagerBuildingStateHolder {
 	private final Properties properties;
 	private final Properties defaultIndexProperties;
 	private final BridgeFactory bridgeFactory;
+	private final BridgeReferenceResolver bridgeReferenceResolver;
 
 	private final Map<String, Backend<?>> backendsByName = new HashMap<>();
 	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	public IndexManagerBuildingStateHolder(BuildContext buildContext,
-			Properties properties, BridgeFactory bridgeFactory) {
+			Properties properties, BridgeFactory bridgeFactory,
+			BridgeReferenceResolver bridgeReferenceResolver) {
 		this.buildContext = buildContext;
 		this.properties = properties;
 		this.defaultIndexProperties = new MaskedProperty( properties, "index.default" );
 		this.bridgeFactory = bridgeFactory;
+		this.bridgeReferenceResolver = bridgeReferenceResolver;
 	}
 
 	public IndexManagerBuildingState<?> startBuilding(String indexName, IndexableTypeOrdering typeOrdering) {
@@ -89,7 +93,7 @@ public class IndexManagerBuildingStateHolder {
 		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, buildContext, indexProperties );
 		IndexModelCollectorImplementor modelCollector = builder.getModelCollector();
 		MappingIndexModelCollectorImpl mappingModelCollector = new MappingIndexModelCollectorImpl(
-				bridgeFactory, modelCollector, typeOrdering );
+				bridgeFactory, bridgeReferenceResolver, modelCollector, typeOrdering );
 		return new IndexMappingBuildingStateImpl<>( builder, mappingModelCollector );
 	}
 

@@ -17,6 +17,7 @@ import java.util.Properties;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
+import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.engine.common.SearchManagerBuilder;
 import org.hibernate.search.engine.common.SearchManagerFactory;
 import org.hibernate.search.engine.common.SearchManagerFactoryBuilder;
@@ -74,6 +75,7 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 		ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
 		BuildContext buildContext = new BuildContextImpl( serviceManager );
 		BridgeFactory bridgeFactory = new BridgeFactory( buildContext, beanResolver );
+		BridgeReferenceResolver bridgeReferenceResolver = new BridgeReferenceResolver();
 		/*
 		 * TODO add an option in the builder to mask properties, but don't enable it by default
 		 * Rationale: we can easily switch this option on in the Hibernate ORM integration,
@@ -82,7 +84,8 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 		 */
 		// Properties maskedProperties = new MaskedProperty( properties, "hibernate.search" );
 		IndexManagerBuildingStateHolder indexManagerBuildingStateProvider =
-				new IndexManagerBuildingStateHolder( buildContext, properties, bridgeFactory );
+				new IndexManagerBuildingStateHolder( buildContext, properties,
+						bridgeFactory, bridgeReferenceResolver );
 		// TODO close the holder (which will close the backends if anything fails after this
 
 		Map<MappingType<?, ?>, MappingBuilder<?, ?>> mappingBuilders = new HashMap<>();

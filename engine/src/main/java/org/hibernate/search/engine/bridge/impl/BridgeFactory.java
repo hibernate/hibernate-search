@@ -8,16 +8,12 @@ package org.hibernate.search.engine.bridge.impl;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.engine.bridge.declaration.spi.BridgeBeanReference;
-import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
-import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.bridge.spi.Bridge;
 import org.hibernate.search.engine.bridge.spi.FunctionBridge;
 import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
@@ -36,18 +32,7 @@ public final class BridgeFactory {
 		return beanResolver.resolve( reference, IdentifierBridge.class );
 	}
 
-	public <A extends Annotation> Bridge<A> createBridge(BridgeDefinition<A> definition) {
-		A annotation = definition.get();
-		Class<?> annotationType = annotation.annotationType();
-		// TODO add a cache for annotation => metaAnnotation?
-		BridgeMapping metaAnnotation = annotationType.getAnnotation( BridgeMapping.class );
-		if ( metaAnnotation == null ) {
-			throw new SearchException( "A '" + annotationType + "' annotation was passed as a bridge definition,"
-					+ " but this annotation type is missing the '" + BridgeMapping.class + "' meta-annotation." );
-		}
-
-		BridgeBeanReferenceWrapper reference = new BridgeBeanReferenceWrapper( metaAnnotation.implementation() );
-
+	public <A extends Annotation> Bridge<A> createBridge(BeanReference<? extends Bridge<?>> reference, A annotation) {
 		// TODO check that the implementation accepts annotations of type A
 		Bridge<A> bridge = beanResolver.resolve( reference, Bridge.class );
 
@@ -60,25 +45,6 @@ public final class BridgeFactory {
 		FunctionBridge<?, ?> bridge = beanResolver.resolve( reference, FunctionBridge.class );
 		bridge.initialize( buildContext );
 		return bridge;
-	}
-
-	private static class BridgeBeanReferenceWrapper implements BeanReference<Bridge<?>> {
-		private final BridgeBeanReference delegate;
-
-		public BridgeBeanReferenceWrapper(BridgeBeanReference delegate) {
-			this.delegate = delegate;
-		}
-
-		@Override
-		public String getName() {
-			return delegate.name();
-		}
-
-		@Override
-		public Class<? extends Bridge<?>> getType() {
-			return delegate.type();
-		}
-
 	}
 
 }
