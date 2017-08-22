@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
@@ -64,17 +65,8 @@ public class IndexedEmbeddedFilter {
 	}
 
 	public boolean isPathIncluded(String relativePath) {
-		if ( isTerminal() ) {
-			return false;
-		}
-		else if ( pathFilters != null ) {
-			// Path filters can override depth limits
-			// TODO implement path filters
-			throw new UnsupportedOperationException( "Path filters not implemented" );
-		}
-		else {
-			return true;
-		}
+		return remainingDepth == null || remainingDepth > 0
+				|| pathFilters != null && pathFilters.contains( relativePath );
 	}
 
 	private boolean hasRecursionLimits() {
@@ -119,17 +111,53 @@ public class IndexedEmbeddedFilter {
 					+ cyclicRecursionPath + "' on type '" + parentTypeId + "'" );
 		}
 
+		Integer defaultedNestedMaxDepth = nestedMaxDepth;
+		if ( defaultedNestedMaxDepth == null && nestedPathFilters != null && !nestedPathFilters.isEmpty() ) {
+			// The max depth is implicitly set to 0 when not provided and when there are path filters
+			defaultedNestedMaxDepth = 0;
+		}
+
 		Integer newRemainingDepth = remainingDepth == null ? null : remainingDepth - 1;
-		if ( nestedMaxDepth != null && ( remainingDepth == null || remainingDepth > nestedMaxDepth ) ) {
-			newRemainingDepth = nestedMaxDepth;
+		if ( defaultedNestedMaxDepth != null && ( remainingDepth == null || remainingDepth > defaultedNestedMaxDepth ) ) {
+			newRemainingDepth = defaultedNestedMaxDepth;
 		}
 
 		Set<String> newPathFilters = null;
-		if ( pathFilters != null || nestedPathFilters != null && !nestedPathFilters.isEmpty() ) {
-			// TODO implement path filters
-			// TODO use relativePrefix and nestedPathFilters to build a new set of filters based on pathFilters
-			// CAUTION: pathFilters being empty means "exclude all", pathFilters being null means "include all", and nestedPathFilters being either null or empty means "include all"
-			throw new UnsupportedOperationException( "Path filters not implemented" );
+		if ( nestedPathFilters != null && !nestedPathFilters.isEmpty() ) {
+			/*
+			 * Explicit path filtering on the nested indexedEmbedded:
+			 * compose filters with the current ones and use the result.
+			 */
+			newPathFilters = new HashSet<>();
+			for ( String nestedPathFilter : nestedPathFilters ) {
+				if ( isPathIncluded( relativePrefix + nestedPathFilter ) ) {
+					newPathFilters.add( nestedPathFilter );
+					// Also add paths leading to this path (so that object nodes are not excluded)
+					int afterPreviousDotIndex = 0;
+					int nextDotIndex = nestedPathFilter.indexOf( '.', afterPreviousDotIndex );
+					while ( nextDotIndex >= 0 ) {
+						String subPath = nestedPathFilter.substring( 0, nextDotIndex );
+						newPathFilters.add( subPath );
+						afterPreviousDotIndex = nextDotIndex + 1;
+						nextDotIndex = nestedPathFilter.indexOf( '.', afterPreviousDotIndex );
+					}
+				}
+			}
+		}
+		else if ( pathFilters != null ) {
+			/*
+			 * No explicit path filtering on the nested indexedEmbedded
+			 * (meaning all path are included as far as it's concerned)
+			 * but the parent indexedEmbedded has path filtering.
+			 * Keep only filters matching the nested indexedEmbedded's prefix.
+			 */
+			newPathFilters = new HashSet<>();
+			int relativePrefixLength = relativePrefix.length();
+			for ( String pathFilter : pathFilters ) {
+				if ( pathFilter.startsWith( relativePrefix ) ) {
+					newPathFilters.add( pathFilter.substring( relativePrefixLength ) );
+				}
+			}
 		}
 
 		return new IndexedEmbeddedFilter( typeOrdering, this, parentTypeId, relativePrefix,

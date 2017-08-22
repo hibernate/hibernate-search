@@ -68,7 +68,8 @@ public class PojoElasticsearchIT {
 								.name( "myTextField" )
 				.property( "embedded" )
 						.indexedEmbedded()
-								.maxDepth( 1 );
+								.maxDepth( 1 )
+								.includePaths( "embedded.customBridgeOnClass.text" );
 
 		MappingDefinition secondMapping = JavaBeanMapper.get().programmaticMapping();
 		secondMapping.entity( ParentIndexedEntity.class )
@@ -166,6 +167,19 @@ public class PojoElasticsearchIT {
 											+ "},"
 											+ "'text': {"
 												+ "'type': 'keyword'"
+											+ "}"
+										+ "}"
+									+ "},"
+									+ "'embedded': {"
+										+ "'type': 'object',"
+										+ "'properties': {"
+											+ "'customBridgeOnClass': {"
+												+ "'type': 'object',"
+												+ "'properties': {"
+													+ "'text': {"
+														+ "'type': 'keyword'"
+													+ "}"
+												+ "}"
 											+ "}"
 										+ "}"
 									+ "},"
