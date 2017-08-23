@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Arquillian.class)
 @TestForIssue(jiraKey = "HSEARCH-1474")
+@ServerSetup(DefaultTransactionTimeoutSetupTask.class)
 public class MassIndexingTimeoutIT {
 
 	private static final int NUMBER_OF_ENTIIES = 2000;
