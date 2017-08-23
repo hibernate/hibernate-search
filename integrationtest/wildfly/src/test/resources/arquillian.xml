@@ -24,7 +24,7 @@
             <configuration>
                 <property name="jbossHome">${jbossHome.node1}</property>
                 <!-- Needed for JMS tests -->
-                <property name="serverConfig">standalone-full-testqueues.xml</property>
+                <property name="serverConfig">standalone-full.xml</property>
                 <property name="javaVmArguments">-javaagent:${byteman.agent.path}=script:${byteman.script.path} -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
                 <!-- To debug the Arquillian managed application server: -->
                 <!-- property name="javaVmArguments">-javaagent:${byteman.agent.path}=script:${byteman.script.path} -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -Dorg.jboss.remoting-jmx.timeout=300  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property -->
@@ -35,7 +35,7 @@
             <configuration>
                 <property name="jbossHome">${jbossHome.node2}</property>
                 <!-- Needed for JMS tests -->
-                <property name="serverConfig">standalone-full-testqueues.xml</property>
+                <property name="serverConfig">standalone-full.xml</property>
                 <property name="javaVmArguments">-Djboss.socket.binding.port-offset=10000 -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
                 <property name="managementPort">19990</property>
             </configuration>
