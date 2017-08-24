@@ -56,7 +56,7 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 	}
 
 	@Override
-	public SearchManagerFactoryBuilder addMapping(MappingContributor<?> mappingContributor) {
+	public SearchManagerFactoryBuilder addMapping(MappingContributor mappingContributor) {
 		mappingContributor.contribute( this::collectMappingContribution );
 		return this;
 	}

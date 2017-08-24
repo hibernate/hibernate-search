@@ -31,7 +31,7 @@ public abstract class PojoMapperImpl implements PojoMapper {
 	}
 
 	@Override
-	public MappingContributor<?> annotationMapping(Set<Class<?>> classes) {
+	public MappingContributor annotationMapping(Set<Class<?>> classes) {
 		// TODO Annotation processing
 		throw new UnsupportedOperationException( "Annotation processing is not implemented yet" );
 	}

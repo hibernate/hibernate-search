@@ -19,7 +19,7 @@ public interface SearchManagerFactoryBuilder {
 
 	SearchManagerFactoryBuilder setProperties(Properties properties);
 
-	SearchManagerFactoryBuilder addMapping(MappingContributor<?> mappingContributor);
+	SearchManagerFactoryBuilder addMapping(MappingContributor mappingContributor);
 
 	SearchManagerFactory build();
 

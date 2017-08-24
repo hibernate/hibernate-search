@@ -18,6 +18,6 @@ public interface PojoMapper {
 
 	MappingDefinition programmaticMapping();
 
-	MappingContributor<?> annotationMapping(Set<Class<?>> classes);
+	MappingContributor annotationMapping(Set<Class<?>> classes);
 
 }
