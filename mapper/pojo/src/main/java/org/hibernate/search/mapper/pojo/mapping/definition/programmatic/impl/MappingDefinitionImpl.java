@@ -36,7 +36,7 @@ public class MappingDefinitionImpl implements MappingDefinition {
 	}
 
 	@Override
-	public TypeMappingContext entity(Class<?> clazz) {
+	public TypeMappingContext type(Class<?> clazz) {
 		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( mappingType, c ) );
 	}
 

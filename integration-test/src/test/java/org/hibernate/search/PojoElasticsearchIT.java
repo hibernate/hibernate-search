@@ -55,7 +55,7 @@ public class PojoElasticsearchIT {
 	@Before
 	public void setup() throws JSONException {
 		MappingDefinition mapping = JavaBeanMapper.get().programmaticMapping();
-		mapping.entity( IndexedEntity.class )
+		mapping.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
 				.bridge(
 						new MyBridgeDefinition()
@@ -72,7 +72,7 @@ public class PojoElasticsearchIT {
 								.includePaths( "embedded.customBridgeOnClass.text" );
 
 		MappingDefinition secondMapping = JavaBeanMapper.get().programmaticMapping();
-		secondMapping.entity( ParentIndexedEntity.class )
+		secondMapping.type( ParentIndexedEntity.class )
 				.property( "localDate" )
 						.field()
 								.name( "myLocalDateField" )
@@ -81,7 +81,7 @@ public class PojoElasticsearchIT {
 								new MyBridgeDefinition()
 								.objectName( "customBridgeOnProperty" )
 						);
-		secondMapping.entity( OtherIndexedEntity.class )
+		secondMapping.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
 				.property( "id" )
 						.documentId().bridge( DefaultIntegerIdentifierBridge.class )
