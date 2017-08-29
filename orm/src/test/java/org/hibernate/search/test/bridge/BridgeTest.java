@@ -39,8 +39,10 @@ import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.testing.SkipForDialect;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -257,12 +259,11 @@ public class BridgeTest extends SearchTestBase {
 
 		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "Date not found or not property truncated", 1, result.size() );
+		assertEquals( "Date not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
 		s.close();
 	}
-
 
 	@Test
 	public void testCalendarBridge() throws Exception {
@@ -341,7 +342,7 @@ public class BridgeTest extends SearchTestBase {
 
 		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "Calendar not found or not property truncated", 1, result.size() );
+		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
 		s.close();
@@ -356,6 +357,66 @@ public class BridgeTest extends SearchTestBase {
 		bridgeParams.put( "resolution", Resolution.DAY.toString() );
 		bridge.setParameterValues( bridgeParams );
 		assertEquals( "20001215", bridge.objectToString( calendar ) );
+	}
+
+	@Test
+	@Category(SkipOnElasticsearch.class) // Elasticsearch uses a specific encoding for dates
+	@SkipForDialect(PostgreSQL81Dialect.class)//PosgreSQL doesn't allow storing null with these column types
+	public void testDateBridgeStringEncoding() throws Exception {
+		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
+		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
+		c.set( Calendar.MILLISECOND, 5 );
+		Date date = new Date( c.getTimeInMillis() );
+
+		Cloud cloud = new Cloud();
+		cloud.setDateDay( date );
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( cloud );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		TermQuery termQuery = new TermQuery( new Term( "dateDayStringEncoding",
+				DateTools.dateToString( date, DateTools.Resolution.DAY ) ) );
+
+		List result = session.createFullTextQuery( termQuery ).list();
+		assertEquals( "Date not found or not properly truncated", 1, result.size() );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	@Category(SkipOnElasticsearch.class) // Elasticsearch uses a specific encoding for calendars
+	public void testCalendarBridgeStringEncoding() throws Exception {
+		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
+		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
+		c.set( Calendar.MILLISECOND, 5 );
+
+		Cloud cloud = new Cloud();
+		cloud.setCalendarDay( c );
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( cloud );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		TermQuery termQuery = new TermQuery( new Term( "calendarDayStringEncoding",
+				DateTools.dateToString( c.getTime(), DateTools.Resolution.DAY ) ) );
+
+		List result = session.createFullTextQuery( termQuery ).list();
+		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
+
+		tx.commit();
+		s.close();
 	}
 
 	@Test
