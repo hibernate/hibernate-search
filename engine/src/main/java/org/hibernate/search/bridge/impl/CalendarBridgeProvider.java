@@ -76,19 +76,19 @@ class CalendarBridgeProvider extends ExtendedBridgeProvider {
 			case STRING: {
 				switch ( resolution ) {
 					case YEAR:
-						return StringEncodingCalendarBridge.DATE_YEAR;
+						return StringEncodingCalendarBridge.CALENDAR_YEAR;
 					case MONTH:
-						return StringEncodingCalendarBridge.DATE_MONTH;
+						return StringEncodingCalendarBridge.CALENDAR_MONTH;
 					case DAY:
-						return StringEncodingCalendarBridge.DATE_DAY;
+						return StringEncodingCalendarBridge.CALENDAR_DAY;
 					case HOUR:
-						return StringEncodingCalendarBridge.DATE_HOUR;
+						return StringEncodingCalendarBridge.CALENDAR_HOUR;
 					case MINUTE:
-						return StringEncodingCalendarBridge.DATE_MINUTE;
+						return StringEncodingCalendarBridge.CALENDAR_MINUTE;
 					case SECOND:
-						return StringEncodingCalendarBridge.DATE_SECOND;
+						return StringEncodingCalendarBridge.CALENDAR_SECOND;
 					case MILLISECOND:
-						return StringEncodingCalendarBridge.DATE_MILLISECOND;
+						return StringEncodingCalendarBridge.CALENDAR_MILLISECOND;
 					default:
 						throw LOG.unknownResolution( resolution.toString() );
 				}
