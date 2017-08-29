@@ -902,7 +902,8 @@ It is still possible to get the total number of matching elements regardless of 
 fulltextQuery.getResultSize()
 ====
 
-===== [[query-sorting]]Sorting
+[[query-sorting]]
+===== Sorting
 
 Apache Lucene provides a very flexible and powerful way to sort results. While the default sorting
 (by relevance) is appropriate most of the time, it can be interesting to sort by one or several
@@ -1486,9 +1487,11 @@ for (Object[] result : results) {
 Be careful, building the explanation object is quite expensive, it is roughly as expensive as
 running the Lucene query again. Don't do it if you don't need the object
 
-=== [[query-filter]] Filters
+[[query-filter]]
+=== Filters
 
-==== [[query-filter-fulltext]] Full-text filters
+[[query-filter-fulltext]] 
+==== Full-text filters
 
 Apache Lucene has a powerful feature that allows to filter query results according to a custom
 filtering process. This is a very powerful way to apply additional data restrictions, especially
@@ -1770,7 +1773,8 @@ Note that by using the `ShardSensitiveOnlyFilter`, you do not have to implement 
 Using filters and sharding strategy reacting to these filters is recommended to speed up queries in
 a sharded environment.
 
-==== [[query-filter-orm]] Hibernate ORM filters
+[[query-filter-orm]]
+==== Hibernate ORM filters
 
 Hibernate ORM filters, enabled using `org.hibernate.Session.enableFilter(String)`,
 will only work partially when combined with a full-text query.
