@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelCon
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
 
@@ -43,6 +44,9 @@ public class ElasticsearchFieldModelContextImpl
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (TypedFieldModelContext<T>) fromLocalDate();
 		}
+		else if ( GeoPoint.class.equals( inputType ) ) {
+			return (TypedFieldModelContext<T>) fromGeoPoint();
+		}
 		else {
 			// TODO implement other types
 			throw new SearchException( "Cannot guess field type for input type " + inputType );
@@ -62,6 +66,11 @@ public class ElasticsearchFieldModelContextImpl
 	@Override
 	public TypedFieldModelContext<LocalDate> fromLocalDate() {
 		return setDelegate( new LocalDateFieldModelContext( accessor.asString() ) );
+	}
+
+	@Override
+	public TypedFieldModelContext<GeoPoint> fromGeoPoint() {
+		return setDelegate( new CoordinatesFieldModelContext( accessor.asObject() ) );
 	}
 
 	@Override
