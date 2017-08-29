@@ -187,7 +187,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>wildfly-10-dist</classifier>
+                                    <classifier>wildfly-11-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
@@ -196,7 +196,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-orm-modules</artifactId>
                                     <version>${hibernateVersion}</version>
-                                    <classifier>wildfly-10-dist</classifier>
+                                    <classifier>wildfly-11-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>

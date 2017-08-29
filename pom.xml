@@ -227,7 +227,7 @@
         <arquillianVersion>1.1.11.Final</arquillianVersion>
         <arquillianContainerVersion>2.0.0.Final</arquillianContainerVersion>
         <shrinkwrapResolverVersion>2.2.2</shrinkwrapResolverVersion>
-        <wildflyVersion>10.1.0.Final</wildflyVersion>
+        <wildflyVersion>11.0.0.CR1</wildflyVersion>
         <jmhVersion>1.19</jmhVersion>
         
         <!-- Elasticsearch -->
