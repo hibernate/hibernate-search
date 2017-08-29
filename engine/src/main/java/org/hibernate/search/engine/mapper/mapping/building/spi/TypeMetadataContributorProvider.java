@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import java.util.stream.Stream;
+
+import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 /**
  * @author Yoann Rodiere
  */
-public interface TypeMappingContributor<C> {
+public interface TypeMetadataContributorProvider<C> {
 
-	void contribute(C collector);
+	Stream<C> get(IndexedTypeIdentifier typeId);
 
 }

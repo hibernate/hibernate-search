@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -23,12 +24,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
  * @author Yoann Rodiere
  */
 public class PropertyMappingContextImpl
-		implements PropertyMappingContext, TypeMappingContributor<PojoTypeNodeMappingCollector> {
+		implements PropertyMappingContext, PojoTypeNodeMetadataContributor {
 
 	private final TypeMappingContext parent;
 	private final String name;
 
-	private final List<TypeMappingContributor<? super PojoPropertyNodeMappingCollector>> children = new ArrayList<>();
+	private final List<PojoNodeMetadataContributor<? super PojoPropertyNodeMappingCollector>>
+			children = new ArrayList<>();
 
 	public PropertyMappingContextImpl(TypeMappingContext parent, String name) {
 		this.parent = parent;
@@ -36,9 +38,9 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public void contribute(PojoTypeNodeMappingCollector collector) {
+	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
 		PojoPropertyNodeMappingCollector propertyNodeCollector = collector.property( name );
-		children.forEach( child -> child.contribute( propertyNodeCollector ) );
+		children.forEach( child -> child.contributeMapping( propertyNodeCollector ) );
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class PropertyMappingContextImpl
 
 	@Override
 	public PropertyMappingContext containedIn() {
-		children.add( c -> c.containedIn() );
+		children.add( new ContainedInMappingContributor() );
 		return this;
 	}
 

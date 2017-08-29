@@ -23,7 +23,7 @@ public interface MappingBuilder<C, B extends SearchManagerBuilder<?>> {
 	 * All contributions for type mappings related to the same mapper are available.
 	 */
 	void addIndexed(IndexedTypeIdentifier typeId, IndexManagerBuildingState<?> indexManagerBuildingState,
-			TypeMappingContributorProvider<C> contributorProvider);
+			TypeMetadataContributorProvider<C> contributorProvider);
 
 	Mapping<B> build();
 

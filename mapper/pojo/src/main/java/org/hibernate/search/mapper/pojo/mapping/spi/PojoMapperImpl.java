@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
@@ -31,7 +31,7 @@ public abstract class PojoMapperImpl implements PojoMapper {
 	}
 
 	@Override
-	public MappingContributor annotationMapping(Set<Class<?>> classes) {
+	public MetadataContributor annotationMapping(Set<Class<?>> classes) {
 		// TODO Annotation processing
 		throw new UnsupportedOperationException( "Annotation processing is not implemented yet" );
 	}

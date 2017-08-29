@@ -11,11 +11,11 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoRootIndexableModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
@@ -25,10 +25,11 @@ import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
  */
 abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector {
 
-	protected final PojoIntrospector introspector;
-	protected final TypeMappingContributorProvider<PojoTypeNodeMappingCollector> contributorProvider;
-
 	protected final Class<?> javaType;
+
+	protected final PojoIntrospector introspector;
+	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
+
 	protected final IndexableModel indexableModel;
 	protected final MappingIndexModelCollector indexModelCollector;
 
@@ -37,9 +38,8 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final Collection<ValueProcessor> processors = new ArrayList<>();
 
 	public AbstractPojoProcessorBuilder(
-			PojoIntrospector introspector,
-			TypeMappingContributorProvider<PojoTypeNodeMappingCollector> contributorProvider,
-			Class<?> javaType,
+			Class<?> javaType, PojoIntrospector introspector,
+			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierBridgeCollector) {
 		this.introspector = introspector;

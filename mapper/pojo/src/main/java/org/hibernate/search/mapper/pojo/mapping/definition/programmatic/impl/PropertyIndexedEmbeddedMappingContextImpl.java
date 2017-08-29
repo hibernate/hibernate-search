@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -20,7 +20,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  * @author Yoann Rodiere
  */
 public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext
-		implements PropertyIndexedEmbeddedMappingContext, TypeMappingContributor<PojoPropertyNodeMappingCollector> {
+		implements PropertyIndexedEmbeddedMappingContext,
+				PojoNodeMetadataContributor<PojoPropertyNodeMappingCollector> {
 
 	private String prefix;
 
@@ -33,7 +34,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public void contribute(PojoPropertyNodeMappingCollector collector) {
+	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
 		collector.indexedEmbedded( prefix, maxDepth, pathFilters );
 	}
 

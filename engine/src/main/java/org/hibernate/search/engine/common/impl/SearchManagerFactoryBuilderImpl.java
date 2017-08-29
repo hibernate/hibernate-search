@@ -7,13 +7,13 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
@@ -27,8 +27,7 @@ import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.MappingType;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuilder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.spi.Mapping;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
@@ -56,13 +55,13 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 	}
 
 	@Override
-	public SearchManagerFactoryBuilder addMapping(MappingContributor mappingContributor) {
+	public SearchManagerFactoryBuilder addMapping(MetadataContributor mappingContributor) {
 		mappingContributor.contribute( this::collectMappingContribution );
 		return this;
 	}
 
 	private <C> void collectMappingContribution(MapperImplementor<C, ?, ?> mapperImpl, IndexedTypeIdentifier typeId, String indexName,
-			Collection<? extends TypeMappingContributor<? super C>> contributor) {
+			C contributor) {
 		@SuppressWarnings("unchecked")
 		MapperContribution<C, ?> collector = (MapperContribution<C, ?>)
 				contributionByMapper.computeIfAbsent( mapperImpl, ignored -> new MapperContribution<>( mapperImpl ));
@@ -117,10 +116,9 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 			this.mapper = mapper;
 		}
 
-		public void update(IndexedTypeIdentifier typeId, String indexName,
-				Collection<? extends TypeMappingContributor<? super C>> contributors) {
+		public void update(IndexedTypeIdentifier typeId, String indexName, C contributor) {
 			contributionByType.computeIfAbsent( typeId, TypeMappingContribution::new )
-					.update( indexName, contributors );
+					.update( indexName, contributor );
 		}
 
 		public MappingBuilder<C, B> preBuild(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
@@ -139,26 +137,26 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 					builder.addIndexed(
 							mappedType,
 							indexManagerBuildingStateHolder.startBuilding( indexName, typeOrdering ),
-							type2 -> ( collector -> contributeWithInheritance( typeOrdering, type2, collector ) )
+							type2 -> getContributors( typeOrdering, type2 )
 							);
 				}
 			}
 			return builder;
 		}
 
-		private void contributeWithInheritance(IndexableTypeOrdering typeOrdering, IndexedTypeIdentifier typeId, C collector) {
-			typeOrdering.getDescendingSuperTypes( typeId )
+		private Stream<C> getContributors(IndexableTypeOrdering typeOrdering, IndexedTypeIdentifier typeId) {
+			return typeOrdering.getDescendingSuperTypes( typeId )
 					.stream()
 					.map( contributionByType::get )
 					.filter( Objects::nonNull )
-					.forEach( contribution -> contribution.contribute( collector ) );
+					.flatMap( TypeMappingContribution::getContributors );
 		}
 	}
 
 	private static class TypeMappingContribution<C> {
 		private final IndexedTypeIdentifier typeId;
 		private String indexName;
-		private final List<TypeMappingContributor<? super C>> contributors = new ArrayList<>();
+		private final List<C> contributors = new ArrayList<>();
 
 		public TypeMappingContribution(IndexedTypeIdentifier typeId) {
 			super();
@@ -169,7 +167,7 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 			return indexName;
 		}
 
-		public void update(String indexName, Collection<? extends TypeMappingContributor<? super C>> contributors) {
+		public void update(String indexName, C contributor) {
 			if ( indexName != null && !indexName.isEmpty() ) {
 				if ( this.indexName != null ) {
 					throw new SearchException( "Type '" + typeId + "' mapped to multiple indexes: '"
@@ -177,11 +175,11 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 				}
 				this.indexName = indexName;
 			}
-			this.contributors.addAll( contributors );
+			this.contributors.add( contributor );
 		}
 
-		public void contribute(C collector) {
-			contributors.forEach( c -> c.contribute( collector ) );
+		public Stream<C> getContributors() {
+			return contributors.stream();
 		}
 	}
 }

@@ -7,15 +7,15 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class BridgeMappingContributor
-		implements TypeMappingContributor<PojoNodeMappingCollector> {
+		implements PojoNodeMetadataContributor<PojoNodeMappingCollector> {
 
 	private final BridgeDefinition<?> definition;
 
@@ -24,7 +24,7 @@ public class BridgeMappingContributor
 	}
 
 	@Override
-	public void contribute(PojoNodeMappingCollector collector) {
+	public void contributeMapping(PojoNodeMappingCollector collector) {
 		collector.bridge( definition );
 	}
 

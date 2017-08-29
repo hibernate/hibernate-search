@@ -16,10 +16,10 @@ import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
@@ -36,13 +36,12 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	private final Collection<PojoTypeNodeProcessor> indexedEmbeddedProcessors = new ArrayList<>();
 
 	public PojoPropertyNodeProcessorBuilder(
-			PojoIntrospector introspector,
-			TypeMappingContributorProvider<PojoTypeNodeMappingCollector> contributorProvider,
-			Class<?> propertyType,
+			Class<?> propertyType, PojoIntrospector introspector,
+			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierMappingCollector,
 			ReadableProperty property) {
-		super( introspector, contributorProvider, propertyType, indexModelCollector,
+		super( propertyType, introspector, contributorProvider, indexModelCollector,
 				identifierMappingCollector);
 		this.property = property;
 	}
@@ -88,12 +87,12 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		Optional<MappingIndexModelCollector> nestedCollectorOptional = indexModelCollector.addIndexedEmbeddedIfIncluded(
 				typeId, defaultedRelativePrefix, maxDepth, pathFilters );
 		nestedCollectorOptional.ifPresent( nestedCollector -> {
-			PojoTypeNodeProcessorBuilder nestedProcessor = new PojoTypeNodeProcessorBuilder(
-					introspector, contributorProvider, javaType, nestedCollector,
+			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
+					javaType, introspector, contributorProvider, nestedCollector,
 					IdentifierMappingCollector.noOp() // Do NOT propagate the ID collector to IndexedEmbeddeds
 					);
-			contributorProvider.get( typeId ).contribute( nestedProcessor );
-			indexedEmbeddedProcessors.add( nestedProcessor.build() );
+			contributorProvider.get( typeId ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+			indexedEmbeddedProcessors.add( nestedProcessorBuilder.build() );
 		} );
 	}
 

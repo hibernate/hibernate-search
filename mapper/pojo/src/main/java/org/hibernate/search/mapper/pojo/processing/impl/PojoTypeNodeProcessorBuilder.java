@@ -10,10 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
 
@@ -26,12 +27,11 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private final Map<ReadableProperty, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
-			PojoIntrospector introspector,
-			TypeMappingContributorProvider<PojoTypeNodeMappingCollector> contributorProvider,
-			Class<?> javaType,
+			Class<?> javaType, PojoIntrospector introspector,
+			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelBuilder,
 			IdentifierMappingCollector identifierBridgeCollector) {
-		super( introspector, contributorProvider, javaType, indexModelBuilder,
+		super( javaType, introspector, contributorProvider, indexModelBuilder,
 				identifierBridgeCollector);
 	}
 
@@ -50,8 +50,8 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(ReadableProperty property) {
 		// TODO use more advanced reflection here (allow to take advantage of @Timestamp for instance)
 		Class<?> nestedType = property.getType();
-		return new PojoPropertyNodeProcessorBuilder( introspector, contributorProvider,
-				nestedType, indexModelCollector, identifierBridgeCollector, property );
+		return new PojoPropertyNodeProcessorBuilder( nestedType, introspector, contributorProvider,
+				indexModelCollector, identifierBridgeCollector, property );
 	}
 
 	public PojoTypeNodeProcessor build() {

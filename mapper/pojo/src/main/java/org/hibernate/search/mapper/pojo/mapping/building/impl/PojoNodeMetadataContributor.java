@@ -4,15 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.spi;
+package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 /**
  * @author Yoann Rodiere
  */
-public interface TypeMappingContributorProvider<C> {
+public interface PojoNodeMetadataContributor<C extends PojoNodeMappingCollector> {
 
-	TypeMappingContributor<C> get(IndexedTypeIdentifier typeId);
+	void contributeMapping(C collector);
 
 }

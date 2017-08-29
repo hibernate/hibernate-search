@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMappingContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -22,13 +23,14 @@ import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 /**
  * @author Yoann Rodiere
  */
-public class TypeMappingContextImpl implements TypeMappingContext, MappingContributor {
+public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
 
 	private final PojoMapperImplementor mappingType;
 	private final Class<?> type;
 
 	private String indexName;
-	private final List<TypeMappingContributor<? super PojoTypeNodeMappingCollector>> children = new ArrayList<>();
+	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeMappingCollector>>
+			children = new ArrayList<>();
 
 	public TypeMappingContextImpl(PojoMapperImplementor mappingType, Class<?> type) {
 		this.mappingType = mappingType;
@@ -36,8 +38,13 @@ public class TypeMappingContextImpl implements TypeMappingContext, MappingContri
 	}
 
 	@Override
-	public void contribute(TypeMappingCollector collector) {
-		collector.collect( mappingType, new PojoIndexedTypeIdentifier( type ), indexName, children );
+	public void contribute(TypeMetadataCollector collector) {
+		collector.collect( mappingType, new PojoIndexedTypeIdentifier( type ), indexName, this );
+	}
+
+	@Override
+	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
+		children.stream().forEach( c -> c.contributeMapping( collector ) );
 	}
 
 	@Override

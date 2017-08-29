@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+
 /**
  * @author Yoann Rodiere
  */
-public interface MappingContributor {
+public interface TypeMetadataCollector {
 
-	void contribute(TypeMappingCollector collector);
+	<C> void collect(MapperImplementor<C, ?, ?> mapper,
+			IndexedTypeIdentifier typeId, String indexName,
+			C contributor);
 
 }
