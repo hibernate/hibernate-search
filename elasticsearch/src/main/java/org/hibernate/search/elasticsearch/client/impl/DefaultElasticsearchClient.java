@@ -74,14 +74,16 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	@Override
 	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
-		return Futures.create( () -> send( request ) )
+		long start = System.nanoTime();
+		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
 				.thenApply( response -> convertResponse( request, response ) );
+		result.thenAccept( response -> log( request, start, response ) );
+		return result;
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest request) {
 		Gson gson = gsonProvider.getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
-		long start = System.nanoTime();
 		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
 		restClient.performRequestAsync(
 				request.getMethod(),
@@ -126,11 +128,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 				);
 		completableFuture.thenRun( () -> timeout.cancel( false ) );
 
-		return completableFuture.thenApply( response -> {
-					long executionTime = System.nanoTime() - start;
-					requestLog.executedRequest( request.getPath(), request.getParameters(), TimeUnit.NANOSECONDS.toMillis( executionTime ) );
-					return response;
-				} );
+		return completableFuture;
 	}
 
 	private ElasticsearchResponse convertResponse(ElasticsearchRequest request, Response response) {
@@ -167,6 +165,19 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 		ContentType contentType = ContentType.get( entity );
 		Charset charset = contentType.getCharset();
 		return charset != null ? charset : StandardCharsets.UTF_8;
+	}
+
+	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
+		long executionTimeNs = System.nanoTime() - start;
+		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
+		if ( requestLog.isTraceEnabled() ) {
+			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
+					response.getStatusCode(), response.getStatusMessage(), request.getBodyParts(), response.getBody() );
+		}
+		else {
+			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
+					response.getStatusCode(), response.getStatusMessage() );
+		}
 	}
 
 	@Override
