@@ -1106,7 +1106,10 @@ Search queries are logged to the `org.hibernate.search.fulltext_query` category 
 as when using an embedded Lucene instance (the query format is Elasticsearch's, though).
 
 In addition, you can enable the logging of every single request sent to the Elasticsearch cluster
-by enabling `TRACE` logging for the log category `org.hibernate.search.elasticsearch.request`.
+by enabling `DEBUG` logging for the log category `org.hibernate.search.elasticsearch.request`.
+The logs will include, in particular, the HTTP method, path, query parameters, execution time and response status.
+At `DEBUG` level, the request body and response body will be omitted;
+use the `TRACE` level to also print out the request body and response body.
 
 === [[elasticsearch-limitations]]Limitations
 
