@@ -25,11 +25,11 @@ import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
-import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.impl.Futures;
@@ -58,13 +58,14 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	private volatile GsonProvider gsonProvider;
 
-	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit) {
+	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit,
+			GsonProvider initialGsonProvider) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = Executors.newScheduledThreadPool( "Elasticsearch request timeout executor" );
 		this.requestTimeoutValue = requestTimeoutValue;
 		this.requestTimeoutUnit = requestTimeoutUnit;
-		this.gsonProvider = DialectIndependentGsonProvider.INSTANCE;
+		this.gsonProvider = initialGsonProvider;
 	}
 
 	@Override
@@ -168,11 +169,14 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	}
 
 	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
+		JsonLogHelper logHelper = gsonProvider.getLogHelper();
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( requestLog.isTraceEnabled() ) {
 			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
-					response.getStatusCode(), response.getStatusMessage(), request.getBodyParts(), response.getBody() );
+					response.getStatusCode(), response.getStatusMessage(),
+					logHelper.toString( request.getBodyParts() ),
+					logHelper.toString( response.getBody() ) );
 		}
 		else {
 			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,

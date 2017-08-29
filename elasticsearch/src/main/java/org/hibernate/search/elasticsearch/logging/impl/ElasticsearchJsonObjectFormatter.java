@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.logging.impl;
 
-import static org.hibernate.search.elasticsearch.util.impl.JsonLogHelper.prettyPrint;
+import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
 
 import com.google.gson.JsonObject;
 
@@ -21,7 +21,7 @@ public class ElasticsearchJsonObjectFormatter {
 	private final String stringRepresentation;
 
 	public ElasticsearchJsonObjectFormatter(JsonObject object) {
-		this.stringRepresentation = prettyPrint( object );
+		this.stringRepresentation = JsonLogHelper.get().toString( object );
 	}
 
 	@Override

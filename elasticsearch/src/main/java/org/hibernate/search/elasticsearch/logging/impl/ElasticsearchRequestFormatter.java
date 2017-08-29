@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.logging.impl;
 
-import static org.hibernate.search.elasticsearch.util.impl.JsonLogHelper.prettyPrint;
-
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
@@ -31,8 +30,8 @@ public class ElasticsearchRequestFormatter {
 		sb.append( "Method: " ).append( request.getMethod() );
 		sb.append( "\nPath: " ).append( request.getPath() );
 		sb.append( "\nData:\n" );
-		prettyPrint( sb, request.getBodyParts() );
-		sb.append( "\n" );
+		JsonLogHelper.get().append( sb, request.getBodyParts() );
+		sb.append( "\n\n" );
 
 		return sb.toString();
 	}

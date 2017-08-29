@@ -22,12 +22,16 @@ import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.SearchThreadFactory;
+
+import com.google.gson.GsonBuilder;
 
 /**
  * @author Gunnar Morling
@@ -58,7 +62,11 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		RestClient restClient = createClient( properties, requestTimeoutMs );
 		Sniffer sniffer = createSniffer( restClient, properties );
 
-		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS );
+		boolean logPrettyPrinting = ConfigurationParseHelper.getBooleanValue( properties,
+				ElasticsearchEnvironment.LOG_JSON_PRETTY_PRINTING, ElasticsearchEnvironment.Defaults.LOG_JSON_PRETTY_PRINTING );
+		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
+
+		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS, initialGsonProvider );
 	}
 
 	private RestClient createClient(Properties properties, int maxRetryTimeoutMillis) {

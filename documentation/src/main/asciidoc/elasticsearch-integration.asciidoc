@@ -312,6 +312,9 @@ Possible values are:
 +
 This setting may be overridden in custom field bridges on a per-field basis:
 see <<elasticsearch-custom-field-bridge-dynamic-mapping>>.
+[[elasticsearch-log-json-pretty-printing]] Whether JSON included in logs should be pretty-printed (indented, with line breaks) (`true` or `false`)::
+`hibernate.search.elasticsearch.log.json_pretty_printing false` (default)
+
 [NOTE]
 --
 Properties prefixed with `hibernate.search.default` can be given globally as shown above and/or be given for specific indexes:
@@ -1117,6 +1120,13 @@ by enabling `DEBUG` logging for the log category `org.hibernate.search.elasticse
 The logs will include, in particular, the HTTP method, path, query parameters, execution time and response status.
 At `DEBUG` level, the request body and response body will be omitted;
 use the `TRACE` level to also print out the request body and response body.
+
+[NOTE]
+--
+By default, JSON in logs will be printed inline, without indent.
+If you wish the JSON to be pretty-printed, use the
+<<elasticsearch-log-json-pretty-printing,`hibernate.search.elasticsearch.log.json_pretty_printing` configuration property>>.
+--
 
 [[elasticsearch-limitations]]
 === Limitations

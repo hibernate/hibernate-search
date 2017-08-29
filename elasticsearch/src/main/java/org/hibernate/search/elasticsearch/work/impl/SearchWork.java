@@ -41,7 +41,7 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 		QUERY_LOG.executingElasticsearchQuery(
 				request.getPath(),
 				request.getParameters(),
-				request.getBodyParts()
+				executionContext.getGsonProvider().getLogHelper().toString( request.getBodyParts() )
 				);
 		return super.beforeExecute( executionContext, request );
 	}

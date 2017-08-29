@@ -37,6 +37,7 @@ public final class ElasticsearchEnvironment {
 		public static final int SCROLL_BACKTRACKING_WINDOW_SIZE = 10_000;
 		public static final int SCROLL_FETCH_SIZE = 1_000;
 		public static final int SCROLL_TIMEOUT = 60;
+		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 	}
 
 	/**
@@ -300,6 +301,18 @@ public final class ElasticsearchEnvironment {
 	 * The value must be the fully-qualified name of a class implementing {@link ElasticsearchAnalysisDefinitionProvider}.
 	 */
 	public static final String ANALYSIS_DEFINITION_PROVIDER = "hibernate.search.elasticsearch.analysis_definition_provider";
+
+	/**
+	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
+	 * <p>
+	 * A boolean value (true, false) is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#LOG_JSON_PRETTY_PRINTING}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.elasticsearch.log.json_pretty_printing=true}).
+	 */
+	public static final String LOG_JSON_PRETTY_PRINTING = "elasticsearch.log.json_pretty_printing";
 
 	private ElasticsearchEnvironment() {
 	}

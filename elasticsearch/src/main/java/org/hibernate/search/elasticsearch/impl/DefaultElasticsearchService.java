@@ -16,6 +16,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImplementor;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
+import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
@@ -85,6 +86,9 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 		this.queryOptions = createQueryOptions( properties );
 
+		boolean logPrettyPrinting = ConfigurationParseHelper.getBooleanValue( properties,
+				ElasticsearchEnvironment.LOG_JSON_PRETTY_PRINTING, ElasticsearchEnvironment.Defaults.LOG_JSON_PRETTY_PRINTING );
+
 		ElasticsearchClientImplementor clientImplementor;
 		try ( ServiceReference<ElasticsearchClientFactory> clientFactory =
 				serviceManager.requestReference( ElasticsearchClientFactory.class ) ) {
@@ -94,7 +98,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		try ( ServiceReference<ElasticsearchDialectFactory> dialectFactory =
 				serviceManager.requestReference( ElasticsearchDialectFactory.class ) ) {
 			ElasticsearchDialect dialect = dialectFactory.get().createDialect( clientImplementor, properties );
-			this.gsonProvider = dialect.createGsonProvider();
+			this.gsonProvider = DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
 
 			clientImplementor.init( gsonProvider );
 			this.client = clientImplementor;
