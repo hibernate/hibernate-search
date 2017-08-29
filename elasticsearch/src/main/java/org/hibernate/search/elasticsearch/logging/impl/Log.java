@@ -296,9 +296,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 53,
-			value = "Executing Elasticsearch query on '%s' with parameters '%s' :\n%s" )
+			value = "Executing Elasticsearch query on '%s' with parameters '%s': <%s>" )
 	void executingElasticsearchQuery(String path, Map<String, String> parameters,
-			@FormatWith(ElasticsearchJsonObjectIterableFormatter.class) Iterable<JsonObject> bodyParts);
+			String bodyParts);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 54,
 			value = "Invalid field path detected for field '%2$s' on entity '%1$s':"
@@ -509,6 +509,5 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
-			@FormatWith(ElasticsearchJsonObjectIterableFormatter.class) List<JsonObject> requestBodyParts,
-			@FormatWith(ElasticsearchJsonObjectFormatter.class) JsonObject responseBody);
+			String requestBodyParts, String responseBody);
 }

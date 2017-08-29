@@ -7,29 +7,6 @@
 
 package org.hibernate.search.elasticsearch.test;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
-import org.hibernate.search.elasticsearch.impl.JsonBuilder;
-import org.hibernate.search.elasticsearch.util.impl.GsonHttpEntity;
-import org.hibernate.search.testsupport.TestForIssue;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.IOControl;
-
 import static java.util.Collections.singletonList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
@@ -39,6 +16,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.http.nio.ContentEncoder;
+import org.apache.http.nio.IOControl;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.elasticsearch.util.impl.GsonHttpEntity;
+import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * Tests for GsonHttpEntity to be able to write the whole JSON string
@@ -55,9 +52,7 @@ public class GsonStreamedEncodingTest {
 	private static final int BULK_BATCH_SIZE = 100;
 	private static final String JSON_TEST_PAYLOAD_LARGE_BULK = produceLargeBukJSONContent();
 
-	private static final Gson gson = new Elasticsearch52Dialect()
-			.createGsonProvider()
-			.getGson();
+	private static final Gson gson = new Gson();
 
 	@Test
 	public void testEmptyJSON() {

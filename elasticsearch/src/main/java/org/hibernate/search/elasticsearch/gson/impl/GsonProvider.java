@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.gson.impl;
 
+import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
+
 import com.google.gson.Gson;
 
 /**
@@ -21,5 +23,7 @@ public interface GsonProvider {
 	 * @return Same as {@link #getGson()}, but with null serialization turned off.
 	 */
 	Gson getGsonNoSerializeNulls();
+
+	JsonLogHelper getLogHelper();
 
 }

@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.dialect.impl.es2;
 import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
-import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.query.impl.Elasticsearch2QueryFactory;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
@@ -36,13 +35,11 @@ import com.google.gson.GsonBuilder;
 public class Elasticsearch2Dialect implements ElasticsearchDialect {
 
 	@Override
-	public GsonProvider createGsonProvider() {
-		return DefaultGsonProvider.create( () -> {
-			return new GsonBuilder()
+	public GsonBuilder createGsonBuilderBase() {
+		return new GsonBuilder()
 					.registerTypeAdapter( IndexType.class, new ES2IndexTypeJsonAdapter().nullSafe() )
 					.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() )
 					.registerTypeAdapter( NormsType.class, new ES2NormsTypeJsonAdapter().nullSafe() );
-		} );
 	}
 
 	@Override

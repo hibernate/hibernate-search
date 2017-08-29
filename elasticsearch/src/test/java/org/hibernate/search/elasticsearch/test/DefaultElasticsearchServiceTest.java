@@ -31,6 +31,8 @@ import org.hibernate.search.spi.BuildContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.google.gson.GsonBuilder;
+
 /**
  * @author Yoann Rodiere
  */
@@ -72,6 +74,7 @@ public class DefaultElasticsearchServiceTest {
 
 		expect( serviceManagerMock.requestService( ElasticsearchDialectFactory.class ) ).andReturn( dialectFactoryMock );
 		expect( dialectFactoryMock.createDialect( anyObject(), anyObject() ) ).andReturn( dialectMock );
+		expect( dialectMock.createGsonBuilderBase() ).andAnswer( GsonBuilder::new ).anyTimes();
 
 		replay( contextMock, serviceManagerMock, clientFactoryMock, clientMock, dialectFactoryMock, dialectMock );
 

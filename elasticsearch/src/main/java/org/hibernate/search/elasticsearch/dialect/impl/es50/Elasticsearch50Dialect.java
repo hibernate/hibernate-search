@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.dialect.impl.es50;
 import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
-import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.query.impl.Elasticsearch5QueryFactory;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
@@ -36,13 +35,11 @@ import com.google.gson.GsonBuilder;
 public class Elasticsearch50Dialect implements ElasticsearchDialect {
 
 	@Override
-	public GsonProvider createGsonProvider() {
-		return DefaultGsonProvider.create( () -> {
-			return new GsonBuilder()
-					.registerTypeAdapter( IndexType.class, new ES5IndexTypeJsonAdapter().nullSafe() )
-					.registerTypeAdapter( FieldDataType.class, new ES5FieldDataTypeJsonAdapter().nullSafe() )
-					.registerTypeAdapter( NormsType.class, new ES5NormsTypeJsonAdapter().nullSafe() );
-		} );
+	public GsonBuilder createGsonBuilderBase() {
+		return new GsonBuilder()
+				.registerTypeAdapter( IndexType.class, new ES5IndexTypeJsonAdapter().nullSafe() )
+				.registerTypeAdapter( FieldDataType.class, new ES5FieldDataTypeJsonAdapter().nullSafe() )
+				.registerTypeAdapter( NormsType.class, new ES5NormsTypeJsonAdapter().nullSafe() );
 	}
 
 	@Override

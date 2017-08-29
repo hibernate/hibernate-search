@@ -21,50 +21,72 @@ import com.google.gson.JsonObject;
  */
 public class JsonLogHelper {
 
-	private static final Gson GSON_PRETTY_PRINT = new GsonBuilder().setPrettyPrinting().create();
+	private static final JsonLogHelper INSTANCE = create( new GsonBuilder(), true );
 
-	private JsonLogHelper() {
-		// Private constructor
+	public static JsonLogHelper get() {
+		return INSTANCE;
 	}
 
-	public static String prettyPrint(JsonObject object) {
-		StringBuilder stringWriter = new StringBuilder();
-		prettyPrint( stringWriter, object );
-		return stringWriter.toString();
-	}
-
-	public static void prettyPrint(StringBuilder sb, JsonObject object) {
-		try {
-			GSON_PRETTY_PRINT.toJson( object, sb );
+	public static JsonLogHelper create(GsonBuilder gsonBuilder, boolean prettyPrinting) {
+		if ( prettyPrinting ) {
+			gsonBuilder.setPrettyPrinting();
 		}
-		catch (RuntimeException e) {
-			StringWriter writer = new StringWriter();
-			e.printStackTrace( new PrintWriter( writer ) );
-			sb.append( writer.toString() );
-		}
+		return new JsonLogHelper( gsonBuilder.create(), prettyPrinting );
 	}
 
-	public static String prettyPrint(Iterable<JsonObject> objects) {
+	private final Gson gson;
+
+	private final boolean prettyPrinting;
+
+	private JsonLogHelper(Gson gson, boolean prettyPrinting) {
+		this.gson = gson;
+		this.prettyPrinting = prettyPrinting;
+	}
+
+	public String toString(JsonObject object) {
+		StringBuilder stringBuilder = new StringBuilder();
+		append( stringBuilder, object );
+		return stringBuilder.toString();
+	}
+
+	public void append(StringBuilder sb, JsonObject object) {
+		beforeValue( sb );
+		doAppend( sb, object );
+		afterValue( sb );
+	}
+
+	public String toString(Iterable<JsonObject> objects) {
 		StringBuilder sb = new StringBuilder( 180 );
-		prettyPrint( sb, objects );
+		append( sb, objects );
 		return sb.toString();
 	}
 
-	public static void prettyPrint(StringBuilder sb, Iterable<JsonObject> objects) {
+	public void append(StringBuilder sb, Iterable<JsonObject> objects) {
+		boolean first = true;
+		beforeValue( sb );
 		for ( JsonObject object : objects ) {
-			prettyPrint( sb, object );
-			sb.append("\n");
+			if ( first ) {
+				first = false;
+			}
+			else if ( prettyPrinting ) {
+				sb.append( "\n" );
+			}
+			else {
+				sb.append( "\\n" );
+			}
+			doAppend( sb, object );
 		}
+		afterValue( sb );
 	}
 
-	public static JsonElement property(JsonObject parent, String name) {
+	public JsonElement property(JsonObject parent, String name) {
 		if ( parent == null ) {
 			return null;
 		}
 		return parent.get( name );
 	}
 
-	public static String propertyAsString(JsonElement parent, String name) {
+	public String propertyAsString(JsonElement parent, String name) {
 		if ( parent == null || !parent.isJsonObject() ) {
 			return null;
 		}
@@ -73,5 +95,28 @@ public class JsonLogHelper {
 			return null;
 		}
 		return propretyValue.toString(); // Also support non-string properties
+	}
+
+	private void beforeValue(StringBuilder sb) {
+		if ( prettyPrinting ) {
+			sb.append( "\n" );
+		}
+	}
+
+	private void doAppend(StringBuilder sb, JsonObject object) {
+		try {
+			gson.toJson( object, sb );
+		}
+		catch (RuntimeException e) {
+			StringWriter writer = new StringWriter();
+			e.printStackTrace( new PrintWriter( writer ) );
+			sb.append( writer.toString() );
+		}
+	}
+
+	private void afterValue(StringBuilder sb) {
+		if ( prettyPrinting ) {
+			sb.append( "\n" );
+		}
 	}
 }
