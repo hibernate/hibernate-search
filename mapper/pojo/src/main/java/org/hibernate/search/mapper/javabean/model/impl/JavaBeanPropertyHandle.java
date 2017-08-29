@@ -12,31 +12,30 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanReadableProperty implements ReadableProperty {
+public class JavaBeanPropertyHandle implements PropertyHandle {
 
 	private final String name;
 	private final Member member;
-	private final MethodHandle handle;
+	private final MethodHandle getter;
 
-	public JavaBeanReadableProperty(String name, Field field) throws IllegalAccessException {
+	public JavaBeanPropertyHandle(String name, Field field) throws IllegalAccessException {
 		this( name, field, MethodHandles.lookup().unreflectGetter( field ) );
 	}
 
-	public JavaBeanReadableProperty(String name, Method method) throws IllegalAccessException {
+	public JavaBeanPropertyHandle(String name, Method method) throws IllegalAccessException {
 		this( name, method, MethodHandles.lookup().unreflect( method ) );
 	}
 
-	private JavaBeanReadableProperty(String name, Member member, MethodHandle handle) {
-		super();
+	private JavaBeanPropertyHandle(String name, Member member, MethodHandle getter) {
 		this.name = name;
 		this.member = member;
-		this.handle = handle;
+		this.getter = getter;
 	}
 
 	@Override
@@ -46,13 +45,13 @@ public class JavaBeanReadableProperty implements ReadableProperty {
 
 	@Override
 	public Class<?> getType() {
-		return handle.type().returnType();
+		return getter.type().returnType();
 	}
 
 	@Override
-	public Object invoke(Object thiz) {
+	public Object get(Object thiz) {
 		try {
-			return handle.invoke( thiz );
+			return getter.invoke( thiz );
 		}
 		catch (Error e) {
 			throw e;
@@ -75,7 +74,7 @@ public class JavaBeanReadableProperty implements ReadableProperty {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		JavaBeanReadableProperty other = (JavaBeanReadableProperty) obj;
+		JavaBeanPropertyHandle other = (JavaBeanPropertyHandle) obj;
 		return member.equals( other.member );
 	}
 

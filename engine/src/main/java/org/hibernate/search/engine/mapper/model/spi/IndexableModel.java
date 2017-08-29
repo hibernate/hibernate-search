@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.mapper.model.spi;
 
+import java.lang.annotation.Annotation;
+import java.util.stream.Stream;
+
 /**
  * @author Yoann Rodiere
  */
@@ -36,6 +39,13 @@ public interface IndexableModel {
 
 	IndexableReference<?> asReference();
 
+	boolean isAssignableTo(Class<?> clazz);
+
+	// TODO use something else than annotations for markers? It's not very sensible for anything else than POJOs...
+	<M extends Annotation> Stream<M> markers(Class<M> markerType);
+
 	IndexableModel property(String relativeName);
+
+	Stream<IndexableModel> properties();
 
 }

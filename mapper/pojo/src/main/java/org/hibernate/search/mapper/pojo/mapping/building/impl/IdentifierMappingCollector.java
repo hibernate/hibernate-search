@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
  * @author Yoann Rodiere
  */
 public interface IdentifierMappingCollector {
 
-	void collect(ReadableProperty property, IdentifierBridge<?> converter);
+	void collect(PropertyHandle handle, IdentifierBridge<?> converter);
 
 	static IdentifierMappingCollector noOp() {
 		return (p, c) -> { };

@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -16,11 +16,11 @@ import org.hibernate.search.util.SearchException;
 public class PropertyIdentifierConverter<I, E> implements IdentifierConverter<I, E> {
 
 	private final Class<I> type;
-	private final ReadableProperty property;
+	private final PropertyHandle property;
 	private final IdentifierBridge<I> bridge;
 
 	@SuppressWarnings("unchecked")
-	public PropertyIdentifierConverter(ReadableProperty property, IdentifierBridge<I> bridge) {
+	public PropertyIdentifierConverter(PropertyHandle property, IdentifierBridge<I> bridge) {
 		this.type = (Class<I>) property.getType();
 		this.property = property;
 		this.bridge = bridge;
@@ -32,7 +32,7 @@ public class PropertyIdentifierConverter<I, E> implements IdentifierConverter<I,
 			return bridge.toString( type.cast( providedId ) );
 		}
 		else if ( property != null ) {
-			Object id = property.invoke( entity );
+			Object id = property.get( entity );
 			return bridge.toString( type.cast( id ) );
 		}
 		else {

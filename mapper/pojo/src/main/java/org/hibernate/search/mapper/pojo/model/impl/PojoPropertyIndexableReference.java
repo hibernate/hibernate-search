@@ -6,27 +6,27 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 class PojoPropertyIndexableReference<T> implements PojoIndexableReference<T> {
 
 	private final PojoIndexableReference<?> parent;
-	private final ReadableProperty property;
+	private final PropertyHandle handle;
 
-	PojoPropertyIndexableReference(PojoIndexableReference<?> parent, ReadableProperty property) {
+	PojoPropertyIndexableReference(PojoIndexableReference<?> parent, PropertyHandle handle) {
 		this.parent = parent;
-		this.property = property;
+		this.handle = handle;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Class<T> getType() {
-		return (Class<T>) property.getType();
+		return (Class<T>) handle.getType();
 	}
 
 	@Override
 	public T get(Object root) {
-		return (T) property.invoke( parent.get( root ) );
+		return (T) handle.get( parent.get( root ) );
 	}
 
 }

@@ -11,7 +11,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -34,31 +34,17 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	}
 
 	@Override
-	public ReadableProperty findReadableProperty(Class<?> holderType, String name) {
-		// TODO also handle primitive property types?
-		return doFind( holderType, name, null );
-	}
-
-	@Override
-	public ReadableProperty findReadableProperty(Class<?> holderType, String name, Class<?> propertyType) {
-		return doFind( holderType, name, propertyType );
-	}
-
-	private ReadableProperty doFind(Class<?> holderType, String name, Class<?> expectedPropertyType) {
+	public PropertyHandle findReadableProperty(Class<?> holderType, String name) {
 		// TODO also handle inherited methods
 		// TODO make sure this works with private methods
 		try {
 			String normalizedName = Introspector.decapitalize( name );
 			PropertyDescriptor propertyDescriptor = getPropertyDescriptor( holderType, normalizedName );
-			Class<?> actualPropertyType = propertyDescriptor.getPropertyType();
-			if ( expectedPropertyType != null && !expectedPropertyType.isAssignableFrom( actualPropertyType ) ) {
-				throw new ClassCastException( actualPropertyType + " cannot be cast to " + expectedPropertyType );
-			}
-			return new JavaBeanReadableProperty( normalizedName, propertyDescriptor.getReadMethod() );
+			return new JavaBeanPropertyHandle( normalizedName, propertyDescriptor.getReadMethod() );
 		}
 		catch (IntrospectionException | IllegalAccessException | RuntimeException e) {
 			throw new SearchException( "Exception while retrieving property reference for '"
-					+ name + "' of type '" + expectedPropertyType + "' on '" + holderType + "'", e );
+					+ name + "' on '" + holderType + "'", e );
 		}
 	}
 

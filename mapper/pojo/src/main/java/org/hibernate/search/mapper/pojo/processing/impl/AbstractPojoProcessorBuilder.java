@@ -12,10 +12,10 @@ import java.util.Collection;
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.impl.PojoIndexableModel;
 import org.hibernate.search.mapper.pojo.model.impl.PojoRootIndexableModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
@@ -30,7 +30,7 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final PojoIntrospector introspector;
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
-	protected final IndexableModel indexableModel;
+	protected final PojoIndexableModel indexableModel;
 	protected final MappingIndexModelCollector indexModelCollector;
 
 	protected final IdentifierMappingCollector identifierBridgeCollector;
@@ -42,12 +42,13 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierBridgeCollector) {
+		this.javaType = javaType;
+
 		this.introspector = introspector;
 		this.contributorProvider = contributorProvider;
 
-		this.javaType = javaType;
 		// XXX do something more with the indexable model, to be able to use it in containedIn processing in particular
-		this.indexableModel = new PojoRootIndexableModel( introspector, javaType );
+		this.indexableModel = new PojoRootIndexableModel( javaType, introspector, contributorProvider );
 		this.indexModelCollector = indexModelCollector;
 
 		this.identifierBridgeCollector = identifierBridgeCollector;

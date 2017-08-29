@@ -10,8 +10,10 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 /**
  * @author Yoann Rodiere
  */
-public interface PojoNodeMetadataContributor<C extends PojoNodeMappingCollector> {
+public interface PojoNodeMetadataContributor<CMO extends PojoNodeModelCollector, CMA extends PojoNodeMappingCollector> {
 
-	void contributeMapping(C collector);
+	void contributeModel(CMO collector);
+
+	void contributeMapping(CMA collector);
 
 }

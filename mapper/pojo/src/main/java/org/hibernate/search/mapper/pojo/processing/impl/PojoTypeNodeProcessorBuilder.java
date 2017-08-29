@@ -15,8 +15,9 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingC
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.impl.PojoPropertyIndexableModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
  * @author Yoann Rodiere
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
 public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 		implements PojoTypeNodeMappingCollector {
 
-	private final Map<ReadableProperty, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
+	private final Map<String, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
 			Class<?> javaType, PojoIntrospector introspector,
@@ -37,21 +38,14 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 
 	@Override
 	public PojoPropertyNodeMappingCollector property(String name) {
-		ReadableProperty property = introspector.findReadableProperty( javaType, name );
-		return property( property );
+		return propertyProcessorBuilders.computeIfAbsent( name, this::createPropertyProcessorBuilder );
 	}
 
-	@Override
-	public PojoPropertyNodeProcessorBuilder property(ReadableProperty property) {
-		// TODO handle collection unwrapping?
-		return propertyProcessorBuilders.computeIfAbsent( property, this::createPropertyProcessorBuilder );
-	}
-
-	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(ReadableProperty property) {
-		// TODO use more advanced reflection here (allow to take advantage of @Timestamp for instance)
-		Class<?> nestedType = property.getType();
-		return new PojoPropertyNodeProcessorBuilder( nestedType, introspector, contributorProvider,
-				indexModelCollector, identifierBridgeCollector, property );
+	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(String name) {
+		PojoPropertyIndexableModel propertyModel = indexableModel.property( name );
+		PropertyHandle handle = propertyModel.getHandle();
+		return new PojoPropertyNodeProcessorBuilder( handle, introspector,
+				contributorProvider, indexModelCollector, identifierBridgeCollector );
 	}
 
 	public PojoTypeNodeProcessor build() {

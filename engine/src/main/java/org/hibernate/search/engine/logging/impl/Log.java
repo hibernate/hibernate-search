@@ -19,8 +19,8 @@ import org.jboss.logging.annotations.MessageLogger;
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
 
-	@Message(id = 1, value = "Unable to create annotation for bridge definition")
-	SearchException unableToCreateAnnotationForBridgeDefinition(@Cause Exception e);
+	@Message(id = 1, value = "Unable to create annotation for definition of type %1$s")
+	SearchException unableToCreateAnnotationForDefinition(Class<? extends Annotation> annotationType, @Cause Exception e);
 
 	@Message(id = 2, value = "Unable to find a default identifier bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(Class<?> sourceType);

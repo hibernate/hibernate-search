@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
+import java.lang.annotation.Annotation;
+import java.util.stream.Stream;
+
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.util.SearchException;
 
@@ -15,20 +20,16 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class PojoRootIndexableModel implements IndexableModel {
+public class PojoRootIndexableModel extends PojoIndexableModel implements IndexableModel {
 
-	private final PojoIntrospector introspector;
-
-	private final Class<?> type;
-
-	public PojoRootIndexableModel(PojoIntrospector introspector, Class<?> type) {
-		this.introspector = introspector;
-		this.type = type;
+	public PojoRootIndexableModel(Class<?> type, PojoIntrospector introspector,
+			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+		super( type, introspector, modelContributorProvider );
 	}
 
 	@Override
 	public <T> IndexableReference<T> asReference(Class<T> requestedType) {
-		if ( !requestedType.isAssignableFrom( this.type ) ) {
+		if ( !isAssignableTo( requestedType ) ) {
 			throw new SearchException( "Requested incompatible type for '" + asReference() + "': '" + requestedType + "'" );
 		}
 		return new PojoRootIndexableReference<>( requestedType );
@@ -36,11 +37,12 @@ public class PojoRootIndexableModel implements IndexableModel {
 
 	@Override
 	public PojoIndexableReference<?> asReference() {
-		return new PojoRootIndexableReference<>( this.type );
+		return new PojoRootIndexableReference<>( getType() );
 	}
 
 	@Override
-	public IndexableModel property(String relativeName) {
-		return new PojoPropertyNameIndexableModel( introspector, asReference(), relativeName );
+	public <M extends Annotation> Stream<M> markers(Class<M> markerType) {
+		return Stream.empty();
 	}
+
 }

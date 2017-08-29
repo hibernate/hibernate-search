@@ -9,13 +9,13 @@ package org.hibernate.search.mapper.pojo.model.spi;
 /**
  * @author Yoann Rodiere
  */
-public interface ReadableProperty {
+public interface PropertyHandle {
 
 	String getName();
 
 	Class<?> getType();
 
-	Object invoke(Object thiz);
+	Object get(Object thiz);
 
 	/*
 	 * Note to implementors: you must override equals to treat two references

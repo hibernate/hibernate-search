@@ -15,6 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataColle
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -29,7 +30,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final Class<?> type;
 
 	private String indexName;
-	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeMappingCollector>>
+	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
 
 	public TypeMappingContextImpl(PojoMapperImplementor mappingType, Class<?> type) {
@@ -40,6 +41,11 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	@Override
 	public void contribute(TypeMetadataCollector collector) {
 		collector.collect( mappingType, new PojoIndexedTypeIdentifier( type ), indexName, this );
+	}
+
+	@Override
+	public void contributeModel(PojoTypeNodeModelCollector collector) {
+		children.stream().forEach( c -> c.contributeModel( collector ) );
 	}
 
 	@Override

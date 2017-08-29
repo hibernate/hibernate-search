@@ -8,13 +8,19 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class ContainedInMappingContributor
-		implements PojoNodeMetadataContributor<PojoPropertyNodeMappingCollector> {
+		implements PojoNodeMetadataContributor<PojoPropertyNodeModelCollector, PojoPropertyNodeMappingCollector> {
+
+	@Override
+	public void contributeModel(PojoPropertyNodeModelCollector collector) {
+		// Nothing to do
+	}
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {

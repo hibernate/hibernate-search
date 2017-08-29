@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.ReadableProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
  * @author Yoann Rodiere
@@ -24,13 +24,7 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	}
 
 	@Override
-	public ReadableProperty findReadableProperty(Class<?> holderType, String name) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException( "Not implemented yet" );
-	}
-
-	@Override
-	public ReadableProperty findReadableProperty(Class<?> holderType, String name, Class<?> propertyType) {
+	public PropertyHandle findReadableProperty(Class<?> holderType, String name) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}

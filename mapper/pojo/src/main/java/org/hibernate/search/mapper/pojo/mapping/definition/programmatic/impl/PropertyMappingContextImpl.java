@@ -10,10 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.engine.bridge.mapping.MarkerDefinition;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -29,12 +32,18 @@ public class PropertyMappingContextImpl
 	private final TypeMappingContext parent;
 	private final String name;
 
-	private final List<PojoNodeMetadataContributor<? super PojoPropertyNodeMappingCollector>>
+	private final List<PojoNodeMetadataContributor<? super PojoPropertyNodeModelCollector, ? super PojoPropertyNodeMappingCollector>>
 			children = new ArrayList<>();
 
 	public PropertyMappingContextImpl(TypeMappingContext parent, String name) {
 		this.parent = parent;
 		this.name = name;
+	}
+
+	@Override
+	public void contributeModel(PojoTypeNodeModelCollector collector) {
+		PojoPropertyNodeModelCollector propertyNodeCollector = collector.property( name );
+		children.forEach( child -> child.contributeModel( propertyNodeCollector ) );
 	}
 
 	@Override
@@ -58,6 +67,12 @@ public class PropertyMappingContextImpl
 	@Override
 	public PropertyMappingContext bridge(BridgeDefinition<?> definition) {
 		children.add( new BridgeMappingContributor( definition ) );
+		return this;
+	}
+
+	@Override
+	public PropertyMappingContext marker(MarkerDefinition<?> definition) {
+		children.add( new MarkerMappingContributor( definition ) );
 		return this;
 	}
 

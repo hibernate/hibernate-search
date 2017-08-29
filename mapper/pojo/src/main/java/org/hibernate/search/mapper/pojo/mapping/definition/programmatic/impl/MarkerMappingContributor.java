@@ -6,32 +6,32 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.engine.bridge.mapping.MarkerDefinition;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class BridgeMappingContributor
-		implements PojoNodeMetadataContributor<PojoNodeModelCollector, PojoNodeMappingCollector> {
+public class MarkerMappingContributor
+		implements PojoNodeMetadataContributor<PojoPropertyNodeModelCollector, PojoNodeMappingCollector> {
 
-	private final BridgeDefinition<?> definition;
+	private final MarkerDefinition<?> definition;
 
-	public BridgeMappingContributor(BridgeDefinition<?> definition) {
+	public MarkerMappingContributor(MarkerDefinition<?> definition) {
 		this.definition = definition;
 	}
 
 	@Override
-	public void contributeModel(PojoNodeModelCollector collector) {
-		// Nothing to do
+	public void contributeModel(PojoPropertyNodeModelCollector collector) {
+		collector.marker( definition );
 	}
 
 	@Override
 	public void contributeMapping(PojoNodeMappingCollector collector) {
-		collector.bridge( definition );
+		// Nothing to do
 	}
 
 }
