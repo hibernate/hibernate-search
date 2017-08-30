@@ -15,6 +15,8 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidat
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
+import com.google.gson.GsonBuilder;
+
 /**
  * An entry point to all operations that may be implemented differently depending
  * on the Elasticsearch version running on the Elasticsearch cluster.
@@ -23,7 +25,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  */
 public interface ElasticsearchDialect {
 
-	GsonProvider createGsonProvider();
+	GsonBuilder createGsonBuilderBase();
 
 	ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider);
 
