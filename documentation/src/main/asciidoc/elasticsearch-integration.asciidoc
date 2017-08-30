@@ -156,7 +156,8 @@ you will need an additional dependency to handle authentication:
 ----
 ====
 
-==== [[elasticsearch-integration-server-configuration]] Elasticsearch configuration
+[[elasticsearch-integration-server-configuration]]
+==== Elasticsearch configuration
 
 Hibernate Search can work with an Elasticsearch server without altering its configuration.
 
@@ -171,7 +172,8 @@ see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
 (for instance access the 10001st result),
 you may increase the value of the `index.max_result_window` property (default is 10000).
 
-==== [[elasticsearch-integration-configuration]] Hibernate Search configuration
+[[elasticsearch-integration-configuration]]
+==== Hibernate Search configuration
 
 Configuration is minimal.
 Add the configuration properties to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
@@ -393,7 +395,8 @@ supported with Elasticsearch, because the platform lacks per-document, index-tim
 The `@Boost` annotation will work, but since it's deprecated
 we suggest to use query-time boosting instead: see <<search-query>>.
 
-==== [[elasticsearch-mapping-analyzer]] Analyzers
+[[elasticsearch-mapping-analyzer]]
+==== Analyzers
 
 NOTE: Analyzers are treated differently than in Lucene embedded mode.
 
@@ -924,7 +927,8 @@ In the general case, your query will automatically use the analyzers defined in 
 Thus, when overriding the analyzer, it must be consistent across all the queried fields.
 ====
 
-==== [[elasticsearch-query-spatial]] Spatial queries
+[[elasticsearch-query-spatial]]
+==== Spatial queries
 
 The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.
 
@@ -942,7 +946,8 @@ script.engine.groovy.inline.search: true
 ----
 --
 
-==== [[elasticsearch-scrolling]] Paging and scrolling
+[[elasticsearch-scrolling]]
+==== Paging and scrolling
 
 You may handle large result sets in two different ways, with different limitations.
 
@@ -964,7 +969,8 @@ Limitations:
   You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration, Elasticsearch integration configuration>>).
   Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
 
-==== [[elasticsearch-query-sorting]]Sorting
+[[elasticsearch-query-sorting]]
+==== Sorting
 
 Sorting is performed the same way as <<query-sorting,with the Lucene backend>>.
 
@@ -1099,8 +1105,9 @@ The optimization features documented in <<search-optimize>> are only partially i
 
  * The automatic optimization is not implemented and most probably never will be.
  * The manual optimization (`searchFactory.optimize()`) is implemented.
- 
-==== [[elasticsearch-logging]]Logging executed requests
+
+[[elasticsearch-logging]]
+==== Logging executed requests
 
 Search queries are logged to the `org.hibernate.search.fulltext_query` category at `DEBUG` level,
 as when using an embedded Lucene instance (the query format is Elasticsearch's, though).
@@ -1108,7 +1115,8 @@ as when using an embedded Lucene instance (the query format is Elasticsearch's, 
 In addition, you can enable the logging of every single request sent to the Elasticsearch cluster
 by enabling `TRACE` logging for the log category `org.hibernate.search.elasticsearch.request`.
 
-=== [[elasticsearch-limitations]]Limitations
+[[elasticsearch-limitations]]
+=== Limitations
 
 Not everything is implemented yet.
 
