@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -46,27 +45,23 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 	}
 
 	public Stream<Class<?>> getAscendingSuperTypes(Class<?> subType) {
-		/*
-		 * Interfaces can be implemented multiple times,
-		 * so we use a LinkedHashSet to preserve order while removing duplicates.
-		 */
+		// Use a LinkedHashSet to preserve order while still providing efficient element lookup
 		Set<Class<?>> result = new LinkedHashSet<>();
 		collectSuperTypesAscending( result, subType );
 		return result.stream();
 	}
 
 	public Stream<Class<?>> getDescendingSuperTypes(Class<?> subType) {
-		/*
-		 * Interfaces can be implemented multiple times,
-		 * so we use a LinkedHashSet to preserve order while removing duplicates.
-		 */
+		// Use a LinkedHashSet to preserve order while still providing efficient element lookup
 		Set<Class<?>> result = new LinkedHashSet<>();
 		collectSuperTypesDescending( result, subType );
 		return result.stream();
 	}
 
-	private void collectSuperTypesAscending(Collection<Class<?>> result, Class<?> subType) {
-		result.add( subType );
+	private void collectSuperTypesAscending(Set<Class<?>> result, Class<?> subType) {
+		if ( ! result.add( subType ) ) {
+			// We've already seen this type, skip the rest of this method
+		}
 		for ( Class<?> interfaze : subType.getInterfaces() ) {
 			collectSuperTypesAscending( result, interfaze );
 		}
@@ -75,7 +70,10 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 		}
 	}
 
-	private void collectSuperTypesDescending(Collection<Class<?>> result, Class<?> subType) {
+	private void collectSuperTypesDescending(Set<Class<?>> result, Class<?> subType) {
+		if ( result.contains( subType ) ) {
+			// We've already seen this type, skip the rest of this method
+		}
 		if ( !Object.class.equals( subType ) ) {
 			collectSuperTypesDescending( result, subType.getSuperclass() );
 		}
