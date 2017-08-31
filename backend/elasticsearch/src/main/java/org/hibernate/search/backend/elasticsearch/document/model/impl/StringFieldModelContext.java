@@ -9,21 +9,23 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitializationIndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.impl.NonConvertingElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+
+import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
  */
 class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContext<String> {
 
-	private final JsonAccessor<String> accessor;
+	private final UnknownTypeJsonAccessor accessor;
 	private Store store;
 
-	public StringFieldModelContext(JsonAccessor<String> accessor) {
+	public StringFieldModelContext(UnknownTypeJsonAccessor accessor) {
 		this.accessor = accessor;
 	}
 
@@ -35,7 +37,7 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 
 	@Override
 	protected void build(DeferredInitializationIndexFieldReference<String> reference, PropertyMapping mapping) {
-		reference.initialize( new NonConvertingElasticsearchIndexFieldReference<>( accessor ) );
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, JsonPrimitive::new ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );

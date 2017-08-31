@@ -55,22 +55,22 @@ public class ElasticsearchFieldModelContextImpl
 
 	@Override
 	public TypedFieldModelContext<String> fromString() {
-		return setDelegate( new StringFieldModelContext( accessor.asString() ) );
+		return setDelegate( new StringFieldModelContext( accessor ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<Integer> fromInteger() {
-		return setDelegate( new IntegerFieldModelContext( accessor.asInteger() ) );
+		return setDelegate( new IntegerFieldModelContext( accessor ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<LocalDate> fromLocalDate() {
-		return setDelegate( new LocalDateFieldModelContext( accessor.asString() ) );
+		return setDelegate( new LocalDateFieldModelContext( accessor ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<GeoPoint> fromGeoPoint() {
-		return setDelegate( new CoordinatesFieldModelContext( accessor.asObject() ) );
+		return setDelegate( new CoordinatesFieldModelContext( accessor ) );
 	}
 
 	@Override

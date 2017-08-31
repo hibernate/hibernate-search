@@ -7,26 +7,28 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitializationIndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.impl.NonConvertingElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+
+import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
  */
 class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> {
 
-	private final JsonAccessor<Integer> accessor;
+	private final UnknownTypeJsonAccessor accessor;
 
-	public IntegerFieldModelContext(JsonAccessor<Integer> accessor) {
+	public IntegerFieldModelContext(UnknownTypeJsonAccessor accessor) {
 		this.accessor = accessor;
 	}
 
 	@Override
 	protected void build(DeferredInitializationIndexFieldReference<Integer> reference, PropertyMapping mapping) {
 		super.build( reference, mapping );
-		reference.initialize( new NonConvertingElasticsearchIndexFieldReference<>( accessor ) );
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, JsonPrimitive::new ) );
 		mapping.setType( DataType.INTEGER );
 	}
 }
