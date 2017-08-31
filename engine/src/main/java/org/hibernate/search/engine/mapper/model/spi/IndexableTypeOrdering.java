@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.model.spi;
 
-import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * @author Yoann Rodiere
@@ -15,8 +15,18 @@ public interface IndexableTypeOrdering {
 
 	boolean isSubType(IndexedTypeIdentifier parent, IndexedTypeIdentifier subType);
 
-	Collection<? extends IndexedTypeIdentifier> getAscendingSuperTypes(IndexedTypeIdentifier subType);
+	/**
+	 * @param subType The type whose supertypes should be returned
+	 * @return A stream containing the type and supertypes in ascending order.
+	 * Each type must only appear once.
+	 */
+	Stream<? extends IndexedTypeIdentifier> getAscendingSuperTypes(IndexedTypeIdentifier subType);
 
-	Collection<? extends IndexedTypeIdentifier> getDescendingSuperTypes(IndexedTypeIdentifier subType);
+	/**
+	 * @param subType The type whose supertypes should be returned
+	 * @return A stream containing the type and supertypes in descending order.
+	 * Each type must only appear once.
+	 */
+	Stream<? extends IndexedTypeIdentifier> getDescendingSuperTypes(IndexedTypeIdentifier subType);
 
 }

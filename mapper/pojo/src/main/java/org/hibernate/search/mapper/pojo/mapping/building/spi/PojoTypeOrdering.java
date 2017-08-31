@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
@@ -22,7 +23,7 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 
 	private static final PojoTypeOrdering INSTANCE = new PojoTypeOrdering();
 
-	public static IndexableTypeOrdering get() {
+	public static PojoTypeOrdering get() {
 		return INSTANCE;
 	}
 
@@ -35,29 +36,37 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 	}
 
 	@Override
-	public Collection<IndexedTypeIdentifier> getAscendingSuperTypes(IndexedTypeIdentifier subType) {
-		/*
-		 * Interfaces can be implemented multiple times,
-		 * so we use a LinkedHashSet to preserve order while removing duplicates.
-		 */
-		Set<IndexedTypeIdentifier> result = new LinkedHashSet<>();
-		collectSuperTypesAscending( result, toClass( subType ) );
-		return result;
+	public Stream<IndexedTypeIdentifier> getAscendingSuperTypes(IndexedTypeIdentifier subType) {
+		return getAscendingSuperTypes( toClass( subType ) ).map( this::toId );
 	}
 
 	@Override
-	public Collection<IndexedTypeIdentifier> getDescendingSuperTypes(IndexedTypeIdentifier subType) {
+	public Stream<IndexedTypeIdentifier> getDescendingSuperTypes(IndexedTypeIdentifier subType) {
+		return getDescendingSuperTypes( toClass( subType ) ).map( this::toId );
+	}
+
+	public Stream<Class<?>> getAscendingSuperTypes(Class<?> subType) {
 		/*
 		 * Interfaces can be implemented multiple times,
 		 * so we use a LinkedHashSet to preserve order while removing duplicates.
 		 */
-		Set<IndexedTypeIdentifier> result = new LinkedHashSet<>();
-		collectSuperTypesDescending( result, toClass( subType ) );
-		return result;
+		Set<Class<?>> result = new LinkedHashSet<>();
+		collectSuperTypesAscending( result, subType );
+		return result.stream();
 	}
 
-	private void collectSuperTypesAscending(Collection<IndexedTypeIdentifier> result, Class<?> subType) {
-		result.add( toId( subType ) );
+	public Stream<Class<?>> getDescendingSuperTypes(Class<?> subType) {
+		/*
+		 * Interfaces can be implemented multiple times,
+		 * so we use a LinkedHashSet to preserve order while removing duplicates.
+		 */
+		Set<Class<?>> result = new LinkedHashSet<>();
+		collectSuperTypesDescending( result, subType );
+		return result.stream();
+	}
+
+	private void collectSuperTypesAscending(Collection<Class<?>> result, Class<?> subType) {
+		result.add( subType );
 		for ( Class<?> interfaze : subType.getInterfaces() ) {
 			collectSuperTypesAscending( result, interfaze );
 		}
@@ -66,14 +75,14 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 		}
 	}
 
-	private void collectSuperTypesDescending(Collection<IndexedTypeIdentifier> result, Class<?> subType) {
+	private void collectSuperTypesDescending(Collection<Class<?>> result, Class<?> subType) {
 		if ( !Object.class.equals( subType ) ) {
 			collectSuperTypesDescending( result, subType.getSuperclass() );
 		}
 		for ( Class<?> interfaze : subType.getInterfaces() ) {
 			collectSuperTypesDescending( result, interfaze );
 		}
-		result.add( toId( subType ) );
+		result.add( subType );
 	}
 
 	private Class<?> toClass(IndexedTypeIdentifier typeId) {

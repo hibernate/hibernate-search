@@ -126,7 +126,6 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 			IndexableTypeOrdering typeOrdering = mapper.getTypeOrdering();
 			for ( IndexedTypeIdentifier mappedType : contributionByType.keySet() ) {
 				Optional<String> indexNameOptional = typeOrdering.getAscendingSuperTypes( mappedType )
-						.stream()
 						.map( contributionByType::get )
 						.filter( Objects::nonNull )
 						.map( TypeMappingContribution::getIndexName )
@@ -146,7 +145,6 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 
 		private Stream<C> getContributors(IndexableTypeOrdering typeOrdering, IndexedTypeIdentifier typeId) {
 			return typeOrdering.getDescendingSuperTypes( typeId )
-					.stream()
 					.map( contributionByType::get )
 					.filter( Objects::nonNull )
 					.flatMap( TypeMappingContribution::getContributors );
