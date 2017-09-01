@@ -75,10 +75,12 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	@Override
 	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
-		long start = System.nanoTime();
 		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
 				.thenApply( response -> convertResponse( request, response ) );
-		result.thenAccept( response -> log( request, start, response ) );
+		if ( requestLog.isDebugEnabled() ) {
+			long startTime = System.nanoTime();
+			result.thenAccept( response -> log( request, startTime, response ) );
+		}
 		return result;
 	}
 
@@ -169,10 +171,10 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	}
 
 	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
-		JsonLogHelper logHelper = gsonProvider.getLogHelper();
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( requestLog.isTraceEnabled() ) {
+			JsonLogHelper logHelper = gsonProvider.getLogHelper();
 			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
 					response.getStatusCode(), response.getStatusMessage(),
 					logHelper.toString( request.getBodyParts() ),
