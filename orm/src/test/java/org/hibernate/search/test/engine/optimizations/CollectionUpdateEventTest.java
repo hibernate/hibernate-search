@@ -36,11 +36,11 @@ import static org.junit.Assert.assertTrue;
 @TestForIssue(jiraKey = "HSEARCH-679")
 public class CollectionUpdateEventTest {
 
-	private static boolean WITH_CLASS_BRIDGE_ON_ITEM = true;
-	private static boolean WITHOUT_CLASS_BRIDGE_ON_ITEM = false;
+	private static final boolean WITH_CLASS_BRIDGE_ON_ITEM = true;
+	private static final boolean WITHOUT_CLASS_BRIDGE_ON_ITEM = false;
 
-	private static boolean WITH_CLASS_BRIDGE_ON_CATALOG = true;
-	private static boolean WITHOUT_CLASS_BRIDGE_ON_CATALOG = false;
+	private static final boolean WITH_CLASS_BRIDGE_ON_CATALOG = true;
+	private static final boolean WITHOUT_CLASS_BRIDGE_ON_CATALOG = false;
 
 	/**
 	 * If the top level class has a class bridge or dynamic boost, then we can't safely
