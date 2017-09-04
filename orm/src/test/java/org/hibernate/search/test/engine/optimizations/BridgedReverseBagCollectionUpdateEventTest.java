@@ -80,7 +80,7 @@ public class BridgedReverseBagCollectionUpdateEventTest extends SearchTestBase {
 		try ( Session session = openSession() ) {
 			Transaction tx = getSession().beginTransaction();
 
-			ContainingEntity parent = session.find( ContainingEntity.class, 1 );
+			ContainingEntity parent = session.get( ContainingEntity.class, 1 );
 			NestedEntity nested = new NestedEntity();
 			nested.id = 12;
 			nested.name = "two";
@@ -119,7 +119,7 @@ public class BridgedReverseBagCollectionUpdateEventTest extends SearchTestBase {
 
 	@Entity
 	@Indexed
-	private static class ContainingEntity {
+	public static class ContainingEntity {
 
 		@Id
 		private Integer id;
@@ -131,7 +131,7 @@ public class BridgedReverseBagCollectionUpdateEventTest extends SearchTestBase {
 	}
 
 	@Entity
-	private static class NestedEntity {
+	public static class NestedEntity {
 
 		@Id
 		private Integer id;
