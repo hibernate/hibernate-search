@@ -237,11 +237,6 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		PersistentCollection persistentCollection = event.getCollection();
 		final String collectionRole;
 		if ( persistentCollection != null ) {
-			if ( !persistentCollection.wasInitialized() ) {
-				// non-initialized collections will still trigger events, but we want to skip them
-				// as they won't contain new values affecting the index state
-				return;
-			}
 			collectionRole = persistentCollection.getRole();
 		}
 		else {
