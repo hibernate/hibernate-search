@@ -1070,7 +1070,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		ContainedInMetadata containedInMetadata = createContainedInMetadata( member );
 		typeMetadataBuilder.addContainedIn( containedInMetadata );
 
-		parseContext.collectUnqualifiedCollectionRole( member.getName() );
+		/*
+		 * Do NOT add the collection role to the parse context here:
+		 * @ContainedIn annotations are information about what depends on this entity's index,
+		 * and in parse context we collect exactly the opposite (what this entity's index depends on).
+		 */
 	}
 
 	private ContainedInMetadata createContainedInMetadata(XProperty member) {
