@@ -35,8 +35,6 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 
 	@Override
 	public PropertyHandle findReadableProperty(Class<?> holderType, String name) {
-		// TODO also handle inherited methods
-		// TODO make sure this works with private methods
 		try {
 			String normalizedName = Introspector.decapitalize( name );
 			PropertyDescriptor propertyDescriptor = getPropertyDescriptor( holderType, normalizedName );

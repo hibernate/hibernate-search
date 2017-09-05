@@ -13,15 +13,6 @@ import java.lang.annotation.Annotation;
  */
 public interface BridgeDefinition<A extends Annotation> {
 
-	/*
-	 * FIXME bridge definitions
- 	 * TODO add support for annotation parameters (?)
- 	 * TODO add support for multi-valued parameters (?)
-	 * see https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/cfg/AnnotationDef.java
-	 * see https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/cfg/ConstraintDef.java
-	 * see NotNullDef in https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.4#section-programmatic-api
-	 */
-
 	A get();
 
 }

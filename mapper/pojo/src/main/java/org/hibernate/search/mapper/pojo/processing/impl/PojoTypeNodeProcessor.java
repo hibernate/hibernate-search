@@ -41,10 +41,6 @@ public class PojoTypeNodeProcessor {
 				processor.process( indexable, destination );
 			}
 		}
-		/*
-		 * TODO discuss whether we want breadth-first processing as we used to or if depth-first is ok.
-		 * Advantage of depth-first is we only get property values once.
-		 */
 		for ( PojoPropertyNodeProcessor processor : propertyScopedProcessors ) {
 			// Recursion here
 			processor.process( source, destination );

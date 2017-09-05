@@ -20,13 +20,6 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 public interface Bridge<A extends Annotation> extends AutoCloseable {
 
 	/* Solves HSEARCH-1306 */
-	/*
-	 * TODO accept a POJO instead of an annotation?
-	 * Pro: would be cleaner and easier to use when mapping JSON for instance
-	 * Con: would be more complex to implement, both on our side and on the service provider side
-	 * (we'd need to map annotations to a POJO). Mapping a custom POJO to an annotation is much easier.
-	 * Other con: the POJO would probably need to be mutable...
-	 */
 	void initialize(BuildContext buildContext, A parameters);
 
 	void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector);

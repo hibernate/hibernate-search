@@ -28,18 +28,9 @@ public interface IndexModelCollector {
 	 * from the values of the given required fields.
 	 */
 	// TODO move projections setup to another class: this has nothing to do with the index itself, it's more about mapping
-	// TODO mandate that document ID bridges use this method to register a projection
 	void projection(Set<IndexFieldReference<?>> requiredFields, Projection projection);
 
 	// TODO move projections setup to another class: this has nothing to do with the index itself, it's more about mapping
-	/*
-	 * TODO is it such a good idea to allow projections on non-existent fields?
-	 *
-	 * We used to allow that because bridges had a "default field" which could be abused
-	 * so that we never actually populated the field in the index, but still allowed to project on it.
-	 *
-	 * Ideally, we'd want to only allow projections on objects, defining those projections with the method above.
-	 */
 	void projection(String relativeName, Set<IndexableReference<?>> requiredFields, Projection projection);
 
 	IndexObjectReference asReference();

@@ -53,7 +53,6 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			defaultedFieldName = handle.getName();
 		}
 
-		// TODO check that the bridge is suitable for the current node's type?
 		ValueProcessor processor = indexModelCollector.addFunctionBridge(
 				indexableModel, javaType, reference, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );

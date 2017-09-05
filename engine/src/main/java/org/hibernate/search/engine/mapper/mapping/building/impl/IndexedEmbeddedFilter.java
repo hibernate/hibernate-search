@@ -16,16 +16,6 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-/*
- * TODO discuss IndexedEmbedded behavior
- *
- * Historically, the recursion context's "depth" has always been the *embedding* depth,
- * not the entity property nesting depth or the index field nesting depth.
- * As a result, bridges are free to use properties up to any depth,
- * as long as the property the bridge was defined on is at the right depth.
- * On the other hand, path filters have always been about *fields*,
- * not embedding nor properties.
- */
 public class IndexedEmbeddedFilter {
 
 	private final IndexableTypeOrdering typeOrdering;

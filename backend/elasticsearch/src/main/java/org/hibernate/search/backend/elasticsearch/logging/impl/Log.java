@@ -15,7 +15,6 @@ import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
-// TODO should we start using one "logger project code" per module, so that it can be extended more easily?
 @MessageLogger(projectCode = "HSEARCH-ES")
 public interface Log extends BasicLogger {
 

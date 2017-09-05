@@ -82,8 +82,8 @@ public class MappingIndexModelCollectorImpl implements MappingIndexModelCollecto
 			defaultedReference = bridgeReferenceResolver.resolveIdentifierBridgeForType( sourceType );
 		}
 		/*
-		 * TODO check that the converter is suitable for the current node's type
-		 * (use introspection, similarly to what we do for function bridges?)
+		 * TODO check that the bridge is suitable for the given sourceType
+		 * (use introspection, similarly to what we do to detect the function bridges field type?)
 		 */
 		IdentifierBridge<?> bridge = bridgeFactory.createIdentifierBridge( defaultedReference );
 
@@ -106,6 +106,9 @@ public class MappingIndexModelCollectorImpl implements MappingIndexModelCollecto
 		}
 
 		FunctionBridge<?, ?> bridge = bridgeFactory.createFunctionBridge( defaultedReference );
+
+		// TODO check that the bridge is suitable for the given sourceType?
+
 		return doAddFunctionBridge( indexableModel, bridge, fieldName, contributor );
 	}
 

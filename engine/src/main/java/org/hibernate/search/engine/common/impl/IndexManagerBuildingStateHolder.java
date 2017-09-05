@@ -59,22 +59,10 @@ public class IndexManagerBuildingStateHolder {
 				indexName,
 				(k, v) -> {
 					if ( v == null ) {
-						/*
-						 * TODO maybe remove this "index" prefix, to limit the disruption for users migrating from 5.x?
-						 * The downside is we may have name conflicts with other properties (most notably, backend definitions).
-						 */
 						Properties indexProperties = new MaskedProperty( properties, "index." + indexName, defaultIndexProperties );
 						return createIndexManagerBuildingState( indexName, indexProperties, typeOrdering );
 					}
 					else {
-						/*
-						 * TODO decide if forbidding multiple entity mappings to target the same index is really what we want.
-						 * It sure as hell is the easiest solution for Elasticsearch 6,
-						 * because it means we won't need to handle the merging of multiple mappings
-						 * into a single index.
-						 * But it also means we won't be able to map multiple entities in the same hierarchy tree
-						 * to a single index.
-						 */
 						throw new SearchException( "Multiple entity mappings target the same index, which is forbidden" );
 					}
 				} );
@@ -102,12 +90,6 @@ public class IndexManagerBuildingStateHolder {
 		// TODO more checks on the backend type (non-null, non-empty)
 		String backendType = backendProperties.getProperty( "type" );
 
-		/*
-		 * TODO use a more easily extensible approach.
-		 * For instance introduce extension points to register aliases for each backend factory.
-		 * Aliases would first be resolved, and only then the result of the resolution would
-		 * be passed to the bean resolver.
-		 */
 		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
 		BackendFactory backendFactory = beanResolver.resolve( backendType, BackendFactory.class );
 		return backendFactory.create( backendName, buildContext, backendProperties );

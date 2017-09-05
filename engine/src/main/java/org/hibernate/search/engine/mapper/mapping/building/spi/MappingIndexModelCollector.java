@@ -35,10 +35,6 @@ public interface MappingIndexModelCollector {
 			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
 			String fieldName, FieldModelContributor contributor);
 
-	/*
-	 * TODO Maybe we should move away from "prefixes" in indexedEmbedded and mandate one actual object per indexedEmbedded?
-	 * It would make recursion in the index model much simpler...
-	 */
 	Optional<MappingIndexModelCollector> addIndexedEmbeddedIfIncluded(IndexedTypeIdentifier parentTypeId,
 			String relativePrefix, Integer maxDepth, Set<String> pathFilters);
 

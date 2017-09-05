@@ -61,7 +61,6 @@ import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
  */
-// TODO confirm that @Spatial becomes @GeoPointBridge, so that we can dream of adding @GeoShape someday...
 @BridgeMapping(implementation = @BridgeBeanReference(type = GeoPointBridgeImpl.class))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })

@@ -12,12 +12,6 @@ import org.hibernate.search.engine.mapper.mapping.MappingType;
 /**
  * @author Yoann Rodiere
  */
-/*
- * TODO find a better name? The name was "SearchFactory" before 6.0,
- * and it wasn't a good one since the class was not, actually, a factory.
- * But now, it actually is a factory... though "SearchManager" may not be a good name.
- * Maybe MappingManager/MappingManagerFactory?
- */
 public interface SearchManagerFactory extends AutoCloseable {
 
 	<T extends SearchManager> T createSearchManager(MappingType<T, ?> mapper);
