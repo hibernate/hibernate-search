@@ -70,7 +70,7 @@ public class ElasticsearchFieldModelContextImpl
 
 	@Override
 	public TypedFieldModelContext<GeoPoint> fromGeoPoint() {
-		return setDelegate( new CoordinatesFieldModelContext( accessor ) );
+		return setDelegate( new GeoPointFieldModelContext( accessor ) );
 	}
 
 	@Override

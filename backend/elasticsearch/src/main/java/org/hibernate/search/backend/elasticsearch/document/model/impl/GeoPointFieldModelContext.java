@@ -18,18 +18,18 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class CoordinatesFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint> {
+class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint> {
 
 	private final UnknownTypeJsonAccessor accessor;
 
-	public CoordinatesFieldModelContext(UnknownTypeJsonAccessor accessor) {
+	public GeoPointFieldModelContext(UnknownTypeJsonAccessor accessor) {
 		this.accessor = accessor;
 	}
 
 	@Override
 	protected void build(DeferredInitializationIndexFieldReference<GeoPoint> reference, PropertyMapping mapping) {
 		super.build( reference, mapping );
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, CoordinatesFieldModelContext::format ) );
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, GeoPointFieldModelContext::format ) );
 		mapping.setType( DataType.GEO_POINT );
 	}
 
