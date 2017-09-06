@@ -16,6 +16,8 @@ import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
@@ -53,10 +55,12 @@ public class ScheduledCommitPolicyTest {
 
 	private final SearchITHelper helper = new SearchITHelper( sfAsyncExclusiveIndex );
 
+	private final IndexedTypeIdentifier testType = PojoIndexedTypeIdentifier.convertFromLegacy( Quote.class );
+
 	@Test
 	public void testScheduledCommits() throws Exception {
 		writeData( NUMBER_ENTITIES );
-		AbstractWorkspaceImpl workspace = sfAsyncExclusiveIndex.extractWorkspace( Quote.class );
+		AbstractWorkspaceImpl workspace = sfAsyncExclusiveIndex.extractWorkspace( testType );
 		CommitPolicy commitPolicy = workspace.getCommitPolicy();
 
 		assertTrue( commitPolicy instanceof ScheduledCommitPolicy );

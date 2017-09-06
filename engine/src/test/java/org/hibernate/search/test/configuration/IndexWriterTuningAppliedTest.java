@@ -15,6 +15,8 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -41,12 +43,15 @@ public class IndexWriterTuningAppliedTest {
 		.withProperty( "hibernate.search.index2.indexwriter.max_thread_states", "7" )
 		.withProperty( "hibernate.search.index2.indexwriter.infostream", "true" );
 
+	private final IndexedTypeIdentifier dvdTestType = PojoIndexedTypeIdentifier.convertFromLegacy( Dvd.class );
+	private final IndexedTypeIdentifier bookTestType = PojoIndexedTypeIdentifier.convertFromLegacy( Book.class );
+
 	@Test
 	public void testInfoStream() throws IOException {
 		//Enable trace level on the magic category:
 		Logger.getLogger( LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName() ).setLevel( Level.TRACE );
-		AbstractWorkspaceImpl dvdsWorkspace = sfHolder.extractWorkspace( Dvd.class );
-		AbstractWorkspaceImpl booksWorkspace = sfHolder.extractWorkspace( Book.class );
+		AbstractWorkspaceImpl dvdsWorkspace = sfHolder.extractWorkspace( dvdTestType );
+		AbstractWorkspaceImpl booksWorkspace = sfHolder.extractWorkspace( bookTestType );
 		IndexWriter dvdsIndexWriter = dvdsWorkspace.getIndexWriter();
 		IndexWriter booksIndexWriter = booksWorkspace.getIndexWriter();
 		try {

@@ -11,6 +11,8 @@ import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.PerChangeSetCommitPolicy;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.impl.lucene.SharedIndexCommitPolicy;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.configuration.mutablefactory.A;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -29,6 +31,8 @@ import static org.junit.Assert.assertTrue;
  */
 @Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class CommitPolicyConfigurationTest {
+
+	private final IndexedTypeIdentifier testType = PojoIndexedTypeIdentifier.convertFromLegacy( A.class );
 
 	@Rule
 	public SearchFactoryHolder sfSyncExclusiveIndex = new SearchFactoryHolder( A.class )
@@ -79,7 +83,7 @@ public class CommitPolicyConfigurationTest {
 	}
 
 	private CommitPolicy getCommitPolicy(SearchFactoryHolder sfHolder) {
-		AbstractWorkspaceImpl workspace = sfHolder.extractWorkspace( A.class );
+		AbstractWorkspaceImpl workspace = sfHolder.extractWorkspace( testType );
 		return workspace.getCommitPolicy();
 	}
 

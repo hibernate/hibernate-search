@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.backend.lucene;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
@@ -25,6 +27,7 @@ public class AsyncBackendFlushTest {
 			.withProperty( "hibernate.search.default.worker.execution", "async" );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
+	private final IndexedTypeIdentifier testType = PojoIndexedTypeIdentifier.convertFromLegacy( Quote.class );
 
 	@Test
 	public void testFlush() throws Exception {
@@ -37,7 +40,7 @@ public class AsyncBackendFlushTest {
 	}
 
 	private void flushIndex() {
-		sfHolder.extractIndexManager( Quote.class ).flushAndReleaseResources();
+		sfHolder.extractIndexManager( testType ).flushAndReleaseResources();
 	}
 
 	private void assertDocumentsIndexed(int number) {
