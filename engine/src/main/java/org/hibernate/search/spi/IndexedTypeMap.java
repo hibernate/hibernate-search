@@ -18,7 +18,7 @@ import java.util.Map.Entry;
  * In an ideal world, we will expose less methods than what is currently listed:
  * some methods have been introduced as Deprecated since the beginning as the plan
  * is to eventually remove them; they currently exist merely to allow a
- * pratical migration of code to the new approach in smaller, testable steps.
+ * practical migration of code to the new approach in smaller, testable steps.
  *
  * @author Sanne Grinovero
  */
