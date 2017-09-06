@@ -19,7 +19,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 // Must be serializable to support query serialization
-public class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializable {
+final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializable {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static final IndexedTypeMap EMPTY = new DelegatingIndexedTypeMap( Collections.EMPTY_MAP, Collections.EMPTY_MAP );
