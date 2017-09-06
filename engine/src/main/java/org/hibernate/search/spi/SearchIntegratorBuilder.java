@@ -182,7 +182,8 @@ public class SearchIntegratorBuilder {
 		final IndexedTypeMap<DocumentBuilderContainedEntity> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
 		final IndexedTypeMap<EntityIndexBinding> indexedEntities = rootFactory.getIndexBindings();
 		for ( Class<?> entity : classes ) {
-			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey( entity ) ) {
+			IndexedTypeIdentifier typeId = PojoIndexedTypeIdentifier.convertFromLegacy( entity );
+			if ( indexedEntities.containsKey( typeId ) || containedEntities.containsKey( typeId ) ) {
 				remove.add( entity );
 			}
 		}

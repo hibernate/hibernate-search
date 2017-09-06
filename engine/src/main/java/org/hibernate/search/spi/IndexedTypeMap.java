@@ -55,13 +55,6 @@ public interface IndexedTypeMap<V> {
 	V get(Class<?> legacyPojoClass);
 
 	/**
-	 * @param legacyPojoClass the Class whose type is to be used as a key.
-	 * @return true if the argument represents an identifier which is mapped to something.
-	 */
-	@Deprecated
-	boolean containsKey(Class<?> legacyPojoClass);
-
-	/**
 	 * @deprecated This method will be removed. The implementations will be refactored to become immutable.
 	 * @param type The key to be used.
 	 * @param typeBinding The value being put in the underlying key/value map.

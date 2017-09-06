@@ -78,11 +78,6 @@ final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializab
 	}
 
 	@Override
-	public boolean containsKey(Class<?> legacyPojo) {
-		return map.containsKey( new PojoIndexedTypeIdentifier( legacyPojo ) );
-	}
-
-	@Override
 	public void put(IndexedTypeIdentifier type, V value) {
 		//technically there's a race condition here but we only do
 		//writes during initialization, which is sequential.
