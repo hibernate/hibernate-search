@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.spi.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeMap;
 
 public final class IndexedTypeMaps {
@@ -30,5 +33,10 @@ public final class IndexedTypeMaps {
 		return new DelegatingIndexedTypeMap<>( new ConcurrentHashMap<>(), new ConcurrentHashMap<>() );
 	}
 
+	public static <V> IndexedTypeMap<V> singletonMapping(IndexedTypeIdentifier key, V value) {
+		Objects.requireNonNull( key );
+		Objects.requireNonNull( value );
+		return new DelegatingIndexedTypeMap<>( Collections.singletonMap( key, value ), Collections.singletonMap( key.getName(), key ) );
+	}
 
 }
