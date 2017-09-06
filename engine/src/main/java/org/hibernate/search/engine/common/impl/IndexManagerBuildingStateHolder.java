@@ -82,7 +82,7 @@ public class IndexManagerBuildingStateHolder {
 		IndexModelCollectorImplementor modelCollector = builder.getModelCollector();
 		MappingIndexModelCollectorImpl mappingModelCollector = new MappingIndexModelCollectorImpl(
 				bridgeFactory, bridgeReferenceResolver, modelCollector, typeOrdering );
-		return new IndexMappingBuildingStateImpl<>( builder, mappingModelCollector );
+		return new IndexMappingBuildingStateImpl<>( indexName, builder, mappingModelCollector );
 	}
 
 	private Backend<?> createBackend(String backendName) {
@@ -104,14 +104,22 @@ public class IndexManagerBuildingStateHolder {
 
 	private static class IndexMappingBuildingStateImpl<D extends DocumentState> implements IndexManagerBuildingState<D> {
 
+		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
 		private final MappingIndexModelCollector modelCollector;
 		private IndexManager<D> result;
 
-		public IndexMappingBuildingStateImpl(IndexManagerBuilder<D> builder,
+		public IndexMappingBuildingStateImpl(String indexName,
+				IndexManagerBuilder<D> builder,
 				MappingIndexModelCollector modelCollector) {
+			this.indexName = indexName;
 			this.builder = builder;
 			this.modelCollector = modelCollector;
+		}
+
+		@Override
+		public String getIndexName() {
+			return indexName;
 		}
 
 		@Override

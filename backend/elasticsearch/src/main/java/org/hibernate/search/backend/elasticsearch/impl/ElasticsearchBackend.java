@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElastic
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
-import org.hibernate.search.engine.backend.spi.BackendWorker;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 
@@ -27,17 +26,20 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilde
 
 	private final ElasticsearchClient client;
 
+	private final String name;
+
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
-	private final ElasticsearchBackendWorker worker;
+	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
-	public ElasticsearchBackend(ElasticsearchClient client, ElasticsearchWorkFactory workFactory) {
+	public ElasticsearchBackend(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory) {
 		this.client = client;
+		this.name = name;
 		this.workFactory = workFactory;
 		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
-		this.worker = new ElasticsearchBackendWorker();
+		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 	}
 
 	@Override
@@ -62,9 +64,8 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilde
 		return streamOrchestrator;
 	}
 
-	@Override
-	public BackendWorker getWorker() {
-		return worker;
+	public ElasticsearchWorkOrchestrator getQueryOrchestrator() {
+		return queryOrchestrator;
 	}
 
 	@Override
@@ -72,6 +73,15 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilde
 		// TODO use a Closer
 		client.close();
 		streamOrchestrator.close();
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "name=" ).append( name )
+				.append( "]")
+				.toString();
 	}
 
 }

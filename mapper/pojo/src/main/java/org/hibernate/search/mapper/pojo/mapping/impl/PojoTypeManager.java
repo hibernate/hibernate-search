@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import org.hibernate.search.engine.backend.document.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierConverter;
@@ -39,6 +40,10 @@ public class PojoTypeManager<I, E, D extends DocumentState> {
 		return identifierConverter;
 	}
 
+	public Class<E> getEntityType() {
+		return entityType;
+	}
+
 	public String toDocumentIdentifier(Object providedId, Object entity) {
 		Object unproxied = proxyIntrospector.unproxy( entity ); // TODO Move this to the ID converter? See HibernateOrmMapper, item 4: we don't want to unproxy needlessly.
 		return identifierConverter.toDocumentId( providedId, entityType.cast( unproxied ) );
@@ -55,6 +60,10 @@ public class PojoTypeManager<I, E, D extends DocumentState> {
 
 	public StreamPojoTypeWorker<D> createStreamWorker(SessionContext context) {
 		return new StreamPojoTypeWorker<>( this, indexManager.createStreamWorker( context ) );
+	}
+
+	public SearchTarget createSearchTarget() {
+		return indexManager.createSearchTarget();
 	}
 
 }

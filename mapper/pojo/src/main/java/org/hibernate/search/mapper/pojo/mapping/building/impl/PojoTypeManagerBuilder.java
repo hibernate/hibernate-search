@@ -11,6 +11,7 @@ import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -50,11 +51,12 @@ public class PojoTypeManagerBuilder<E, D extends DocumentState> {
 		this.idConverter = new PropertyIdentifierConverter<>( handle, bridge );
 	}
 
-	public PojoTypeManager<?, E, D> build() {
+	public void addTo(PojoTypeManagerContainer.Builder builder) {
 		if ( idConverter == null ) {
 			throw new SearchException( "Missing identifier mapping for indexed type '" + javaType + "'" );
 		}
-		return new PojoTypeManager<>( proxyIntrospector, idConverter, javaType,
+		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>( proxyIntrospector, idConverter, javaType,
 				processorBuilder.build(), indexManagerBuildingState.getResult() );
+		builder.add( indexManagerBuildingState.getIndexName(), javaType, typeManager );
 	}
 }

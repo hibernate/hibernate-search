@@ -17,7 +17,6 @@ import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitializationIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
@@ -25,6 +24,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 /**
@@ -32,7 +33,7 @@ import com.google.gson.JsonPrimitive;
  */
 class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDate> {
 
-	private static final Function<LocalDate, JsonPrimitive> DEFAULT_FORMATTER = new LocalDateFormatter(
+	private static final LocalDateFormatter DEFAULT_FORMATTER = new LocalDateFormatter(
 					new DateTimeFormatterBuilder()
 							.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
 							.appendLiteral( '-' )
@@ -44,21 +45,25 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 			);
 
 	private final UnknownTypeJsonAccessor accessor;
-	private final Function<LocalDate, JsonPrimitive> formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
+	private final LocalDateFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
 
 	public LocalDateFieldModelContext(UnknownTypeJsonAccessor accessor) {
 		this.accessor = accessor;
 	}
 
 	@Override
-	protected void build(DeferredInitializationIndexFieldReference<LocalDate> reference, PropertyMapping mapping) {
-		super.build( reference, mapping );
+	protected void contribute(DeferredInitializationIndexFieldReference<LocalDate> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+		super.contribute( reference, mapping, collector );
 		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.DATE );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
+
+		String absolutePath = accessor.getStaticAbsolutePath();
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+		collector.collect( absolutePath, model );
 	}
 
-	private static class LocalDateFormatter implements Function<LocalDate, JsonPrimitive> {
+	private static final class LocalDateFormatter implements ElasticsearchFieldFormatter {
 
 		private final DateTimeFormatter delegate;
 
@@ -67,8 +72,26 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 		}
 
 		@Override
-		public JsonPrimitive apply(LocalDate value) {
-			return value == null ? null : new JsonPrimitive( delegate.format( value ) );
+		public JsonElement format(Object object) {
+			if ( object == null ) {
+				return JsonNull.INSTANCE;
+			}
+			LocalDate value = (LocalDate) object;
+			return new JsonPrimitive( delegate.format( value ) );
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj == null || obj.getClass() != getClass() ) {
+				return false;
+			}
+			LocalDateFormatter other = (LocalDateFormatter) obj;
+			return delegate.equals( other.delegate );
+		}
+
+		@Override
+		public int hashCode() {
+			return delegate.hashCode();
 		}
 
 	}

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollecto
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModelCollectorImpl;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -30,8 +31,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final BuildContext context;
 	private final Properties indexProperties;
 
-	private final ElasticsearchIndexModelCollectorImpl collector =
-			new ElasticsearchIndexModelCollectorImpl();
+	private final ElasticsearchIndexModelCollectorImpl<TypeMapping> collector =
+			ElasticsearchIndexModelCollectorImpl.root();
 
 	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
 			BuildContext context, Properties indexProperties) {
@@ -48,10 +49,12 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	@Override
 	public ElasticsearchIndexManager build() {
-		ElasticsearchIndexModel model = new ElasticsearchIndexModel( collector );
+		ElasticsearchIndexModel model = new ElasticsearchIndexModel( indexName, collector );
 
 		Gson gson = new Gson();
-		JsonObject modelAsJson = gson.toJsonTree( model ).getAsJsonObject();
+		JsonObject mappingAsJson = gson.toJsonTree( model.getMapping() ).getAsJsonObject();
+		JsonObject modelAsJson = new JsonObject();
+		modelAsJson.add( "mapping", mappingAsJson );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
 		ElasticsearchWork<?> work = backend.getWorkFactory().createIndex( indexName, modelAsJson );

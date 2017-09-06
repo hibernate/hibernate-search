@@ -21,24 +21,19 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
  */
 public class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
 
-	private final Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers;
 	private final SessionContext context;
 	private final Map<Class<?>, ChangesetPojoTypeWorker<?>> delegates = new HashMap<>();
 
 	public ChangesetPojoWorkerImpl(PojoProxyIntrospector introspector,
-			Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers,
+			PojoTypeManagerContainer typeManagers,
 			SessionContext context) {
-		super( introspector );
-		this.typeManagers = typeManagers;
+		super( introspector, typeManagers );
 		this.context = context;
 	}
 
 	@Override
 	protected ChangesetPojoTypeWorker<?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> {
-			PojoTypeManager<?, ?, ?> typeManager = typeManagers.get( c );
-			return typeManager.createWorker( context );
-		});
+		return delegates.computeIfAbsent( clazz, c -> getTypeManager( c ).createWorker( context ) );
 	}
 
 	@Override

@@ -13,6 +13,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 /**
@@ -27,19 +29,34 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 	}
 
 	@Override
-	protected void build(DeferredInitializationIndexFieldReference<GeoPoint> reference, PropertyMapping mapping) {
-		super.build( reference, mapping );
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, GeoPointFieldModelContext::format ) );
+	protected void contribute(DeferredInitializationIndexFieldReference<GeoPoint> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+		super.contribute( reference, mapping, collector );
+		ElasticsearchFieldFormatter formatter = GeoPointFieldFormatter.INSTANCE;
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.GEO_POINT );
+
+		String absolutePath = accessor.getStaticAbsolutePath();
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+		collector.collect( absolutePath, model );
 	}
 
-	protected static JsonObject format(GeoPoint value) {
-		if ( value == null ) {
-			return null;
+	private static final class GeoPointFieldFormatter implements ElasticsearchFieldFormatter {
+		// Must be a singleton so that equals() works as required by the interface
+		public static final GeoPointFieldFormatter INSTANCE = new GeoPointFieldFormatter();
+
+		private GeoPointFieldFormatter() {
 		}
-		JsonObject result = new JsonObject();
-		result.addProperty( "lat", value.getLatitude() );
-		result.addProperty( "lon", value.getLongitude() );
-		return result;
+
+		@Override
+		public JsonElement format(Object object) {
+			if ( object == null ) {
+				return JsonNull.INSTANCE;
+			}
+			GeoPoint value = (GeoPoint) object;
+			JsonObject result = new JsonObject();
+			result.addProperty( "lat", value.getLatitude() );
+			result.addProperty( "lon", value.getLongitude() );
+			return result;
+		}
 	}
 }

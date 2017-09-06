@@ -13,9 +13,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.fest.assertions.Assertions;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
@@ -37,6 +39,10 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.SearchResult;
 import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
@@ -88,6 +94,12 @@ public class PojoElasticsearchIT {
 				.property( "numeric" )
 						.field()
 						.field().name( "numericAsString" ).bridge( IntegerAsStringFunctionBridge.class );
+		secondMapping.type( YetAnotherIndexedEntity.class )
+				.indexed( YetAnotherIndexedEntity.INDEX )
+				.property( "id" )
+						.documentId()
+				.property( "numeric" )
+						.field();
 
 		managerFactory = SearchManagerFactory.builder()
 				.addMapping( mapping )
@@ -112,6 +124,32 @@ public class PojoElasticsearchIT {
 							+ "'numericAsString': {"
 								+ "'type': 'keyword'"
 							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
+		assertRequest( requests, YetAnotherIndexedEntity.INDEX, 0, HOST_1, "createIndex", null,
+				"{"
+					+ "'mapping': {"
+						+ "'properties': {"
+							+ "'customBridgeOnProperty': {"
+								+ "'type': 'object',"
+								+ "'properties': {"
+									+ "'date': {"
+										+ "'type': 'date',"
+										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "},"
+									+ "'text': {"
+										+ "'type': 'keyword'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'myLocalDateField': {"
+								+ "'type': 'date',"
+								+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+							+ "},"
+							+ "'numeric': {"
+								+ "'type': 'integer'"
+							+ "},"
 						+ "}"
 					+ "}"
 				+ "}" );
@@ -279,6 +317,106 @@ public class PojoElasticsearchIT {
 				+ "}" );
 	}
 
+	@Test
+	public void search() throws JSONException {
+		try ( PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() ) ) {
+			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
+					.asReferences()
+					.bool()
+							.must().match()
+									.onField( "myTextField" ).boostedTo( 1.5f )
+									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.matching( "foo" )
+									.end()
+							.should().range()
+									.onField( "myLocalDateField" )
+									.from( LocalDate.of( 2017, 10, 01 ) ).excludeLimit()
+									.to( LocalDate.of( 2017, 11, 01 ) )
+									.end()
+							/*
+							 * Alternative syntax taking advantage of lambdas,
+							 * allowing to introduce if/else statements in the query building code
+							 * and removing the need to call .end() on nested clause contexts.
+							 */
+							.should( c -> {
+								if ( /* put some condition here, for example based on user input */ true ) {
+									c.range()
+											.onField( "numeric" )
+											.above( 12 );
+								}
+							} )
+							.end()
+					.build();
+			query.setFirstResult( 2L );
+			query.setMaxResults( 10L );
+
+			/*
+			 * These are stubbed results, they are unrelated to the query. See StubElasticsearchWorkFactory.
+			 * Here we just check that result wrapping (document reference -> pojo reference) works as expected.
+			 */
+			SearchResult<PojoReference> result = query.execute();
+			Assertions.assertThat( result.getHits() ).hasSize( 2 )
+					.containsExactly(
+							new PojoReferenceImpl( IndexedEntity.class, 0 ),
+							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
+					);
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
+				HOST_1, "search", null /* No ID */,
+				c -> {
+					c.accept( "offset", "2" );
+					c.accept( "limit", "10" );
+				},
+				"{"
+					+ "'query': {"
+						+ "'bool': {"
+							+ "'must': {"
+								+ "'bool': {"
+									+ "'should': ["
+										+ "{"
+											+ "'match': {"
+												+ "'myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 1.5"
+												+ "}"
+											+ "}"
+										+ "},"
+										+ "{"
+											+ "'match': {"
+												+ "'embedded.myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 0.9"
+												+ "}"
+											+ "}"
+										+ "}"
+									+ "]"
+								+ "}"
+							+ "},"
+							+ "'should': ["
+								+ "{"
+									+ "'range': {"
+										+ "'myLocalDateField': {"
+											+ "'gt': '2017-10-01',"
+											+ "'lte': '2017-11-01'"
+										+ "}"
+									+ "}"
+								+ "},"
+								+ "{"
+									+ "'range': {"
+										+ "'numeric': {"
+											+ "'gte': 12"
+										+ "}"
+									+ "}"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+				+ "}" );
+	}
+
 	public static class ParentIndexedEntity {
 
 		private LocalDate localDate;
@@ -355,6 +493,31 @@ public class PojoElasticsearchIT {
 			this.numeric = numeric;
 		}
 
+	}
+
+	public static final class YetAnotherIndexedEntity extends ParentIndexedEntity {
+
+		public static final String INDEX = "YetAnotherIndexedEntity";
+
+		private Integer id;
+
+		private Integer numeric;
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public Integer getNumeric() {
+			return numeric;
+		}
+
+		public void setNumeric(Integer numeric) {
+			this.numeric = numeric;
+		}
 	}
 
 	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {

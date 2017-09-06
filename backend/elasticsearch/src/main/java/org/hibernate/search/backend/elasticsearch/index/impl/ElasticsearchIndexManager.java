@@ -10,9 +10,11 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTarget;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 
@@ -22,6 +24,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
  */
 public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentBuilder> {
 
+	private final ElasticsearchBackend backend;
 	private final String name;
 	private final ElasticsearchIndexModel model;
 	private final ElasticsearchWorkFactory workFactory;
@@ -29,11 +32,20 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public ElasticsearchIndexManager(ElasticsearchBackend backend, String name, ElasticsearchIndexModel model) {
+		this.backend = backend;
 		this.name = name;
 		this.model = model;
 		this.workFactory = backend.getWorkFactory();
 		this.changesetOrchestrator = backend.createChangesetOrchestrator();
 		this.streamOrchestrator = backend.getStreamOrchestrator();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public ElasticsearchIndexModel getModel() {
+		return model;
 	}
 
 	@Override
@@ -45,5 +57,20 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	public StreamIndexWorker<ElasticsearchDocumentBuilder> createStreamWorker(SessionContext context) {
 		return new ElasticsearchStreamIndexWorker( workFactory, streamOrchestrator, name, context );
 	}
+
+	@Override
+	public SearchTarget createSearchTarget() {
+		return new ElasticsearchSearchTarget( backend, this );
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "name=" ).append( name )
+				.append( "]")
+				.toString();
+	}
+
 
 }

@@ -12,6 +12,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 /**
@@ -26,9 +28,31 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 	}
 
 	@Override
-	protected void build(DeferredInitializationIndexFieldReference<Integer> reference, PropertyMapping mapping) {
-		super.build( reference, mapping );
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, JsonPrimitive::new ) );
+	protected void contribute(DeferredInitializationIndexFieldReference<Integer> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+		super.contribute( reference, mapping, collector );
+		ElasticsearchFieldFormatter formatter = IntegerFieldFormatter.INSTANCE;
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.INTEGER );
+
+		String absolutePath = accessor.getStaticAbsolutePath();
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+		collector.collect( absolutePath, model );
+	}
+
+	private static final class IntegerFieldFormatter implements ElasticsearchFieldFormatter {
+		// Must be a singleton so that equals() works as required by the interface
+		public static final IntegerFieldFormatter INSTANCE = new IntegerFieldFormatter();
+
+		private IntegerFieldFormatter() {
+		}
+
+		@Override
+		public JsonElement format(Object object) {
+			if ( object == null ) {
+				return JsonNull.INSTANCE;
+			}
+			Integer value = (Integer) object;
+			return new JsonPrimitive( value );
+		}
 	}
 }

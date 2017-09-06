@@ -19,8 +19,6 @@ public interface Backend<D extends DocumentState> extends AutoCloseable {
 
 	IndexManagerBuilder<D> createIndexManagerBuilder(String name, BuildContext context, Properties indexProperties);
 
-	BackendWorker getWorker();
-
 	@Override
 	void close();
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.gson.impl;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -70,18 +69,11 @@ abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAc
 		else if ( JsonElementType.ARRAY.isInstance( currentValue ) ) {
 			JsonElementType.ARRAY.fromElement( currentValue ).add( newValue );
 		}
-		else if ( JsonElementType.PRIMITIVE.isInstance( currentValue )
-				|| JsonElementType.NULL.isInstance( currentValue ) ) {
+		else {
 			JsonArray array = new JsonArray();
 			array.add( currentValue );
 			array.add( newValue );
 			doSet( parent, array );
-		}
-		else {
-			throw new UnexpectedJsonElementTypeException(
-					this,
-					Arrays.asList( JsonElementType.ARRAY, JsonElementType.PRIMITIVE, JsonElementType.NULL ),
-					currentValue );
 		}
 	}
 

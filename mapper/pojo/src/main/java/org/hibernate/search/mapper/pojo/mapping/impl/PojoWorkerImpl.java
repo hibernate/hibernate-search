@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.stream.Stream;
+
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
@@ -15,9 +18,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 abstract class PojoWorkerImpl implements PojoWorker {
 
 	private final PojoProxyIntrospector introspector;
+	private final PojoTypeManagerContainer typeManagers;
 
-	public PojoWorkerImpl(PojoProxyIntrospector introspector) {
+	public PojoWorkerImpl(PojoProxyIntrospector introspector, PojoTypeManagerContainer typeManagers) {
 		this.introspector = introspector;
+		this.typeManagers = typeManagers;
 	}
 
 	@Override
@@ -48,6 +53,15 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	public void delete(Class<?> clazz, Object id) {
 		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
 		delegate.delete( id );
+	}
+
+	protected <E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
+		return typeManagers.getByExactType( clazz )
+				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
+	}
+
+	protected Stream<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
+		return typeManagers.getAll();
 	}
 
 	protected abstract PojoTypeWorker<?, ?> getDelegate(Class<?> clazz);

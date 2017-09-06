@@ -25,7 +25,7 @@ public class StubElasticsearchWorkOrchestrator implements ElasticsearchWorkOrche
 	}
 
 	@Override
-	public CompletableFuture<?> submit(ElasticsearchWork<?> work) {
+	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		return work.execute( context );
 	}
 

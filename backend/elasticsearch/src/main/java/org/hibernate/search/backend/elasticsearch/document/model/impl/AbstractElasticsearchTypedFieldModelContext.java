@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
  * @author Yoann Rodiere
  */
 public abstract class AbstractElasticsearchTypedFieldModelContext<T>
-		implements ElasticsearchTypedFieldModelContext<T>, ElasticsearchMappingContributor<PropertyMapping> {
+		implements ElasticsearchTypedFieldModelContext<T>, ElasticsearchIndexModelNodeContributor<PropertyMapping> {
 
 	private DeferredInitializationIndexFieldReference<T> reference = new DeferredInitializationIndexFieldReference<>();
 
@@ -25,10 +25,11 @@ public abstract class AbstractElasticsearchTypedFieldModelContext<T>
 	}
 
 	@Override
-	public final void contribute(PropertyMapping mapping) {
-		build( reference, mapping );
+	public void contribute(PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+		contribute( reference, mapping, collector );
 	}
 
-	protected abstract void build(DeferredInitializationIndexFieldReference<T> reference, PropertyMapping mapping);
+	protected abstract void contribute(DeferredInitializationIndexFieldReference<T> reference, PropertyMapping mapping,
+			ElasticsearchFieldModelCollector collector);
 
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.index.impl;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 
@@ -33,6 +34,11 @@ public class SimplifyingIndexManager<D extends DocumentState> implements IndexMa
 	@Override
 	public StreamIndexWorker<D> createStreamWorker(SessionContext context) {
 		return delegate.createStreamWorker( context );
+	}
+
+	@Override
+	public SearchTarget createSearchTarget() {
+		return delegate.createSearchTarget();
 	}
 
 }

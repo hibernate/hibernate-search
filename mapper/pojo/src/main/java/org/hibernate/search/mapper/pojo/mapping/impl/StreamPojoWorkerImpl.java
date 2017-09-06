@@ -18,16 +18,14 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
  */
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
-	private final Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers;
 	private final SessionContext context;
 	private final Map<Class<?>, StreamPojoTypeWorker<?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
 	public StreamPojoWorkerImpl(PojoProxyIntrospector introspector,
-			Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers,
+			PojoTypeManagerContainer typeManagers,
 			SessionContext context) {
-		super( introspector );
-		this.typeManagers = typeManagers;
+		super( introspector, typeManagers );
 		this.context = context;
 	}
 
@@ -57,17 +55,12 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	protected StreamPojoTypeWorker<?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> {
-			PojoTypeManager<?, ?, ?> typeManager = typeManagers.get( c );
-			return typeManager.createStreamWorker( context );
-		});
+		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( context ) );
 	}
 
 	private Iterable<StreamPojoTypeWorker<?>> getAllDelegates() {
 		if ( !addedAll ) {
-			for ( Class<?> clazz : typeManagers.keySet() ) {
-				getDelegate( clazz );
-			}
+			getAllTypeManagers().forEach( manager -> getDelegate( manager.getClass() ) );
 			addedAll = true;
 		}
 		return delegates.values();

@@ -6,6 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.function.Function;
+
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchResult;
+
 import com.google.gson.JsonObject;
 
 
@@ -51,6 +63,39 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 	public ElasticsearchWork<?> optimize(String indexName) {
 		return new StubElasticsearchWork<>( "optimize", null )
 				.addParam( "indexName", indexName );
+	}
+
+	@Override
+	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, JsonObject payload,
+			Function<DocumentReference, T> hitConverter, Long offset, Long limit) {
+		return new StubElasticsearchWork<SearchResult<T>>( "search", payload )
+				.addParam( "indexName", indexNames )
+				.addParam( "offset", String.valueOf( offset ) )
+				.addParam( "limit", String.valueOf( limit ) )
+				.setResult( () -> generateSearchResult( indexNames, hitConverter ) );
+	}
+
+	private static <T> SearchResult<T> generateSearchResult(Set<String> indexNames, Function<DocumentReference, T> hitConverter) {
+		SortedSet<String> indexNamesInOrder = new TreeSet<>( indexNames );
+		List<T> hits = new ArrayList<>();
+		int id = 0;
+		for ( String indexName : indexNamesInOrder ) {
+			DocumentReference reference = new ElasticsearchDocumentReference( indexName, String.valueOf( id ) );
+			hits.add( hitConverter.apply( reference ) );
+			id++;
+		}
+		final List<T> finalHits = Collections.unmodifiableList( hits );
+		return new SearchResult<T>() {
+			@Override
+			public long getHitCount() {
+				return finalHits.size();
+			}
+
+			@Override
+			public List<T> getHits() {
+				return finalHits;
+			}
+		};
 	}
 
 }

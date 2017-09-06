@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.Map;
-
 import org.hibernate.search.engine.common.SearchManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.Mapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -20,9 +18,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 public class PojoMappingImpl implements Mapping<SearchManagerBuilder<PojoSearchManager>> {
 
 	private final PojoProxyIntrospector introspector;
-	private final Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers;
+	private final PojoTypeManagerContainer typeManagers;
 
-	public PojoMappingImpl(PojoProxyIntrospector introspector, Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers) {
+	public PojoMappingImpl(PojoProxyIntrospector introspector, PojoTypeManagerContainer typeManagers) {
 		this.introspector = introspector;
 		this.typeManagers = typeManagers;
 	}

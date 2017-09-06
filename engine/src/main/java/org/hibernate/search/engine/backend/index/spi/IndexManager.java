@@ -18,4 +18,6 @@ public interface IndexManager<D extends DocumentState> {
 
 	StreamIndexWorker<D> createStreamWorker(SessionContext context);
 
+	SearchTarget createSearchTarget();
+
 }

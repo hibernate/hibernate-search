@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 
 /**
@@ -13,17 +16,36 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.T
  */
 public class ElasticsearchIndexModel {
 
+	private final String indexName;
 	private final TypeMapping mapping;
+	private final Map<String, ElasticsearchFieldModel> fieldModels = new HashMap<>();
 
-	public ElasticsearchIndexModel(ElasticsearchIndexModelCollectorImpl collector) {
+	public ElasticsearchIndexModel(String indexName, ElasticsearchIndexModelCollectorImpl<TypeMapping> collector) {
+		this.indexName = indexName;
 		this.mapping = new TypeMapping();
-		// TODO also collect projections
-		collector.contribute( mapping );
+		collector.contribute( mapping, fieldModels::put );
+	}
+
+	public String getIndexName() {
+		return indexName;
+	}
+
+	public TypeMapping getMapping() {
+		return mapping;
+	}
+
+	public ElasticsearchFieldModel getFieldModel(String absolutePath) {
+		return fieldModels.get( absolutePath );
 	}
 
 	@Override
 	public String toString() {
-		return mapping.toString();
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "indexName=" ).append( indexName )
+				.append( ", mapping=" ).append( mapping )
+				.append( "]" )
+				.toString();
 	}
 
 }

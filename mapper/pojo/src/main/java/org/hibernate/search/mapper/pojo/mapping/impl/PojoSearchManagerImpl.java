@@ -6,15 +6,26 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
+import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.spi.SearchResultDefinitionContext;
+import org.hibernate.search.engine.search.spi.SearchWrappingDefinitionContext;
+import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.SearchException;
 
 
 /**
@@ -23,7 +34,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 public class PojoSearchManagerImpl implements PojoSearchManager {
 
 	private final PojoProxyIntrospector introspector;
-	private final Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers;
+	private final PojoTypeManagerContainer typeManagers;
 	private final SessionContext context;
 	private ChangesetPojoWorker changesetWorker;
 	private StreamPojoWorker streamWorker;
@@ -66,12 +77,12 @@ public class PojoSearchManagerImpl implements PojoSearchManager {
 			implements PojoSearchManagerBuilder<PojoSearchManager> {
 
 		private final PojoProxyIntrospector introspector;
-		private final Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers;
+		private final PojoTypeManagerContainer typeManagers;
 
 		private String tenantId;
 
 		public Builder(PojoProxyIntrospector introspector,
-				Map<Class<?>, PojoTypeManager<?, ?, ?>> typeManagers) {
+				PojoTypeManagerContainer typeManagers) {
 			this.introspector = introspector;
 			this.typeManagers = typeManagers;
 		}
@@ -85,6 +96,62 @@ public class PojoSearchManagerImpl implements PojoSearchManager {
 		@Override
 		public PojoSearchManager build() {
 			return new PojoSearchManagerImpl( this );
+		}
+
+	}
+
+	@Override
+	public SearchResultDefinitionContext<PojoReference> search(Class<?>... indexedTypes) {
+		List<Class<?>> targetedTypes = Arrays.asList( indexedTypes );
+		Stream<PojoTypeManager<?, ?, ?>> targetedTypeManagers;
+		if ( indexedTypes == null || indexedTypes.length == 0 ) {
+			targetedTypeManagers = typeManagers.getAll();
+		}
+		else {
+			targetedTypeManagers = targetedTypes.stream()
+					.flatMap( t -> typeManagers.getAllBySuperType( t )
+							.orElseThrow( () -> new SearchException( "Type " + t + " is not indexed and hasn't any indexed supertype." ) ) );
+		}
+		SearchTarget searchTarget = targetedTypeManagers.map( PojoTypeManager::createSearchTarget )
+				.reduce( (a, b) -> {
+					a.add( b );
+					return a;
+				} )
+				// If we get here, there is at least one type manager
+				.get();
+		return new PojoSearchResultDefinitionContext( searchTarget.search( context ), this::toPojoReference );
+	}
+
+	private PojoReference toPojoReference(DocumentReference documentReference) {
+		PojoTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
+				.orElseThrow( () -> new AssertionFailure(
+						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
+		// TODO error handling if typeManager is null
+		Object id = typeManager.getIdentifierMapping().fromDocumentId( documentReference.getId() );
+		return new PojoReferenceImpl( typeManager.getEntityType(), id );
+	}
+
+	private static class PojoSearchResultDefinitionContext implements SearchResultDefinitionContext<PojoReference> {
+
+		private final SearchResultDefinitionContext<DocumentReference> delegate;
+
+		private final Function<DocumentReference, PojoReference> pojoReferenceFunction;
+
+		public PojoSearchResultDefinitionContext(SearchResultDefinitionContext<DocumentReference> delegate,
+				Function<DocumentReference, PojoReference> pojoReferenceFunction) {
+			this.delegate = delegate;
+			this.pojoReferenceFunction = pojoReferenceFunction;
+		}
+
+		@Override
+		public <T> SearchWrappingDefinitionContext<SearchQuery<T>> asReferences(Function<PojoReference, T> hitTransformer) {
+			return delegate.asReferences( hitTransformer.compose( pojoReferenceFunction ) );
+		}
+
+		@Override
+		public <T> SearchWrappingDefinitionContext<SearchQuery<T>> asProjections(Function<List<?>, T> hitTransformer, String... projections) {
+			// TODO Add support for projections to the PojoReference (replace it in the projection list with a projection to the DocumentReference, and add a hitTransformer to convert it when fetching results)
+			return delegate.asProjections( hitTransformer );
 		}
 
 	}

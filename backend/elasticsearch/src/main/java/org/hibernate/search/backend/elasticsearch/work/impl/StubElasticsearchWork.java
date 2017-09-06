@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 
@@ -23,7 +27,9 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 
 	private final JsonObject document;
 
-	private final Map<String, String> parameters;
+	private final Map<String, List<String>> parameters;
+
+	private Supplier<T> resultSupplier = () -> null;
 
 	public StubElasticsearchWork(String workType, JsonObject document) {
 		super();
@@ -33,13 +39,23 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 	}
 
 	public StubElasticsearchWork<T> addParam(String name, String value) {
-		parameters.put( name, value );
+		parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( value );
+		return this;
+	}
+
+	public StubElasticsearchWork<T> addParam(String name, Collection<String> values) {
+		parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).addAll( values );
+		return this;
+	}
+
+	public StubElasticsearchWork<T> setResult(Supplier<T> resultSupplier) {
+		this.resultSupplier = resultSupplier;
 		return this;
 	}
 
 	@Override
 	public CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context) {
-		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document );
+		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document, resultSupplier );
 	}
 
 }

@@ -15,6 +15,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.F
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 /**
@@ -36,8 +38,10 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 	}
 
 	@Override
-	protected void build(DeferredInitializationIndexFieldReference<String> reference, PropertyMapping mapping) {
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, JsonPrimitive::new ) );
+	protected void contribute(DeferredInitializationIndexFieldReference<String> reference, PropertyMapping mapping,
+			ElasticsearchFieldModelCollector collector) {
+		ElasticsearchFieldFormatter formatter = StringFieldFormatter.INSTANCE;
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
@@ -52,6 +56,27 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 				// TODO what about Store.COMPRESS?
 				mapping.setStore( true );
 			}
+		}
+
+		String absolutePath = accessor.getStaticAbsolutePath();
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+		collector.collect( absolutePath, model );
+	}
+
+	private static final class StringFieldFormatter implements ElasticsearchFieldFormatter {
+		// Must be a singleton so that equals() works as required by the interface
+		public static final StringFieldFormatter INSTANCE = new StringFieldFormatter();
+
+		private StringFieldFormatter() {
+		}
+
+		@Override
+		public JsonElement format(Object object) {
+			if ( object == null ) {
+				return JsonNull.INSTANCE;
+			}
+			String value = (String) object;
+			return new JsonPrimitive( value );
 		}
 	}
 }

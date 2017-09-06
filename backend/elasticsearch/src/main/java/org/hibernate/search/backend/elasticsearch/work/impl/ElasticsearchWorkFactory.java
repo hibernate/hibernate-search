@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.Set;
+import java.util.function.Function;
+
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchResult;
+
 import com.google.gson.JsonObject;
 
 /**
@@ -24,5 +30,9 @@ public interface ElasticsearchWorkFactory {
 	ElasticsearchWork<?> flush(String indexName);
 
 	ElasticsearchWork<?> optimize(String indexName);
+
+	<T> ElasticsearchWork<SearchResult<T>> search(
+			Set<String> indexNames, JsonObject payload, Function<DocumentReference, T> hitConverter,
+			Long offset, Long limit);
 
 }

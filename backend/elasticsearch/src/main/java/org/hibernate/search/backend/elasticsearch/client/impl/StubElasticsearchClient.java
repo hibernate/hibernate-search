@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.spi.LoggerFactory;
@@ -35,7 +36,11 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 		Map<String, List<Request>> result = new HashMap<>();
 		Request next = requests.pollFirst();
 		while ( next != null ) {
-			result.computeIfAbsent( next.getParameters().get( "indexName" ), ignored -> new LinkedList<>() ).add( next );
+			final Request request = next;
+			request.getParameters().get( "indexName" ).stream()
+					.map( indexName -> result.computeIfAbsent( indexName, ignored -> new LinkedList<>() ) )
+					.forEach( resultList -> resultList.add( request ) );
+
 			next = requests.pollFirst();
 		}
 		return result;
@@ -44,10 +49,10 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 	public static class Request {
 		private final String host;
 		private final String workType;
-		private final Map<String, String> parameters;
+		private final Map<String, List<String>> parameters;
 		private final String body;
 
-		public Request(String host, String workType, Map<String, String> parameters, String body) {
+		public Request(String host, String workType, Map<String, List<String>> parameters, String body) {
 			super();
 			this.host = host;
 			this.workType = workType;
@@ -63,7 +68,7 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 			return workType;
 		}
 
-		public Map<String, String> getParameters() {
+		public Map<String, List<String>> getParameters() {
 			return parameters;
 		}
 
@@ -78,11 +83,12 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 		this.host = host;
 	}
 
-	public <T> CompletableFuture<T> execute(String workType, Map<String, String> parameters, JsonObject body) {
+	public <T> CompletableFuture<T> execute(String workType, Map<String, List<String>> parameters, JsonObject body,
+			Supplier<T> resultSupplier) {
 		String bodyAsString = body == null ? null : gson.toJson( body );
 		log.executingWork( host, workType, parameters, bodyAsString );
 		requests.addLast( new Request( host, workType, parameters, bodyAsString ) );
-		return CompletableFuture.completedFuture( null );
+		return CompletableFuture.completedFuture( resultSupplier.get() );
 	}
 
 	@Override

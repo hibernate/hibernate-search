@@ -29,7 +29,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		// TODO implement and detect dialects
 		ElasticsearchClient client = new StubElasticsearchClient( host );
 		ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory();
-		return new ElasticsearchBackend( client, workFactory );
+		return new ElasticsearchBackend( client, name, workFactory );
 	}
 
 }
