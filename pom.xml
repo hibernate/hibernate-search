@@ -1582,6 +1582,9 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <additionalRuntimeArgLine>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLine>
             </properties>
+            <modules>
+                <module>integrationtest/jdk9-modules</module>
+            </modules>
         </profile>
 
         <profile>
