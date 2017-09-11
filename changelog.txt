@@ -379,6 +379,7 @@ Hibernate Search Changelog
     * HSEARCH-2403 TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values
     * HSEARCH-2402 Elasticsearch backend mistakes @DateBridge for @CalendarBridge
     * HSEARCH-2401 Boosts are (erroneously) not applied to IndexedEmbeddeds
+    * HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
     * HSEARCH-2386 TikaMetadataProcessor cannot add sortable fields (or fields usable in Elasticsearch)
     * HSEARCH-2330 MetadataProvidingFieldBridge cannot override metadata on annotation-generated field
     * HSEARCH-2324 Distance computation is inconsistent between the Lucene and the ElasticSearch backend
@@ -663,6 +664,7 @@ Version 5.6.0.Alpha2 (29-2-2016)
 
 ** Improvement
     * [HSEARCH-2099] - Upgrade to Apache Lucene 5.5.0
+    * [HSEARCH-2103] - Fix Checkstyle for Java 8 syntax
     * [HSEARCH-2105] - Don't use nested mapping by default with ES backend
     * [HSEARCH-2113] - Elasticsearch - Better sort support
     * [HSEARCH-2118] - Add infrastructure to be able to ignore tests when running the Elasticsearch backend
@@ -800,6 +802,7 @@ Version 5.5.0.CR1 (8-9-2015)
     * [HSEARCH-1998] - Upgrade to Hibernate ORM 5.0.1.Final
 
 ** Improvement
+    * [HSEARCH-1982] - Upgrade to Apache Lucene 5.3.0
     * [HSEARCH-1989] - Let maven build support maven-color
 
 
@@ -1056,6 +1059,7 @@ Version 5.0.0.CR2 (11-12-2014)
 
 ** Bug
     * [HSEARCH-1744] - NumericFieldBridge#objectToString does not check for null
+    * [HSEARCH-1745] - Define default resolution for date bridges
     * [HSEARCH-1751] - Extend NumericFieldSettingsDescriptor to expose the numeric encoding type
     * [HSEARCH-1752] - StringEncodingDateBridge does not comply with the TwoWayFieldBridge contract
 
@@ -1397,6 +1401,7 @@ Version 5.0.0.Alpha1 (08-02-2014)
 
 ** Improvement
     * [HSEARCH-1191] - Update to Lucene 4.x
+    * [HSEARCH-1243] - Reduce dependency to Solr analysis machinery from solr-analysis-extras to solr-core
     * [HSEARCH-1468] - Reduce amount of objects created by the FacetCollector
     * [HSEARCH-1477] - Trivial optimization for empty results
     * [HSEARCH-1480] - Helper newArrayList should mandate a size hint
@@ -1777,6 +1782,7 @@ Version 4.2.0.Beta1 (21-6-2012)
     * [HSEARCH-1122] - Update Avro dependency to 1.6.3
     * [HSEARCH-1124] - Log level for Log#indexDirectoryNotFoundCreatingNewOne should be INFO and not WARN
     * [HSEARCH-1125] - archetype improvement
+    * [HSEARCH-1126] - minor doc change to be consistent
     * [HSEARCH-1158] - Make NRT ReaderProvider lockless on the hot path
     * [HSEARCH-1159] - Avoid cloning of IndexReader instances for concurrent searchers
     * [HSEARCH-1161] - Throw a more specific exception type on searching on meaningless input
@@ -2077,6 +2083,7 @@ Version 4.1.0.Beta1 (3-2-2012)
     * [HSEARCH-901] - ClassCastException during creation of index: Hibernate (Search) assumes varchar entity field called "id" is an Integer but it isn't
     * [HSEARCH-912] - JBoss Logger processor and generator is marked as a compile scope dependency
     * [HSEARCH-913] - org.hibernate.search.test.embedded.EmbeddedTest#testEmbeddedToManyInSuperslass fails against MySQL with a constraint violation
+    * [HSEARCH-977] - MassIndexer freezes when there is an indexed 'id' filed, which is not document's id
 
 ** Deprecation
     * [HSEARCH-711] - Review of @org.hibernate.search.annotations.Field parameters
@@ -2212,6 +2219,7 @@ Version 4.1.0.Beta1 (3-2-2012)
     * [HSEARCH-774] - build using Java6 as target
     * [HSEARCH-775] - Have all tests close the SessionFactory and other resources
     * [HSEARCH-788] - Several components minor versions upgrades
+    * [HSEARCH-790] - upgrade to org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final
     * [HSEARCH-801] - Move Version.touch() to an appropriate position
     * [HSEARCH-805] - Cleanup dependencies, reorganize jars in distribution
     * [HSEARCH-807] - Document dependency to Hibernate 4
@@ -2423,11 +2431,12 @@ Version 4.1.0.Beta1 (3-2-2012)
     * [HSEARCH-608] - Index not created if path contains tilde like ~/.lucene/
     * [HSEARCH-616] - Factory method invocation in FullTextQueryImpl swallows exception
     * [HSEARCH-619] - Update documentation about hibernate-search-analyzers module
-    
+
 ** Improvement
     * [HSEARCH-405] - Be able to set Similarity per index in configuration properties
     * [HSEARCH-424] - Update to Lucene 3.0
     * [HSEARCH-569] - duplicate identifiers on @AnalyzerDef are accepted and don't warn about the inconsistent configuration
+    * [HSEARCH-611] - Automatic archetype deployment during build
 
 ** New Feature
     * [HSEARCH-374] - Timeout support for full-text searches
