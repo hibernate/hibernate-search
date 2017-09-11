@@ -120,14 +120,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	public PartitionPlan mapPartitions() throws Exception {
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		Session session = null;
-		StatelessSession ss = null;
+		emf = jobData.getEntityManagerFactory();
 
-		try {
-			emf = jobData.getEntityManagerFactory();
-			session = PersistenceUtil.openSession( emf, tenantId );
-			ss = PersistenceUtil.openStatelessSession( emf, tenantId );
-
+		try (Session session = PersistenceUtil.openSession( emf, tenantId );
+				StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
 			Integer maxResults = null;
 			if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 				maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
@@ -186,20 +182,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			log.partitionsPlan( partitionPlan.getPartitions(), partitionPlan.getThreads() );
 			return partitionPlan;
 		}
-		finally {
-			try {
-				ss.close();
-			}
-			catch (Exception e) {
-				log.unableToCloseStatelessSession( e );
-			}
-			try {
-				session.close();
-			}
-			catch (Exception e) {
-				log.unableToCloseSession( e );
-			}
-		}
 	}
 
 	private List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
@@ -218,13 +200,12 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		if ( maxResults != null ) {
 			criteria.setMaxResults( maxResults );
 		}
-
-		ScrollableResults scroll = criteria.setProjection( Projections.id() )
+		criteria.setProjection( Projections.id() )
 				.setFetchSize( fetchSize )
-				.setReadOnly( true )
-				.scroll( ScrollMode.FORWARD_ONLY );
+				.setReadOnly( true );
 
-		try {
+
+		try ( ScrollableResults scroll = criteria.scroll( ScrollMode.FORWARD_ONLY ) ) {
 			/*
 			 * The scroll results are originally positioned *before* the first element,
 			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
@@ -245,16 +226,6 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			upperID = null;
 			partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
 			return partitionUnits;
-		}
-		finally {
-			try {
-				if ( scroll != null ) {
-					scroll.close();
-				}
-			}
-			catch (Exception e) {
-				log.unableToCloseScrollableResults( e );
-			}
 		}
 	}
 

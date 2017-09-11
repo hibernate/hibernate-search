@@ -105,30 +105,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	)
 	void analyzeIndexProgress(String progress);
 
-	@LogMessage(level = ERROR)
-	@Message(id = JSR_352_MESSAGES_START_ID + 11,
-			value = "Unable to close session."
-	)
-	void unableToCloseSession(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = JSR_352_MESSAGES_START_ID + 12,
-			value = "Unable to close stateless session."
-	)
-	void unableToCloseStatelessSession(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = JSR_352_MESSAGES_START_ID + 13,
-			value = "Unable to close scrollable results."
-	)
-	void unableToCloseScrollableResults(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = JSR_352_MESSAGES_START_ID + 14,
-			value = "Unable to close entity manager."
-	)
-	void unableToCloseEntityManager(@Cause Exception e);
-
 	@LogMessage(level = INFO)
 	@Message(id = JSR_352_MESSAGES_START_ID + 15,
 			value = "Optimizing all entities ..."
