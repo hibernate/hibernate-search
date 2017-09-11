@@ -36,6 +36,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHE_MODE;
@@ -185,22 +186,14 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public void close() throws Exception {
-		log.closingReader( serializedPartitionId, entityName );
-		try {
-			scroll.close();
-		}
-		catch (Exception e) {
-			log.unableToCloseScrollableResults( e );
-		}
-		try {
-			session.close();
-		}
-		catch (Exception e) {
-			log.unableToCloseSession( e );
-		}
 		// reset the chunk work count to avoid over-count in item collector
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
 		stepContext.setPersistentUserData( partitionData );
+		try ( Closer<Exception> closer = new Closer<>() ) {
+			log.closingReader( serializedPartitionId, entityName );
+			closer.push( scroll::close );
+			closer.push( session::close );
+		}
 	}
 
 	/**

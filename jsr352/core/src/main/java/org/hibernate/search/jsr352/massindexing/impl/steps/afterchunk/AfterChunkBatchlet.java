@@ -62,11 +62,6 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public void stop() throws Exception {
-		try {
-			session.close();
-		}
-		catch (Exception e) {
-			log.unableToCloseSession( e );
-		}
+		session.close();
 	}
 }
