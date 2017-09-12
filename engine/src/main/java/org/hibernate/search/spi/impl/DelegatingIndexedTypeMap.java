@@ -29,6 +29,7 @@ final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializab
 
 	private final Map<IndexedTypeIdentifier,V> map;
 	private final Map<String,IndexedTypeIdentifier> name2keyMapping;
+	private volatile IndexedTypeSet keyset;
 
 	public DelegatingIndexedTypeMap(Map<IndexedTypeIdentifier, V> map,
 			Map<String, IndexedTypeIdentifier> name2keyMapping) {
@@ -85,11 +86,6 @@ final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializab
 		//initializations.
 		name2keyMapping.put( type.getName(), type );
 		map.put( type, value );
-	}
-
-	@Override
-	public void put(Class<?> type, V typeBinding) {
-		put( new PojoIndexedTypeIdentifier( type ), typeBinding );
 	}
 
 	@Override

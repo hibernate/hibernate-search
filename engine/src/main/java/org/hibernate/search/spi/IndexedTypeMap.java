@@ -55,14 +55,6 @@ public interface IndexedTypeMap<V> {
 	V get(Class<?> legacyPojoClass);
 
 	/**
-	 * @deprecated This method will be removed. The implementations will be refactored to become immutable.
-	 * @param type The key to be used.
-	 * @param typeBinding The value being put in the underlying key/value map.
-	 */
-	@Deprecated
-	void put(Class<?> type, V typeBinding);
-
-	/**
 	 * Returns a type identified by its unique name.
 	 * This method returns instance from a pool of known types,
 	 * and will throw an exception when requesting an unknown type name.
