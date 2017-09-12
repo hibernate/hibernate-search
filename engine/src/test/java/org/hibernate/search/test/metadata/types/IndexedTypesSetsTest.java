@@ -35,6 +35,17 @@ public class IndexedTypesSetsTest {
 	}
 
 	@Test
+	public void testNullTypesAmongArray() {
+		//take any two random classes:
+		final IndexedTypeSet fromClasses = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, null, Foo.class );
+		final String tostring = fromClasses.toString();
+		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
+		Assert.assertTrue(
+				"[org.hibernate.search.test.metadata.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
+				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.Foo]".equals( tostring ) );
+	}
+
+	@Test
 	public void testCreationOfEmptySets() {
 		//This is more to test about creation from special parameters than to test the isEmpty() method
 		Assert.assertTrue( IndexedTypeSets.fromClasses().isEmpty() );
