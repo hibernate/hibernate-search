@@ -32,11 +32,8 @@ public final class IndexedTypeSets {
 			// "null" needs to be acceptable to support some legacy use cases
 			return empty();
 		}
-		else if ( classes.length == 1 ) {
-			return fromClass( classes[0] );
-		}
 		else {
-			return Arrays.stream( classes ).map( PojoIndexedTypeIdentifier::new ).collect( streamCollector() );
+			return Arrays.stream( classes ).filter( c -> c != null ).map( PojoIndexedTypeIdentifier::new ).collect( streamCollector() );
 		}
 	}
 
