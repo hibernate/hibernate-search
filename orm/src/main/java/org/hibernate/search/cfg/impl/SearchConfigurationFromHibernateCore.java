@@ -26,7 +26,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.orm.loading.impl.HibernateStatelessInitializer;
 import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.named.spi.NamedResolver;
