@@ -7,7 +7,7 @@
 package org.hibernate.search.test.util;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.orm.loading.impl.HibernateStatelessInitializer;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**

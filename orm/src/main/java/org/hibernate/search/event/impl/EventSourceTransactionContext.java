@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.impl;
+package org.hibernate.search.event.impl;
 
 import java.io.Serializable;
 
@@ -22,7 +22,6 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.FlushEventListener;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

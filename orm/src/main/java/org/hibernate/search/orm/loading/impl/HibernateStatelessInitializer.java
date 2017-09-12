@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-package org.hibernate.search.engine.impl;
+package org.hibernate.search.orm.loading.impl;
 
 import java.util.Collection;
 import java.util.Map;

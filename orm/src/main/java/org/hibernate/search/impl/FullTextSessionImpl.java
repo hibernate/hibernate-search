@@ -19,7 +19,7 @@ import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.backend.impl.EventSourceTransactionContext;
+import org.hibernate.search.event.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
