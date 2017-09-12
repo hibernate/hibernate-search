@@ -10,7 +10,7 @@
         <property name="jboss.api" value="private"/>
     </properties>
     <resources>
-        <resource-root path="rest-${elasticsearchClientVersion}.jar"/>
+        <resource-root path="elasticsearch-rest-client-${elasticsearchClientVersion}.jar"/>
     </resources>
     <dependencies>
         <module name="org.apache.httpcomponents"/>

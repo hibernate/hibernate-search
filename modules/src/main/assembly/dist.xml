@@ -184,7 +184,7 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.elasticsearch.client:rest</include>
+                <include>org.elasticsearch.client:elasticsearch-rest-client</include>
             </includes>
         </dependencySet>
 
@@ -194,7 +194,7 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.elasticsearch.client:sniffer</include>
+                <include>org.elasticsearch.client:elasticsearch-rest-client-sniffer</include>
             </includes>
         </dependencySet>
 

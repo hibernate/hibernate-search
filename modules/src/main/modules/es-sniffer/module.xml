@@ -10,7 +10,7 @@
         <property name="jboss.api" value="private"/>
     </properties>
     <resources>
-        <resource-root path="sniffer-${elasticsearchSnifferVersion}.jar"/>
+        <resource-root path="elasticsearch-rest-client-sniffer-${elasticsearchSnifferVersion}.jar"/>
     </resources>
     <dependencies>
         <module name="org.hibernate.search.elasticsearch-client" slot="${hibernate.search.version}"/>
