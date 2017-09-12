@@ -88,11 +88,6 @@ final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializab
 	}
 
 	@Override
-	public void put(Class<?> type, V typeBinding) {
-		put( new PojoIndexedTypeIdentifier( type ), typeBinding );
-	}
-
-	@Override
 	public IndexedTypeIdentifier keyFromName(String entityClassName) {
 		if ( entityClassName == null ) {
 			throw log.nullIsInvalidIndexedType();
