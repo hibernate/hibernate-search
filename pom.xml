@@ -1583,7 +1583,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <additionalRuntimeArgLine>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLine>
             </properties>
             <modules>
-                <module>integrationtest/jdk9-modules</module>
+                <!--
+                     Disabled for now, because Lucene and Hibernate ORM use the same packages in different JARs,
+                     thus the module won't compile.
+                 -->
+                <!--<module>integrationtest/jdk9-modules</module>-->
             </modules>
         </profile>
 

@@ -8,6 +8,7 @@ package org.hibernate.search.test.integration.jdk9_modules;
 
 import org.hibernate.search.test.integration.jdk9_modules.client.service.MyEntityService;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.fest.assertions.Assertions;
