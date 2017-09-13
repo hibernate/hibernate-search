@@ -47,7 +47,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorForUnindexedType;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
