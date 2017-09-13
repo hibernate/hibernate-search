@@ -24,7 +24,7 @@ public class CDIObserver {
 	private BeanManager beanManager;
 
 	public void onBeanManagerInitialized(@Observes @Initialized(ApplicationScoped.class) Object init) {
-		CDIBeanManagerSynchronizer synchronizer = CDIBeanManagerSynchronizer.get( beanManager );
+		CDIBeanManagerInitializedSynchronizer synchronizer = CDIBeanManagerInitializedSynchronizer.get( beanManager );
 		if ( synchronizer != null ) {
 			synchronizer.onBeanManagerInitialized();
 		}
