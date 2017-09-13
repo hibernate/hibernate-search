@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import com.google.gson.GsonBuilder;
 
 /**
- * An object representic Elasticsearch type mappings.
+ * An object representing Elasticsearch type mappings.
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  * @author Yoann Rodiere

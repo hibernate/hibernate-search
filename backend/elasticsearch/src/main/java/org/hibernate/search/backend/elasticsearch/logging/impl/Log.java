@@ -27,7 +27,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.TRACE)
 	void executingWork(String host, String workType, Map<String, List<String>> parameters, String bodyAsString);
 
-	@Message(id = 2, value = "A search query cannot target both an Elasticsearch index an other types of index."
+	@Message(id = 2, value = "A search query cannot target both an Elasticsearch index and other types of index."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
 	SearchException cannotMixElasticsearchSearchTargetWithOtherType(ElasticsearchSearchTarget firstTarget, SearchTarget otherTarget);
 
