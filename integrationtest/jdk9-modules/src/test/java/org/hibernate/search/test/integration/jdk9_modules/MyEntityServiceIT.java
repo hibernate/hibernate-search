@@ -8,9 +8,8 @@ package org.hibernate.search.test.integration.jdk9_modules;
 
 import org.hibernate.search.test.integration.jdk9_modules.client.service.MyEntityService;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import org.fest.assertions.Assertions;
 
 public class MyEntityServiceIT {
 
@@ -25,10 +24,8 @@ public class MyEntityServiceIT {
 		service.add( 1, "foo" );
 		service.add( 2, "bar" );
 		service.add( 3, "foo bar" );
-		Assertions.assertThat( service.search( "foo" ) )
-				.containsOnly( 1, 3 );
+		Assert.assertEquals( 2, service.search( "foo" ).size() );
 	}
-
 
 }
 
