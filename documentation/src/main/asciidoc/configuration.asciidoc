@@ -1395,7 +1395,7 @@ configuration.
 === Hibernate Search as a WildFly module
 
 Hibernate Search is included in the WildFly application server, and since WildFly 10 the module
-is automatically activated (added to the classpath of your deployment) if you have any indexed entities.
+is automatically activated (added to the classpath of your deployment) if you are using Hibernate ORM and have any indexed entities.
 
 Alternatively you can opt to use a different version of the module by downloading and unzipping a different
 moduleset and setting the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml`.
@@ -1409,6 +1409,8 @@ is compatible with the Hibernate ORM version you choose.
 This version of Hibernate Search `{hibernateSearchVersion}` requires an Hibernate ORM version `5.2.3.Final` or a later version
 of the 5.2 branch, such as `5.2.8.Final`.
 
+The modules distributed by Hibernate Search `{hibernateSearchVersion}` are meant for WildFly 11.
+
 WildFly includes an older version of Hibernate ORM, so you will need to upgrade this dependency as well.
 The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
 
@@ -1418,7 +1420,7 @@ Not least, as the same guide explains you might need to exclude the Javassist ve
 [[using-wildfly-provided-hibernatesearch-versions]]
 ==== Use the Hibernate Search version included in WildFly
 
-The activation of the Hibernate Search modules in wildfly is automatic, provided you're having at least one
+The activation of the Hibernate Search modules in WildFly is automatic, provided you're having at least one
 entity annotated with `org.hibernate.search.annotations.Indexed`.
 
 You can control this behaviour of the JPA deployer explicitly; for example to make sure Hibernate Search
@@ -1433,7 +1435,7 @@ wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:main
 
 ==== Update and activate latest Hibernate Search version in WildFly
 
-You can also download the latest Hibernate Search provided module and install it. This is often the
+You can download the latest Hibernate Search provided module and install it. This is often the
 best approach as you will benefit from all the latest improvements of
 Hibernate Search. Because of the modular design in WildFly, these additional modules can
 coexist with the embedded modules and won't affect any other application, unless you
@@ -1462,13 +1464,13 @@ Set the following property in your `persistence.xml`:
 wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:{hibernateSearchVersion}
 ====
 
-See also link:https://docs.jboss.org/author/display/WFLY10/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration]
+See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration]
 
 
 ==== More about modules
 
 More information about the modules configuration in WildFly can be found in the
-link:https://docs.jboss.org/author/display/WFLY10/Class+Loading+in+WildFly[Class Loading in WildFly 10] wiki.
+link:https://docs.jboss.org/author/display/WFLY/Class+Loading+in+WildFly[Class Loading in WildFly] wiki.
 
 [TIP]
 ====
