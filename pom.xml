@@ -962,7 +962,8 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.bsc.maven</groupId>
