@@ -15,7 +15,7 @@ import javax.management.ObjectName;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
