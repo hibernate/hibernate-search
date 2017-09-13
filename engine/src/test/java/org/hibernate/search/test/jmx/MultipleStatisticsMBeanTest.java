@@ -22,7 +22,7 @@ import javax.management.ObjectName;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
