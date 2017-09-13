@@ -41,7 +41,7 @@ public class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements Changeset
 		try {
 			List<CompletableFuture<?>> futures = new ArrayList<>();
 			for ( ChangesetPojoTypeWorker<?> delegate : delegates.values() ) {
-				delegate.execute();
+				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture[futures.size()] ) );
 		}
