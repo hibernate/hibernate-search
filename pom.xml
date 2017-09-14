@@ -34,6 +34,7 @@
         <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/elasticsearch</module>
+        <module>integrationtest/wildfly</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
@@ -1563,12 +1564,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>non-jigsaw</id>
             <activation>
-                <!-- Asciidoctor, Karaf and WildFly won't work on JDK9 yet  -->
+                <!-- Asciidoctor and Karaf won't work on JDK9 yet  -->
                 <jdk>1.8</jdk>
             </activation>
             <modules>
                 <module>documentation</module>
-                <module>integrationtest/wildfly</module>
                 <module>integrationtest/osgi/karaf-it</module>
                 <module>integrationtest/performance/orm</module>
             </modules>
