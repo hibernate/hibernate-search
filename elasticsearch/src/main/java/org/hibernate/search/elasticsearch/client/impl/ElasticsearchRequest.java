@@ -68,7 +68,7 @@ public final class ElasticsearchRequest {
 	}
 
 	public static final class Builder {
-		private static final String PATH_SEPARATOR = "/";
+		private static final char PATH_SEPARATOR = '/';
 
 		private final String method;
 		private final StringBuilder pathBuilder = new StringBuilder( 20 );
