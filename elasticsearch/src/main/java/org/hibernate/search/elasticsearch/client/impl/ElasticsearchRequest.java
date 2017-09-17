@@ -71,7 +71,7 @@ public final class ElasticsearchRequest {
 		private static final String PATH_SEPARATOR = "/";
 
 		private final String method;
-		private final StringBuilder pathBuilder = new StringBuilder( PATH_SEPARATOR );
+		private final StringBuilder pathBuilder = new StringBuilder( 20 );
 
 		private Map<String, String> parameters;
 		private List<JsonObject> bodyParts;
@@ -82,7 +82,7 @@ public final class ElasticsearchRequest {
 		}
 
 		public Builder pathComponent(URLEncodedString pathComponent) {
-			pathBuilder.append( pathComponent.encoded ).append( PATH_SEPARATOR );
+			pathBuilder.append( PATH_SEPARATOR ).append( pathComponent.encoded );
 			return this;
 		}
 
@@ -93,11 +93,11 @@ public final class ElasticsearchRequest {
 					pathBuilder.append( ',' );
 				}
 				else {
+					pathBuilder.append( PATH_SEPARATOR );
 					first = false;
 				}
 				pathBuilder.append( name.encoded );
 			}
-			pathBuilder.append( PATH_SEPARATOR );
 			return this;
 		}
 
