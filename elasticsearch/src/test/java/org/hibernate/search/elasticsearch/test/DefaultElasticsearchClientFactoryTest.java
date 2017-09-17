@@ -553,7 +553,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {
-		return urlPathMatching( path + "/?" );
+		return urlPathMatching( path );
 	}
 
 	private static ResponseDefinitionBuilder elasticsearchResponse() {
