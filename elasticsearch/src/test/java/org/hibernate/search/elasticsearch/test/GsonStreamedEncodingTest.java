@@ -7,16 +7,6 @@
 
 package org.hibernate.search.elasticsearch.test;
 
-import static java.util.Collections.singletonList;
-import static org.apache.commons.codec.binary.Hex.encodeHexString;
-import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
-import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -26,16 +16,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.nio.ContentEncoder;
-import org.apache.http.nio.IOControl;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.util.impl.GsonHttpEntity;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.http.nio.ContentEncoder;
+import org.apache.http.nio.IOControl;
+
+import static java.util.Collections.singletonList;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
+import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for GsonHttpEntity to be able to write the whole JSON string
@@ -91,6 +92,14 @@ public class GsonStreamedEncodingTest {
 		verifyProducedContent( list );
 		verifySha256Signature( list );
 		verifyOutput( JSON_TEST_PAYLOAD_LARGE_BULK, list );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2886")
+	public void testSplitUnicodeSurrogatePair() {
+		final List<JsonObject> list = produceUnicodeSplitSurrogatePairJSON();
+		verifyProducedContent( list );
+		verifySha256Signature( list );
 	}
 
 	@Test
@@ -248,6 +257,30 @@ public class GsonStreamedEncodingTest {
 		for ( int i = 0; i < 100; i++ ) {
 			list.add( buildVersionJSON() );
 		}
+		return list;
+	}
+
+	private static List<JsonObject> produceUnicodeSplitSurrogatePairJSON() {
+		String splitObjectPrefix = "{\"p\":\"";
+		String surrogatePair = "\uD802\uDD04"; // U+10904: http://unicode.org/cldr/utility/character.jsp?a=10904
+		String splitObjectSuffix = "\"}";
+		int splitIndex = 1024;
+		int lengthToFill = splitIndex - splitObjectPrefix.length() - 1 /* left part of the surrogate pair */;
+
+		ArrayList<JsonObject> list = new ArrayList<>();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append( splitObjectPrefix );
+		// Add characters to align the surrogate pair precisely on the buffer split
+		for ( int i = 0; i < lengthToFill; i++ ) {
+			sb.append( 'a' ); // Any one-byte character that has no meaning in JSON would do the trick
+		}
+		sb.append( surrogatePair );
+		sb.append( splitObjectSuffix );
+		JsonObject splitObject = gson.fromJson( sb.toString(), JsonObject.class );
+
+		list.add( splitObject );
+
 		return list;
 	}
 
