@@ -72,7 +72,8 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		return Futures.create( () -> context.getClient().submit( request ) )
 				.thenApply( this::generateResult )
 				.exceptionally( Futures.handler(
-						throwable -> { throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
+						throwable -> {
+							throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
 				) );
 	}
 

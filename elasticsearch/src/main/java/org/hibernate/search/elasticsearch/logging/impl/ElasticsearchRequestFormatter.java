@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.logging.impl;
 
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
-import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
@@ -27,11 +26,11 @@ public class ElasticsearchRequestFormatter {
 		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
 		StringBuilder sb = new StringBuilder( 180 );
 
-		sb.append( "Method: " ).append( request.getMethod() );
-		sb.append( "\nPath: " ).append( request.getPath() );
-		sb.append( "\nData:\n" );
-		JsonLogHelper.get().append( sb, request.getBodyParts() );
-		sb.append( "\n\n" );
+		sb.append( request.getMethod() )
+				.append( " " )
+				.append( request.getPath() )
+				.append( " with parameters " )
+				.append( request.getParameters() );
 
 		return sb.toString();
 	}

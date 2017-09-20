@@ -86,17 +86,6 @@ public class JsonLogHelper {
 		return parent.get( name );
 	}
 
-	public String propertyAsString(JsonElement parent, String name) {
-		if ( parent == null || !parent.isJsonObject() ) {
-			return null;
-		}
-		JsonElement propretyValue = property( parent.getAsJsonObject(), name );
-		if ( propretyValue == null ) {
-			return null;
-		}
-		return propretyValue.toString(); // Also support non-string properties
-	}
-
 	private void beforeValue(StringBuilder sb) {
 		if ( prettyPrinting ) {
 			sb.append( "\n" );

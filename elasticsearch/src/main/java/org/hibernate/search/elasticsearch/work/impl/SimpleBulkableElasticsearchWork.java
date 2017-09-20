@@ -87,16 +87,16 @@ public abstract class SimpleBulkableElasticsearchWork<R>
 			}
 		}
 		catch (RuntimeException e) {
-			throw LOG.elasticsearchBulkedRequestFailed( getBulkableActionMetadata(), getBulkableActionBody(), bulkResponseItem, e );
+			throw LOG.elasticsearchBulkedRequestFailed( getBulkableActionMetadata(), bulkResponseItem, e );
 		}
 
 		return afterSuccess( executionContext )
 				.exceptionally( Futures.handler(
 						throwable -> {
 							throw LOG.elasticsearchBulkedRequestFailed(
-									getBulkableActionMetadata(), getBulkableActionBody(),
+									getBulkableActionMetadata(),
 									bulkResponseItem, Throwables.expectException( throwable )
-									);
+							);
 						}
 				) )
 				.thenApply( ignored -> result );

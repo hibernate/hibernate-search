@@ -60,7 +60,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException cannotQueryOnEmptyPhraseQuery();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
-			value = "Elasticsearch request failed\nRequest:\n========\n%1$sResponse:\n=========\n%2$s"
+			value = "Elasticsearch request failed.\nRequest: %1$s\nResponse: %2$s"
 	)
 	SearchException elasticsearchRequestFailed(
 			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
@@ -68,11 +68,11 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			@Cause Exception cause);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 8,
-			value = "Elasticsearch bulked request failed\nRequest:\n========\n%1$s\n%2$sResponse:\n=========\n%3$s"
+			// Note: no need to add a '\n' before "Response", since the formatter will always add one
+			value = "Elasticsearch bulked request failed.\nRequest metadata: %1$sResponse: %2$s"
 	)
 	SearchException elasticsearchBulkedRequestFailed(
 			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestMetadata,
-			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestBody,
 			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject response,
 			@Cause Exception cause);
 
