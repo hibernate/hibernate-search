@@ -209,9 +209,10 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 			// Unlikely: there's no output buffer yet!
 			throw new SearchException( e );
 		}
-		if ( writer.isFlowControlPushingBack() == false ) {
-			// We may not have written everything yet, but the content-size is final,
-			// as we know the entire content has been rendered already.
+		if ( nextBodyToEncodeIndex == bodyParts.size() ) {
+			// The buffer's current content size is the final content size,
+			// as we know the entire content has been encoded already,
+			// and we also know no content was consumed from the buffer yet.
 			hintContentLength( writer.bufferedContentSize() );
 		}
 	}
