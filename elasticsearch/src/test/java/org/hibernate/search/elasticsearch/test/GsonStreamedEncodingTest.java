@@ -101,6 +101,7 @@ public class GsonStreamedEncodingTest {
 		list.add( buildEmptyJSON() );
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
 			final byte[] productionOne = produceContentWithCustomEncoder( entity );
+			entity.close();
 			final byte[] productionTwo = produceContentWithCustomEncoder( entity );
 			assertArrayEquals( productionOne, productionTwo );
 		}
