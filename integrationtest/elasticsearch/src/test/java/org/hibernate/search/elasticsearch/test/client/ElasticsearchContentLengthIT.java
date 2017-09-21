@@ -132,7 +132,9 @@ public class ElasticsearchContentLengthIT {
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		int bodyPartCount = BUFFER_LIMIT / BODY_PART_BYTE_SIZE + 1;
+		int bodyPartCount = BUFFER_LIMIT / BODY_PART_BYTE_SIZE
+				+ 1 // The last body part will require the use of a second buffer page
+				+ 1; // ... and there will still be body parts to write, so we'll give up on computing content-length
 
 		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			doPost( client, "/myIndex/myType", produceBody( bodyPartCount ) );
