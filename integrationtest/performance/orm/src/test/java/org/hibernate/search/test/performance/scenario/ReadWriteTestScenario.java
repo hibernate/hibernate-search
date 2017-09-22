@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.performance.scenario;
 
-import java.io.IOException;
-import java.util.Properties;
-
 import org.hibernate.search.test.performance.task.InsertBookTask;
 import org.hibernate.search.test.performance.task.QueryBooksByAuthorTask;
 import org.hibernate.search.test.performance.task.QueryBooksByAverageRatingTask;
@@ -19,12 +16,26 @@ import org.hibernate.search.test.performance.task.QueryBooksByTitleTask;
 import org.hibernate.search.test.performance.task.QueryBooksByTotalSoldTask;
 import org.hibernate.search.test.performance.task.UpdateBookRatingTask;
 import org.hibernate.search.test.performance.task.UpdateBookTotalSoldTask;
-import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Tomas Hradec
  */
 public abstract class ReadWriteTestScenario extends AbstractTestScenario {
+
+	@Override
+	protected void initContext(TestContext testContext) {
+		super.initContext( testContext );
+		if ( testContext.performanceEnabled ) {
+			testContext.warmupCyclesCount = 1_000;
+			testContext.measuredCyclesCount = 5_000;
+			testContext.threadCount = 20;
+		}
+		else {
+			testContext.warmupCyclesCount = 1;
+			testContext.measuredCyclesCount = 1;
+			testContext.threadCount = 2;
+		}
+	}
 
 	@Override
 	protected void addTasks(TestScenarioContext ctx) {

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.performance.task;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -17,7 +16,6 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
@@ -47,7 +45,7 @@ public class QueryBooksByAuthorTask extends AbstractTask {
 
 		List<Book> result = fts.createFullTextQuery( q, Book.class ).setCriteriaQuery( fetchAuthors ).list();
 
-		if ( ASSERT_QUERY_RESULTS ) {
+		if ( ctx.testContext.assertQueryResults ) {
 			assertResult( authorId, result );
 			assertResultSize( authorId, result );
 		}
@@ -62,8 +60,8 @@ public class QueryBooksByAuthorTask extends AbstractTask {
 
 	private void assertResultSize(long authorId, List<Book> result) {
 		long estimatedBooksCount = ctx.bookIdCounter.get();
-		long estimatedBooksCountPerAuthor = estimatedBooksCount / TestContext.MAX_AUTHORS;
-		long tolerance = 2 * TestContext.THREADS_COUNT;
+		long estimatedBooksCountPerAuthor = estimatedBooksCount / ctx.testContext.maxAuthors;
+		long tolerance = 2 * ctx.testContext.threadCount;
 
 		if ( result.size() < ( estimatedBooksCountPerAuthor - tolerance )
 				|| result.size() > ( estimatedBooksCountPerAuthor + tolerance ) ) {

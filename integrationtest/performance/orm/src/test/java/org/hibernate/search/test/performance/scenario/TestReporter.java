@@ -38,12 +38,6 @@ import static org.apache.commons.lang.StringUtils.leftPad;
 import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.hibernate.search.test.performance.TestRunnerArquillian.RUNNER_PROPERTIES;
 import static org.hibernate.search.test.performance.TestRunnerArquillian.TARGET_DIR_KEY;
-import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
-import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
-import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_MEMORY;
-import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_TASK_TIME;
-import static org.hibernate.search.test.performance.scenario.TestContext.THREADS_COUNT;
-import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
 import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
 /**
@@ -79,7 +73,7 @@ public class TestReporter {
 			TestContext testCtx, TestScenarioContext warmupCtx, TestScenarioContext measureCtx, PrintWriter out) {
 		long freeMemory2 = -1;
 		long totalMemory2 = -1;
-		if ( MEASURE_MEMORY ) {
+		if ( testCtx.measureMemory ) {
 			runGarbageCollectorAndWait();
 			freeMemory2 = Runtime.getRuntime().freeMemory();
 			totalMemory2 = Runtime.getRuntime().totalMemory();
@@ -96,7 +90,7 @@ public class TestReporter {
 		out.println( "        init index     : " + DurationFormatUtils.formatDuration( testCtx.initIndexStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
 		out.println( "        warmup phase   : " + DurationFormatUtils.formatDuration( warmupCtx.executionStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
 
-		if ( MEASURE_MEMORY ) {
+		if ( testCtx.measureMemory ) {
 			out.println( "" );
 			out.println( "    Memory usage (total-free):" );
 			out.println( "        before : " + toMB( measureCtx.initialTotalMemory - measureCtx.initialFreeMemory ) );
@@ -110,7 +104,7 @@ public class TestReporter {
 		for ( AbstractTask task : ctx.tasks ) {
 			String taskTotalTime = "n/a";
 			String taskAverageTime = "n/a";
-			if ( MEASURE_TASK_TIME ) {
+			if ( ctx.testContext.measureTaskTime ) {
 				long taskTotalMilis = TimeUnit.MILLISECONDS.convert( task.getTimerValue(), TimeUnit.NANOSECONDS );
 				long taskAverageMilis = taskTotalMilis / task.getCounterValue();
 				taskTotalTime = DurationFormatUtils.formatDuration( taskTotalMilis, "mm:ss.SSS" );
@@ -128,16 +122,16 @@ public class TestReporter {
 		out.println( "" );
 		out.println( "TEST CONFIGURATION" );
 		out.println( "    measure performance : " + TestConstants.arePerformanceTestsEnabled() );
-		out.println( "    threads             : " + THREADS_COUNT );
+		out.println( "    threads             : " + testCtx.threadCount );
 		out.println( "    measured cycles     : " + testCtx.measuredCyclesCount );
 		out.println( "    warmup cycles       : " + testCtx.warmupCyclesCount );
 		out.println( "    initial book count  : " + testCtx.initialBookCount );
 		out.println( "    initial author count: " + testCtx.initialAuthorCount );
-		out.println( "    verbose             : " + VERBOSE );
-		out.println( "    measure memory      : " + MEASURE_MEMORY );
-		out.println( "    measure task time   : " + MEASURE_TASK_TIME );
-		out.println( "    check query results : " + ASSERT_QUERY_RESULTS );
-		out.println( "    check index state   : " + CHECK_INDEX_STATE );
+		out.println( "    verbose             : " + testCtx.verbose );
+		out.println( "    measure memory      : " + testCtx.measureMemory );
+		out.println( "    measure task time   : " + testCtx.measureTaskTime );
+		out.println( "    check query results : " + testCtx.assertQueryResults );
+		out.println( "    check index state   : " + testCtx.checkIndexState );
 
 		out.println( "" );
 		out.println( "HIBERNATE SEARCH PROPERTIES" );

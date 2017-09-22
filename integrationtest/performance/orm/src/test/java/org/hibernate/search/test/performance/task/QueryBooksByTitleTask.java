@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.performance.task;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
-import static org.hibernate.search.test.performance.scenario.TestContext.THREADS_COUNT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -43,14 +41,14 @@ public class QueryBooksByTitleTask extends AbstractTask {
 
 		List<Book> result = fts.createFullTextQuery( q, Book.class ).list();
 
-		if ( ASSERT_QUERY_RESULTS ) {
+		if ( ctx.testContext.assertQueryResults ) {
 			assertTitle( bookId, result );
 		}
 	}
 
 	private void assertTitle(long bookId, List<Book> result) {
 		long estimatedBooksCount = ctx.bookIdCounter.get();
-		if ( bookId == 0 || bookId + 2 * THREADS_COUNT > estimatedBooksCount ) {
+		if ( bookId == 0 || bookId + 2 * ctx.testContext.threadCount > estimatedBooksCount ) {
 			return; // noop
 		}
 

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.performance.task;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_TASK_TIME;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.hibernate.Transaction;
@@ -42,7 +40,7 @@ public abstract class AbstractTask implements Runnable {
 		counter.incrementAndGet();
 
 		long startTime = 0;
-		if ( MEASURE_TASK_TIME ) {
+		if ( ctx.testContext.measureTaskTime ) {
 			startTime = System.nanoTime();
 		}
 
@@ -61,7 +59,7 @@ public abstract class AbstractTask implements Runnable {
 			s.close();
 		}
 
-		if ( MEASURE_TASK_TIME ) {
+		if ( ctx.testContext.measureTaskTime ) {
 			long stopTime = System.nanoTime();
 			timer.addAndGet( stopTime - startTime );
 		}

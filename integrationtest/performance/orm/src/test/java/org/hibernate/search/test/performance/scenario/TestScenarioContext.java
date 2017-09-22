@@ -44,7 +44,7 @@ public class TestScenarioContext {
 		this.testContext = testContext;
 		this.scenario = testScenario;
 
-		if ( testContext.MEASURE_MEMORY ) {
+		if ( testContext.measureMemory ) {
 			runGarbageCollectorAndWait();
 			initialFreeMemory = Runtime.getRuntime().freeMemory();
 			initialTotalMemory = Runtime.getRuntime().totalMemory();

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.performance.task;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -16,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
@@ -78,7 +76,7 @@ public class QueryBooksBySummaryTask extends AbstractTask {
 
 		List<Book> result = fts.createFullTextQuery( q, Book.class ).list();
 
-		if ( ASSERT_QUERY_RESULTS ) {
+		if ( ctx.testContext.assertQueryResults ) {
 			assertResult( result, phrase );
 			assertResultSize( result, phrase, bookCount );
 		}
@@ -93,7 +91,7 @@ public class QueryBooksBySummaryTask extends AbstractTask {
 
 	private void assertResultSize(List<Book> result, String phrase, long estimatedBooksCount) {
 		long estimatedBooksCountPerSummary = estimatedBooksCount / InsertBookTask.SUMMARIES.length;
-		long tolerance = 2 * TestContext.THREADS_COUNT;
+		long tolerance = 2 * ctx.testContext.threadCount;
 
 		if ( result.size() < ( estimatedBooksCountPerSummary - tolerance )
 				|| result.size() > ( estimatedBooksCountPerSummary + tolerance ) ) {
