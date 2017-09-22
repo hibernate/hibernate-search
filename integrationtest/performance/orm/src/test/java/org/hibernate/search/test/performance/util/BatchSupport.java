@@ -40,7 +40,7 @@ public class BatchSupport {
 			}
 			for ( long iterationIndex = 0; iterationIndex < iterationCount; iterationIndex++ ) {
 				final long idOffset = initialOffset + ( iterationIndex * batchSize );
-				final long idCount = initialOffset + ( iterationIndex * batchSize ) + batchSize - 1;
+				final long idCount = initialOffset + ( iterationIndex * batchSize ) + batchSize;
 
 				final SessionImplementor session = (SessionImplementor) s;
 				session.getTransactionCoordinator().createIsolationDelegate().delegateWork(
