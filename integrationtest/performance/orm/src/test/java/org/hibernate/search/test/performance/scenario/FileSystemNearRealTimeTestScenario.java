@@ -14,7 +14,7 @@ import org.hibernate.search.testsupport.TestConstants;
 /**
  * @author Tomas Hradec
  */
-public class FileSystemNearRealTimeTestScenario extends TestScenario {
+public class FileSystemNearRealTimeTestScenario extends ReadWriteTestScenario {
 
 	@Override
 	public Properties getHibernateProperties() {

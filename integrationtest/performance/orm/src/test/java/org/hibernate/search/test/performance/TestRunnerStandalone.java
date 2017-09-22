@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.test.performance.model.Author;
 import org.hibernate.search.test.performance.model.Book;
+import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class TestRunnerStandalone {
 	public void runPerformanceTest() throws IOException {
 		SessionFactory sf = getSessionFactory();
 		try {
-			scenario.run( sf );
+			scenario.run( new TestContext( sf ) );
 		}
 		finally {
 			sf.close();

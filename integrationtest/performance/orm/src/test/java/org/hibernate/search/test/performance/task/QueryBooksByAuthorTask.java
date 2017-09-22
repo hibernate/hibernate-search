@@ -18,13 +18,14 @@ import org.hibernate.FetchMode;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
  */
 public class QueryBooksByAuthorTask extends AbstractTask {
 
-	public QueryBooksByAuthorTask(TestContext ctx) {
+	public QueryBooksByAuthorTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

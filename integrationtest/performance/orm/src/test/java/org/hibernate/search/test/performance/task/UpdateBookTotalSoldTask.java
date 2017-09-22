@@ -8,14 +8,14 @@ package org.hibernate.search.test.performance.task;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
  */
 public class UpdateBookTotalSoldTask extends AbstractTask {
 
-	public UpdateBookTotalSoldTask(TestContext ctx) {
+	public UpdateBookTotalSoldTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

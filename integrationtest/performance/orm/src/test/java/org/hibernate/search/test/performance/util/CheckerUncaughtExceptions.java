@@ -11,7 +11,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
@@ -32,7 +32,7 @@ public class CheckerUncaughtExceptions {
 		} );
 	}
 
-	public static void printUncaughtExceptions(TestContext ctx, PrintWriter outWriter) {
+	public static void printUncaughtExceptions(TestScenarioContext ctx, PrintWriter outWriter) {
 		if ( UNCAUGHT_EXCEPTIONS.size() > 0 ) {
 			outWriter.println( "===========================================================================" );
 			outWriter.println( "EXCEPTIONS" );

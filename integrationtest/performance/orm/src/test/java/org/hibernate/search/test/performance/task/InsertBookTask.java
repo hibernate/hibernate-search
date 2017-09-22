@@ -16,6 +16,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Author;
 import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
@@ -24,7 +25,7 @@ public class InsertBookTask extends AbstractTask {
 
 	public static final Date PUBLICATION_DATE_ZERO = new Date();
 
-	public InsertBookTask(TestContext ctx) {
+	public InsertBookTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

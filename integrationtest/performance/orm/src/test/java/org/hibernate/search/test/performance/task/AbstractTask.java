@@ -13,19 +13,19 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
  */
 public abstract class AbstractTask implements Runnable {
 
-	protected final TestContext ctx;
+	protected final TestScenarioContext ctx;
 
 	private final AtomicLong counter = new AtomicLong( 0 );
 	private final AtomicLong timer = new AtomicLong( 0 );
 
-	public AbstractTask(TestContext ctx) {
+	public AbstractTask(TestScenarioContext ctx) {
 		this.ctx = ctx;
 		this.ctx.tasks.add( this );
 	}
@@ -46,7 +46,7 @@ public abstract class AbstractTask implements Runnable {
 			startTime = System.nanoTime();
 		}
 
-		FullTextSession s = Search.getFullTextSession( ctx.sf.openSession() );
+		FullTextSession s = Search.getFullTextSession( ctx.testContext.sessionFactory.openSession() );
 		Transaction tx = s.beginTransaction();
 		try {
 			execute( s );

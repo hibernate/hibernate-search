@@ -10,7 +10,7 @@ import java.util.Random;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
@@ -20,7 +20,7 @@ public class UpdateBookRatingTask extends AbstractTask {
 	private static final float MAX_RATING = 100;
 	private static final Random RANDOM_RATING = new Random();
 
-	public UpdateBookRatingTask(TestContext ctx) {
+	public UpdateBookRatingTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

@@ -6,21 +6,10 @@
  */
 package org.hibernate.search.test.performance.scenario;
 
-import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
-
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.hibernate.SessionFactory;
-import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.testsupport.TestConstants;
+
+import com.google.common.base.Stopwatch;
 
 /**
  * @author Tomas Hradec
@@ -35,79 +24,37 @@ public class TestContext {
 	public static final boolean ASSERT_QUERY_RESULTS = true;
 	public static final boolean CHECK_INDEX_STATE = true;
 	public static final int MAX_AUTHORS = 1000;
+
 	public static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 20 : 2;
 
-	public final SessionFactory sf;
-	public final TestScenario scenario;
-	public final ExecutorService executor = Executors.newFixedThreadPool( THREADS_COUNT );
-	public final CountDownLatch startSignal = new CountDownLatch( 1 );
+	public final SessionFactory sessionFactory;
 
-	public final List<AbstractTask> tasks = new CopyOnWriteArrayList<AbstractTask>();
-	public final AtomicLong bookIdCounter = new AtomicLong( 0 );
-	public final AtomicLong authorIdCounter = new AtomicLong( 0 );
-	public final Random bookRandom = new Random();
-	public final Random authorRandom = new Random();
-	public final AtomicReference<RuntimeException> firstKnownError = new AtomicReference<>();
+	public long initialOffset;
+	public long initialAuthorCount;
+	public long initialBookCount;
+	public long warmupCyclesCount;
+	public long measuredCyclesCount;
 
-	public long startTime;
-	public long stopTime;
-	public long freeMemory;
-	public long totalMemory;
+	public final Stopwatch initDatabaseStopWatch = Stopwatch.createUnstarted();
+	public final Stopwatch initIndexStopWatch = Stopwatch.createUnstarted();
 
-	public TestContext(TestScenario testScenario, SessionFactory sf) {
-		this.scenario = testScenario;
-		this.sf = sf;
+	public TestContext(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 
-		if ( MEASURE_MEMORY ) {
-			runGarbageCollectorAndWait();
-			freeMemory = Runtime.getRuntime().freeMemory();
-			totalMemory = Runtime.getRuntime().totalMemory();
+		if ( PERFORMANCE_ENABLED ) {
+			this.initialOffset = 1_000_000;
+			this.initialAuthorCount = 10_000;
+			this.initialBookCount = 1_000_000;
+			this.warmupCyclesCount = 1_000;
+			this.measuredCyclesCount = 5_000;
 		}
-	}
-
-	public long getRandomBookId() {
-		long bookId = bookIdCounter.get();
-		if ( bookId > 0 ) {
-			return Math.abs( bookRandom.nextLong() ) % bookId;
+		else {
+			this.initialOffset = 100;
+			this.initialAuthorCount = 10;
+			this.initialBookCount = 100;
+			this.warmupCyclesCount = 1;
+			this.measuredCyclesCount = 1;
 		}
-		return 0;
-	}
-
-	public long getRandomAuthorId() {
-		long authorId = authorIdCounter.get();
-		if ( authorId > 0 ) {
-			return Math.abs( authorRandom.nextLong() ) % authorIdCounter.get();
-		}
-		return 0;
-	}
-
-	public void startAndWait() {
-		try {
-			startTime = System.nanoTime();
-			startSignal.countDown();
-			executor.shutdown();
-			executor.awaitTermination( 1, TimeUnit.DAYS );
-			stopTime = System.nanoTime();
-		}
-		catch (InterruptedException e) {
-			throw new RuntimeException( e );
-		}
-		RuntimeException firstRuntimeError = getFirstRuntimeError();
-		if ( firstRuntimeError != null ) {
-			throw firstRuntimeError;
-		}
-	}
-
-	public void reportRuntimeException(RuntimeException e) {
-		//We only want to track the first exception:
-		//having any error is enough to invalidate the results,
-		//and if there are multiple it's likely that they are either
-		//repeated errors, or that others are caused by the first one.
-		firstKnownError.compareAndSet( null, e );
-	}
-
-	private RuntimeException getFirstRuntimeError() {
-		return firstKnownError.get();
 	}
 
 }
