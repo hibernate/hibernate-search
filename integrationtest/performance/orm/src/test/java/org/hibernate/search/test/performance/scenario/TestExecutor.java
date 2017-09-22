@@ -106,6 +106,11 @@ class TestExecutor {
 	}
 
 	protected void initIndex(TestContext ctx) {
+		if ( !ctx.initIndex ) {
+			log( "skipping index initialization as requested" );
+			return;
+		}
+
 		log( "starting initialize index" );
 
 		ctx.initIndexStopWatch.start();
