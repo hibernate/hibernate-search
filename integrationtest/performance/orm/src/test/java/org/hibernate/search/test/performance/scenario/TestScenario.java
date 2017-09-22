@@ -51,7 +51,7 @@ public abstract class TestScenario {
 	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
 
 	public final long initialOffset;
-	public final long initialAutorCount;
+	public final long initialAuthorCount;
 	public final long initialBookCount;
 	public final long warmupCyclesCount;
 	public final long measuredCyclesCount;
@@ -62,14 +62,14 @@ public abstract class TestScenario {
 
 	public TestScenario() {
 		if ( PERFORMANCE_ENABLED ) {
-			this.initialAutorCount = 10_000;
+			this.initialAuthorCount = 10_000;
 			this.initialBookCount = 1_000_000;
 			this.warmupCyclesCount = 1_000;
 			this.measuredCyclesCount = 5_000;
 			this.initialOffset = 1_000_000;
 		}
 		else {
-			this.initialAutorCount = 10;
+			this.initialAuthorCount = 10;
 			this.initialBookCount = 100;
 			this.warmupCyclesCount = 1;
 			this.measuredCyclesCount = 1;
@@ -77,9 +77,9 @@ public abstract class TestScenario {
 		}
 	}
 
-	public TestScenario(long initialAutorCount, long initialBookCount, long warmupCyclesCount, long measuredCyclesCount) {
+	public TestScenario(long initialAuthorCount, long initialBookCount, long warmupCyclesCount, long measuredCyclesCount) {
 		super();
-		this.initialAutorCount = initialAutorCount;
+		this.initialAuthorCount = initialAuthorCount;
 		this.initialBookCount = initialBookCount;
 		this.warmupCyclesCount = warmupCyclesCount;
 		this.measuredCyclesCount = measuredCyclesCount;
@@ -108,12 +108,12 @@ public abstract class TestScenario {
 		initDatabaseStopWatch.start();
 
 		BatchSupport batchSupport = new BatchSupport( sf, initialOffset );
-		batchSupport.execute( "insert into author(id, name) values(?, ?)", initialAutorCount,
-				new BatchCallback() {
+		batchSupport.execute( "insert into author(id, name) values(?, ?)", initialAuthorCount,
+							  new BatchCallback() {
 					@Override
 					public void initStatement(PreparedStatement ps, long id) throws SQLException {
 						ps.setLong( 1, id );
-						ps.setString( 2, "autor" + id );
+						ps.setString( 2, "author" + id );
 					}
 				} );
 		batchSupport.execute( "insert into book(id, title, summary, rating, totalSold, publicationDate) values(?, ?, ?, ?, ?, ?)", initialBookCount,
@@ -133,7 +133,7 @@ public abstract class TestScenario {
 					@Override
 					public void initStatement(PreparedStatement ps, long id) throws SQLException {
 						ps.setLong( 1, id );
-						ps.setLong( 2, initialOffset + ( id % initialAutorCount ) );
+						ps.setLong( 2, initialOffset + ( id % initialAuthorCount ) );
 					}
 				} );
 

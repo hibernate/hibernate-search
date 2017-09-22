@@ -31,7 +31,7 @@ public class QueryBooksByAuthorTask extends AbstractTask {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void execute(FullTextSession fts) {
-		long authorId = ctx.getRandomAutorId();
+		long authorId = ctx.getRandomAuthorId();
 
 		Query q = fts.getSearchFactory()
 				.buildQueryBuilder()
