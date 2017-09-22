@@ -11,11 +11,7 @@ import java.util.Properties;
 /**
  * @author Tomas Hradec
  */
-public class SmokeTestScenario extends TestScenario {
-
-	public SmokeTestScenario() {
-		super( 10, 10, 10, 10 );
-	}
+public class SmokeTestScenario extends ReadWriteTestScenario {
 
 	@Override
 	public Properties getHibernateProperties() {
@@ -24,4 +20,10 @@ public class SmokeTestScenario extends TestScenario {
 		return properties;
 	}
 
+	@Override
+	protected void initContext(TestContext testContext) {
+		super.initContext( testContext );
+		testContext.initialBookCount = 10;
+		testContext.initialAuthorCount = 10;
+	}
 }

@@ -11,14 +11,14 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
  */
 public class QueryBooksByNewestPublishedTask extends AbstractTask {
 
-	public QueryBooksByNewestPublishedTask(TestContext ctx) {
+	public QueryBooksByNewestPublishedTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

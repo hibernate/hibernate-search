@@ -16,14 +16,14 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
+import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
  * @author Tomas Hradec
  */
 public class QueryBooksByTitleTask extends AbstractTask {
 
-	public QueryBooksByTitleTask(TestContext ctx) {
+	public QueryBooksByTitleTask(TestScenarioContext ctx) {
 		super( ctx );
 	}
 

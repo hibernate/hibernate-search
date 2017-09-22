@@ -42,7 +42,7 @@ public class CheckerLuceneIndex {
 		out.println( "INDEX CHECK..." );
 		out.println( "" );
 
-		Session s = ctx.sf.openSession();
+		Session s = ctx.sessionFactory.openSession();
 		FullTextSession fts = Search.getFullTextSession( s );
 		ExtendedSearchIntegrator integrator = fts.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 		Collection<IndexManager> indexManagers = integrator.getIndexManagerHolder().getIndexManagers();

@@ -14,7 +14,7 @@ import org.hibernate.search.testsupport.TestConstants;
 /**
  * @author Tomas Hradec
  */
-public class FileSystemDefaultTestScenario extends TestScenario {
+public class FileSystemDefaultTestScenario extends ReadWriteTestScenario {
 
 	@Override
 	public Properties getHibernateProperties() {

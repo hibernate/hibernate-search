@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
@@ -54,27 +54,29 @@ public class TestReporter {
 	private TestReporter() {
 	}
 
-	public static void printReport(TestContext ctx) throws UnsupportedEncodingException, IOException {
-		PrintStream outStream = createOutputStream( ctx.scenario.getClass().getSimpleName() );
+	public static void printReport(TestContext testCtx, TestScenarioContext warmupCtx, TestScenarioContext measureCtx)
+			throws UnsupportedEncodingException, IOException {
+		PrintStream outStream = createOutputStream( measureCtx.scenario.getClass().getSimpleName() );
 		PrintWriter outWriter = new PrintWriter(
 				new BufferedWriter( new OutputStreamWriter( outStream, "UTF-8" ) ), false );
 
 		outWriter.println( "==================================================================" );
 		outWriter.println( "HIBERNATE SEARCH PERFORMANCE TEST REPORT" );
-		printSummary( ctx, outWriter );
-		printTaskInfo( ctx, outWriter );
-		printEnvInfo( ctx, outWriter );
+		printSummary( testCtx, warmupCtx, measureCtx, outWriter );
+		printTaskInfo( measureCtx, outWriter );
+		printEnvInfo( testCtx, outWriter );
 		outWriter.println( "==================================================================" );
 		outWriter.flush();
 
-		CheckerLuceneIndex.printIndexReport( ctx, outStream );
-		CheckerUncaughtExceptions.printUncaughtExceptions( ctx, outWriter );
+		CheckerLuceneIndex.printIndexReport( testCtx, outStream );
+		CheckerUncaughtExceptions.printUncaughtExceptions( measureCtx, outWriter );
 
 		outWriter.close();
 		outStream.close();
 	}
 
-	private static void printSummary(TestContext ctx, PrintWriter out) {
+	private static void printSummary(
+			TestContext testCtx, TestScenarioContext warmupCtx, TestScenarioContext measureCtx, PrintWriter out) {
 		long freeMemory2 = -1;
 		long totalMemory2 = -1;
 		if ( MEASURE_MEMORY ) {
@@ -83,29 +85,26 @@ public class TestReporter {
 			totalMemory2 = Runtime.getRuntime().totalMemory();
 		}
 
-		long totalNanos = ctx.stopTime - ctx.startTime;
-		long totalMilis = TimeUnit.MILLISECONDS.convert( totalNanos, TimeUnit.NANOSECONDS );
-
 		out.println( "" );
 		out.println( "SUMMARY" );
-		out.println( "    Name   : " + ctx.scenario.getClass().getSimpleName() );
+		out.println( "    Name   : " + measureCtx.scenario.getClass().getSimpleName() );
 		out.println( "    Date   : " + DateFormatUtils.format( new Date(), "yyyy-MM-dd HH:mm" ) );
 		out.println( "" );
 		out.println( "    Measured time (HH:mm:ss.SSS)" );
-		out.println( "        MEASURED TASKS : " + DurationFormatUtils.formatDuration( totalMilis, "HH:mm:ss.SSS" ) );
-		out.println( "        init database  : " + DurationFormatUtils.formatDuration( ctx.scenario.initDatabaseStopWatch.getTime(), "HH:mm:ss.SSS" ) );
-		out.println( "        init index     : " + DurationFormatUtils.formatDuration( ctx.scenario.initIndexStopWatch.getTime(), "HH:mm:ss.SSS" ) );
-		out.println( "        warmup phase   : " + DurationFormatUtils.formatDuration( ctx.scenario.warmupStopWatch.getTime(), "HH:mm:ss.SSS" ) );
+		out.println( "        MEASURED TASKS : " + DurationFormatUtils.formatDuration( measureCtx.executionStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
+		out.println( "        init database  : " + DurationFormatUtils.formatDuration( testCtx.initDatabaseStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
+		out.println( "        init index     : " + DurationFormatUtils.formatDuration( testCtx.initIndexStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
+		out.println( "        warmup phase   : " + DurationFormatUtils.formatDuration( warmupCtx.executionStopWatch.elapsed( TimeUnit.MILLISECONDS ), "HH:mm:ss.SSS" ) );
 
 		if ( MEASURE_MEMORY ) {
 			out.println( "" );
 			out.println( "    Memory usage (total-free):" );
-			out.println( "        before : " + toMB( ctx.totalMemory - ctx.freeMemory ) );
+			out.println( "        before : " + toMB( measureCtx.initialTotalMemory - measureCtx.initialFreeMemory ) );
 			out.println( "        after  : " + toMB( totalMemory2 - freeMemory2 ) );
 		}
 	}
 
-	private static void printTaskInfo(TestContext ctx, PrintWriter out) {
+	private static void printTaskInfo(TestScenarioContext ctx, PrintWriter out) {
 		out.println( "" );
 		out.println( "TASKS" );
 		for ( AbstractTask task : ctx.tasks ) {
@@ -125,15 +124,15 @@ public class TestReporter {
 		}
 	}
 
-	private static void printEnvInfo(TestContext ctx, PrintWriter out) {
+	private static void printEnvInfo(TestContext testCtx, PrintWriter out) {
 		out.println( "" );
 		out.println( "TEST CONFIGURATION" );
 		out.println( "    measure performance : " + TestConstants.arePerformanceTestsEnabled() );
 		out.println( "    threads             : " + THREADS_COUNT );
-		out.println( "    measured cycles     : " + ctx.scenario.measuredCyclesCount );
-		out.println( "    warmup cycles       : " + ctx.scenario.warmupCyclesCount );
-		out.println( "    initial book count  : " + ctx.scenario.initialBookCount );
-		out.println( "    initial author count: " + ctx.scenario.initialAuthorCount );
+		out.println( "    measured cycles     : " + testCtx.measuredCyclesCount );
+		out.println( "    warmup cycles       : " + testCtx.warmupCyclesCount );
+		out.println( "    initial book count  : " + testCtx.initialBookCount );
+		out.println( "    initial author count: " + testCtx.initialAuthorCount );
 		out.println( "    verbose             : " + VERBOSE );
 		out.println( "    measure memory      : " + MEASURE_MEMORY );
 		out.println( "    measure task time   : " + MEASURE_TASK_TIME );
@@ -142,7 +141,7 @@ public class TestReporter {
 
 		out.println( "" );
 		out.println( "HIBERNATE SEARCH PROPERTIES" );
-		Map<String, Object> properties = ( (SessionFactoryImplementor) ctx.sf ).getProperties();
+		Map<String, Object> properties = testCtx.sessionFactory.getProperties();
 		for ( Entry<String, Object> e : properties.entrySet() ) {
 			if ( e.getKey().toString().startsWith( "hibernate.search" ) ) {
 				out.println( "    " + e.getKey() + " = " + e.getValue() );

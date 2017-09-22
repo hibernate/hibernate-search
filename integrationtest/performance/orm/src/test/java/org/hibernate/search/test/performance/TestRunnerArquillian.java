@@ -6,24 +6,25 @@
  */
 package org.hibernate.search.test.performance;
 
-import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
-import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Map.Entry;
 import java.util.Properties;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
 import org.hibernate.search.test.performance.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -36,8 +37,9 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 /**
  * @author Tomas Hradec
@@ -100,7 +102,7 @@ public class TestRunnerArquillian {
 
 	public static Asset manifest() {
 		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.apache.commons.lang" )
+				.attribute( "Dependencies", "org.apache.commons.lang,com.google.guava" )
 				.exportAsString();
 		return new StringAsset( manifest );
 	}
@@ -111,7 +113,7 @@ public class TestRunnerArquillian {
 	@Test
 	public void runPerformanceTest() throws IOException {
 		SessionFactory sf = em.unwrap( Session.class ).getSessionFactory();
-		scenario.run( sf );
+		scenario.run( new TestContext( sf ) );
 	}
 
 }
