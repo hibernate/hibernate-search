@@ -73,7 +73,7 @@ public class TestContext {
 		return 0;
 	}
 
-	public long getRandomAutorId() {
+	public long getRandomAuthorId() {
 		long authorId = authorIdCounter.get();
 		if ( authorId > 0 ) {
 			return Math.abs( authorRandom.nextLong() ) % authorIdCounter.get();

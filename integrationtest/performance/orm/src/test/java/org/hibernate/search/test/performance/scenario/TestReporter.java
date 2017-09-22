@@ -133,7 +133,7 @@ public class TestReporter {
 		out.println( "    measured cycles     : " + ctx.scenario.measuredCyclesCount );
 		out.println( "    warmup cycles       : " + ctx.scenario.warmupCyclesCount );
 		out.println( "    initial book count  : " + ctx.scenario.initialBookCount );
-		out.println( "    initial autor count : " + ctx.scenario.initialAutorCount );
+		out.println( "    initial author count: " + ctx.scenario.initialAuthorCount );
 		out.println( "    verbose             : " + VERBOSE );
 		out.println( "    measure memory      : " + MEASURE_MEMORY );
 		out.println( "    measure task time   : " + MEASURE_TASK_TIME );

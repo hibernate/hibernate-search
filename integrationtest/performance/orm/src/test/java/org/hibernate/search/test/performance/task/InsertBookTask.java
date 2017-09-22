@@ -58,7 +58,7 @@ public class InsertBookTask extends AbstractTask {
 	private long getNextAuthorId() {
 		long id = ctx.authorIdCounter.get();
 		if ( id > TestContext.MAX_AUTHORS ) {
-			return ctx.getRandomAutorId();
+			return ctx.getRandomAuthorId();
 		}
 		else {
 			return ctx.authorIdCounter.incrementAndGet();
