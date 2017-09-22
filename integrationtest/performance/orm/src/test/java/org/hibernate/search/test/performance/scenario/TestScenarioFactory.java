@@ -35,8 +35,9 @@ public class TestScenarioFactory {
 
 	private static void printTestScenarioNames(String msg) {
 		log( msg );
-		log( "    " + FileSystemDefaultTestScenario.class.getName() );
-		log( "    " + FileSystemNearRealTimeTestScenario.class.getName() );
+		log( "    " + FileSystemReadWriteTestScenario.class.getName() );
+		log( "    " + FileSystemNearRealTimeReadWriteTestScenario.class.getName() );
+		log( "    " + FileSystemSessionMassIndexerTestScenario.class.getName() );
 	}
 
 }

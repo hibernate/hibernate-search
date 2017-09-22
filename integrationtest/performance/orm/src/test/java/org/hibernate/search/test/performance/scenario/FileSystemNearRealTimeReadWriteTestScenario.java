@@ -14,7 +14,7 @@ import org.hibernate.search.testsupport.TestConstants;
 /**
  * @author Tomas Hradec
  */
-public class FileSystemDefaultTestScenario extends ReadWriteTestScenario {
+public class FileSystemNearRealTimeReadWriteTestScenario extends ReadWriteTestScenario {
 
 	@Override
 	public Properties getHibernateProperties() {
@@ -22,6 +22,7 @@ public class FileSystemDefaultTestScenario extends ReadWriteTestScenario {
 		properties.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		properties.setProperty( "hibernate.search.default.indexBase",
 				TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ).toAbsolutePath().toString() );
+		properties.setProperty( "hibernate.search.default.indexmanager", "near-real-time" );
 		return properties;
 	}
 

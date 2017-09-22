@@ -21,6 +21,7 @@ public class TestContext {
 	public final boolean verbose = performanceEnabled;
 	public final boolean measureMemory = performanceEnabled;
 	public final boolean measureTaskTime = performanceEnabled;
+	public boolean initIndex = true;
 	public final boolean assertQueryResults = true;
 	public final boolean checkIndexState = true;
 
