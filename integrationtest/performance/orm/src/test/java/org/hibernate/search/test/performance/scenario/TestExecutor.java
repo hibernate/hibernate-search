@@ -23,7 +23,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.util.BatchCallback;
 import org.hibernate.search.test.performance.util.BatchSupport;
-import org.hibernate.search.testsupport.TestConstants;
 
 import static org.apache.commons.lang.StringUtils.reverse;
 import static org.hibernate.search.test.performance.task.InsertBookTask.PUBLICATION_DATE_ZERO;
@@ -35,9 +34,6 @@ import static org.hibernate.search.test.performance.util.Util.log;
  * @author Tomas Hradec
  */
 class TestExecutor {
-
-	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
-	private static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 20 : 2;
 
 	public final void run(TestContext testContext, TestScenarioContext warmupContext, TestScenarioContext measureContext)
 			throws IOException {
@@ -142,7 +138,7 @@ class TestExecutor {
 	}
 
 	private void scheduleTasksAndStart(TestScenarioContext ctx, long cyclesCount) {
-		ExecutorService executor = Executors.newFixedThreadPool( THREADS_COUNT );
+		ExecutorService executor = Executors.newFixedThreadPool( ctx.testContext.threadCount );
 		for ( int i = 0; i < cyclesCount; i++ ) {
 			for ( Runnable task : ctx.tasks ) {
 				executor.execute( task );

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.performance.task;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
 import static org.hibernate.search.test.performance.util.Util.log;
 
 import java.util.Date;
@@ -15,7 +14,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Author;
 import org.hibernate.search.test.performance.model.Book;
-import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenarioContext;
 
 /**
@@ -34,7 +32,7 @@ public class InsertBookTask extends AbstractTask {
 		long bookId = getNextBookId();
 		long authorId = getNextAuthorId();
 
-		if ( VERBOSE ) {
+		if ( ctx.testContext.verbose ) {
 			if ( bookId % 100 == 0 ) {
 				log( "InsertBookTask: bookId=" + bookId );
 			}
@@ -58,7 +56,7 @@ public class InsertBookTask extends AbstractTask {
 
 	private long getNextAuthorId() {
 		long id = ctx.authorIdCounter.get();
-		if ( id > TestContext.MAX_AUTHORS ) {
+		if ( id > ctx.testContext.maxAuthors ) {
 			return ctx.getRandomAuthorId();
 		}
 		else {

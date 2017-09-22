@@ -9,8 +9,6 @@ package org.hibernate.search.test.performance.scenario;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.search.testsupport.TestConstants;
-
 /**
  * @author Tomas Hradec
  */

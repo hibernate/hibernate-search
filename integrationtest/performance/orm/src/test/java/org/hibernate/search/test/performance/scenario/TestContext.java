@@ -16,22 +16,22 @@ import com.google.common.base.Stopwatch;
  */
 public class TestContext {
 
-	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
+	public final Boolean performanceEnabled = TestConstants.arePerformanceTestsEnabled();
 
-	public static final boolean VERBOSE = PERFORMANCE_ENABLED;
-	public static final boolean MEASURE_MEMORY = PERFORMANCE_ENABLED;
-	public static final boolean MEASURE_TASK_TIME = PERFORMANCE_ENABLED;
-	public static final boolean ASSERT_QUERY_RESULTS = true;
-	public static final boolean CHECK_INDEX_STATE = true;
-	public static final int MAX_AUTHORS = 1000;
-
-	public static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 20 : 2;
+	public final boolean verbose = performanceEnabled;
+	public final boolean measureMemory = performanceEnabled;
+	public final boolean measureTaskTime = performanceEnabled;
+	public final boolean assertQueryResults = true;
+	public final boolean checkIndexState = true;
 
 	public final SessionFactory sessionFactory;
 
 	public long initialOffset;
 	public long initialAuthorCount;
 	public long initialBookCount;
+	public long maxAuthors = 1000;
+
+	public int threadCount;
 	public long warmupCyclesCount;
 	public long measuredCyclesCount;
 
@@ -41,20 +41,30 @@ public class TestContext {
 	public TestContext(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 
-		if ( PERFORMANCE_ENABLED ) {
+		if ( performanceEnabled ) {
 			this.initialOffset = 1_000_000;
 			this.initialAuthorCount = 10_000;
 			this.initialBookCount = 1_000_000;
-			this.warmupCyclesCount = 1_000;
-			this.measuredCyclesCount = 5_000;
 		}
 		else {
 			this.initialOffset = 100;
 			this.initialAuthorCount = 10;
 			this.initialBookCount = 100;
-			this.warmupCyclesCount = 1;
-			this.measuredCyclesCount = 1;
 		}
+
+		/*
+		 * Scenarios are to customize these values themselves
+		 * based on their knowledge of the actual code being run.
+		 * They should also adapt the values based on whether
+		 * performance tests are enabled or not.
+		 *
+		 * We can't set sensible values here,
+		 * because we don't know how expensive one cycle is,
+		 * or whether parallel execution even makes sense.
+		 */
+		this.threadCount = 1;
+		this.warmupCyclesCount = 1;
+		this.measuredCyclesCount = 1;
 	}
 
 }

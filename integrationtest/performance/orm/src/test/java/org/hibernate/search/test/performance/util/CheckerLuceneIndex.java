@@ -23,7 +23,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.performance.scenario.TestContext;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -35,7 +34,7 @@ public class CheckerLuceneIndex {
 	}
 
 	public static void printIndexReport(TestContext ctx, PrintStream out) throws IOException {
-		if ( !CHECK_INDEX_STATE ) {
+		if ( !ctx.checkIndexState ) {
 			return;
 		}
 
