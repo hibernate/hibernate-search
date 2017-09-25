@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.logging.impl;
 
+import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import org.hibernate.search.cfg.Environment;
@@ -55,6 +56,13 @@ public interface BaseHibernateSearchLogger extends BasicLogger {
 	@Message(id = 49,
 			value = "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
 	void interruptedWhileWaitingForIndexActivity(@Cause InterruptedException e);
+
+	@LogMessage(level = ERROR)
+	@Message(id = 69, value = "Illegal object retrieved from message")
+	void illegalObjectRetrievedFromMessage(@Cause Exception e);
+
+	@Message(id = 114, value = "Could not load resource: '%1$s'")
+	SearchException unableToLoadResource(String fileName);
 
 	@Message(id = 140, value = "Unknown Resolution: %1$s")
 	AssertionFailure unknownResolution(String resolution);

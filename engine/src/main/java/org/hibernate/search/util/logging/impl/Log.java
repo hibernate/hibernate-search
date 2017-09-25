@@ -251,9 +251,11 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 68, value = "Unable to retrieve object from message: %1$s")
 	void unableToRetrieveObjectFromMessage(@FormatWith(ClassFormatter.class) Class<?> messageClass, @Cause Exception e);
 
+	/* Moved to the parent logger interface to be shared across compilation units
 	@LogMessage(level = ERROR)
 	@Message(id = 69, value = "Illegal object retrieved from message")
 	void illegalObjectRetrievedFromMessage(@Cause Exception e);
+	*/
 
 	@LogMessage(level = ERROR)
 	@Message(id = 72,
@@ -279,9 +281,11 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
 	void unableToShutdownAsynchronousIndexingByTimeout(String indexName);
 
+	/* Moved to the specific logger of the Avro serialization module
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d initialized")
 	void serializationProtocol(int major, int minor);
+	*/
 
 	@LogMessage(level = WARN)
 	@Message(id = 81,
@@ -325,9 +329,11 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 96, value = "Fail to deserialize object")
 	SearchException failToDeserializeObject(@Cause Throwable e);
 
+	/* Moved to the specific logger of the Avro serialization module
 	@Message(id = 98, value = "Unable to parse message from protocol version %1$d.%2$d. "
 			+ "Current protocol version: %3$d.%4$d")
 	SearchException incompatibleProtocolVersion(int messageMajor, int messageMinor, int currentMajor, int currentMinor);
+	*/
 
 	@Message(id = 99, value = "Unable to deserialize Avro stream")
 	SearchException unableToDeserializeAvroStream(@Cause Throwable e);
@@ -378,8 +384,10 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 113, value = "'null' is not a valid index name")
 	IllegalArgumentException nullIsInvalidIndexName();
 
+	/* Moved to the parent logger interface to be shared across compilation units
 	@Message(id = 114, value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
+	*/
 
 	@Message(id = 115, value = "Unknown @FullTextFilter: '%1$s'")
 	SearchException unknownFullTextFilter(String filterName);

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.jgroups.logging.impl;
 import java.util.Properties;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
@@ -31,7 +32,7 @@ import static org.jboss.logging.Logger.Level.WARN;
  * @author Hardy Ferentschik
  */
 @MessageLogger(projectCode = "HSEARCH")
-public interface Log extends org.hibernate.search.util.logging.impl.Log {
+public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 1,
 			value = "Remote JGroups peer '%1$s' is suspected to have left '")
