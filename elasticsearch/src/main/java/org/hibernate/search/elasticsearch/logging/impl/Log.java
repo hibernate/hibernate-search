@@ -19,6 +19,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
 import org.hibernate.search.util.logging.impl.IndexedTypeIdentifierFormatter;
 import org.jboss.logging.Logger.Level;
@@ -37,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author Gunnar Morling
  */
 @MessageLogger(projectCode = "HSEARCH")
-public interface Log extends org.hibernate.search.util.logging.impl.Log {
+public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 1,
 			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is not mapped to an Elasticsearch index")
