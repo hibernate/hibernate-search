@@ -14,9 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -76,7 +74,7 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 				.create( EnterpriseArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".ear" )
 				.addAsModules( ejb )
 				.addAsModule( war )
-				.addAsResource( jbossDeploymentXml(), "/jboss-deployment-structure.xml" )
+				.addAsResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.setApplicationXML( new StringAsset( applicationXml ) );
 		return ear;
 	}
@@ -94,17 +92,6 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 				.up()
 			.exportAsString();
 		return new StringAsset( webXml );
-	}
-
-	private static Asset jbossDeploymentXml() throws IOException {
-		String text;
-		try ( InputStream inputStream = ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getClassLoader().getResourceAsStream( "jboss-deployment-structure-ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.xml" ) ) {
-			try ( Scanner scanner = new Scanner( inputStream, "UTF-8" ) ) {
-				text = scanner.useDelimiter( "\\A" ).next();
-			}
-		}
-		String finalXml = text.replace( (CharSequence)"${project.slot}", (CharSequence)VersionTestHelper.getModuleSlotString() );
-		return new StringAsset( finalXml );
 	}
 
 	private static Asset persistenceXml() {

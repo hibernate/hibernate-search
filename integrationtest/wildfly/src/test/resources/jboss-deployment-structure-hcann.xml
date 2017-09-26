@@ -10,9 +10,5 @@
         <dependencies>
             <module name="org.hibernate.commons-annotations" slot="main"/>
         </dependencies>
-        <exclusions>
-            <!-- See jboss-deployment-structure-excludejavassist.xml -->
-            <module name="org.javassist" />
-        </exclusions>
     </deployment>
 </jboss-deployment-structure>
