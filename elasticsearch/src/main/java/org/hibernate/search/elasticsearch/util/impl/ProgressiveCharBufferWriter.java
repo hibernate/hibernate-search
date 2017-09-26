@@ -40,6 +40,12 @@ public class ProgressiveCharBufferWriter extends Writer {
 	private final int pageSize;
 
 	/**
+	 * A higher-level buffer for chars, so that we don't have
+	 * to wrap every single incoming char[] into a CharBuffer.
+	 */
+	private final CharBuffer charBuffer;
+
+	/**
 	 * Filled buffer pages to be written, in write order.
 	 */
 	private final Deque<ByteBuffer> needWritingPages = new ArrayDeque<>( 5 );
@@ -65,9 +71,10 @@ public class ProgressiveCharBufferWriter extends Writer {
 	 */
 	private boolean flowControlPushingBack = false;
 
-	public ProgressiveCharBufferWriter(Charset charset, int pageSize) {
+	public ProgressiveCharBufferWriter(Charset charset, int charBufferSize, int pageSize) {
 		this.charsetEncoder = charset.newEncoder();
 		this.pageSize = pageSize;
+		this.charBuffer = CharBuffer.allocate( charBufferSize );
 	}
 
 	/**
@@ -79,7 +86,114 @@ public class ProgressiveCharBufferWriter extends Writer {
 
 	@Override
 	public void write(char[] cbuf, int off, int len) throws IOException {
-		CharBuffer input = CharBuffer.wrap( cbuf, off, len );
+		if ( len > charBuffer.capacity() ) {
+			/*
+			 * "cbuf" won't fit in our char buffer, so we'll just write
+			 * everything to the byte buffer (first the pending chars in the
+			 * char buffer, then "cbuf").
+			 */
+			flush();
+			writeToByteBuffer( CharBuffer.wrap( cbuf, off, len ) );
+		}
+		else if ( len > charBuffer.remaining() ) {
+			/*
+			 * We flush the buffer before writing anything in this case.
+			 *
+			 * If we did not, we'd run the risk of splitting a 3 or 4-byte
+			 * character in two parts (one at the end of the buffer before
+			 * flushing it, and the other at the beginning after flushing it),
+			 * and the encoder would fail when encoding the second part.
+			 *
+			 * See HSEARCH-2886.
+			 */
+			flush();
+			charBuffer.put( cbuf, off, len );
+		}
+		else {
+			charBuffer.put( cbuf, off, len );
+		}
+	}
+
+	@Override
+	public void flush() throws IOException {
+		if ( charBuffer.position() == 0 ) {
+			return;
+		}
+		charBuffer.flip();
+		writeToByteBuffer( charBuffer );
+		charBuffer.clear();
+
+		// don't flush byte buffers to output as we want to control that flushing independently.
+	}
+
+	@Override
+	public void close() throws IOException {
+		// Nothing to do
+	}
+
+	/**
+	 * Send all full buffer pages to the {@link #setOutput(ContentEncoder) output}.
+	 * <p>
+	 * Flow control may push back, in which case this method or {@link #flushToOutput()}
+	 * should be called again later.
+	 *
+	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
+	 */
+	public void resumePendingWrites() throws IOException {
+		flush();
+		flowControlPushingBack = false;
+		attemptFlushPendingBuffers( false );
+	}
+
+	/**
+	 * @return {@code true} if the {@link #setOutput(ContentEncoder) output} pushed
+	 * back the last time a write was attempted, {@code false} otherwise.
+	 */
+	public boolean isFlowControlPushingBack() {
+		return flowControlPushingBack;
+	}
+
+	/**
+	 * Send all buffer pages to the {@link #setOutput(ContentEncoder) output},
+	 * Even those that are not full yet
+	 * <p>
+	 * Flow control may push back, in which case this method should be called again later.
+	 *
+	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
+	 */
+	public void flushToOutput() throws IOException {
+		flush();
+		flowControlPushingBack = false;
+		attemptFlushPendingBuffers( true );
+	}
+
+	/**
+	 * @return The current size of content stored in the byte buffer, in bytes.
+	 * This does not include the content that has already been written to the {@link #setOutput(ContentEncoder) output},
+	 * nor the content of the char buffer (which can be flushed using {@link #flush()}).
+	 */
+	public int byteBufferContentSize() {
+		int contentSize = 0;
+		/*
+		 * We cannot just multiply the number of pages by the page size,
+		 * because the encoder may overflow without filling a page in some
+		 * cases (for instance when there's only 1 byte of space available in
+		 * the buffer, and the encoder needs to write two bytes for a single char).
+		 */
+		for ( ByteBuffer page : needWritingPages ) {
+			contentSize += page.remaining();
+		}
+		if ( currentPage != null ) {
+			/*
+			 * Add the size of the current page using position(),
+			 * since it hasn't been flipped yet.
+			 */
+			contentSize += currentPage.position();
+		}
+		return contentSize;
+	}
+
+	private void writeToByteBuffer(CharBuffer input) throws IOException {
 		while ( true ) {
 			if ( currentPage == null ) {
 				currentPage = ByteBuffer.allocate( pageSize );
@@ -107,75 +221,6 @@ public class ProgressiveCharBufferWriter extends Writer {
 				return; //Unreachable
 			}
 		}
-	}
-
-	@Override
-	public void flush() throws IOException {
-		// don't flush for real as we want to control actual flushing independently.
-	}
-
-	@Override
-	public void close() throws IOException {
-		// Nothing to do
-	}
-
-	/**
-	 * Send all full buffer pages to the {@link #setOutput(ContentEncoder) output}.
-	 * <p>
-	 * Flow control may push back, in which case this method or {@link #flushToOutput()}
-	 * should be called again later.
-	 *
-	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
-	 */
-	public void resumePendingWrites() throws IOException {
-		flowControlPushingBack = false;
-		attemptFlushPendingBuffers( false );
-	}
-
-	/**
-	 * @return {@code true} if the {@link #setOutput(ContentEncoder) output} pushed
-	 * back the last time a write was attempted, {@code false} otherwise.
-	 */
-	public boolean isFlowControlPushingBack() {
-		return flowControlPushingBack;
-	}
-
-	/**
-	 * Send all buffer pages to the {@link #setOutput(ContentEncoder) output},
-	 * Even those that are not full yet
-	 * <p>
-	 * Flow control may push back, in which case this method should be called again later.
-	 *
-	 * @throws IOException when {@link ContentEncoder#write(ByteBuffer)} fails.
-	 */
-	public void flushToOutput() throws IOException {
-		flowControlPushingBack = false;
-		attemptFlushPendingBuffers( true );
-	}
-
-	/**
-	 * @return The current size of content stored in the buffer, in bytes.
-	 * This does not include the content that has already been written to the {@link #setOutput(ContentEncoder) output}.
-	 */
-	public int bufferedContentSize() {
-		int contentSize = 0;
-		/*
-		 * We cannot just multiply the number of pages by the page size,
-		 * because the encoder may overflow without filling a page in some
-		 * cases (for instance when there's only 1 byte of space available in
-		 * the buffer, and the encoder needs to write two bytes for a single char).
-		 */
-		for ( ByteBuffer page : needWritingPages ) {
-			contentSize += page.remaining();
-		}
-		if ( currentPage != null ) {
-			/*
-			 * Add the size of the current page using position(),
-			 * since it hasn't been flipped yet.
-			 */
-			contentSize += currentPage.position();
-		}
-		return contentSize;
 	}
 
 	/**
