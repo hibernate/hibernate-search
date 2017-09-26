@@ -197,13 +197,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 48, value = "Unable to retrieve named analyzer: %1$s")
 	void unableToRetrieveNamedAnalyzer(String value);
 
-	/* Moved to the parent logger interface to be shared across compilation units
-	@LogMessage(level = WARN)
-	@Message(id = 49,
-			value = "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity(@Cause InterruptedException e);
-	*/
-
 	@LogMessage(level = WARN)
 	@Message(id = 50, value = "It appears changes are being pushed to the index out of a transaction. " +
 			"Register the IndexWorkFlushEventListener listener on flush to correctly manage Collections!")
@@ -253,12 +246,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 68, value = "Unable to retrieve object from message: %1$s")
 	void unableToRetrieveObjectFromMessage(@FormatWith(ClassFormatter.class) Class<?> messageClass, @Cause Exception e);
 
-	/* Moved to the parent logger interface to be shared across compilation units
-	@LogMessage(level = ERROR)
-	@Message(id = 69, value = "Illegal object retrieved from message")
-	void illegalObjectRetrievedFromMessage(@Cause Exception e);
-	*/
-
 	@LogMessage(level = ERROR)
 	@Message(id = 72,
 			value = "Couldn't open the IndexWriter because of previous error: operation skipped, index ouf of sync!")
@@ -282,12 +269,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
 	void unableToShutdownAsynchronousIndexingByTimeout(String indexName);
-
-	/* Moved to the specific logger of the Avro serialization module
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d initialized")
-	void serializationProtocol(int major, int minor);
-	*/
 
 	@LogMessage(level = WARN)
 	@Message(id = 81,
@@ -330,12 +311,6 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 96, value = "Fail to deserialize object")
 	SearchException failToDeserializeObject(@Cause Throwable e);
-
-	/* Moved to the specific logger of the Avro serialization module
-	@Message(id = 98, value = "Unable to parse message from protocol version %1$d.%2$d. "
-			+ "Current protocol version: %3$d.%4$d")
-	SearchException incompatibleProtocolVersion(int messageMajor, int messageMinor, int currentMajor, int currentMinor);
-	*/
 
 	@Message(id = 99, value = "Unable to deserialize Avro stream")
 	SearchException unableToDeserializeAvroStream(@Cause Throwable e);
@@ -385,11 +360,6 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 113, value = "'null' is not a valid index name")
 	IllegalArgumentException nullIsInvalidIndexName();
-
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 114, value = "Could not load resource: '%1$s'")
-	SearchException unableToLoadResource(String fileName);
-	*/
 
 	@Message(id = 115, value = "Unknown @FullTextFilter: '%1$s'")
 	SearchException unknownFullTextFilter(String filterName);
@@ -452,11 +422,6 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 139, value = "Unable to instantiate FieldBridge for %1$s of class %2$s")
 	SearchException unableToInstantiateFieldBridge(String appliedOnName, String appliedOnTypeName, @Cause Throwable e);
-
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 140, value = "Unknown Resolution: %1$s")
-	AssertionFailure unknownResolution(String resolution);
-	*/
 
 	@Message(id = 144, value = "FieldBridge passed in is not an instance of %1$s")
 	SearchException fieldBridgeNotAnInstanceof(String className);
@@ -799,11 +764,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 265, value = "Unable to build Lucene Document due to facet indexing error")
 	SearchException errorDuringFacetingIndexing(@Cause Exception e );
 
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 266, value = "'%s' is not a valid type for a facet range request. Numbers (byte, short, int, long, float, double and their wrappers) as well as dates are supported")
-	SearchException unsupportedFacetRangeParameter(String type);
-	*/
-
 	@Message(id = 267, value = "Unable to index date facet '%1$s' for field '%2$s', since the matching field is not using a numeric field bridge")
 	SearchException numericDateFacetForNonNumericField(String facetName, String fieldName);
 
@@ -974,11 +934,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 323, value = "The field '%1$s' is not stored.")
 	SearchException projectingNonStoredField(String fieldName);
 
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 324, value = "The fieldBridge for field '%1$s' is an instance of '%2$s', which does not implement TwoWayFieldBridge. Projected fields must have a TwoWayFieldBridge.")
-	SearchException projectingFieldWithoutTwoWayFieldBridge(String fieldName, Class<?> fieldBridgeClass);
-	*/
-
 	@Message(id = 325, value = "The 'indexNullAs' property for field '%2$s', with value '%1$s', has invalid format: %3$s"
 			+ " Could not parse '%1$s'." )
 	SearchException nullMarkerInvalidFormat(String proposedTokenValue, String fieldName, String invalidFormatMessage, @Cause Exception e);
@@ -986,21 +941,8 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 326, value = "Index names collision detected. Different index managers will point to the same actual index: %1$s")
 	SearchException indexNamesCollisionDetected(String string);
 
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 327, value = "Unsupported indexNullAs token type '%3$s' on field '%2$s' of entity '%1$s'." )
-	SearchException unsupportedNullTokenType(@FormatWith(IndexedTypeIdentifierFormatter.class) IndexedTypeIdentifier entityName, String fieldName, Class<?> tokenType);
-	*/
-
 	@Message(id = 328, value = "Cannot create context for class: %1$s" )
 	SearchException cannotCreateBridgeDefinedField(@FormatWith(ClassFormatter.class) Class<?> backend, @Cause Exception e);
-
-	/* Moved to the parent logger interface to be shared across compilation units
-	@Message(id = 329, value = "Property '" + Environment.ANALYSIS_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
-			+ " The value must be the fully-qualified name of a class with a public, no-arg constructor in your classpath."
-			+ " Also, the class must either implement LuceneAnalyzerDefinitionProvider or expose a public,"
-			+ " @Factory-annotated method returning a LuceneAnalyzerDefinitionProvider.")
-	SearchException invalidLuceneAnalyzerDefinitionProvider(String providerClassName, @Cause Exception e);
-	*/
 
 	@Message(id = 330, value = "Multiple analyzer definitions with the same name: '%1$s'." )
 	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
