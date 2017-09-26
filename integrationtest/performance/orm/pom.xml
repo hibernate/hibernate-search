@@ -26,6 +26,7 @@
         here due to dependency conflicts with specific versions of WildFly
         -->
         <enforcer.skip>true</enforcer.skip>
+        <scenario></scenario>
     </properties>
 
     <dependencyManagement>
