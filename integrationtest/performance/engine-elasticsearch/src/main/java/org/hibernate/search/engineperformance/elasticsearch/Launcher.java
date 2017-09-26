@@ -29,7 +29,7 @@ public class Launcher {
 
 	public static void main(String... args) throws Exception {
 		Options opts = new OptionsBuilder()
-			.include( ".*" )
+			.include( "StreamWriteJMHBenchmarks\\.write" )
 			.warmupIterations( 1 )
 			.measurementIterations( 10 )
 			.param( "indexSize", "100" )
