@@ -75,7 +75,15 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * be a penalty for small requests.
 	 * 1024 has been shown to produce reasonable, TLAB only garbage.
 	 */
-	private static final int BUFFER_PAGE_SIZE = 1024;
+	private static final int BYTE_BUFFER_PAGE_SIZE = 1024;
+
+	/**
+	 * We want the char buffer and byte buffer pages of approximately
+	 * the same size, however one is in characters and the other in bytes.
+	 * Considering we hardcoded UTF-8 as encoding, which has an average
+	 * conversion ratio of almost 1.0, this should be close enough.
+	 */
+	private static final int CHAR_BUFFER_SIZE = BYTE_BUFFER_PAGE_SIZE;
 
 	private final Gson gson;
 	private final List<JsonObject> bodyParts;
@@ -115,7 +123,8 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	 * partially rendered JSON stored in its buffers while flow control
 	 * refuses to accept more bytes.
 	 */
-	private ProgressiveCharBufferWriter writer = new ProgressiveCharBufferWriter( CHARSET, BUFFER_PAGE_SIZE );
+	private ProgressiveCharBufferWriter writer =
+			new ProgressiveCharBufferWriter( CHARSET, CHAR_BUFFER_SIZE, BYTE_BUFFER_PAGE_SIZE );
 
 	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) {
 		Objects.requireNonNull( gson );
@@ -183,7 +192,7 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		//so that we can start from the beginning if needed
 		this.nextBodyToEncodeIndex = 0;
 		//Discard previous buffers as they might contain in-process content:
-		this.writer = new ProgressiveCharBufferWriter( CHARSET, BUFFER_PAGE_SIZE );
+		this.writer = new ProgressiveCharBufferWriter( CHARSET, CHAR_BUFFER_SIZE, BYTE_BUFFER_PAGE_SIZE );
 	}
 
 	/**
@@ -199,16 +208,18 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		// as it's not set yet.
 		try {
 			triggerFullWrite();
+			if ( nextBodyToEncodeIndex == bodyParts.size() ) {
+				writer.flush();
+				// The buffer's current content size is the final content size,
+				// as we know the entire content has been encoded already,
+				// and we also know no content was consumed from the buffer yet.
+				hintContentLength( writer.byteBufferContentSize() );
+			}
 		}
 		catch (IOException e) {
-			// Unlikely: there's no output buffer yet!
+			// Unlikely to be caused by a real IO operation as there's no output buffer yet,
+			// but it could also be triggered by the UTF8 encoding operations.
 			throw new SearchException( e );
-		}
-		if ( nextBodyToEncodeIndex == bodyParts.size() ) {
-			// The buffer's current content size is the final content size,
-			// as we know the entire content has been encoded already,
-			// and we also know no content was consumed from the buffer yet.
-			hintContentLength( writer.bufferedContentSize() );
 		}
 	}
 
