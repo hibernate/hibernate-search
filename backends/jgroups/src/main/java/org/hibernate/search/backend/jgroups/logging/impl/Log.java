@@ -17,6 +17,7 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.ValidIdRange;
 import org.jgroups.Address;
 import org.jgroups.SuspectedException;
 import org.jgroups.TimeoutException;
@@ -28,98 +29,96 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Hibernate Search JGroup backend log abstraction.
+ * Valid ranges for the message ids are between 200000 and 300000.
  *
  * @author Hardy Ferentschik
  */
 @MessageLogger(projectCode = "HSEARCH")
+@ValidIdRange(min = 200001, max = 299999)
 public interface Log extends BaseHibernateSearchLogger {
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 1,
-			value = "Remote JGroups peer '%1$s' is suspected to have left '")
+	@Message(id = 200001, value = "Remote JGroups peer '%1$s' is suspected to have left '")
 	SuspectedException jgroupsSuspectingPeer(Address sender);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 2,
-			value = "Timeout sending synchronous message to JGroups peer '%1$s''")
+	@Message(id = 200002, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
 	TimeoutException jgroupsRpcTimeout(Address sender);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 3,
-			value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
+	@Message(id = 200003, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
 	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 4,
-			value = "Unable to send Lucene update work via JGroups cluster")
+	@Message(id = 200004, value = "Unable to send Lucene update work via JGroups cluster")
 	SearchException unableToSendWorkViaJGroups(@Cause Throwable e);
 
 	@LogMessage(level = WARN)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 5, value = "Received null or empty Lucene works list in message.")
+	@Message(id = 200005, value = "Received null or empty Lucene works list in message.")
 	void receivedEmptyLuceneWorksInMessage();
 
 	@LogMessage(level = INFO)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 6, value = "Received new cluster view: %1$s")
+	@Message(id = 200006, value = "Received new cluster view: %1$s")
 	void jGroupsReceivedNewClusterView(Object view);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 7, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '%s'.")
+	@Message(id = 200007, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '%s'.")
 	SearchException missingJGroupsMuxId(String muxId);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 8, value = "Starting JGroups ChannelProvider")
+	@Message(id = 200008, value = "Starting JGroups ChannelProvider")
 	void jGroupsStartingChannelProvider();
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 9, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
+	@Message(id = 200009, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
 	SearchException jGroupsMuxIdAlreadyTaken(short n);
 
 	@LogMessage(level = WARN)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 10,
+	@Message(id = 200010,
 			value = "FLUSH is not present in your JGroups stack! FLUSH is needed to ensure messages are not dropped while new nodes join the cluster. Will proceed, but inconsistencies may arise!")
 	void jGroupsFlushNotPresentInStack();
 
 	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 11, value = "Using JGroups channel having configuration '%1$s'")
+	@Message(id = 200011, value = "Using JGroups channel having configuration '%1$s'")
 	void jgroupsFullConfiguration(String printProtocolSpecAsXML);
 
 	@LogMessage(level = ERROR)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 12, value = "Problem closing channel; setting it to null")
+	@Message(id = 200012, value = "Problem closing channel; setting it to null")
 	void jGroupsClosingChannelError(@Cause Exception toLog);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 13, value = "Object injected for JGroups channel in %1$s is of an unexpected type %2$s (expecting org.jgroups.JChannel)")
+	@Message(id = 200013, value = "Object injected for JGroups channel in %1$s is of an unexpected type %2$s (expecting org.jgroups.JChannel)")
 	SearchException jGroupsChannelInjectionError(String channelInject, @Cause Exception e, @FormatWith(ClassFormatter.class) Class<?> actualType);
 
 	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 14, value = "Starting JGroups channel using configuration '%1$s'")
+	@Message(id = 200014, value = "Starting JGroups channel using configuration '%1$s'")
 	void startingJGroupsChannel(Object cfg);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 15, value = "Error while trying to create a channel using config file: %1$s")
+	@Message(id = 200015, value = "Error while trying to create a channel using config file: %1$s")
 	SearchException jGroupsChannelCreationUsingFileError(String configuration, @Cause Throwable e);
 
 	@LogMessage(level = INFO)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 16,
+	@Message(id = 200016,
 			value = "Unable to use any JGroups configuration mechanisms provided in properties %1$s. Using default JGroups configuration file!")
 	void jGroupsConfigurationNotFoundInProperties(Properties props);
 
 	@LogMessage(level = INFO)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 17, value = "Disconnecting and closing JGroups Channel to cluster '%1$s'")
+	@Message(id = 200017, value = "Disconnecting and closing JGroups Channel to cluster '%1$s'")
 	void jGroupsDisconnectingAndClosingChannel(String clusterName);
 
 	@LogMessage(level = WARN)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 18,
+	@Message(id = 200018,
 			value = "Default JGroups configuration file was not found. Attempt to start JGroups channel with default configuration!")
 	void jGroupsDefaultConfigurationFileNotFound();
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 19, value = "Unable to start JGroups channel")
+	@Message(id = 200019, value = "Unable to start JGroups channel")
 	SearchException unableToStartJGroupsChannel(@Cause Throwable e);
 
 	@LogMessage(level = INFO)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 20, value = "Connected to cluster [ %1$s ]. The local Address is %2$s")
+	@Message(id = 200020, value = "Connected to cluster [ %1$s ]. The local Address is %2$s")
 	void jGroupsConnectedToCluster(String clusterName, Object address);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 21, value = "Unable to connect to: [%1$s] JGroups channel")
+	@Message(id = 200021, value = "Unable to connect to: [%1$s] JGroups channel")
 	SearchException unableConnectingToJGroupsCluster(String clusterName, @Cause Throwable e);
 
 	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 22, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
+	@Message(id = 200022, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
 	void jgroupsBlockWaitingForAck(String indexName, boolean block);
 
-	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 23, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
+	@Message(id = 200023, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/5.0/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
 }

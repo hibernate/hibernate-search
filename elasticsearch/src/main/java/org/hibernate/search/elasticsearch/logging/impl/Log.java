@@ -28,17 +28,22 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.ValidIdRange;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
  * Hibernate Search log abstraction for the Elasticsearch integration.
+ * Valid ranges for the message ids are between 400000 and 500000.
  *
  * @author Gunnar Morling
  */
 @MessageLogger(projectCode = "HSEARCH")
+@ValidIdRange(min = 400001, max = 499999)
 public interface Log extends BaseHibernateSearchLogger {
+
+	int ES_BACKEND_MESSAGES_START_ID = 400000;
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 1,
 			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is not mapped to an Elasticsearch index")

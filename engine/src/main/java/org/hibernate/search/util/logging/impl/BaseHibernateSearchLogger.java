@@ -40,10 +40,6 @@ import org.jboss.logging.annotations.MessageLogger;
 @MessageLogger(projectCode = "HSEARCH")
 public interface BaseHibernateSearchLogger extends BasicLogger {
 
-	int JGROUPS_BACKEND_MESSAGES_START_ID = 200000;
-	int AVRO_SERIALIZATION_MESSAGES_START_ID = 300000;
-	int ES_BACKEND_MESSAGES_START_ID = 400000;
-
 	/*
 	 * Below we have messages moved from the hibernate-search-engine specific
 	 * module to allow reuse from other modules, but their id will need to respect
