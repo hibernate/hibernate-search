@@ -60,7 +60,7 @@ public class BlackholeElasticsearchClient implements ElasticsearchClientImplemen
 		if ( "GET".equals( method ) && ( StringHelper.isEmpty( path ) || "/".equals( path ) ) ) {
 			return getResponse;
 		}
-		else if ( "POST".equals( method ) && path.endsWith( "/_bulk/" ) ) {
+		else if ( "POST".equals( method ) && path.endsWith( "/_bulk" ) ) {
 			JsonBuilder.Array builder = JsonBuilder.array();
 
 			// In our case we only bulk requests without a body
