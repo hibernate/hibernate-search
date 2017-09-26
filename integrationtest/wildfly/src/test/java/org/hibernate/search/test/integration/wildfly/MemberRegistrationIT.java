@@ -58,8 +58,6 @@ public class MemberRegistrationIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
-				.clazz( Member.class.getName() )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()

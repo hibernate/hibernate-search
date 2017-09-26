@@ -40,7 +40,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Example of an integration test using JBoss AS 7 and Arquillian.
+ * Example of an integration test using WildFly and Arquillian.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
@@ -100,8 +100,6 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 			.createPersistenceUnit()
 				.name( "primary" )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-				// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
-				.clazz( Member.class.getName() )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
