@@ -61,7 +61,6 @@ public class MassIndexingTimeoutIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				.clazz( Concert.class.getName() )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()

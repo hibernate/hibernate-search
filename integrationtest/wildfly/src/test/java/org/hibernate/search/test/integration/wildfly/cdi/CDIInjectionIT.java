@@ -19,7 +19,6 @@ import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.integration.wildfly.cdi.i18n.InternationalizedValue;
 import org.hibernate.search.test.integration.wildfly.cdi.model.EntityWithCDIAwareBridges;
 import org.hibernate.search.test.integration.wildfly.cdi.model.EntityWithCDIAwareBridgesDao;
-import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -60,8 +59,6 @@ public class CDIInjectionIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
-				.clazz( Member.class.getName() )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()

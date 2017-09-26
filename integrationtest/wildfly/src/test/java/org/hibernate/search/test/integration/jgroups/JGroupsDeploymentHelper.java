@@ -86,8 +86,6 @@ public class JGroupsDeploymentHelper {
 				.createPersistenceUnit()
 					.name( "pu-" + name )
 					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-					// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
-					.clazz( RegisteredMember.class.getName() )
 					.getOrCreateProperties()
 						.createProperty()
 							.name( "wildfly.jpa.hibernate.search.module" )
