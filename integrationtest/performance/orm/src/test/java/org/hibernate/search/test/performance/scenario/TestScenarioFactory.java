@@ -18,7 +18,7 @@ public class TestScenarioFactory {
 
 	public static TestScenario create() {
 		String scenarioClassName = System.getProperty( "scenario" );
-		if ( scenarioClassName == null ) {
+		if ( scenarioClassName == null || scenarioClassName.isEmpty() ) {
 			scenarioClassName = SmokeTestScenario.class.getName();
 			printTestScenarioNames( "No test scenario was set, please use one of the following (via -Dscenario=...):" );
 		}
