@@ -52,7 +52,7 @@ public abstract class AbstractTask implements Runnable {
 		}
 		catch (RuntimeException e) {
 			tx.rollback();
-			ctx.reportRuntimeException( e );
+			ctx.reportFailure( e );
 			throw e;
 		}
 		finally {

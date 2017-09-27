@@ -11,7 +11,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.transaction.TransactionManager;
 
@@ -23,11 +25,11 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.util.BatchCallback;
 import org.hibernate.search.test.performance.util.BatchSupport;
+import org.hibernate.search.util.impl.SearchThreadFactory;
 
 import static org.apache.commons.lang.StringUtils.reverse;
 import static org.hibernate.search.test.performance.task.InsertBookTask.PUBLICATION_DATE_ZERO;
 import static org.hibernate.search.test.performance.task.InsertBookTask.SUMMARIES;
-import static org.hibernate.search.test.performance.util.CheckerUncaughtExceptions.initUncaughtExceptionHandler;
 import static org.hibernate.search.test.performance.util.Util.log;
 
 /**
@@ -37,13 +39,26 @@ class TestExecutor {
 
 	public final void run(TestContext testContext, TestScenarioContext warmupContext, TestScenarioContext measureContext)
 			throws IOException {
-		initUncaughtExceptionHandler();
 		initDatabase( testContext );
 		performWarmUp( warmupContext );
 		performCleanUp( testContext );
-		initIndex( testContext );
-		performMeasuring( measureContext );
+		if ( warmupContext.getFailures().isEmpty() ) {
+			initIndex( testContext );
+			performMeasuring( measureContext );
+		}
 		TestReporter.printReport( testContext, warmupContext, measureContext );
+
+		// Propagate the very first failure, which is likely to be the most important one
+		if ( !warmupContext.getFailures().isEmpty() ) {
+			throw new RuntimeException(
+					"Warmup phase failed due to an unexpected exception",
+					warmupContext.getFailures().iterator().next() );
+		}
+		else if ( !measureContext.getFailures().isEmpty() ) {
+			throw new RuntimeException(
+					"Measure phase failed due to an unexpected exception",
+					measureContext.getFailures().iterator().next() );
+		}
 	}
 
 	protected void initDatabase(TestContext ctx) {
@@ -138,7 +153,7 @@ class TestExecutor {
 	}
 
 	private void scheduleTasksAndStart(TestScenarioContext ctx, long cyclesCount) {
-		ExecutorService executor = Executors.newFixedThreadPool( ctx.testContext.threadCount );
+		ExecutorService executor = newAutoStoppingErrorReportingThreadPool( ctx );
 		for ( int i = 0; i < cyclesCount; i++ ) {
 			for ( Runnable task : ctx.tasks ) {
 				executor.execute( task );
@@ -155,10 +170,33 @@ class TestExecutor {
 		catch (InterruptedException e) {
 			throw new RuntimeException( e );
 		}
-		RuntimeException firstRuntimeError = ctx.getFirstRuntimeError();
-		if ( firstRuntimeError != null ) {
-			throw firstRuntimeError;
-		}
+	}
+
+	private ExecutorService newAutoStoppingErrorReportingThreadPool(TestScenarioContext ctx) {
+		int nThreads = ctx.testContext.threadCount;
+		ThreadFactory threadFactory = new SearchThreadFactory( ctx.scenario.getClass().getSimpleName() ) {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = super.newThread( r );
+				// Just ignore uncaught exceptions, we'll report them through other means (see below)
+				t.setUncaughtExceptionHandler( (thread, throwable) -> { } );
+				return t;
+			}
+		};
+		return new ThreadPoolExecutor(
+				nThreads, nThreads,
+				0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>(), threadFactory
+				) {
+			@Override
+			protected void afterExecute(Runnable r, Throwable t) {
+				super.afterExecute( r, t );
+				if ( t != null ) {
+					ctx.reportFailure( t );
+					shutdown();
+				}
+			}
+		};
 	}
 
 	private void commitTransaction(SessionImplementor session) {

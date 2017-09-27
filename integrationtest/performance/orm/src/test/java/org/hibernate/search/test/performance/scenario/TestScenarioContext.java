@@ -6,18 +6,20 @@
  */
 package org.hibernate.search.test.performance.scenario;
 
-import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
-
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.search.test.performance.task.AbstractTask;
 
 import com.google.common.base.Stopwatch;
+
+import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
 /**
  * @author Tomas Hradec
@@ -34,7 +36,7 @@ public class TestScenarioContext {
 	public final AtomicLong authorIdCounter = new AtomicLong( 0 );
 	public final Random bookRandom = new Random();
 	public final Random authorRandom = new Random();
-	public final AtomicReference<RuntimeException> firstKnownError = new AtomicReference<>();
+	private final Collection<Throwable> failures = new ConcurrentLinkedDeque<>();
 
 	public final Stopwatch executionStopWatch = Stopwatch.createUnstarted();
 	public final long initialFreeMemory;
@@ -71,16 +73,12 @@ public class TestScenarioContext {
 		return 0;
 	}
 
-	public void reportRuntimeException(RuntimeException e) {
-		//We only want to track the first exception:
-		//having any error is enough to invalidate the results,
-		//and if there are multiple it's likely that they are either
-		//repeated errors, or that others are caused by the first one.
-		firstKnownError.compareAndSet( null, e );
+	public void reportFailure(Throwable t) {
+		failures.add( t );
 	}
 
-	public RuntimeException getFirstRuntimeError() {
-		return firstKnownError.get();
+	public Collection<Throwable> getFailures() {
+		return Collections.unmodifiableCollection( failures );
 	}
 
 }
