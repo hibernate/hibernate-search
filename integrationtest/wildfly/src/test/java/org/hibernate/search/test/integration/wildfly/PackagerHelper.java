@@ -10,6 +10,7 @@ import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.integration.VersionTestHelper;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
 import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
 
 
@@ -57,18 +58,34 @@ public class PackagerHelper {
 	 */
 	public static JavaArchive[] hibernateSearchLibraries() {
 		return Maven.resolver()
-			.resolve( "org.hibernate:hibernate-search-orm:" + getCurrentVersion() )
-			// we need some dependencies at the right version: Lucene, search-engine, etc..
-			.using( new RejectDependenciesStrategy( false, exclusions ) )
-			.as( JavaArchive.class );
-		// To debug dependencies, have it dump a zip export:
-		//archive.as( ZipExporter.class ).exportTo( new File("test-app.war"), true );
+				.resolve( "org.hibernate:hibernate-search-orm:" + getCurrentVersion() )
+				// we need some dependencies at the right version: Lucene, search-engine, etc..
+				.using( new RejectDependenciesStrategy( false, exclusions ) )
+				.as( JavaArchive.class );
 	}
 
+	/**
+	 * @return the Maven coordinates of all archives returned by {@link #hibernateSearchLibraries()}
+	 */
+	private static String[] coordinatesOfHibernateSearchLibraries() {
+		return Maven.resolver()
+				.resolve( "org.hibernate:hibernate-search-orm:" + getCurrentVersion() )
+				.using( new RejectDependenciesStrategy( false, exclusions ) )
+				.asList( MavenResolvedArtifact.class )
+				.stream().map( m -> m.getCoordinate().getGroupId().toString() + ":" + m.getCoordinate().getArtifactId().toString() )
+				.toArray( String[]::new );
+	}
+
+	/**
+	 * Returns the set of dependencies defined as org.hibernate:hibernate-search-testing at
+	 * the version being built, including transitive dependencies but strictly excluding
+	 * anything which would be provided by {@link #hibernateSearchLibraries()} so that
+	 * the two combined would not contain duplicates.
+	 */
 	public static JavaArchive[] hibernateSearchTestingLibraries() {
 		return Maven.resolver()
 			.resolve( "org.hibernate:hibernate-search-testing:" + getCurrentVersion() )
-			.using( new RejectDependenciesStrategy( false, exclusions ) )
+			.using( new RejectDependenciesStrategy( false, coordinatesOfHibernateSearchLibraries() ) )
 			.as( JavaArchive.class );
 	}
 
