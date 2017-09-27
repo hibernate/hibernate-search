@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Environment;
 import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
 import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenario;
@@ -97,6 +98,7 @@ public class TestRunnerArquillian {
 		pu.getOrCreateProperties()
 			.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 			.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+			.createProperty().name( Environment.ALLOW_JTA_TRANSACTION_ACCESS ).value( Boolean.toString( true ) ).up()
 			;
 		return new StringAsset( pd.exportAsString() );
 	}
