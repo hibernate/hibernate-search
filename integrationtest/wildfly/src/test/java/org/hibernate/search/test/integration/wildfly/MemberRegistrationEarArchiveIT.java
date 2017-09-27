@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
-import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 import java.util.List;
 
@@ -37,7 +36,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Example of an integration test using JBoss AS 7 and Arquillian.
+ * Example of an integration test using WildFly and Arquillian.
+ * This variation assembles an EAR archive and includes the Hibernate Search
+ * jars into the archive.
+ * The WildFly system normally providing the Hibernate Search modules is
+ * disabled.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
@@ -74,7 +77,7 @@ public class MemberRegistrationEarArchiveIT {
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
-					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( "none" ).up()
 					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 				.up().up()
 			.exportAsString();
