@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,7 +31,6 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
-import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;
 import org.hibernate.search.test.performance.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 
@@ -63,7 +63,22 @@ public class TestReporter {
 		outWriter.flush();
 
 		CheckerLuceneIndex.printIndexReport( testCtx, outStream );
-		CheckerUncaughtExceptions.printUncaughtExceptions( measureCtx, outWriter );
+
+		Collection<Throwable> warmupFailures = warmupCtx.getFailures();
+		Collection<Throwable> measureFailures = measureCtx.getFailures();
+		if ( !warmupFailures.isEmpty() || !measureFailures.isEmpty() ) {
+			outWriter.println( "===========================================================================" );
+			outWriter.println( "EXCEPTIONS" );
+			outWriter.println( "" );
+			for ( Throwable e : warmupFailures ) {
+				e.printStackTrace( outWriter );
+				outWriter.println( "---------------------------------------------------------------" );
+			}
+			for ( Throwable e : measureFailures ) {
+				e.printStackTrace( outWriter );
+				outWriter.println( "---------------------------------------------------------------" );
+			}
+		}
 
 		outWriter.close();
 		outStream.close();
