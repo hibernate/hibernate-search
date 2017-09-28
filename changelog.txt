@@ -629,7 +629,7 @@ Version 5.6.0.Alpha3 (16-3-2016)
 ** Bug
     * [HSEARCH-2126] - Checkstyle fails when explicitly called via goal checkstyle:check
     * [HSEARCH-2127] - SpatialFieldBridges implement MetadataProvidingFieldBridge but does not provide useful information about the added fields
-    * [HSEARCH-2129] - Spatial FieldBrige defined fields are not contributed correctly in the DocumentBuilderIndexedEntity
+    * [HSEARCH-2129] - Spatial FieldBridge defined fields are not contributed correctly in the DocumentBuilderIndexedEntity
     * [HSEARCH-2160] - JGroups Backend SyncJGroupsBackendTest doesn't work after 2150 on anymore.
     * [HSEARCH-2163] - ElasticsearchIndexManager should close the underlying BackendQueueProcessor
     * [HSEARCH-2169] - TermQuery should be translated to term query not match query
