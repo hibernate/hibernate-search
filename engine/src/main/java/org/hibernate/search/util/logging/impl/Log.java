@@ -1005,4 +1005,8 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " Please refer to the official documentation for more information." )
 	void usingDeprecatedNameForRamDirectoryProvider();
 
+	@Message(id = 347, value = "The EntityManagerFactory of type '%s' is not an Hibernate based EntityManagerFactory, "
+			+ "or not compatible with this version of Hibernate Search." )
+	SearchException incompatibleEntityManagerFactory(String emfClassName);
+
 }

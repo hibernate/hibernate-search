@@ -11,6 +11,11 @@
         <exclude-unlisted-classes />
     </persistence-unit>
 
+    <persistence-unit name="IntegratorExtractionTestPU">
+        <class>org.hibernate.search.test.jpa.Bretzel</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
     <persistence-unit name="EntityManagerTestPU">
         <class>org.hibernate.search.test.jpa.Bretzel</class>
         <exclude-unlisted-classes />
