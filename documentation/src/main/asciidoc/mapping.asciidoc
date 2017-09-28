@@ -2036,7 +2036,7 @@ discovery mechanism.
 
 Now, any indexed property of type `Currency` will use `CurrencyFieldBridge` automatically.
 
-.An explicit `@FieldBrige` is no longer needed
+.An explicit `@FieldBridge` is no longer needed
 ====
 [source, JAVA]
 ----
