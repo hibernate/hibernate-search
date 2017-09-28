@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.jms.master;
 
-import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
+import org.hibernate.search.backend.jms.spi.AbstractJMSHibernateSearchController;
 import org.hibernate.search.spi.SearchIntegrator;
 
 /**

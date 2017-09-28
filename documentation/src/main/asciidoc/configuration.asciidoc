@@ -699,7 +699,7 @@ import javax.jms.MessageListener;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
-import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
+import org.hibernate.search.backend.jms.spi.AbstractJMSHibernateSearchController;
 import org.hibernate.search.orm.spi.SearchIntegratorHelper;
 import org.hibernate.search.spi.SearchIntegrator;
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.impl.jms;
+package org.hibernate.search.backend.jms.spi;
 
 import java.util.List;
 
@@ -24,11 +24,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Example template to implement the Hibernate Search controller for processing the
  * work send through JMS by the slave nodes.
  *
+ * While it is possible to extend this class directly for convenience in your project,
+ * we would suggest to look at this as an example and implement your own.
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
- * @deprecated moved to org.hibernate.search.backend.jms.spi.AbstractJMSHibernateSearchController. This will be removed.
  */
-@Deprecated
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
 
 	private static final Log log = LoggerFactory.make();
