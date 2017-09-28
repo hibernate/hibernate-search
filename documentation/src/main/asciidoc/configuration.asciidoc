@@ -693,6 +693,16 @@ and set up to process the index works queue through JMS.
 ====
 [source, JAVA]
 ----
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.MessageDriven;
+import javax.jms.MessageListener;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+
+import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
+import org.hibernate.search.orm.spi.SearchIntegratorHelper;
+import org.hibernate.search.spi.SearchIntegrator;
+
 @MessageDriven(activationConfig = {
       @ActivationConfigProperty(propertyName="destinationType",
                                 propertyValue="javax.jms.Queue"),
@@ -702,12 +712,11 @@ and set up to process the index works queue through JMS.
 public class MDBSearchController extends AbstractJMSHibernateSearchController
                                  implements MessageListener {
 
-    @PersistenceContext EntityManager em;
+    @PersistenceUnit EntityManagerFactory emf;
 
     @Override
     protected SearchIntegrator getSearchIntegrator() {
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
-        return fullTextEntityManager.getSearchFactory().unwrap(SearchIntegrator.class);
+        return SearchIntegratorHelper.extractFromEntityManagerFactory( emf );
     }
 }
 ----

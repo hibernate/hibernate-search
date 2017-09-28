@@ -23,14 +23,35 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();
 [[AccessingSearchIntegrator]]
 === Accessing the `SearchIntegrator`
 
-The interface `SearchIntegrator` gives access to lower level APIs of Hibernate Search.
-You can access the `SearchIntegrator` SPI using the SearchFactory (<<AccessingSearchFactory>>):
+The interface `SearchIntegrator` gives access to advanced functionality and internals of Hibernate Search;
+these are typically only useful to integrate Hibernate Search with other libraries.
+These are called SPI - Service Provide Interface - to better differentiate them from normal APIs.
+You can recognize them by noticing an `spi` element in the package name, such as in `org.hibernate.search.spi.SearchIntegrator`.
 
-.Accessing the `SearchIntegrator`
+You can access the `SearchIntegrator` SPI using the SearchFactory (<<AccessingSearchFactory>>),
+or by extracting the instance from the Hibernate native `SessionFactory` or the JPA `EntityManagerFactory` as in the following examples:
+
+.Accessing the `SearchIntegrator` from a `SearchFactory`
 ====
 [source, JAVA]
 ----
-SearchIntegrator searchIntegrator = searchFactory.unwrap(SearchIntegrator.class);
+SearchIntegrator si = searchFactory.unwrap(SearchIntegrator.class);
+----
+====
+
+.Accessing the `SearchIntegrator` from a `SessionFactory`
+====
+[source, JAVA]
+----
+SearchIntegrator si = org.hibernate.search.orm.spi.SearchIntegratorHelper.extractFromSessionFactory( sf );
+----
+====
+
+.Accessing the `SearchIntegrator` from an `EntityManagerFactory`
+====
+[source, JAVA]
+----
+SearchIntegrator si = org.hibernate.search.orm.spi.SearchIntegratorHelper.extractFromEntityManagerFactory( emf );
 ----
 ====
 
