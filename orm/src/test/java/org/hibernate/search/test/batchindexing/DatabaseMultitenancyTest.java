@@ -43,7 +43,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * @since 5.2
  */
 @RequiresDialect(
-	comment = "The connection provider for this test requires H2",
+	comment = "The connection provider for this test ignores configuration and requires H2",
 	strictMatching = true,
 	value = org.hibernate.dialect.H2Dialect.class
 )

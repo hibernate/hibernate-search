@@ -26,6 +26,8 @@ import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+
+import org.hibernate.testing.RequiresDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +37,11 @@ import org.junit.Test;
  *
  * @author Gunnar Morling
  */
+@RequiresDialect(
+		comment = "The connection provider for this test ignores configuration and requires H2",
+		strictMatching = true,
+		value = org.hibernate.dialect.H2Dialect.class
+)
 public class DeleteByQueryMultiTenancyIT extends SearchTestBase {
 
 	private static final String EXTRA_TERRESTRIAL = "Extraterrestrial";
