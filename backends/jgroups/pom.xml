@@ -93,12 +93,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Enable extracting shared test build resources -->
         <!-- See how maven-dependency-plugin is configured in the parent pom -->
         <dependency>
