@@ -17,6 +17,23 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.BridgeException;
+import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
@@ -26,23 +43,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.HibernateException;
-import org.hibernate.Transaction;
-import org.hibernate.dialect.PostgreSQL81Dialect;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.bridge.BridgeException;
-import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.testing.SkipForDialect;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -154,7 +154,7 @@ public class BridgeTest extends SearchTestBase {
 		Cloud cloud = new Cloud();
 		cloud.setCustomFieldBridge( "This is divided by 2" );
 		cloud.setCustomStringBridge( "This is div by 4" );
-		cloud.setChar2( 's' );
+		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
@@ -181,7 +181,6 @@ public class BridgeTest extends SearchTestBase {
 	}
 
 	@Test
-	@SkipForDialect(PostgreSQL81Dialect.class)//PosgreSQL doesn't allow storing null with these column types
 	public void testDateBridge() throws Exception {
 		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
@@ -197,6 +196,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setDateMonth( date );
 		cloud.setDateSecond( date );
 		cloud.setDateYear( date );
+		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
 
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -280,7 +280,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setCalendarMonth( calendar );
 		cloud.setCalendarSecond( calendar );
 		cloud.setCalendarYear( calendar );
-		cloud.setChar2( 's' );
+		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
@@ -361,7 +361,6 @@ public class BridgeTest extends SearchTestBase {
 
 	@Test
 	@Category(SkipOnElasticsearch.class) // Elasticsearch uses a specific encoding for dates
-	@SkipForDialect(PostgreSQL81Dialect.class)//PosgreSQL doesn't allow storing null with these column types
 	public void testDateBridgeStringEncoding() throws Exception {
 		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
@@ -370,6 +369,7 @@ public class BridgeTest extends SearchTestBase {
 
 		Cloud cloud = new Cloud();
 		cloud.setDateDay( date );
+		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
 
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -399,6 +399,7 @@ public class BridgeTest extends SearchTestBase {
 
 		Cloud cloud = new Cloud();
 		cloud.setCalendarDay( c );
+		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
 
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
