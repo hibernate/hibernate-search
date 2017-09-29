@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.1.Final (29-09-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2886 Use of BufferedWriter in GsonEntity may lead to MalformedInputException when input contains 4-byte unicode characters
+    * HSEARCH-2883 Getting health status fails for non system users
+
+** Task
+    * HSEARCH-2903 Incorrect word @FieldBrige in documentation
+    * HSEARCH-2896 Upgrade GSON dependency to version 2.8.2
+    * HSEARCH-2892 Upgrade Elasticsearch dependencies to 5.6.2
+    * HSEARCH-2889 WildFly integration tests no longer need WF10 related workarounds
+
 5.8.0.Final (13-09-2017)
 -------------------------
 
