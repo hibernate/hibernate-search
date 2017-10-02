@@ -4,17 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.analyzer;
+package org.hibernate.search.test.analyzer.common;
 
 import java.util.Set;
 
 import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -28,28 +28,26 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
  * @author Hardy Ferentschik
  */
 @Indexed
-@AnalyzerDefs({
-		@AnalyzerDef(name = "en",
-				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = SnowballPorterFilterFactory.class
-						)
-				}),
-		@AnalyzerDef(name = "de",
-				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = GermanStemFilterFactory.class)
+@AnalyzerDef(name = "en",
+		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+		filters = {
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+					@Parameter(name = "language", value = "English")
 				})
-})
-@AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
-public class BlogEntry {
+		})
+@AnalyzerDef(name = "de",
+		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+		filters = {
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				@TokenFilterDef(factory = GermanStemFilterFactory.class)
+		})
+public class Article {
 
 	private Integer id;
 	private String language;
 	private String text;
-	private Set<BlogEntry> references;
+	private Set<Article> references;
 
 	@DocumentId
 	public Integer getId() {
@@ -80,11 +78,11 @@ public class BlogEntry {
 	}
 
 	@IndexedEmbedded(depth = 1)
-	public Set<BlogEntry> getReferences() {
+	public Set<Article> getReferences() {
 		return references;
 	}
 
-	public void setReferences(Set<BlogEntry> references) {
+	public void setReferences(Set<Article> references) {
 		this.references = references;
 	}
 }

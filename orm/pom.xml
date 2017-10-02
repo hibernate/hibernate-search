@@ -50,11 +50,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-phonetic</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <scope>provided</scope>
