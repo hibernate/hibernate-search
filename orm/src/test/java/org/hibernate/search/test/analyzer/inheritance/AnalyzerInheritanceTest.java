@@ -6,30 +6,25 @@
  */
 package org.hibernate.search.test.analyzer.inheritance;
 
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.util.AnalyzerUtils;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 
-import org.hibernate.Transaction;
-
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.util.AnalyzerUtils;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Map;
+import static org.hibernate.search.test.analyzer.common.AnalyzerTest.assertTokensEqual;
 
 /**
  * Test to verify HSEARCH-267.
@@ -39,9 +34,15 @@ import java.util.Map;
  *
  * @author Hardy Ferentschik
  */
-public class AnalyzerInheritanceTest extends SearchTestBase {
+public class AnalyzerInheritanceTest {
 
-	public static final Log log = LoggerFactory.make();
+	private static final IndexedTypeIdentifier SUB_CLASS_TYPE_ID = PojoIndexedTypeIdentifier.convertFromLegacy( SubClass.class );
+
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( SubClass.class )
+			.withProperty( Environment.ANALYZER_CLASS, KeywordAnalyzer.class.getName() );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	/**
 	 * Try to verify that the right analyzer is used when indexing.
@@ -50,30 +51,23 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 	 */
 	@Test
 	public void testBySearch() throws Exception {
-		SubClass testClass = new SubClass();
+		SubClass testClass = new SubClass( 1 );
 
 		// See https://en.wikipedia.org/wiki/Dotted_and_dotless_I
 		testClass.setName( "I\u0307stanbul" );
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		s.persist( testClass );
-		tx.commit();
-
-		tx = s.beginTransaction();
-
+		helper.index( testClass );
 
 		QueryParser parser = new QueryParser( "name", TestConstants.keywordAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:istanbul" );
-		FullTextQuery query = s.createFullTextQuery( luceneQuery, SubClass.class );
-		assertEquals( 1, query.getResultSize() );
+		helper.assertThat( luceneQuery )
+				.from( SubClass.class )
+				.matchesExactlyIds( 1 );
 
 		// make sure the result is not always 1
 		luceneQuery = parser.parse( "name:foo" );
-		query = s.createFullTextQuery( luceneQuery, SubClass.class );
-		assertEquals( 0, query.getResultSize() );
-
-		tx.commit();
-		s.close();
+		helper.assertThat( luceneQuery )
+				.from( SubClass.class )
+				.matchesNone();
 	}
 
 	/**
@@ -84,25 +78,11 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 	@Test
 	@Category(SkipOnElasticsearch.class) // Analyzers cannot be retrieved directly when using Elasticsearch
 	public void testByAnalyzerRetrieval() throws Exception {
-
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Analyzer analyzer = s.getSearchFactory().getAnalyzer( SubClass.class );
+		Analyzer analyzer = sfHolder.getSearchFactory().getAnalyzer( SUB_CLASS_TYPE_ID );
 
 		// See https://en.wikipedia.org/wiki/Dotted_and_dotless_I
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", "I\u0307stanbul" );
 		assertTokensEqual( tokens, new String[] { "istanbul" } );
-
-		s.close();
 	}
 
-	@Override
-	public void configure(Map<String, Object> settings) {
-		super.configure( settings );
-		settings.put( Environment.ANALYZER_CLASS, KeywordAnalyzer.class.getName() );
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { SubClass.class };
-	}
 }

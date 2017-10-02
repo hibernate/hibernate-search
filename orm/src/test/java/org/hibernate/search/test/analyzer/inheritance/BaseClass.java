@@ -6,12 +6,6 @@
  */
 package org.hibernate.search.test.analyzer.inheritance;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
@@ -19,16 +13,16 @@ import org.hibernate.search.annotations.Store;
 /**
  * @author Hardy Ferentschik
  */
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class BaseClass {
 
 	private Integer id;
 
 	protected String name;
 
-	@Id
-	@GeneratedValue
+	public BaseClass(Integer id) {
+		this.id = id;
+	}
+
 	@DocumentId
 	public Integer getId() {
 		return id;

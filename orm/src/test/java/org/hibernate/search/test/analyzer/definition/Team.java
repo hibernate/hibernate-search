@@ -6,9 +6,19 @@
  */
 package org.hibernate.search.test.analyzer.definition;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.CharFilterDef;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.NormalizerDefs;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.charfilter.MappingCharFilterFactory;
@@ -28,24 +38,10 @@ import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.CharFilterDef;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Normalizer;
-import org.hibernate.search.annotations.NormalizerDef;
-import org.hibernate.search.annotations.NormalizerDefs;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
 
 /**
  * @author Emmanuel Bernard
  */
-@Entity
 @Indexed
 @AnalyzerDefs({
 		@AnalyzerDef(name = "customanalyzer",
@@ -192,9 +188,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 		)
 })
 public class Team {
-	@Id
 	@DocumentId
-	@GeneratedValue
 	private Integer id;
 
 	@Field
@@ -221,6 +215,10 @@ public class Team {
 	@Field
 	@Analyzer(definition = "customanalyzer")
 	private String description;
+
+	public Team(Integer id) {
+		this.id = id;
+	}
 
 	public Integer getId() {
 		return id;

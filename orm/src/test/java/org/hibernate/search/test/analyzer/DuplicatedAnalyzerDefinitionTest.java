@@ -9,18 +9,23 @@ package org.hibernate.search.test.analyzer;
 
 import java.lang.annotation.ElementType;
 
+import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+
+import org.junit.Rule;
+import org.junit.Test;
+
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.test.SearchTestBase;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -28,22 +33,19 @@ import static org.junit.Assert.fail;
  *
  * @author Hardy Ferentschik
  */
-public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
+public class DuplicatedAnalyzerDefinitionTest {
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { };
-	}
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testDuplicatedAnalyzerDefinitionThrowsException() throws Exception {
-		Configuration config = new Configuration();
-		config.addAnnotatedClass( Entity1.class );
-		config.addAnnotatedClass( Entity2.class );
-		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
+		SearchConfigurationForTest config = new SearchConfigurationForTest()
+				.addClasses( Entity1.class, Entity2.class )
+				.addProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
-			config.buildSessionFactory();
-			fail( "Session creation should have failed due to duplicate analyzer definition" );
+			integratorResource.create( config );
+			fail( "Integrator creation should have failed due to duplicate analyzer definition" );
 		}
 		catch (SearchException e) {
 			assertEquals(
@@ -55,12 +57,12 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 
 	@Test
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
-		Configuration config = new Configuration();
-		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
-		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
+		SearchConfigurationForTest config = new SearchConfigurationForTest()
+				.addProperty( Environment.MODEL_MAPPING, ProgrammaticMappingWithDuplicateAnalyzerDefinitions.class.getName() )
+				.addProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
-			config.buildSessionFactory();
-			fail( "Session creation should have failed due to duplicate analyzer definition" );
+			integratorResource.create( config );
+			fail( "Integrator creation should have failed due to duplicate analyzer definition" );
 		}
 		catch (SearchException e) {
 			assertEquals(
@@ -70,21 +72,40 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 		}
 	}
 
-	private SearchMapping createSearchMapping() {
-		SearchMapping mapping = new SearchMapping();
+	@Test
+	public void testDuplicatedAnalyzerDiscriminatorDefinitions() throws Exception {
+		SearchConfigurationForTest config = new SearchConfigurationForTest()
+				.addClass( BlogEntry.class )
+				.addProperty( "hibernate.search.default.directory_provider", "local-heap" );
+		try {
+			integratorResource.create( config );
+			fail( "Integrator creation should have failed due to duplicate analyzer definition" );
+		}
+		catch (SearchException e) {
+			assertTrue(
+					"Wrong error message",
+					e.getMessage().startsWith( "Multiple AnalyzerDiscriminator defined in the same class hierarchy" )
+			);
+		}
+	}
 
-		mapping.analyzerDef( "english", StandardTokenizerFactory.class )
-				.filter( LowerCaseFilterFactory.class )
-				.filter( SnowballPorterFilterFactory.class )
-				.analyzerDef(
-						"english", StandardTokenizerFactory.class
-				) // ups duplicate name here - this should throw an exception
-				.filter( LowerCaseFilterFactory.class )
-				.filter( GermanStemFilterFactory.class )
-				.entity( BlogEntry.class )
-				.indexed()
-				.property( "title", ElementType.METHOD );
-		return mapping;
+	public static class ProgrammaticMappingWithDuplicateAnalyzerDefinitions {
+		@Factory
+		public SearchMapping create() {
+			SearchMapping searchMapping = new SearchMapping();
+			searchMapping.analyzerDef( "english", StandardTokenizerFactory.class )
+					.filter( LowerCaseFilterFactory.class )
+					.filter( SnowballPorterFilterFactory.class )
+					.analyzerDef(
+							"english", StandardTokenizerFactory.class
+					) // ups duplicate name here - this should throw an exception
+					.filter( LowerCaseFilterFactory.class )
+					.filter( GermanStemFilterFactory.class )
+					.entity( BlogEntry.class )
+					.indexed()
+					.property( "title", ElementType.METHOD );
+			return searchMapping;
+		}
 	}
 }
 

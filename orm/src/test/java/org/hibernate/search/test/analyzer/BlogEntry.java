@@ -7,16 +7,6 @@
 package org.hibernate.search.test.analyzer;
 
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import org.apache.lucene.analysis.de.GermanStemFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -29,10 +19,14 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.de.GermanStemFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+
 /**
  * @author Hardy Ferentschik
  */
-@Entity
 @Indexed
 @AnalyzerDefs({
 		@AnalyzerDef(name = "en",
@@ -57,8 +51,6 @@ public class BlogEntry {
 	private String text;
 	private Set<BlogEntry> references;
 
-	@Id
-	@GeneratedValue
 	@DocumentId
 	public Integer getId() {
 		return id;
@@ -87,7 +79,6 @@ public class BlogEntry {
 		this.text = text;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
 	@IndexedEmbedded(depth = 1)
 	public Set<BlogEntry> getReferences() {
 		return references;

@@ -6,34 +6,26 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Equivalent of {@link CustomAnalyzerImplementationInClassBridgeTest}, but using analyzer
@@ -41,37 +33,24 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Hardy Ferentschik
  */
-public class CustomAnalyzerDefinitionInClassBridgeTest extends SearchTestBase {
+public class CustomAnalyzerDefinitionInClassBridgeTest {
 
-	public static final Log log = LoggerFactory.make();
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( FooBar.class );
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { FooBar.class };
-	}
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testClassBridgeWithSingleField() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.persist( new FooBar() );
-		tx.commit();
-		fullTextSession.clear();
+		helper.index( new FooBar( 1 ) );
 
 		TermQuery termQuery = new TermQuery( new Term( "classField", "dog" ) );
-		FullTextQuery query = fullTextSession.createFullTextQuery( termQuery );
 
-		assertEquals(
-				"custom analyzer should have inserted search token",
-				1,
-				query.getResultSize()
-		);
-
-		fullTextSession.close();
+		helper.assertThat( termQuery )
+				.as( "custom analyzer should have inserted search token" )
+				.matchesExactlyIds( 1 );
 	}
 
-	@Entity
-	@Table(name = "JUSTFOOBAR")
 	@Indexed
 	@AnalyzerDef(
 			name = "foobarAnalyzer",
@@ -80,9 +59,12 @@ public class CustomAnalyzerDefinitionInClassBridgeTest extends SearchTestBase {
 	)
 	@ClassBridge(name = "classField", impl = FooBarBridge.class, analyzer = @Analyzer(definition = "foobarAnalyzer"))
 	public static class FooBar {
-		@Id
-		@GeneratedValue
+		@DocumentId
 		private Integer id;
+
+		public FooBar(Integer id) {
+			this.id = id;
+		}
 	}
 
 	public static class FooBarBridge implements FieldBridge {

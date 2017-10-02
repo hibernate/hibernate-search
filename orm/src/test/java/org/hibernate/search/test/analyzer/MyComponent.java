@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
 
 /**
  * @author Emmanuel Bernard
