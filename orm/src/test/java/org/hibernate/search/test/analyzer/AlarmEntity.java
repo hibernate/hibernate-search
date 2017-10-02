@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -17,13 +13,10 @@ import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Normalizer;
 
-@Entity
 @Indexed(index = "idx1")
 @Analyzer(impl = AnalyzerForTests1.class)
 public class AlarmEntity {
 
-	@Id
-	@GeneratedValue
 	@DocumentId
 	private Integer id;
 

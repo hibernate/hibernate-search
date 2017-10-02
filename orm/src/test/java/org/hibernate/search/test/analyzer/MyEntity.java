@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
@@ -21,12 +16,9 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 /**
  * @author Emmanuel Bernard
  */
-@Entity
 @Indexed(index = "idx1")
 @Analyzer(impl = AnalyzerForTests1.class)
 public class MyEntity {
-	@Id
-	@GeneratedValue
 	@DocumentId
 	private Integer id;
 
@@ -53,7 +45,6 @@ public class MyEntity {
 	}
 
 	@IndexedEmbedded
-	@Embedded
 	private MyComponent component;
 
 	public Integer getId() {

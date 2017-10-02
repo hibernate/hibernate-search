@@ -6,26 +6,30 @@
  */
 package org.hibernate.search.test.analyzer.definition;
 
-import java.util.Map;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.fest.assertions.Assertions;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestBase;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+
 /**
  * Tests that built analyzers are indeed used when indexing.
  */
 @RunWith( Parameterized.class )
-public class AnalyzerBuilderIndexingTest extends SearchTestBase {
+public class AnalyzerBuilderIndexingTest {
+
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Team.class )
+			.withProperty( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LATEST.toString() );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Parameters(name = "Analyzer {0}, terms {1}")
 	public static Object[][] data() {
@@ -82,61 +86,27 @@ public class AnalyzerBuilderIndexingTest extends SearchTestBase {
 
 	@Test
 	public void test() {
-		Team team = new Team();
+		Team team = new Team( 1 );
 		team.setName( stringToIndex );
 
-		FullTextSession fts = Search.getFullTextSession( openSession() );
-		Transaction tx = fts.beginTransaction();
-		try {
-			fts.persist( team );
-		}
-		catch (Exception e) {
-			tx.rollback();
-			throw e;
-		}
-		tx.commit();
-		try {
-			if ( unexpectedTokens != null ) {
-				for ( String token : unexpectedTokens ) {
-					String fieldName = "name_" + analyzerName;
-					Query query = new TermQuery( new Term( fieldName, token ) );
-					Assertions.assertThat( fts.createFullTextQuery( query ).list() )
-							.as( "Results of searching '" + token + "' on field '" + fieldName + "'" )
-							.isEmpty();
-				}
-			}
-			for ( String token : expectedTokens ) {
+		helper.index( team );
+
+		if ( unexpectedTokens != null ) {
+			for ( String token : unexpectedTokens ) {
 				String fieldName = "name_" + analyzerName;
 				Query query = new TermQuery( new Term( fieldName, token ) );
-				Assertions.assertThat( fts.createFullTextQuery( query ).list() )
+				helper.assertThat( query )
 						.as( "Results of searching '" + token + "' on field '" + fieldName + "'" )
-						.containsOnly( team );
+						.matchesNone();
 			}
 		}
-		finally {
-			tx = fts.beginTransaction();
-			try {
-				fts.delete( team );
-			}
-			catch (Exception e) {
-				tx.rollback();
-				throw e;
-			}
+		for ( String token : expectedTokens ) {
+			String fieldName = "name_" + analyzerName;
+			Query query = new TermQuery( new Term( fieldName, token ) );
+			helper.assertThat( query )
+					.as( "Results of searching '" + token + "' on field '" + fieldName + "'" )
+					.matchesExactlyIds( team.getId() );
 		}
-
-		fts.close();
 	}
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				Team.class
-		};
-	}
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		super.configure( cfg );
-		cfg.put( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LATEST.toString() );
-	}
 }

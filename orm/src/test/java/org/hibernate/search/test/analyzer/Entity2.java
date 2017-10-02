@@ -7,22 +7,19 @@
 
 package org.hibernate.search.test.analyzer;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
-import org.apache.lucene.analysis.standard.StandardFilterFactory;
-
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 
+import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
+import org.apache.lucene.analysis.standard.StandardFilterFactory;
+
 /**
  * @author Hardy Ferentschik
  */
-@Entity
 @Indexed
 @AnalyzerDef(name = "my-analyzer",
 		tokenizer = @TokenizerDef(factory = PatternTokenizerFactory.class, params = {
@@ -32,7 +29,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 				@TokenFilterDef(factory = StandardFilterFactory.class)
 		})
 public class Entity2 {
-	@Id
+	@DocumentId
 	private long id;
 
 	public long getId() {

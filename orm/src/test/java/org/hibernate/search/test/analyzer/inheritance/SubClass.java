@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.test.analyzer.inheritance;
 
-import javax.persistence.Entity;
-
-import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
+
+import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 
 /**
  * @author Hardy Ferentschik
  */
-@Entity
 @Indexed
 @Analyzer(impl = TurkishAnalyzer.class)
 public class SubClass extends BaseClass {
-
+	public SubClass(Integer id) {
+		super( id );
+	}
 }
