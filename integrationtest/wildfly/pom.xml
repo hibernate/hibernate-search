@@ -424,6 +424,31 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-drivers</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${jdbc.driver.groupId}</groupId>
+                                            <artifactId>${jdbc.driver.artifactId}</artifactId>
+                                            <version>${jdbc.driver.version}</version>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${jbossHome.node1}/standalone/deployments</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>${jdbc.driver.groupId}</groupId>
+                                            <artifactId>${jdbc.driver.artifactId}</artifactId>
+                                            <version>${jdbc.driver.version}</version>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${jbossHome.node2}/standalone/deployments</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
