@@ -25,6 +25,7 @@ import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +42,7 @@ public class EntityReaderTest {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 	private static final Company[] COMPANIES = new Company[]{
 			new Company( "Red Hat" ),
 			new Company( "Google" ),
@@ -99,6 +100,13 @@ public class EntityReaderTest {
 		MockitoAnnotations.initMocks( this );
 	}
 
+	@After
+	public void shutDown() {
+		if ( emf.isOpen() ) {
+			emf.close();
+		}
+	}
+
 	@Test
 	public void testReadItem_withoutBoundary() throws Exception {
 		// mock job context
@@ -111,12 +119,17 @@ public class EntityReaderTest {
 		// mock step context
 		Mockito.doNothing().when( mockedStepContext ).setTransientUserData( Mockito.any() );
 
-		entityReader.open( null );
-		for ( int i = 0; i < COMPANIES.length; i++ ) {
-			Company c = (Company) entityReader.readItem();
-			assertEquals( COMPANIES[i].getName(), c.getName() );
+		try {
+			entityReader.open( null );
+			for ( int i = 0; i < COMPANIES.length; i++ ) {
+				Company c = (Company) entityReader.readItem();
+				assertEquals( COMPANIES[i].getName(), c.getName() );
+			}
+			// no more item
+			assertNull( entityReader.readItem() );
 		}
-		// no more item
-		assertNull( entityReader.readItem() );
+		finally {
+			entityReader.close();
+		}
 	}
 }

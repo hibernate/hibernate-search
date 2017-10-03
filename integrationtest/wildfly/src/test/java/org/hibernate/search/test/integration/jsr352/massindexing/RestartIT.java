@@ -6,22 +6,17 @@
  */
 package org.hibernate.search.test.integration.jsr352.massindexing;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
@@ -29,15 +24,25 @@ import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.util.JobInterruptorUtil;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This integration test (IT) aims to test the restartability of the job execution mass-indexer under Java EE
@@ -49,8 +54,6 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class RestartIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
-
 	private static final int JOB_TIMEOUT_MS = 40_000;
 
 	private static final SimpleDateFormat SDF = new SimpleDateFormat( "dd/MM/yyyy", Locale.ROOT );
@@ -60,20 +63,36 @@ public class RestartIT {
 	@Inject
 	private MessageManager messageManager;
 
-	@PersistenceUnit(unitName = PERSISTENCE_UNIT_NAME)
-	private EntityManagerFactory emf;
-
 	@Deployment
 	public static WebArchive createDeployment() {
 		WebArchive war = ShrinkWrap
 				.create( WebArchive.class, RestartIT.class.getSimpleName() + ".war" )
-				.addAsResource( "jsr352/persistence.xml", "META-INF/persistence.xml" )
+				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure-jsr352.xml", "/jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( JobTestUtil.class.getPackage() )
 				.addPackage( JobInterruptorUtil.class.getPackage() )
 				.addPackage( Message.class.getPackage() );
 		return war;
+	}
+
+	private static Asset persistenceXml() {
+		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
+			.version( "2.0" )
+			.createPersistenceUnit()
+				.name( MessageManager.PERSISTENCE_UNIT_NAME )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.getOrCreateProperties()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+					.createProperty().name( "hibernate.connection.release_mode" ).value( "on_close" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
+					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
+				.up().up()
+			.exportAsString();
+		return new StringAsset( persistenceXml );
 	}
 
 	@Before

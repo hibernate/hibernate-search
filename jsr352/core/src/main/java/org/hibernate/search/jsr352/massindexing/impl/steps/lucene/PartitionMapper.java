@@ -99,21 +99,21 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	}
 
 	/**
-	 * Constructor for unit test. TODO should it be done in this way?
-	 *
-	 * @param emf
-	 * @param customQueryHql
+	 * Constructor for unit test.
 	 */
-	PartitionMapper(EntityManagerFactory emf,
-			String serializedIdFetchSize,
-			String customQueryHql,
-			String serializedRowsPerPartition,
-			String serializedMaxThreads) {
-		this.emf = emf;
+	PartitionMapper(
+				String serializedIdFetchSize,
+				String customQueryHql,
+				String serializedMaxThreads,
+				String serializedMaxResultsPerEntity,
+				String serializedRowsPerPartition,
+				String tenantId) {
 		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.customQueryHql = customQueryHql;
 		this.serializedMaxThreads = serializedMaxThreads;
+		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedRowsPerPartition = serializedRowsPerPartition;
+		this.tenantId = tenantId;
 	}
 
 	@Override

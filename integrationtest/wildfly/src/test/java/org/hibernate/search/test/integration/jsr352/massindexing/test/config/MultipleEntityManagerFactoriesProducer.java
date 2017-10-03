@@ -13,24 +13,29 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
+import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
+
 /**
  * @author Yoann Rodiere
  */
 @ApplicationScoped
 public class MultipleEntityManagerFactoriesProducer {
 
-	public static final String H2_ENTITY_MANAGER_FACTORY_BEAN_NAME = "h2_emf_bean";
-	public static final String UNUSED_ENTITY_MANAGER_FACTORY_BEAN_NAME = "unused_emf_bean";
+	public static final String PRIMARY_PERSISTENCE_UNIT_NAME = MessageManager.PERSISTENCE_UNIT_NAME;
+	public static final String UNUSED_PERSISTENCE_UNIT_NAME = "unused_pu";
 
-	@PersistenceUnit(unitName = "h2")
+	public static final String PRIMARY_ENTITY_MANAGER_FACTORY_BEAN_NAME = "primary_emf_bean";
+	private static final String UNUSED_ENTITY_MANAGER_FACTORY_BEAN_NAME = "unused_emf_bean";
+
+	@PersistenceUnit(unitName = PRIMARY_PERSISTENCE_UNIT_NAME)
 	private EntityManagerFactory h2PersistenceUnit;
 
-	@PersistenceUnit(unitName = "unused_pu")
+	@PersistenceUnit(unitName = UNUSED_PERSISTENCE_UNIT_NAME)
 	private EntityManagerFactory unusedPersistenceUnit;
 
 	@Produces
 	@Singleton
-	@Named(H2_ENTITY_MANAGER_FACTORY_BEAN_NAME)
+	@Named(PRIMARY_ENTITY_MANAGER_FACTORY_BEAN_NAME)
 	public EntityManagerFactory createH2PersistenceUnit() {
 		return h2PersistenceUnit;
 	}

@@ -11,7 +11,7 @@ import static org.fest.assertions.MapAssert.entry;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +23,13 @@ import javax.batch.runtime.StepExecution;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgress;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
@@ -49,8 +50,18 @@ public class BatchIndexingJobIT {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
-	private static final String SESSION_FACTORY_NAME = "h2-entityManagerFactory";
+	/*
+	 * Make sure to have more than one checkpoint,
+	 * because we had errors related to that in the past.
+	 */
+	private static final int CHECKPOINT_INTERVAL = 10;
+	private static final int INSTANCES_PER_DATA_TEMPLATE = 100;
+
+	// We have three data templates per entity type (see setup)
+	private static final int INSTANCE_PER_ENTITY_TYPE = INSTANCES_PER_DATA_TEMPLATE * 3;
+
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String SESSION_FACTORY_NAME = "primary_session_factory";
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
 
@@ -61,18 +72,23 @@ public class BatchIndexingJobIT {
 
 	@Before
 	public void setup() {
-		List<Company> companies = Arrays.asList(
-				new Company( "Google" ),
-				new Company( "Red Hat" ),
-				new Company( "Microsoft" ) );
-		List<Person> people = Arrays.asList(
-				new Person( "BG", "Bill", "Gates" ),
-				new Person( "LT", "Linus", "Torvalds" ),
-				new Person( "SJ", "Steven", "Jobs" ) );
-		List<WhoAmI> whos = Arrays.asList(
-				new WhoAmI( "cid01", "id01", "uid01" ),
-				new WhoAmI( "cid02", "id02", "uid02" ),
-				new WhoAmI( "cid03", "id03", "uid03" ) );
+		List<Company> companies = new ArrayList();
+		List<Person> people = new ArrayList();
+		List<WhoAmI> whos = new ArrayList();
+		for ( int i = 0 ; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
+			int index1 = i;
+			int index2 = i + 1;
+			int index3 = i + 2;
+			companies.add( new Company( "Google " + index1 ) );
+			companies.add( new Company( "Red Hat " + index2 ) );
+			companies.add( new Company( "Microsoft " + index3 ) );
+			people.add( new Person( "BG " + index1, "Bill", "Gates" ) );
+			people.add( new Person( "LT " + index2, "Linus", "Torvalds" ) );
+			people.add( new Person( "SJ " + index3, "Steven", "Jobs" ) );
+			whos.add( new WhoAmI( "cid01 " + index1, "id01 " + index1, "uid01 " + index1 ) );
+			whos.add( new WhoAmI( "cid02 " + index2, "id02 " + index2, "uid02 " + index2 ) );
+			whos.add( new WhoAmI( "cid03 " + index3, "id03 " + index3, "uid03 " + index3 ) );
+		}
 		EntityManager em = null;
 
 		try {
@@ -108,13 +124,39 @@ public class BatchIndexingJobIT {
 	@Test
 	public void simple() throws InterruptedException,
 			IOException {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Person.class );
-		ftem.purgeAll( Company.class );
-		ftem.purgeAll( WhoAmI.class );
-		ftem.flushToIndexes();
-		em.close();
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
+		assertEquals( 0, companies.size() );
+		assertEquals( 0, people.size() );
+		assertEquals( 0, whos.size() );
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( Company.class, Person.class, WhoAmI.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		assertCompletion( executionId );
+		assertProgress( executionId, Person.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, Company.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, WhoAmI.class, INSTANCE_PER_ENTITY_TYPE );
+
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, people.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, whos.size() );
+	}
+
+	@Test
+	public void simple_defaultCheckpointInterval() throws InterruptedException,
+			IOException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
@@ -128,20 +170,20 @@ public class BatchIndexingJobIT {
 						.forEntities( Company.class, Person.class, WhoAmI.class )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );
-		assertProgress( executionId, Person.class, 3 );
-		assertProgress( executionId, Company.class, 3 );
-		assertProgress( executionId, WhoAmI.class, 3 );
+		assertProgress( executionId, Person.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, Company.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, WhoAmI.class, INSTANCE_PER_ENTITY_TYPE );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
-		assertEquals( 1, companies.size() );
-		assertEquals( 1, people.size() );
-		assertEquals( 1, whos.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, people.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, whos.size() );
 	}
 
 	@Test
@@ -153,13 +195,21 @@ public class BatchIndexingJobIT {
 		try {
 			em = emf.createEntityManager();
 			em.getTransaction().begin();
-			CriteriaQuery<Company> criteria = em.getCriteriaBuilder().createQuery(Company.class);
-			criteria.from( Company.class );
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery(Company.class);
+			Root<Company> root = criteria.from( Company.class );
+			Path<Integer> id = root.get( root.getModel().getId( int.class ) );
+			criteria.orderBy( criteriaBuilder.asc( id ) );
 			List<Company> companies = em.createQuery( criteria ).getResultList();
-			List<CompanyGroup> groups = Arrays.asList(
-					new CompanyGroup( "group1", companies.get( 0 ) ),
-					new CompanyGroup( "group2", companies.get( 0 ), companies.get( 1 ) ),
-					new CompanyGroup( "group3", companies.get( 2 ) ) );
+			List<CompanyGroup> groups = new ArrayList<>();
+			for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
+				int index1 = i;
+				int index2 = i + 1;
+				int index3 = i + 2;
+				groups.add( new CompanyGroup( "group" + index1, companies.get( index1 ) ) );
+				groups.add( new CompanyGroup( "group" + index2, companies.get( index1 ), companies.get( index2 ) ) );
+				groups.add( new CompanyGroup( "group" + index3, companies.get( index3 ) ) );
+			}
 			for ( CompanyGroup group : groups ) {
 				em.persist( group );
 			}
@@ -174,41 +224,36 @@ public class BatchIndexingJobIT {
 			}
 		}
 
-		em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( CompanyGroup.class );
-		ftem.flushToIndexes();
-		em.close();
 		List<CompanyGroup> groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
 		List<CompanyGroup> groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
 		List<CompanyGroup> groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
 		assertEquals( 0, groupsContainingGoogle.size() );
+		assertEquals( 0, groupsContainingRedHat.size() );
+		assertEquals( 0, groupsContainingMicrosoft.size() );
 
 		long executionId = jobOperator.start(
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntities( CompanyGroup.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );
-		assertProgress( executionId, CompanyGroup.class, 3 );
+		assertProgress( executionId, CompanyGroup.class, INSTANCE_PER_ENTITY_TYPE );
 
 		groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
 		groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
 		groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
-		assertEquals( 2, groupsContainingGoogle.size() );
-		assertEquals( 1, groupsContainingRedHat.size() );
-		assertEquals( 1, groupsContainingMicrosoft.size() );
+		assertEquals( 2 * INSTANCES_PER_DATA_TEMPLATE, groupsContainingGoogle.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingRedHat.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingMicrosoft.size() );
 	}
 
 	@Test
 	public void entityManagerFactoryNamespace_persistenceUnitName() throws Exception {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Company.class );
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
@@ -216,6 +261,7 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.entityManagerFactoryNamespace( "persistence-unit-name" )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
@@ -224,14 +270,11 @@ public class BatchIndexingJobIT {
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( 1, companies.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
 	}
 
 	@Test
 	public void entityManagerFactoryNamespace_sessionFactoryName() throws Exception {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Company.class );
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
@@ -239,6 +282,7 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.entityManagerFactoryNamespace( "session-factory-name" )
 						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 						.build()
@@ -247,22 +291,12 @@ public class BatchIndexingJobIT {
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( 1, companies.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
 	}
 
 	@Test
 	public void criteria() throws InterruptedException,
 			IOException {
-
-		// purge all before start
-		// TODO Can the creation of a new EM and FTEM be avoided?
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Person.class );
-		ftem.purgeAll( Company.class );
-		ftem.flushToIndexes();
-		em.close();
-
 		// searches before mass index,
 		// expected no results for each search
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
@@ -273,31 +307,25 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
-						.restrictedBy( Restrictions.in( "name", "Google", "Red Hat" ) )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.restrictedBy( Restrictions.or(
+								Restrictions.like( "name", "Google%" ),
+								Restrictions.like( "name","Red Hat%" )
+						) )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
-		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
 	@Test
 	public void hql() throws InterruptedException,
 			IOException {
-
-		// purge all before start
-		// TODO Can the creation of a new EM and FTEM be avoided?
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Person.class );
-		ftem.purgeAll( Company.class );
-		ftem.flushToIndexes();
-		em.close();
-
 		// searches before mass index,
 		// expected no results for each search
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
@@ -308,28 +336,22 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
-						.restrictedBy( "select c from Company c where c.name in ( 'Google', 'Red Hat' )" )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
-		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
 	@Test
 	public void partitioned() throws InterruptedException,
 			IOException {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Person.class );
-		ftem.purgeAll( Company.class );
-		ftem.purgeAll( WhoAmI.class );
-		ftem.flushToIndexes();
-		em.close();
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
@@ -341,17 +363,17 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class, WhoAmI.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-						.rowsPerPartition( 2 )
-						.checkpointInterval( 1 )
+						.rowsPerPartition( INSTANCE_PER_ENTITY_TYPE - 1 )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );
-		assertProgress( executionId, Person.class, 3 );
-		assertProgress( executionId, Company.class, 3 );
-		assertProgress( executionId, WhoAmI.class, 3 );
+		assertProgress( executionId, Person.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, Company.class, INSTANCE_PER_ENTITY_TYPE );
+		assertProgress( executionId, WhoAmI.class, INSTANCE_PER_ENTITY_TYPE );
 
 		StepProgress progress = getMainStepProgress( executionId );
 		Map<Integer, Long> partitionProgress = progress.getPartitionProgress();
@@ -359,23 +381,23 @@ public class BatchIndexingJobIT {
 				.as( "Entities processed per partition" )
 				.hasSize( 3 * 2 )
 				.includes(
-						// Company
-						entry( 0, 2L ), // Partition 1
-						entry( 1, 1L ), // Partition 2
-						// Person
-						entry( 2, 2L ), // Partition 1
-						entry( 3, 1L ), // Partition 2
-						// WhoAmI
-						entry( 4, 2L ), // Partition 1
-						entry( 5, 1L ) // Partition 2
+						// First entity type
+						entry( 0, INSTANCE_PER_ENTITY_TYPE - 1L ), // Partition 1 for first entity type
+						entry( 1, 1L ), // Partition 2 for first entity type
+						// Second entity type
+						entry( 2, INSTANCE_PER_ENTITY_TYPE - 1L ), // Partition 1 for second entity type
+						entry( 3, 1L ), // Partition 2 for second entity type
+						// Third entity type
+						entry( 4, INSTANCE_PER_ENTITY_TYPE - 1L ), // Partition 1 for third entity type
+						entry( 5, 1L ) // Partition 2 for third entity type
 				);
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
 		whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
-		assertEquals( 1, companies.size() );
-		assertEquals( 1, people.size() );
-		assertEquals( 1, whos.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, people.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, whos.size() );
 	}
 
 	private void assertCompletion(long executionId) {

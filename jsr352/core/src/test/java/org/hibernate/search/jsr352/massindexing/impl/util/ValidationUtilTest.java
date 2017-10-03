@@ -26,7 +26,7 @@ import org.junit.rules.ExpectedException;
  */
 public class ValidationUtilTest {
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 
 	private static final String EMF_SCOPE = "persistence-unit-name";
 
