@@ -39,6 +39,7 @@
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/osgi/karaf-features</module>
+        <module>integrationtest/osgi/karaf-it</module>
         <module>integrationtest/performance/sandbox</module>
         <module>integrationtest/performance/engine-lucene</module>
         <module>integrationtest/performance/engine-elasticsearch</module>
@@ -1571,7 +1572,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </activation>
             <modules>
                 <module>documentation</module>
-                <module>integrationtest/osgi/karaf-it</module>
                 <module>integrationtest/performance/orm</module>
             </modules>
         </profile>
