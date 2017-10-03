@@ -2,18 +2,21 @@
 # See https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # for a list of available properties
 
-spring.jpa.properties:
+spring.jpa:
   hibernate:
-    dialect: org.hibernate.dialect.H2Dialect
-    ddl-auto: create-drop
-  hibernate.search:
-    default:
-      directory_provider: local-heap
+   ddl-auto: create-drop
+  properties:
+    hibernate:
+      dialect: '${db.dialect}'
+    hibernate.search:
+      default:
+        directory_provider: local-heap
 
 spring.datasource:
-  url: jdbc:h2:mem:foobar
-  username: sa
-  password: sa
+  driver-class: '${jdbc.driver}'
+  url: '${jdbc.url}'
+  username: '${jdbc.user}'
+  password: '${jdbc.pass}'
 
 logging.level:
   org.hibernate.SQL: DEBUG
