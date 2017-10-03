@@ -42,9 +42,9 @@ import org.junit.runner.RunWith;
 @RunWith(org.jboss.byteman.contrib.bmunit.BMUnitRunner.class)
 public class RestartChunkIT {
 
-	static final int CHECKPOINT_INTERVAL = 10;
+	private static final int CHECKPOINT_INTERVAL = 10;
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 
 	private static final int JOB_TIMEOUT_MS = 1_000;
 

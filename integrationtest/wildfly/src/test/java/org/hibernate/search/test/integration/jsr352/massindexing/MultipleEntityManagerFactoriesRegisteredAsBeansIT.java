@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.test.integration.jsr352.massindexing;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
@@ -26,15 +23,27 @@ import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.config.MultipleEntityManagerFactoriesProducer;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test the behavior when there are multiple entity manager factories (persistence units),
@@ -46,7 +55,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MultipleEntityManagerFactoriesRegisteredAsBeansIT {
 
-	private static final String ENTITY_MANAGER_FACTORY_BEAN_NAME = MultipleEntityManagerFactoriesProducer.H2_ENTITY_MANAGER_FACTORY_BEAN_NAME;
+	private static final String ENTITY_MANAGER_FACTORY_BEAN_NAME = MultipleEntityManagerFactoriesProducer.PRIMARY_ENTITY_MANAGER_FACTORY_BEAN_NAME;
 
 	private static final int JOB_TIMEOUT_MS = 40_000;
 
@@ -61,7 +70,7 @@ public class MultipleEntityManagerFactoriesRegisteredAsBeansIT {
 	public static WebArchive createDeployment() {
 		WebArchive war = ShrinkWrap
 				.create( WebArchive.class, MultipleEntityManagerFactoriesRegisteredAsBeansIT.class.getSimpleName() + ".war" )
-				.addAsResource( "jsr352/persistence_multiple.xml", "META-INF/persistence.xml" )
+				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure-jsr352.xml", "/jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( JobTestUtil.class.getPackage() )
@@ -70,6 +79,38 @@ public class MultipleEntityManagerFactoriesRegisteredAsBeansIT {
 		return war;
 	}
 
+	private static Asset persistenceXml() {
+		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
+			.version( "2.0" )
+			.createPersistenceUnit()
+				.name( MultipleEntityManagerFactoriesProducer.PRIMARY_PERSISTENCE_UNIT_NAME )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.getOrCreateProperties()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+					.createProperty().name( "hibernate.connection.release_mode" ).value( "on_close" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
+					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
+				.up().up()
+			.createPersistenceUnit()
+				.name( MultipleEntityManagerFactoriesProducer.UNUSED_PERSISTENCE_UNIT_NAME )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.getOrCreateProperties()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+					.createProperty().name( "hibernate.connection.release_mode" ).value( "on_close" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
+					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
+				.up().up()
+			.exportAsString();
+		return new StringAsset( persistenceXml );
+	}
+
+	@Before
 	public void insertData() throws ParseException {
 		List<Message> messages = new ArrayList<>( DB_DAY1_ROWS + DB_DAY2_ROWS );
 		for ( int i = 0; i < DB_DAY1_ROWS; i++ ) {
@@ -81,10 +122,13 @@ public class MultipleEntityManagerFactoriesRegisteredAsBeansIT {
 		messageManager.persist( messages );
 	}
 
+	@After
+	public void removeAll() {
+		messageManager.removeAll();
+	}
+
 	@Test
 	public void testJob() throws InterruptedException, IOException, ParseException {
-		insertData();
-
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
 

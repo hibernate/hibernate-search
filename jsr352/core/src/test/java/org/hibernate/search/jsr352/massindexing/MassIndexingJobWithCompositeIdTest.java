@@ -23,7 +23,6 @@ import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithIdClass;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,21 +36,19 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-2615")
 public class MassIndexingJobWithCompositeIdTest {
 
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 
 	private static final LocalDate END = LocalDate.of( 2017, 8, 1 );
 
-	private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory( "h2" );
-
+	private EntityManagerFactory emf;
 	private FullTextEntityManager ftem;
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		emf.close();
-	}
 
 	@Before
 	public void setUp() throws Exception {
+		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
+
 		ftem = Search.getFullTextEntityManager( emf.createEntityManager() );
 		ftem.getTransaction().begin();
 		for ( LocalDate d = START; d.isBefore( END ); d = d.plusDays( 1 ) ) {
@@ -77,6 +74,8 @@ public class MassIndexingJobWithCompositeIdTest {
 
 		ftem.getTransaction().commit();
 		ftem.close();
+
+		emf.close();
 	}
 
 	@Test

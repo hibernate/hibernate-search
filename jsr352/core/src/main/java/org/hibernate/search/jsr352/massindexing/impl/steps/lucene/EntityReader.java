@@ -141,7 +141,7 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	/**
-	 * Constructor for unit test TODO should it be done in this way?
+	 * Constructor for unit test
 	 */
 	EntityReader(String serializedCacheMode,
 			String entityName,

@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
-
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManager;
@@ -28,10 +25,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for partition plan validation.
@@ -42,7 +42,7 @@ public class PartitionMapperTest {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final String PERSISTENCE_UNIT_NAME = "h2";
+	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
@@ -82,13 +82,23 @@ public class PartitionMapperTest {
 		final String hql = null;
 		final String maxThreads = String.valueOf( 1 );
 		final String rowsPerPartition = String.valueOf( 3 );
-		partitionMapper = new PartitionMapper( null,
+		partitionMapper = new PartitionMapper(
 				fetchSize,
 				hql,
+				maxThreads,
+				null,
 				rowsPerPartition,
-				maxThreads );
+				null
+		);
 
 		MockitoAnnotations.initMocks( this );
+	}
+
+	@After
+	public void shutDown() {
+		if ( emf.isOpen() ) {
+			emf.close();
+		}
 	}
 
 	/**
@@ -128,12 +138,5 @@ public class PartitionMapperTest {
 		// nbPartitions = rows / rowsPerPartition
 		assertEquals( 1, compPartitions ); // 3 / 3 => 1 partition
 		assertEquals( 3, persPartitions ); // 8 / 3 => 3 partitions
-	}
-
-	@After
-	public void shutDown() {
-		if ( emf.isOpen() ) {
-			emf.close();
-		}
 	}
 }

@@ -28,7 +28,9 @@ import org.jboss.ejb3.annotation.TransactionTimeout;
 @Stateless
 public class MessageManager {
 
-	@PersistenceContext(unitName = "h2")
+	public static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+
+	@PersistenceContext(unitName = PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
 
 	@TransactionTimeout(value = 5, unit = TimeUnit.MINUTES)
