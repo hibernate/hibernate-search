@@ -201,8 +201,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				.setFetchSize( fetchSize )
 				.setReadOnly( true );
 
-
-		try ( ScrollableResults scroll = criteria.scroll( ScrollMode.FORWARD_ONLY ) ) {
+		try ( ScrollableResults scroll = criteria.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
 			/*
 			 * The scroll results are originally positioned *before* the first element,
 			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
