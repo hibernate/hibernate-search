@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.test.integration.jsr352.massindexing;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.text.ParseException;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
@@ -15,11 +20,9 @@ import javax.batch.runtime.JobExecution;
 
 import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.config.MultipleEntityManagerFactoriesProducer;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -31,9 +34,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 
-import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
-import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test the behavior when there are multiple entity manager factories (persistence units),
@@ -65,7 +67,7 @@ public class MultipleEntityManagerFactoriesNotRegisteredAsBeansIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( MultipleEntityManagerFactoriesProducer.PRIMARY_PERSISTENCE_UNIT_NAME )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.connection.release_mode" ).value( "on_close" ).up()
