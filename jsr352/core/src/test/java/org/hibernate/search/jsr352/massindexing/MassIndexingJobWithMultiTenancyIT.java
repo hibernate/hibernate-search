@@ -24,6 +24,7 @@ import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.SearchTestBase;
 
+import org.hibernate.testing.RequiresDialect;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,6 +36,11 @@ import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResul
 /**
  * @author Mincong Huang
  */
+@RequiresDialect(
+		comment = "The connection provider for this test ignores configuration and requires H2",
+		strictMatching = true,
+		value = org.hibernate.dialect.H2Dialect.class
+)
 public class MassIndexingJobWithMultiTenancyIT extends SearchTestBase {
 
 	private static final String TARGET_TENANT_ID = "targetTenant";
