@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
+    <deployment>
+        <dependencies>
+            <module name="org.apache.commons.lang" slot="main" />
+            <module name="com.google.guava" slot="main" />
+            <module name="org.hibernate.search.jsr352" slot="${project.version}" meta-inf="import"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

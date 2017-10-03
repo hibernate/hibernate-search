@@ -29,6 +29,7 @@ and after test, log from index check and uncaught exceptions.
 - `org.hibernate.search.test.performance.scenario.FileSystemReadWriteTestScenario`
 - `org.hibernate.search.test.performance.scenario.FileSystemNearRealTimeReadWriteTestScenario`
 - `org.hibernate.search.test.performance.scenario.FileSystemSessionMassIndexerTestScenario`
+- `org.hibernate.search.test.performance.scenario.FileSystemJsr352MassIndexerTestScenario`
 
 
 ## Enable benchmarking

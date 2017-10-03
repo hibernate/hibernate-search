@@ -38,7 +38,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 
 import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
@@ -61,8 +60,8 @@ public class TestRunnerArquillian {
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
 				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "/jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( reportsOutputDirectory(), "classes/" + RUNNER_PROPERTIES );
 		return archive;
 	}
@@ -96,18 +95,11 @@ public class TestRunnerArquillian {
 		}
 		//Additional properties:
 		pu.getOrCreateProperties()
-			.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
-			.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
-			.createProperty().name( Environment.ALLOW_JTA_TRANSACTION_ACCESS ).value( Boolean.toString( true ) ).up()
-			;
+				.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
+				.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+				.createProperty().name( Environment.ALLOW_JTA_TRANSACTION_ACCESS ).value( Boolean.toString( true ) ).up()
+				;
 		return new StringAsset( pd.exportAsString() );
-	}
-
-	public static Asset manifest() {
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.apache.commons.lang,com.google.guava" )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	@PersistenceContext

@@ -38,6 +38,7 @@ public class TestScenarioFactory {
 		log( "    " + FileSystemReadWriteTestScenario.class.getName() );
 		log( "    " + FileSystemNearRealTimeReadWriteTestScenario.class.getName() );
 		log( "    " + FileSystemSessionMassIndexerTestScenario.class.getName() );
+		log( "    " + FileSystemJsr352MassIndexerTestScenario.class.getName() );
 	}
 
 }

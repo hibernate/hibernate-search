@@ -149,6 +149,34 @@
             <artifactId>hibernate-search-infinispan</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-jberet</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.batch</groupId>
+            <artifactId>javax.batch-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ibm.jbatch</groupId>
+            <artifactId>com.ibm.jbatch-runtime</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
+            Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
+            so it won't complain.
+         -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.13.1.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
