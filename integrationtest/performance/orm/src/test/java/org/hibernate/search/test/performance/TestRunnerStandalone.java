@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.performance;
 
-import static org.hibernate.search.test.performance.util.Util.setDefaultProperty;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -18,6 +16,7 @@ import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
+
 import org.junit.Test;
 
 /**
@@ -36,16 +35,8 @@ public class TestRunnerStandalone {
 	}
 
 	private Properties getHibernateProperties() {
-		Properties properties = scenario.getHibernateProperties();
-		setDefaultProperty( properties, "hibernate.dialect", "org.hibernate.dialect.H2Dialect" );
-		setDefaultProperty( properties, "hibernate.connection.provider_class", "org.hibernate.hikaricp.internal.HikariCPConnectionProvider" );
-		setDefaultProperty( properties, "hibernate.connection.driver_class", "org.h2.Driver" );
-		setDefaultProperty( properties, "hibernate.connection.username", "sa" );
-		setDefaultProperty( properties, "hibernate.connection.password", "" );
-		setDefaultProperty( properties, "hibernate.connection.url", "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MULTI_THREADED=1" );
-		setDefaultProperty( properties, "hibernate.hikari.maximumPoolSize", "20" );
-		setDefaultProperty( properties, "hibernate.connection.isolation", "TRANSACTION_READ_COMMITTED" );
-		return properties;
+		// Hibernate will also source properties from hibernate.properties
+		return scenario.getHibernateProperties();
 	}
 
 	@Test
