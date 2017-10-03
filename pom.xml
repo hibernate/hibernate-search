@@ -1567,7 +1567,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <id>non-jigsaw</id>
             <activation>
                 <!-- Asciidoctor and Karaf won't work on JDK9 yet  -->
-                <jdk>1.8</jdk>
+                <jdk>[1.8,)</jdk>
             </activation>
             <modules>
                 <module>documentation</module>
