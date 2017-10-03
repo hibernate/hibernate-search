@@ -13,6 +13,7 @@ public class WildFlyConfigurationExtension implements RemoteLoadableExtension {
 	@Override
 	public void register(ExtensionBuilder extensionBuilder) {
 		extensionBuilder.observer( LoggingConfigurator.class );
+		extensionBuilder.observer( DataSourceConfigurator.class );
 	}
 
 }

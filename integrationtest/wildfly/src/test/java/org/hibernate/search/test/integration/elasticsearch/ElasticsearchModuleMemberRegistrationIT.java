@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.test.integration.VersionTestHelper;
+import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -85,7 +86,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()

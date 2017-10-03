@@ -8,6 +8,7 @@ package org.hibernate.search.test.integration.cmp;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -67,7 +68,7 @@ public class ContainerManagedPersistenceWithMassIndexerIT {
 				.version( "2.0" )
 				.createPersistenceUnit()
 				.name( "cmt-test" )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
 				.clazz( Singer.class.getName() )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create" ).up()
