@@ -16,9 +16,12 @@ import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
+import org.hibernate.FlushMode;
+import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -287,6 +290,9 @@ public class EntityReader extends AbstractItemReader {
 			query.setMaxResults( maxResults );
 		}
 		return query.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockModeType.NONE )
+				.setHibernateFlushMode( FlushMode.MANUAL )
 				.setCacheMode( cacheMode )
 				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
@@ -324,6 +330,9 @@ public class EntityReader extends AbstractItemReader {
 		}
 
 		return criteria.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockMode.NONE )
+				.setFlushMode( FlushMode.MANUAL )
 				.setCacheMode( cacheMode )
 				.setFetchSize( entityFetchSize )
 				.scroll( ScrollMode.FORWARD_ONLY );
