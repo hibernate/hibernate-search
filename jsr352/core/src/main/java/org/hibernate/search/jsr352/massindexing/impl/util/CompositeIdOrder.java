@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiFunction;
-
 import javax.persistence.EmbeddedId;
 import javax.persistence.IdClass;
 
@@ -77,6 +76,11 @@ public class CompositeIdOrder implements IdOrder {
 			// Prepend the path prefix to each property; we will only use absolute path from now on
 			iterator.set( pathPrefix + propertyName );
 		}
+	}
+
+	@Override
+	public Criterion idGreater(Object idObj) {
+		return restrictLexicographically( Restrictions::gt, idObj, false );
 	}
 
 	@Override
