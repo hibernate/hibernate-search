@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Criteria;
+import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
@@ -199,7 +200,9 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		}
 		criteria.setProjection( Projections.id() )
 				.setFetchSize( fetchSize )
-				.setReadOnly( true );
+				.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockMode.NONE );
 
 		try ( ScrollableResults scroll = criteria.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
 			/*

@@ -11,9 +11,12 @@ import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
+import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+import org.hibernate.StatelessSessionBuilder;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
@@ -45,15 +48,15 @@ public final class PersistenceUtil {
 	 */
 	public static Session openSession(EntityManagerFactory entityManagerFactory, String tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-		Session session;
-		if ( StringHelper.isEmpty( tenantId ) ) {
-			session = sessionFactory.openSession();
+		SessionBuilder builder = sessionFactory.withOptions();
+		if ( StringHelper.isNotEmpty( tenantId ) ) {
+			builder.tenantIdentifier( tenantId );
 		}
-		else {
-			session = sessionFactory.withOptions()
-					.tenantIdentifier( tenantId )
-					.openSession();
-		}
+		Session session = builder.openSession();
+		// We don't need to write to the database
+		session.setDefaultReadOnly( true );
+		// ... thus flushes are not necessary.
+		session.setHibernateFlushMode( FlushMode.MANUAL );
 		return session;
 	}
 
@@ -68,16 +71,11 @@ public final class PersistenceUtil {
 	 */
 	public static StatelessSession openStatelessSession(EntityManagerFactory entityManagerFactory, String tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-		StatelessSession statelessSession;
-		if ( StringHelper.isEmpty( tenantId ) ) {
-			statelessSession = sessionFactory.openStatelessSession();
+		StatelessSessionBuilder builder = sessionFactory.withStatelessOptions();
+		if ( StringHelper.isNotEmpty( tenantId ) ) {
+			builder.tenantIdentifier( tenantId );
 		}
-		else {
-			statelessSession = sessionFactory.withStatelessOptions()
-					.tenantIdentifier( tenantId )
-					.openStatelessSession();
-		}
-		return statelessSession;
+		return builder.openStatelessSession();
 	}
 
 	/**
