@@ -6,17 +6,11 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
-import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
@@ -27,7 +21,6 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
@@ -41,6 +34,11 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
 
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
@@ -122,8 +120,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 		emf = jobData.getEntityManagerFactory();
 
-		try (Session session = PersistenceUtil.openSession( emf, tenantId );
-				StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
+		try (StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
 			Integer maxResults = null;
 			if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
 				maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
