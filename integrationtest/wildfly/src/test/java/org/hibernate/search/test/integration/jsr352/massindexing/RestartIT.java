@@ -85,7 +85,6 @@ public class RestartIT {
 				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-					.createProperty().name( "hibernate.connection.release_mode" ).value( "on_close" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "local-heap" ).up()
 					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
