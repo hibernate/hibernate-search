@@ -24,8 +24,12 @@ public class SingularIdOrder implements IdOrder {
 	private final String idPropertyName;
 
 	public SingularIdOrder(String idPropertyName) {
-		super();
 		this.idPropertyName = idPropertyName;
+	}
+
+	@Override
+	public Criterion idGreater(Object idObj) {
+		return Restrictions.gt( idPropertyName, idObj );
 	}
 
 	@Override

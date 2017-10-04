@@ -81,7 +81,6 @@
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
-                    <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                 </properties>
             </writer>
         </chunk>

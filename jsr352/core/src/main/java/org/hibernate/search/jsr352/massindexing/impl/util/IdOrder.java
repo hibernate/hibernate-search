@@ -20,6 +20,12 @@ import org.hibernate.criterion.Criterion;
 public interface IdOrder {
 
 	/**
+	 * @param idObj The ID all results should be greater than.
+	 * @return A "greater than" restriction on the ID.
+	 */
+	Criterion idGreater(Object idObj);
+
+	/**
 	 * @param idObj The ID all results should be greater than or equal to.
 	 * @return A "greater or equal" restriction on the ID.
 	 */

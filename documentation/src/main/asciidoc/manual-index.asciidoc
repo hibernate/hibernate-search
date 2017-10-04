@@ -535,13 +535,13 @@ request maximum.
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
 |===
 
-==== [[jsr-352-index-scope]] Define index scope for each entity
+==== [[jsr-352-indexing-mode]] Define indexing mode for each entity
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
 indexation or a partial indexation through 3 different methods: selecting the desired entity types,
 using HQL, or using Hibernate criteria.
 
-.How to define the indexing scope?
+.How to define the indexing mode?
 ====
 [source, JAVA]
 ----
@@ -573,38 +573,36 @@ If your want to reindex only part of your data, you need to add restrictions usi
 they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
 use-case is to index the new entities appeared since yesterday.
 
-Note that, as detailed below, some features may not be supported depending on the restrictions.
+Note that, as detailed below, some features may not be supported depending on the indexing mode.
 
-.Comparaison of each index scope
+.Comparaison of each indexing mode
 |===
-| Index Scope | Indexation | Parallel Indexing | Checkpoint
+| Indexing mode | Scope | Parallel Indexing
 
 | Full Indexation
-| Full Indexation
+| All entities
 | Supported
+
+| Criteria
+| Some entities
 | Supported
 
 | HQL
-| Partial Indexation
-| Not Supported
-| Not Supported
-
-| Criteria
-| Partial Indexation
-| Supported
-| Supported
+| Some entities
+| Not supported
 |===
 
-[NOTE]
+[WARNING]
 ====
-When using the HQL approach, there isn't any query validation before the job's start.
+When using the HQL mode, there isn't any query validation before the job's start.
 If the query is invalid, the job will start and fail.
 
-Also, parallel indexing and recovery from failure are disabled when using an HQL-defined scope,
-because our current parallelism and failure recovery implementations rely on selection order,
+Also, parallel indexing is disabled in HQL mode,
+because our current parallelism implementations relies on selection order,
 which might not be provided by the HQL given by user.
 
-Because of those limitations, we suggest you use this approach only for indexing small numbers of entities.
+Because of those limitations, we suggest you use this approach only for indexing small numbers of entities,
+and only if you know that no entities matching the query will be created during indexing.
 ====
 
 ==== Parallel indexing
@@ -673,13 +671,14 @@ Please see the <<jsr-352-checkpoint,Checkpoint section>> to see how to tune chec
 
 When `rowsPerPartition` is low, there will be many small partitions,
 so processing threads will be less likely to starve (stay idle because there's no more partition to process),
-but on the other hand you will only be able to use a small fetch size,
+but on the other hand you will only be able to take advantage of a small fetch size,
 which will increase the number of database accesses.
 Also, due to the failure recovery mechanisms, there is some overhead in starting a new partition,
 so with an unnecessarily large number of partitions, this overhead will add up.
 
 When `rowsPerPartition` is high, there will be a few big partitions,
-so you will be able to take advantage of a higher fetch size,
+so you will be able to take advantage of a higher <<jsr-352-checkpoint,chunk size>>,
+and thus a higher fetch size,
 which will reduce the number of database accesses,
 and the overhead of starting a new partition will be less noticeable,
 but on the other hand you may not use all the threads available.
@@ -722,7 +721,9 @@ having a 1000-element checkpoint interval.
 On the other hand, performing a checkpoint means your JSR-352 runtime
 will write information about the progress of the job execution to its persistent storage,
 which also has a cost.
-So having a 1-element checkpoint interval is definitely not a good idea.
+Also, a new transaction and an entity manager are created for each chunk,
+so setting the fetch size to a value higher than the chunk size is pointless.
+Thus having a 1-element checkpoint interval is definitely not a good idea.
 ====
 
 ==== [[jsr-352-emf]] Selecting the persistence unit (EntityManagerFactory)

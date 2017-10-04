@@ -17,19 +17,17 @@ public class PartitionProgress implements Serializable {
 	private String entityName;
 	private int partitionId;
 	private long workDone;
-	private IndexScope indexScope;
 
-	public PartitionProgress(int partitionId, String entityName, IndexScope indexScope) {
+	public PartitionProgress(int partitionId, String entityName) {
 		this.partitionId = partitionId;
 		this.entityName = entityName;
 		this.workDone = 0L;
-		this.indexScope = indexScope;
 	}
 
 	/**
 	 * documentsAdded is an elementary count. It records how many items have been written in the current chunk. This
 	 * value is overwritten be the item writer at the end of each
-	 * {@link org.hibernate.search.jsr352.internal.steps.lucene.ItemWriter#writeItems}
+	 * {@link LuceneDocWriter#writeItems}
 	 */
 	public void documentsAdded(int increment) {
 		this.workDone += increment;
@@ -59,13 +57,9 @@ public class PartitionProgress implements Serializable {
 		this.workDone = workDone;
 	}
 
-	public IndexScope getIndexScope() {
-		return indexScope;
-	}
-
 	@Override
 	public String toString() {
 		return "PartitionProgress [workDone=" + workDone + ", entityName=" + entityName
-				+ ", partitionId=" + partitionId + ", indexScope=" + indexScope + "]";
+				+ ", partitionId=" + partitionId + "]";
 	}
 }

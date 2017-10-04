@@ -14,7 +14,6 @@ import static org.jboss.logging.Logger.Level.TRACE;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
-import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
 
@@ -119,9 +118,9 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = JSR_352_MESSAGES_START_ID + 17,
-			value = "Checkpoint reached. Sending checkpoint ID to batch runtime... (entity='%1$s', id='%2$s')"
+			value = "Checkpoint reached. Sending checkpoint ID to batch runtime... (entity='%1$s', checkpointInfo='%2$s')"
 	)
-	void checkpointReached(String entityName, Object checkpointId);
+	void checkpointReached(String entityName, Object checkpointInfo);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = JSR_352_MESSAGES_START_ID + 18,
@@ -134,12 +133,6 @@ public interface Log extends BaseHibernateSearchLogger {
 			value = "Closing EntityReader of partitionId='%1$s', entity='%2$s'."
 	)
 	void closingReader(String partitionId, String entityName);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = JSR_352_MESSAGES_START_ID + 20,
-			value = "%1$s"
-	)
-	void printBound(PartitionBound partitionBound);
 
 	@LogMessage(level = TRACE)
 	@Message(id = JSR_352_MESSAGES_START_ID + 21,

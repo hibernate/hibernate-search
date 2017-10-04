@@ -59,12 +59,6 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
 	private String partitionIdStr;
 
-	@Inject
-	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
-	private String indexScopeName;
-
-	private IndexScope indexScope;
-
 	private IndexManagerSelector indexManagerSelector;
 
 	private WriteMode writeMode;
@@ -77,8 +71,6 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@Override
 	public void open(Serializable checkpoint) throws Exception {
 		log.openingDocWriter( partitionIdStr, entityName );
-
-		this.indexScope = IndexScope.valueOf( indexScopeName );
 
 		/*
 		 * Always execute works as updates on the first checkpoint interval,
@@ -127,14 +119,11 @@ public class LuceneDocWriter extends AbstractItemWriter {
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
 		partitionData.documentAdded( items.size() );
 
-		if ( !IndexScope.HQL.equals( indexScope ) ) {
-			/*
-			 * We can switch to a faster mode, without checks, because we know the next items
-			 * we'll write haven't been written to the index yet.
-			 * This is not possible when using HQL, because checkpoints are ignored in that case.
-			 */
-			this.writeMode = WriteMode.ADD;
-		}
+		/*
+		 * We can switch to a faster mode, without checks, because we know the next items
+		 * we'll write haven't been written to the index yet.
+		 */
+		this.writeMode = WriteMode.ADD;
 	}
 
 	private void writeItem(Object item) {
