@@ -106,9 +106,14 @@ public class TestReporter {
 			String taskAverageTime = "n/a";
 			if ( ctx.testContext.measureTaskTime ) {
 				long taskTotalMilis = TimeUnit.MILLISECONDS.convert( task.getTimerValue(), TimeUnit.NANOSECONDS );
-				long taskAverageMilis = taskTotalMilis / task.getCounterValue();
+				long taskCount = task.getCounterValue();
 				taskTotalTime = DurationFormatUtils.formatDuration( taskTotalMilis, "mm:ss.SSS" );
-				taskAverageTime = DurationFormatUtils.formatDuration( taskAverageMilis, "mm:ss.SSS" );
+				if ( taskCount == 0L ) {
+					taskAverageTime = "n/a";
+				}
+				else {
+					taskAverageTime = DurationFormatUtils.formatDuration( taskTotalMilis / taskCount, "mm:ss.SSS" );
+				}
 			}
 			out.println( "    "
 					+ leftPad( task.getCounterValue() + "x ", 5 )
