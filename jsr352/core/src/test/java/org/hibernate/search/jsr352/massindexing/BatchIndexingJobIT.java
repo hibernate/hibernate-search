@@ -350,6 +350,59 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
+	public void criteria_maxResults() throws InterruptedException,
+			IOException {
+		// searches before mass index,
+		// expected no results for each search
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+
+		int maxResults = CHECKPOINT_INTERVAL + 1;
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.restrictedBy( Restrictions.or(
+								Restrictions.like( "name", "Google%" ),
+								Restrictions.like( "name","Red Hat%" )
+						) )
+						.maxResultsPerEntity( maxResults )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+		);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+
+		assertEquals( maxResults, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+	}
+
+	@Test
+	public void hql_maxResults() throws InterruptedException,
+			IOException {
+		// searches before mass index,
+		// expected no results for each search
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+
+		int maxResults = CHECKPOINT_INTERVAL + 1;
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
+						.maxResultsPerEntity( maxResults )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+		);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+
+		assertEquals( maxResults, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+	}
+
+	@Test
 	public void partitioned() throws InterruptedException,
 			IOException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
