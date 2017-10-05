@@ -178,7 +178,8 @@ public abstract class ReflectionHelper {
 	 * @return Returns {@code true} if the annotation is a Search annotation, {@code false} otherwise
 	 */
 	public static boolean isSearchAnnotation(Annotation annotation) {
-		return "org.hibernate.search.annotations".equals( annotation.annotationType().getPackage().getName() );
+		Package p = annotation.annotationType().getPackage();
+		return p != null && "org.hibernate.search.annotations".equals( p.getName() );
 	}
 
 
