@@ -127,6 +127,32 @@ public class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test(expected = SearchException.class)
+	public void testSessionClearInterval_greaterThanCheckpointInterval() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.sessionClearInterval( 5 )
+				.checkpointInterval( 4 )
+				.build();
+	}
+
+	@Test
+	public void testSessionClearInterval_defaultGreaterThanCheckpointInterval() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.checkpointInterval( Defaults.SESSION_CLEAR_INTERVAL_DEFAULT_RAW - 1 )
+				.build();
+		// ok, session clear interval will default to the value of checkpointInterval
+	}
+
+	@Test(expected = SearchException.class)
+	public void testSessionClearInterval_greaterThanDefaultCheckpointInterval() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.sessionClearInterval( Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW + 1 )
+				.build();
+	}
+
+	@Test(expected = SearchException.class)
 	public void testCheckpointInterval_greaterThanRowsPerPartitions() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )

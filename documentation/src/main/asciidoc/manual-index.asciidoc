@@ -521,6 +521,13 @@ request maximum.
 |The number of entities to process before triggering a checkpoint. The value defined must be greater
 than 0, and equal to or less than the value of `rowsPerPartition`.
 
+|`sessionClearInterval`
+|`sessionClearInterval(int)`
+|Optional
+|100, or the value of `checkpointInterval` if it is smaller
+|The number of entities to process before clearing the session. The value defined must be greater
+than 0, and equal to or less than the value of `checkpointInterval`.
+
 |`entityManagerFactoryReference`
 |`entityManagerFactoryReference(String)`
 |Required if there's more than one persistence unit
@@ -661,11 +668,11 @@ MassIndexingJob.parameters()
 ====
 This property has *nothing* to do with "chunk size",
 which is how many elements are processed together between each write.
-That aspect of processing is addressed by checkpoints.
+That aspect of processing is addressed by chunking.
 
 Instead, `rowsPerPartition` is more about how parallel your mass indexing job will be.
 
-Please see the <<jsr-352-checkpoint,Checkpoint section>> to see how to tune checkpoint algorithms.
+Please see the <<jsr-352-chunking,Chunking section>> to see how to tune chunking.
 ====
 
 When `rowsPerPartition` is low, there will be many small partitions,
@@ -676,7 +683,7 @@ Also, due to the failure recovery mechanisms, there is some overhead in starting
 so with an unnecessarily large number of partitions, this overhead will add up.
 
 When `rowsPerPartition` is high, there will be a few big partitions,
-so you will be able to take advantage of a higher <<jsr-352-checkpoint,chunk size>>,
+so you will be able to take advantage of a higher <<jsr-352-chunking,chunk size>>,
 and thus a higher fetch size,
 which will reduce the number of database accesses,
 and the overhead of starting a new partition will be less noticeable,
@@ -688,12 +695,15 @@ Each partition deals with one root entity type, so two different entity types wi
 the same partition.
 ====
 
-==== [[jsr-352-checkpoint]] Checkpoint
+==== [[jsr-352-chunking]] Chunking and session clearing
 
-The mass indexing job supports checkpoint algorithm, which helps you to restart your suspended or
-failed job from the last successful checkpoint. Assuming that N is the value of checkpoint interval,
-a partition will reach the checkpoint at every N items processed. You can overwrite the default
-interval to adapt your business requirement. By default, it is set to 500.
+The mass indexing job supports restart a suspended or failed job more or less from where it stopped.
+
+This is made possible by splitting each partition in several consecutive _chunks_ of entities,
+and saving process information in a _checkpoint_ at the end of each chunk.
+When a job is restarted, it will resume from the last checkpoint.
+
+The size of each chunk is determined by the `checkpointInterval` parameter.
 
 ====
 [source, JAVA]
@@ -704,24 +714,34 @@ MassIndexingJob.parameters()
 ----
 ====
 
-Checkpoint algorithms are partition-scoped, meaning each partition has its own checkpoint counter
-and it is not shared with other partitions.
+But the size of a chunk is not only about saving progress, it is also about performance:
+
+ * a new Hibernate session is opened for each chunk;
+ * a new transaction is started for each chunk;
+ * inside a chunk, the session is cleared periodically
+   according to the `sessionClearInterval` parameter,
+   which must thereby be smaller than (or equal to) the chunk size;
+ * documents are flushed to the index at the end of each chunk.
 
 [TIP]
 ====
-In general the checkpoint interval should be small compared to the number of rows per partition,
-but it shouldn't be too small in absolute terms.
+In general the checkpoint interval should be small compared to the number of rows per partition.
 
 Indeed, due to the failure recovery mechanism,
 the elements before the first checkpoint of each partition will take longer to process than the other,
 so in a 1000-element partition, having a 100-element checkpoint interval will be faster than
 having a 1000-element checkpoint interval.
 
-On the other hand, performing a checkpoint means your JSR-352 runtime
+On the other hand, *chunks shouldn't be too small* in absolute terms.
+Performing a checkpoint means your JSR-352 runtime
 will write information about the progress of the job execution to its persistent storage,
 which also has a cost.
-Also, a new transaction and an entity manager are created for each chunk,
-so setting the fetch size to a value higher than the chunk size is pointless.
+Also, a new transaction and session are created for each chunk
+which doesn't come for free, and implies that setting the fetch size
+to a value higher than the chunk size is pointless.
+Finally, the index flush performed at the end of each chunk
+is an expensive operation that involves a global lock,
+which essentially means that the less you do it, the faster indexing will be.
 Thus having a 1-element checkpoint interval is definitely not a good idea.
 ====
 

@@ -38,6 +38,12 @@ public final class ValidationUtil {
 		}
 	}
 
+	public static void validateSessionClearInterval(int sessionClearInterval, int checkpointInterval) {
+		if ( sessionClearInterval > checkpointInterval ) {
+			throw log.illegalSessionClearInterval( sessionClearInterval, checkpointInterval );
+		}
+	}
+
 	public static void validatePositive(String parameterName, int parameterValue) {
 		if ( parameterValue <= 0 ) {
 			throw log.negativeValueOrZero( parameterName, parameterValue );
