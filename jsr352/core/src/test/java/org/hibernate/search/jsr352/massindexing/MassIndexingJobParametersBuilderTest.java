@@ -44,6 +44,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
 	private static final int MAX_THREADS = 2;
 	private static final int ROWS_PER_PARTITION = 500;
+	private static final int CHECKPOINT_INTERVAL = 200;
 	private static final CacheMode CACHE_MODE = CacheMode.GET;
 
 	@Test
@@ -58,6 +59,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.optimizeAfterPurge( OPTIMIZE_AFTER_PURGE )
 				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
 				.rowsPerPartition( ROWS_PER_PARTITION )
+				.checkpointInterval( CHECKPOINT_INTERVAL )
 				.purgeAllOnStart( PURGE_ALL_ON_START )
 				.cacheMode( CACHE_MODE )
 				.tenantId( TENANT_ID )
@@ -70,6 +72,7 @@ public class MassIndexingJobParametersBuilderTest {
 		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE ) ) );
 		assertEquals( OPTIMIZE_ON_FINISH, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_ON_FINISH ) ) );
 		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );
+		assertEquals( CHECKPOINT_INTERVAL, Integer.parseInt( props.getProperty( MassIndexingJobParameters.CHECKPOINT_INTERVAL ) ) );
 		assertEquals( PURGE_ALL_ON_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) );
 		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
 		assertEquals( CACHE_MODE, CacheMode.valueOf( props.getProperty( MassIndexingJobParameters.CACHE_MODE ) ) );
