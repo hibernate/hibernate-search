@@ -36,6 +36,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
@@ -134,6 +135,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			int rowsPerPartition = SerializationUtil.parseIntegerParameterOptional(
 					ROWS_PER_PARTITION, serializedRowsPerPartition, Defaults.ROWS_PER_PARTITION
 			);
+			Integer checkpointIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
+					CHECKPOINT_INTERVAL, serializedCheckpointInterval, null
+			);
+			int checkpointInterval = Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
 			int idFetchSize = SerializationUtil.parseIntegerParameterOptional(
 					ID_FETCH_SIZE, serializedIdFetchSize, Defaults.ID_FETCH_SIZE
 			);
@@ -176,8 +181,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				props[i].setProperty( MassIndexingPartitionProperties.INDEX_SCOPE, bound.getIndexScope().name() );
 				props[i].setProperty(
 						MassIndexingPartitionProperties.CHECKPOINT_INTERVAL,
-						serializedCheckpointInterval == null ? String.valueOf( Defaults.CHECKPOINT_INTERVAL )
-								: serializedCheckpointInterval
+						String.valueOf( checkpointInterval )
 				);
 			}
 

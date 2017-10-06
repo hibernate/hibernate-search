@@ -32,9 +32,9 @@ public final class ValidationUtil {
 		// Private constructor, do not use it.
 	}
 
-	public static void validateCheckpointInterval(Integer checkpointInterval, Integer rowsPerPartitions) {
-		if ( checkpointInterval != null && rowsPerPartitions != null && checkpointInterval >= rowsPerPartitions ) {
-			throw log.illegalCheckpointInterval( checkpointInterval, rowsPerPartitions );
+	public static void validateCheckpointInterval(int checkpointInterval, int rowsPerPartition) {
+		if ( checkpointInterval > rowsPerPartition ) {
+			throw log.illegalCheckpointInterval( checkpointInterval, rowsPerPartition );
 		}
 	}
 

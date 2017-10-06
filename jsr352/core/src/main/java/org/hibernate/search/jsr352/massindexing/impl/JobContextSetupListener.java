@@ -146,12 +146,13 @@ public class JobContextSetupListener extends AbstractJobListener {
 	}
 
 	private void validateChunkSettings() {
-		int checkpointInterval = SerializationUtil.parseIntegerParameterOptional(
-				CHECKPOINT_INTERVAL, serializedCheckpointInterval, Defaults.CHECKPOINT_INTERVAL
-		);
-		int rowsPerPartition = SerializationUtil.parseIntegerParameterOptional(
+		Integer rowsPerPartition = SerializationUtil.parseIntegerParameterOptional(
 				ROWS_PER_PARTITION, serializedRowsPerPartition, Defaults.ROWS_PER_PARTITION
 		);
+		Integer checkpointIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
+				CHECKPOINT_INTERVAL, serializedCheckpointInterval, null
+		);
+		int checkpointInterval = Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
 
 		ValidationUtil.validatePositive( CHECKPOINT_INTERVAL, checkpointInterval );
 		ValidationUtil.validatePositive( ROWS_PER_PARTITION, rowsPerPartition );

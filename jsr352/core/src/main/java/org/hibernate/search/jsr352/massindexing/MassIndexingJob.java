@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.CacheMode;
@@ -21,6 +20,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -170,10 +170,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * The number of entities to process before triggering the next checkpoint. The value defined must be greater
-		 * than 0, and less than the value of {@link #rowsPerPartition}.
+		 * than 0, and equal to or less than the value of {@link #rowsPerPartition}.
 		 * <p>
 		 * This is an optional parameter, its default value is
-		 * {@link MassIndexingJobParameters.Defaults#CHECKPOINT_INTERVAL}.
+		 * {@link MassIndexingJobParameters.Defaults#CHECKPOINT_INTERVAL_DEFAULT_RAW}, or the value of
+		 * {@link #rowsPerPartition} if it is smaller.
 		 *
 		 * @param checkpointInterval the number of entities to process before triggering the next checkpoint.
 		 *
@@ -397,7 +398,11 @@ public final class MassIndexingJob {
 		 * @throws SearchException if the serialization of some parameters fail.
 		 */
 		public Properties build() {
-			ValidationUtil.validateCheckpointInterval( checkpointInterval, rowsPerPartition );
+			int defaultedCheckpointInterval = Defaults.checkpointInterval( checkpointInterval, rowsPerPartition );
+			ValidationUtil.validateCheckpointInterval(
+					defaultedCheckpointInterval,
+					rowsPerPartition != null ? rowsPerPartition : Defaults.ROWS_PER_PARTITION
+			);
 
 			Properties jobParams = new Properties();
 
