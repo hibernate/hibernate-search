@@ -17,6 +17,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
@@ -51,8 +52,12 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		boolean purgeAllOnStart = SerializationUtil.parseBooleanParameter( PURGE_ALL_ON_START, serializedPurgeAllOnStart );
-		boolean optimizeAfterPurge = SerializationUtil.parseBooleanParameter( OPTIMIZE_AFTER_PURGE, serializedOptimizeAfterPurge );
+		boolean purgeAllOnStart = SerializationUtil.parseBooleanParameterOptional(
+				PURGE_ALL_ON_START, serializedPurgeAllOnStart, Defaults.PURGE_ALL_ON_START
+		);
+		boolean optimizeAfterPurge = SerializationUtil.parseBooleanParameterOptional(
+				OPTIMIZE_AFTER_PURGE, serializedOptimizeAfterPurge, Defaults.OPTIMIZE_AFTER_PURGE
+		);
 
 		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();

@@ -156,7 +156,8 @@ public final class MassIndexingJob {
 		/**
 		 * The Hibernate {@link CacheMode} when loading entities.
 		 * <p>
-		 * This method is optional, its default value is {@link CacheMode#IGNORE}.
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#CACHE_MODE}.
 		 *
 		 * @param cacheMode the cache mode
 		 *
@@ -169,8 +170,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * The number of entities to process before triggering the next checkpoint. The value defined must be greater
-		 * than 0, and less than the value of {@link #rowsPerPartition}. This is an optional method, its default value
-		 * is {@literal 200}.
+		 * than 0, and less than the value of {@link #rowsPerPartition}.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#CHECKPOINT_INTERVAL}.
 		 *
 		 * @param checkpointInterval the number of entities to process before triggering the next checkpoint.
 		 *
@@ -187,7 +190,8 @@ public final class MassIndexingJob {
 		 * might benefit from using {@link Integer#MIN_VALUE}, otherwise it
 		 * will attempt to preload everything in memory.
 		 * <p>
-		 * This is an optional parameter.
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#ID_FETCH_SIZE}.
 		 *
 		 * @param idFetchSize the fetch size to be used when loading primary keys
 		 *
@@ -204,8 +208,8 @@ public final class MassIndexingJob {
 		 * might benefit from using {@link Integer#MIN_VALUE}, otherwise it
 		 * will attempt to preload everything in memory.
 		 * <p>
-		 * This is an optional parameter. The default value is the value of
-		 * checkpoint interval.
+		 * This is an optional parameter, its default value is
+		 * the value of the checkpoint interval.
 		 *
 		 * @param entityFetchSize the fetch size to be used when loading entities
 		 *
@@ -242,8 +246,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * The maximum number of threads to use for processing the job. Note the batch runtime cannot guarantee the
-		 * request number of threads are available; it will use as many as it can up to the request maximum. This
-		 * method is optional, its default value is the number of partitions.
+		 * request number of threads are available; it will use as many as it can up to the request maximum.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * the number of partitions.
 		 *
 		 * @param maxThreads the maximum number of threads.
 		 *
@@ -259,7 +265,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the mass indexer should be optimized at the beginning of the job. This operation takes place
-		 * after the purge operation and before indexing. This method is optional, its default value is false.
+		 * after the purge operation and before indexing.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#OPTIMIZE_AFTER_PURGE}.
 		 *
 		 * @param optimizeAfterPurge optimize after purge.
 		 *
@@ -272,7 +281,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the mass indexer should be optimized at the end of the job. This operation takes place after
-		 * indexing. This method is optional, its default value is false.
+		 * indexing.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#OPTIMIZE_ON_FINISH}.
 		 *
 		 * @param optimizeOnFinish optimize on finish.
 		 *
@@ -285,7 +297,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the existing lucene index should be purged at the beginning of the job. This operation takes
-		 * place before indexing. This method is optional, its default value is false.
+		 * place before indexing.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#PURGE_ALL_ON_START}.
 		 *
 		 * @param purgeAllOnStart purge all on start.
 		 *
@@ -338,7 +353,10 @@ public final class MassIndexingJob {
 
 		/**
 		 * The maximum number of rows to process per partition. The value defined must be greater than 0, and greater
-		 * than the value of {@link #checkpointInterval}. This method is optional, its default value is {@literal 250}.
+		 * than the value of {@link #checkpointInterval}.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#ROWS_PER_PARTITION}.
 		 *
 		 * @param rowsPerPartition Rows per partition.
 		 *

@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
@@ -47,7 +48,9 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		boolean optimizeOnFinish = SerializationUtil.parseBooleanParameter( OPTIMIZE_ON_FINISH, serializedOptimizeOnFinish );
+		boolean optimizeOnFinish = SerializationUtil.parseBooleanParameterOptional(
+				OPTIMIZE_ON_FINISH, serializedOptimizeOnFinish, Defaults.OPTIMIZE_ON_FINISH
+		);
 
 		if ( optimizeOnFinish ) {
 			log.startOptimization();

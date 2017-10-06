@@ -60,34 +60,56 @@ public class SerializationUtilTest {
 	}
 
 	@Test
+	public void deserializeInt_missing() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH500029: Unable to parse value 'null' for job parameter 'My parameter'." );
+
+		SerializationUtil.parseIntegerParameter( "My parameter", null );
+	}
+
+	@Test
+	public void deserializeInt_defaultValue() throws Exception {
+		int i = SerializationUtil.parseIntegerParameterOptional( "My parameter", null, 1 );
+		assertThat( i ).isEqualTo( 1 );
+	}
+
+	@Test
 	public void deserializeBoolean_fromLowerCase() throws Exception {
-		boolean t = SerializationUtil.parseBooleanParameter( "My parameter 1", "true" );
-		boolean f = SerializationUtil.parseBooleanParameter( "My parameter 2", "false" );
+		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "true", false );
+		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "false", true );
 		assertThat( t ).isTrue();
 		assertThat( f ).isFalse();
 	}
 
 	@Test
 	public void deserializeBoolean_fromUpperCase() throws Exception {
-		boolean t = SerializationUtil.parseBooleanParameter( "My parameter 1", "TRUE" );
-		boolean f = SerializationUtil.parseBooleanParameter( "My parameter 2", "FALSE" );
+		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "TRUE", false );
+		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "FALSE", true );
 		assertThat( t ).isTrue();
 		assertThat( f ).isFalse();
 	}
 
 	@Test
 	public void deserializeBoolean_fromIrregularCase() throws Exception {
-		boolean t = SerializationUtil.parseBooleanParameter( "My parameter 1", "TruE" );
-		boolean f = SerializationUtil.parseBooleanParameter( "My parameter 2", "FalSe" );
+		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "TruE", false );
+		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "FalSe", true );
 		assertThat( t ).as( "Case should be ignored." ).isTrue();
 		assertThat( f ).as( "Case should be ignored." ).isFalse();
 	}
 
 	@Test
+	public void deserializeBoolean_fromMissing() throws Exception {
+		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", null, true );
+		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", null, false );
+		assertThat( t ).as( "Default value should be returned." ).isTrue();
+		assertThat( f ).as( "Default value should be returned." ).isFalse();
+	}
+
+	@Test
 	public void deserializeBoolean_fromOthers() throws Exception {
-		for ( String value : new String[] { null, "", "0", "1", "t", "f" } ) {
+		for ( String value : new String[] { "", "0", "1", "t", "f" } ) {
 			try {
-				SerializationUtil.parseBooleanParameter( "My parameter", value );
+				SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true );
 				fail();
 			}
 			catch (SearchException e) {
