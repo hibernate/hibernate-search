@@ -18,6 +18,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -131,12 +132,20 @@ public class MassIndexingJobParametersBuilderTest {
 				.build();
 	}
 
-	@Test(expected = SearchException.class)
-	public void testCheckpointInterval_equalToRowsPerPartitions() {
+	@Test
+	public void testCheckpointInterval_defaultGreaterThanRowsPerPartitions() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
-				.checkpointInterval( 4 )
-				.rowsPerPartition( 4 )
+				.rowsPerPartition( Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW - 1 )
+				.build();
+		// ok, checkpoint interval will default to the value of rowsPerPartition
+	}
+
+	@Test(expected = SearchException.class)
+	public void testCheckpointInterval_greaterThanDefaultRowsPerPartitions() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.checkpointInterval( Defaults.ROWS_PER_PARTITION + 1 )
 				.build();
 	}
 

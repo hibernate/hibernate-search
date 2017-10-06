@@ -192,8 +192,8 @@ public class EntityReader extends AbstractItemReader {
 		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter(
 				CACHE_MODE, serializedCacheMode, Defaults.CACHE_MODE
 		);
-		int checkpointInterval = SerializationUtil.parseIntegerParameterOptional(
-				CHECKPOINT_INTERVAL, serializedCheckpointInterval, Defaults.CHECKPOINT_INTERVAL
+		int checkpointInterval = SerializationUtil.parseIntegerParameter(
+				CHECKPOINT_INTERVAL, serializedCheckpointInterval
 		);
 		int entityFetchSize = SerializationUtil.parseIntegerParameterOptional(
 				ENTITY_FETCH_SIZE, serializedEntityFetchSize, checkpointInterval

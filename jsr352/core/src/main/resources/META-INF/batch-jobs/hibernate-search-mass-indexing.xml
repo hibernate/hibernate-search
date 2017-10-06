@@ -67,7 +67,8 @@
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
                     <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
-                    <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
+                    <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
+                    <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>

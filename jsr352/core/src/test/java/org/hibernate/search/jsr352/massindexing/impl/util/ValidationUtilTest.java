@@ -88,30 +88,19 @@ public class ValidationUtilTest {
 	}
 
 	@Test
-	public void validateCheckpointInterval_checkpointIntervalIsNull() throws Exception {
-		ValidationUtil.validateCheckpointInterval( null, 100 );
-		// ok
-	}
-
-	@Test
-	public void validateCheckpointInterval_rowsPerPartitionsIsNull() throws Exception {
-		ValidationUtil.validateCheckpointInterval( 100, null );
-		// ok
-	}
-
-	@Test
-	public void validateCheckpointInterval_lessThanRowsPerPartitions() throws Exception {
+	public void validateCheckpointInterval_lessThanRowsPerPartition() throws Exception {
 		ValidationUtil.validateCheckpointInterval( 99, 100 );
 		// ok
 	}
 
-	@Test(expected = SearchException.class)
-	public void validateCheckpointInterval_equalToRowsPerPartitions() throws Exception {
+	@Test
+	public void validateCheckpointInterval_equalToRowsPerPartition() {
 		ValidationUtil.validateCheckpointInterval( 100, 100 );
+		// ok
 	}
 
 	@Test(expected = SearchException.class)
-	public void validateCheckpointInterval_greaterThanRowsPerPartitions() throws Exception {
+	public void validateCheckpointInterval_greaterThanRowsPerPartition() throws Exception {
 		ValidationUtil.validateCheckpointInterval( 101, 100 );
 	}
 

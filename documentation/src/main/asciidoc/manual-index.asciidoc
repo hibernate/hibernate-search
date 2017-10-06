@@ -499,20 +499,12 @@ See <<jsr-352-index-scope>> for more detail and limitations.
 |The maximum number of results to load per entity type. This parameter let you define a threshold
 value to avoid loading too many entities accidentally. The value defined must be greater than 0.
 The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL.
-
-|`checkpointInterval`
-|`checkpointInterval(int)`
-|Optional
-|200
-|The number of entities to process before triggering a checkpoint. The value defined must be greater
-than 0, and less than the value of `rowsPerPartition`.
-
 |`rowsPerPartition`
 |`rowsPerPartition(int)`
 |Optional
 |1000
 |The maximum number of rows to process per partition. The value defined must be greater than 0, and
-greater than the value of `checkpointInterval`.
+equal to or greater than the value of `checkpointInterval`.
 
 |`maxThreads`
 |`maxThreads(int)`
@@ -521,6 +513,13 @@ greater than the value of `checkpointInterval`.
 |The maximum number of threads to use for processing the job. Note the batch runtime cannot
 guarantee the request number of threads are available; it will use as many as it can up to the
 request maximum.
+
+|`checkpointInterval`
+|`checkpointInterval(int)`
+|Optional
+|200, or the value of `rowsPerPartition` if it is smaller
+|The number of entities to process before triggering a checkpoint. The value defined must be greater
+than 0, and equal to or less than the value of `rowsPerPartition`.
 
 |`entityManagerFactoryReference`
 |`entityManagerFactoryReference(String)`

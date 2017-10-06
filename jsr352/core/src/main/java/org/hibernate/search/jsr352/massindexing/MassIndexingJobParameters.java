@@ -61,8 +61,21 @@ public final class MassIndexingJobParameters {
 		public static final boolean OPTIMIZE_ON_FINISH = true;
 		public static final boolean OPTIMIZE_AFTER_PURGE = true;
 		public static final boolean PURGE_ALL_ON_START = true;
+
 		public static final int ROWS_PER_PARTITION = 1000;
-		public static final int CHECKPOINT_INTERVAL = 200;
+
+		public static final int CHECKPOINT_INTERVAL_DEFAULT_RAW = 200;
+		public static int checkpointInterval(Integer checkpointIntervalRaw, Integer rowsPerPartition) {
+			if ( checkpointIntervalRaw != null ) {
+				return checkpointIntervalRaw;
+			}
+			if ( rowsPerPartition == null || rowsPerPartition > CHECKPOINT_INTERVAL_DEFAULT_RAW ) {
+				return CHECKPOINT_INTERVAL_DEFAULT_RAW;
+			}
+			else {
+				return rowsPerPartition;
+			}
+		}
 
 	}
 }

@@ -183,8 +183,9 @@ public interface Log extends BaseHibernateSearchLogger {
 	SearchException unableToParseJobParameter(String parameterName, Object parameterValue, @Cause Exception e);
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 30,
-			value = "The value of parameter 'checkpointInterval' (value=%1$d) should be less than"
-					+ " the value of parameter 'rowsPerPartition' (value=%2$d)."
+			value = "The value of parameter '" + MassIndexingJobParameters.CHECKPOINT_INTERVAL
+					+ "' (value=%1$d) should be equal to or less than the value of parameter '"
+					+ MassIndexingJobParameters.ROWS_PER_PARTITION + "' (value=%2$d)."
 	)
 	SearchException illegalCheckpointInterval(int checkpointInterval, int rowsPerPartition);
 

@@ -17,6 +17,7 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
@@ -32,6 +33,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit test for partition plan validation.
@@ -127,13 +129,20 @@ public class PartitionMapperTest {
 		int compPartitions = 0;
 		int persPartitions = 0;
 		for ( Properties p : partitionPlan.getPartitionProperties() ) {
-			String entityName = p.getProperty( "entityName" );
+			String entityName = p.getProperty( MassIndexingPartitionProperties.ENTITY_NAME );
 			if ( entityName.equals( Company.class.getName() ) ) {
 				compPartitions++;
 			}
 			if ( entityName.equals( Person.class.getName() ) ) {
 				persPartitions++;
 			}
+			/*
+			 * The checkpoint interval should have defaulted to the value of rowsPerPartition,
+			 * since the value of rowsPerPartition is lower than the static default for checkpoint interval.
+			 */
+			String checkpointInterval = p.getProperty( MassIndexingPartitionProperties.CHECKPOINT_INTERVAL );
+			assertNotNull( checkpointInterval );
+			assertEquals( "3", checkpointInterval );
 		}
 
 		// nbPartitions = rows / rowsPerPartition
