@@ -8,9 +8,11 @@
 package org.hibernate.search.elasticsearch.test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,7 +135,13 @@ public class GsonStreamedEncodingTest {
 		//to the Apache HTTP client or it gets confused.
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
 			final MessageDigest digest = getSha256Digest();
-			entity.fillDigest( digest );
+			OutputStream discardingStream = new OutputStream() {
+				@Override
+				public void write(int b) throws IOException {
+				}
+			};
+			DigestOutputStream digestStream = new DigestOutputStream( discardingStream, digest );
+			entity.writeTo( digestStream );
 			assertNotEquals( -1l, entity.getContentLength() );
 			final byte[] content = produceContentWithCustomEncoder( entity );
 			assertEquals( content.length, entity.getContentLength() );
@@ -172,7 +180,13 @@ public class GsonStreamedEncodingTest {
 		notEmpty( bodyParts );
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, bodyParts ) ) {
 			final MessageDigest digest = getSha256Digest();
-			entity.fillDigest( digest );
+			OutputStream discardingStream = new OutputStream() {
+				@Override
+				public void write(int b) throws IOException {
+				}
+			};
+			DigestOutputStream digestStream = new DigestOutputStream( discardingStream, digest );
+			entity.writeTo( digestStream );
 			return encodeHexString( digest.digest() );
 		}
 		catch (IOException e) {

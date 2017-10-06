@@ -7,7 +7,8 @@
 package org.hibernate.search.elasticsearch.aws.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Hex;
@@ -18,7 +19,8 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.protocol.HttpContext;
-import org.hibernate.search.elasticsearch.spi.DigestSelfSigningCapable;
+
+import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
 
 /**
  * Interceptor computing the hash of the request payload.
@@ -35,6 +37,15 @@ class AWSPayloadHashingRequestInterceptor implements HttpRequestInterceptor {
 
 	public static final String CONTEXT_ATTRIBUTE_HASH = AWSPayloadHashingRequestInterceptor.class.getName() + "_hash";
 
+	private static final OutputStream DISCARDING_STREAM = new OutputStream() {
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+		}
+		@Override
+		public void write(int b) throws IOException {
+		}
+	};
+
 	@Override
 	public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
 		String contentHash = computeContentHash( request );
@@ -46,20 +57,14 @@ class AWSPayloadHashingRequestInterceptor implements HttpRequestInterceptor {
 		if ( entity == null ) {
 			return DigestUtils.sha256Hex( "" );
 		}
-		if ( entity instanceof DigestSelfSigningCapable ) {
-			DigestSelfSigningCapable e = (DigestSelfSigningCapable) entity;
-			MessageDigest digest = DigestUtils.getSha256Digest();
-			e.fillDigest( digest );
-			return Hex.encodeHexString( digest.digest() );
+		if ( !entity.isRepeatable() ) {
+			throw new IllegalStateException( "Cannot sign AWS requests with non-repeatable entities" );
 		}
-		else {
-			if ( !entity.isRepeatable() ) {
-				throw new IllegalStateException( "Cannot sign AWS requests with non-repeatable entities" );
-			}
-			try ( InputStream content = entity.getContent() ) {
-				return DigestUtils.sha256Hex( content );
-			}
-		}
+
+		final MessageDigest digest = getSha256Digest();
+		DigestOutputStream digestStream = new DigestOutputStream( DISCARDING_STREAM, digest );
+		entity.writeTo( digestStream );
+		return Hex.encodeHexString( digest.digest() );
 	}
 
 	private HttpEntity getEntity(HttpRequest request) throws IOException {
@@ -70,5 +75,6 @@ class AWSPayloadHashingRequestInterceptor implements HttpRequestInterceptor {
 			return null;
 		}
 	}
+
 
 }

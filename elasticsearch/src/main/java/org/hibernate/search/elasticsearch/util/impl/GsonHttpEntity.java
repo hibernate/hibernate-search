@@ -9,16 +9,13 @@ package org.hibernate.search.elasticsearch.util.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.elasticsearch.spi.DigestSelfSigningCapable;
 import org.hibernate.search.exception.SearchException;
 
 import com.google.gson.Gson;
@@ -60,11 +57,9 @@ import org.apache.http.protocol.HTTP;
  *
  * @author Sanne Grinovero (C) 2017 Red Hat Inc.
  */
-public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer, DigestSelfSigningCapable {
+public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
-
-	private static final byte[] NEWLINE = "\n".getBytes( CHARSET );
 
 	private static final BasicHeader CONTENT_TYPE = new BasicHeader( HTTP.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString() );
 
@@ -166,14 +161,27 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 	public InputStream getContent() throws IOException {
 		//This could be implemented but would be sub-optimal compared to using produceContent().
 		//We therefore prefer throwing the exception so that we can easily spot unintended usage via tests.
-		throw new UnsupportedOperationException( "Not implemented! Expected to produce content only over produceContent()" );
+		throw new UnsupportedOperationException( "Not implemented! Expected to produce content only over produceContent(),"
+				+ " or writeTo(OutputStream) if blocking calls are acceptable for your use case." );
 	}
 
 	@Override
-	public void writeTo(OutputStream outstream) throws IOException {
-		//This could be implemented but would be sub-optimal compared to using produceContent().
-		//We therefore prefer throwing the exception so that we can easily spot unintended usage via tests.
-		throw new UnsupportedOperationException( "Not implemented! Expected to produce content only over produceContent()" );
+	public void writeTo(OutputStream out) throws IOException {
+		/*
+		 * For this method we use no pagination, so ignore the mutable fields.
+		 *
+		 * Note we don't close the counting stream or the writer,
+		 * because we must not close the output stream that was passed as a parameter.
+		 */
+		CountingOutputStream countingStream = new CountingOutputStream( out );
+		Writer writer = new OutputStreamWriter( countingStream, CHARSET );
+		for ( JsonObject bodyPart : bodyParts ) {
+			gson.toJson( bodyPart, writer );
+			writer.append( '\n' );
+		}
+		writer.flush();
+		//Now we finally know the content size in bytes:
+		hintContentLength( countingStream.getBytesWritten() );
 	}
 
 	@Override
@@ -283,60 +291,10 @@ public final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProduce
 		this.nextBodyToEncodeIndex = 0;
 	}
 
-	@Override
-	public void fillDigest(MessageDigest digest) throws IOException {
-		//For digest computation we use no pagination, so ignore the mutable fields.
-		final DigestWriter digestWriter = new DigestWriter( digest );
-		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, digestWriter );
-			digestWriter.insertNewline();
-		}
-		//Now we finally know the content size in bytes:
-		hintContentLength( digestWriter.getContentLength() );
-	}
-
 	private void hintContentLength(long contentLength) {
 		if ( contentlengthWasProvided == false ) {
 			this.contentLength = contentLength;
 		}
-	}
-
-	private static final class DigestWriter extends Writer {
-
-		private final MessageDigest digest;
-		private long totalWrittenBytes = 0;
-
-		public DigestWriter(MessageDigest digest) {
-			this.digest = digest;
-		}
-
-		@Override
-		public void write(char[] input, int offset, int len) throws IOException {
-			CharBuffer charBuffer = CharBuffer.wrap( input, offset, len );
-			ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode( charBuffer );
-			this.totalWrittenBytes += byteBuffer.remaining();
-			this.digest.update( byteBuffer );
-		}
-
-		@Override
-		public void flush() throws IOException {
-			// Nothing to do
-		}
-
-		@Override
-		public void close() throws IOException {
-			// Nothing to do
-		}
-
-		public void insertNewline() {
-			this.totalWrittenBytes += NEWLINE.length;
-			this.digest.update( NEWLINE );
-		}
-
-		public long getContentLength() {
-			return this.totalWrittenBytes;
-		}
-
 	}
 
 }
