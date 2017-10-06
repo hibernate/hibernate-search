@@ -31,6 +31,7 @@ import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
 import org.hibernate.search.jsr352.massindexing.impl.util.IdOrder;
@@ -39,7 +40,6 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionP
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -189,21 +189,18 @@ public class EntityReader extends AbstractItemReader {
 
 		PartitionContextData partitionData;
 		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
-		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode );
-		int entityFetchSize;
-		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
-			entityFetchSize = SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
-		}
-		else {
-			entityFetchSize = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
-		}
-		Integer maxResults;
-		if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
-			maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
-		}
-		else {
-			maxResults = null;
-		}
+		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter(
+				CACHE_MODE, serializedCacheMode, Defaults.CACHE_MODE
+		);
+		int checkpointInterval = SerializationUtil.parseIntegerParameterOptional(
+				CHECKPOINT_INTERVAL, serializedCheckpointInterval, Defaults.CHECKPOINT_INTERVAL
+		);
+		int entityFetchSize = SerializationUtil.parseIntegerParameterOptional(
+				ENTITY_FETCH_SIZE, serializedEntityFetchSize, checkpointInterval
+		);
+		Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
+				MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
+		);
 		FetchingStrategy fetchingStrategy;
 		switch ( indexScope ) {
 			case HQL:

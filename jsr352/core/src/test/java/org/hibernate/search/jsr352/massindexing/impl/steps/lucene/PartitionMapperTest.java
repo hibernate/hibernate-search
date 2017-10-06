@@ -88,6 +88,7 @@ public class PartitionMapperTest {
 				maxThreads,
 				null,
 				rowsPerPartition,
+				null,
 				null
 		);
 

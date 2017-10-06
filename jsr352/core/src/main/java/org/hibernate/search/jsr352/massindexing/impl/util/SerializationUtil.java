@@ -61,7 +61,10 @@ public final class SerializationUtil {
 	 *
 	 * @throws SearchException if the parsing fails.
 	 */
-	public static boolean parseBooleanParameter(String key, String value) {
+	public static boolean parseBooleanParameterOptional(String key, String value, boolean defaultValue) {
+		if ( value == null ) {
+			return defaultValue;
+		}
 		if ( "true".equalsIgnoreCase( value ) ) {
 			return true;
 		}
@@ -80,6 +83,15 @@ public final class SerializationUtil {
 		}
 	}
 
+	public static Integer parseIntegerParameterOptional(String key, String value, Integer defaultValue) {
+		if ( value == null ) {
+			return defaultValue;
+		}
+		else {
+			return parseIntegerParameter( key, value );
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T parseParameter(@SuppressWarnings("unused") Class<T> type, String key, String value) {
 		try {
@@ -90,11 +102,14 @@ public final class SerializationUtil {
 		}
 	}
 
-	public static CacheMode parseCacheModeParameter(String key, String value) {
-		return parseEnumParameter( CacheMode.class, key, value.toUpperCase( Locale.ROOT ) );
+	public static CacheMode parseCacheModeParameter(String key, String value, CacheMode defaultValue) {
+		return parseEnumParameter( CacheMode.class, key, value == null ? value : value.toUpperCase( Locale.ROOT ), defaultValue );
 	}
 
-	private static <T extends Enum<T>> T parseEnumParameter(Class<T> clazz, String key, String value) {
+	private static <T extends Enum<T>> T parseEnumParameter(Class<T> clazz, String key, String value, T defaultValue) {
+		if ( value == null ) {
+			return defaultValue;
+		}
 		try {
 			return Enum.valueOf( clazz, value );
 		}

@@ -16,6 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
@@ -145,8 +146,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 	}
 
 	private void validateChunkSettings() {
-		int checkpointInterval = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
-		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
+		int checkpointInterval = SerializationUtil.parseIntegerParameterOptional(
+				CHECKPOINT_INTERVAL, serializedCheckpointInterval, Defaults.CHECKPOINT_INTERVAL
+		);
+		int rowsPerPartition = SerializationUtil.parseIntegerParameterOptional(
+				ROWS_PER_PARTITION, serializedRowsPerPartition, Defaults.ROWS_PER_PARTITION
+		);
 
 		ValidationUtil.validatePositive( CHECKPOINT_INTERVAL, checkpointInterval );
 		ValidationUtil.validatePositive( ROWS_PER_PARTITION, rowsPerPartition );
@@ -160,13 +165,13 @@ public class JobContextSetupListener extends AbstractJobListener {
 		}
 
 		// A boolean parameter is validated if its deserialization is successful.
-		SerializationUtil.parseBooleanParameter( OPTIMIZE_ON_FINISH , serializedOptimizedOnFinish );
-		SerializationUtil.parseBooleanParameter( OPTIMIZE_AFTER_PURGE, serializedOptimizedAfterPurge );
-		SerializationUtil.parseBooleanParameter( PURGE_ALL_ON_START, serializedPurgeAllOnStart );
+		SerializationUtil.parseBooleanParameterOptional( OPTIMIZE_ON_FINISH , serializedOptimizedOnFinish, Defaults.OPTIMIZE_ON_FINISH );
+		SerializationUtil.parseBooleanParameterOptional( OPTIMIZE_AFTER_PURGE, serializedOptimizedAfterPurge, Defaults.OPTIMIZE_AFTER_PURGE );
+		SerializationUtil.parseBooleanParameterOptional( PURGE_ALL_ON_START, serializedPurgeAllOnStart, Defaults.PURGE_ALL_ON_START );
 	}
 
 	private void validateQuerying() {
-		SerializationUtil.parseIntegerParameter( ID_FETCH_SIZE, serializedIdFetchSize );
+		SerializationUtil.parseIntegerParameterOptional( ID_FETCH_SIZE, serializedIdFetchSize, Defaults.ID_FETCH_SIZE );
 
 		if ( StringHelper.isNotEmpty( serializedEntityFetchSize ) ) {
 			SerializationUtil.parseIntegerParameter( ENTITY_FETCH_SIZE, serializedEntityFetchSize );
@@ -180,7 +185,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 			ValidationUtil.validatePositive( MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 		}
 
-		SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode );
+		SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode, Defaults.CACHE_MODE );
 
 		if ( StringHelper.isNotEmpty( serializedCustomQueryCriteria ) ) {
 			SerializationUtil.parseParameter( Criteria.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );

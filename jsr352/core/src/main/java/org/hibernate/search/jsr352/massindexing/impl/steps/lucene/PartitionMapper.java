@@ -27,13 +27,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.EntityTypeDescriptor;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
@@ -89,6 +89,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	private String serializedRowsPerPartition;
 
 	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
+	private String serializedCheckpointInterval;
+
+	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
 	private String tenantId;
 
@@ -106,12 +110,14 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				String serializedMaxThreads,
 				String serializedMaxResultsPerEntity,
 				String serializedRowsPerPartition,
+				String serializedCheckpointInterval,
 				String tenantId) {
 		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.customQueryHql = customQueryHql;
 		this.serializedMaxThreads = serializedMaxThreads;
 		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedRowsPerPartition = serializedRowsPerPartition;
+		this.serializedCheckpointInterval = serializedCheckpointInterval;
 		this.tenantId = tenantId;
 	}
 
@@ -122,12 +128,15 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		emf = jobData.getEntityManagerFactory();
 
 		try (StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
-			Integer maxResults = null;
-			if ( StringHelper.isNotEmpty( serializedMaxResultsPerEntity ) ) {
-				maxResults = SerializationUtil.parseIntegerParameter( MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity );
-			}
-			int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
-			int idFetchSize = SerializationUtil.parseIntegerParameter( ID_FETCH_SIZE, serializedIdFetchSize );
+			Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
+					MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
+			);
+			int rowsPerPartition = SerializationUtil.parseIntegerParameterOptional(
+					ROWS_PER_PARTITION, serializedRowsPerPartition, Defaults.ROWS_PER_PARTITION
+			);
+			int idFetchSize = SerializationUtil.parseIntegerParameterOptional(
+					ID_FETCH_SIZE, serializedIdFetchSize, Defaults.ID_FETCH_SIZE
+			);
 
 			List<EntityTypeDescriptor> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
@@ -165,6 +174,11 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				props[i].setProperty( MassIndexingPartitionProperties.LOWER_BOUND, SerializationUtil.serialize( bound.getLowerBound() ) );
 				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND, SerializationUtil.serialize( bound.getUpperBound() ) );
 				props[i].setProperty( MassIndexingPartitionProperties.INDEX_SCOPE, bound.getIndexScope().name() );
+				props[i].setProperty(
+						MassIndexingPartitionProperties.CHECKPOINT_INTERVAL,
+						serializedCheckpointInterval == null ? String.valueOf( Defaults.CHECKPOINT_INTERVAL )
+								: serializedCheckpointInterval
+				);
 			}
 
 			log.infof( "Partitions: %s", (Object) props );
@@ -172,8 +186,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );
 			partitionPlan.setPartitions( partitions );
-			if ( StringHelper.isNotEmpty( serializedMaxThreads ) ) {
-				final int threads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
+			Integer threads = SerializationUtil.parseIntegerParameterOptional(
+					MAX_THREADS, serializedMaxThreads, null
+			);
+			if ( threads != null ) {
 				partitionPlan.setThreads( threads );
 			}
 

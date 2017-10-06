@@ -7,6 +7,8 @@
 package org.hibernate.search.jsr352.massindexing;
 
 
+import org.hibernate.CacheMode;
+
 /**
  * @author Yoann Rodiere
  */
@@ -47,4 +49,20 @@ public final class MassIndexingJobParameters {
 	public static final String CUSTOM_QUERY_CRITERIA = "customQueryCriteria";
 
 	public static final String TENANT_ID = "tenantId";
+
+	public static final class Defaults {
+
+		private Defaults() {
+			// Private constructor, do not use
+		}
+
+		public static final int ID_FETCH_SIZE = 1_000;
+		public static final CacheMode CACHE_MODE = CacheMode.IGNORE;
+		public static final boolean OPTIMIZE_ON_FINISH = true;
+		public static final boolean OPTIMIZE_AFTER_PURGE = true;
+		public static final boolean PURGE_ALL_ON_START = true;
+		public static final int ROWS_PER_PARTITION = 1000;
+		public static final int CHECKPOINT_INTERVAL = 200;
+
+	}
 }

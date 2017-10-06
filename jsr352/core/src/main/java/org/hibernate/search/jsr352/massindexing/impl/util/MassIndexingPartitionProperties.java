@@ -7,6 +7,8 @@
 package org.hibernate.search.jsr352.massindexing.impl.util;
 
 
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+
 /**
  * @author Yoann Rodiere
  */
@@ -19,6 +21,8 @@ public final class MassIndexingPartitionProperties {
 	public static final String ENTITY_NAME = "entityName";
 
 	public static final String PARTITION_ID = "partitionId";
+
+	public static final String CHECKPOINT_INTERVAL = MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 
 	public static final String LOWER_BOUND = "lowerBound";
 
