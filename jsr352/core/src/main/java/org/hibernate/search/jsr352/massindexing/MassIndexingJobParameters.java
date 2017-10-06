@@ -44,6 +44,8 @@ public final class MassIndexingJobParameters {
 
 	public static final String CHECKPOINT_INTERVAL = "checkpointInterval";
 
+	public static final String SESSION_CLEAR_INTERVAL = "sessionClearInterval";
+
 	public static final String CUSTOM_QUERY_HQL = "customQueryHQL";
 
 	public static final String CUSTOM_QUERY_CRITERIA = "customQueryCriteria";
@@ -74,6 +76,19 @@ public final class MassIndexingJobParameters {
 			}
 			else {
 				return rowsPerPartition;
+			}
+		}
+
+		public static final int SESSION_CLEAR_INTERVAL_DEFAULT_RAW = 100;
+		public static int sessionClearInterval(Integer sessionClearIntervalRaw, Integer checkpointInterval) {
+			if ( sessionClearIntervalRaw != null ) {
+				return sessionClearIntervalRaw;
+			}
+			if ( checkpointInterval == null || checkpointInterval > SESSION_CLEAR_INTERVAL_DEFAULT_RAW ) {
+				return SESSION_CLEAR_INTERVAL_DEFAULT_RAW;
+			}
+			else {
+				return checkpointInterval;
 			}
 		}
 

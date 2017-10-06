@@ -8,7 +8,6 @@ package org.hibernate.search.jsr352.logging.impl;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.TRACE;
 
 import org.hibernate.cfg.AvailableSettings;
@@ -199,5 +198,12 @@ public interface Log extends BaseHibernateSearchLogger {
 					+ " '@Indexed' has been added to each of them."
 	)
 	SearchException failingEntityTypes(String failingEntityNames);
+
+	@Message(id = JSR_352_MESSAGES_START_ID + 33,
+			value = "The value of parameter '" + MassIndexingJobParameters.SESSION_CLEAR_INTERVAL
+					+ "' (value=%1$d) should be equal to or less than the value of parameter '"
+					+ MassIndexingJobParameters.CHECKPOINT_INTERVAL + "' (value=%2$d)."
+	)
+	SearchException illegalSessionClearInterval(int sessionClearInterval, int checkpointInterval);
 
 }

@@ -103,6 +103,7 @@ public final class MassIndexingJob {
 		private Boolean purgeAllOnStart;
 		private Integer idFetchSize;
 		private Integer entityFetchSize;
+		private Integer sessionClearInterval;
 		private Integer checkpointInterval;
 		private Integer rowsPerPartition;
 		private Integer maxThreads;
@@ -165,6 +166,23 @@ public final class MassIndexingJob {
 		 */
 		public ParametersBuilder cacheMode(CacheMode cacheMode) {
 			this.cacheMode = cacheMode;
+			return this;
+		}
+
+		/**
+		 * The number of entities to process before clearing the session. The value defined must be greater
+		 * than 0, and equal to or less than the value of {@link #checkpointInterval}.
+		 * <p>
+		 * This is an optional parameter, its default value is
+		 * {@link MassIndexingJobParameters.Defaults#SESSION_CLEAR_INTERVAL_DEFAULT_RAW},
+		 * or the value of {@link #checkpointInterval} if it is smaller.
+		 *
+		 * @param sessionClearInterval the number of entities to process before clearing the session.
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder sessionClearInterval(int sessionClearInterval) {
+			this.sessionClearInterval = sessionClearInterval;
 			return this;
 		}
 
@@ -403,6 +421,8 @@ public final class MassIndexingJob {
 					defaultedCheckpointInterval,
 					rowsPerPartition != null ? rowsPerPartition : Defaults.ROWS_PER_PARTITION
 			);
+			int defaultedSessionClearInterval = Defaults.sessionClearInterval( sessionClearInterval, defaultedCheckpointInterval );
+			ValidationUtil.validateSessionClearInterval( defaultedSessionClearInterval, defaultedCheckpointInterval );
 
 			Properties jobParams = new Properties();
 
@@ -412,6 +432,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_FETCH_SIZE, entityFetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
+			addIfNotNull( jobParams, MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, sessionClearInterval );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, optimizeAfterPurge );

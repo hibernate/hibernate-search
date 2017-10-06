@@ -104,6 +104,23 @@ public class ValidationUtilTest {
 		ValidationUtil.validateCheckpointInterval( 101, 100 );
 	}
 
+	@Test
+	public void validateSessionClearInterval_lessThanCheckpointInterval() throws Exception {
+		ValidationUtil.validateSessionClearInterval( 99, 100 );
+		// ok
+	}
+
+	@Test
+	public void validateSessionClearInterval_equalToCheckpointInterval() {
+		ValidationUtil.validateSessionClearInterval( 100, 100 );
+		// ok
+	}
+
+	@Test(expected = SearchException.class)
+	public void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
+		ValidationUtil.validateSessionClearInterval( 101, 100 );
+	}
+
 	private static class NotIndexed {
 		private NotIndexed() {
 			// Private constructor, do not use it.

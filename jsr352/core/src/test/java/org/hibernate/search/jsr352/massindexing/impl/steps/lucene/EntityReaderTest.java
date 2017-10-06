@@ -83,6 +83,7 @@ public class EntityReaderTest {
 		final String entityName = Company.class.getName();
 		final String entityFetchSize = String.valueOf( 1000 );
 		final String checkpointInterval = String.valueOf( 1000 );
+		final String sessionClearInterval = String.valueOf( 100 );
 		final String hql = null;
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
@@ -90,6 +91,7 @@ public class EntityReaderTest {
 				entityName,
 				entityFetchSize,
 				checkpointInterval,
+				sessionClearInterval,
 				hql,
 				maxResults,
 				partitionId,

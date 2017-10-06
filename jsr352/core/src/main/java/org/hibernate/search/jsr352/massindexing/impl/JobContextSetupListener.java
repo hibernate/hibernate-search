@@ -37,6 +37,7 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.SESSION_CLEAR_INTERVAL;
 
 /**
  * Listener before the start of the job. It aims to validate all the job
@@ -106,6 +107,10 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedCheckpointInterval;
 
 	@Inject
+	@BatchProperty(name = SESSION_CLEAR_INTERVAL)
+	private String serializedSessionClearInterval;
+
+	@Inject
 	@BatchProperty(name = ROWS_PER_PARTITION)
 	private String serializedRowsPerPartition;
 
@@ -153,10 +158,16 @@ public class JobContextSetupListener extends AbstractJobListener {
 				CHECKPOINT_INTERVAL, serializedCheckpointInterval, null
 		);
 		int checkpointInterval = Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
+		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
+				SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null
+		);
+		int sessionClearInterval = Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
 
+		ValidationUtil.validatePositive( SESSION_CLEAR_INTERVAL, sessionClearInterval );
 		ValidationUtil.validatePositive( CHECKPOINT_INTERVAL, checkpointInterval );
 		ValidationUtil.validatePositive( ROWS_PER_PARTITION, rowsPerPartition );
 		ValidationUtil.validateCheckpointInterval( checkpointInterval, rowsPerPartition );
+		ValidationUtil.validateSessionClearInterval( sessionClearInterval, checkpointInterval );
 	}
 
 	private void validateJobSettings() {

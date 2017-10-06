@@ -23,6 +23,7 @@
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+                <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
                 <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
                 <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
 
@@ -70,6 +71,7 @@
                     <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
                     <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
                     <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
+                    <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>

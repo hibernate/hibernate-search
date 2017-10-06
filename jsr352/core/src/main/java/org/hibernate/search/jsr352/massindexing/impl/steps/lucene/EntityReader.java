@@ -47,6 +47,7 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_FETCH_SIZE;
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.SESSION_CLEAR_INTERVAL;
 import static org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties.PARTITION_ID;
 
 /**
@@ -108,6 +109,10 @@ public class EntityReader extends AbstractItemReader {
 	private String serializedCheckpointInterval;
 
 	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.SESSION_CLEAR_INTERVAL)
+	private String serializedSessionClearInterval;
+
+	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
 	private String customQueryHql;
 
@@ -150,6 +155,7 @@ public class EntityReader extends AbstractItemReader {
 			String entityName,
 			String serializedEntityFetchSize,
 			String serializedCheckpointInterval,
+			String serializedSessionClearInterval,
 			String hql,
 			String serializedMaxResultsPerEntity,
 			String partitionIdStr,
@@ -160,6 +166,7 @@ public class EntityReader extends AbstractItemReader {
 		this.entityName = entityName;
 		this.serializedEntityFetchSize = serializedEntityFetchSize;
 		this.serializedCheckpointInterval = serializedCheckpointInterval;
+		this.serializedSessionClearInterval = serializedSessionClearInterval;
 		this.customQueryHql = hql;
 		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedPartitionId = partitionIdStr;
@@ -217,7 +224,10 @@ public class EntityReader extends AbstractItemReader {
 				throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
 		}
 
-		chunkState = new ChunkState( emf, tenantId, fetchingStrategy, checkpointInfo );
+		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
+				SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null );
+		int sessionClearInterval = Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
+		chunkState = new ChunkState( emf, tenantId, fetchingStrategy, sessionClearInterval, checkpointInfo );
 
 		if ( isRestarted ) {
 			partitionData = (PartitionContextData) stepContext.getPersistentUserData();
@@ -397,6 +407,7 @@ public class EntityReader extends AbstractItemReader {
 		private final EntityManagerFactory emf;
 		private final String tenantId;
 		private final FetchingStrategy fetchingStrategy;
+		private final int clearInterval;
 
 		private Session session;
 		private ScrollableResults scroll;
@@ -406,16 +417,13 @@ public class EntityReader extends AbstractItemReader {
 		private Serializable lastProcessedEntityId;
 
 		public ChunkState(
-				EntityManagerFactory emf, String tenantId, FetchingStrategy fetchingStrategy,
+				EntityManagerFactory emf, String tenantId, FetchingStrategy fetchingStrategy, int clearInterval,
 				Serializable checkpointInfo) {
 			this.emf = emf;
 			this.tenantId = tenantId;
 			this.fetchingStrategy = fetchingStrategy;
-			if ( checkpointInfo != null ) {
-				this.lastCheckpointInfo = (CheckpointInfo) checkpointInfo;
-				this.processedEntityCount = lastCheckpointInfo.getProcessedEntityCount();
-				this.lastProcessedEntityId = lastCheckpointInfo.getLastProcessedEntityId();
-			}
+			this.clearInterval = clearInterval;
+			this.lastCheckpointInfo = (CheckpointInfo) checkpointInfo;
 		}
 
 		/**
@@ -425,6 +433,14 @@ public class EntityReader extends AbstractItemReader {
 		public Object next() {
 			if ( scroll == null ) {
 				start();
+			}
+			// Mind the "else": we don't clear a session we just created.
+			else if ( processedEntityCount % clearInterval == 0 ) {
+				/*
+				 * This must be executed before we extract the entity,
+				 * because the returned entity must be attached to the session.
+				 */
+				session.clear();
 			}
 			if ( !scroll.next() ) {
 				return null;
@@ -441,7 +457,17 @@ public class EntityReader extends AbstractItemReader {
 		 */
 		public Serializable end() {
 			close();
-			lastCheckpointInfo = new CheckpointInfo( lastProcessedEntityId, processedEntityCount );
+			int processedEntityCountInPartition = processedEntityCount;
+			if ( lastCheckpointInfo != null ) {
+				processedEntityCountInPartition += lastCheckpointInfo.getProcessedEntityCount();
+			}
+			Serializable lastProcessedEntityIdInPartition = lastProcessedEntityId;
+			if ( lastCheckpointInfo != null && lastProcessedEntityIdInPartition == null ) {
+				lastProcessedEntityIdInPartition = lastCheckpointInfo.getLastProcessedEntityId();
+			}
+			processedEntityCount = 0;
+			lastProcessedEntityId = null;
+			lastCheckpointInfo = new CheckpointInfo( lastProcessedEntityIdInPartition, processedEntityCountInPartition );
 			return lastCheckpointInfo;
 		}
 
