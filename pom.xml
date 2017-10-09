@@ -744,40 +744,6 @@
                 <groupId>org.jboss.narayana.jta</groupId>
                 <artifactId>narayana-jta</artifactId>
                 <version>${narayanaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>byteman</artifactId>
-                        <groupId>org.jboss.byteman</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>byteman-submit</artifactId>
-                        <groupId>org.jboss.byteman</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>hornetq-journal</artifactId>
-                        <groupId>org.hornetq</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jboss-logmanager</artifactId>
-                        <groupId>org.jboss.logmanager</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>hornetq-commons</artifactId>
-                        <groupId>org.hornetq</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jfreechart</artifactId>
-                        <groupId>jfree</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jcommon</artifactId>
-                        <groupId>jfree</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-                        <groupId>org.jboss.spec.javax.interceptor</groupId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
