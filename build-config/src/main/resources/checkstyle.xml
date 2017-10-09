@@ -23,6 +23,8 @@
     <module name="TreeWalker">
         <property name="cacheFile" value="${checkstyle.cache.file}" />
 
+        <module name="SuppressionCommentFilter" />
+
         <!-- Use tabs -->
         <module name="RegexpSinglelineJava">
             <property name="format" value="^\t* +\t*\S" />
@@ -164,9 +166,6 @@
             <property name="message" value="Nobody should be using StringBuffer anymore" />
         </module>
 
-        <!-- Required to get SuppressionCommentFilter to work -->
-        <module name="FileContentsHolder" />
-
         <!--  Avoid some import statements -->
         <module name="IllegalImport">
             <property name="illegalPkgs" value="java.awt, sun, org.slf4j"/>
@@ -202,8 +201,6 @@
         <property name="format" value="\s+throw new AssertionError\(" />
         <property name="message" value="Avoid throwing 'AssertionError': use org.hibernate.search.exception.AssertionFailure" />
     </module>
-
-    <module name="SuppressionCommentFilter" />
 
     <module name="SuppressionFilter">
         <property name="file" value="/suppressions.xml" />

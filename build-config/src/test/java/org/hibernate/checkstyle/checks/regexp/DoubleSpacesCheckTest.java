@@ -73,7 +73,7 @@ public class DoubleSpacesCheckTest {
 		}
 
 		private FileContents content(List<String> aLines) {
-			FileText fileText = FileText.fromLines( new File( "" ), aLines );
+			FileText fileText = new FileText( new File( "" ), aLines );
 			return new FileContents( fileText );
 		}
 	}

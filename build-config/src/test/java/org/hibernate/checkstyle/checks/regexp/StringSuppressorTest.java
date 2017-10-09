@@ -56,7 +56,7 @@ public class StringSuppressorTest {
 	}
 
 	private FileContents content(String string) {
-		FileText fileText = FileText.fromLines( new File( "" ), Arrays.asList( string ) );
+		FileText fileText = new FileText( new File( "" ), Arrays.asList( string ) );
 		return new FileContents( fileText );
 	}
 }
