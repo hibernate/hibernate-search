@@ -23,6 +23,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJob.ParametersBuilder;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+import org.hibernate.search.jsr352.test.util.PersistenceUnitTestUtil;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 
@@ -44,9 +45,9 @@ public class RestartChunkIT {
 
 	private static final int CHECKPOINT_INTERVAL = 10;
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
-	private static final int JOB_TIMEOUT_MS = 1_000;
+	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	protected static final long DB_COMP_ROWS = 150;
 
