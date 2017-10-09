@@ -18,6 +18,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithEmbeddedId;
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithIdClass;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+import org.hibernate.search.jsr352.test.util.PersistenceUnitTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import org.junit.After;
@@ -36,7 +37,7 @@ import static org.fest.assertions.Assertions.assertThat;
 @TestForIssue(jiraKey = "HSEARCH-2615")
 public class MassIndexingJobWithCompositeIdIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 

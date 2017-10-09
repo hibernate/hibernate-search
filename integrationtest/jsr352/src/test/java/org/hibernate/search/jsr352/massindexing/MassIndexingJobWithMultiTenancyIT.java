@@ -23,10 +23,12 @@ import org.hibernate.search.Search;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
 import org.hibernate.testing.RequiresDialect;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.fest.util.Collections;
 
@@ -41,6 +43,8 @@ import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResul
 		strictMatching = true,
 		value = org.hibernate.dialect.H2Dialect.class
 )
+// This test uses native APIs to load configuration, but ES-related configuration is in JPA's persistence.xml
+@Category(SkipOnElasticsearch.class)
 public class MassIndexingJobWithMultiTenancyIT extends SearchTestBase {
 
 	private static final String TARGET_TENANT_ID = "targetTenant";

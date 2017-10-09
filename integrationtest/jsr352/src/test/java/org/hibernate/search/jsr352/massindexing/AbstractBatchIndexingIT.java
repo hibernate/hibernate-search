@@ -24,6 +24,7 @@ import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
+import org.hibernate.search.jsr352.test.util.PersistenceUnitTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.After;
@@ -36,7 +37,7 @@ public abstract class AbstractBatchIndexingIT {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
 	protected static final int INSTANCES_PER_DATA_TEMPLATE = 100;
 

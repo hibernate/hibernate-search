@@ -41,7 +41,7 @@ public final class JobTestUtil {
 
 	private static final int THREAD_SLEEP = 1000;
 
-	private static final int JOB_TIMEOUT_MS = 5_000;
+	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	private JobTestUtil() {
 	}
