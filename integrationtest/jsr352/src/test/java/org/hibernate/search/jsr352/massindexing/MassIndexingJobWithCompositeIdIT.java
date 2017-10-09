@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.jsr352.massindexing;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Properties;
-
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -22,9 +19,12 @@ import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithEmbeddedId
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithIdClass;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Tests that mass indexing job can handle entity having
@@ -34,7 +34,7 @@ import org.junit.Test;
  * @author Mincong Huang
  */
 @TestForIssue(jiraKey = "HSEARCH-2615")
-public class MassIndexingJobWithCompositeIdTest {
+public class MassIndexingJobWithCompositeIdIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 

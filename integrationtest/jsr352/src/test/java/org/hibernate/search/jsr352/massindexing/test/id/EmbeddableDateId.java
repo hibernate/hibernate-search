@@ -9,7 +9,6 @@ package org.hibernate.search.jsr352.massindexing.test.id;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
-
 import javax.persistence.Embeddable;
 
 import org.hibernate.search.jsr352.massindexing.test.entity.EntityWithEmbeddedId;
