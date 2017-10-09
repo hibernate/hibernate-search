@@ -6,23 +6,14 @@
  */
 package org.hibernate.search.jsr352.massindexing;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -39,87 +30,29 @@ import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.junit.After;
-import org.junit.Before;
+
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.MapAssert.entry;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Mincong Huang
  */
-public class BatchIndexingJobIT {
+public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 
 	private static final Log log = LoggerFactory.make( Log.class );
+
+	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	/*
 	 * Make sure to have more than one checkpoint,
 	 * because we had errors related to that in the past.
 	 */
 	private static final int CHECKPOINT_INTERVAL = 10;
-	private static final int INSTANCES_PER_DATA_TEMPLATE = 100;
-
-	// We have three data templates per entity type (see setup)
-	private static final int INSTANCE_PER_ENTITY_TYPE = INSTANCES_PER_DATA_TEMPLATE * 3;
-
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
-	private static final String SESSION_FACTORY_NAME = "primary_session_factory";
-
-	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
-
-	private JobOperator jobOperator = BatchRuntime.getJobOperator();
-	private EntityManagerFactory emf;
-
-	@Before
-	public void setup() {
-		List<Company> companies = new ArrayList();
-		List<Person> people = new ArrayList();
-		List<WhoAmI> whos = new ArrayList();
-		for ( int i = 0 ; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
-			int index1 = i;
-			int index2 = i + 1;
-			int index3 = i + 2;
-			companies.add( new Company( "Google " + index1 ) );
-			companies.add( new Company( "Red Hat " + index2 ) );
-			companies.add( new Company( "Microsoft " + index3 ) );
-			people.add( new Person( "BG " + index1, "Bill", "Gates" ) );
-			people.add( new Person( "LT " + index2, "Linus", "Torvalds" ) );
-			people.add( new Person( "SJ " + index3, "Steven", "Jobs" ) );
-			whos.add( new WhoAmI( "cid01 " + index1, "id01 " + index1, "uid01 " + index1 ) );
-			whos.add( new WhoAmI( "cid02 " + index2, "id02 " + index2, "uid02 " + index2 ) );
-			whos.add( new WhoAmI( "cid03 " + index3, "id03 " + index3, "uid03 " + index3 ) );
-		}
-		EntityManager em = null;
-
-		try {
-			emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-			em = emf.createEntityManager();
-			em.getTransaction().begin();
-			for ( Company c : companies ) {
-				em.persist( c );
-			}
-			for ( Person p : people ) {
-				em.persist( p );
-			}
-			for ( WhoAmI w : whos ) {
-				em.persist( w );
-			}
-			em.getTransaction().commit();
-		}
-		finally {
-			try {
-				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
-			}
-		}
-	}
-
-	@After
-	public void shutdown() {
-		emf.close();
-	}
 
 	@Test
 	public void simple() throws InterruptedException,
@@ -136,7 +69,6 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class, WhoAmI.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -168,7 +100,6 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class, WhoAmI.class )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -236,7 +167,6 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntities( CompanyGroup.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -250,48 +180,6 @@ public class BatchIndexingJobIT {
 		assertEquals( 2 * INSTANCES_PER_DATA_TEMPLATE, groupsContainingGoogle.size() );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingRedHat.size() );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingMicrosoft.size() );
-	}
-
-	@Test
-	public void entityManagerFactoryNamespace_persistenceUnitName() throws Exception {
-		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( 0, companies.size() );
-
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
-				MassIndexingJob.parameters()
-						.forEntity( Company.class )
-						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.entityManagerFactoryNamespace( "persistence-unit-name" )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-						.build()
-				);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-
-		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
-	}
-
-	@Test
-	public void entityManagerFactoryNamespace_sessionFactoryName() throws Exception {
-		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( 0, companies.size() );
-
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
-				MassIndexingJob.parameters()
-						.forEntity( Company.class )
-						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.entityManagerFactoryNamespace( "session-factory-name" )
-						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
-						.build()
-				);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-
-		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
 	}
 
 	@Test
@@ -312,7 +200,6 @@ public class BatchIndexingJobIT {
 								Restrictions.like( "name", "Google%" ),
 								Restrictions.like( "name","Red Hat%" )
 						) )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -338,7 +225,6 @@ public class BatchIndexingJobIT {
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -368,7 +254,6 @@ public class BatchIndexingJobIT {
 								Restrictions.like( "name","Red Hat%" )
 						) )
 						.maxResultsPerEntity( maxResults )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -393,7 +278,6 @@ public class BatchIndexingJobIT {
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
 						.maxResultsPerEntity( maxResults )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -417,7 +301,6 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class, WhoAmI.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.rowsPerPartition( INSTANCE_PER_ENTITY_TYPE - 1 )
 						.build()
 				);
