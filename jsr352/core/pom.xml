@@ -40,16 +40,6 @@
 
         <!-- test -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -64,42 +54,10 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-install</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-bmunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-runtime</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!--
-            JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
-            Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
-            so it won't complain.
-         -->
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.13.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -126,25 +84,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <!-- enable execution to run an integration test -->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <argLine>${additionalRuntimeArgLine}</argLine>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <systemPropertyVariables>
-                        <jberet.tmp.dir>${project.build.directory}${file.separator}tmp</jberet.tmp.dir>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
         </plugins>
     </build>

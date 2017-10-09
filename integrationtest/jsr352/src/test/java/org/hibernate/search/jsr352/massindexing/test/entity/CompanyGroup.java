@@ -9,7 +9,6 @@ package org.hibernate.search.jsr352.massindexing.test.entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;

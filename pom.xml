@@ -41,6 +41,7 @@
         <module>integrationtest/spring</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/osgi/karaf-it</module>
+        <module>integrationtest/jsr352</module>
         <module>integrationtest/performance/orm</module>
         <module>integrationtest/performance/sandbox</module>
         <module>integrationtest/performance/engine-lucene</module>
