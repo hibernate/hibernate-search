@@ -1709,6 +1709,32 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <pluginManagement>
                     <plugins>
                         <plugin>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>unpack-es-plugins</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                    <configuration>
+                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <artifactItems>
+                                            <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.plugin</groupId>
+                                                <artifactId>delete-by-query</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                            </artifactItem>
+                                        </artifactItems>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
@@ -1724,6 +1750,17 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${test.elasticsearch.host.version}</version>
+                                </dependency>
+
+                                <!-- Groovy is in a core module named "org.elasticsearch:elasticsearch-groovy" in Elasticsearch 2.0.x and 2.1.x
+                                     Also, in ES 2.0/2.1, core modules are not located in the plugin directory as with newer versions, but are
+                                     simply expected to be in the classpath.
+                                -->
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch-groovy</artifactId>
+                                    <version>${test.elasticsearch.host.version}</version>
+                                    <type>jar</type>
                                 </dependency>
                                 
                                 <!-- The next is used to get ES log output into the Maven console -->
@@ -1765,6 +1802,41 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>unpack-es-plugins</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                    <configuration>
+                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <artifactItems>
+                                            <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.plugin</groupId>
+                                                <artifactId>delete-by-query</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                            </artifactItem>
+                                            <!-- Groovy is in a plugin named "org.elasticsearch.module:lang-groovy" in Elasticsearch 2.2+ -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.module</groupId>
+                                                <artifactId>lang-groovy</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
+                                            </artifactItem>
+                                        </artifactItems>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
