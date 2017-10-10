@@ -32,8 +32,9 @@ and after test, log from index check and uncaught exceptions.
 
 ## Enable benchmarking
 
-All metrics are disabled by default, so that you're not forced to run lengthy test for any build.
-A profile enables them:
+Data sets are small and metrics are disabled by default,
+so that you're not forced to run lengthy test for any build.
+A profile enables larger data sets and metrics recording:
 
     -Pperf
 
