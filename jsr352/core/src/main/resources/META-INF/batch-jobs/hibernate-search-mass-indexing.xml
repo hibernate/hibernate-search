@@ -46,6 +46,7 @@
             <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
+                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                 </properties>
             </listener>
         </listeners>

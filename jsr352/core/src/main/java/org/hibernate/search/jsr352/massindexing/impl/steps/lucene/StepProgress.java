@@ -87,11 +87,7 @@ public class StepProgress implements Serializable {
 		return Collections.unmodifiableMap( entityTotal );
 	}
 
-	public long getRowsToIndex(String entityName) {
-		return entityTotal.get( entityName );
-	}
-
-	public void setRowsToIndex(String entityName, long rowsToIndex) {
+	public void setRowsToIndex(String entityName, Long rowsToIndex) {
 		entityProgress.put( entityName, 0L );
 		entityTotal.put( entityName, rowsToIndex );
 	}
