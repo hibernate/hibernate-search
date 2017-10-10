@@ -15,13 +15,11 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
-import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
@@ -65,7 +63,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 				if ( optimizeAfterPurge ) {
 					log.startOptimization();
-					ContextHelper.getSearchIntegrator( session ).optimize();
+					fts.getSearchFactory().optimize();
 				}
 			}
 		}
