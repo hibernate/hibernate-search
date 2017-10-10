@@ -42,15 +42,18 @@ A profile enables them:
 
 ### Standalone accessing database directly
 
-- run tests in standalone mode against in-memory database
+- run tests in standalone mode against in-memory database,
+  **with a small dataset and with metrics disabled**
+  (otherwise you will probably run out of memory)
 
-        mvn clean test -Pperf -Dtest=TestRunnerStandalone \
+        mvn clean test -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
 
 Note: For the following scenarios, the test database needs to be created first with appropriate
 username and password.
 
-- run tests in standalone mode against a PostgreSQL database
+- run tests in standalone mode against a PostgreSQL database,
+  with a large dataset and with metrics enabled
 
         mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
@@ -58,7 +61,8 @@ username and password.
         -Djdbc.user=foo \
         -Djdbc.pass=foo
 
-- run tests in standalone mode against a MariaDB database
+- run tests in standalone mode against a MariaDB database,
+  with a large dataset and with metrics enabled
 
         mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
@@ -71,15 +75,18 @@ username and password.
 The tests will create the datasource automatically.
 Just provide the parameters as you would do in standalone mode.
 
-- run tests in container mode against in-memory database
+- run tests in container mode against in-memory database,
+  **with a small dataset and with metrics disabled**
+  (otherwise you will probably run out of memory)
 
-        mvn clean test -Pperf -Dtest=TestRunnerArquillian \
+        mvn clean test -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
 
 Note: For the following scenarios, the test database needs to be created first with appropriate
 username and password.
 
-- run tests in container mode against a PostgreSQL database
+- run tests in container mode against a PostgreSQL database,
+  with a large dataset and with metrics enabled
 
         mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
@@ -87,7 +94,8 @@ username and password.
         -Djdbc.user=foo \
         -Djdbc.pass=foo
 
-- run tests in container mode against a MariaDB database
+- run tests in container mode against a MariaDB database,
+  with a large dataset and with metrics enabled
 
         mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
