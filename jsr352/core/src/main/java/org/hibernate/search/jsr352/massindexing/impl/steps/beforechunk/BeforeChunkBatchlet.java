@@ -21,6 +21,7 @@ import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
@@ -50,9 +51,6 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
 	private String tenantId;
 
-	private Session session;
-	private FullTextSession fts;
-
 	@Override
 	public String process() throws Exception {
 		boolean purgeAllOnStart = SerializationUtil.parseBooleanParameter( PURGE_ALL_ON_START, serializedPurgeAllOnStart );
@@ -61,20 +59,16 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			session = PersistenceUtil.openSession( emf, tenantId );
-			fts = Search.getFullTextSession( session );
-			jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
+			try (Session session = PersistenceUtil.openSession( emf, tenantId )) {
+				FullTextSession fts = Search.getFullTextSession( session );
+				jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 
-			if ( optimizeAfterPurge ) {
-				log.startOptimization();
-				ContextHelper.getSearchIntegrator( session ).optimize();
+				if ( optimizeAfterPurge ) {
+					log.startOptimization();
+					ContextHelper.getSearchIntegrator( session ).optimize();
+				}
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public void stop() throws Exception {
-		session.close();
 	}
 }
