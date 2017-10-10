@@ -189,33 +189,38 @@ numeric encoding of the property value.
 Lucene supports the numeric types: `Double`, `Long`, `Integer` and `Float`. For properties of types
 `Byte` and `Short`, an `Integer` field will be used in the index. Other numeric types
 should use the default string encoding (via `@Field`), unless the application can deal with a
-potential loss in precision, in which case a custom `NumericFieldBridge` can be used. See
+potential loss in precision, in which case a custom `TwoWayFieldBridge` can be used. See
 <<example-custom-numericfieldbridge>>.
 
 [[example-custom-numericfieldbridge]]
-.Defining a custom NumericFieldBridge for `BigDecimal`
+.Defining a custom FieldBridge for `BigDecimal`
 ====
 [source, JAVA]
 ----
-public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
-    private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+public class BigDecimalNumericFieldBridge implements TwoWayFieldBridge {
 
-    @Override
-    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-        if ( value != null ) {
-            BigDecimal decimalValue = (BigDecimal) value;
-            long tmpLong = decimalValue.multiply( storeFactor ).longValue();
-            Long indexedValue = Long.valueOf( tmpLong );
-            luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
-        }
-    }
+	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
-    @Override
-    public Object get(String name, Document document) {
-        String fromLucene = document.get( name );
-        BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
-        return storedBigDecimal.divide( storeFactor );
-    }
+	@Override
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( value != null ) {
+			BigDecimal decimalValue = (BigDecimal) value;
+			Long indexedValue = decimalValue.multiply( storeFactor ).longValue();
+			luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		String fromLucene = document.get( name );
+		BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
+		return storedBigDecimal.divide( storeFactor );
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		return object.toString();
+	}
 }
 ----
 ====
@@ -223,9 +228,6 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
 You would use this custom bridge like seen in <<example-useof-custom-numericfieldbridge>>. In this
 case three annotations are used - `@Field`, `@NumericField` and `@FieldBridge`. `@Field` is required
 to mark the property for being indexed (a standalone `@NumericField` is never allowed).
-`@NumericField` might be omitted in this specific case, because the used `@FieldBridge` annotation
-refers already to a `NumericFieldBridge` instance. However, the use of `@NumericField` makes the
-use of the property as numeric value explicit.
 
 [[example-useof-custom-numericfieldbridge]]
 .Use of `BigDecimalNumericFieldBridge`
@@ -257,6 +259,54 @@ public class Item {
     }
 }
 ----
+====
+
+Alternatively, you can define the type of this field directly from the bridge
+by implementing `MetadataProvidingFieldBridge`, as shown in <<example-useof-custom-numericfieldbridge-metadataproviding>>
+Then the `@NumericField` annotation will not be needed anymore when using the bridge.
+
+[[example-useof-custom-numericfieldbridge-metadataproviding]]
+.Defining a custom FieldBridge for `BigDecimal` and implementing `MetadataProvidingFieldBridge`
+====
+[source, JAVA]
+----
+public class BigDecimalNumericFieldBridge implements MetadataProvidingFieldBridge, TwoWayFieldBridge {
+
+	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
+
+	@Override
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( value != null ) {
+			BigDecimal decimalValue = (BigDecimal) value;
+			Long indexedValue = decimalValue.multiply( storeFactor ).longValue();
+			luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		String fromLucene = document.get( name );
+		BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
+		return storedBigDecimal.divide( storeFactor );
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		return object.toString();
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.LONG );
+	}
+}
+----
+====
+
+[NOTE]
+====
+The `MetadataProvidingFieldBridge` contract is under active development and considered experimental at this time.
+It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
 ====
 
 [[sortablefield-annotation]]
