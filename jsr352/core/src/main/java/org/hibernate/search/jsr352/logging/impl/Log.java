@@ -171,7 +171,7 @@ public interface Log extends BaseHibernateSearchLogger {
 	@LogMessage(level = INFO)
 	@Message(id = JSR_352_MESSAGES_START_ID + 27,
 			value = "entityName: '%1$s', rowsToIndex: %2$d")
-	void rowsToIndex(String entityName, long rowsToIndex);
+	void rowsToIndex(String entityName, Long rowsToIndex);
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 28,
 			value = "Failed to serialize job parameter of type %1$s")

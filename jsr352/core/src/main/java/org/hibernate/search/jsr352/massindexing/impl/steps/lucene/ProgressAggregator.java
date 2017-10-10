@@ -64,12 +64,24 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 	}
 
 	private String formatEntityProgress(String entity, Long processed, Long total) {
-		return String.format(
-				Locale.ROOT,
-				"%s: %d/%d works processed (%.2f%%).",
-				entity,
-				processed,
-				total,
-				processed * 100F / total );
+		if ( total == null ) {
+			// Total number of entities unknown
+			return String.format(
+					Locale.ROOT,
+					"%s: %d entities processed.",
+					entity,
+					processed
+			);
+		}
+		else {
+			return String.format(
+					Locale.ROOT,
+					"%s: %d/%d entities processed (%.2f%%).",
+					entity,
+					processed,
+					total,
+					processed * 100F / total
+			);
+		}
 	}
 }
