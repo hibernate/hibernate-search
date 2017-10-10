@@ -61,6 +61,9 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 				FullTextSession fts = Search.getFullTextSession( session );
 				jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 
+				// This is necessary because the batchlet is not executed inside a transaction
+				fts.flushToIndexes();
+
 				if ( optimizeAfterPurge ) {
 					log.startOptimization();
 					fts.getSearchFactory().optimize();
