@@ -72,13 +72,33 @@ username and password.
 
 ### In container against a data source
 
-- run tests in container mode against default data source (java:jboss/datasources/ExampleDS)
+The tests will create the datasource automatically.
+Just provide the parameters as you would do in standalone mode.
+
+- run tests in container mode against in-memory database
 
         mvn clean test -Pperf -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
 
-- run tests in container mode against specified data source (via system property)
+Note: For the following scenarios, the test database needs to be created first with appropriate
+username and password.
 
-        mvn clean test -Pperf -Dtest=TestRunnerArquillian \
+- run tests in container mode against a PostgreSQL database (via system properties)
+
+        mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Ddatasource=foo \
+        -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect \
+        -Dhibernate.connection.driver_class=org.postgresql.Driver \
+        -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/hibperf \
+        -Dhibernate.connection.username=foo \
+        -Dhibernate.connection.password=foo
+
+- run tests in container mode against a MariaDB database (via system properties)
+
+        mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerArquillian \
+        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
+        -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect \
+        -Dhibernate.connection.driver_class=com.mysql.jdbc.Driver \
+        -Dhibernate.connection.url=jdbc:mysql://hostname:3306/hibperf \
+        -Dhibernate.connection.username=foo \
+        -Dhibernate.connection.password=foo
