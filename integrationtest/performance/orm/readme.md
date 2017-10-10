@@ -50,25 +50,21 @@ A profile enables them:
 Note: For the following scenarios, the test database needs to be created first with appropriate
 username and password.
 
-- run tests in standalone mode against a PostgreSQL database (via system properties)
+- run tests in standalone mode against a PostgreSQL database
 
         mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect \
-        -Dhibernate.connection.driver_class=org.postgresql.Driver \
-        -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo
+        -Djdbc.url=jdbc:postgresql://localhost:5432/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
 
-- run tests in standalone mode against a MariaDB database (via system properties)
+- run tests in standalone mode against a MariaDB database
 
         mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect \
-        -Dhibernate.connection.driver_class=com.mysql.jdbc.Driver \
-        -Dhibernate.connection.url=jdbc:mysql://hostname:3306/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo
+        -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
 
 ### In container against a data source
 
@@ -83,22 +79,18 @@ Just provide the parameters as you would do in standalone mode.
 Note: For the following scenarios, the test database needs to be created first with appropriate
 username and password.
 
-- run tests in container mode against a PostgreSQL database (via system properties)
+- run tests in container mode against a PostgreSQL database
 
         mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect \
-        -Dhibernate.connection.driver_class=org.postgresql.Driver \
-        -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo
+        -Djdbc.url=jdbc:postgresql://localhost:5432/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
 
-- run tests in container mode against a MariaDB database (via system properties)
+- run tests in container mode against a MariaDB database
 
         mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect \
-        -Dhibernate.connection.driver_class=com.mysql.jdbc.Driver \
-        -Dhibernate.connection.url=jdbc:mysql://hostname:3306/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo
+        -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
