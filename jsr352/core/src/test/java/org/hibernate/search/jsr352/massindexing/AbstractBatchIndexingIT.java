@@ -13,7 +13,13 @@ import javax.batch.runtime.BatchRuntime;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
@@ -95,4 +101,30 @@ public abstract class AbstractBatchIndexingIT {
 		return PERSISTENCE_UNIT_NAME;
 	}
 
+	protected final void indexSomeCompanies(int count) {
+		EntityManager em = null;
+		try {
+			em = emf.createEntityManager();
+			em.getTransaction().begin();
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class);
+			Root<Company> root = criteria.from( Company.class );
+			Path<Integer> id = root.get( root.getModel().getId( int.class ) );
+			criteria.orderBy( criteriaBuilder.asc( id ) );
+			List<Company> companies = em.createQuery( criteria ).setMaxResults( count ).getResultList();
+			FullTextEntityManager ftEm = Search.getFullTextEntityManager( em );
+			for ( Company company : companies ) {
+				ftEm.index( company );
+			}
+			em.getTransaction().commit();
+		}
+		finally {
+			try {
+				em.close();
+			}
+			catch (Exception e) {
+				log.error( e );
+			}
+		}
+	}
 }

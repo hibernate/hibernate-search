@@ -211,6 +211,62 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 	}
 
 	@Test
+	public void purge() throws InterruptedException, IOException {
+		int expectedCount = 10;
+
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+		indexSomeCompanies( expectedCount );
+		assertEquals( expectedCount, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+
+		/*
+		 * Request a mass indexing with a filter matching nothing,
+		 * which should effectively amount to a simple purge.
+		 */
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.purgeAllOnStart( true )
+						.restrictedBy(
+								Restrictions.eq( "name", "NEVER_MATCH" )
+						)
+						.build()
+		);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+	}
+
+	@Test
+	public void noPurge() throws InterruptedException, IOException {
+		int expectedCount = 10;
+
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+		indexSomeCompanies( expectedCount );
+		assertEquals( expectedCount, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+
+		/*
+		 * Request a mass indexing with a filter matching nothing, and requesting no purge at all,
+		 * which should effectively amount to a no-op.
+		 */
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.purgeAllOnStart( false )
+						.restrictedBy(
+								Restrictions.eq( "name", "NEVER_MATCH" )
+						)
+						.build()
+		);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+
+		assertEquals( expectedCount, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
+	}
+
+	@Test
 	public void hql() throws InterruptedException,
 			IOException {
 		// searches before mass index,
