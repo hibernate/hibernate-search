@@ -257,6 +257,21 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!--
+                          This allows to run mvn clean install -am -pl :thismodule
+                          and have Maven re-build WildFly modules automatically.
+                          Otherwise the plugin would simply try to fetch the
+                          version in the local repository.
+                     -->
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-search-modules</artifactId>
+                        <version>${project.version}</version>
+                        <classifier>wildfly-11-dist</classifier>
+                        <type>zip</type>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
 
