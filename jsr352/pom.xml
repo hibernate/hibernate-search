@@ -18,8 +18,8 @@
     <artifactId>hibernate-search-jsr352-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>GSoC JSR352 - Aggregator</name>
-    <description>New implementation mass-indexer using JSR 352</description>
+    <name>Hibernate Search JSR-352 Aggregator</name>
+    <description>Hibernate Search JSR-352 integration aggregator POM</description>
 
     <properties>
         <hibernate.search.version>${project.version}</hibernate.search.version>

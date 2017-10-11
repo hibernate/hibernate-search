@@ -17,7 +17,7 @@
 
     <artifactId>hibernate-search-jsr352-core</artifactId>
 
-    <name>Hibernate Search JSR-352</name>
+    <name>Hibernate Search JSR-352 Core</name>
     <description>Core of the Hibernate Search JSR-352 integration</description>
 
     <dependencies>
