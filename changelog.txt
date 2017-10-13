@@ -11,7 +11,6 @@ Hibernate Search Changelog
 ** Task
     * HSEARCH-2928 Update to WildFly 11.0.0.Final
     * HSEARCH-2927 Update to Apache Lucene 5.5.5
-    * HSEARCH-2916 Avoid random failures in TestRunnerStandalone.runPerformanceTest
 
 5.8.1.Final (29-09-2017)
 -------------------------

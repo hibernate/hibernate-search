@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.performance.task;
 
+import org.hibernate.LockMode;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.performance.model.Book;
 import org.hibernate.search.test.performance.scenario.TestContext;
@@ -22,7 +23,8 @@ public class UpdateBookTotalSoldTask extends AbstractTask {
 	@Override
 	protected void execute(FullTextSession fts) {
 		long bookId = ctx.getRandomBookId();
-		Book book = (Book) fts.get( Book.class, bookId );
+		// See HSEARCH-2916, we often had concurrent write errors here
+		Book book = (Book) fts.get( Book.class, bookId, LockMode.PESSIMISTIC_WRITE );
 		if ( book != null ) {
 			book.setTotalSold( book.getTotalSold() + 1 );
 		}
