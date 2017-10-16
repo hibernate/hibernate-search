@@ -204,8 +204,11 @@ public class EntityReader extends AbstractItemReader {
 		int checkpointInterval = SerializationUtil.parseIntegerParameter(
 				CHECKPOINT_INTERVAL, serializedCheckpointInterval
 		);
+		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
+				SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null );
+		int sessionClearInterval = Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
 		int entityFetchSize = SerializationUtil.parseIntegerParameterOptional(
-				ENTITY_FETCH_SIZE, serializedEntityFetchSize, checkpointInterval
+				ENTITY_FETCH_SIZE, serializedEntityFetchSize, sessionClearInterval
 		);
 		Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
 				MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
@@ -226,9 +229,6 @@ public class EntityReader extends AbstractItemReader {
 				throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
 		}
 
-		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
-				SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null );
-		int sessionClearInterval = Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
 		chunkState = new ChunkState( emf, tenantId, fetchingStrategy, sessionClearInterval, checkpointInfo );
 
 		if ( isRestarted ) {
