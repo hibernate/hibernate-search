@@ -58,7 +58,11 @@ public final class StubAssert {
 		if ( id != null ) {
 			parameters.put( "id", Arrays.asList( id ) );
 		}
-		otherParams.accept( (key, value) -> parameters.computeIfAbsent( key, ignored -> new ArrayList<>() ).add( value ) );
+		if ( otherParams != null ) {
+			otherParams.accept( (key, value) ->
+					parameters.computeIfAbsent( key, ignored -> new ArrayList<>() ).add( value )
+			);
+		}
 		boolean sameParameters = true;
 		if ( !parameters.keySet().equals( request.getParameters().keySet() ) ) {
 			sameParameters = false;
