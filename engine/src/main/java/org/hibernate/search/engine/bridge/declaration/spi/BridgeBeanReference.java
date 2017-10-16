@@ -29,7 +29,7 @@ public @interface BridgeBeanReference {
 	/**
 	 * Class used as a marker for the default value of the {@link BridgeBeanReference#type()} attribute.
 	 */
-	public abstract class UndefinedImplementationType implements Bridge<Annotation> {
+	abstract class UndefinedImplementationType implements Bridge<Annotation> {
 		private UndefinedImplementationType() {
 		}
 	}

@@ -41,7 +41,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierMappingCollector) {
 		super( handle.getType(), introspector, contributorProvider, indexModelCollector,
-				identifierMappingCollector);
+				identifierMappingCollector );
 		this.handle = handle;
 	}
 

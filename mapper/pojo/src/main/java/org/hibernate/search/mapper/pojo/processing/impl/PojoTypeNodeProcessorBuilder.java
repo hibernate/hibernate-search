@@ -33,7 +33,7 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 			MappingIndexModelCollector indexModelBuilder,
 			IdentifierMappingCollector identifierBridgeCollector) {
 		super( javaType, introspector, contributorProvider, indexModelBuilder,
-				identifierBridgeCollector);
+				identifierBridgeCollector );
 	}
 
 	@Override

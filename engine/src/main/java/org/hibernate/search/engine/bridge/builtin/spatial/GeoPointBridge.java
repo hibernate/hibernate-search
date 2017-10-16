@@ -68,8 +68,8 @@ import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
 @Repeatable(GeoPointBridge.List.class)
 public @interface GeoPointBridge {
 
-	static int DEFAULT_TOP_SPATIAL_HASH_LEVEL = 0;
-	static int DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL = 16;
+	int DEFAULT_TOP_SPATIAL_HASH_LEVEL = 0;
+	int DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL = 16;
 
 	/**
 	 * The name of the index field holding spatial information.

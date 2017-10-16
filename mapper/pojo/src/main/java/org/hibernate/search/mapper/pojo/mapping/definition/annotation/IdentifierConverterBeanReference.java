@@ -29,7 +29,7 @@ public @interface IdentifierConverterBeanReference {
 	/**
 	 * Class used as a marker for the default value of the {@link IdentifierConverterBeanReference#type()} attribute.
 	 */
-	public abstract class UndefinedImplementationType implements IdentifierBridge<Object> {
+	abstract class UndefinedImplementationType implements IdentifierBridge<Object> {
 		private UndefinedImplementationType() {
 		}
 	}

@@ -35,7 +35,7 @@ public final class StubAssert {
 	public static void assertRequest(Map<String, List<Request>> requestQueuesByIndex, String indexName, int workPositionInQueue,
 			String host, String workType, String id, String body) throws JSONException {
 		assertRequest( requestQueuesByIndex.get( indexName ).get( workPositionInQueue ),
-				Arrays.asList( indexName ), host, workType, id, ignored -> {}, body );
+				Arrays.asList( indexName ), host, workType, id, ignored -> { }, body );
 	}
 
 	public static void assertRequest(Map<String, List<Request>> requestQueuesByIndex, Collection<String> indexNames, int workPositionInQueue,

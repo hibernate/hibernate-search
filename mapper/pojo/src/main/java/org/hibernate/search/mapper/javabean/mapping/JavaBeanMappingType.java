@@ -17,6 +17,10 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
  */
 public final class JavaBeanMappingType {
 
+	private JavaBeanMappingType() {
+		// Private constructor, use get() instead.
+	}
+
 	public static MappingType<PojoSearchManager, SearchManagerBuilder<PojoSearchManager>> get() {
 		return JavaBeanMapperImplementor.get();
 	}

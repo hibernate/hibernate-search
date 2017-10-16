@@ -115,7 +115,7 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 					+ " Multiple bridges may be trying to access the same index field, "
 					+ " or two indexedEmbeddeds may have prefixes that end up mixing fields together,"
 					+ " or you may have declared multiple conflicting mappings."
-					+ " In any case, there is something wrong with your mapping and you should fix it.");
+					+ " In any case, there is something wrong with your mapping and you should fix it." );
 		}
 	}
 

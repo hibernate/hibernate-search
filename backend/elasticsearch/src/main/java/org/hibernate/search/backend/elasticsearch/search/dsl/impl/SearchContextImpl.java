@@ -42,7 +42,7 @@ public class SearchContextImpl<Q> extends AbstractClauseContainerContext<SearchQ
 	@Override
 	public <R> SearchContext<R> asWrappedQuery(Function<Q, R> wrapperFactory) {
 		return new SearchContextImpl<R>( this,
-				rootQuery -> wrapperFactory.apply( queryFactory.create( rootQuery ) ));
+				rootQuery -> wrapperFactory.apply( queryFactory.create( rootQuery ) ) );
 	}
 
 	@Override

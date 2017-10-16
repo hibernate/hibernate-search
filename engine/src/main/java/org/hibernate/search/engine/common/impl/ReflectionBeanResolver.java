@@ -22,7 +22,7 @@ public class ReflectionBeanResolver implements BeanResolver {
 		try {
 			instance = classOrFactoryClass.newInstance();
 		}
-		catch (InstantiationException|IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException e) {
 			throw new SearchException( "Error while resolving bean", e );
 		}
 

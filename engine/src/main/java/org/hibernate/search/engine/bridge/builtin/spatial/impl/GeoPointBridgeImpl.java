@@ -82,7 +82,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 		}
 	}
 
-	private static final Collector<IndexableModel, ?, IndexableModel> singleMarkedProperty(
+	private static Collector<IndexableModel, ?, IndexableModel> singleMarkedProperty(
 			String markerName, String fieldName, String markerSet) {
 		return StreamHelper.singleElement(
 				() -> new SearchException( "Could not find a property with the " + markerName

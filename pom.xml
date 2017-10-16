@@ -23,6 +23,7 @@
     </licenses>
 
     <modules>
+        <module>build-config</module>
         <module>engine</module>
         <module>backend/elasticsearch</module>
         <module>backend/lucene</module>
@@ -33,6 +34,7 @@
     </modules>
     
     <properties>
+        <puppycrawl.checkstyle.version>8.3</puppycrawl.checkstyle.version>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.0.1.Final</jbossLoggingProcessorVersion>
     </properties>
@@ -141,6 +143,65 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate.search</groupId>
+                            <artifactId>hibernate-search-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                        <!--
+                             force SLF4J dependency to align
+                             Maven internals and CheckStyle's
+                             see https://github.com/jcgay/maven-color/wiki/Problems
+                             If that causes problem, that can be removed
+                             but maven-color won't work -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${puppycrawl.checkstyle.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>jcl-over-slf4j</artifactId>
+                            <version>1.7.22</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-jdk14</artifactId>
+                            <version>1.7.22</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <!-- Location is relative to the classpath -->
+                        <configLocation>checkstyle.xml</configLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <violationSeverity>error</violationSeverity>
+                        <includeTestResources>true</includeTestResources>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
+                        <!-- generated respectively copied code -->
+                        <excludes>
+                            **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
+                            **/Log_$logger.java
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>check-style</id>
+                            <phase>verify</phase>
+                            <!-- not using checkstyle:checkstyle here, as for
+                                some reason checkstyle:check finds more errors -->
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.bsc.maven</groupId>
                     <artifactId>maven-processor-plugin</artifactId>

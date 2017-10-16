@@ -44,6 +44,10 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <!-- 2.19.1 seems buggy, see https://hibernate.atlassian.net/browse/HV-1117 -->
                 <version>2.18.1</version>

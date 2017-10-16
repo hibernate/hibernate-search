@@ -29,7 +29,7 @@ public @interface FunctionBridgeBeanReference {
 	/**
 	 * Class used as a marker for the default value of the {@link FunctionBridgeBeanReference#type()} attribute.
 	 */
-	public abstract class UndefinedImplementationType implements FunctionBridge<Object, Object> {
+	abstract class UndefinedImplementationType implements FunctionBridge<Object, Object> {
 		private UndefinedImplementationType() {
 		}
 	}
