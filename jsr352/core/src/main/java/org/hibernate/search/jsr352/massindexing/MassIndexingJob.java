@@ -228,7 +228,7 @@ public final class MassIndexingJob {
 		 * will attempt to preload everything in memory.
 		 * <p>
 		 * This is an optional parameter, its default value is
-		 * the value of the checkpoint interval.
+		 * the value of the session clear interval.
 		 *
 		 * @param entityFetchSize the fetch size to be used when loading entities
 		 *

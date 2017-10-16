@@ -470,7 +470,7 @@ will attempt to preload everything in memory.
 |`entityFetchSize`
 |`entityFetchSize(int)`
 |Optional
-|The value of `checkpointInterval`
+|The value of `sessionClearInterval`
 |Specifies the fetch size to be used when loading entities from database. Some databases
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
