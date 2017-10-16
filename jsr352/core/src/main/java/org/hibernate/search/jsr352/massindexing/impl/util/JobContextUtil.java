@@ -22,7 +22,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;

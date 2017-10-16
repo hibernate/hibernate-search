@@ -7,7 +7,7 @@
 package org.hibernate.search.jsr352.context.jpa.impl;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 
 
 /**

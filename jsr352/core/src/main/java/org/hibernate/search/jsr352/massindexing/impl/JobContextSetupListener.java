@@ -14,8 +14,8 @@ import javax.inject.Named;
 
 import org.hibernate.Criteria;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
-import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
+import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchJobScoped;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;

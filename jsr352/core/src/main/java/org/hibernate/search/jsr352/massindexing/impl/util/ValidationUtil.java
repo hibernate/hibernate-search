@@ -13,7 +13,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
