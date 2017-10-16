@@ -19,6 +19,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
@@ -106,7 +108,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 	}
 
 	private static Long rowCountCriteria(Session session, Class<?> entityType, Set<Criterion> customQueryCriteria) {
-		Criteria criteria = session.createCriteria( entityType );
+		Criteria criteria = new CriteriaImpl( entityType.getName(), session.unwrap( SessionImplementor.class ) );
 
 		customQueryCriteria.forEach( c -> criteria.add( c ) );
 

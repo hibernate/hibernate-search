@@ -25,6 +25,8 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaults;
@@ -212,7 +214,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		Object lowerID = null;
 		Object upperID = null;
 
-		Criteria criteria = ss.createCriteria( javaClass );
+		Criteria criteria = new CriteriaImpl( javaClass.getName(), (SharedSessionContractImplementor) ss );
 		entityTypeDescriptor.getIdOrder().addAscOrder( criteria );
 
 		if ( maxResults != null ) {

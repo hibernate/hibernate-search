@@ -26,6 +26,8 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.query.Query;
 import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchPartitionScoped;
@@ -357,7 +359,7 @@ public class EntityReader extends AbstractItemReader {
 		IdOrder idOrder = typeDescriptor.getIdOrder();
 
 		return (session, lastCheckpointInfo) -> {
-			Criteria criteria = session.createCriteria( entityType );
+			Criteria criteria = new CriteriaImpl( entityType.getName(), session.unwrap( SessionImplementor.class ) );
 
 			// build orders for this entity
 			idOrder.addAscOrder( criteria );
