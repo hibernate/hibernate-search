@@ -179,4 +179,36 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>IDEA</id>
+            <!--
+            Dependencies to allow easy project import in IntelliJ IDEA.
+            These should not be listed as project dependencies to users
+            but are necessary during compile time as they include the
+            JBoss Logger annotation processor.
+            -->
+            <activation>
+                <!-- This is a trick to have the profile automatically activated by IDEA -->
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-processor</artifactId>
+                    <version>${jbossLoggingProcessorVersion}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>jsr250-api</artifactId>
+                    <version>1.0</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
