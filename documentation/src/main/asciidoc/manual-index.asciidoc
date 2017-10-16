@@ -814,8 +814,8 @@ you can use `hibernate-search-jsr352-core` under the following conditions:
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
- * `org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped`
- * `org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped`
+ * `org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchJobScoped`
+ * `org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchPartitionScoped`
 2. You must make sure that the dependency injection mechanism will register
 all injection-annotated classes (`@Named`, ...) from the
 `hibernate-search-jsr352-core` module in the dependency injection context.

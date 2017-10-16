@@ -19,9 +19,9 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 
-import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
-import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
-import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
+import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchJobScoped;
+import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener;
 import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
 import org.jberet.cdi.JobScoped;
