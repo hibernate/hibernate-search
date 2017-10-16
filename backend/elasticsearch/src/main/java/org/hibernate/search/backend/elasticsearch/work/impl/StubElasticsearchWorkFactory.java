@@ -70,8 +70,8 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 			Function<DocumentReference, T> hitConverter, Long offset, Long limit) {
 		return new StubElasticsearchWork<SearchResult<T>>( "search", payload )
 				.addParam( "indexName", indexNames )
-				.addParam( "offset", String.valueOf( offset ) )
-				.addParam( "limit", String.valueOf( limit ) )
+				.addParam( "offset", offset, String::valueOf )
+				.addParam( "limit", limit, String::valueOf )
 				.setResult( () -> generateSearchResult( indexNames, hitConverter ) );
 	}
 

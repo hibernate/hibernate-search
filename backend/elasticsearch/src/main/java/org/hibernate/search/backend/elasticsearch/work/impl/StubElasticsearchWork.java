@@ -11,7 +11,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
@@ -39,12 +41,23 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 	}
 
 	public StubElasticsearchWork<T> addParam(String name, String value) {
-		parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( value );
+		if ( value != null ) {
+			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( value );
+		}
+		return this;
+	}
+
+	public <U> StubElasticsearchWork<T> addParam(String name, U value, Function<U, String> renderer) {
+		if ( value != null ) {
+			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( renderer.apply( value ) );
+		}
 		return this;
 	}
 
 	public StubElasticsearchWork<T> addParam(String name, Collection<String> values) {
-		parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).addAll( values );
+		if ( values != null && values.stream().anyMatch( Objects::nonNull ) ) {
+			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).addAll( values );
+		}
 		return this;
 	}
 
