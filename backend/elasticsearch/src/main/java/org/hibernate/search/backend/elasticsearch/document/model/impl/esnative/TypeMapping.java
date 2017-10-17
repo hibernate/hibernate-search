@@ -10,7 +10,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 
 /**
  * An object representing Elasticsearch type mappings.
@@ -18,6 +22,11 @@ import com.google.gson.GsonBuilder;
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  * @author Yoann Rodiere
  */
+/*
+ * CAUTION: JSON serialization is controlled by a specific adapter, which must be
+ * updated whenever fields of this class are added, renamed or removed.
+ */
+@JsonAdapter(TypeMappingJsonAdapterFactory.class)
 public class TypeMapping {
 
 	/**
@@ -26,6 +35,9 @@ public class TypeMapping {
 	private Map<String, PropertyMapping> properties;
 
 	private DynamicType dynamic;
+
+	@SerializeExtraProperties
+	private Map<String, JsonElement> extraAttributes;
 
 	public Map<String, PropertyMapping> getProperties() {
 		return properties == null ? null : Collections.unmodifiableMap( properties );
@@ -52,6 +64,14 @@ public class TypeMapping {
 
 	public void setDynamic(DynamicType dynamic) {
 		this.dynamic = dynamic;
+	}
+
+	public Map<String, JsonElement> getExtraAttributes() {
+		return extraAttributes;
+	}
+
+	public void setExtraAttributes(Map<String, JsonElement> extraAttributes) {
+		this.extraAttributes = extraAttributes;
 	}
 
 	@Override

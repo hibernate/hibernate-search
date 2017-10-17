@@ -21,6 +21,11 @@ import com.google.gson.annotations.SerializedName;
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  * @author Yoann Rodiere
  */
+/*
+ * CAUTION: JSON serialization is controlled by a specific adapter, which must be
+ * updated whenever fields of this class are added, renamed or removed.
+ */
+@JsonAdapter(PropertyMappingJsonAdapterFactory.class)
 public class PropertyMapping extends TypeMapping {
 
 	private DataType type;
@@ -81,7 +86,6 @@ public class PropertyMapping extends TypeMapping {
 	 * Date datatype
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/date.html
 	 */
-	@JsonAdapter(ElasticsearchFormatJsonAdapter.class)
 	private List<String> format;
 
 	public DataType getType() {
