@@ -20,7 +20,9 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 public interface Bridge<A extends Annotation> extends AutoCloseable {
 
 	/* Solves HSEARCH-1306 */
-	void initialize(BuildContext buildContext, A parameters);
+	default void initialize(BuildContext buildContext, A parameters) {
+		// Default does nothing
+	}
 
 	void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector);
 

@@ -7,9 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.spi.TerminalFieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
@@ -74,13 +73,8 @@ public class ElasticsearchFieldModelContextImpl
 	}
 
 	@Override
-	public <T extends FieldModelContext> Optional<T> unwrap(Class<T> clazz) {
-		if ( clazz.isAssignableFrom( ElasticsearchFieldModelContext.class ) ) {
-			return Optional.of( clazz.cast( this ) );
-		}
-		else {
-			return Optional.empty();
-		}
+	public TerminalFieldModelContext<String> fromJsonString(String mappingJsonString) {
+		return setDelegate( new JsonStringFieldModelContext( accessor, mappingJsonString ) );
 	}
 
 	@Override

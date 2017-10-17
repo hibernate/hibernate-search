@@ -6,8 +6,6 @@
  */
 package org.hibernate.search;
 
-import static org.hibernate.search.util.StubAssert.assertRequest;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.fest.assertions.Assertions;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
@@ -43,10 +40,15 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
-import org.json.JSONException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.fest.assertions.Assertions;
+import org.json.JSONException;
+
+import static org.hibernate.search.util.StubAssert.assertRequest;
 
 /**
  * @author Yoann Rodiere
@@ -319,7 +321,7 @@ public class PojoElasticsearchIT {
 
 	@Test
 	public void search() throws JSONException {
-		try ( PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() ) ) {
+		try (PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() )) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					.asReferences()
 					.bool()

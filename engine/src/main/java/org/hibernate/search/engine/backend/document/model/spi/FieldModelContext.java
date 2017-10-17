@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.backend.document.model.spi;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
 
@@ -30,6 +29,8 @@ public interface FieldModelContext {
 	// TODO JavaTimeBridgeProvider
 	// TODO BasicJDKTypesBridgeProvider
 
-	<T extends FieldModelContext> Optional<T> unwrap(Class<T> clazz);
+	default <T> T withExtension(FieldModelExtension<T> extension) {
+		return extension.extendOrFail( this );
+	}
 
 }

@@ -43,4 +43,8 @@ public interface Log extends BasicLogger {
 			ElasticsearchFieldFormatter formatter1, String indexName1,
 			ElasticsearchFieldFormatter formatter2, String indexName2);
 
+	@Message(id = 6, value = "The Elasticsearch extension can only be applied to contexts"
+			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
+	SearchException elasticsearchExtensionOnUnknownContext(Object context);
+
 }

@@ -6,15 +6,13 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
-import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
 
 /**
  * @author Yoann Rodiere
  */
-public interface TypedFieldModelContext<T> extends TerminalFieldModelContext<T> {
+public interface TerminalFieldModelContext<T> {
 
-	// TODO add common options: stored, sortable, ...
-
-	TypedFieldModelContext<T> store(Store store);
+	IndexFieldReference<T> asReference();
 
 }

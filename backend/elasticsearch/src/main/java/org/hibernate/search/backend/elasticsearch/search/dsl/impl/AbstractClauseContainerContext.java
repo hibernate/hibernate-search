@@ -6,11 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.ElasticsearchQueryClauseContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.clause.impl.ClauseBuilder;
 import org.hibernate.search.engine.search.dsl.BooleanJunctionContext;
 import org.hibernate.search.engine.search.dsl.MatchClauseContext;
 import org.hibernate.search.engine.search.dsl.QueryClauseContainerContext;
+import org.hibernate.search.engine.search.dsl.QueryClauseExtension;
 import org.hibernate.search.engine.search.dsl.RangeClauseContext;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -18,7 +26,9 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractClauseContainerContext<N> implements QueryClauseContainerContext<N> {
+abstract class AbstractClauseContainerContext<N> implements ElasticsearchQueryClauseContainerContext<N> {
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final QueryTargetContext targetContext;
 
@@ -51,8 +61,45 @@ abstract class AbstractClauseContainerContext<N> implements QueryClauseContainer
 		return child;
 	}
 
+	@Override
+	public N fromJsonString(String jsonString) {
+		add( new UserProvidedJsonClauseBuilder<>( jsonString ) );
+		return getNext();
+	}
+
 	protected abstract void add(ClauseBuilder<JsonObject> child);
 
 	protected abstract N getNext();
+
+	@Override
+	public <T> T withExtension(QueryClauseExtension<N, T> extension) {
+		return extension.extendOrFail( this );
+	}
+
+	@Override
+	public <T> N withExtensionOptional(
+			QueryClauseExtension<N, T> extension, Consumer<T> clauseContributor) {
+		extension.extendOptional( this ).ifPresent( clauseContributor );
+		return getNext();
+	}
+
+	@Override
+	public <T> N withExtensionOptional(
+			QueryClauseExtension<N, T> extension,
+			Consumer<T> clauseContributor,
+			Consumer<QueryClauseContainerContext<N>> fallbackClauseContributor) {
+		Optional<T> optional = extension.extendOptional( this );
+		if ( optional.isPresent() ) {
+			clauseContributor.accept( optional.get() );
+		}
+		else {
+			fallbackClauseContributor.accept( this );
+		}
+		return getNext();
+	}
+
+	private <T extends QueryClauseContainerContext<N>> boolean supportsExtension(QueryClauseExtension<N, T> extension) {
+		return extension == ElasticsearchExtension.get();
+	}
 
 }

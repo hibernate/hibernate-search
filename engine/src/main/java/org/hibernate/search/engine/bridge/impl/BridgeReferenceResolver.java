@@ -36,7 +36,7 @@ public final class BridgeReferenceResolver {
 	private final Map<Class<?>, BeanReference<? extends FunctionBridge<?, ?>>> defaultFunctionBridgeBySourceType = new HashMap<>();
 
 	public BridgeReferenceResolver() {
-		// TODO add and extension point to override these maps, or at least to add defaults for other types
+		// TODO add and using point to override these maps, or at least to add defaults for other types
 		// TODO add defaults for other types (byte, char, Characeter, Double, double, boolean, Boolean, ...)
 
 		defaultIdentifierBridgeBySourceType.put( Integer.class, new ImmutableBeanReference<>( DefaultIntegerIdentifierBridge.class ) );

@@ -7,11 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.document.model;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.spi.TerminalFieldModelContext;
 
 
 /**
  * @author Yoann Rodiere
  */
 public interface ElasticsearchFieldModelContext extends FieldModelContext {
+
+	TerminalFieldModelContext<String> fromJsonString(String mappingJsonString);
 
 }

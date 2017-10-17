@@ -1,13 +1,14 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.backend.elasticsearch.document.model.impl.esnative;
 
-import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory;
-
 import com.google.gson.JsonPrimitive;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 public class PropertyMappingJsonAdapterFactory extends TypeMappingJsonAdapterFactory {
