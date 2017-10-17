@@ -22,8 +22,7 @@ public class ElasticsearchIndexModel {
 
 	public ElasticsearchIndexModel(String indexName, ElasticsearchIndexModelCollectorImpl<TypeMapping> collector) {
 		this.indexName = indexName;
-		this.mapping = new TypeMapping();
-		collector.contribute( mapping, fieldModels::put );
+		this.mapping = collector.contribute( fieldModels::put );
 	}
 
 	public String getIndexName() {

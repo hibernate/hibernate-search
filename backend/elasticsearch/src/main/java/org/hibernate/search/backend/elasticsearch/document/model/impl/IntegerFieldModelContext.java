@@ -28,8 +28,9 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldReference<Integer> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
-		super.contribute( reference, mapping, collector );
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<Integer> reference, ElasticsearchFieldModelCollector collector) {
+		PropertyMapping mapping = super.contribute( reference, collector );
+
 		ElasticsearchFieldFormatter formatter = IntegerFieldFormatter.INSTANCE;
 		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.INTEGER );
@@ -37,6 +38,8 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 		String absolutePath = accessor.getStaticAbsolutePath();
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
+
+		return mapping;
 	}
 
 	private static final class IntegerFieldFormatter implements ElasticsearchFieldFormatter {

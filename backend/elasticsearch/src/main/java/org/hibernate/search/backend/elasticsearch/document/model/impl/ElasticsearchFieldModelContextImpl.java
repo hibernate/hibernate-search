@@ -84,9 +84,9 @@ public class ElasticsearchFieldModelContextImpl
 	}
 
 	@Override
-	public void contribute(PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector) {
 		// TODO error if delegate is null
-		delegate.contribute( mapping, collector );
+		return delegate.contribute( collector );
 	}
 
 	private <T extends ElasticsearchIndexModelNodeContributor<PropertyMapping>> T setDelegate(T context) {

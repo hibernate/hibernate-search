@@ -52,8 +52,10 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldReference<LocalDate> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
-		super.contribute( reference, mapping, collector );
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<LocalDate> reference,
+			ElasticsearchFieldModelCollector collector) {
+		PropertyMapping mapping = super.contribute( reference, collector );
+
 		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.DATE );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
@@ -61,6 +63,8 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 		String absolutePath = accessor.getStaticAbsolutePath();
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
+
+		return mapping;
 	}
 
 	private static final class LocalDateFormatter implements ElasticsearchFieldFormatter {

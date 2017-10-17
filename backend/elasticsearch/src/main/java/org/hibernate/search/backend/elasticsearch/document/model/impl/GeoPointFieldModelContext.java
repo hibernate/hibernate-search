@@ -29,8 +29,10 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldReference<GeoPoint> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
-		super.contribute( reference, mapping, collector );
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<GeoPoint> reference,
+			ElasticsearchFieldModelCollector collector) {
+		PropertyMapping mapping = super.contribute( reference, collector );
+
 		ElasticsearchFieldFormatter formatter = GeoPointFieldFormatter.INSTANCE;
 		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		mapping.setType( DataType.GEO_POINT );
@@ -38,6 +40,8 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 		String absolutePath = accessor.getStaticAbsolutePath();
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
+
+		return mapping;
 	}
 
 	private static final class GeoPointFieldFormatter implements ElasticsearchFieldFormatter {

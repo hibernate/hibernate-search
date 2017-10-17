@@ -38,8 +38,10 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldReference<String> reference, PropertyMapping mapping,
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<String> reference,
 			ElasticsearchFieldModelCollector collector) {
+		PropertyMapping mapping = new PropertyMapping();
+
 		ElasticsearchFieldFormatter formatter = StringFieldFormatter.INSTANCE;
 		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
@@ -61,6 +63,8 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 		String absolutePath = accessor.getStaticAbsolutePath();
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
+
+		return mapping;
 	}
 
 	private static final class StringFieldFormatter implements ElasticsearchFieldFormatter {

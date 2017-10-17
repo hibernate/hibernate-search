@@ -11,6 +11,6 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
  */
 public interface ElasticsearchIndexModelNodeContributor<T> {
 
-	void contribute(T mapping, ElasticsearchFieldModelCollector collector);
+	T contribute(ElasticsearchFieldModelCollector collector);
 
 }

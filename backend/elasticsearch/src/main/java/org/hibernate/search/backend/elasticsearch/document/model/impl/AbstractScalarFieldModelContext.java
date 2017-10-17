@@ -28,10 +28,15 @@ abstract class AbstractScalarFieldModelContext<T> extends AbstractElasticsearchT
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldReference<T> reference, PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<T> reference,
+			ElasticsearchFieldModelCollector collector) {
+		PropertyMapping mapping = new PropertyMapping();
+
 		if ( store != null && !store.equals( Store.NO ) ) {
 			// TODO what about Store.COMPRESS?
 			mapping.setStore( true );
 		}
+
+		return mapping;
 	}
 }

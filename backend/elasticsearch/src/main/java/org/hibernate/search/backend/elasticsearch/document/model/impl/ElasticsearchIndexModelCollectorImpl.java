@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
@@ -35,24 +36,36 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 		implements ElasticsearchIndexModelCollector, IndexModelCollectorImplementor,
 				ElasticsearchIndexModelNodeContributor<T> {
 
+	private static final Supplier<TypeMapping> TYPE_MAPPING_FACTORY = TypeMapping::new;
+	private static final Supplier<PropertyMapping> PROPERTY_MAPPING_FACTORY = () -> {
+		PropertyMapping mapping = new PropertyMapping();
+		mapping.setType( DataType.OBJECT );
+		return mapping;
+	};
+
 	public static ElasticsearchIndexModelCollectorImpl<TypeMapping> root() {
-		return new RootElasticsearchIndexModelCollectorImpl();
+		return new ElasticsearchIndexModelCollectorImpl<>( JsonAccessor.root(), TYPE_MAPPING_FACTORY,
+				IndexModelNestingContext.includeAll() );
 	}
 
 	private final JsonObjectAccessor accessor;
+	private final Supplier<T> mappingFactory;
 	private final Map<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> propertyContributors;
 	private final IndexModelNestingContext filter;
 
-	private ElasticsearchIndexModelCollectorImpl(JsonObjectAccessor accessor, IndexModelNestingContext filter) {
+	private ElasticsearchIndexModelCollectorImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
+			IndexModelNestingContext filter) {
 		this.accessor = accessor;
+		this.mappingFactory = mappingFactory;
 		this.propertyContributors = new HashMap<>();
 		this.filter = filter;
 	}
 
-	private ElasticsearchIndexModelCollectorImpl(ElasticsearchIndexModelCollectorImpl<?> original,
+	private ElasticsearchIndexModelCollectorImpl(ElasticsearchIndexModelCollectorImpl<T> original,
 			IndexModelNestingContext filter) {
 		// Share the same state as the original regarding the model itself
 		this.accessor = original.accessor;
+		this.mappingFactory = original.mappingFactory;
 		this.propertyContributors = original.propertyContributors;
 		// ... but use a different filter
 		this.filter = filter;
@@ -99,12 +112,13 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 
 		// Only take the contributor into account if the child is included
 		return filter.applyIfIncluded( relativeName, (name, filter) -> {
-					PropertyElasticsearchIndexModelCollectorImpl childCollector =
-							new PropertyElasticsearchIndexModelCollectorImpl( propertyAccessor, filter );
+					ElasticsearchIndexModelCollectorImpl<PropertyMapping> childCollector =
+							new ElasticsearchIndexModelCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY, filter );
 					addPropertyContributor( name, childCollector );
 					return childCollector;
 				} )
-				.orElseGet( () -> new PropertyElasticsearchIndexModelCollectorImpl( propertyAccessor, IndexModelNestingContext.excludeAll() ) );
+				.orElseGet( () -> new ElasticsearchIndexModelCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
+						IndexModelNestingContext.excludeAll() ) );
 	}
 
 	private void addPropertyContributor(String name, ElasticsearchIndexModelNodeContributor<PropertyMapping> contributor) {
@@ -148,36 +162,15 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public void contribute(T mapping, ElasticsearchFieldModelCollector collector) {
+	public T contribute(ElasticsearchFieldModelCollector collector) {
+		T mapping = mappingFactory.get();
 		for ( Map.Entry<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> entry : propertyContributors.entrySet() ) {
 			String propertyName = entry.getKey();
 			ElasticsearchIndexModelNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
-			PropertyMapping propertyMapping = new PropertyMapping();
-			propertyContributor.contribute( propertyMapping, collector );
+			PropertyMapping propertyMapping = propertyContributor.contribute( collector );
 			mapping.addProperty( propertyName, propertyMapping );
 		}
-	}
-
-	private static class RootElasticsearchIndexModelCollectorImpl extends ElasticsearchIndexModelCollectorImpl<TypeMapping> {
-
-		public RootElasticsearchIndexModelCollectorImpl() {
-			super( JsonAccessor.root(), IndexModelNestingContext.includeAll() );
-		}
-
-	}
-
-	private static class PropertyElasticsearchIndexModelCollectorImpl extends ElasticsearchIndexModelCollectorImpl<PropertyMapping> {
-
-		public PropertyElasticsearchIndexModelCollectorImpl(JsonObjectAccessor accessor,
-				IndexModelNestingContext filter) {
-			super( accessor, filter );
-		}
-
-		@Override
-		public void contribute(PropertyMapping mapping, ElasticsearchFieldModelCollector collector) {
-			mapping.setType( DataType.OBJECT );
-			super.contribute( mapping, collector );
-		}
+		return mapping;
 	}
 
 }
