@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitiali
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 import com.google.gson.JsonElement;
@@ -82,6 +83,15 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 			}
 			LocalDate value = (LocalDate) object;
 			return new JsonPrimitive( delegate.format( value ) );
+		}
+
+		@Override
+		public Object parse(JsonElement element) {
+			if ( element == null || element.isJsonNull() ) {
+				return null;
+			}
+			String stringValue = JsonElementType.STRING.fromElement( element );
+			return LocalDate.parse( stringValue, delegate );
 		}
 
 		@Override

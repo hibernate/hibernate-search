@@ -10,8 +10,11 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitiali
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
+import org.hibernate.search.engine.bridge.builtin.spatial.ImmutableGeoPoint;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -48,6 +51,11 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 		// Must be a singleton so that equals() works as required by the interface
 		public static final GeoPointFieldFormatter INSTANCE = new GeoPointFieldFormatter();
 
+		private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
+				JsonAccessor.root().property( "lat" ).asDouble();
+		private static final JsonAccessor<Double> LONGITUDE_ACCESSOR =
+				JsonAccessor.root().property( "lon" ).asDouble();
+
 		private GeoPointFieldFormatter() {
 		}
 
@@ -58,9 +66,21 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 			}
 			GeoPoint value = (GeoPoint) object;
 			JsonObject result = new JsonObject();
-			result.addProperty( "lat", value.getLatitude() );
-			result.addProperty( "lon", value.getLongitude() );
+			LATITUDE_ACCESSOR.set( result, value.getLatitude() );
+			LONGITUDE_ACCESSOR.set( result, value.getLongitude() );
 			return result;
 		}
+
+		@Override
+		public Object parse(JsonElement element) {
+			if ( element == null || element.isJsonNull() ) {
+				return null;
+			}
+			JsonObject object = JsonElementType.OBJECT.fromElement( element );
+			double latitude = LATITUDE_ACCESSOR.get( object ).get();
+			double longitude = LONGITUDE_ACCESSOR.get( object ).get();
+			return new ImmutableGeoPoint( latitude, longitude );
+		}
 	}
+
 }

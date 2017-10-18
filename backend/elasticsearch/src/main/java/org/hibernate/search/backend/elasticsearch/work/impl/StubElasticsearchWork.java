@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 
@@ -31,7 +30,7 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 
 	private final Map<String, List<String>> parameters;
 
-	private Supplier<T> resultSupplier = () -> null;
+	private Function<JsonObject, T> resultFunction = ignored -> null;
 
 	public StubElasticsearchWork(String workType, JsonObject document) {
 		super();
@@ -61,14 +60,14 @@ public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 		return this;
 	}
 
-	public StubElasticsearchWork<T> setResult(Supplier<T> resultSupplier) {
-		this.resultSupplier = resultSupplier;
+	public StubElasticsearchWork<T> setResultFunction(Function<JsonObject, T> resultFunction) {
+		this.resultFunction = resultFunction;
 		return this;
 	}
 
 	@Override
 	public CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context) {
-		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document, resultSupplier );
+		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document, resultFunction );
 	}
 
 }

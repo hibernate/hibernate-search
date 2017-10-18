@@ -6,29 +6,31 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryFactory;
-import org.hibernate.search.engine.search.dsl.SearchQueryContext;
+import java.util.function.Function;
 
-import com.google.gson.JsonObject;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.SearchQueryContext;
 
 
 /**
  * @author Yoann Rodiere
  */
-class SearchQueryContextImpl<Q> implements SearchQueryContext<Q> {
+class SearchQueryContextImpl<T, Q> implements SearchQueryContext<Q> {
 
-	private final ElasticsearchSearchQueryFactory<Q> queryFactory;
+	private final ElasticsearchSearchQueryBuilder<T> searchQueryBuilder;
 
-	private final JsonObject rootQueryClause;
+	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
 
-	public SearchQueryContextImpl(ElasticsearchSearchQueryFactory<Q> queryFactory, JsonObject rootQueryClause) {
-		this.queryFactory = queryFactory;
-		this.rootQueryClause = rootQueryClause;
+	public SearchQueryContextImpl(ElasticsearchSearchQueryBuilder<T> searchQueryBuilder,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+		this.searchQueryBuilder = searchQueryBuilder;
+		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 	}
 
 	@Override
 	public Q build() {
-		return queryFactory.create( rootQueryClause );
+		return searchQueryBuilder.build( searchQueryWrapperFactory );
 	}
 
 }

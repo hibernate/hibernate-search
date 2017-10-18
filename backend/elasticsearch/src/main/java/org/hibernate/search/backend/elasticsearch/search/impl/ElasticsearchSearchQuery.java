@@ -7,12 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.Set;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -27,20 +25,20 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
 	private final Set<String> indexNames;
-	private final JsonObject rootQueryClause;
-	private final Function<DocumentReference, T> hitTransformer;
+	private final JsonObject payload;
+	private final HitExtractor<T> hitExtractor;
 
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
 	public ElasticsearchSearchQuery(ElasticsearchWorkOrchestrator queryOrchestrator,
 			ElasticsearchWorkFactory workFactory,
-			Set<String> indexNames, JsonObject rootQueryClause, Function<DocumentReference, T> hitTransformer) {
+			Set<String> indexNames, JsonObject payload, HitExtractor<T> hitExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
-		this.rootQueryClause = rootQueryClause;
-		this.hitTransformer = hitTransformer;
+		this.payload = payload;
+		this.hitExtractor = hitExtractor;
 	}
 
 	@Override
@@ -55,10 +53,8 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		JsonObject payload = new JsonObject();
-		payload.add( "query", rootQueryClause );
 		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
-				indexNames, payload, hitTransformer,
+				indexNames, payload, hitExtractor,
 				firstResultIndex, maxResultsCount );
 		return queryOrchestrator.submit( work ).join();
 	}

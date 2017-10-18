@@ -9,7 +9,8 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.clause.impl.ClauseBuilder;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.SearchContext;
 import org.hibernate.search.engine.search.dsl.SearchQueryContext;
 import org.hibernate.search.engine.search.spi.SearchWrappingDefinitionContext;
@@ -20,29 +21,35 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class SearchContextImpl<Q> extends AbstractClauseContainerContext<SearchQueryContext<Q>>
+public class SearchContextImpl<T, Q> extends AbstractClauseContainerContext<SearchQueryContext<Q>>
 		implements SearchContext<Q>, SearchWrappingDefinitionContext<Q> {
 
-	private final ElasticsearchSearchQueryFactory<Q> queryFactory;
+	private final ElasticsearchSearchQueryBuilder<T> searchQueryBuilder;
+
+	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
 
 	private ClauseBuilder<JsonObject> rootQueryClauseBuilder;
 
 	public SearchContextImpl(QueryTargetContext targetContext,
-			ElasticsearchSearchQueryFactory<Q> queryFactory) {
+			ElasticsearchSearchQueryBuilder<T> searchQueryBuilder,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		super( targetContext );
-		this.queryFactory = queryFactory;
+		this.searchQueryBuilder = searchQueryBuilder;
+		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 	}
 
-	private SearchContextImpl(SearchContextImpl<?> original,
-			ElasticsearchSearchQueryFactory<Q> newQueryFactory) {
+	public SearchContextImpl(SearchContextImpl<T, ?> original,
+			ElasticsearchSearchQueryBuilder<T> searchQueryBuilder,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		super( original );
-		this.queryFactory = newQueryFactory;
+		this.searchQueryBuilder = searchQueryBuilder;
+		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 	}
 
 	@Override
 	public <R> SearchContext<R> asWrappedQuery(Function<Q, R> wrapperFactory) {
-		return new SearchContextImpl<R>( this,
-				rootQuery -> wrapperFactory.apply( queryFactory.create( rootQuery ) ) );
+		return new SearchContextImpl<>( this, searchQueryBuilder,
+				searchQueryWrapperFactory.andThen( wrapperFactory ) );
 	}
 
 	@Override
@@ -53,7 +60,8 @@ public class SearchContextImpl<Q> extends AbstractClauseContainerContext<SearchQ
 	@Override
 	protected SearchQueryContext<Q> getNext() {
 		JsonObject rootQueryClause = rootQueryClauseBuilder.build();
-		return new SearchQueryContextImpl<>( queryFactory, rootQueryClause );
+		searchQueryBuilder.setRootQueryClause( rootQueryClause );
+		return new SearchQueryContextImpl<>( searchQueryBuilder, searchQueryWrapperFactory );
 	}
 
 }

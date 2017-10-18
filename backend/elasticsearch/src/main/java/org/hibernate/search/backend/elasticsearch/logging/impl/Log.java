@@ -47,4 +47,7 @@ public interface Log extends BasicLogger {
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
 	SearchException elasticsearchExtensionOnUnknownContext(Object context);
 
+	@Message(id = 7, value = "Unknown projection %1$s in indexes %2$s." )
+	SearchException unknownProjectionForSearch(List<String> projections, List<String> indexNames);
+
 }

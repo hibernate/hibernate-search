@@ -69,5 +69,13 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 			String jsonString = (String) object;
 			return GSON.fromJson( jsonString, JsonElement.class );
 		}
+
+		@Override
+		public Object parse(JsonElement element) {
+			if ( element == null || element.isJsonNull() ) {
+				return null;
+			}
+			return GSON.toJson( element );
+		}
 	}
 }

@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.spi.LoggerFactory;
@@ -30,7 +30,17 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+	private static final Deque<JsonObject> stubResponses = new LinkedList<>();
+
 	private static final Deque<Request> requests = new LinkedList<>();
+
+	public static void pushStubResponse(String jsonObject) {
+		stubResponses.addLast( gson.fromJson( jsonObject, JsonObject.class ) );
+	}
+
+	public static void pushStubResponse(JsonObject jsonObject) {
+		stubResponses.addLast( jsonObject );
+	}
 
 	public static Map<String, List<Request>> drainRequestsByIndex() {
 		Map<String, List<Request>> result = new HashMap<>();
@@ -84,11 +94,15 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 	}
 
 	public <T> CompletableFuture<T> execute(String workType, Map<String, List<String>> parameters, JsonObject body,
-			Supplier<T> resultSupplier) {
+			Function<JsonObject, T> resultFunction) {
 		String bodyAsString = body == null ? null : gson.toJson( body );
 		log.executingWork( host, workType, parameters, bodyAsString );
 		requests.addLast( new Request( host, workType, parameters, bodyAsString ) );
-		return CompletableFuture.completedFuture( resultSupplier.get() );
+		JsonObject stubResponse = stubResponses.pollLast();
+		if ( stubResponse == null ) {
+			stubResponse = new JsonObject();
+		}
+		return CompletableFuture.completedFuture( resultFunction.apply( stubResponse ) );
 	}
 
 	@Override

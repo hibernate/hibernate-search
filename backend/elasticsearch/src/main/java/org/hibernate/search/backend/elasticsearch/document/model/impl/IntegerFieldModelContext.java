@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitiali
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 import com.google.gson.JsonElement;
@@ -56,6 +57,14 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 			}
 			Integer value = (Integer) object;
 			return new JsonPrimitive( value );
+		}
+
+		@Override
+		public Object parse(JsonElement element) {
+			if ( element == null || element.isJsonNull() ) {
+				return null;
+			}
+			return JsonElementType.INTEGER.fromElement( element );
 		}
 	}
 }

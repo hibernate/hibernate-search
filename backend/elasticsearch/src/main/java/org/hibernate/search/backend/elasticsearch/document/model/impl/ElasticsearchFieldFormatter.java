@@ -15,6 +15,8 @@ public interface ElasticsearchFieldFormatter {
 
 	JsonElement format(Object object);
 
+	Object parse(JsonElement element);
+
 	/**
 	 * @param obj An object to compare
 	 * @return {@code true} if {@code obj} is a formatter whose {@link #format(Object)} method is

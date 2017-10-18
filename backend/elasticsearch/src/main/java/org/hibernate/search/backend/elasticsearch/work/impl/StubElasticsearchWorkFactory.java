@@ -9,15 +9,15 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.HitExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -25,6 +25,8 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
+
+	private static final JsonAccessor<JsonArray> HITS_HITS_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "hits" ).asArray();
 
 	@Override
 	public ElasticsearchWork<?> createIndex(String indexName, JsonObject model) {
@@ -67,22 +69,20 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, JsonObject payload,
-			Function<DocumentReference, T> hitConverter, Long offset, Long limit) {
+			HitExtractor<T> hitExtractor, Long offset, Long limit) {
 		return new StubElasticsearchWork<SearchResult<T>>( "search", payload )
 				.addParam( "indexName", indexNames )
 				.addParam( "offset", offset, String::valueOf )
 				.addParam( "limit", limit, String::valueOf )
-				.setResult( () -> generateSearchResult( indexNames, hitConverter ) );
+				.setResultFunction( (object) -> generateSearchResult( hitExtractor, object ) );
 	}
 
-	private static <T> SearchResult<T> generateSearchResult(Set<String> indexNames, Function<DocumentReference, T> hitConverter) {
-		SortedSet<String> indexNamesInOrder = new TreeSet<>( indexNames );
+	private static <T> SearchResult<T> generateSearchResult(HitExtractor<T> hitExtractor, JsonObject jsonObject) {
 		List<T> hits = new ArrayList<>();
-		int id = 0;
-		for ( String indexName : indexNamesInOrder ) {
-			DocumentReference reference = new ElasticsearchDocumentReference( indexName, String.valueOf( id ) );
-			hits.add( hitConverter.apply( reference ) );
-			id++;
+		Optional<JsonArray> jsonHits = HITS_HITS_ACCESSOR.get( jsonObject );
+		for ( JsonElement hit : jsonHits.orElseGet( JsonArray::new ) ) {
+			JsonObject hitObject = hit.getAsJsonObject();
+			hits.add( hitExtractor.extractHit( jsonObject, hitObject ) );
 		}
 		final List<T> finalHits = Collections.unmodifiableList( hits );
 		return new SearchResult<T>() {

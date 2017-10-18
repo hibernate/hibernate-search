@@ -353,10 +353,22 @@ public class PojoElasticsearchIT {
 			query.setFirstResult( 2L );
 			query.setMaxResults( 10L );
 
-			/*
-			 * These are stubbed results, they are unrelated to the query. See StubElasticsearchWorkFactory.
-			 * Here we just check that result wrapping (document reference -> pojo reference) works as expected.
-			 */
+			StubElasticsearchClient.pushStubResponse(
+					"{"
+						+ "'hits': {"
+							+ "'hits': ["
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '0'"
+								+ "},"
+								+ "{"
+									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_id': '1'"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+			);
 			SearchResult<PojoReference> result = query.execute();
 			Assertions.assertThat( result.getHits() ).hasSize( 2 )
 					.containsExactly(
@@ -417,6 +429,70 @@ public class PojoElasticsearchIT {
 							+ "]"
 						+ "}"
 					+ "}"
+				+ "}" );
+	}
+
+	@Test
+	public void search_projection() throws JSONException {
+		try (PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() )) {
+			SearchQuery<List<?>> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
+					.asProjections( "myTextField", "myLocalDateField", "customBridgeOnClass.text" )
+					.match()
+							.onField( "myTextField" )
+							.matching( "foo" )
+							.end()
+					.build();
+
+			StubElasticsearchClient.pushStubResponse(
+					"{"
+						+ "'hits': {"
+							+ "'hits': ["
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '0',"
+									+ "_source: {"
+										+ "'myLocalDateField': '2017-11-01',"
+										+ "'myTextField': 'text1',"
+										+ "'customBridgeOnClass.text': 'text2'"
+									+ "}"
+								+ "},"
+								+ "{"
+									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_id': '1',"
+									+ "_source: {"
+										+ "'myLocalDateField': '2017-11-02'"
+									+ "}"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+			);
+			SearchResult<List<?>> result = query.execute();
+			Assertions.assertThat( result.getHits() ).hasSize( 2 )
+					.containsExactly(
+							Arrays.asList( "text1", LocalDate.of( 2017, 11, 1 ), "text2" ),
+							Arrays.asList( null, LocalDate.of( 2017, 11, 2 ), null )
+					);
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
+				HOST_1, "search", null /* No ID */,
+				null,
+				"{"
+					+ "'query': {"
+						+ "'match': {"
+							+ "'myTextField': {"
+								+ "'value': 'foo'"
+							+ "}"
+						+ "}"
+					+ "},"
+					+ "'_source': ["
+						+ "'myTextField',"
+						+ "'myLocalDateField',"
+						+ "'customBridgeOnClass.text'"
+					+ "]"
 				+ "}" );
 	}
 

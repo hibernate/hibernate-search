@@ -8,12 +8,10 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
-public interface ElasticsearchSearchQueryFactory<T> {
+public interface HitExtractor<T> {
 
-	// TODO add more arguments, such as faceting options
-	T create(JsonObject rootQueryClause);
+	void contributeRequest(JsonObject requestBody);
+
+	T extractHit(JsonObject responseBody, JsonObject hit);
 
 }
