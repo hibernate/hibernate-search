@@ -246,6 +246,7 @@ public class PojoElasticsearchIT {
 
 	@After
 	public void cleanup() {
+		StubElasticsearchClient.drainRequestsByIndex();
 		if ( managerFactory != null ) {
 			managerFactory.close();
 		}

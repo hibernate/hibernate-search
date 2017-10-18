@@ -89,6 +89,7 @@ public class PojoElasticsearchExtensionIT {
 
 	@After
 	public void cleanup() {
+		StubElasticsearchClient.drainRequestsByIndex();
 		if ( managerFactory != null ) {
 			managerFactory.close();
 		}
