@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.engine.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
@@ -38,6 +39,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -436,7 +438,13 @@ public class PojoElasticsearchIT {
 	public void search_projection() throws JSONException {
 		try (PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() )) {
 			SearchQuery<List<?>> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
-					.asProjections( "myTextField", "myLocalDateField", "customBridgeOnClass.text" )
+					.asProjections(
+							"myTextField",
+							ProjectionConstants.REFERENCE,
+							"myLocalDateField",
+							ProjectionConstants.DOCUMENT_REFERENCE,
+							"customBridgeOnClass.text"
+					)
 					.match()
 							.onField( "myTextField" )
 							.matching( "foo" )
@@ -470,8 +478,20 @@ public class PojoElasticsearchIT {
 			SearchResult<List<?>> result = query.execute();
 			Assertions.assertThat( result.getHits() ).hasSize( 2 )
 					.containsExactly(
-							Arrays.asList( "text1", LocalDate.of( 2017, 11, 1 ), "text2" ),
-							Arrays.asList( null, LocalDate.of( 2017, 11, 2 ), null )
+							Arrays.asList(
+									"text1",
+									new PojoReferenceImpl( IndexedEntity.class, 0 ),
+									LocalDate.of( 2017, 11, 1 ),
+									new ElasticsearchDocumentReference( IndexedEntity.INDEX, "0" ),
+									"text2"
+							),
+							Arrays.asList(
+									null,
+									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
+									LocalDate.of( 2017, 11, 2 ),
+									new ElasticsearchDocumentReference( YetAnotherIndexedEntity.INDEX, "1" ),
+									null
+							)
 					);
 			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
 		}

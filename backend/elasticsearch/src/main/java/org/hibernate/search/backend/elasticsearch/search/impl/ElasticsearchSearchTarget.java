@@ -28,6 +28,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchContextI
 import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
 import org.hibernate.search.engine.search.spi.SearchWrappingDefinitionContext;
@@ -145,15 +146,30 @@ public class ElasticsearchSearchTarget implements SearchTarget {
 				BitSet projectionFound) {
 			List<HitExtractor<?>> extractors = new ArrayList<>( projections.length );
 			for ( int i = 0; i < projections.length; ++i ) {
-				String absoluteFieldPath = projections[i];
-				ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( absoluteFieldPath );
-				if ( fieldModel != null ) {
-					projectionFound.set( i );
-					extractors.add( new SourceHitExtractor( absoluteFieldPath, fieldModel.getFormatter() ) );
-				}
-				else {
-					// Make sure that the result list will have the correct indices and size
-					extractors.add( NullHitExtractor.get() );
+				String projection = projections[i];
+				switch ( projection ) {
+					case ProjectionConstants.REFERENCE:
+						projectionFound.set( i );
+						extractors.add( new TransformingHitExtractor<>(
+								DocumentReferenceHitExtractor.get(),
+								documentReferenceTransformer
+						) );
+						break;
+					case ProjectionConstants.DOCUMENT_REFERENCE:
+						projectionFound.set( i );
+						extractors.add( DocumentReferenceHitExtractor.get() );
+						break;
+					default:
+						ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( projection );
+						if ( fieldModel != null ) {
+							projectionFound.set( i );
+							extractors.add( new SourceHitExtractor( projection, fieldModel.getFormatter() ) );
+						}
+						else {
+							// Make sure that the result list will have the correct indices and size
+							extractors.add( NullHitExtractor.get() );
+						}
+						break;
 				}
 			}
 			return new CompositeHitExtractor( extractors );
