@@ -1,29 +1,69 @@
-[![Build Status][travis-img]][travis]
+# Hibernate Search JSR-352 integration
 
-# gsoc-hsearch
+## Purpose
 
-This project aims to provide an alternative to the current mass indexer 
-implementation, using the Java Batch architecture as defined by JSR 352. This 
-standardized tool JSR 352 provides task-and-chunk oriented processing, parallel 
-execution and many other optimization features. This batch job should accept 
-the entity type(s) to re-index as an input, load the relevant entities from the 
-database and rebuild the full-text index from these.
+This module provides a JSR-352 batch job executing a mass indexing.
 
+The main advantage over the classic `fullTextSession.createIndexer(Class<?>)`
+is that batch jobs can be suspended and resumed on demand,
+and even be resumed after a failure.
 
-## Run
+## Main components
 
-You can install the project and see test cases using:
+### `MassIndexingJob`
 
-    mvn clean install
+Provides the mass indexing job name, and a builder of parameters for a mass indexing job
 
+### `EntityReader`
 
-## Mechanism
+Reads entities from the database.
 
-This project redesigns the mass index job as a chunk-oriented, non-interactive,
-long-running, background execution process. Execution contains operational
-control (start/stop/restart), logging, checkpointing and parallelization.
+### `LuceneDocProducer`
 
-For more information, please check http://mincong-h.github.io/gsoc-hsearch
+Takes entities from `EntityReader` as an input,
+and transforms them to documents.
 
-[travis]: https://travis-ci.org/mincong-h/gsoc-hsearch
-[travis-img]: https://travis-ci.org/mincong-h/gsoc-hsearch.svg?branch=master
+### `LuceneDocWriter`
+
+Takes documents from `LuceneDocProducer` as an input,
+and writes them to the index.
+
+### `PartitionMapper`
+
+Creates a partition plan based on the job parameters.
+
+### `JobContextData`
+
+Contains the main context accessible from most job components,
+mainly the `EntityManagerFactory` and `SearchIntegrator`.
+
+Access to this component is a bit unusual,
+because the only state the JSR-352 spec allows is strings injected into components
+and a object which can be serialized (not ideal for `EntityManagerFactory`)
+and may be reset during the job process (when starting a partition for instance).  
+
+To work around those limitations, each component requiring access
+to the `JobContextData` is injected with all the information needed to rebuild it,
+and will use a utility (`JobContextUtil`) to either retrieve the current instance
+(if possible) or rebuild it (if necessary).
+
+### `EntityManagerFactoryRegistry`
+
+Retrieves an entity manager factory for use during the job execution.
+
+This component has two default implementations in the core,
+one relying on a static registry populated using a Hibernate Integrator,
+and one relying on JNDI.
+
+Another implementation is 
+
+### `JobContextSetupListener`
+
+Validates the job parameters and the `EntityManagerFactory` retrieval
+at the start of the job execution.
+
+## Workflow
+
+For information about how a mass indexing job is executed,
+please refer to [the JSR-352 specification](https://jcp.org/en/jsr/detail?id=352),
+in particular section 11.7 ("Partitioned Chunk Processing").
