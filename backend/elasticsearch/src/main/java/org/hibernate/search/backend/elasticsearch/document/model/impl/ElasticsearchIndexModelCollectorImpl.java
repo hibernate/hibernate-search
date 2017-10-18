@@ -9,14 +9,12 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelNestingContext;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexModelCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
@@ -25,8 +23,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.T
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.engine.backend.projection.spi.Projection;
-import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -131,18 +127,6 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 					+ " or you may have declared multiple conflicting mappings."
 					+ " In any case, there is something wrong with your mapping and you should fix it." );
 		}
-	}
-
-	@Override
-	public void projection(Set<IndexFieldReference<?>> requiredFields, Projection projection) {
-		// TODO Projections
-		throw new UnsupportedOperationException( "Projections not implemented yet" );
-	}
-
-	@Override
-	public void projection(String relativeName, Set<IndexableReference<?>> requiredFields, Projection projection) {
-		// TODO Projections
-		throw new UnsupportedOperationException( "Projections not implemented yet" );
 	}
 
 	@Override

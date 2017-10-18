@@ -24,6 +24,10 @@ public interface Bridge<A extends Annotation> extends AutoCloseable {
 		// Default does nothing
 	}
 
+	/*
+	 * TODO add an object to define "virtual" fields: fields which are not in the index,
+	 * but can be simulated on the client side when projecting and querying.
+	 */
 	void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector);
 
 	void toDocument(Indexable source, DocumentState target);
