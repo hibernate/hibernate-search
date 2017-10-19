@@ -7,6 +7,7 @@
 
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,6 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchExtensionOnUnknownContext(Object context);
 
 	@Message(id = 7, value = "Unknown projection %1$s in indexes %2$s." )
-	SearchException unknownProjectionForSearch(List<String> projections, List<String> indexNames);
+	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<String> indexNames);
 
 }
