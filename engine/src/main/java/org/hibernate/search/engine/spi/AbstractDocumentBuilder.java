@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,7 +44,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  */
 public abstract class AbstractDocumentBuilder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<?> beanClass;
 	private final TypeMetadata typeMetadata;

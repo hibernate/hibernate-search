@@ -9,6 +9,7 @@ package org.hibernate.search.query.engine.impl;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,7 +61,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Common prefix shared by all defined projection constants.
