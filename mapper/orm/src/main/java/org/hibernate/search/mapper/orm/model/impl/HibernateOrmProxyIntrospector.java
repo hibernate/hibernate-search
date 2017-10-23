@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 
 
@@ -14,16 +15,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
  */
 public class HibernateOrmProxyIntrospector implements PojoProxyIntrospector {
 
-	private static final HibernateOrmProxyIntrospector INSTANCE = new HibernateOrmProxyIntrospector();
-
-	public static HibernateOrmProxyIntrospector get() {
-		return INSTANCE;
-	}
-
-	private HibernateOrmProxyIntrospector() {
+	public HibernateOrmProxyIntrospector(SessionImplementor sessionImplementor) {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> Class<? extends T> getClass(T entity) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException( "Not implemented yet" );

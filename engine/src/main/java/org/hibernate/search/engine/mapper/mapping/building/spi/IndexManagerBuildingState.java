@@ -18,10 +18,6 @@ public interface IndexManagerBuildingState<D extends DocumentState> {
 
 	MappingIndexModelCollector getModelCollector();
 
-	/**
-	 * Return the created index manager; to be called only after the model collector has been fully populated.
-	 * @return the created index manager
-	 */
-	IndexManager<D> getResult();
+	IndexManager<D> build();
 
 }

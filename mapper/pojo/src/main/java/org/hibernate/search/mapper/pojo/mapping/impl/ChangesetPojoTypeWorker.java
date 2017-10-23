@@ -10,14 +10,16 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 /**
  * @author Yoann Rodiere
  */
 class ChangesetPojoTypeWorker<D extends DocumentState> extends PojoTypeWorker<D, ChangesetIndexWorker<D>> {
 
-	public ChangesetPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, ChangesetIndexWorker<D> delegate) {
-		super( typeManager, delegate );
+	public ChangesetPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext,
+			ChangesetIndexWorker<D> delegate) {
+		super( typeManager, sessionContext, delegate );
 	}
 
 	public CompletableFuture<?> execute() {

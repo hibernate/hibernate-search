@@ -13,14 +13,16 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContribut
 /**
  * @author Yoann Rodiere
  */
-public interface SearchManagerFactoryBuilder {
+public interface SearchMappingRepositoryBuilder {
 
-	SearchManagerFactoryBuilder setProperty(String name, String value);
+	SearchMappingRepositoryBuilder setProperty(String name, String value);
 
-	SearchManagerFactoryBuilder setProperties(Properties properties);
+	SearchMappingRepositoryBuilder setProperties(Properties properties);
 
-	SearchManagerFactoryBuilder addMapping(MetadataContributor mappingContributor);
+	SearchMappingRepositoryBuilder addMapping(MetadataContributor mappingContributor);
 
-	SearchManagerFactory build();
+	SearchMappingRepository build();
+
+	SearchMappingRepository getBuiltResult();
 
 }

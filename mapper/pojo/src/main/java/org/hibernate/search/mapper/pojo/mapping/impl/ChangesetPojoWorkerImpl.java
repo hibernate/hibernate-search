@@ -12,28 +12,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 /**
  * @author Yoann Rodiere
  */
 public class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
 
-	private final SessionContext context;
+	private final PojoSessionContext sessionContext;
 	private final Map<Class<?>, ChangesetPojoTypeWorker<?>> delegates = new HashMap<>();
 
-	public ChangesetPojoWorkerImpl(PojoProxyIntrospector introspector,
-			PojoTypeManagerContainer typeManagers,
-			SessionContext context) {
-		super( introspector, typeManagers );
-		this.context = context;
+	public ChangesetPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+			PojoSessionContext sessionContext) {
+		super( typeManagers, sessionContext );
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	protected ChangesetPojoTypeWorker<?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> getTypeManager( c ).createWorker( context ) );
+		return delegates.computeIfAbsent( clazz, c -> getTypeManager( c ).createWorker( sessionContext ) );
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataCo
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
@@ -26,21 +26,21 @@ import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
  */
 public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
 
-	private final PojoMapperImplementor mappingType;
+	private final PojoMapperFactory<?> mapperFactory;
 	private final Class<?> type;
 
 	private String indexName;
 	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
 
-	public TypeMappingContextImpl(PojoMapperImplementor mappingType, Class<?> type) {
-		this.mappingType = mappingType;
+	public TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, Class<?> type) {
+		this.mapperFactory = mapperFactory;
 		this.type = type;
 	}
 
 	@Override
 	public void contribute(TypeMetadataCollector collector) {
-		collector.collect( mappingType, new PojoIndexedTypeIdentifier( type ), indexName, this );
+		collector.collect( mapperFactory, new PojoIndexedTypeIdentifier( type ), indexName, this );
 	}
 
 	@Override

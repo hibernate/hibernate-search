@@ -95,19 +95,11 @@ public class IndexManagerBuildingStateHolder {
 		return backendFactory.create( backendName, buildContext, backendProperties );
 	}
 
-	public Map<String, IndexManager<?>> build() {
-		Map<String, IndexManager<?>> result = new HashMap<>();
-		indexManagerBuildingStateByName.forEach( (k, v) -> result.put( k, v.build() ) );
-		// TODO close the managers created so far if anything fails
-		return result;
-	}
-
 	private static class IndexMappingBuildingStateImpl<D extends DocumentState> implements IndexManagerBuildingState<D> {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
 		private final MappingIndexModelCollector modelCollector;
-		private IndexManager<D> result;
 
 		public IndexMappingBuildingStateImpl(String indexName,
 				IndexManagerBuilder<D> builder,
@@ -128,15 +120,8 @@ public class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public IndexManager<D> getResult() {
-			if ( result == null ) {
-				throw new SearchException( "getResult() called before the IndexManager was built" );
-			}
-			return result;
-		}
-
 		public IndexManager<D> build() {
-			result = builder.build();
+			IndexManager<D> result = builder.build();
 			// Optimize changeset execution in the resulting index manager
 			result = new SimplifyingIndexManager<>( result );
 			return result;

@@ -18,9 +18,10 @@ import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPointBridgeDefinition;
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPointBridgeDefinition.LatitudeMarkerDefinition;
 import org.hibernate.search.engine.bridge.builtin.spatial.GeoPointBridgeDefinition.LongitudeMarkerDefinition;
-import org.hibernate.search.engine.common.SearchManagerFactory;
-import org.hibernate.search.mapper.javabean.mapping.JavaBeanMapper;
-import org.hibernate.search.mapper.javabean.mapping.JavaBeanMappingType;
+import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.json.JSONException;
@@ -32,16 +33,21 @@ import org.junit.Test;
 /**
  * @author Yoann Rodiere
  */
-public class GeoPointPojoElasticsearchIT {
+public class JavaBeanElasticsearchGeoPointIT {
 
-	private SearchManagerFactory managerFactory;
+	private SearchMappingRepository mappingRepository;
+
+	private JavaBeanMapping mapping;
 
 	private static final String HOST = "http://es1.mycompany.com:9200/";
 
 	@Before
 	public void setup() throws JSONException {
-		MappingDefinition mapping = JavaBeanMapper.get().programmaticMapping();
-		mapping.type( GeoPointOnTypeEntity.class )
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder();
+		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
+
+		MappingDefinition mappingDefinition = contributor.programmaticMapping();
+		mappingDefinition.type( GeoPointOnTypeEntity.class )
 				.indexed( GeoPointOnTypeEntity.INDEX )
 				.bridge( new GeoPointBridgeDefinition()
 						.fieldName( "homeLocation" )
@@ -63,7 +69,7 @@ public class GeoPointPojoElasticsearchIT {
 				.property( "workLongitude" )
 						.marker( new LongitudeMarkerDefinition().markerSet( "work" ) );
 
-		mapping.type( GeoPointOnCoordinatesPropertyEntity.class )
+		mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
 				.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
 				.property( "id" )
 						.documentId()
@@ -72,7 +78,7 @@ public class GeoPointPojoElasticsearchIT {
 								.fieldName( "location" )
 						);
 
-		mapping.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
+		mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
 				.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
 				.property( "id" )
 						.documentId()
@@ -81,18 +87,18 @@ public class GeoPointPojoElasticsearchIT {
 								.fieldName( "location" )
 						);
 
-		mapping.type( CustomCoordinates.class )
+		mappingDefinition.type( CustomCoordinates.class )
 				.property( "lat" )
 						.marker( new LatitudeMarkerDefinition() )
 				.property( "lon" )
 						.marker( new LongitudeMarkerDefinition() );
 
-		managerFactory = SearchManagerFactory.builder()
-				.addMapping( mapping )
+		mappingRepository = mappingRepositoryBuilder
 				.setProperty( "backend.elasticsearchBackend.type", ElasticsearchBackendFactory.class.getName() )
 				.setProperty( "backend.elasticsearchBackend.host", HOST )
 				.setProperty( "index.default.backend", "elasticsearchBackend" )
 				.build();
+		mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 
@@ -136,14 +142,14 @@ public class GeoPointPojoElasticsearchIT {
 	@After
 	public void cleanup() {
 		StubElasticsearchClient.drainRequestsByIndex();
-		if ( managerFactory != null ) {
-			managerFactory.close();
+		if ( mappingRepository != null ) {
+			mappingRepository.close();
 		}
 	}
 
 	@Test
 	public void index() throws JSONException {
-		try ( PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() ) ) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.setId( 1 );
 			entity1.setHomeLatitude( 1.1d );

@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
-import org.hibernate.search.engine.common.SearchManagerBuilder;
-
 /**
+ * Interface used by the engine to manipulate mappings
+ * <p>
+ * Publicly exposed mapping interfaces do not have to extend this interface;
+ * only the implementations have to implement it.
+ *
  * @author Yoann Rodiere
  */
-public interface Mapping<B extends SearchManagerBuilder<?>> extends AutoCloseable {
-
-	B createManagerBuilder();
+public interface MappingImplementor extends AutoCloseable {
 
 	@Override
-	default void close() {
-	}
+	void close();
 
 }

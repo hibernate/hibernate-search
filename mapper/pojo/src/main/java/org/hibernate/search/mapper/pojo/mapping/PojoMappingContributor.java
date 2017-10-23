@@ -8,16 +8,17 @@ package org.hibernate.search.mapper.pojo.mapping;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 
 /**
  * @author Yoann Rodiere
  */
-public interface PojoMapper {
+public interface PojoMappingContributor<M> {
 
 	MappingDefinition programmaticMapping();
 
-	MetadataContributor annotationMapping(Set<Class<?>> classes);
+	void annotationMapping(Set<Class<?>> classes);
+
+	M getResult();
 
 }

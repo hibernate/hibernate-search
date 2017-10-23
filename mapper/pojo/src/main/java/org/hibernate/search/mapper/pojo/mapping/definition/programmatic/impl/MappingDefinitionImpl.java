@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 
@@ -20,13 +20,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
  */
 public class MappingDefinitionImpl implements MappingDefinition, MetadataContributor {
 
-	private final PojoMapperImplementor mappingType;
+	private final PojoMapperFactory<?> mapperFactory;
 
 	private final Map<Class<?>, TypeMappingContextImpl> entities = new HashMap<>();
 
-	public MappingDefinitionImpl(PojoMapperImplementor mappingType) {
+	public MappingDefinitionImpl(PojoMapperFactory<?> mapperFactory) {
 		super();
-		this.mappingType = mappingType;
+		this.mapperFactory = mapperFactory;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class MappingDefinitionImpl implements MappingDefinition, MetadataContrib
 
 	@Override
 	public TypeMappingContext type(Class<?> clazz) {
-		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( mappingType, c ) );
+		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( mapperFactory, c ) );
 	}
 
 }

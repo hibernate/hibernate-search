@@ -71,11 +71,21 @@
                 <artifactId>hibernate-search-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>5.2.10.Final</version>
+            </dependency>
             <dependency>
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>5.0.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>5.2.10.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>

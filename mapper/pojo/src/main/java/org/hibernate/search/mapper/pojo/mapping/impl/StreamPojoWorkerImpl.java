@@ -9,23 +9,21 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 /**
  * @author Yoann Rodiere
  */
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
-	private final SessionContext context;
+	private final PojoSessionContext context;
 	private final Map<Class<?>, StreamPojoTypeWorker<?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
-	public StreamPojoWorkerImpl(PojoProxyIntrospector introspector,
-			PojoTypeManagerContainer typeManagers,
-			SessionContext context) {
-		super( introspector, typeManagers );
+	public StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+			PojoSessionContext context) {
+		super( typeManagers, context );
 		this.context = context;
 	}
 

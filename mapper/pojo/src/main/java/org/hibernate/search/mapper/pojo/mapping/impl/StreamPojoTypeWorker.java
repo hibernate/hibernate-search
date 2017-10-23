@@ -8,14 +8,16 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 /**
  * @author Yoann Rodiere
  */
 class StreamPojoTypeWorker<D extends DocumentState> extends PojoTypeWorker<D, StreamIndexWorker<D>> {
 
-	public StreamPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, StreamIndexWorker<D> delegate) {
-		super( typeManager, delegate );
+	public StreamPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext,
+			StreamIndexWorker<D> delegate) {
+		super( typeManager, sessionContext, delegate );
 	}
 
 	public void flush() {

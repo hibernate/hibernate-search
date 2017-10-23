@@ -6,16 +6,14 @@
  */
 package org.hibernate.search.engine.mapper.mapping;
 
-import org.hibernate.search.engine.common.SearchManager;
-import org.hibernate.search.engine.common.SearchManagerBuilder;
-import org.hibernate.search.engine.common.SearchManagerFactory;
+import org.hibernate.search.engine.common.SearchMappingRepository;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in
- * {@link SearchManagerFactory#createSearchManager(MappingKey)}.
+ * {@link SearchMappingRepository#getMapping(MappingKey)}.
  *
  * @author Yoann Rodiere
  */
-public interface MappingKey<T extends SearchManager, B extends SearchManagerBuilder<T>> {
+public interface MappingKey<M> {
 
 }

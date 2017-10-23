@@ -28,13 +28,14 @@ import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinitionBase;
 import org.hibernate.search.engine.bridge.spi.Bridge;
 import org.hibernate.search.engine.bridge.spi.FunctionBridge;
-import org.hibernate.search.engine.common.SearchManagerFactory;
+import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.javabean.mapping.JavaBeanMapper;
-import org.hibernate.search.mapper.javabean.mapping.JavaBeanMappingType;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.engine.mapper.model.spi.Indexable;
 import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -55,17 +56,22 @@ import static org.hibernate.search.util.StubAssert.assertRequest;
 /**
  * @author Yoann Rodiere
  */
-public class PojoElasticsearchIT {
+public class JavaBeanElasticsearchIT {
 
-	private SearchManagerFactory managerFactory;
+	private SearchMappingRepository mappingRepository;
+
+	private JavaBeanMapping mapping;
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
 
 	@Before
 	public void setup() throws JSONException {
-		MappingDefinition mapping = JavaBeanMapper.get().programmaticMapping();
-		mapping.type( IndexedEntity.class )
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder();
+		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
+
+		MappingDefinition mappingDefinition = contributor.programmaticMapping();
+		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
 				.bridge(
 						new MyBridgeDefinition()
@@ -81,8 +87,8 @@ public class PojoElasticsearchIT {
 								.maxDepth( 1 )
 								.includePaths( "embedded.customBridgeOnClass.text" );
 
-		MappingDefinition secondMapping = JavaBeanMapper.get().programmaticMapping();
-		secondMapping.type( ParentIndexedEntity.class )
+		MappingDefinition secondMappingDefinition = contributor.programmaticMapping();
+		secondMappingDefinition.type( ParentIndexedEntity.class )
 				.property( "localDate" )
 						.field()
 								.name( "myLocalDateField" )
@@ -91,23 +97,21 @@ public class PojoElasticsearchIT {
 								new MyBridgeDefinition()
 								.objectName( "customBridgeOnProperty" )
 						);
-		secondMapping.type( OtherIndexedEntity.class )
+		secondMappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
 				.property( "id" )
 						.documentId().bridge( DefaultIntegerIdentifierBridge.class )
 				.property( "numeric" )
 						.field()
 						.field().name( "numericAsString" ).bridge( IntegerAsStringFunctionBridge.class );
-		secondMapping.type( YetAnotherIndexedEntity.class )
+		secondMappingDefinition.type( YetAnotherIndexedEntity.class )
 				.indexed( YetAnotherIndexedEntity.INDEX )
 				.property( "id" )
 						.documentId()
 				.property( "numeric" )
 						.field();
 
-		managerFactory = SearchManagerFactory.builder()
-				.addMapping( mapping )
-				.addMapping( secondMapping )
+		mappingRepository = mappingRepositoryBuilder
 				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
 				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
 				.setProperty( "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
@@ -115,6 +119,7 @@ public class PojoElasticsearchIT {
 				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
 				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
 				.build();
+		mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 
@@ -249,14 +254,14 @@ public class PojoElasticsearchIT {
 	@After
 	public void cleanup() {
 		StubElasticsearchClient.drainRequestsByIndex();
-		if ( managerFactory != null ) {
-			managerFactory.close();
+		if ( mappingRepository != null ) {
+			mappingRepository.close();
 		}
 	}
 
 	@Test
 	public void index() throws JSONException {
-		try ( PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() ) ) {
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -324,7 +329,7 @@ public class PojoElasticsearchIT {
 
 	@Test
 	public void search() throws JSONException {
-		try (PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() )) {
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					.asReferences()
 					.bool()
@@ -436,7 +441,7 @@ public class PojoElasticsearchIT {
 
 	@Test
 	public void search_projection() throws JSONException {
-		try (PojoSearchManager manager = managerFactory.createSearchManager( JavaBeanMappingType.get() )) {
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			SearchQuery<List<?>> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					.asProjections(
 							"myTextField",

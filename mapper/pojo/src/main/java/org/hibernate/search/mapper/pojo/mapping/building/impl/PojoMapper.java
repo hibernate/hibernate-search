@@ -8,36 +8,39 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-import org.hibernate.search.engine.common.SearchManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingImpl;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.ProvidedToStringIdentifierConverter;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoMappingBuilder implements MappingBuilder<PojoTypeNodeMetadataContributor, SearchManagerBuilder<PojoSearchManager>> {
+public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeNodeMetadataContributor, M> {
 
 	private final PojoIntrospector introspector;
-	private final PojoProxyIntrospector proxyIntrospector;
 	private final boolean implicitProvidedId;
+	private final Function<PojoMappingDelegate, M> wrapperFactory;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
-	public PojoMappingBuilder(PojoIntrospector introspector, PojoProxyIntrospector proxyIntrospector, boolean implicitProvidedId) {
+	public PojoMapper(
+			PojoIntrospector introspector,
+			boolean implicitProvidedId,
+			Function<PojoMappingDelegate, M> wrapperFactory) {
 		this.introspector = introspector;
-		this.proxyIntrospector = proxyIntrospector;
 		this.implicitProvidedId = implicitProvidedId;
+		this.wrapperFactory = wrapperFactory;
 	}
 
 	@Override
@@ -47,7 +50,7 @@ public class PojoMappingBuilder implements MappingBuilder<PojoTypeNodeMetadataCo
 		PojoIndexedTypeIdentifier pojoTypeId = (PojoIndexedTypeIdentifier) typeId;
 		Class<?> javaType = pojoTypeId.toJavaType();
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
-				javaType, introspector, proxyIntrospector, indexManagerBuildingState, contributorProvider,
+				javaType, introspector, indexManagerBuildingState, contributorProvider,
 				implicitProvidedId ? ProvidedToStringIdentifierConverter.get() : null );
 		PojoTypeNodeMappingCollector collector = builder.asCollector();
 		contributorProvider.get( pojoTypeId ).forEach( c -> c.contributeMapping( collector ) );
@@ -55,10 +58,11 @@ public class PojoMappingBuilder implements MappingBuilder<PojoTypeNodeMetadataCo
 	}
 
 	@Override
-	public PojoMappingImpl build() {
+	public M build() {
 		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
 		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
-		return new PojoMappingImpl( proxyIntrospector, typeManagersBuilder.build() );
+		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );
+		return wrapperFactory.apply( mappingImplementor );
 	}
 
 }

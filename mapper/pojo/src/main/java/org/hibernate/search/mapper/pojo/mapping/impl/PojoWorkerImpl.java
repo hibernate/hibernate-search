@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -17,11 +17,12 @@ import org.hibernate.search.util.SearchException;
  */
 abstract class PojoWorkerImpl implements PojoWorker {
 
-	private final PojoProxyIntrospector introspector;
+	private final PojoSessionContext sessionContext;
 	private final PojoTypeManagerContainer typeManagers;
 
-	public PojoWorkerImpl(PojoProxyIntrospector introspector, PojoTypeManagerContainer typeManagers) {
-		this.introspector = introspector;
+	public PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+			PojoSessionContext sessionContext) {
+		this.sessionContext = sessionContext;
 		this.typeManagers = typeManagers;
 	}
 
@@ -32,7 +33,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 
 	@Override
 	public void add(Object id, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
+		Class<?> clazz = sessionContext.getProxyIntrospector().getClass( entity );
 		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
@@ -44,7 +45,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 
 	@Override
 	public void update(Object id, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
+		Class<?> clazz = sessionContext.getProxyIntrospector().getClass( entity );
 		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
@@ -60,7 +61,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
 	}
 
-	protected Stream<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
+	protected Set<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
 		return typeManagers.getAll();
 	}
 

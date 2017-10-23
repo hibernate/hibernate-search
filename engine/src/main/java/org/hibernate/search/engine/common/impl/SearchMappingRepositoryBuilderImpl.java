@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,20 +16,19 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
-import org.hibernate.search.engine.common.SearchManagerBuilder;
-import org.hibernate.search.engine.common.SearchManagerFactory;
-import org.hibernate.search.engine.common.SearchManagerFactoryBuilder;
+import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.MappingKey;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperImplementor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-import org.hibernate.search.engine.mapper.mapping.spi.Mapping;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.SearchException;
@@ -37,39 +37,33 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuilder {
+public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
 
 	private final Properties properties = new Properties();
-	private final Map<MappingKey<?, ?>, MapperContribution<?, ?>> contributionByMapper = new HashMap<>();
+	private final Collection<MetadataContributor> contributors = new ArrayList<>();
+
+	private SearchMappingRepository builtResult;
 
 	@Override
-	public SearchManagerFactoryBuilder setProperty(String name, String value) {
+	public SearchMappingRepositoryBuilder setProperty(String name, String value) {
 		this.properties.setProperty( name, value );
 		return this;
 	}
 
 	@Override
-	public SearchManagerFactoryBuilder setProperties(Properties properties) {
+	public SearchMappingRepositoryBuilder setProperties(Properties properties) {
 		this.properties.putAll( properties );
 		return this;
 	}
 
 	@Override
-	public SearchManagerFactoryBuilder addMapping(MetadataContributor mappingContributor) {
-		mappingContributor.contribute( this::collectMappingContribution );
+	public SearchMappingRepositoryBuilder addMapping(MetadataContributor mappingContributor) {
+		contributors.add( mappingContributor );
 		return this;
 	}
 
-	private <C> void collectMappingContribution(MapperImplementor<C, ?, ?> mapperImpl, IndexedTypeIdentifier typeId, String indexName,
-			C contributor) {
-		@SuppressWarnings("unchecked")
-		MapperContribution<C, ?> collector = (MapperContribution<C, ?>)
-				contributionByMapper.computeIfAbsent( mapperImpl, ignored -> new MapperContribution<>( mapperImpl ));
-		collector.update( typeId, indexName, contributor );
-	}
-
 	@Override
-	public SearchManagerFactory build() {
+	public SearchMappingRepository build() {
 		BeanResolver beanResolver = new ReflectionBeanResolver();
 		ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
 		BuildContext buildContext = new BuildContextImpl( serviceManager );
@@ -85,35 +79,60 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 		IndexManagerBuildingStateHolder indexManagerBuildingStateProvider =
 				new IndexManagerBuildingStateHolder( buildContext, properties,
 						bridgeFactory, bridgeReferenceResolver );
-		// TODO close the holder (which will close the backends if anything fails after this
+		// TODO close the holder (which will close the backends) if anything fails after this
 
-		Map<MappingKey<?, ?>, MappingBuilder<?, ?>> mappingBuilders = new HashMap<>();
-		contributionByMapper.forEach( (mapper, contribution) -> {
-			MappingBuilder<?, ?> builder = contribution.preBuild( indexManagerBuildingStateProvider );
-			mappingBuilders.put( mapper, builder );
-		} );
+		TypeMetadataCollectorImpl metadataCollector = new TypeMetadataCollectorImpl();
+		contributors.forEach( c -> c.contribute( metadataCollector ) );
 
-		Map<String, IndexManager<?>> indexManagers = indexManagerBuildingStateProvider.build();
-		// TODO close the index managers if anything fails after this
+		Map<MappingKey<?>, Mapper<?, ?>> mappers =
+				metadataCollector.createMappers( indexManagerBuildingStateProvider );
 
-		Map<MappingKey<?, ?>, Mapping<?>> mappings = new HashMap<>();
+		Map<MappingKey<?>, MappingImplementor> mappings = new HashMap<>();
 		// TODO close the mappings created so far if anything fails after this
-		mappingBuilders.forEach( (mapper, builder) -> {
-			Mapping<?> mapping = builder.build();
-			mappings.put( mapper, mapping );
+		mappers.forEach( (mappingKey, mapper) -> {
+			MappingImplementor mapping = mapper.build();
+			mappings.put( mappingKey, mapping );
 		} );
 
-		return new SearchManagerFactoryImpl( mappings );
+		builtResult = new SearchMappingRepositoryImpl( mappings );
+		return builtResult;
 	}
 
-	// Note we need to delay type mapping contributions so as to only start creating backends etc. when build() is called
-	private static class MapperContribution<C, B extends SearchManagerBuilder<?>> {
+	@Override
+	public SearchMappingRepository getBuiltResult() {
+		return builtResult;
+	}
 
-		private final MapperImplementor<C, ?, B> mapper;
+	private static class TypeMetadataCollectorImpl implements TypeMetadataCollector {
+		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new HashMap<>();
+
+		@Override
+		public <C> void collect(MapperFactory<C, ?> mapperFactory, IndexedTypeIdentifier typeId,
+				String indexName, C contributor) {
+			@SuppressWarnings("unchecked")
+			MapperContribution<C, ?> contribution = (MapperContribution<C, ?>)
+					contributionByMappingKey.computeIfAbsent( mapperFactory, ignored -> new MapperContribution<>( mapperFactory ));
+			contribution.update( typeId, indexName, contributor );
+		}
+
+		public Map<MappingKey<?>, Mapper<?, ?>> createMappers(
+				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
+			Map<MappingKey<?>, Mapper<?, ?>> mappers = new HashMap<>();
+			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
+				Mapper<?, ?> mapper = contribution.preBuild( indexManagerBuildingStateProvider );
+				mappers.put( mappingKey, mapper );
+			} );
+			return mappers;
+		}
+	}
+
+	private static class MapperContribution<C, M extends MappingImplementor> {
+
+		private final MapperFactory<C, M> mapperFactory;
 		private final Map<IndexedTypeIdentifier, TypeMappingContribution<C>> contributionByType = new HashMap<>();
 
-		public MapperContribution(MapperImplementor<C, ?, B> mapper) {
-			this.mapper = mapper;
+		public MapperContribution(MapperFactory<C, M> mapperFactory) {
+			this.mapperFactory = mapperFactory;
 		}
 
 		public void update(IndexedTypeIdentifier typeId, String indexName, C contributor) {
@@ -121,9 +140,9 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 					.update( indexName, contributor );
 		}
 
-		public MappingBuilder<C, B> preBuild(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-			MappingBuilder<C, B> builder = mapper.createBuilder();
-			IndexableTypeOrdering typeOrdering = mapper.getTypeOrdering();
+		public Mapper<C, M> preBuild(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
+			Mapper<C, M> mapper = mapperFactory.createMapper();
+			IndexableTypeOrdering typeOrdering = mapperFactory.getTypeOrdering();
 			for ( IndexedTypeIdentifier mappedType : contributionByType.keySet() ) {
 				Optional<String> indexNameOptional = typeOrdering.getAscendingSuperTypes( mappedType )
 						.map( contributionByType::get )
@@ -133,14 +152,14 @@ public class SearchManagerFactoryBuilderImpl implements SearchManagerFactoryBuil
 						.findFirst();
 				if ( indexNameOptional.isPresent() ) {
 					String indexName = indexNameOptional.get();
-					builder.addIndexed(
+					mapper.addIndexed(
 							mappedType,
 							indexManagerBuildingStateHolder.startBuilding( indexName, typeOrdering ),
 							type2 -> getContributors( typeOrdering, type2 )
 							);
 				}
 			}
-			return builder;
+			return mapper;
 		}
 
 		private Stream<C> getContributors(IndexableTypeOrdering typeOrdering, IndexedTypeIdentifier typeId) {

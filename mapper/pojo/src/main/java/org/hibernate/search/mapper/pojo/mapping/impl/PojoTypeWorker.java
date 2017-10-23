@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.IndexWorker;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 
 /**
@@ -16,10 +17,12 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorker;
 class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
 
 	private final PojoTypeManager<?, ?, D> typeManager;
+	private final PojoSessionContext sessionContext;
 	private final C delegate;
 
-	public PojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, C delegate) {
+	public PojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext, C delegate) {
 		this.typeManager = typeManager;
+		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
 
@@ -32,7 +35,10 @@ class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
 	}
 
 	public void add(Object id, Object entity) {
-		getDelegate().add( typeManager.toDocumentIdentifier( id, entity ), typeManager.toDocumentContributor( entity ) );
+		getDelegate().add(
+				typeManager.toDocumentIdentifier( sessionContext, id, entity ),
+				typeManager.toDocumentContributor( sessionContext, entity )
+		);
 	}
 
 	public void update(Object entity) {
@@ -40,11 +46,14 @@ class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
 	}
 
 	public void update(Object id, Object entity) {
-		getDelegate().update( typeManager.toDocumentIdentifier( id, entity ), typeManager.toDocumentContributor( entity ) );
+		getDelegate().update(
+				typeManager.toDocumentIdentifier( sessionContext, id, entity ),
+				typeManager.toDocumentContributor( sessionContext, entity )
+		);
 	}
 
 	public void delete(Object id) {
-		getDelegate().delete( typeManager.toDocumentIdentifier( id, null ) );
+		getDelegate().delete( typeManager.toDocumentIdentifier( sessionContext, id, null ) );
 	}
 
 }
