@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperImplementor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
@@ -17,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 /**
  * @author Yoann Rodiere
  */
-public class MappingDefinitionImpl implements MappingDefinition {
+public class MappingDefinitionImpl implements MappingDefinition, MetadataContributor {
 
 	private final PojoMapperImplementor mappingType;
 

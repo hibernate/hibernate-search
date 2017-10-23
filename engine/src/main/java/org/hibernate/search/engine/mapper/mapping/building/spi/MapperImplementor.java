@@ -8,14 +8,14 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.common.SearchManager;
 import org.hibernate.search.engine.common.SearchManagerBuilder;
-import org.hibernate.search.engine.mapper.mapping.MappingType;
+import org.hibernate.search.engine.mapper.mapping.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 
 /**
  * @author Yoann Rodiere
  */
 public interface MapperImplementor<C, T extends SearchManager, B extends SearchManagerBuilder<T>>
-		extends MappingType<T, B> {
+		extends MappingKey<T, B> {
 
 	IndexableTypeOrdering getTypeOrdering();
 

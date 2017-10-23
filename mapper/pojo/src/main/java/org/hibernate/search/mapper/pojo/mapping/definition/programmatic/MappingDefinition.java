@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-
 /**
  * @author Yoann Rodiere
  */
-public interface MappingDefinition extends MetadataContributor {
+public interface MappingDefinition {
 
 	TypeMappingContext type(Class<?> clazz);
 

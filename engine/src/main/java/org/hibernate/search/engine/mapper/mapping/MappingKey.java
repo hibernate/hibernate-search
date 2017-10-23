@@ -12,10 +12,10 @@ import org.hibernate.search.engine.common.SearchManagerFactory;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in
- * {@link SearchManagerFactory#createSearchManager(MappingType)}.
+ * {@link SearchManagerFactory#createSearchManager(MappingKey)}.
  *
  * @author Yoann Rodiere
  */
-public interface MappingType<T extends SearchManager, B extends SearchManagerBuilder<T>> {
+public interface MappingKey<T extends SearchManager, B extends SearchManagerBuilder<T>> {
 
 }
