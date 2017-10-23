@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,13 +41,13 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoSearchTarget createPojoSearchTarget(Class<?>... targetedTypes) {
+	public PojoSearchTarget createPojoSearchTarget(Collection<? extends Class<?>> targetedTypes) {
 		Set<PojoTypeManager<?, ?, ?>> targetedTypeManagers;
-		if ( targetedTypes == null || targetedTypes.length == 0 ) {
+		if ( targetedTypes.isEmpty() ) {
 			targetedTypeManagers = typeManagers.getAll();
 		}
 		else {
-			targetedTypeManagers = Arrays.stream( targetedTypes )
+			targetedTypeManagers = targetedTypes.stream()
 					.flatMap( t -> typeManagers.getAllBySuperType( t )
 							.orElseThrow( () -> new SearchException( "Type " + t + " is not indexed and hasn't any indexed supertype." ) )
 							.stream()

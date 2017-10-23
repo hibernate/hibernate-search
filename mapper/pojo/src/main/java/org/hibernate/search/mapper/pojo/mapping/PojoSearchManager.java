@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.hibernate.search.engine.common.SearchManager;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
@@ -16,7 +19,15 @@ import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
  */
 public interface PojoSearchManager extends SearchManager {
 
-	SearchResultDefinitionContext<PojoReference> search(Class<?> ... types);
+	default SearchResultDefinitionContext<PojoReference> search() {
+		return search( Collections.singleton( Object.class ) );
+	}
+
+	default SearchResultDefinitionContext<PojoReference> search(Class<?> targetedType) {
+		return search( Collections.singleton( targetedType ) );
+	}
+
+	SearchResultDefinitionContext<PojoReference> search(Collection<? extends Class<?>> targetedTypes);
 
 	/**
 	 * @return The worker for this manager. Calling {@link ChangesetPojoWorker#execute()}

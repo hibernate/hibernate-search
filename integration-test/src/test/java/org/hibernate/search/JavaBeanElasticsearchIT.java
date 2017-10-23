@@ -330,7 +330,9 @@ public class JavaBeanElasticsearchIT {
 	@Test
 	public void search() throws JSONException {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
-			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			SearchQuery<PojoReference> query = manager.search(
+							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+					)
 					.asReferences()
 					.bool()
 							.must().match()
@@ -442,7 +444,9 @@ public class JavaBeanElasticsearchIT {
 	@Test
 	public void search_projection() throws JSONException {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
-			SearchQuery<List<?>> query = manager.search( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			SearchQuery<List<?>> query = manager.search(
+							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+					)
 					.asProjections(
 							"myTextField",
 							ProjectionConstants.REFERENCE,

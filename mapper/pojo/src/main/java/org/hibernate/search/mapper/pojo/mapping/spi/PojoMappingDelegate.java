@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
+import java.util.Collection;
+
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
@@ -19,6 +21,6 @@ public interface PojoMappingDelegate extends PojoMapping, AutoCloseable {
 
 	StreamPojoWorker createStreamWorker(PojoSessionContext sessionContext);
 
-	PojoSearchTarget createPojoSearchTarget(Class<?>... targetedTypes);
+	PojoSearchTarget createPojoSearchTarget(Collection<? extends Class<?>> targetedTypes);
 
 }

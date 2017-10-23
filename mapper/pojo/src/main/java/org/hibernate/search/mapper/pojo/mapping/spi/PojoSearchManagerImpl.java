@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
@@ -62,7 +63,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	}
 
 	@Override
-	public SearchResultDefinitionContext<PojoReference> search(Class<?>... targetedTypes) {
+	public SearchResultDefinitionContext<PojoReference> search(Collection<? extends Class<?>> targetedTypes) {
 		PojoSearchTarget searchTarget = mappingDelegate.createPojoSearchTarget( targetedTypes );
 		return searchTarget.search( sessionContext );
 	}
