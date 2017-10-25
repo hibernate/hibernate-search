@@ -32,58 +32,74 @@ and after test, log from index check and uncaught exceptions.
 
 ## Enable benchmarking
 
-All metrics are disabled by default, so that you're not forced to run lengthy test for any build.
-A system property enables them:
+Data sets are small and metrics are disabled by default,
+so that you're not forced to run lengthy test for any build.
+A profile enables larger data sets and metrics recording:
 
-    -Dorg.hibernate.search.enable_performance_tests=true
+    -Pperf
 
 
 ## Examples how to run
 
 ### Standalone accessing database directly
 
-- run tests in standalone mode against in-memory database
+- run tests in standalone mode against in-memory database,
+  **with a small dataset and with metrics disabled**
+  (otherwise you will probably run out of memory)
 
         mvn clean test -Dtest=TestRunnerStandalone \
-        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dorg.hibernate.search.enable_performance_tests=true
+        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
 
 Note: For the following scenarios, the test database needs to be created first with appropriate
 username and password.
 
-- run tests in standalone mode against a PostgreSQL database (via system properties)
+- run tests in standalone mode against a PostgreSQL database,
+  with a large dataset and with metrics enabled
 
-        mvn clean test -Ppostgresql84 -Dtest=TestRunnerStandalone \
+        mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect \
-        -Dhibernate.connection.driver_class=org.postgresql.Driver \
-        -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo \
-        -Dorg.hibernate.search.enable_performance_tests=true
+        -Djdbc.url=jdbc:postgresql://localhost:5432/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
 
-- run tests in standalone mode against a MariaDB database (via system properties)
+- run tests in standalone mode against a MariaDB database,
+  with a large dataset and with metrics enabled
 
-        mvn clean test -Pmysql51 -Dtest=TestRunnerStandalone \
+        mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect \
-        -Dhibernate.connection.driver_class=com.mysql.jdbc.Driver \
-        -Dhibernate.connection.url=jdbc:mysql://hostname:3306/hibperf \
-        -Dhibernate.connection.username=foo \
-        -Dhibernate.connection.password=foo \
-        -Dorg.hibernate.search.enable_performance_tests=true
+        -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
 
 ### In container against a data source
 
-- run tests in container mode against default data source (java:jboss/datasources/ExampleDS)
+The tests will create the datasource automatically.
+Just provide the parameters as you would do in standalone mode. 
+
+- run tests in container mode against in-memory database,
+  **with a small dataset and with metrics disabled**
+  (otherwise you will probably run out of memory)
 
         mvn clean test -Dtest=TestRunnerArquillian \
-        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Dorg.hibernate.search.enable_performance_tests=true
+        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
 
-- run tests in container mode against specified data source (via system property)
+Note: For the following scenarios, the test database needs to be created first with appropriate
+username and password.
 
-        mvn clean test -Dtest=TestRunnerArquillian \
+- run tests in container mode against a PostgreSQL database,
+  with a large dataset and with metrics enabled
+
+        mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
-        -Ddatasource=foo \
-        -Dorg.hibernate.search.enable_performance_tests=true
+        -Djdbc.url=jdbc:postgresql://localhost:5432/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
+
+- run tests in container mode against a MariaDB database,
+  with a large dataset and with metrics enabled
+
+        mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerArquillian \
+        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
+        -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
+        -Djdbc.user=foo \
+        -Djdbc.pass=foo
