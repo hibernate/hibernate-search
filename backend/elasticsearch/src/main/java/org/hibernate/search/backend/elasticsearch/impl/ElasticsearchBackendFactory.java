@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.util.Properties;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
@@ -14,6 +16,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFac
 import org.hibernate.search.backend.elasticsearch.work.impl.StubElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 
@@ -22,12 +26,17 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public class ElasticsearchBackendFactory implements BackendFactory {
 
+	private static final ConfigurationProperty<String> HOST = ConfigurationProperty.forKey( "host" )
+			.asString()
+			.withDefault( "localhost:9200" )
+			.build();
+
 	@Override
-	public Backend<?> create(String name, BuildContext context, Properties properties) {
-		// TODO more checks on the host (non-null, non-empty)
-		String host = properties.getProperty( "host" );
+	public Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
+		// TODO allow multiple hosts
+		String hosts = HOST.get( propertySource );
 		// TODO implement and detect dialects
-		ElasticsearchClient client = new StubElasticsearchClient( host );
+		ElasticsearchClient client = new StubElasticsearchClient( hosts );
 		ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory();
 		return new ElasticsearchBackend( client, name, workFactory );
 	}

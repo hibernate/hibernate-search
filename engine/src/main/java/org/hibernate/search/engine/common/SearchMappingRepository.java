@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.impl.SearchMappingRepositoryBuilderImpl;
 import org.hibernate.search.engine.mapper.mapping.MappingKey;
 
@@ -20,6 +21,10 @@ public interface SearchMappingRepository extends AutoCloseable {
 	void close();
 
 	static SearchMappingRepositoryBuilder builder() {
-		return new SearchMappingRepositoryBuilderImpl();
+		return new SearchMappingRepositoryBuilderImpl( ConfigurationPropertySource.empty() );
+	}
+
+	static SearchMappingRepositoryBuilder builder(ConfigurationPropertySource propertySource) {
+		return new SearchMappingRepositoryBuilderImpl( propertySource );
 	}
 }

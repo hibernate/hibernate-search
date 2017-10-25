@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanResolver;
@@ -39,20 +40,25 @@ import org.hibernate.search.util.SearchException;
  */
 public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
 
-	private final Properties properties = new Properties();
+	private final ConfigurationPropertySource mainPropertySource;
+	private final Properties overriddenProperties = new Properties();
 	private final Collection<MetadataContributor> contributors = new ArrayList<>();
 
 	private SearchMappingRepository builtResult;
 
+	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
+		this.mainPropertySource = mainPropertySource;
+	}
+
 	@Override
 	public SearchMappingRepositoryBuilder setProperty(String name, String value) {
-		this.properties.setProperty( name, value );
+		this.overriddenProperties.setProperty( name, value );
 		return this;
 	}
 
 	@Override
 	public SearchMappingRepositoryBuilder setProperties(Properties properties) {
-		this.properties.putAll( properties );
+		this.overriddenProperties.putAll( properties );
 		return this;
 	}
 
@@ -69,15 +75,18 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		BuildContext buildContext = new BuildContextImpl( serviceManager );
 		BridgeFactory bridgeFactory = new BridgeFactory( buildContext, beanResolver );
 		BridgeReferenceResolver bridgeReferenceResolver = new BridgeReferenceResolver();
-		/*
-		 * TODO add an option in the builder to mask properties, but don't enable it by default
-		 * Rationale: we can easily switch this option on in the Hibernate ORM integration,
-		 * and other integrations may not want it to be enabled, or may want a custom mask
-		 * (see Infinispan for instance).
-		 */
-		// Properties maskedProperties = new MaskedProperty( properties, "hibernate.search" );
+
+		ConfigurationPropertySource propertySource;
+		if ( !overriddenProperties.isEmpty() ) {
+			propertySource = ConfigurationPropertySource.fromProperties( overriddenProperties )
+					.withFallback( mainPropertySource );
+		}
+		else {
+			propertySource = mainPropertySource;
+		}
+
 		IndexManagerBuildingStateHolder indexManagerBuildingStateProvider =
-				new IndexManagerBuildingStateHolder( buildContext, properties,
+				new IndexManagerBuildingStateHolder( buildContext, propertySource,
 						bridgeFactory, bridgeReferenceResolver );
 		// TODO close the holder (which will close the backends) if anything fails after this
 

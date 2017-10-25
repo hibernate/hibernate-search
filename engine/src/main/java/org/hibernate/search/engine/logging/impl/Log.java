@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.search.engine.bridge.declaration.spi.BridgeMapping;
 import org.hibernate.search.util.SearchException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
@@ -33,4 +34,21 @@ public interface Log extends BasicLogger {
 	SearchException unableToResolveBridgeFromAnnotationType(Class<? extends Annotation> annotationType,
 			Class<BridgeMapping> bridgeMappingAnnotationClass);
 
+	@Message(id = 5, value = "Unable to convert configuration property '%1$s' with value '%2$s': %3$s")
+	SearchException unableToConvertConfigurationProperty(String key, Object rawValue, String errorMessage, @Cause Exception cause);
+
+	@Message(id = 6, value = "Invalid value: expected either an instance of '%1$s' or a parsable String.")
+	SearchException invalidPropertyValue(Class<?> expectedType, @Cause Exception cause);
+
+	@Message(id = 7, value = "Invalid boolean value: expected either a Boolean, the String 'true' or the String 'false'.")
+	SearchException invalidBooleanPropertyValue(@Cause Exception cause);
+
+	@Message(id = 8, value = "%1$s")
+	SearchException invalidIntegerPropertyValue(String errorMessage, @Cause Exception cause);
+
+	@Message(id = 9, value = "%1$s")
+	SearchException invalidLongPropertyValue(String errorMessage, @Cause Exception cause);
+
+	@Message(id = 10, value = "Invalid multi value: expected either a Collection or a String.")
+	SearchException invalidMultiPropertyValue();
 }

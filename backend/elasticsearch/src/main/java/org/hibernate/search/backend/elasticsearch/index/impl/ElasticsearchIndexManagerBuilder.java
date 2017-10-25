@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.util.Properties;
-
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -16,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.T
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 import com.google.gson.Gson;
@@ -29,17 +28,17 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final ElasticsearchBackend backend;
 	private final String indexName;
 	private final BuildContext context;
-	private final Properties indexProperties;
+	private final ConfigurationPropertySource propertySource;
 
 	private final ElasticsearchIndexModelCollectorImpl<TypeMapping> collector =
 			ElasticsearchIndexModelCollectorImpl.root();
 
 	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
-			BuildContext context, Properties indexProperties) {
+			BuildContext context, ConfigurationPropertySource propertySource) {
 		this.backend = backend;
 		this.indexName = indexName;
 		this.context = context;
-		this.indexProperties = indexProperties;
+		this.propertySource = propertySource;
 	}
 
 	@Override

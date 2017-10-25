@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import java.util.Properties;
-
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 /**
@@ -15,6 +14,6 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public interface BackendFactory {
 
-	Backend<?> create(String name, BuildContext context, Properties properties);
+	Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource);
 
 }
