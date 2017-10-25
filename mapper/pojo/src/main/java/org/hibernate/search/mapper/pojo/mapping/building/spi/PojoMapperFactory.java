@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
@@ -35,10 +36,11 @@ public abstract class PojoMapperFactory<M extends MappingImplementor>
 	}
 
 	@Override
-	public PojoMapper<M> createMapper() {
-		return new PojoMapper<>( introspector, implicitProvidedId, this::createMapping );
+	public final PojoMapper<M> createMapper(ConfigurationPropertySource propertySource) {
+		return new PojoMapper<>( propertySource, introspector, implicitProvidedId, this::createMapping );
 	}
 
-	protected abstract M createMapping(PojoMappingDelegate mappingDelegate);
+	protected abstract M createMapping(ConfigurationPropertySource propertySource,
+			PojoMappingDelegate mappingDelegate);
 
 }

@@ -94,7 +94,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		contributors.forEach( c -> c.contribute( metadataCollector ) );
 
 		Map<MappingKey<?>, Mapper<?, ?>> mappers =
-				metadataCollector.createMappers( indexManagerBuildingStateProvider );
+				metadataCollector.createMappers( propertySource, indexManagerBuildingStateProvider );
 
 		Map<MappingKey<?>, MappingImplementor> mappings = new HashMap<>();
 		// TODO close the mappings created so far if anything fails after this
@@ -125,10 +125,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 
 		public Map<MappingKey<?>, Mapper<?, ?>> createMappers(
+				ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			Map<MappingKey<?>, Mapper<?, ?>> mappers = new HashMap<>();
 			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
-				Mapper<?, ?> mapper = contribution.preBuild( indexManagerBuildingStateProvider );
+				Mapper<?, ?> mapper = contribution.preBuild( propertySource, indexManagerBuildingStateProvider );
 				mappers.put( mappingKey, mapper );
 			} );
 			return mappers;
@@ -149,8 +150,9 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 					.update( indexName, contributor );
 		}
 
-		public Mapper<C, M> preBuild(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-			Mapper<C, M> mapper = mapperFactory.createMapper();
+		public Mapper<C, M> preBuild(ConfigurationPropertySource propertySource,
+				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
+			Mapper<C, M> mapper = mapperFactory.createMapper( propertySource );
 			IndexableTypeOrdering typeOrdering = mapperFactory.getTypeOrdering();
 			for ( IndexedTypeIdentifier mappedType : contributionByType.keySet() ) {
 				Optional<String> indexNameOptional = typeOrdering.getAscendingSuperTypes( mappedType )

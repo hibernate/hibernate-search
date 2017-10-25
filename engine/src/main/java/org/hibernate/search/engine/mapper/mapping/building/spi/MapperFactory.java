@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
@@ -18,6 +19,6 @@ public interface MapperFactory<C, M extends MappingImplementor>
 
 	IndexableTypeOrdering getTypeOrdering();
 
-	Mapper<C, M> createMapper();
+	Mapper<C, M> createMapper(ConfigurationPropertySource propertySource);
 
 }

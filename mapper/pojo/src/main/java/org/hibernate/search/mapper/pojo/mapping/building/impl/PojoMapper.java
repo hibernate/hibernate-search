@@ -8,8 +8,9 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -28,16 +29,19 @@ import org.hibernate.search.mapper.pojo.processing.impl.ProvidedToStringIdentifi
  */
 public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeNodeMetadataContributor, M> {
 
+	private final ConfigurationPropertySource propertySource;
 	private final PojoIntrospector introspector;
 	private final boolean implicitProvidedId;
-	private final Function<PojoMappingDelegate, M> wrapperFactory;
+	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
 	public PojoMapper(
+			ConfigurationPropertySource propertySource,
 			PojoIntrospector introspector,
 			boolean implicitProvidedId,
-			Function<PojoMappingDelegate, M> wrapperFactory) {
+			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory) {
+		this.propertySource = propertySource;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
@@ -62,7 +66,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
 		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
 		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );
-		return wrapperFactory.apply( mappingImplementor );
+		return wrapperFactory.apply( propertySource, mappingImplementor );
 	}
 
 }
