@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.4.Final (25-10-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2868 Collection updates may not trigger reindexing despite @ContainedIn in some circumstances
+    * HSEARCH-2863 CalendarBridgeProvider creates StringEncodingDateBridge
+
+** Improvement
+    * HSEARCH-2853 Get rid of standalone-full-testqueues.xml file in integration tests
+    * HSEARCH-2850 Option to run WildFly integration tests against manually prepared distribution and to run against built-in Search modules
+
+** Task
+    * HSEARCH-2929 Update to Hibernate ORM 5.1.10.Final
+    * HSEARCH-2927 Update to Apache Lucene 5.5.5
+    * HSEARCH-2916 Avoid random failures in TestRunnerStandalone.runPerformanceTest
+
 5.6.3.Final (23-08-2017)
 -------------------------
 
