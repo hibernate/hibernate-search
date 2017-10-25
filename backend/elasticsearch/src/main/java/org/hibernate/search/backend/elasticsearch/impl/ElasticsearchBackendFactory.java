@@ -26,15 +26,14 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public class ElasticsearchBackendFactory implements BackendFactory {
 
-	private static final ConfigurationProperty<String> HOST = ConfigurationProperty.forKey( "host" )
-			.asString()
-			.withDefault( "localhost:9200" )
+	private static final ConfigurationProperty<List<String>> HOSTS = ConfigurationProperty.forKey( "host" )
+			.asString().multivalued( Pattern.compile( "\\s" ) )
+			.withDefault( Collections.singletonList( "localhost:9200" ) )
 			.build();
 
 	@Override
 	public Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
-		// TODO allow multiple hosts
-		String hosts = HOST.get( propertySource );
+		List<String> hosts = HOSTS.get( propertySource );
 		// TODO implement and detect dialects
 		ElasticsearchClient client = new StubElasticsearchClient( hosts );
 		ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory();

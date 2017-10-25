@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -87,15 +88,19 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 		}
 	}
 
-	private final String host;
+	private final List<String> hosts;
 
-	public StubElasticsearchClient(String host) {
-		this.host = host;
+	private final AtomicInteger nextHostIndex = new AtomicInteger( 0 );
+
+	public StubElasticsearchClient(List<String> hosts) {
+		this.hosts = hosts;
 	}
 
 	public <T> CompletableFuture<T> execute(String workType, Map<String, List<String>> parameters, JsonObject body,
 			Function<JsonObject, T> resultFunction) {
 		String bodyAsString = body == null ? null : gson.toJson( body );
+		int hostIndex = nextHostIndex.getAndUpdate( i -> ( i + 1 ) % hosts.size() );
+		String host = hosts.get( hostIndex );
 		log.executingWork( host, workType, parameters, bodyAsString );
 		requests.addLast( new Request( host, workType, parameters, bodyAsString ) );
 		JsonObject stubResponse = stubResponses.pollLast();
@@ -107,7 +112,7 @@ public class StubElasticsearchClient implements ElasticsearchClient {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + host + "]";
+		return getClass().getSimpleName() + "[" + hosts + "]";
 	}
 
 }
