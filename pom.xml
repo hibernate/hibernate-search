@@ -57,7 +57,7 @@
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
-      <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <organization>
@@ -239,7 +239,7 @@
         <wildflyVersion>11.0.0.Final</wildflyVersion>
         <jmhVersion>1.19</jmhVersion>
         <h2Version>1.4.178</h2Version>
-        
+
         <!-- Elasticsearch -->
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
