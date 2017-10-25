@@ -100,7 +100,6 @@ public class SerializationTest {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( OptimizeLuceneWork.INSTANCE );
-		IndexedTypeIdentifier remoteTypeId = new PojoIndexedTypeIdentifier( RemoteEntity.class );
 		works.add( new OptimizeLuceneWork( remoteTypeId ) ); //won't be send over
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );

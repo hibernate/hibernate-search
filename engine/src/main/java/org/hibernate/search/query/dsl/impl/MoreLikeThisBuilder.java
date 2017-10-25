@@ -390,7 +390,6 @@ public class MoreLikeThisBuilder<T> {
 			// The original algorithm looks for all field names and finds the top frequency
 			// and only consider this field for the query
 			// "go through all the fields and find the largest document frequency"
-			Term term = new Term( fieldName, word );
 			int freq = indexReader.docFreq( new Term( fieldName, word ) );
 
 			if ( minDocFreq > 0 && freq < minDocFreq ) {

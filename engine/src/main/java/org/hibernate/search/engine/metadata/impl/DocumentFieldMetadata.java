@@ -18,7 +18,6 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata.Builder;
 import org.hibernate.search.engine.nulls.codec.impl.NotEncodingCodec;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 

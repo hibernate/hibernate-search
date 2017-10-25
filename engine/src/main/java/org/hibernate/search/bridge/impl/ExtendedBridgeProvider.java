@@ -11,7 +11,6 @@ import java.lang.reflect.AnnotatedElement;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
-import org.hibernate.search.bridge.spi.BridgeProvider.BridgeProviderContext;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**

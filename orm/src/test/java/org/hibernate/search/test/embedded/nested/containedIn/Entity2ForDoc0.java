@@ -21,8 +21,6 @@ import javax.persistence.Version;
 @javax.persistence.Table(name = "entity2")
 public class Entity2ForDoc0 {
 
-	private static final long serialVersionUID = -3191273589083411349L;
-
 	@Id
 	@GeneratedValue //(generator = "ids_generator2", strategy = GenerationType.SEQUENCE)
 	@Column(name = "universalid")//"uid" is a keywork in Oracle

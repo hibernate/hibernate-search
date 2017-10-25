@@ -283,10 +283,12 @@ public class SearchFactoryTest {
 	}
 
 	public static class Foo {
+		@SuppressWarnings("unused")
 		private long id;
 	}
 
 	public static class Bar {
+		@SuppressWarnings("unused")
 		private long id;
 	}
 

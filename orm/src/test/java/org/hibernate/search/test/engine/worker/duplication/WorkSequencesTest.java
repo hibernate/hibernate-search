@@ -13,7 +13,6 @@ import java.io.IOException;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.session.Domain;
 import org.junit.Test;
@@ -29,13 +28,10 @@ import org.junit.Test;
  */
 public class WorkSequencesTest extends SearchTestBase {
 
-	private SearchFactory searchFactory;
-
 	@Test
 	public void testComplexTransactionSequence() throws IOException {
 		Session classicSession = openSession( );
 		FullTextSession session = Search.getFullTextSession( classicSession );
-		searchFactory = session.getSearchFactory();
 
 		// create some different domains:
 		{

@@ -28,6 +28,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 	private static SessionFactory[] sessionFactories;
 	private static Configuration[] cfgs;
 	private static Dialect dialect;
+	@SuppressWarnings("unused")
 	private static Class lastTestClass;
 
 	protected abstract int getSFNbrs();

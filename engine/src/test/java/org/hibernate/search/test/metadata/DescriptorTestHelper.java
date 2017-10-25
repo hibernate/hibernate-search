@@ -57,10 +57,8 @@ public final class DescriptorTestHelper {
 
 	public static Set<IndexManager> getDummyShardedIndexManager() {
 		Set<IndexManager> managers = new HashSet<>();
-		int i = 0;
 		for ( String indexName : TEST_INDEX_NAMES ) {
 			managers.add( new DummyIndexManager( indexName ) );
-			i++;
 		}
 		return managers;
 	}

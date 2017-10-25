@@ -23,10 +23,6 @@ import javax.persistence.Version;
 @javax.persistence.Table(name = "entity2")
 @org.hibernate.search.annotations.Indexed
 public class Entity2ForUnindexed {
-	/**
-	 * Commentaire pour <code>serialVersionUID</code>
-	 */
-	private static final long serialVersionUID = -3191273589083411349L;
 
 	/**
 	 * Identifiant unique

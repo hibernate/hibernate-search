@@ -336,17 +336,7 @@ public class GsonStreamedEncodingTest {
 			byte[] currentRead = new byte[toRead];
 			byteBuffer.get( currentRead );
 			buf.put( currentRead );
-//			debugReadSoFar( currentRead );
 			return toRead;
-		}
-
-		private void debugReadSoFar(byte[] currentRead) {
-			if ( currentRead.length > 0 ) {
-				CharBuffer decodedExpected = StandardCharsets.UTF_8.decode( ByteBuffer.wrap( currentRead ) );
-				String easy = decodedExpected.toString();
-				System.out.println( easy );
-				return;
-			}
 		}
 
 		@Override

@@ -270,12 +270,6 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 				.getResultSize();
 	}
 
-	private Query searchQueryWithWildcard(String field, FullTextSession session) {
-		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder()
-				.forEntity( WorkingPerson.class ).get();
-		return queryBuilder.keyword().wildcard().onField( field ).matching( "*" ).createQuery();
-	}
-
 	private void renamePerson(Integer id, String newName) {
 		Transaction transaction = getSession().beginTransaction();
 		WorkingPerson person = getSession().load( WorkingPerson.class, id );

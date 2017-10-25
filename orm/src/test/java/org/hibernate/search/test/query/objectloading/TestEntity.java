@@ -24,6 +24,7 @@ public class TestEntity {
 	@DocumentId
 	private String documentId;
 
+	@SuppressWarnings("unused")
 	private TestEntity() {
 		// used by ORM
 	}

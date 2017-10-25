@@ -25,8 +25,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Entity
 public class HelpItemTag {
 
-	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;

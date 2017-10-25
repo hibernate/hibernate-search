@@ -15,7 +15,6 @@ import java.util.Random;
  *
  * @author gustavonalle
  */
-@SuppressWarnings("UnusedDeclaration")
 public class RandomGenerator {
 
 	private static final int DEFAULT_MAX_WORD_SIZE = 20;

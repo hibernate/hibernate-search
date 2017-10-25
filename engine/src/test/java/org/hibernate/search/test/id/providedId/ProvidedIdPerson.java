@@ -24,8 +24,7 @@ import org.hibernate.search.bridge.builtin.LongBridge;
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
-	// No annotations: this entity uses a ProvidedId
-	private long id;
+	// No ID: this entity uses a ProvidedId
 
 	@Field(store = Store.YES)
 	private String name;

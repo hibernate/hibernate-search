@@ -37,7 +37,6 @@ import java.lang.invoke.MethodHandles;
  * @see org.apache.lucene.search.CachingWrapperQuery
  * @see <a href="https://hibernate.atlassian.net/browse/HSEARCH-174">HSEARCH-174</a>
  */
-@SuppressWarnings("serial")
 public class CachingWrapperQuery extends Query implements Cloneable {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
@@ -126,9 +125,6 @@ public class CachingWrapperQuery extends Query implements Cloneable {
 
 			@Override
 			public Scorer scorer(LeafReaderContext context) throws IOException {
-				final LeafReader reader = context.reader();
-				final Object key = reader.getCoreCacheKey();
-
 				DocIdSet docIdSet = getDocIdSet( context );
 
 				assert docIdSet != null;

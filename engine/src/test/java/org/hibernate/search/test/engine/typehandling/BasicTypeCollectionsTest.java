@@ -118,8 +118,8 @@ public class BasicTypeCollectionsTest {
 		Assert.assertEquals( 2, typeSet.size() );
 		Iterator<IndexedTypeIdentifier> iterator = typeSet.iterator();
 		Assert.assertTrue( iterator.hasNext() );
-		IndexedTypeIdentifier firstElement = iterator.next(); // increment once
-		IndexedTypeIdentifier secondElement = iterator.next(); // increment twice
+		iterator.next(); // increment once
+		iterator.next(); // increment twice
 		Assert.assertFalse( iterator.hasNext() );
 		iterator.forEachRemaining( l -> Assert.fail( "should never happen" ) ); //no more elements
 		Set<Class<?>> pojosSet = typeSet.toPojosSet();

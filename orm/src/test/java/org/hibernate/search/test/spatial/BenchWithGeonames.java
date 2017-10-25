@@ -393,7 +393,7 @@ public final class BenchWithGeonames {
 
 			facetManager.enableFaceting( facetingRequest );
 
-			Integer size = hibQuery.getResultSize();
+			hibQuery.getResultSize();
 
 			hibQuery.list();
 

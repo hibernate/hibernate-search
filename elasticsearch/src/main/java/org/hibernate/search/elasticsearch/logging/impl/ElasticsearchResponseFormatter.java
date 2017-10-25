@@ -10,8 +10,6 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.util.impl.JsonLogHelper;
 
-import com.google.gson.JsonObject;
-
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
  * to display {@link ElasticsearchRequest}s in log messages.
@@ -33,7 +31,6 @@ public class ElasticsearchResponseFormatter {
 
 		JsonLogHelper helper = JsonLogHelper.get();
 
-		JsonObject body = response.getBody();
 		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
 		//Also useful to hint the builder to use larger increment steps.
 		StringBuilder sb = new StringBuilder( 180 );
