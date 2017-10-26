@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-/**
- * @author Yoann Rodiere
- */
-public interface PojoIntrospector {
+public interface PropertyModel<T> {
 
-	<T> TypeModel<T> getEntityTypeModel(Class<T> type);
+	String getName();
+
+	Class<T> getJavaType();
+
+	TypeModel<T> getTypeModel();
+
+	PropertyHandle getHandle();
 
 }

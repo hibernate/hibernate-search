@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCol
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexableModel;
 import org.hibernate.search.mapper.pojo.model.impl.PojoRootIndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 
 /**
@@ -25,9 +25,6 @@ import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
  */
 abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector {
 
-	protected final Class<?> javaType;
-
-	protected final PojoIntrospector introspector;
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
 	protected final PojoIndexableModel indexableModel;
@@ -38,17 +35,14 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final Collection<ValueProcessor> processors = new ArrayList<>();
 
 	public AbstractPojoProcessorBuilder(
-			Class<?> javaType, PojoIntrospector introspector,
+			TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierBridgeCollector) {
-		this.javaType = javaType;
-
-		this.introspector = introspector;
 		this.contributorProvider = contributorProvider;
 
-		// XXX do something more with the indexable model, to be able to use it in containedIn processing in particular
-		this.indexableModel = new PojoRootIndexableModel( javaType, introspector, contributorProvider );
+		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
+		this.indexableModel = new PojoRootIndexableModel( typeModel, contributorProvider );
 		this.indexModelCollector = indexModelCollector;
 
 		this.identifierBridgeCollector = identifierBridgeCollector;

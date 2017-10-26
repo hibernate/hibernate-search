@@ -21,8 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingC
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
 import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 
 /**
@@ -31,18 +30,18 @@ import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 		implements PojoPropertyNodeMappingCollector {
 
-	private final PropertyHandle handle;
+	private final PropertyModel<?> propertyModel;
 
 	private final Collection<PojoTypeNodeProcessorBuilder> indexedEmbeddedProcessorBuilders = new ArrayList<>();
 
 	public PojoPropertyNodeProcessorBuilder(
-			PropertyHandle handle, PojoIntrospector introspector,
+			PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
 			IdentifierMappingCollector identifierMappingCollector) {
-		super( handle.getType(), introspector, contributorProvider, indexModelCollector,
+		super( propertyModel.getTypeModel(), contributorProvider, indexModelCollector,
 				identifierMappingCollector );
-		this.handle = handle;
+		this.propertyModel = propertyModel;
 	}
 
 	@Override
@@ -50,18 +49,18 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			String fieldName, FieldModelContributor fieldModelContributor) {
 		String defaultedFieldName = fieldName;
 		if ( defaultedFieldName == null ) {
-			defaultedFieldName = handle.getName();
+			defaultedFieldName = propertyModel.getName();
 		}
 
 		ValueProcessor processor = indexModelCollector.addFunctionBridge(
-				indexableModel, javaType, reference, defaultedFieldName, fieldModelContributor );
+				indexableModel, propertyModel.getJavaType(), reference, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );
 	}
 
 	@Override
 	public void identifierBridge(BeanReference<IdentifierBridge<?>> converterReference) {
-		IdentifierBridge<?> bridge = indexModelCollector.createIdentifierBridge( javaType, converterReference );
-		identifierBridgeCollector.collect( handle, bridge );
+		IdentifierBridge<?> bridge = indexModelCollector.createIdentifierBridge( propertyModel.getJavaType(), converterReference );
+		identifierBridgeCollector.collect( propertyModel.getHandle(), bridge );
 	}
 
 	@Override
@@ -77,16 +76,16 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = handle.getName() + ".";
+			defaultedRelativePrefix = propertyModel.getName() + ".";
 		}
 
-		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( javaType );
+		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( propertyModel.getJavaType() );
 
 		Optional<MappingIndexModelCollector> nestedCollectorOptional = indexModelCollector.addIndexedEmbeddedIfIncluded(
 				typeId, defaultedRelativePrefix, maxDepth, pathFilters );
 		nestedCollectorOptional.ifPresent( nestedCollector -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
-					javaType, introspector, contributorProvider, nestedCollector,
+					propertyModel.getTypeModel(), contributorProvider, nestedCollector,
 					IdentifierMappingCollector.noOp() // Do NOT propagate the ID collector to IndexedEmbeddeds
 					);
 			indexedEmbeddedProcessorBuilders.add( nestedProcessorBuilder );
@@ -95,7 +94,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	}
 
 	public PojoPropertyNodeProcessor build() {
-		return new PojoPropertyNodeProcessor( handle, processors, indexedEmbeddedProcessorBuilders );
+		return new PojoPropertyNodeProcessor( propertyModel.getHandle(), processors, indexedEmbeddedProcessorBuilders );
 	}
 
 }

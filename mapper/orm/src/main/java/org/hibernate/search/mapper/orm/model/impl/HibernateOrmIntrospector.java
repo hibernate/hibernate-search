@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -20,7 +20,7 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	}
 
 	@Override
-	public PropertyHandle findReadableProperty(Class<?> holderType, String name) {
+	public <T> TypeModel<T> getEntityTypeModel(Class<T> type) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}

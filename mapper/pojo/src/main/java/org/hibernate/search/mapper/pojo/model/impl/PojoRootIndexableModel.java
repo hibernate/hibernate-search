@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 
@@ -22,9 +22,12 @@ import org.hibernate.search.util.SearchException;
  */
 public class PojoRootIndexableModel extends PojoIndexableModel implements IndexableModel {
 
-	public PojoRootIndexableModel(Class<?> type, PojoIntrospector introspector,
+	private final TypeModel<?> typeModel;
+
+	public PojoRootIndexableModel(TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
-		super( type, introspector, modelContributorProvider );
+		super( modelContributorProvider );
+		this.typeModel = typeModel;
 	}
 
 	@Override
@@ -37,7 +40,7 @@ public class PojoRootIndexableModel extends PojoIndexableModel implements Indexa
 
 	@Override
 	public PojoIndexableReference<?> asReference() {
-		return new PojoRootIndexableReference<>( getType() );
+		return new PojoRootIndexableReference<>( getJavaType() );
 	}
 
 	@Override
@@ -45,4 +48,13 @@ public class PojoRootIndexableModel extends PojoIndexableModel implements Indexa
 		return Stream.empty();
 	}
 
+	@Override
+	protected Class<?> getJavaType() {
+		return typeModel.getJavaType();
+	}
+
+	@Override
+	public TypeModel<?> getTypeModel() {
+		return typeModel;
+	}
 }

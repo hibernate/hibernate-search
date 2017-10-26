@@ -15,9 +15,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingC
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.PojoPropertyIndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -28,11 +27,11 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private final Map<String, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
-			Class<?> javaType, PojoIntrospector introspector,
+			TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelBuilder,
 			IdentifierMappingCollector identifierBridgeCollector) {
-		super( javaType, introspector, contributorProvider, indexModelBuilder,
+		super( typeModel, contributorProvider, indexModelBuilder,
 				identifierBridgeCollector );
 	}
 
@@ -42,9 +41,8 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	}
 
 	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(String name) {
-		PojoPropertyIndexableModel propertyModel = indexableModel.property( name );
-		PropertyHandle handle = propertyModel.getHandle();
-		return new PojoPropertyNodeProcessorBuilder( handle, introspector,
+		PropertyModel<?> propertyModel = indexableModel.property( name ).getPropertyModel();
+		return new PojoPropertyNodeProcessorBuilder( propertyModel,
 				contributorProvider, indexModelCollector, identifierBridgeCollector );
 	}
 

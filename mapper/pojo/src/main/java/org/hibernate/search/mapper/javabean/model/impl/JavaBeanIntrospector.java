@@ -7,12 +7,9 @@
 package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 
-import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -35,26 +32,13 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	}
 
 	@Override
-	public PropertyHandle findReadableProperty(Class<?> holderType, String name) {
+	public <T> TypeModel<T> getEntityTypeModel(Class<T> type) {
 		try {
-			String normalizedName = Introspector.decapitalize( name );
-			PropertyDescriptor propertyDescriptor = getPropertyDescriptor( holderType, normalizedName );
-			return new MemberPropertyHandle( normalizedName, propertyDescriptor.getReadMethod() );
+			return new JavaBeanTypeModel<>( type );
 		}
-		catch (IntrospectionException | IllegalAccessException | RuntimeException e) {
-			throw new SearchException( "Exception while retrieving property reference for '"
-					+ name + "' on '" + holderType + "'", e );
+		catch (IntrospectionException | RuntimeException e) {
+			throw new SearchException( "Exception while retrieving the type model for '" + type + "'", e );
 		}
-	}
-
-	private PropertyDescriptor getPropertyDescriptor(Class<?> holderType, String propertyName) throws IntrospectionException {
-		PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo( holderType ).getPropertyDescriptors();
-		for ( PropertyDescriptor descriptor : propertyDescriptors ) {
-			if ( propertyName.equals( descriptor.getName() ) ) {
-				return descriptor;
-			}
-		}
-		throw new SearchException( "JavaBean property '" + propertyName + "' not found in '" + holderType + "'" );
 	}
 
 }

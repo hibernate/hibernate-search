@@ -20,8 +20,9 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 
@@ -33,16 +34,15 @@ public class PojoPropertyIndexableModel extends PojoIndexableModel
 
 	private final PojoIndexableModel parent;
 
-	private final PropertyHandle handle;
+	private final PropertyModel<?> propertyModel;
 
 	private final Map<Class<? extends Annotation>, List<? extends Annotation>> markers = new HashMap<>();
 
-	public PojoPropertyIndexableModel(PojoIndexableModel parent, PropertyHandle handle,
-			PojoIntrospector introspector,
+	public PojoPropertyIndexableModel(PojoIndexableModel parent, PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
-		super( handle.getType(), introspector, modelContributorProvider );
+		super( modelContributorProvider );
 		this.parent = parent;
-		this.handle = handle;
+		this.propertyModel = propertyModel;
 	}
 
 	@Override
@@ -50,12 +50,12 @@ public class PojoPropertyIndexableModel extends PojoIndexableModel
 		if ( !isAssignableTo( requestedType ) ) {
 			throw new SearchException( "Requested incompatible type for '" + asReference() + "': '" + requestedType + "'" );
 		}
-		return new PojoPropertyIndexableReference<>( parent.asReference(), handle );
+		return new PojoPropertyIndexableReference<>( parent.asReference(), getHandle() );
 	}
 
 	@Override
 	public PojoIndexableReference<?> asReference() {
-		return new PojoPropertyIndexableReference<>( parent.asReference(), handle );
+		return new PojoPropertyIndexableReference<>( parent.asReference(), getHandle() );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,7 +71,21 @@ public class PojoPropertyIndexableModel extends PojoIndexableModel
 	}
 
 	public PropertyHandle getHandle() {
-		return handle;
+		return propertyModel.getHandle();
+	}
+
+	@Override
+	protected Class<?> getJavaType() {
+		return propertyModel.getJavaType();
+	}
+
+	@Override
+	protected TypeModel<?> getTypeModel() {
+		return propertyModel.getTypeModel();
+	}
+
+	public PropertyModel<?> getPropertyModel() {
+		return propertyModel;
 	}
 
 	@SuppressWarnings("unchecked")

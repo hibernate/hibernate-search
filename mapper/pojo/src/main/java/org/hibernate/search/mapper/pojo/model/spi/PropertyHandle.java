@@ -11,8 +11,6 @@ package org.hibernate.search.mapper.pojo.model.spi;
  */
 public interface PropertyHandle {
 
-	String getName();
-
 	Class<?> getType();
 
 	Object get(Object thiz);
