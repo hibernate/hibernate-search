@@ -10,6 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
+import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
@@ -38,7 +39,7 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 		try {
 			String normalizedName = Introspector.decapitalize( name );
 			PropertyDescriptor propertyDescriptor = getPropertyDescriptor( holderType, normalizedName );
-			return new JavaBeanPropertyHandle( normalizedName, propertyDescriptor.getReadMethod() );
+			return new MemberPropertyHandle( normalizedName, propertyDescriptor.getReadMethod() );
 		}
 		catch (IntrospectionException | IllegalAccessException | RuntimeException e) {
 			throw new SearchException( "Exception while retrieving property reference for '"

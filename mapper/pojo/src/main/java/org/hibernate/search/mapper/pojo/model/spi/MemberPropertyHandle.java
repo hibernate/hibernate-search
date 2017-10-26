@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean.model.impl;
+package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -12,27 +12,26 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanPropertyHandle implements PropertyHandle {
+public final class MemberPropertyHandle implements PropertyHandle {
 
 	private final String name;
 	private final Member member;
 	private final MethodHandle getter;
 
-	public JavaBeanPropertyHandle(String name, Field field) throws IllegalAccessException {
+	public MemberPropertyHandle(String name, Field field) throws IllegalAccessException {
 		this( name, field, MethodHandles.lookup().unreflectGetter( field ) );
 	}
 
-	public JavaBeanPropertyHandle(String name, Method method) throws IllegalAccessException {
+	public MemberPropertyHandle(String name, Method method) throws IllegalAccessException {
 		this( name, method, MethodHandles.lookup().unreflect( method ) );
 	}
 
-	private JavaBeanPropertyHandle(String name, Member member, MethodHandle getter) {
+	private MemberPropertyHandle(String name, Member member, MethodHandle getter) {
 		this.name = name;
 		this.member = member;
 		this.getter = getter;
@@ -74,7 +73,7 @@ public class JavaBeanPropertyHandle implements PropertyHandle {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		JavaBeanPropertyHandle other = (JavaBeanPropertyHandle) obj;
+		MemberPropertyHandle other = (MemberPropertyHandle) obj;
 		return member.equals( other.member );
 	}
 
