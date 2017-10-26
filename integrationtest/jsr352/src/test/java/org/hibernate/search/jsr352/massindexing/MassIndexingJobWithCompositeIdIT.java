@@ -39,6 +39,8 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
+	private static final int JOB_TIMEOUT_MS = 30_000;
+
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 
 	private static final LocalDate END = LocalDate.of( 2017, 8, 1 );
@@ -86,7 +88,7 @@ public class MassIndexingJobWithCompositeIdIT {
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
-		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
+		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props, JOB_TIMEOUT_MS );
 
 		int expectedDays = (int) ChronoUnit.DAYS.between( START, END );
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, EntityWithIdClass.class ) ).isEqualTo( expectedDays );
@@ -100,7 +102,7 @@ public class MassIndexingJobWithCompositeIdIT {
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
-		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
+		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props, JOB_TIMEOUT_MS );
 
 		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithIdClass.class );
@@ -115,7 +117,7 @@ public class MassIndexingJobWithCompositeIdIT {
 				.checkpointInterval( 4 )
 				.build();
 
-		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
+		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props, JOB_TIMEOUT_MS );
 
 		int expectedDays = (int) ChronoUnit.DAYS.between( START, END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class );
@@ -130,7 +132,7 @@ public class MassIndexingJobWithCompositeIdIT {
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
-		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props );
+		JobTestUtil.startJobAndWait( MassIndexingJob.NAME, props, JOB_TIMEOUT_MS );
 
 		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class );

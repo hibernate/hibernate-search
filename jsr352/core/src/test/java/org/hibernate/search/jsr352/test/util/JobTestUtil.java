@@ -41,16 +41,14 @@ public final class JobTestUtil {
 
 	private static final int THREAD_SLEEP = 1000;
 
-	private static final int JOB_TIMEOUT_MS = 10_000;
-
 	private JobTestUtil() {
 	}
 
-	public static void startJobAndWait(String jobName, Properties jobParams) throws InterruptedException {
+	public static void startJobAndWait(String jobName, Properties jobParams, int timeoutInMs) throws InterruptedException {
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 		long execId = jobOperator.start( jobName, jobParams );
 		JobExecution jobExec = jobOperator.getJobExecution( execId );
-		jobExec = JobTestUtil.waitForTermination( jobOperator, jobExec, JOB_TIMEOUT_MS );
+		jobExec = JobTestUtil.waitForTermination( jobOperator, jobExec, timeoutInMs );
 		assertThat( jobExec.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 	}
 

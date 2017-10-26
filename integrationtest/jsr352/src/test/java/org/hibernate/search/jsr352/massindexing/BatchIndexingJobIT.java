@@ -44,13 +44,13 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final int JOB_TIMEOUT_MS = 10_000;
+	private static final int JOB_TIMEOUT_MS = 30_000;
 
 	/*
 	 * Make sure to have more than one checkpoint,
 	 * because we had errors related to that in the past.
 	 */
-	private static final int CHECKPOINT_INTERVAL = 10;
+	private static final int CHECKPOINT_INTERVAL = INSTANCES_PER_DATA_TEMPLATE / 2;
 
 	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
 
