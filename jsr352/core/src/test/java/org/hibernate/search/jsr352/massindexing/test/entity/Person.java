@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jsr352.massindexing.test.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -22,6 +23,8 @@ public class Person {
 
 	@Id
 	@DocumentId
+	// We use UTF-8, let's avoid the error "Specified key was too long; max key length is 767 bytes" on MariaDB
+	@Column(length = 50)
 	private String id;
 
 	@Field
