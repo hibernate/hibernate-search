@@ -15,6 +15,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.impl.SortConfigurations;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Creates and closes the IndexReaders encompassing multiple indexes.

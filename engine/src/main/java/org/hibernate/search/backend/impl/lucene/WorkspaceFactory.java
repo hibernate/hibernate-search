@@ -13,6 +13,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.

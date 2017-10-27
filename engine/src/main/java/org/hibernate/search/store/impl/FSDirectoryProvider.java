@@ -20,6 +20,7 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.spi.DirectoryHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Use a Lucene {@link FSDirectory}. The base directory is represented by the property <i>hibernate.search.default.indexBase</i>

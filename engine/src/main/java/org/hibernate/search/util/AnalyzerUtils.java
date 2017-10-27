@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper class to hide boilerplate code when using Lucene Analyzers.

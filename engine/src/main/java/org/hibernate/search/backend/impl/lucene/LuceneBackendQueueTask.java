@@ -14,6 +14,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Apply the operations to Lucene directories.

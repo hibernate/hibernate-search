@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Converts a {@link OffsetTime} to a {@link String} in Elasticsearch's "strict_time" format.

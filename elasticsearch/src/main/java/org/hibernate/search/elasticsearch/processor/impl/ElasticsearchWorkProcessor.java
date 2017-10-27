@@ -21,6 +21,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Executes single or multiple {@link ElasticsearchWork}s against the Elasticsearch server.

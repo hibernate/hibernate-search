@@ -27,6 +27,7 @@ import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 @Stateful
 public class RegistrationController {

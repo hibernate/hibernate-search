@@ -10,6 +10,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A reference to a Lucene analyzer that also provides a name for this analyzer.

@@ -81,6 +81,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Build a search factory following the builder pattern.

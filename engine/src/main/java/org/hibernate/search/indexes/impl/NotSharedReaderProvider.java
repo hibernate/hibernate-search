@@ -18,6 +18,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Open a reader each time

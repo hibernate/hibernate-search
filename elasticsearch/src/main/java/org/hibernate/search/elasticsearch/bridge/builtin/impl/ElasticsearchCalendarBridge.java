@@ -22,6 +22,7 @@ import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Bridge a {@code java.util.Calendar} to a {@code String} using the ISO 8601 standard which is the default date format

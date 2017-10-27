@@ -15,6 +15,7 @@ import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.jgroups.Message;
 
 /**

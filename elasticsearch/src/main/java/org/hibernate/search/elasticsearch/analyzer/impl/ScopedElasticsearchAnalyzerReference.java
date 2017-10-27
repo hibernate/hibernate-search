@@ -16,6 +16,7 @@ import org.hibernate.search.elasticsearch.analyzer.definition.impl.Elasticsearch
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Yoann Rodiere

@@ -22,6 +22,7 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Bridge a {@code java.util.Date} to a {@code String}, truncated to the specified resolution.

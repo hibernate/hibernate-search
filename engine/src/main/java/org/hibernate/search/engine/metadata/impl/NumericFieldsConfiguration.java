@@ -14,6 +14,7 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Represents the configuration of numeric fields of a specific entity property.

@@ -18,6 +18,7 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.Message;

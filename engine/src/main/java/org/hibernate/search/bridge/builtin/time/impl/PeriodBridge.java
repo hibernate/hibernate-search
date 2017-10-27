@@ -14,6 +14,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Converts a {@link Period} to a {@link String} concatenating year, months and days.

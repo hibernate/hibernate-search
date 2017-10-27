@@ -23,6 +23,7 @@ import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Hardy Ferentschik

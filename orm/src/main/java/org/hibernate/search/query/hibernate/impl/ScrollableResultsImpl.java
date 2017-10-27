@@ -29,6 +29,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.hibernate.type.Type;
 
 /**

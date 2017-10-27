@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper class that should be used when building a FullTextEntityManager

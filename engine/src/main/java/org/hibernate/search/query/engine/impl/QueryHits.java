@@ -60,6 +60,7 @@ import org.hibernate.search.spatial.impl.DistanceCollector;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically

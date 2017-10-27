@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.cfg;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 public enum ElasticsearchIndexStatus {
 

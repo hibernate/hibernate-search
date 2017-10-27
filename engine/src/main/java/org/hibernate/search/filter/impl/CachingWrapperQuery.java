@@ -25,6 +25,7 @@ import org.apache.lucene.util.RoaringDocIdSet;
 import org.hibernate.search.util.impl.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperQuery</code> which

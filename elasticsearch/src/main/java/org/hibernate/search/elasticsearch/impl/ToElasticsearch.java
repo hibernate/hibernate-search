@@ -56,6 +56,7 @@ import org.hibernate.search.spatial.impl.DistanceQuery;
 import org.hibernate.search.spatial.impl.SpatialHashQuery;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

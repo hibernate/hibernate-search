@@ -17,6 +17,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefiniti
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A simple implementation of {@link ElasticsearchAnalysisDefinitionRegistry}.

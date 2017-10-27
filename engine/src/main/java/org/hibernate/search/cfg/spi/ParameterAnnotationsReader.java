@@ -12,6 +12,7 @@ import java.util.Map;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper to convert the org.hibernate.search.annotations.Parameter

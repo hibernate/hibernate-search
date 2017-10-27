@@ -18,6 +18,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.Receiver;

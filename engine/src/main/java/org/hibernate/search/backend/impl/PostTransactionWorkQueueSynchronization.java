@@ -14,6 +14,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Execute final work in the after transaction synchronization.

@@ -80,6 +80,7 @@ import org.hibernate.search.util.impl.InternalAnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Set up and provide a manager for classes which are directly annotated with {@code @Indexed}.

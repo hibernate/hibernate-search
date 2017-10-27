@@ -16,6 +16,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.impl.Throwables;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Gunnar Morling

@@ -21,6 +21,7 @@ import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 

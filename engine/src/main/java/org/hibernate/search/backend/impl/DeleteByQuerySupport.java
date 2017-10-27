@@ -10,6 +10,7 @@ import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This class provides means to convert all (by default) supported DeletionQueries back to Lucene Queries and to their

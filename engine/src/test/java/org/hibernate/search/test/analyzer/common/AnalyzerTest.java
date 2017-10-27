@@ -19,6 +19,7 @@ import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import org.junit.Assert;
 import org.junit.Rule;

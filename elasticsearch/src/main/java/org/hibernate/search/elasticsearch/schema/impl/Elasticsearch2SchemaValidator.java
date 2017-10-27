@@ -34,6 +34,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinitio
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.jboss.logging.Messages;
 
 import com.google.gson.JsonElement;

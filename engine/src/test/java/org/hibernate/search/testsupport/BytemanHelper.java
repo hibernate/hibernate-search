@@ -19,6 +19,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import static org.junit.Assert.fail;
 

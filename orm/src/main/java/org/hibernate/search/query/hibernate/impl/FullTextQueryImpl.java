@@ -52,6 +52,7 @@ import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 

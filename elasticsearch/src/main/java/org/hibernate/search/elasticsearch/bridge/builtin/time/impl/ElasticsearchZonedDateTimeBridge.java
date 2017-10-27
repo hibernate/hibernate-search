@@ -16,6 +16,7 @@ import java.util.Locale;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.TimeHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Converts a {@link ZonedDateTime} to a {@link String} in ISO-8601 extended format (9 digits for the year instead of 4).

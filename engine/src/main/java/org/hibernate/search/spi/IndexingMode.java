@@ -8,6 +8,7 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Modes for triggering indexing of entities.

@@ -16,6 +16,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Optimization strategy triggered after a certain amount of operations

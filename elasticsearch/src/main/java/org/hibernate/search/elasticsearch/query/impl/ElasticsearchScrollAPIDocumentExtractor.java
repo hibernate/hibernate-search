@@ -16,6 +16,7 @@ import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

@@ -18,6 +18,7 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoadingExceptio
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper to extract the programmatic SearchMapping from a configuration object

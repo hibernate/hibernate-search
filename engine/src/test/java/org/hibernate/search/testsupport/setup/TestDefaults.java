@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Provides access to the defaults used in tests.

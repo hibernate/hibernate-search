@@ -15,6 +15,7 @@ import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 5.2.

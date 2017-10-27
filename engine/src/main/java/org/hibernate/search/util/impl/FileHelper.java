@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Utility class for file and directory operations, like synchronisation and reading from class path.

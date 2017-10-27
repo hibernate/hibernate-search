@@ -15,6 +15,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Bridge a boolean field to a {@link String}.

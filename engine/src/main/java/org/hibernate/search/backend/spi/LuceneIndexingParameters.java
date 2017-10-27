@@ -20,6 +20,7 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Wrapper class around the Lucene indexing parameters defined in IndexWriterSetting.

@@ -13,6 +13,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Version of LuceneBackendQueueTask meant for streaming operations only,

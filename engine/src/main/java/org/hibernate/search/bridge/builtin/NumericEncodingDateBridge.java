@@ -26,6 +26,7 @@ import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Bridge a {@code java.util.Date} truncated to the specified resolution to a numerically indexed {@code long}.

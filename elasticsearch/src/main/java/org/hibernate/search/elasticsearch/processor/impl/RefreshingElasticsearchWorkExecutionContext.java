@@ -20,6 +20,7 @@ import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFac
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.impl.Futures;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * The execution context used in {@link ElasticsearchWorkProcessor}

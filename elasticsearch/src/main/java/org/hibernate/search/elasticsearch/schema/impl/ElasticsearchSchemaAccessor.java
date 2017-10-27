@@ -19,6 +19,7 @@ import org.hibernate.search.elasticsearch.work.impl.CreateIndexResult;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A utility implementing primitives for the various {@code DefaultElasticsearchSchema*}.

@@ -9,6 +9,7 @@ package org.hibernate.search.indexes.serialization.avro.impl;
 import org.apache.avro.Protocol;
 import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Keeps a reference to each known Avro Protocol revision we can support.

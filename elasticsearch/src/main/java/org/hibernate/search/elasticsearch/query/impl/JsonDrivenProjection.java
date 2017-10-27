@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.query.impl;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

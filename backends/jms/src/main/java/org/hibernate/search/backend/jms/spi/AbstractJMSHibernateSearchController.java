@@ -19,6 +19,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Example template to implement the Hibernate Search controller for processing the

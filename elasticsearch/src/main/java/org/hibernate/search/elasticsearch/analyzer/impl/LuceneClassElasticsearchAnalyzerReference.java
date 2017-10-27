@@ -11,6 +11,7 @@ import org.hibernate.search.elasticsearch.settings.impl.translation.Elasticsearc
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A reference to an analyzer that should be translated from a Lucene class.

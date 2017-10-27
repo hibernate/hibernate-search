@@ -9,6 +9,7 @@ package org.hibernate.search.test.util.impl;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

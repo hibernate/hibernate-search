@@ -24,6 +24,7 @@ import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.Defaul
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A utility class to start the Hibernate Search JSR-352 mass indexing job.

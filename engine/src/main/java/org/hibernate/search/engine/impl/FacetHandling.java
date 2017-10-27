@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.facet.FacetsConfig;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper class to manage a {@literal FacetsConfig} instance:
