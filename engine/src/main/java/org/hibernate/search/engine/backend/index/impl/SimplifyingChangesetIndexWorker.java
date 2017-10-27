@@ -92,20 +92,28 @@ public class SimplifyingChangesetIndexWorker<D> implements ChangesetIndexWorker<
 		}
 
 		public void add(DocumentContributor<D> contributor) {
-			delete = false; // An "add" work means we don't expect the document to be in the index
 			add = true;
 			documentContributor = contributor;
 		}
 
 		public void update(DocumentContributor<D> contributor) {
-			delete = true;
-			add = true;
+			/*
+			 * If add is true, either this is already an update (in which case we don't need to change the flags)
+			 * or we called add() in the same changeset (in which case we don't expect the document to be in the index).
+			 */
+			if ( !add ) {
+				delete = true;
+				add = true;
+			}
 			documentContributor = contributor;
 		}
 
 		public void delete() {
 			if ( add && !delete ) {
-				// Initial add in the same changeset: no need to delete, just do not add.
+				/*
+				 * We called add() in the same changeset, so we don't expect the document to be in the index.
+				 * Don't delete, just cancel the addition.
+				 */
 				add = false;
 				delete = false;
 			}
