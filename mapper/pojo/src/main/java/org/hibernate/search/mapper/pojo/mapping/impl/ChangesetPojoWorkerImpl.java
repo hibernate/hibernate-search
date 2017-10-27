@@ -14,18 +14,19 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
 /**
  * @author Yoann Rodiere
  */
-public class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
+class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
 
 	private final PojoSessionContext sessionContext;
 	private final Map<Class<?>, ChangesetPojoTypeWorker<?>> delegates = new HashMap<>();
 
 	public ChangesetPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
-			PojoSessionContext sessionContext) {
-		super( typeManagers, sessionContext );
+			PojoIntrospector introspector, PojoSessionContext sessionContext) {
+		super( typeManagers, introspector );
 		this.sessionContext = sessionContext;
 	}
 

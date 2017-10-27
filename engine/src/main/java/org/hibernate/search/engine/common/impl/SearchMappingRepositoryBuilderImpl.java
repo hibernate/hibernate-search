@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
@@ -44,10 +45,17 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private final Properties overriddenProperties = new Properties();
 	private final Collection<MetadataContributor> contributors = new ArrayList<>();
 
+	private BeanResolver beanResolver = new ReflectionBeanResolver();
 	private SearchMappingRepository builtResult;
 
 	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
 		this.mainPropertySource = mainPropertySource;
+	}
+
+	@Override
+	public SearchMappingRepositoryBuilder setBeanResolver(BeanResolver beanResolver) {
+		this.beanResolver = beanResolver;
+		return this;
 	}
 
 	@Override
@@ -70,7 +78,6 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 	@Override
 	public SearchMappingRepository build() {
-		BeanResolver beanResolver = new ReflectionBeanResolver();
 		ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
 		BuildContext buildContext = new BuildContextImpl( serviceManager );
 		BridgeFactory bridgeFactory = new BridgeFactory( buildContext, beanResolver );

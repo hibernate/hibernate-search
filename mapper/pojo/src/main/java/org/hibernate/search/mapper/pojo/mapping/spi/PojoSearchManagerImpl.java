@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoSessionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
 
 
@@ -35,11 +36,16 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	}
 
 	@Override
-	public ChangesetPojoWorker getWorker() {
+	public ChangesetPojoWorker getMainWorker() {
 		if ( changesetWorker == null ) {
-			changesetWorker = mappingDelegate.createWorker( sessionContext );
+			changesetWorker = createWorker();
 		}
 		return changesetWorker;
+	}
+
+	@Override
+	public ChangesetPojoWorker createWorker() {
+		return mappingDelegate.createWorker( sessionContext );
 	}
 
 	@Override
@@ -63,9 +69,9 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	}
 
 	@Override
-	public SearchResultDefinitionContext<PojoReference> search(Collection<? extends Class<?>> targetedTypes) {
-		PojoSearchTarget searchTarget = mappingDelegate.createPojoSearchTarget( targetedTypes );
-		return searchTarget.search( sessionContext );
+	public <T> SearchResultDefinitionContext<PojoReference, ?> search(Collection<? extends Class<? extends T>> targetedTypes) {
+		PojoSearchTarget<T> searchTarget = mappingDelegate.createPojoSearchTarget( targetedTypes );
+		return searchTarget.search( sessionContext, ObjectLoader.identity() );
 	}
 
 	protected final PojoMappingDelegate getMappingDelegate() {

@@ -26,19 +26,19 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private final ElasticsearchWorkFactory workFactory;
 	private final Set<String> indexNames;
 	private final JsonObject payload;
-	private final HitExtractor<T> hitExtractor;
+	private final SearchResultExtractor<T> searchResultExtractor;
 
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
 	public ElasticsearchSearchQuery(ElasticsearchWorkOrchestrator queryOrchestrator,
-			ElasticsearchWorkFactory workFactory,
-			Set<String> indexNames, JsonObject payload, HitExtractor<T> hitExtractor) {
+			ElasticsearchWorkFactory workFactory, Set<String> indexNames, JsonObject payload,
+			SearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
 		this.payload = payload;
-		this.hitExtractor = hitExtractor;
+		this.searchResultExtractor = searchResultExtractor;
 	}
 
 	@Override
@@ -52,9 +52,14 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
+	public String getQueryString() {
+		return payload.toString();
+	}
+
+	@Override
 	public SearchResult<T> execute() {
 		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
-				indexNames, payload, hitExtractor,
+				indexNames, payload, searchResultExtractor,
 				firstResultIndex, maxResultsCount );
 		return queryOrchestrator.submit( work ).join();
 	}

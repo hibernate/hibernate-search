@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 
 import com.google.gson.JsonObject;
@@ -31,7 +31,7 @@ public interface ElasticsearchWorkFactory {
 	ElasticsearchWork<?> optimize(String indexName);
 
 	<T> ElasticsearchWork<SearchResult<T>> search(
-			Set<String> indexNames, JsonObject payload, HitExtractor<T> hitExtractor,
+			Set<String> indexNames, JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);
 
 }

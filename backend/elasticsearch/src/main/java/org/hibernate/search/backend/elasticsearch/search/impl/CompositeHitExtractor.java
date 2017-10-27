@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonObject;
 
-class CompositeHitExtractor implements HitExtractor<List<?>> {
+class CompositeHitExtractor<C> implements HitExtractor<C> {
 
-	private final List<HitExtractor<?>> extractors;
+	private final List<HitExtractor<? super C>> extractors;
 
-	public CompositeHitExtractor(List<HitExtractor<?>> extractors) {
+	public CompositeHitExtractor(List<HitExtractor<? super C>> extractors) {
 		this.extractors = extractors;
 	}
 
@@ -25,13 +24,10 @@ class CompositeHitExtractor implements HitExtractor<List<?>> {
 		}
 	}
 
-	public List<?> extractHit(JsonObject responseBody, JsonObject hit) {
-		List<Object> result = new ArrayList<>( extractors.size() );
-		for ( HitExtractor<?> extractor : extractors ) {
-			Object element = extractor.extractHit( responseBody, hit );
-			result.add( element );
+	public void extract(C collector, JsonObject responseBody, JsonObject hit) {
+		for ( HitExtractor<? super C> extractor : extractors ) {
+			extractor.extract( collector, responseBody, hit );
 		}
-		return result;
 	}
 
 }

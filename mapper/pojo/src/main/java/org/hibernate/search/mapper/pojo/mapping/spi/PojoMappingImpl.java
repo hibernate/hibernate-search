@@ -26,4 +26,18 @@ public class PojoMappingImpl implements PojoMapping, MappingImplementor {
 		return delegate;
 	}
 
+	@Override
+	public boolean isIndexable(Class<?> type) {
+		return delegate.isIndexable( type );
+	}
+
+	@Override
+	public boolean isIndexable(Object entity) {
+		return delegate.isIndexable( entity );
+	}
+
+	@Override
+	public boolean isSearchable(Class<?> type) {
+		return delegate.isSearchable( type );
+	}
 }

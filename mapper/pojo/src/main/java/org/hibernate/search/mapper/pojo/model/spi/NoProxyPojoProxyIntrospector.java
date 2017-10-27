@@ -22,12 +22,6 @@ class NoProxyPojoProxyIntrospector implements PojoProxyIntrospector {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
-	public <T> Class<? extends T> getClass(T entity) {
-		return entity == null ? null : (Class<? extends T>) entity.getClass();
-	}
-
-	@Override
 	public Object unproxy(Object value) {
 		return value;
 	}

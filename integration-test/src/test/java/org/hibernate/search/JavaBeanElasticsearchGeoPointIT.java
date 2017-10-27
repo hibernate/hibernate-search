@@ -43,7 +43,11 @@ public class JavaBeanElasticsearchGeoPointIT {
 
 	@Before
 	public void setup() throws JSONException {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder();
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
+				.setProperty( "backend.elasticsearchBackend.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend.host", HOST )
+				.setProperty( "index.default.backend", "elasticsearchBackend" );
+
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
 		MappingDefinition mappingDefinition = contributor.programmaticMapping();
@@ -93,11 +97,7 @@ public class JavaBeanElasticsearchGeoPointIT {
 				.property( "lon" )
 						.marker( new LongitudeMarkerDefinition() );
 
-		mappingRepository = mappingRepositoryBuilder
-				.setProperty( "backend.elasticsearchBackend.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend.host", HOST )
-				.setProperty( "index.default.backend", "elasticsearchBackend" )
-				.build();
+		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
@@ -172,9 +172,9 @@ public class JavaBeanElasticsearchGeoPointIT {
 			entity3.setId( 3 );
 			entity3.setCoord( new CustomCoordinates( 3.1d, 3.2d ) );
 
-			manager.getWorker().add( entity1 );
-			manager.getWorker().add( entity2 );
-			manager.getWorker().add( entity3 );
+			manager.getMainWorker().add( entity1 );
+			manager.getMainWorker().add( entity2 );
+			manager.getMainWorker().add( entity3 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();

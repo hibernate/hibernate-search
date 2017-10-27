@@ -52,7 +52,11 @@ public class JavaBeanElasticsearchMultipleHostsIT {
 
 	@Test
 	public void index() throws JSONException {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder();
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
+				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend_1.host", HOSTS )
+				.setProperty( "index.default.backend", "elasticsearchBackend_1" );
+
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
 		MappingDefinition mappingDefinition = contributor.programmaticMapping();
@@ -61,11 +65,7 @@ public class JavaBeanElasticsearchMultipleHostsIT {
 				.property( "id" )
 				.documentId();
 
-		mappingRepository = mappingRepositoryBuilder
-				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_1.host", HOSTS )
-				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
-				.build();
+		mappingRepository = mappingRepositoryBuilder.build();
 		JavaBeanMapping mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
@@ -79,7 +79,7 @@ public class JavaBeanElasticsearchMultipleHostsIT {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
-			manager.getWorker().add( entity1 );
+			manager.getMainWorker().add( entity1 );
 		}
 
 		requests = StubElasticsearchClient.drainRequestsByIndex();

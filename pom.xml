@@ -37,6 +37,7 @@
         <puppycrawl.checkstyle.version>8.3</puppycrawl.checkstyle.version>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.0.1.Final</jbossLoggingProcessorVersion>
+        <h2Version>1.4.178</h2Version>
     </properties>
 
     <dependencyManagement>
@@ -134,6 +135,14 @@
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
                 <version>1.2.3</version>
+            </dependency>
+
+            <!-- JDBC drivers -->
+            <!-- Profile-specific driver, used in most database-sensitive integration tests -->
+            <dependency>
+                <groupId>${jdbc.driver.groupId}</groupId>
+                <artifactId>${jdbc.driver.artifactId}</artifactId>
+                <version>${jdbc.driver.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -280,6 +289,31 @@
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <!-- =============================== -->
+        <!-- Database profiles               -->
+        <!-- =============================== -->
+        <!-- H2 is the default -->
+        <profile>
+            <id>h2</id>
+            <activation>
+                <property>
+                    <name>inMemoryTests</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
+                <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
+                <jdbc.driver.version>${h2Version}</jdbc.driver.version>
+                <jdbc.driver>org.h2.Driver</jdbc.driver>
+                <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
+                <jdbc.user>sa</jdbc.user>
+                <jdbc.pass>sa</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
         </profile>
     </profiles>
 </project>

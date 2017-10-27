@@ -19,21 +19,28 @@ import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
  */
 public interface PojoSearchManager extends SearchManager {
 
-	default SearchResultDefinitionContext<PojoReference> search() {
+	default SearchResultDefinitionContext<PojoReference, ?> search() {
 		return search( Collections.singleton( Object.class ) );
 	}
 
-	default SearchResultDefinitionContext<PojoReference> search(Class<?> targetedType) {
+	default <T> SearchResultDefinitionContext<PojoReference, ?> search(Class<T> targetedType) {
 		return search( Collections.singleton( targetedType ) );
 	}
 
-	SearchResultDefinitionContext<PojoReference> search(Collection<? extends Class<?>> targetedTypes);
+	<T> SearchResultDefinitionContext<PojoReference, ?> search(Collection<? extends Class<? extends T>> targetedTypes);
 
 	/**
-	 * @return The worker for this manager. Calling {@link ChangesetPojoWorker#execute()}
+	 * @return The main worker for this manager. Calling {@link ChangesetPojoWorker#execute()}
 	 * is optional, as it will be executed upon closing this manager.
 	 */
-	ChangesetPojoWorker getWorker();
+	ChangesetPojoWorker getMainWorker();
+
+	/**
+	 * @return A new worker for this manager, maintaining its changeset state independently from the manager.
+	 * Calling {@link ChangesetPojoWorker#execute()} is required to actually execute works,
+	 * the manager will <strong>not</strong> do it automatically upon closing.
+	 */
+	ChangesetPojoWorker createWorker();
 
 	/**
 	 * @return A stream worker for this manager.

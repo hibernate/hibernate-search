@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import javax.persistence.EntityManager;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
@@ -19,11 +19,11 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImpl;
 public class HibernateOrmMappingImpl extends PojoMappingImpl
 		implements HibernateOrmMapping {
 
-	private final SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactoryImplementor;
 
-	public HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactory sessionFactory) {
+	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor) {
 		super( mappingDelegate );
-		this.sessionFactory = sessionFactory;
+		this.sessionFactoryImplementor = sessionFactoryImplementor;
 	}
 
 	@Override

@@ -15,7 +15,9 @@ import org.hibernate.search.engine.search.spi.SearchWrappingDefinitionContext;
 /**
  * @author Yoann Rodiere
  */
-public interface SearchResultDefinitionContext<R> {
+public interface SearchResultDefinitionContext<R, O> {
+
+	SearchWrappingDefinitionContext<SearchQuery<O>> asObjects();
 
 	default SearchWrappingDefinitionContext<SearchQuery<R>> asReferences() {
 		return asReferences( Function.identity() );

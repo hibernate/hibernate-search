@@ -8,12 +8,15 @@ package org.hibernate.search.engine.common;
 
 import java.util.Properties;
 
+import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 
 /**
  * @author Yoann Rodiere
  */
 public interface SearchMappingRepositoryBuilder {
+
+	SearchMappingRepositoryBuilder setBeanResolver(BeanResolver beanResolver);
 
 	SearchMappingRepositoryBuilder setProperty(String name, String value);
 

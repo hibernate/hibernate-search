@@ -67,7 +67,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	public M build() {
 		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
 		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
-		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );
+		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build(), introspector );
 		return wrapperFactory.apply( propertySource, mappingImplementor );
 	}
 

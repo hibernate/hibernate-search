@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -13,15 +14,17 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.spi.HitAggregator;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchSearchQueryBuilderImpl<T> implements ElasticsearchSearchQueryBuilder<T> {
+class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQueryBuilder<T> {
 
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
 	private final Set<String> indexNames;
-	private final HitExtractor<T> hitExtractor;
+	private final HitExtractor<? super C> hitExtractor;
+	private final HitAggregator<C, List<T>> hitAggregator;
 	private JsonObject rootQueryClause;
 
 	public ElasticsearchSearchQueryBuilderImpl(
@@ -29,7 +32,10 @@ class ElasticsearchSearchQueryBuilderImpl<T> implements ElasticsearchSearchQuery
 			ElasticsearchWorkFactory workFactory,
 			Set<String> indexNames,
 			SessionContext context,
-			HitExtractor<T> hitExtractor) {
+			HitExtractor<? super C> hitExtractor,
+			HitAggregator<C, List<T>> hitAggregator) {
+		this.hitExtractor = hitExtractor;
+		this.hitAggregator = hitAggregator;
 		String tenantId = context.getTenantIdentifier();
 		if ( tenantId != null ) {
 			// TODO handle tenant ID filtering
@@ -37,7 +43,6 @@ class ElasticsearchSearchQueryBuilderImpl<T> implements ElasticsearchSearchQuery
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
-		this.hitExtractor = hitExtractor;
 	}
 
 	@Override
@@ -49,8 +54,10 @@ class ElasticsearchSearchQueryBuilderImpl<T> implements ElasticsearchSearchQuery
 		JsonObject payload = new JsonObject();
 		payload.add( "query", rootQueryClause );
 		hitExtractor.contributeRequest( payload );
+		SearchResultExtractor<T> searchResultExtractor =
+				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );
 		return new ElasticsearchSearchQuery<>( queryOrchestrator, workFactory, indexNames,
-				payload, hitExtractor );
+				payload, searchResultExtractor );
 	}
 
 	@Override

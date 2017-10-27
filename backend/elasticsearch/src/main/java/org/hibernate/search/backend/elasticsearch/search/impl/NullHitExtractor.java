@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import org.hibernate.search.engine.search.spi.HitCollector;
+
 import com.google.gson.JsonObject;
 
-class NullHitExtractor implements HitExtractor<Void> {
+class NullHitExtractor implements HitExtractor<HitCollector<?>> {
 
 	private static final NullHitExtractor INSTANCE = new NullHitExtractor();
 
@@ -26,8 +28,7 @@ class NullHitExtractor implements HitExtractor<Void> {
 	}
 
 	@Override
-	public Void extractHit(JsonObject responseBody, JsonObject hit) {
-		// Always return null
-		return null;
+	public void extract(HitCollector<?> collector, JsonObject responseBody, JsonObject hit) {
+		collector.collect( null );
 	}
 }

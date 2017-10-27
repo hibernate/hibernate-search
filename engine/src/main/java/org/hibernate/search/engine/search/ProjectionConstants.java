@@ -17,6 +17,22 @@ public final class ProjectionConstants {
 	}
 
 	/**
+	 * Project to an object representing the match.
+	 * <p>
+	 * The actual type of the object depends on the entry point
+	 * for your search query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
+	 * may return a Java representation of the document,
+	 * but a {@link org.hibernate.search.engine.common.SearchManager} will
+	 * return a Java representation of the mapped object.
+	 * <p>
+	 * As a general rule, a projection on {@link #OBJECT} will result in the same value
+	 * which would have been returned by the query if not using projections
+	 * (i.e. if {@link SearchResultDefinitionContext#asObjects()} was called instead of
+	 * {@link SearchResultDefinitionContext#asProjections(String...)}).
+	 */
+	public static final String OBJECT = PREFIX + "object";
+
+	/**
 	 * Project to a reference to the match.
 	 * <p>
 	 * The actual type of the reference depends on the entry point

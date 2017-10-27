@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -52,13 +53,15 @@ public class ElasticsearchSearchTarget implements SearchTarget {
 	}
 
 	@Override
-	public <R> SearchResultDefinitionContext<R> search(
-			SessionContext context, Function<DocumentReference, R> documentReferenceTransformer) {
+	public <R, O> SearchResultDefinitionContext<R, O> search(
+			SessionContext context, Function<DocumentReference, R> documentReferenceTransformer,
+			ObjectLoader<R, O> objectLoader) {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManager::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		QueryTargetContextImpl targetContext = new QueryTargetContextImpl( indexModels );
-		return new SearchResultDefinitionContextImpl<>( backend, targetContext, context, documentReferenceTransformer );
+		return new SearchResultDefinitionContextImpl<>( backend, targetContext, context,
+				documentReferenceTransformer, objectLoader );
 	}
 
 	@Override

@@ -15,10 +15,6 @@ import org.hibernate.search.engine.search.dsl.SearchContext;
  */
 public interface SearchWrappingDefinitionContext<Q> extends SearchContext<Q> {
 
-	default SearchContext<Q> asSearchQuery() {
-		return asWrappedQuery( Function.identity() );
-	}
-
 	<R> SearchContext<R> asWrappedQuery(Function<Q, R> wrapperFactory);
 
 }

@@ -15,31 +15,32 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
 import org.hibernate.search.util.AssertionFailure;
 
-public class PojoSearchTargetImpl implements PojoSearchTarget {
+public class PojoSearchTargetImpl<T> implements PojoSearchTarget<T> {
 
 	private final PojoTypeManagerContainer typeManagers;
-	private final Set<PojoTypeManager<?, ?, ?>> targetedTypeManagers;
+	private final Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers;
 
 	public PojoSearchTargetImpl(PojoTypeManagerContainer typeManagers,
-			Set<PojoTypeManager<?, ?, ?>> targetedTypeManagers) {
+			Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers) {
 		this.typeManagers = typeManagers;
 		this.targetedTypeManagers = targetedTypeManagers;
 	}
 
 	@Override
-	public Set<Class<?>> getTargetedIndexedTypes() {
+	public Set<Class<? extends T>> getTargetedIndexedTypes() {
 		return targetedTypeManagers.stream()
 				.map( PojoTypeManager::getEntityType )
 				.collect( Collectors.toCollection( LinkedHashSet::new) );
 	}
 
 	@Override
-	public SearchResultDefinitionContext<PojoReference> search(
-			PojoSessionContext context) {
-		return createIndexSearchTarget().search( context, this::toPojoReference );
+	public <O> SearchResultDefinitionContext<PojoReference, O> search(
+			PojoSessionContext context, ObjectLoader<PojoReference, O> objectLoader) {
+		return createIndexSearchTarget().search( context, this::toPojoReference, objectLoader );
 	}
 
 	private SearchTarget createIndexSearchTarget() {

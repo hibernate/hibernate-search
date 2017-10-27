@@ -6,23 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.function.Function;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.spi.HitCollector;
 
 import com.google.gson.JsonObject;
 
-class DocumentReferenceHitExtractor implements HitExtractor<DocumentReference> {
+class DocumentReferenceHitExtractor<R> implements HitExtractor<HitCollector<? super R>> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "_id" ).asString();
 
-	private static final DocumentReferenceHitExtractor INSTANCE = new DocumentReferenceHitExtractor();
+	private final Function<DocumentReference, R> referenceTransformer;
 
-	public static DocumentReferenceHitExtractor get() {
-		return INSTANCE;
-	}
-
-	private DocumentReferenceHitExtractor() {
-		// Private constructor, use get() instead.
+	public DocumentReferenceHitExtractor(Function<DocumentReference, R> referenceTransformer) {
+		this.referenceTransformer = referenceTransformer;
 	}
 
 	@Override
@@ -31,10 +30,12 @@ class DocumentReferenceHitExtractor implements HitExtractor<DocumentReference> {
 	}
 
 	@Override
-	public DocumentReference extractHit(JsonObject responseBody, JsonObject hit) {
+	public void extract(HitCollector<? super R> collector, JsonObject responseBody, JsonObject hit) {
 		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).get();
 		String id = HIT_ID_ACCESSOR.get( hit ).get();
-		return new ElasticsearchDocumentReference( indexName, id );
+		DocumentReference documentReference = new ElasticsearchDocumentReference( indexName, id );
+		R reference = referenceTransformer.apply( documentReference );
+		collector.collect( reference );
 	}
 
 }

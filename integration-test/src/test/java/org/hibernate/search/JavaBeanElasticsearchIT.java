@@ -67,7 +67,14 @@ public class JavaBeanElasticsearchIT {
 
 	@Before
 	public void setup() throws JSONException {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder();
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
+				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
+				.setProperty( "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend_2.host", HOST_2 )
+				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
+				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" );
+
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
 		MappingDefinition mappingDefinition = contributor.programmaticMapping();
@@ -111,14 +118,7 @@ public class JavaBeanElasticsearchIT {
 				.property( "numeric" )
 						.field();
 
-		mappingRepository = mappingRepositoryBuilder
-				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
-				.setProperty( "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_2.host", HOST_2 )
-				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
-				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
-				.build();
+		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
@@ -281,11 +281,11 @@ public class JavaBeanElasticsearchIT {
 			entity1.setEmbedded( entity2 );
 			entity2.setEmbedded( entity3 );
 
-			manager.getWorker().add( entity1 );
-			manager.getWorker().add( entity2 );
-			manager.getWorker().add( entity4 );
-			manager.getWorker().delete( IndexedEntity.class, 1 );
-			manager.getWorker().add( entity3 );
+			manager.getMainWorker().add( entity1 );
+			manager.getMainWorker().add( entity2 );
+			manager.getMainWorker().add( entity4 );
+			manager.getMainWorker().delete( IndexedEntity.class, 1 );
+			manager.getMainWorker().add( entity3 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();

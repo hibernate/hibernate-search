@@ -4,17 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.common.impl;
+package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.common.spi.BeanReference;
-import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.util.SearchException;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class ReflectionBeanResolver implements BeanResolver {
+public final class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {

@@ -12,13 +12,6 @@ package org.hibernate.search.mapper.pojo.model.spi;
 public interface PojoProxyIntrospector {
 
 	/**
-	 * @param <T> the type of the entity
-	 * @param entity an instance or proxy of T
-	 * @return the class from the instance, or the underlying class from a proxy.
-	 */
-	<T> Class<? extends T> getClass(T entity);
-
-	/**
 	 * @param value the object to unproxy
 	 * @return if value is a proxy, unwraps it, otherwise works as a pass-through function.
 	 */

@@ -7,11 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
@@ -21,13 +23,21 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchContextImpl;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
+import org.hibernate.search.engine.search.spi.HitAggregator;
+import org.hibernate.search.engine.search.spi.HitCollector;
+import org.hibernate.search.engine.search.spi.LoadingHitCollector;
+import org.hibernate.search.engine.search.spi.ObjectHitAggregator;
+import org.hibernate.search.engine.search.spi.ProjectionHitAggregator;
+import org.hibernate.search.engine.search.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.search.spi.SearchWrappingDefinitionContext;
+import org.hibernate.search.engine.search.spi.SimpleHitAggregator;
 import org.hibernate.search.util.spi.LoggerFactory;
 
-class SearchResultDefinitionContextImpl<R> implements SearchResultDefinitionContext<R> {
+class SearchResultDefinitionContextImpl<R, O> implements SearchResultDefinitionContext<R, O> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -35,27 +45,41 @@ class SearchResultDefinitionContextImpl<R> implements SearchResultDefinitionCont
 
 	private final QueryTargetContextImpl targetContext;
 
-	private final SessionContext context;
+	private final SessionContext sessionContext;
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
 
+	private final ObjectLoader<R, O> objectLoader;
+
 	public SearchResultDefinitionContextImpl(ElasticsearchBackend backend,
 			QueryTargetContextImpl targetContext,
-			SessionContext context,
-			Function<DocumentReference, R> documentReferenceTransformer) {
+			SessionContext sessionContext,
+			Function<DocumentReference, R> documentReferenceTransformer,
+			ObjectLoader<R, O> objectLoader) {
 		this.backend = backend;
 		this.targetContext = targetContext;
-		this.context = context;
+		this.sessionContext = sessionContext;
 		this.documentReferenceTransformer = documentReferenceTransformer;
+		this.objectLoader = objectLoader;
+	}
+
+	@Override
+	public SearchWrappingDefinitionContext<SearchQuery<O>> asObjects() {
+		HitExtractor<LoadingHitCollector<? super R>> hitExtractor =
+				new ObjectHitExtractor<>( documentReferenceTransformer );
+		HitAggregator<LoadingHitCollector<R>, List<O>> hitAggregator =
+				new ObjectHitAggregator<>( objectLoader );
+		ElasticsearchSearchQueryBuilder<O> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
+		return new SearchContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
 	@Override
 	public <T> SearchWrappingDefinitionContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer) {
-		HitExtractor<T> extractor = new TransformingHitExtractor<>(
-				DocumentReferenceHitExtractor.get(),
-				documentReferenceTransformer.andThen( hitTransformer )
-		);
-		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( extractor );
+		HitExtractor<HitCollector<? super R>> hitExtractor =
+				new DocumentReferenceHitExtractor<>( documentReferenceTransformer );
+		HitAggregator<HitCollector<R>, List<T>> hitAggregator =
+				new SimpleHitAggregator<>( hitTransformer );
+		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
 		return new SearchContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
@@ -64,20 +88,20 @@ class SearchResultDefinitionContextImpl<R> implements SearchResultDefinitionCont
 			Function<List<?>, T> hitTransformer, String... projections) {
 		BitSet projectionFound = new BitSet( projections.length );
 
-		HitExtractor<List<?>> compositeHitExtractor;
+		HitExtractor<? super ProjectionHitCollector<R>> hitExtractor;
 		if ( targetContext.getIndexModels().size() == 1 ) {
 			ElasticsearchIndexModel indexModel = targetContext.getIndexModels().iterator().next();
-			compositeHitExtractor = createProjectionHitExtractor( indexModel, projections, projectionFound );
+			hitExtractor = createProjectionHitExtractor( indexModel, projections, projectionFound );
 		}
 		else {
 			// Use LinkedHashMap to ensure stable order when generating requests
-			Map<String, HitExtractor<List<?>>> extractorByIndex = new LinkedHashMap<>();
+			Map<String, HitExtractor<? super ProjectionHitCollector<R>>> extractorByIndex = new LinkedHashMap<>();
 			for ( ElasticsearchIndexModel indexModel : targetContext.getIndexModels() ) {
-				HitExtractor<List<?>> indexHitExtractor = createProjectionHitExtractor(
-						indexModel, projections, projectionFound );
+				HitExtractor<? super ProjectionHitCollector<R>> indexHitExtractor =
+						createProjectionHitExtractor( indexModel, projections, projectionFound );
 				extractorByIndex.put( indexModel.getIndexName(), indexHitExtractor );
 			}
-			compositeHitExtractor = new IndexSensitiveHitExtractor<>( extractorByIndex );
+			hitExtractor = new IndexSensitiveHitExtractor<>( extractorByIndex );
 		}
 		if ( projectionFound.cardinality() < projections.length ) {
 			projectionFound.flip( 0, projectionFound.length() );
@@ -86,27 +110,34 @@ class SearchResultDefinitionContextImpl<R> implements SearchResultDefinitionCont
 					.collect( Collectors.toList() );
 			throw log.unknownProjectionForSearch( unknownProjections, targetContext.getIndexNames() );
 		}
-		HitExtractor<T> hitExtractor = new TransformingHitExtractor<>( compositeHitExtractor, hitTransformer );
-		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( hitExtractor );
+
+		int expectedLoadPerHit = (int) Arrays.stream( projections )
+				.filter( Predicate.isEqual( ProjectionConstants.OBJECT ) )
+				.count();
+		HitAggregator<ProjectionHitCollector<R>, List<T>> hitAggregator =
+				new ProjectionHitAggregator<>( objectLoader, hitTransformer, projections.length, expectedLoadPerHit );
+
+		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
 		return new SearchContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
-	private HitExtractor<List<?>> createProjectionHitExtractor(ElasticsearchIndexModel indexModel, String[] projections,
-			BitSet projectionFound) {
-		List<HitExtractor<?>> extractors = new ArrayList<>( projections.length );
+	private HitExtractor<? super ProjectionHitCollector<R>> createProjectionHitExtractor(
+			ElasticsearchIndexModel indexModel, String[] projections, BitSet projectionFound) {
+		List<HitExtractor<? super ProjectionHitCollector<R>>> extractors = new ArrayList<>( projections.length );
 		for ( int i = 0; i < projections.length; ++i ) {
 			String projection = projections[i];
 			switch ( projection ) {
+				case ProjectionConstants.OBJECT:
+					projectionFound.set( i );
+					extractors.add( new ObjectHitExtractor<>( documentReferenceTransformer ) );
+					break;
 				case ProjectionConstants.REFERENCE:
 					projectionFound.set( i );
-					extractors.add( new TransformingHitExtractor<>(
-							DocumentReferenceHitExtractor.get(),
-							documentReferenceTransformer
-					) );
+					extractors.add( new DocumentReferenceHitExtractor<>( documentReferenceTransformer ) );
 					break;
 				case ProjectionConstants.DOCUMENT_REFERENCE:
 					projectionFound.set( i );
-					extractors.add( DocumentReferenceHitExtractor.get() );
+					extractors.add( new DocumentReferenceHitExtractor<>( Function.identity() ) );
 					break;
 				default:
 					ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( projection );
@@ -121,16 +152,17 @@ class SearchResultDefinitionContextImpl<R> implements SearchResultDefinitionCont
 					break;
 			}
 		}
-		return new CompositeHitExtractor( extractors );
+		return new CompositeHitExtractor<>( extractors );
 	}
 
-	private <T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(HitExtractor<T> hitExtractor) {
+	private <C, T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
+			HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
 		return new ElasticsearchSearchQueryBuilderImpl<>(
 				backend.getQueryOrchestrator(),
 				backend.getWorkFactory(),
 				targetContext.getIndexNames(),
-				context,
-				hitExtractor
+				sessionContext,
+				hitExtractor, hitAggregator
 		);
 	}
 }

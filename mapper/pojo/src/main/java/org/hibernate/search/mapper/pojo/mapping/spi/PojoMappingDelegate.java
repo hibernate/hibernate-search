@@ -21,6 +21,6 @@ public interface PojoMappingDelegate extends PojoMapping, AutoCloseable {
 
 	StreamPojoWorker createStreamWorker(PojoSessionContext sessionContext);
 
-	PojoSearchTarget createPojoSearchTarget(Collection<? extends Class<?>> targetedTypes);
+	<T> PojoSearchTarget<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes);
 
 }

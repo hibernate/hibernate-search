@@ -15,6 +15,8 @@ public interface SearchQuery<T> {
 
 	void setMaxResults(Long maxResultsCount);
 
+	String getQueryString();
+
 	SearchResult<T> execute();
 
 }

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
@@ -18,16 +18,16 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
  */
 public final class HibernateOrmMapperFactory extends PojoMapperFactory<HibernateOrmMappingImpl> {
 
-	private SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactoryImplementor;
 
-	public HibernateOrmMapperFactory(SessionFactory sessionFactory) {
-		super( new HibernateOrmIntrospector( sessionFactory ), false );
-		this.sessionFactory = sessionFactory;
+	public HibernateOrmMapperFactory(SessionFactoryImplementor sessionFactoryImplementor) {
+		super( new HibernateOrmIntrospector( sessionFactoryImplementor ), false );
+		this.sessionFactoryImplementor = sessionFactoryImplementor;
 	}
 
 	@Override
 	protected HibernateOrmMappingImpl createMapping(ConfigurationPropertySource propertySource,
 			PojoMappingDelegate mappingDelegate) {
-		return new HibernateOrmMappingImpl( mappingDelegate, sessionFactory );
+		return new HibernateOrmMappingImpl( mappingDelegate, sessionFactoryImplementor );
 	}
 }

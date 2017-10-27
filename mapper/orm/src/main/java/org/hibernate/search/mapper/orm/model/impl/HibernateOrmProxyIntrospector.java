@@ -7,28 +7,40 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 
 
 /**
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Yoann Rodiere
  */
 public class HibernateOrmProxyIntrospector implements PojoProxyIntrospector {
 
-	public HibernateOrmProxyIntrospector(SessionImplementor sessionImplementor) {
-	}
+	private final SessionImplementor sessionImplementor;
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> Class<? extends T> getClass(T entity) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public HibernateOrmProxyIntrospector(SessionImplementor sessionImplementor) {
+		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
 	public Object unproxy(Object value) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		if ( value instanceof HibernateProxy ) {
+			final HibernateProxy proxy = (HibernateProxy) value;
+			final LazyInitializer lazyInitializer = proxy.getHibernateLazyInitializer();
+			Object initialized = lazyInitializer.getImplementation( sessionImplementor );
+			if ( initialized != null ) {
+				return initialized;
+			}
+			else {
+				// This is the case in which the proxy was created by a different session.
+				// unproxyAndReassociate is the ultimate bomb,
+				// able to deal with a Session change:
+				return sessionImplementor.getPersistenceContext().unproxyAndReassociate( proxy );
+			}
+		}
+		return value;
 	}
 
 }

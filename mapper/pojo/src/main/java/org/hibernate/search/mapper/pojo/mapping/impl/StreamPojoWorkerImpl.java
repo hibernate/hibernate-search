@@ -11,20 +11,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
 /**
  * @author Yoann Rodiere
  */
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
-	private final PojoSessionContext context;
+	private final PojoSessionContext sessionContext;
 	private final Map<Class<?>, StreamPojoTypeWorker<?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
 	public StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
-			PojoSessionContext context) {
-		super( typeManagers, context );
-		this.context = context;
+			PojoIntrospector introspector, PojoSessionContext sessionContext) {
+		super( typeManagers, introspector );
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -53,7 +54,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	protected StreamPojoTypeWorker<?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( context ) );
+		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( sessionContext ) );
 	}
 
 	private Iterable<StreamPojoTypeWorker<?>> getAllDelegates() {

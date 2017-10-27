@@ -12,14 +12,14 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;
 
-class IndexSensitiveHitExtractor<T> implements HitExtractor<T> {
+class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root()
 			.property( "_index" )
 			.asString();
 
-	private final Map<String, HitExtractor<T>> extractorByIndex;
+	private final Map<String, HitExtractor<? super C>> extractorByIndex;
 
-	public IndexSensitiveHitExtractor(Map<String, HitExtractor<T>> extractorByIndex) {
+	public IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByIndex) {
 		this.extractorByIndex = extractorByIndex;
 	}
 
@@ -31,9 +31,9 @@ class IndexSensitiveHitExtractor<T> implements HitExtractor<T> {
 	}
 
 	@Override
-	public T extractHit(JsonObject responseBody, JsonObject hit) {
+	public void extract(C collector, JsonObject responseBody, JsonObject hit) {
 		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).get();
-		HitExtractor<T> delegate = extractorByIndex.get( indexName );
-		return delegate.extractHit( responseBody, hit );
+		HitExtractor<? super C> delegate = extractorByIndex.get( indexName );
+		delegate.extract( collector, responseBody, hit );
 	}
 }

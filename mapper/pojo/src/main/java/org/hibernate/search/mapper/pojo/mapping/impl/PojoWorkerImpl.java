@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -17,13 +17,13 @@ import org.hibernate.search.util.SearchException;
  */
 abstract class PojoWorkerImpl implements PojoWorker {
 
-	private final PojoSessionContext sessionContext;
 	private final PojoTypeManagerContainer typeManagers;
+	private final PojoIntrospector introspector;
 
 	public PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
-			PojoSessionContext sessionContext) {
-		this.sessionContext = sessionContext;
+			PojoIntrospector introspector) {
 		this.typeManagers = typeManagers;
+		this.introspector = introspector;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 
 	@Override
 	public void add(Object id, Object entity) {
-		Class<?> clazz = sessionContext.getProxyIntrospector().getClass( entity );
+		Class<?> clazz = introspector.getClass( entity );
 		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
@@ -45,7 +45,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 
 	@Override
 	public void update(Object id, Object entity) {
-		Class<?> clazz = sessionContext.getProxyIntrospector().getClass( entity );
+		Class<?> clazz = introspector.getClass( entity );
 		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}

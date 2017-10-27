@@ -13,4 +13,11 @@ public interface PojoIntrospector {
 
 	<T> TypeModel<T> getEntityTypeModel(Class<T> type);
 
+	/**
+	 * @param <T> the type of the entity
+	 * @param entity an instance or proxy of T
+	 * @return the class from the instance, or the underlying class from a proxy.
+	 */
+	<T> Class<? extends T> getClass(T entity);
+
 }
