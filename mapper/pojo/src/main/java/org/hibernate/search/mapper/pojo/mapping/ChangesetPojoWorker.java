@@ -20,6 +20,17 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ChangesetPojoWorker extends PojoWorker {
 
+	/**
+	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.
+	 * <p>
+	 * In particular, ensure that all data is extracted from the POJOs
+	 * and converted to the backend-specific format.
+	 * <p>
+	 * Calling this method is optional: the {@link #execute()} method
+	 * will perform the preparation if necessary.
+	 */
+	void prepare();
+
 	CompletableFuture<?> execute();
 
 }

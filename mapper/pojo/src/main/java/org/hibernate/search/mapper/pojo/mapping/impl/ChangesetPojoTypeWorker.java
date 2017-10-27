@@ -22,7 +22,15 @@ class ChangesetPojoTypeWorker<D extends DocumentState> extends PojoTypeWorker<D,
 		super( typeManager, sessionContext, delegate );
 	}
 
+	public void prepare() {
+		getDelegate().prepare();
+	}
+
 	public CompletableFuture<?> execute() {
+		/*
+		 * No need to call prepare() here: we don't do anything special ourselves when preparing,
+		 * and delegates are supposed to handle execute() even without a prior call to prepare().
+		 */
 		return getDelegate().execute();
 	}
 

@@ -35,8 +35,20 @@ public class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements Changeset
 	}
 
 	@Override
+	public void prepare() {
+		for ( ChangesetPojoTypeWorker<?> delegate : delegates.values() ) {
+			delegate.prepare();
+		}
+	}
+
+
+	@Override
 	public CompletableFuture<?> execute() {
 		try {
+			/*
+			 * No need to call prepare() here: we don't do anything special ourselves when preparing,
+			 * and delegates are supposed to handle execute() even without a prior call to prepare().
+			 */
 			List<CompletableFuture<?>> futures = new ArrayList<>();
 			for ( ChangesetPojoTypeWorker<?> delegate : delegates.values() ) {
 				futures.add( delegate.execute() );

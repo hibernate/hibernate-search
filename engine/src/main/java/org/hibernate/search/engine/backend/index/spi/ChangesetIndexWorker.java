@@ -20,6 +20,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ChangesetIndexWorker<D> extends IndexWorker<D> {
 
+	/**
+	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.
+	 * <p>
+	 * Calling this method is optional: the {@link #execute()} method
+	 * will perform the preparation if necessary.
+	 */
+	void prepare();
+
 	CompletableFuture<?> execute();
 
 }

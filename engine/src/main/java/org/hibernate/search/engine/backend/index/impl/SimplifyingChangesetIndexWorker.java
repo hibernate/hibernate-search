@@ -51,10 +51,24 @@ public class SimplifyingChangesetIndexWorker<D> implements ChangesetIndexWorker<
 	}
 
 	@Override
+	public void prepare() {
+		doPrepare();
+		delegate.prepare();
+	}
+
+	@Override
 	public CompletableFuture<?> execute() {
+		/*
+		 * No need to call prepare() on the delegate here:
+		 * the delegate is supposed to handle execute() even without a prior call to prepare().
+		 */
+		doPrepare();
+		return delegate.execute();
+	}
+
+	void doPrepare() {
 		try {
 			worksPerDocument.values().forEach( WorkPerDocument::doDelegate );
-			return delegate.execute();
 		}
 		finally {
 			worksPerDocument.clear();

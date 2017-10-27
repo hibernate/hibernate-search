@@ -40,6 +40,14 @@ public class ElasticsearchChangesetIndexWorker extends ElasticsearchIndexWorker
 	}
 
 	@Override
+	public void prepare() {
+		/*
+		 * Nothing to do: we can't execute anything more
+		 * without sending a request to the cluster.
+		 */
+	}
+
+	@Override
 	public CompletableFuture<?> execute() {
 		try {
 			CompletableFuture<?> future = orchestrator.submit( works );
