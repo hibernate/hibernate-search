@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Converts a {@link LocalTime} to a {@link String} in Elasticsearch's "strict_hour_minute_second_fraction" format.

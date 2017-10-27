@@ -12,6 +12,7 @@ import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Performs a flush of all pending changes.

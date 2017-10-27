@@ -17,6 +17,7 @@ import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper class which keeps track of all super classes and interfaces of known entities.

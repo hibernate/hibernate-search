@@ -24,6 +24,7 @@ import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * The one and only {@link LockFactoryCreator}.

@@ -18,6 +18,7 @@ import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Copy all AttributeImpl for each incrementToken

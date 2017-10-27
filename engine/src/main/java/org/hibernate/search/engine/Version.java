@@ -7,6 +7,7 @@
 package org.hibernate.search.engine;
 
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Emmanuel Bernard

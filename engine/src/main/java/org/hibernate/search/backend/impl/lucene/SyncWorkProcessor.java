@@ -11,6 +11,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

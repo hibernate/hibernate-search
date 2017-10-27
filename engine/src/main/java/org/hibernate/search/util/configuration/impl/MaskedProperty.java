@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A wrapper to {@link Properties}, to restrict the availability of values to only those which have a key

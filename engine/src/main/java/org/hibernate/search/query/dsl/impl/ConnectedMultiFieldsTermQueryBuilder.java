@@ -34,6 +34,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.TermTermination;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Emmanuel Bernard

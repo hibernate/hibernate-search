@@ -25,6 +25,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This Runnable is going to feed the indexing queue

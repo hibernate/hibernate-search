@@ -21,6 +21,7 @@ import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFac
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonObject;
 

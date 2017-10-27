@@ -24,6 +24,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This <code>ReaderProvider</code> shares IndexReaders as long as they are "current";

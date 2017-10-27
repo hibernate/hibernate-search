@@ -20,6 +20,7 @@ import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchCalen
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchDateBridge;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Creates bridges specific to Elasticsearch for the time-related classes in java.util.*

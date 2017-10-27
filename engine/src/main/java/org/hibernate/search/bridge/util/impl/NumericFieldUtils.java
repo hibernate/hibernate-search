@@ -17,6 +17,7 @@ import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Utility class to handle numeric fields.

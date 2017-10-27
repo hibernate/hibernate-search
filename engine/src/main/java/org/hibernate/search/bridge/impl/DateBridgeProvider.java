@@ -18,6 +18,7 @@ import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Built-in {@link org.hibernate.search.bridge.spi.BridgeProvider} handling date bridging when {@code @DateBridge} is involved.

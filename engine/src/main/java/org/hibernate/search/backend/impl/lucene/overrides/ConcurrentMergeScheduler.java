@@ -15,6 +15,7 @@ import org.apache.lucene.util.ThreadInterruptedException;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable error handler.

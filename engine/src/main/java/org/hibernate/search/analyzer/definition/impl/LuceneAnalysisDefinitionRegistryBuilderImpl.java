@@ -14,6 +14,7 @@ import org.hibernate.search.analyzer.definition.LuceneNormalizerDefinitionContex
 import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 
 /**

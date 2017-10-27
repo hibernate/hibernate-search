@@ -18,6 +18,7 @@ import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 /**
  * Batch work until {@link #performWorks} is called.
  * The work is then executed synchronously or asynchronously.

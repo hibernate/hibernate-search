@@ -9,6 +9,7 @@ package org.hibernate.search.analyzer.impl;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A reference to an {@link Analyzer}.

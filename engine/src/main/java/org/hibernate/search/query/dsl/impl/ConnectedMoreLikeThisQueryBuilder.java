@@ -23,6 +23,7 @@ import org.hibernate.search.query.dsl.MoreLikeThisTermination;
 import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Emmanuel Bernard

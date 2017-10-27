@@ -17,6 +17,7 @@ import org.hibernate.search.engine.service.named.spi.NamedResolver;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * JMSBackendQueueProcessor using JNDI to lookup the JMS components.

@@ -17,6 +17,7 @@ import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Built-in {@link org.hibernate.search.bridge.spi.BridgeProvider} handling spatial index bridging

@@ -41,6 +41,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;
 

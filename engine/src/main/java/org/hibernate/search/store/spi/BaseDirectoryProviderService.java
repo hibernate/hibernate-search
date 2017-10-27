@@ -21,6 +21,7 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Base class for custom {@link org.hibernate.search.cfg.spi.DirectoryProviderService} implementations

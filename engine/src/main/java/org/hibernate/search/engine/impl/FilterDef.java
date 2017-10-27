@@ -17,6 +17,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A wrapper class which encapsulates all required information to create a defined filter.

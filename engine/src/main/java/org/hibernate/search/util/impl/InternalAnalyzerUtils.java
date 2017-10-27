@@ -16,6 +16,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Analysis helpers that have no reason to be exposed publicly as {@link AnalyzerUtils} is.

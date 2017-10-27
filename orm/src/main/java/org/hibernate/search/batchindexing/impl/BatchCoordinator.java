@@ -25,6 +25,7 @@ import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)

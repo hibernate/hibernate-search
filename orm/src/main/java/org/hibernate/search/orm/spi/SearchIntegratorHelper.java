@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Simple helper to get a reference to the {@link SearchIntegrator} from

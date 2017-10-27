@@ -15,6 +15,7 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Check if the entity is available in the second level cache and load it if there

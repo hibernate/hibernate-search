@@ -13,6 +13,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Base class for the conversion of {@link TemporalAccessor} to {@link String}.

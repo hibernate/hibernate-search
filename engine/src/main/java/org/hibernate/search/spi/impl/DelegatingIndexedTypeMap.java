@@ -17,6 +17,7 @@ import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 // Must be serializable to support query serialization
 final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializable {

@@ -44,6 +44,7 @@ import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Hibernate ORM event listener called by various ORM life cycle events. This listener must be registered in order

@@ -7,6 +7,7 @@
 package org.hibernate.search.test.util;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;

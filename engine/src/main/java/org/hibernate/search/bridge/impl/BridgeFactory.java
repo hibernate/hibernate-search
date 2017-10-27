@@ -42,6 +42,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This factory is responsible for creating and initializing build-in and custom {@code FieldBridge}s.

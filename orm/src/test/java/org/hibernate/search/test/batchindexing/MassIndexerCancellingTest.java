@@ -23,6 +23,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 import org.hibernate.testing.TestForIssue;
 import org.junit.Assert;
 import org.junit.Test;

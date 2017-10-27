@@ -22,6 +22,7 @@ import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Handles reading configuration properties about JMX MBeans

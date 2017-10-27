@@ -16,6 +16,7 @@ import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
 import org.hibernate.search.util.impl.Closeables;
 import org.hibernate.search.util.impl.StreamHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Helper to build an Avro Protocol version 1.0 from all our resource

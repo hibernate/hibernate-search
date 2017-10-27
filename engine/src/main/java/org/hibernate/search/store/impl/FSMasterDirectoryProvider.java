@@ -28,6 +28,7 @@ import org.hibernate.search.store.spi.DirectoryHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * File based DirectoryProvider that takes care of index copy

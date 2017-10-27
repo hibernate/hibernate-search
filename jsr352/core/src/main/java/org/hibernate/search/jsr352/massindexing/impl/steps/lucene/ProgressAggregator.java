@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Progress aggregator aggregates the intermediary chunk progress received from each partition sent via the collectors.

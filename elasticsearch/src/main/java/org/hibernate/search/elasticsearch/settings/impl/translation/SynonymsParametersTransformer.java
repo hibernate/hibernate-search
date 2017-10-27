@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;

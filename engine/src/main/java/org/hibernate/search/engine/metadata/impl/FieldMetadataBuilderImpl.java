@@ -14,6 +14,7 @@ import org.hibernate.search.bridge.spi.FieldMetadataCreationContext;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * The internal implementation of {@link FieldMetadataBuilder}.

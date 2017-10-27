@@ -19,6 +19,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Mincong Huang

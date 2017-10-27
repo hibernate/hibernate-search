@@ -79,6 +79,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This implementation is never directly exposed to the user, it is always wrapped into a {@link org.hibernate.search.engine.impl.MutableSearchFactory}

@@ -18,6 +18,7 @@ import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Utility class for job parameter validation.

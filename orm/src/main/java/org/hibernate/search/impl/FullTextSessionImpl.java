@@ -40,6 +40,7 @@ import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Lucene full text search aware session.

@@ -37,6 +37,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Represents the set of changes going to be applied to the index for the entities. A stream of Work is feed as input, a
