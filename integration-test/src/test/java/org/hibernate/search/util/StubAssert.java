@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,10 +17,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
-import org.json.JSONException;
+
 import org.junit.Assert;
+
+import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yoann Rodiere
@@ -34,14 +37,25 @@ public final class StubAssert {
 
 	public static void assertRequest(Map<String, List<Request>> requestQueuesByIndex, String indexName, int workPositionInQueue,
 			String host, String workType, String id, String body) throws JSONException {
-		assertRequest( requestQueuesByIndex.get( indexName ).get( workPositionInQueue ),
+		assertRequest( getRequestInQueue( requestQueuesByIndex, indexName, workPositionInQueue ),
 				Arrays.asList( indexName ), host, workType, id, ignored -> { }, body );
+	}
+
+	private static Request getRequestInQueue(Map<String, List<Request>> requestQueuesByIndex,
+			String indexName, int workPositionInQueue) {
+		List<Request> queue = requestQueuesByIndex.get( indexName );
+		Request request = null;
+		if ( queue != null && queue.size() > workPositionInQueue ) {
+			request = queue.get( workPositionInQueue );
+		}
+		assertNotNull( "No request found in queue for index '" + indexName + "' at position '" + workPositionInQueue + "'", queue );
+		return request;
 	}
 
 	public static void assertRequest(Map<String, List<Request>> requestQueuesByIndex, Collection<String> indexNames, int workPositionInQueue,
 			String host, String workType, String id, Consumer<BiConsumer<String, String>> otherParams, String body) throws JSONException {
 		for ( String indexName : indexNames ) {
-			assertRequest( requestQueuesByIndex.get( indexName ).get( workPositionInQueue ),
+			assertRequest( getRequestInQueue( requestQueuesByIndex, indexName, workPositionInQueue ),
 					indexNames, host, workType, id, otherParams, body );
 		}
 	}
