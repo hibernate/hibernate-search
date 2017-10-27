@@ -72,7 +72,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  */
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final IndexedTypeMap<EntityIndexBinding> typesRegistry;
 	private final List<LuceneWork> results;

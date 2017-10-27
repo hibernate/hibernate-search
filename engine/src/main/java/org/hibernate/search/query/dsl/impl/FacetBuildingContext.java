@@ -26,7 +26,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
  * @author Hardy Ferentschik
  */
 class FacetBuildingContext<T> {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The list of types which are supported for range faceting

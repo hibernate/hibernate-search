@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class ConnectedMoreLikeThisQueryBuilder {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;

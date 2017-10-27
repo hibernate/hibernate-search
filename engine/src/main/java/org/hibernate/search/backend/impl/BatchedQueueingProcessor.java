@@ -27,7 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class BatchedQueueingProcessor implements QueueingProcessor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final int batchSize;
 	private final TransactionalOperationDispatcher operationDispatcher;

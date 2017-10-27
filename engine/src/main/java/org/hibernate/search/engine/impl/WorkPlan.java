@@ -51,7 +51,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @SuppressWarnings( { "rawtypes", "unchecked" })
 public class WorkPlan {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/*
 	 * Using a LinkedHashMap to ensure the order will be stable from one run to another.

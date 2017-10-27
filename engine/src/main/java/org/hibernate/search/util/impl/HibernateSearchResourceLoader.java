@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final ServiceManager serviceManager;
 
 	public HibernateSearchResourceLoader(ServiceManager serviceManager) {

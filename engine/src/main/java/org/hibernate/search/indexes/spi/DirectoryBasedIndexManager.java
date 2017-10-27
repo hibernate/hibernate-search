@@ -44,7 +44,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DirectoryBasedIndexManager implements IndexManager {
 
-	private static Log log = LoggerFactory.make();
+	private static Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private String indexName;
 	private DirectoryProvider<?> directoryProvider;

@@ -42,7 +42,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class MaskedProperty extends Properties implements Serializable {
 
 	private static final long serialVersionUID = -593307257383085113L;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Properties masked;
 	private final Properties fallBack;

@@ -49,7 +49,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class ConfigContext {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default token for indexing null values. See {@link org.hibernate.search.annotations.Field#indexNullAs()}

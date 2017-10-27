@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class JGroupsReceivingMockBackend implements Backend {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final JGroupsBackend delegate = new JGroupsMasterBackend();
 

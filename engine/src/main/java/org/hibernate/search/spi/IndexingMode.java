@@ -26,7 +26,7 @@ public enum IndexingMode {
 	 */
 	MANUAL("manual");
 
-	private static Log LOG = LoggerFactory.make();
+	private static Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private String externalRepresentation;
 

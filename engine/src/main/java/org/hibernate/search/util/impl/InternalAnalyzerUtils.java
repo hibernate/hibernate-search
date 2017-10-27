@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class InternalAnalyzerUtils {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private InternalAnalyzerUtils() {
 		// Not used

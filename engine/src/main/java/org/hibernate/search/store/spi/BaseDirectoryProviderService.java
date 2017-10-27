@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class BaseDirectoryProviderService implements DirectoryProviderService {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String CONFIG_KEY = "directory_provider";
 
 	protected final Map<String, String> defaultProviderClasses = new HashMap<>( 5 );

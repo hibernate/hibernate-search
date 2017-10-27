@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 */
 public final class LazyQueryState implements Closeable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final Log QUERY_LOG = LoggerFactory.make( DefaultLogCategories.QUERY );
 
 	private final Query userQuery;

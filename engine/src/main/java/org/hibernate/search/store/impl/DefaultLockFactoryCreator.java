@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ServiceManager serviceManager;
 

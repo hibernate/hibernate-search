@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @SuppressWarnings("serial")
 public class CachingWrapperQuery extends Query implements Cloneable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final int DEFAULT_SIZE = 5;
 

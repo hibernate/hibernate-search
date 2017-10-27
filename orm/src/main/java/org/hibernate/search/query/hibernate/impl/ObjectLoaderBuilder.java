@@ -36,7 +36,7 @@ public class ObjectLoaderBuilder {
 	private TimeoutManager timeoutManager;
 	private ObjectLookupMethod lookupMethod;
 	private DatabaseRetrievalMethod retrievalMethod;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public ObjectLoaderBuilder criteria(Criteria criteria) {
 		this.criteria = criteria;

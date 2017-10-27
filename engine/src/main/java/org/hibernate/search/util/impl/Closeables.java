@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class Closeables {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Closeables() {
 		// Private constructor

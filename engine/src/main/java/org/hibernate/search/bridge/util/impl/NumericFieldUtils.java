@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class NumericFieldUtils {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private NumericFieldUtils() {
 		//not allowed

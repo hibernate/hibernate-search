@@ -56,7 +56,7 @@ import org.hibernate.type.Type;
  */
 public class ScrollableResultsImpl implements ScrollableResults, ScrollableResultsImplementor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final int first;
 	private final int max;

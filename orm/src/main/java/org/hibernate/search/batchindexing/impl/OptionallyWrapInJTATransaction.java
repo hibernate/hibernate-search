@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final StatelessSessionAwareRunnable statelessSessionAwareRunnable;
 	private final BatchTransactionalContext batchContext;

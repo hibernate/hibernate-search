@@ -51,7 +51,7 @@ import org.junit.runners.model.Statement;
  */
 public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
-	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
+	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make( MethodHandles.lookup() );
 
 	private Path indexRootDirectory;
 	private final Properties cfg = new Properties();

@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements SimpleQueryStringTermination {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String simpleQueryString;
 	private final QueryCustomizer queryCustomizer;

@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class LookupObjectInitializer implements ObjectInitializer {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final LookupObjectInitializer INSTANCE = new LookupObjectInitializer();
 

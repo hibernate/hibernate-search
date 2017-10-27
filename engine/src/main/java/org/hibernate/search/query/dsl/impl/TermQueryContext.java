@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 * @author Emmanuel Bernard
 */
 class TermQueryContext {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Approximation approximation;
 

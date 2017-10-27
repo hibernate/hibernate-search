@@ -143,7 +143,7 @@ public enum IndexWriterSetting implements Serializable {
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String cfgKey;
 

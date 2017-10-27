@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference implements ScopedAnalyzerReference {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final LuceneAnalyzerReference globalAnalyzerReference;
 	private final Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences;

@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IncrementalOptimizerStrategy extends ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int operationMax = -1;
 	private int transactionMax = -1;

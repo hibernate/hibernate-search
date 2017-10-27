@@ -41,7 +41,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class StandardServiceManager implements ServiceManager {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Properties properties;
 	private final BuildContext buildContext;

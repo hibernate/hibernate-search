@@ -45,7 +45,7 @@ import org.junit.Test;
  */
 public class IndexingGeneratedCorpusTest {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int BOOK_NUM = 140;
 	private static final int ANCIENTBOOK_NUM = 120;

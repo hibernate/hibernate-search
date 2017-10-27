@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class MassIndexerImpl implements MassIndexerWithTenant {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final SessionFactoryImplementor sessionFactory;

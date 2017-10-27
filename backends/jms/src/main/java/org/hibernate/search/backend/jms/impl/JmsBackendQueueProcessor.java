@@ -50,7 +50,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	public static final String JMS_CONNECTION_LOGIN = Environment.WORKER_PREFIX + "jms.login";
 	public static final String JMS_CONNECTION_PASSWORD = Environment.WORKER_PREFIX + "jms.password";
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Properties props = null;
 	private boolean isTransactional;

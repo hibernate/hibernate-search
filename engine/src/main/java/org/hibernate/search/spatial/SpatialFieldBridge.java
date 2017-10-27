@@ -28,7 +28,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge, AppliedOnTypeAwareBridge {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected String latitudeField;
 	protected String longitudeField;

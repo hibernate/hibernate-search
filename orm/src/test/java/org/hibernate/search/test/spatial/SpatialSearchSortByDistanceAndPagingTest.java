@@ -47,7 +47,7 @@ import org.junit.Test;
  */
 @TestForIssue(jiraKey = "HSEARCH-1267")
 public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
 	private static final double CENTER_LAT = 54.0;

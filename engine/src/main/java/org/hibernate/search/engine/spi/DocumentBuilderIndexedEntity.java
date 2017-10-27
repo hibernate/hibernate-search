@@ -97,7 +97,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	public static final String TENANT_ID_FIELDNAME = "__HSearch_TenantId";
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final LuceneOptions NULL_EMBEDDED_MARKER_OPTIONS;
 

@@ -48,7 +48,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class CriteriaObjectInitializer implements ObjectInitializer {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int MAX_IN_CLAUSE = 500;
 
 	public static final CriteriaObjectInitializer INSTANCE = new CriteriaObjectInitializer();

@@ -64,7 +64,7 @@ import org.hibernate.type.Type;
 @SuppressWarnings("rawtypes") // We extend the raw version of AbstractProducedQuery on purpose, see HSEARCH-2564
 public class FullTextQueryImpl extends AbstractProducedQuery implements FullTextQuery {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ObjectLookupMethod objectLookupMethod;
 	private DatabaseRetrievalMethod databaseRetrievalMethod;

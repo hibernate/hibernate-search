@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class ImplementationFactory {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ImplementationFactory() {
 		//not meant to be instantiated

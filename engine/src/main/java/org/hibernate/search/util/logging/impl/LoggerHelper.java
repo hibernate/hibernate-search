@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
  */
 public final class LoggerHelper {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private LoggerHelper() {
 		//now allowed

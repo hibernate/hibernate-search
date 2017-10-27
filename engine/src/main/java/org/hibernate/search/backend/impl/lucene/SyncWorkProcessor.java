@@ -35,7 +35,7 @@ import java.util.concurrent.locks.LockSupport;
  */
 final class SyncWorkProcessor implements WorkProcessor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final MultiWriteDrainableLinkedList<Changeset> transferQueue = new MultiWriteDrainableLinkedList<>();
 

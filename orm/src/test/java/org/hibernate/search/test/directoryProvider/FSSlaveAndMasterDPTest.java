@@ -36,7 +36,7 @@ import org.junit.experimental.categories.Category;
 @Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The lucene index directory which is shared between master and slave.

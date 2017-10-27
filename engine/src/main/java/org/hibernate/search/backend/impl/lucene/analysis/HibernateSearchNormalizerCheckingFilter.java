@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final char TOKEN_SEPARATOR = ' ';
 

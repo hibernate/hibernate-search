@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 @Category(SkipOnElasticsearch.class) // Dynamic boosting is not supported on Elasticsearch
 public class DynamicBoostingTest extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
 	public void testDynamicBoosts() throws Exception {

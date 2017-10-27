@@ -28,7 +28,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class FieldDescriptorImpl implements FieldDescriptor {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String name;
 	private final Index index;

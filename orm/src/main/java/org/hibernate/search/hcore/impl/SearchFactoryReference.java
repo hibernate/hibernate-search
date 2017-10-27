@@ -32,7 +32,7 @@ public final class SearchFactoryReference implements Service {
 			return value;
 		}
 		else {
-			throw LoggerFactory.make().searchIntegratorNotInitialized();
+			throw LoggerFactory.make( MethodHandles.lookup() ).searchIntegratorNotInitialized();
 		}
 	}
 

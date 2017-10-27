@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class SimpleLuceneAnalyzerReference extends LuceneAnalyzerReference {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Analyzer analyzer;
 

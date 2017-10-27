@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class OptimizeWorkExecutor implements LuceneWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Workspace workspace;
 

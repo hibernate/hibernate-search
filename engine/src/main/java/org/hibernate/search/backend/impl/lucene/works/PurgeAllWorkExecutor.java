@@ -32,7 +32,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 */
 class PurgeAllWorkExecutor implements LuceneWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	protected final Workspace workspace;
 
 	PurgeAllWorkExecutor(Workspace workspace) {

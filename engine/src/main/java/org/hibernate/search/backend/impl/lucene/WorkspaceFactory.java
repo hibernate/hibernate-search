@@ -19,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 final class WorkspaceFactory {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private WorkspaceFactory() {
 		//not allowed

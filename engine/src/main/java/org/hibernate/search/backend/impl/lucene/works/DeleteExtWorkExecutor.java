@@ -33,7 +33,7 @@ public final class DeleteExtWorkExecutor extends DeleteWorkExecutor {
 
 	private final IndexedTypeIdentifier managedType;
 	private final DocumentBuilderIndexedEntity builder;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final boolean idIsNumeric;
 
 	DeleteExtWorkExecutor(Workspace workspace) {

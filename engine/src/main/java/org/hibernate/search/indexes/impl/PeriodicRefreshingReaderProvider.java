@@ -48,7 +48,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class PeriodicRefreshingReaderProvider implements DirectoryBasedReaderProvider {
 
 	public static final int DEFAULT_ACCEPTABLE_MAX_AGE_MS = 5000;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * contains all Readers (most current per Directory and all unclosed old readers)

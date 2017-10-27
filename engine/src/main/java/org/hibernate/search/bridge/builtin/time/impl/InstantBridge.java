@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class InstantBridge implements TwoWayFieldBridge, IgnoreAnalyzerBridge, EncodingBridge {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final InstantBridge INSTANCE = new InstantBridge();
 

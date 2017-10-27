@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final LongAdder totalCounter = new LongAdder();
 	private volatile long startTime;

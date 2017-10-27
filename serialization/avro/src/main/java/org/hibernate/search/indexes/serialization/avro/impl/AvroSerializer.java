@@ -48,7 +48,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class AvroSerializer implements Serializer {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private GenericRecord idRecord;
 	private List<GenericRecord> fieldables;

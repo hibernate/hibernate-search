@@ -18,7 +18,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 final class LazyExecutorHolder {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final int maxQueueLength;
 	private final String threadNamePrefix;

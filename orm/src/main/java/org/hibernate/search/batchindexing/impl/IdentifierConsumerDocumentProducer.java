@@ -55,7 +55,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IdentifierConsumerDocumentProducer implements Runnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ProducerConsumerQueue<List<Serializable>> source;
 	private final SessionFactory sessionFactory;

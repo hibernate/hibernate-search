@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 //TODO serialization
 public class FilterDef {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Method factoryMethod;
 	private Method keyMethod;

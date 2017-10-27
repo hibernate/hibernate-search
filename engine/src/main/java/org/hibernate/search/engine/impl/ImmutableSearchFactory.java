@@ -91,7 +91,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final IndexedTypeMap<EntityIndexBinding> indexBindingForEntities;
 	private final IndexedTypeMap<DocumentBuilderContainedEntity> documentBuildersContainedEntities;

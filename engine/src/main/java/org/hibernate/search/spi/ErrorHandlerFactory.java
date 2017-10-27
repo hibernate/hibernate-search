@@ -56,7 +56,7 @@ public final class ErrorHandlerFactory {
 			return (ErrorHandler) configuredErrorHandler;
 		}
 		else {
-			throw LoggerFactory.make().unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
+			throw LoggerFactory.make( MethodHandles.lookup() ).unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
 		}
 	}
 

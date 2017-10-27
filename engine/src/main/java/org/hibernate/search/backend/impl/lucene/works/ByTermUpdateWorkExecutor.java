@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final AddWorkExecutor addDelegate;
 	private final Workspace workspace;

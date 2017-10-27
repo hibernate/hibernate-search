@@ -61,7 +61,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private volatile EventsIntegratorState state = new NonInitializedIntegratorState();
 
