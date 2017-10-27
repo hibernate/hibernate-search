@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 final class JMXHook {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String indexControlMBeanName;
 	private final boolean indexControlMBeanEnabled;

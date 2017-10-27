@@ -33,7 +33,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class LuceneIndexingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5424606407623591663L;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default";

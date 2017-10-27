@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @Stateful
 public class RegistrationController {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@PersistenceContext
 	private EntityManager em;

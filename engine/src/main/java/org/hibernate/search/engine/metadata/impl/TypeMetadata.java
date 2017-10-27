@@ -41,7 +41,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class TypeMetadata {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String COMPONENT_PATH_SEPARATOR = ".";
 
 	/**

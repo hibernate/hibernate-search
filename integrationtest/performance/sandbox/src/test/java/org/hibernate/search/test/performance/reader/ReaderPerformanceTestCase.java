@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	@Before

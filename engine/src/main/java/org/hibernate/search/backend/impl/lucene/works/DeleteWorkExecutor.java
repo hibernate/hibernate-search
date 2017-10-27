@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class DeleteWorkExecutor implements LuceneWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	protected final Workspace workspace;
 
 	DeleteWorkExecutor(Workspace workspace) {

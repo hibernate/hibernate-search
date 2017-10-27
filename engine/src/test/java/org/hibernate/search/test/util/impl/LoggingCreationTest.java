@@ -31,7 +31,7 @@ public class LoggingCreationTest {
 
 	private static class Foo {
 
-		private static Log log = LoggerFactory.make();
+		private static Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 		Foo(String bar) {
 			if ( bar == null ) {

@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 //TODO think about using an Executor instead of starting Threads directly
 public class ConcurrentMergeScheduler extends org.apache.lucene.index.ConcurrentMergeScheduler {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ErrorHandler errorHandler;
 	private final String indexName;

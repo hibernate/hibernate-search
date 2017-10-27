@@ -66,7 +66,7 @@ import org.junit.experimental.categories.Category;
  */
 public class ProgrammaticMappingTest extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
 	public void testMapping() throws Exception {

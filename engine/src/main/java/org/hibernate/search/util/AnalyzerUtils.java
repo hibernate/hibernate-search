@@ -33,7 +33,7 @@ public final class AnalyzerUtils {
 		//not allowed
 	}
 
-	public static final Log log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static List<String> tokenizedTermValues(Analyzer analyzer, String field, String text) throws IOException {
 		final List<String> tokenList = new ArrayList<String>();

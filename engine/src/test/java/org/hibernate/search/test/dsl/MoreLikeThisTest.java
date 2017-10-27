@@ -41,7 +41,7 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class MoreLikeThisTest {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class );

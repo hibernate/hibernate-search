@@ -28,7 +28,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class SpatialBridgeProvider extends ExtendedBridgeProvider {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {

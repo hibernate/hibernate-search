@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
  */
 public class BytemanHelper extends Helper {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final String NAME = "org.hibernate.search.testsupport.BytemanHelper";
 

@@ -27,7 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private DirectoryProvider directoryProvider;
 	private String indexName;

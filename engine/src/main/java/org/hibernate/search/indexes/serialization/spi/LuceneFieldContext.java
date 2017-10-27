@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public final class LuceneFieldContext {
-	private static Log log = LoggerFactory.make();
+	private static Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Field field;
 	private final FieldType fieldType;

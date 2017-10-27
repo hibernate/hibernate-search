@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class JMXRegistrar {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private JMXRegistrar() {
 	}
@@ -226,7 +226,7 @@ public final class JMXRegistrar {
 	 * @author Hardy Ferentschik
 	 */
 	public static class IndexingProgressMonitor implements IndexingProgressMonitorMBean, MassIndexerProgressMonitor {
-		private static final Log log = LoggerFactory.make();
+		private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 		private final LongAdder documentsDoneCounter = new LongAdder();
 		private final LongAdder documentsBuiltCounter = new LongAdder();

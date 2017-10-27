@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Set<String> sortableFieldsAbsoluteNames = new LinkedHashSet<>();
 	private final Set<BridgeDefinedField> bridgeDefinedFields = new LinkedHashSet<>();

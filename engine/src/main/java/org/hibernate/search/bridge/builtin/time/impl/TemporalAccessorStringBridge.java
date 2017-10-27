@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class TemporalAccessorStringBridge<T extends TemporalAccessor> implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final DateTimeFormatter formatter;
 

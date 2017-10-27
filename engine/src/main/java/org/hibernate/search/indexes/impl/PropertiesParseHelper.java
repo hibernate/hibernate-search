@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class PropertiesParseHelper {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private PropertiesParseHelper() {
 		// no need to create instances

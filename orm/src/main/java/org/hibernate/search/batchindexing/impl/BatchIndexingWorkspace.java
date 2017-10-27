@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final SessionFactoryImplementor sessionFactory;
 

@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class FileHelper {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int FAT_PRECISION = 2000;
 
 	private FileHelper() {

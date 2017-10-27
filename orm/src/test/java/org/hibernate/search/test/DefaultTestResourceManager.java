@@ -49,7 +49,7 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
  */
 public final class DefaultTestResourceManager implements TestResourceManager {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TestConfiguration test;
 	private final Path baseIndexDir;

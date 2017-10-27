@@ -49,7 +49,7 @@ public class ContextHelper {
 			return factoryReference.getSearchIntegrator();
 		}
 		else {
-			throw LoggerFactory.make().searchFactoryReferenceServiceNotFound();
+			throw LoggerFactory.make( MethodHandles.lookup() ).searchFactoryReferenceServiceNotFound();
 		}
 	}
 

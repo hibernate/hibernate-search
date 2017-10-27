@@ -66,7 +66,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
-	static final Log log = LoggerFactory.make();
+	static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(

@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class DirectoryProviderHelper {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String ROOT_INDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVE_INDEX_PROP_NAME = "source";

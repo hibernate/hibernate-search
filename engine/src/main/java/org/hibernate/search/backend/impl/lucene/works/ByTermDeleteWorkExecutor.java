@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.Log;
  */
 public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	ByTermDeleteWorkExecutor(Workspace workspace) {
 		super( workspace );

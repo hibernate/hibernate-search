@@ -69,7 +69,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements DirectoryBasedReaderProvider {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ReentrantLock writeLock = new ReentrantLock();
 	private final AtomicReference<DirectoryReader> currentReader = new AtomicReference<DirectoryReader>();

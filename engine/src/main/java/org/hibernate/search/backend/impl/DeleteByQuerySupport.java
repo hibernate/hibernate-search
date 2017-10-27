@@ -23,7 +23,7 @@ public final class DeleteByQuerySupport {
 		// Not meant to be invoked
 	}
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static DeletionQuery fromString(int queryKey, String[] string) {
 		switch ( queryKey ) {

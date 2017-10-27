@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, BridgeAdaptor {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TwoWayFieldBridge fieldBridge;
 	private final NullMarkerCodec nullTokenCodec;

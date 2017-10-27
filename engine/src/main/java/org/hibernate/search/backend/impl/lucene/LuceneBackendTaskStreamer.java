@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 final class LuceneBackendTaskStreamer {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final LuceneBackendResources resources;
 	private final Lock modificationLock;

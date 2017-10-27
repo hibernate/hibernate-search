@@ -69,7 +69,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class QueryHits {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
 	private static final int DEFAULT_FACET_RETRIEVAL_SIZE = 100;

@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class AbstractWorkspaceImpl implements Workspace {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final OptimizerStrategy optimizerStrategy;
 	private final DirectoryBasedIndexManager indexManager;

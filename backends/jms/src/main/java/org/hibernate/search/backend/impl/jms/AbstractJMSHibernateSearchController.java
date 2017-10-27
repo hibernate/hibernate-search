@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @Deprecated
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected abstract SearchIntegrator getSearchIntegrator();
 

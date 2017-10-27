@@ -36,7 +36,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 @Category(SkipOnElasticsearch.class) // Custom analyzer implementations cannot be used with Elasticsearch
 public class AnalyzerTest {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final IndexedTypeIdentifier MY_ENTITY_TYPE_ID = PojoIndexedTypeIdentifier.convertFromLegacy( MyEntity.class );
 

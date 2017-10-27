@@ -28,7 +28,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DurationBridge implements TwoWayFieldBridge, IgnoreAnalyzerBridge, EncodingBridge {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final DurationBridge INSTANCE = new DurationBridge();
 

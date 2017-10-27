@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.Log;
  */
 public class LogErrorHandler implements ErrorHandler {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public void handle(ErrorContext context) {

@@ -39,7 +39,7 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1296")
 public class SyncJGroupsBackendTest {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JGROUPS_CONFIGURATION = "testing-flush-loopback.xml";
 	private static final long JGROUPS_MESSAGES_TIMEOUT = 1000;
 

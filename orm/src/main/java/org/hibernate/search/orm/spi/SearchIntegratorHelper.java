@@ -50,7 +50,7 @@ public final class SearchIntegratorHelper {
 			return extractFromSessionFactory( sf );
 		}
 		catch (PersistenceException cce) {
-			throw LoggerFactory.make().incompatibleEntityManagerFactory( emf.getClass().toString() );
+			throw LoggerFactory.make( MethodHandles.lookup() ).incompatibleEntityManagerFactory( emf.getClass().toString() );
 		}
 	}
 

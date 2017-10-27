@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IdentifierProducer implements StatelessSessionAwareRunnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ProducerConsumerQueue<List<Serializable>> destination;
 	private final SessionFactory sessionFactory;

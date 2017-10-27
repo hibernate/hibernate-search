@@ -32,7 +32,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerReference {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final String name;
 

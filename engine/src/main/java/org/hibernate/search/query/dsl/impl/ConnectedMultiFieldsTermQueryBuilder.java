@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Object value;
 	private final QueryCustomizer queryCustomizer;

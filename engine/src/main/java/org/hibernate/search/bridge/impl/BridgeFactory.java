@@ -51,7 +51,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Map<IndexManagerType, BridgeProvider> backendSpecificProviders = new HashMap<>();
 	private final List<BridgeProvider> annotationBasedProviders = new ArrayList<>( 6 );

@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class StringEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final TwoWayFieldBridge DATE_YEAR = new StringEncodingDateBridge( Resolution.YEAR );
 	public static final TwoWayFieldBridge DATE_MONTH = new StringEncodingDateBridge( Resolution.MONTH );

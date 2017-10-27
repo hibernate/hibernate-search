@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {

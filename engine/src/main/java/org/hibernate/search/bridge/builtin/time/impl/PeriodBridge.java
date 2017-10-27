@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class PeriodBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int PADDING = 11;
 	private static final String FORMAT = "%+0" + PADDING + "d%+0" + PADDING + "d%+0" + PADDING + "d";
 

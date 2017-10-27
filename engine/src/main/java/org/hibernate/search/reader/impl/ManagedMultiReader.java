@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ManagedMultiReader extends MultiReader {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The index readers to be closed in {@link #doClose()}. Will be the readers originally given upon instantiation in

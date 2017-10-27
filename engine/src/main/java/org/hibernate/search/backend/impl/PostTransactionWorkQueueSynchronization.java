@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchronization {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * FullTextIndexEventListener is using a WeakIdentityHashMap<Session,Synchronization>

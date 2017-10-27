@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Ales Justin
  */
 public final class DocumentBuilderHelper {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final Object NOT_SET = new Object();
 
 	private DocumentBuilderHelper() {

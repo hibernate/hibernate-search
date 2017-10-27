@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class SerializationHelper {
 
-	private static Log log = LoggerFactory.make();
+	private static Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private SerializationHelper() {
 		//not allowed

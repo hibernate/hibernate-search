@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class MultiReaderFactory {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private MultiReaderFactory() {
 		//not allowed

@@ -47,7 +47,7 @@ final class NonInitializedIntegratorState implements EventsIntegratorState, Seri
 	private SearchException notInitialized() {
 		// do not make a static field as we want this class to be disposable.
 		// we're unlikely to ever need this logger anyway!
-		return LoggerFactory.make().searchIntegratorNotInitialized();
+		return LoggerFactory.make( MethodHandles.lookup() ).searchIntegratorNotInitialized();
 	}
 
 }

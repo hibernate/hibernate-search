@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private FSDirectory directory;
 

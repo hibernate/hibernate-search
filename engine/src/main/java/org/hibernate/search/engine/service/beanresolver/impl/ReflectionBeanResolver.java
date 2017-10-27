@@ -28,7 +28,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ReflectionBeanResolver implements BeanResolver {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {

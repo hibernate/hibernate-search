@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class CopyTokenStream extends TokenStream implements Serializable {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private List<List<AttributeImpl>> cache;
 	private int index;

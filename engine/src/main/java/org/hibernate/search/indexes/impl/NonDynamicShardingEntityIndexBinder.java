@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 @SuppressWarnings("deprecation")
 class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String INDEX_BACKEND_NAME_SEPARATOR = "#";
 
 	private final Class<? extends IndexShardingStrategy> shardingStrategyClass;

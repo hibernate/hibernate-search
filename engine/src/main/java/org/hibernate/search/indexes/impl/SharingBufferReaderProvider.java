@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * contains all Readers (most current per Directory and all unclosed old readers)

@@ -48,7 +48,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 
 	private volatile boolean initialized = false;

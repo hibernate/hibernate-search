@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class NRTIndexManager extends DirectoryBasedIndexManager {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private NRTWorkspaceImpl nrtWorkspace;
 
 	@Override

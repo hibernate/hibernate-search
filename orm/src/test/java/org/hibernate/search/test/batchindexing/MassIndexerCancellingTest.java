@@ -30,7 +30,7 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-655")
 public class MassIndexerCancellingTest extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
 	public void testMassIndexerCancel() throws InterruptedException {

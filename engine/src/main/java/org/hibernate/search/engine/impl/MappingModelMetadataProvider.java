@@ -72,7 +72,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class MappingModelMetadataProvider implements MetadataProvider {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Filter FILTER = new Filter() {
 		@Override

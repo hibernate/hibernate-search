@@ -19,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class ParameterAnnotationsReader {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ParameterAnnotationsReader() {
 		// Not to be constructed

@@ -48,7 +48,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	// defined to have CURRENT_DIR_NAME[1] == "current"+"1":
 	private static final String[] CURRENT_DIR_NAME = { null, CURRENT1, CURRENT2 };
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 
 	private volatile int current;

@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class AddWorkExecutor implements LuceneWorkExecutor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	protected final Workspace workspace;
 
 	AddWorkExecutor(Workspace workspace) {

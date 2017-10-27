@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class ConnectedSpatialQueryBuilder implements SpatialTermination {
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final SpatialQueryContext spatialContext;
 	private final QueryCustomizer queryCustomizer;

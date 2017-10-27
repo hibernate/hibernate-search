@@ -23,7 +23,7 @@ public final class Version {
 	}
 
 	static {
-		LoggerFactory.make().version( getVersionString() );
+		LoggerFactory.make( MethodHandles.lookup() ).version( getVersionString() );
 	}
 
 	public static void touch() {

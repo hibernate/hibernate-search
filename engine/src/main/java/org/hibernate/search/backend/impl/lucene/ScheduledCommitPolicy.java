@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 
 	public static final int DEFAULT_DELAY_MS = 1000;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private volatile ScheduledExecutorService scheduledExecutorService;
 	private final ErrorHandler errorHandler;

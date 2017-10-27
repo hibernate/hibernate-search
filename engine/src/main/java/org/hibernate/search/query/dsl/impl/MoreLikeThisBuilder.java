@@ -70,7 +70,7 @@ import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuil
  */
 public class MoreLikeThisBuilder<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final int minWordLen = MoreLikeThis.DEFAULT_MIN_WORD_LENGTH;
 	private final int maxNumTokensParsed = MoreLikeThis.DEFAULT_MAX_NUM_TOKENS_PARSED;

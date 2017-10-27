@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Helper class which keeps track of all super classes and interfaces of known entities.
  */
 public class TypeHierarchy {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Map<Class<?>, Set<IndexedTypeIdentifier>> classToConfiguredClass;
 

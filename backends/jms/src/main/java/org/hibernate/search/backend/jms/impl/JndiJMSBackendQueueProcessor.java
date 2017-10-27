@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties properties) {

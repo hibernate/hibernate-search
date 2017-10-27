@@ -33,7 +33,7 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
  */
 public class HibernateSearchIntegrator implements Integrator {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static final String AUTO_REGISTER = "hibernate.search.autoregister_listeners";
 

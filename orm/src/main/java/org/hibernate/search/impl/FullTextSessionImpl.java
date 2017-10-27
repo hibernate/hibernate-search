@@ -50,7 +50,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession, SessionImplementor {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private transient ExtendedSearchIntegrator searchFactory;
 	private transient SearchFactory searchFactoryAPI;

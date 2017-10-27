@@ -108,7 +108,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class AnnotationMetadataProvider implements MetadataProvider {
 	private static final int INFINITE_DEPTH = Integer.MAX_VALUE;
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = DefaultStringBridge.INSTANCE;
 	private static final String UNKNOWN_MAPPED_BY_ROLE = "";
 	private static final String EMPTY_PREFIX = "";

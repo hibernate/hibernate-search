@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 abstract class ErrorHandledRunnable implements Runnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final ExtendedSearchIntegrator extendedIntegrator;
 

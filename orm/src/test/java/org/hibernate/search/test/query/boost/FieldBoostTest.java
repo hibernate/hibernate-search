@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class FieldBoostTest extends SearchTestBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Test
 	public void testBoostedGetDesc() throws Exception {

@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class BatchCoordinator extends ErrorHandledRunnable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final IndexedTypeSet rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SessionFactoryImplementor sessionFactory;

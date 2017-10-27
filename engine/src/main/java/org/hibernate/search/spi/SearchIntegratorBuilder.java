@@ -95,7 +95,7 @@ public class SearchIntegratorBuilder {
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;

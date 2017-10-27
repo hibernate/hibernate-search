@@ -51,7 +51,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  */
 public class LuceneWorkSerializerImpl implements LuceneWorkSerializer, Startable, Stoppable {
 
-	private static Log log = LoggerFactory.make();
+	private static Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ExtendedSearchIntegrator searchIntegrator;
 	private ServiceManager serviceManager;

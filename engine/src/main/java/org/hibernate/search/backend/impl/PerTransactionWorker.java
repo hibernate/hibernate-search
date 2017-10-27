@@ -41,7 +41,7 @@ public class PerTransactionWorker implements Worker {
 
 	//note: there is only one Worker instance, reused concurrently for all sessions.
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	//this is being used from different threads, but doesn't need a
 	//synchronized map since for a given transaction, we have not concurrent access

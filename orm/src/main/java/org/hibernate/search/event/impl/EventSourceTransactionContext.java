@@ -36,7 +36,7 @@ import org.hibernate.service.Service;
  */
 public class EventSourceTransactionContext implements TransactionContext, Serializable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final EventSource eventSource;
 

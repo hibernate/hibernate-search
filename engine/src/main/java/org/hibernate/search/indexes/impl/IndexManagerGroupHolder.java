@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Yoann Rodiere
  */
 public class IndexManagerGroupHolder implements AutoCloseable {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String INDEX_SHARD_ID_SEPARATOR = ".";
 

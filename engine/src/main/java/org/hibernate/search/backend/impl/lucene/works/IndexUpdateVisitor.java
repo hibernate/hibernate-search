@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IndexUpdateVisitor implements IndexWorkVisitor<Void, LuceneWorkExecutor> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final AddWorkExecutor addExecutor;
 	private final DeleteWorkExecutor deleteExecutor;

@@ -24,7 +24,7 @@ final class DelegatingIndexedTypeMap<V> implements IndexedTypeMap<V>, Serializab
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static final IndexedTypeMap EMPTY = new DelegatingIndexedTypeMap( Collections.EMPTY_MAP, Collections.EMPTY_MAP );
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final IndexedTypeIdentifier ROOT_OBJECT = new PojoIndexedTypeIdentifier( Object.class );
 
 	private final Map<IndexedTypeIdentifier,V> map;

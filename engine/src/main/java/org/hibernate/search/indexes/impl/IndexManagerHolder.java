@@ -60,7 +60,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 @SuppressWarnings("deprecation")
 public class IndexManagerHolder {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
