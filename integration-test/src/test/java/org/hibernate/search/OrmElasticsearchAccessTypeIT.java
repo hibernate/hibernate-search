@@ -214,9 +214,9 @@ public class OrmElasticsearchAccessTypeIT {
 					.property( "fieldWithDefaultFieldAccess" ).field()
 					.property( "fieldWithNonDefaultMethodAccess" ).field()
 					.property( "fieldWithDefaultMethodAccess" ).field()
-					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded().maxDepth( 2 )
-					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded().maxDepth( 2 )
-					.property( "nonManaged" ).indexedEmbedded().maxDepth( 2 );
+					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded()
+					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded()
+					.property( "nonManaged" ).indexedEmbedded();
 			mapping.type( EmbeddableWithDefaultFieldAccess.class )
 					.property( "fieldWithDefaultFieldAccess" ).field()
 					.property( "fieldWithNonDefaultMethodAccess" ).field();

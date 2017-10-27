@@ -26,7 +26,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private String prefix;
 
-	private int maxDepth;
+	private Integer maxDepth;
 
 	private final Set<String> pathFilters = new HashSet<>();
 
@@ -51,7 +51,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext maxDepth(int depth) {
+	public PropertyIndexedEmbeddedMappingContext maxDepth(Integer depth) {
 		this.maxDepth = depth;
 		return this;
 	}

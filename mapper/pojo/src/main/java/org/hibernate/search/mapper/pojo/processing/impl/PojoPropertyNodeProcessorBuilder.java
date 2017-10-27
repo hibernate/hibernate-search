@@ -71,7 +71,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	}
 
 	@Override
-	public void indexedEmbedded(String relativePrefix, int maxDepth, Set<String> pathFilters) {
+	public void indexedEmbedded(String relativePrefix, Integer maxDepth, Set<String> pathFilters) {
 		// TODO handle collections
 
 		String defaultedRelativePrefix = relativePrefix;

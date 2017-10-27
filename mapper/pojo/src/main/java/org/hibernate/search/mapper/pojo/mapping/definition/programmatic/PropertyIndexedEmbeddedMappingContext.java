@@ -16,7 +16,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 
 	PropertyIndexedEmbeddedMappingContext prefix(String prefix);
 
-	PropertyIndexedEmbeddedMappingContext maxDepth(int depth);
+	PropertyIndexedEmbeddedMappingContext maxDepth(Integer depth);
 
 	default PropertyIndexedEmbeddedMappingContext includePaths(String ... paths) {
 		return includePaths( Arrays.asList( paths ) );
