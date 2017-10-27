@@ -59,24 +59,28 @@ public final class PojoTypeOrdering implements IndexableTypeOrdering {
 	}
 
 	private void collectSuperTypesAscending(Set<Class<?>> result, Class<?> subType) {
+		if ( subType == null ) {
+			// Reached the superclass of Object or of an interface
+			return;
+		}
 		if ( ! result.add( subType ) ) {
 			// We've already seen this type, skip the rest of this method
 		}
 		for ( Class<?> interfaze : subType.getInterfaces() ) {
 			collectSuperTypesAscending( result, interfaze );
 		}
-		if ( !Object.class.equals( subType ) ) {
-			collectSuperTypesAscending( result, subType.getSuperclass() );
-		}
+		collectSuperTypesAscending( result, subType.getSuperclass() );
 	}
 
 	private void collectSuperTypesDescending(Set<Class<?>> result, Class<?> subType) {
+		if ( subType == null ) {
+			// Reached the superclass of Object or of an interface
+			return;
+		}
 		if ( result.contains( subType ) ) {
 			// We've already seen this type, skip the rest of this method
 		}
-		if ( !Object.class.equals( subType ) ) {
-			collectSuperTypesDescending( result, subType.getSuperclass() );
-		}
+		collectSuperTypesDescending( result, subType.getSuperclass() );
 		for ( Class<?> interfaze : subType.getInterfaces() ) {
 			collectSuperTypesDescending( result, interfaze );
 		}
