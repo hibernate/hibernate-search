@@ -64,7 +64,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchIndexManager implements IndexManager, IndexNameNormalizer {
 
-	static final Log LOG = LoggerFactory.make( Log.class );
+	static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * The index name for Hibernate Search, which is actually

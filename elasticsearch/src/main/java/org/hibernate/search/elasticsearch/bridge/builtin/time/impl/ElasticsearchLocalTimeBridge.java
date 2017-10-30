@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchLocalTimeBridge extends ElasticsearchTemporalAccessorStringBridge<LocalTime> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( HOUR_OF_DAY, 2 )

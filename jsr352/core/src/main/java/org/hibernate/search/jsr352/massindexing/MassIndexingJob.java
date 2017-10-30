@@ -46,7 +46,7 @@ import java.lang.invoke.MethodHandles;
  */
 public final class MassIndexingJob {
 
-	public static final Log log = LoggerFactory.make( Log.class );
+	public static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final String NAME = "hibernate-search-mass-indexing";
 

@@ -25,7 +25,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectFactory {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> VERSION_ACCESSOR = JsonAccessor.root().property( "version" ).property( "number" ).asString();
 

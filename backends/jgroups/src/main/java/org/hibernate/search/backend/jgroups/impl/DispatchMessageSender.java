@@ -44,7 +44,7 @@ import org.jgroups.util.RspList;
  */
 public final class DispatchMessageSender implements MessageSenderService, Startable, Stoppable {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final String JGROUPS_PREFIX = "hibernate.search.services.jgroups.";
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";

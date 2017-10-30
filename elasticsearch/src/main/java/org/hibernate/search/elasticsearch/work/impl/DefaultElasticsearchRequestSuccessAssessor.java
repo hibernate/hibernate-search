@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
  */
 public class DefaultElasticsearchRequestSuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<Integer> BULK_ITEM_STATUS_CODE = JsonAccessor.root().property( "status" ).asInteger();
 	private static final JsonAccessor<String> ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" ).asString();

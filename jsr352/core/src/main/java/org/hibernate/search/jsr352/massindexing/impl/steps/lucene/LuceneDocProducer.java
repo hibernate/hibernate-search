@@ -40,7 +40,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class LuceneDocProducer implements ItemProcessor {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;

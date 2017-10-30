@@ -27,7 +27,7 @@ import org.jgroups.Message;
  */
 public class JGroupsBackendQueueTask {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MessageSenderService messageSender;
 	private final String indexName;

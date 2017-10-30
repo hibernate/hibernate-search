@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class WebShopTest extends AbstractFacetTest {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Test
 	public void testSimulateClient() {

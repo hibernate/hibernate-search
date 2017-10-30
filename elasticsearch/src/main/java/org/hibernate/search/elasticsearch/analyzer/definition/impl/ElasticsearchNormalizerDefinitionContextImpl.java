@@ -20,7 +20,7 @@ public class ElasticsearchNormalizerDefinitionContextImpl
 		implements ElasticsearchNormalizerDefinitionContext,
 				ElasticsearchAnalysisDefinitionRegistryPopulator {
 
-	protected static final Log LOG = LoggerFactory.make( Log.class );
+	protected static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 

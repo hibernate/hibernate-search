@@ -27,7 +27,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class YearBridge implements IgnoreAnalyzerBridge, EncodingBridge, TwoWayFieldBridge {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final YearBridge INSTANCE = new YearBridge();
 

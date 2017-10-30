@@ -34,7 +34,7 @@ import org.jgroups.View;
  */
 public class JGroupsMasterMessageListener implements Receiver {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchIntegrator integrator;
 	private final NodeSelectorService selector;

@@ -36,7 +36,7 @@ public class ElasticsearchDateBridge
 		extends EncodingStringBridge<Date>
 		implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final ElasticsearchDateBridge DATE_YEAR = new ElasticsearchDateBridge( Resolution.YEAR );
 	public static final ElasticsearchDateBridge DATE_MONTH = new ElasticsearchDateBridge( Resolution.MONTH );

@@ -77,7 +77,7 @@ public class ToElasticsearch {
 	 */
 	public static final String FACET_FIELD_SUFFIX = "__HSearch_Facet";
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int DEFAULT_SLOP = 0;
 	private static final int DEFAULT_MAX_EDIT_DISTANCE = 0;

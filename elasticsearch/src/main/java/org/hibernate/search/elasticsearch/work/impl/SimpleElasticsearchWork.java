@@ -24,7 +24,7 @@ import java.lang.invoke.MethodHandles;
  */
 public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final CompletableFuture<Void> SUCCESSFUL_FUTURE = CompletableFuture.completedFuture( null );
 

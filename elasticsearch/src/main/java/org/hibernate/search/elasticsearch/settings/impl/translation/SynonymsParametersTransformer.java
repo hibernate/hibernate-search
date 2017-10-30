@@ -19,7 +19,7 @@ import com.google.gson.JsonPrimitive;
 
 class SynonymsParametersTransformer implements ParametersTransformer {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String SOLR_FORMAT = "solr";
 	private static final String WORDNET_FORMAT = "wordnet";

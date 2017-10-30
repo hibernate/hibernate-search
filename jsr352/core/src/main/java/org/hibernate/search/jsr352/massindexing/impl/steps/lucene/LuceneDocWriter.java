@@ -43,7 +43,7 @@ import java.lang.invoke.MethodHandles;
 @SuppressWarnings("deprecation")
 public class LuceneDocWriter extends AbstractItemWriter {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final boolean FORCE_ASYNC = true;
 
 	@Inject

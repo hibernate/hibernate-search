@@ -31,7 +31,7 @@ import java.lang.invoke.MethodHandles;
  */
 class ElasticsearchJavaUtilTimeBridgeProvider extends ExtendedBridgeProvider {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {

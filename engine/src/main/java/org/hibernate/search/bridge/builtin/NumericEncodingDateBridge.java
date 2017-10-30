@@ -47,7 +47,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class NumericEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge, EncodingBridge {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final TwoWayFieldBridge DATE_YEAR = new NumericEncodingDateBridge( Resolution.YEAR );
 	public static final TwoWayFieldBridge DATE_MONTH = new NumericEncodingDateBridge( Resolution.MONTH );

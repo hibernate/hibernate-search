@@ -31,7 +31,7 @@ public final class KnownProtocols {
 	public static final int MAJOR_VERSION = 1;
 	public static final int LATEST_MINOR_VERSION = 2;
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private volatile Protocol v1_0 = null;
 	private volatile Protocol v1_1 = null;
 	private volatile Protocol v1_2 = null;

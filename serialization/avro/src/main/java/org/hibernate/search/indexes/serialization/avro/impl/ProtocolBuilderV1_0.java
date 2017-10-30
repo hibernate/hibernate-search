@@ -27,7 +27,7 @@ class ProtocolBuilderV1_0 {
 	private static final String AVRO_SCHEMA_FILE_SUFFIX = ".avro";
 	private static final String AVRO_PROTOCOL_FILE_SUFFIX = ".avpr";
 	private static String V1_0_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, String> schemas = new HashMap<String, String>();
 

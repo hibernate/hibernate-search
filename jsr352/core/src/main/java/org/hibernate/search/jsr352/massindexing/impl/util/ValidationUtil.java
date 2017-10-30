@@ -27,7 +27,7 @@ import java.lang.invoke.MethodHandles;
  */
 public final class ValidationUtil {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ValidationUtil() {
 		// Private constructor, do not use it.

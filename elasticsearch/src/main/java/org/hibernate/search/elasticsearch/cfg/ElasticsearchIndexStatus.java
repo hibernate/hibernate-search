@@ -16,7 +16,7 @@ public enum ElasticsearchIndexStatus {
 	YELLOW("yellow"),
 	RED("red");
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String elasticsearchString;
 

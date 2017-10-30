@@ -62,7 +62,7 @@ import com.google.gson.JsonPrimitive;
 @SuppressWarnings( "deprecation" )
 public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTranslator {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public IndexMetadata translate(URLEncodedString indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {

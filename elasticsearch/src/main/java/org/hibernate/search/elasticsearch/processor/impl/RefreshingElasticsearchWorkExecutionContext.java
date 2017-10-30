@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
  */
 class RefreshingElasticsearchWorkExecutionContext extends IndexMonitorBufferingElasticsearchWorkExecutionContext {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchWorkFactory workFactory;
 

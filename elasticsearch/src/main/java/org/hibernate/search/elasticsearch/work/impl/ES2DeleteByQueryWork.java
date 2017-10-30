@@ -102,7 +102,7 @@ public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 
 	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
-		private static final Log LOG = LoggerFactory.make( Log.class );
+		private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 		private static final int NOT_FOUND_HTTP_STATUS_CODE = 404;
 

@@ -27,7 +27,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class JGroupsBackend implements Backend {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * All configuration properties need to be prefixed with <blockquote>.jgroups

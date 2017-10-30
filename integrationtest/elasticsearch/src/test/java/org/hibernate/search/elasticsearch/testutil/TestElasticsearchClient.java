@@ -45,7 +45,7 @@ import com.google.gson.JsonParser;
  */
 public class TestElasticsearchClient extends ExternalResource {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * We use a {@link DefaultElasticsearchClientFactory} to create our low-level client.

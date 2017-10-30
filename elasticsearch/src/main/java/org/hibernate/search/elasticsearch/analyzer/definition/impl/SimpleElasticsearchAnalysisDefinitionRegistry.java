@@ -29,7 +29,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class SimpleElasticsearchAnalysisDefinitionRegistry implements ElasticsearchAnalysisDefinitionRegistry {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
 	protected final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();

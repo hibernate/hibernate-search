@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class Elasticsearch50SchemaTranslator extends Elasticsearch2SchemaTranslator {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata) {

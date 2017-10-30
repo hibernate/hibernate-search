@@ -17,7 +17,7 @@ import com.google.gson.JsonPrimitive;
 
 class JsonDrivenProjection extends FieldProjection {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteName;
 

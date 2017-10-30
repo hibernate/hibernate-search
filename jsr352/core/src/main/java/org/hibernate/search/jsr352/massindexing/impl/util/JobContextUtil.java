@@ -44,7 +44,7 @@ import java.lang.invoke.MethodHandles;
  */
 public final class JobContextUtil {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private JobContextUtil() {
 		// Private constructor, do not use it.

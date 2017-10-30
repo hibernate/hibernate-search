@@ -36,7 +36,7 @@ public class ElasticsearchCalendarBridge
 		extends EncodingStringBridge<Calendar>
 		implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final ElasticsearchCalendarBridge DATE_YEAR = new ElasticsearchCalendarBridge( Resolution.YEAR );
 	public static final ElasticsearchCalendarBridge DATE_MONTH = new ElasticsearchCalendarBridge( Resolution.MONTH );

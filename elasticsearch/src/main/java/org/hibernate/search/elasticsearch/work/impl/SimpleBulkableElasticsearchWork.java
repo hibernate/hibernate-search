@@ -27,7 +27,7 @@ public abstract class SimpleBulkableElasticsearchWork<R>
 		extends SimpleElasticsearchWork<R>
 		implements BulkableElasticsearchWork<R> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JsonObject bulkableActionMetadata;
 

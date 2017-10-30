@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 
 class ElasticsearchScrollAPIDocumentExtractor implements DocumentExtractor {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Search parameters
 	private final IndexSearcher searcher;

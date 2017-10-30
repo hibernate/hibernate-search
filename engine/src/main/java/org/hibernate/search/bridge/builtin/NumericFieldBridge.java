@@ -155,7 +155,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 	};
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {

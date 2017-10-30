@@ -28,7 +28,7 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 				ElasticsearchAnalysisComponentDefinitionContext,
 				ElasticsearchAnalysisDefinitionRegistryPopulator {
 
-	protected static final Log LOG = LoggerFactory.make( Log.class );
+	protected static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String name;
 

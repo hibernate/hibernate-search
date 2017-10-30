@@ -28,7 +28,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchOffsetDateTimeBridge extends ElasticsearchTemporalAccessorStringBridge<OffsetDateTime> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchLocalDateTimeBridge.FORMATTER )
