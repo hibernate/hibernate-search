@@ -34,7 +34,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class ElasticsearchQueries {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonParser PARSER = new JsonParser();
 

@@ -69,7 +69,7 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 
 	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
-		private static final Log LOG = LoggerFactory.make( Log.class );
+		private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 		private static final int TIMED_OUT_HTTP_STATUS_CODE = 408;
 

@@ -29,7 +29,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchZonedDateTimeBridge extends ElasticsearchTemporalAccessorStringBridge<ZonedDateTime> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchOffsetDateTimeBridge.FORMATTER )

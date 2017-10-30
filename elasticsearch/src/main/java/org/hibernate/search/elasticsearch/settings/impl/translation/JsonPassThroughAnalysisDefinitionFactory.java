@@ -22,7 +22,7 @@ import com.google.gson.JsonParser;
 
 class JsonPassThroughAnalysisDefinitionFactory<D extends AnalysisDefinition> implements AnalysisDefinitionFactory<D> {
 
-	static final Log LOG = LoggerFactory.make( Log.class );
+	static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<D> targetClass;
 

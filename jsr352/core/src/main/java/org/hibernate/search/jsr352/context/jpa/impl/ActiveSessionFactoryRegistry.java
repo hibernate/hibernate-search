@@ -37,7 +37,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegistry {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final MutableSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
 

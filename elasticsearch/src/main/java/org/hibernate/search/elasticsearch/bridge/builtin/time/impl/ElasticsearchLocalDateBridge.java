@@ -29,7 +29,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchLocalDateBridge extends ElasticsearchTemporalAccessorStringBridge<LocalDate> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchYearMonthBridge.FORMATTER )

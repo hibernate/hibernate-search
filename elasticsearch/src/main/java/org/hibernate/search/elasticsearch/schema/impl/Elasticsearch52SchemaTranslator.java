@@ -24,7 +24,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class Elasticsearch52SchemaTranslator extends Elasticsearch50SchemaTranslator {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	protected void addAnalyzerOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,

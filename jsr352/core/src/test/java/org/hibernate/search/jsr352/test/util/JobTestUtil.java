@@ -38,7 +38,7 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public final class JobTestUtil {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int THREAD_SLEEP = 1000;
 

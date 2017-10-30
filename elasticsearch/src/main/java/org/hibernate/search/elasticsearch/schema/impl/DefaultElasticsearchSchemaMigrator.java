@@ -24,7 +24,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMigrator {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSchemaAccessor schemaAccessor;
 	private final ElasticsearchSchemaValidator schemaValidator;

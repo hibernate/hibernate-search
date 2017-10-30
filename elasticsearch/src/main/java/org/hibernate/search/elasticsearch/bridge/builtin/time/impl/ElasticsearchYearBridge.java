@@ -30,7 +30,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchYearBridge extends ElasticsearchTemporalAccessorStringBridge<Year> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )

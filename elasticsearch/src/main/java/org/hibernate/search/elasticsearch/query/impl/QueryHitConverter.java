@@ -46,7 +46,7 @@ import com.google.gson.JsonPrimitive;
  */
 class QueryHitConverter {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String SPATIAL_DISTANCE_FIELD = "_distance";
 

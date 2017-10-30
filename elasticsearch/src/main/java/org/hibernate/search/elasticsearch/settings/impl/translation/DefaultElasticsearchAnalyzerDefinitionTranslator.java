@@ -164,7 +164,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class DefaultElasticsearchAnalyzerDefinitionTranslator implements ElasticsearchAnalyzerDefinitionTranslator, Startable, Stoppable {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Map<String, String> luceneAnalyzers;
 

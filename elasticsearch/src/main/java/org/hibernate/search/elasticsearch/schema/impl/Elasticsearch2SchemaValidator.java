@@ -51,7 +51,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidator {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
 

@@ -28,7 +28,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchBooleanBridge implements EncodingBridge, TwoWayStringBridge, IgnoreAnalyzerBridge {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final ElasticsearchBooleanBridge INSTANCE = new ElasticsearchBooleanBridge();
 

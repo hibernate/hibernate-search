@@ -21,7 +21,7 @@ import java.lang.invoke.MethodHandles;
  */
 public final class TestDefaults {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String DEFAULT_PROPERTIES_PATH = "/test-defaults.properties";
 

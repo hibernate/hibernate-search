@@ -41,7 +41,7 @@ import java.lang.invoke.MethodHandles;
  */
 class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearchWorkOrchestrator, AutoCloseable {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 	private final FlushableElasticsearchWorkOrchestrator delegate;

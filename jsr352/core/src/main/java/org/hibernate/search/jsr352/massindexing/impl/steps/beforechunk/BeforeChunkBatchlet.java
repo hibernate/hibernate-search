@@ -34,7 +34,7 @@ import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters
  */
 public class BeforeChunkBatchlet extends AbstractBatchlet {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;

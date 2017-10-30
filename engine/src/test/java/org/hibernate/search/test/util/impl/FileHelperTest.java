@@ -33,7 +33,7 @@ import org.junit.Test;
  */
 public class FileHelperTest {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static Path root;
 

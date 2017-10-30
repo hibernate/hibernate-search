@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
  */
 public class BulkWork implements ElasticsearchWork<BulkResult> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 

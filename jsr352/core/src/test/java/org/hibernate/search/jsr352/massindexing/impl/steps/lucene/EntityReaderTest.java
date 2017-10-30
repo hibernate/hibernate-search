@@ -41,7 +41,7 @@ import org.mockito.MockitoAnnotations;
  */
 public class EntityReaderTest {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 	private static final Company[] COMPANIES = new Company[]{

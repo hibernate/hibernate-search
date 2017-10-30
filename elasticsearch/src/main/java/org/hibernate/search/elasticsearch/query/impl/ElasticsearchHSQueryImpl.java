@@ -74,7 +74,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(

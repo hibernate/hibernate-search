@@ -27,7 +27,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class ElasticsearchMonthDayBridge extends ElasticsearchTemporalAccessorStringBridge<MonthDay> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendLiteral( "--" )

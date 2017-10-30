@@ -64,7 +64,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private static final int NON_STREAM_MAX_CHANGESETS_PER_BATCH = 10 * MAX_BULK_SIZE;
 	private static final int STREAM_MAX_CHANGESETS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ErrorHandler errorHandler;
 	private final ElasticsearchClient client;

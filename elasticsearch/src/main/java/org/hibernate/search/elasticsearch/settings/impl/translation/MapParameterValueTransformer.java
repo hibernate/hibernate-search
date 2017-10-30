@@ -16,7 +16,7 @@ import com.google.gson.JsonElement;
 
 class MapParameterValueTransformer implements ParameterValueTransformer {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<?> factoryClass;
 	private final String parameterName;

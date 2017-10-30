@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
  */
 public class DefaultElasticsearchClient implements ElasticsearchClientImplementor {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Log requestLog = LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST );
 

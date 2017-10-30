@@ -33,7 +33,7 @@ import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isExce
  */
 public class LogTest {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Gson GSON = new Gson();
 
