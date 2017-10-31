@@ -289,7 +289,6 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-search-testing</artifactId>
-                    <version>${project.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
