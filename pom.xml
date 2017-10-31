@@ -1598,6 +1598,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
                 <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <!-- And this to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
+                <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
         </profile>
         <profile>
@@ -1610,6 +1612,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
                 <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <!-- And this to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
+                <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
         </profile>
 

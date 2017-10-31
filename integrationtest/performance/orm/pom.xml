@@ -208,6 +208,7 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipWildFlyPreparation}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
@@ -245,6 +246,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipWildFlyPreparation}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${jdbc.driver.groupId}</groupId>
