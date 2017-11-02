@@ -126,8 +126,9 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 		return providedServices;
 	}
 
-	public void addProvidedService(Class<? extends Service> serviceRole, Object service) {
+	public SearchConfigurationForTest addProvidedService(Class<? extends Service> serviceRole, Object service) {
 		providedServices.put( serviceRole, service );
+		return this;
 	}
 
 	@Override

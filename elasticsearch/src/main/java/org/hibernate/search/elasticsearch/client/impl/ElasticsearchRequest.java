@@ -67,6 +67,17 @@ public final class ElasticsearchRequest {
 		return bodyParts;
 	}
 
+	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "method=" ).append( method )
+				.append( ", path=" ).append( path )
+				.append( ", parameters=" ).append( parameters )
+				.append( "]" )
+				.toString();
+	}
+
 	public static final class Builder {
 		private static final char PATH_SEPARATOR = '/';
 
