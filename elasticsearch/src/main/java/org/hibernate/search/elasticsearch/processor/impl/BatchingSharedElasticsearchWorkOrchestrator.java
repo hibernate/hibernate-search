@@ -13,8 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
@@ -39,11 +37,11 @@ import java.lang.invoke.MethodHandles;
  *
  * @author Yoann Rodiere
  */
-class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearchWorkOrchestrator, AutoCloseable {
+class BatchingSharedElasticsearchWorkOrchestrator extends AbstractBarrierElasticsearchWorkOrchestrator
+		implements BarrierElasticsearchWorkOrchestrator, AutoCloseable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String name;
 	private final FlushableElasticsearchWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
@@ -52,9 +50,6 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	private final BlockingQueue<Changeset> changesetQueue;
 	private final List<Changeset> changesetBuffer;
 	private final AtomicBoolean processingScheduled;
-
-	private boolean open; // Guarded by shutdownLock
-	private final ReadWriteLock shutdownLock;
 
 	private final Phaser phaser = new Phaser() {
 		@Override
@@ -65,7 +60,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	};
 
 	/**
-	 * @param name The name of the orchestrator thread
+	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param maxChangesetsPerBatch The maximum number of changesets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
@@ -79,7 +74,7 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 			String name, int maxChangesetsPerBatch, boolean fair,
 			FlushableElasticsearchWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
-		this.name = name;
+		super( name );
 		this.delegate = delegate;
 		this.errorHandler = errorHandler;
 		this.changesetsPerBatch = maxChangesetsPerBatch;
@@ -87,34 +82,30 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 		changesetBuffer = CollectionHelper.newArrayList( maxChangesetsPerBatch );
 		executor = Executors.newFixedThreadPool( 1, name );
 		processingScheduled = new AtomicBoolean( false );
-		open = true;
-		shutdownLock = new ReentrantReadWriteLock();
+	}
+
+	/**
+	 * Create a child orchestrator.
+	 * <p>
+	 * The child orchestrator will use the same resources and its works
+	 * will be executed by the same background thread.
+	 * <p>
+	 * Closing the child will not close the parent,
+	 * but will make the current thread wait for the completion of previously submitted works,
+	 * and will prevent any more work to be submitted through the child.
+	 *
+	 * @param name The name of the child orchestrator when reporting errors
+	 */
+	public BarrierElasticsearchWorkOrchestrator createChild(String name) {
+		return new ChildOrchestrator( name );
 	}
 
 	@Override
-	public CompletableFuture<Void> submit(Iterable<ElasticsearchWork<?>> works) {
+	protected CompletableFuture<Void> doSubmit(Iterable<ElasticsearchWork<?>> works)
+			throws InterruptedException {
 		CompletableFuture<Void> future = new CompletableFuture<>();
-
-		if ( !shutdownLock.readLock().tryLock() ) {
-			// The orchestrator is shutting down: abort.
-			throw LOG.orchestratorShutDownBeforeSubmittingChangeset( name );
-		}
-		try {
-			if ( !open ) {
-				// The orchestrator has shut down: abort.
-				throw LOG.orchestratorShutDownBeforeSubmittingChangeset( name );
-			}
-			changesetQueue.put( new Changeset( works, future ) );
-			ensureProcessingScheduled();
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw LOG.threadInterruptedWhileSubmittingChangeset( name );
-		}
-		finally {
-			shutdownLock.readLock().unlock();
-		}
-
+		changesetQueue.put( new Changeset( works, future ) );
+		ensureProcessingScheduled();
 		return future;
 	}
 
@@ -186,31 +177,23 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 	}
 
 	@Override
-	public void close() {
-		shutdownLock.writeLock().lock();
-		try {
-			if ( !open ) {
-				return;
-			}
-			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				open = false;
-				closer.push( () -> {
-					try {
-						awaitCompletion();
-					}
-					catch (InterruptedException e) {
-						LOG.interruptedWhileWaitingForIndexActivity( e );
-						Thread.currentThread().interrupt();
-					}
-				} );
-				closer.push( executor::shutdownNow );
-				//It's possible that a task was successfully scheduled but had no chance to run,
-				//so we need to release waiting threads:
-				closer.push( phaser::forceTermination );
-			}
+	protected void doClose() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( () -> awaitCompletionBeforeClose( getName() ) );
+			closer.push( executor::shutdownNow );
+			//It's possible that a task was successfully scheduled but had no chance to run,
+			//so we need to release waiting threads:
+			closer.push( phaser::forceTermination );
 		}
-		finally {
-			shutdownLock.writeLock().unlock();
+	}
+
+	private void awaitCompletionBeforeClose(String name) {
+		try {
+			awaitCompletion();
+		}
+		catch (InterruptedException e) {
+			LOG.interruptedWhileWaitingForIndexActivity( name, e );
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -303,6 +286,29 @@ class BatchingSharedElasticsearchWorkOrchestrator implements BarrierElasticsearc
 		public Changeset(Iterable<ElasticsearchWork<?>> works, CompletableFuture<Void> future) {
 			this.works = works;
 			this.future = future;
+		}
+	}
+
+	private class ChildOrchestrator extends AbstractBarrierElasticsearchWorkOrchestrator
+			implements BarrierElasticsearchWorkOrchestrator {
+
+		protected ChildOrchestrator(String name) {
+			super( name );
+		}
+
+		@Override
+		protected CompletableFuture<Void> doSubmit(Iterable<ElasticsearchWork<?>> works) throws InterruptedException {
+			return BatchingSharedElasticsearchWorkOrchestrator.this.submit( works );
+		}
+
+		@Override
+		public void awaitCompletion() throws InterruptedException {
+			BatchingSharedElasticsearchWorkOrchestrator.this.awaitCompletion();
+		}
+
+		@Override
+		protected void doClose() {
+			BatchingSharedElasticsearchWorkOrchestrator.this.awaitCompletionBeforeClose( getName() );
 		}
 	}
 

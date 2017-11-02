@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.processor.impl;
 
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
@@ -19,9 +18,5 @@ import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 public interface ElasticsearchWorkOrchestrator {
 
 	CompletableFuture<Void> submit(Iterable<ElasticsearchWork<?>> nonBulkedWorks);
-
-	default CompletableFuture<?> submit(ElasticsearchWork<?> work) {
-		return submit( Collections.singleton( work ) );
-	}
 
 }

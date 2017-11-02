@@ -23,6 +23,10 @@ public interface BarrierElasticsearchWorkOrchestrator extends ElasticsearchWorkO
 	 */
 	void awaitCompletion() throws InterruptedException;
 
+	/**
+	 * Prevent any more work to be submitted, block until there is no more work to execute,
+	 * then release resources.
+	 */
 	@Override
 	void close();
 

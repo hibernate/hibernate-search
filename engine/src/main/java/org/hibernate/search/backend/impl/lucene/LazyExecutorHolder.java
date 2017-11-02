@@ -93,7 +93,7 @@ final class LazyExecutorHolder {
 				asyncIndexingExecutor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 			}
 			catch (InterruptedException e) {
-				log.interruptedWhileWaitingForIndexActivity( e );
+				log.interruptedWhileWaitingForIndexActivity( indexName, e );
 			}
 			if ( ! asyncIndexingExecutor.isTerminated() ) {
 				log.unableToShutdownAsynchronousIndexingByTimeout( indexName );

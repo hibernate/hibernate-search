@@ -72,7 +72,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
-	private final BarrierElasticsearchWorkOrchestrator streamOrchestrator;
+	private final BatchingSharedElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
 			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
@@ -94,7 +94,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		 * so we disable refreshes both in the bulk API call and in the execution contexts.
 		 */
 		this.streamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch async stream work orchestrator",
+				"Elasticsearch stream work orchestrator",
 				STREAM_MAX_CHANGESETS_PER_BATCH,
 				false, // Do not care about ordering when queuing changesets
 				createParallelOrchestrator( this::createIndexMonitorBufferingWorkExecutionContext, STREAM_MIN_BULK_SIZE, false ) );
@@ -144,7 +144,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Return an orchestrator for non-stream background works.
+	 * Return an orchestrator for non-stream works.
 	 * <p>
 	 * Works submitted in the same changeset will be executed in the given order.
 	 * Relative execution order between changesets is undefined.
@@ -156,6 +156,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
 	 * and the remaining works will not be executed.
 	 *
+	 * @param indexName The name of the index that all submitted works will target.
 	 * @return the orchestrator for synchronous, non-stream background works.
 	 */
 	public BarrierElasticsearchWorkOrchestrator createNonStreamOrchestrator(String indexName, boolean refreshAfterWrite) {
@@ -195,7 +196,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
-	 * Return the orchestrator for asynchronous, non-stream background works.
+	 * Return an orchestrator for asynchronous, stream background works.
 	 * <p>
 	 * Works submitted in the same changeset will be executed in the given order.
 	 * Relative execution order between changesets is undefined.
@@ -204,14 +205,21 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * will only be bulked with subsequent works from the same changeset
 	 * or with works from a different changeset.
 	 * <p>
+	 * Works submitted to this orchestrator may be bulked with works from changesets
+	 * targeting different indexes, submitted to a different stream orchestrator
+	 * relying on the same internal resources.
+	 * <p>
 	 * If any work throws an exception, this exception will be passed
 	 * to the error handler with an {@link ErrorContext} spanning exactly the given works,
 	 * and the remaining works will not be executed.
 	 *
+	 * @param indexName The name of the index that all submitted works will target.
 	 * @return the orchestrator for stream background works.
 	 */
-	public BarrierElasticsearchWorkOrchestrator getStreamOrchestrator() {
-		return streamOrchestrator;
+	public BarrierElasticsearchWorkOrchestrator createStreamOrchestrator(String indexName) {
+		return streamOrchestrator.createChild(
+				"Elasticsearch stream work orchestrator for index " + indexName
+		);
 	}
 
 	private <T> CompletableFuture<T> start(ElasticsearchWork<T> work, ElasticsearchWorkExecutionContext context) {

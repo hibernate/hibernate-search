@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -55,7 +54,9 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * An {@link IndexManager} applying indexing work to an Elasticsearch server.
@@ -105,6 +106,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private ElasticsearchIndexWorkVisitor visitor;
 	private ElasticsearchWorkProcessor workProcessor;
 	private BarrierElasticsearchWorkOrchestrator nonStreamOrchestrator;
+	private BarrierElasticsearchWorkOrchestrator streamOrchestrator;
 
 	// Lifecycle
 
@@ -158,6 +160,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		this.workProcessor = elasticsearchService.getWorkProcessor();
 
 		this.nonStreamOrchestrator = workProcessor.createNonStreamOrchestrator( indexName, refreshAfterWrite );
+		this.streamOrchestrator = workProcessor.createStreamOrchestrator( indexName );
 	}
 
 	/**
@@ -231,11 +234,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	@Override
 	public void destroy() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( this::awaitCompletion, nonStreamOrchestrator );
+			closer.push( nonStreamOrchestrator::close );
+			closer.push( streamOrchestrator::close );
 			if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
 				closer.push( () -> elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions ) );
 			}
-			closer.push( nonStreamOrchestrator::close );
 
 			workProcessor = null;
 			visitor = null;
@@ -426,9 +429,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				.index( actualIndexName )
 				.build();
 		awaitCompletion( nonStreamOrchestrator );
-		awaitCompletion( workProcessor.getStreamOrchestrator() );
+		awaitCompletion( streamOrchestrator );
 		nonStreamOrchestrator
-				.submit( flushWork )
+				.submit( Collections.singleton( flushWork ) )
 				.join();
 	}
 
@@ -457,13 +460,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
 			awaitAsyncProcessingCompletion();
-			workProcessor.getStreamOrchestrator()
-					.submit( elasticsearchWork )
+			streamOrchestrator.submit( Collections.singleton( elasticsearchWork ) )
 					.join();
 		}
 		else {
-			workProcessor.getStreamOrchestrator()
-					.submit( elasticsearchWork );
+			streamOrchestrator.submit( Collections.singleton( elasticsearchWork ) );
 		}
 	}
 
@@ -472,7 +473,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		if ( !sync ) {
 			awaitCompletion( nonStreamOrchestrator );
 		}
-		awaitCompletion( workProcessor.getStreamOrchestrator() );
+		awaitCompletion( streamOrchestrator );
 	}
 
 	private void awaitCompletion(BarrierElasticsearchWorkOrchestrator orchestrator) {

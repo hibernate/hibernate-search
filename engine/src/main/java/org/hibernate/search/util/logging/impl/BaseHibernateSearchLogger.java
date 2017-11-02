@@ -50,8 +50,8 @@ public interface BaseHibernateSearchLogger extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 49,
-			value = "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity(@Cause InterruptedException e);
+			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
+	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 69, value = "Illegal object retrieved from message")
