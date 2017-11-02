@@ -103,6 +103,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Tika -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
@@ -446,7 +453,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-wildfly-testingmodules</artifactId>
+                                            <artifactId>hibernate-search-testing-jbossmodules</artifactId>
                                             <version>${project.version}</version>
                                             <classifier>testing-modules-dist</classifier>
                                             <type>zip</type>
@@ -455,7 +462,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-wildfly-testingmodules</artifactId>
+                                            <artifactId>hibernate-search-testing-jbossmodules</artifactId>
                                             <version>${project.version}</version>
                                             <classifier>testing-modules-dist</classifier>
                                             <type>zip</type>

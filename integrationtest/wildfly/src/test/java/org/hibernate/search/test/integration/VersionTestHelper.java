@@ -29,6 +29,7 @@ public class VersionTestHelper {
 	private static String hibernateOrmModuleName = null;
 	private static String luceneFullVersion = null;
 	private static String hibernateAnnotationsFullVersion = null;
+	private static String tikaVersion = null;
 
 	private VersionTestHelper() {
 		//not meant to be created
@@ -88,6 +89,13 @@ public class VersionTestHelper {
 			hibernateAnnotationsFullVersion = injectVariables( "${dependency.version.hcann}" );
 		}
 		return hibernateAnnotationsFullVersion;
+	}
+
+	public static synchronized String getDependencyVersionTika() {
+		if ( tikaVersion == null ) {
+			tikaVersion = injectVariables( "${dependency.version.tika}" );
+		}
+		return tikaVersion;
 	}
 
 	public static String getWildFlyModuleIdentifier() {
