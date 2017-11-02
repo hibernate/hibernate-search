@@ -338,7 +338,6 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 * <p>This method only may add new mappings to the existing index (depending on the strategy), but will never
 	 * create or drop the index (since it's supposed to have been created by Hibernate Search already, if necessary).
 	 *
-	 * @param indexCreatedByHibernateSearch If the index was created by Hibernate Search in {@link #initializeIndex(Set)}.
 	 * @param entityTypesToInitialize The entity types whose mapping will be added to the index
 	 * (if it's part of the schema management strategy).
 	 */
