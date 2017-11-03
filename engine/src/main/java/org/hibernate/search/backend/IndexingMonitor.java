@@ -12,11 +12,19 @@ package org.hibernate.search.backend;
 public interface IndexingMonitor {
 
 	/**
-	 * Notify the IndexingMonitor of the number of documents added to the index.
-	 * This can be invoked several times during the indexing process, and could
-	 * be invoked concurrently by different threads.
+	 * Notify the monitor that {@code increment} more documents have been added to the index.
+	 * <p>
+	 * Summing the numbers passed to this method gives the total
+	 * number of documents that have been added to the index so far.
+	 * <p>
+	 * This method is invoked several times during indexing,
+	 * and calls are <strong>incremental</strong>:
+	 * calling {@code documentsAdded(3)} and then {@code documentsAdded(1)}
+	 * should be understood as "3+1 documents, i.e. 4 documents have been added to the index".
+	 * <p>
+	 * This method can be invoked from several threads and should thus be thread-safe.
 	 *
-	 * @param increment number of documents add operations performed
+	 * @param increment additional number of documents built
 	 */
 	void documentsAdded(long increment);
 
