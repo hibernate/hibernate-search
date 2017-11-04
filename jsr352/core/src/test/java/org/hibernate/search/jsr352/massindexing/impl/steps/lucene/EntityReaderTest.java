@@ -8,6 +8,8 @@ package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.persistence.EntityManager;
@@ -39,10 +41,13 @@ import static org.junit.Assert.assertNull;
 public class EntityReaderTest {
 
 	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
-	private static final Company[] COMPANIES = new Company[]{
+
+	private static final List<Company> COMPANIES = Arrays.asList(
 			new Company( "Red Hat" ),
 			new Company( "Google" ),
-			new Company( "Microsoft" ) };
+			new Company( "Microsoft" )
+	);
+
 	private EntityManagerFactory emf;
 
 	@Mock
@@ -61,9 +66,7 @@ public class EntityReaderTest {
 			emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
 			em = emf.createEntityManager();
 			em.getTransaction().begin();
-			for ( Company c : COMPANIES ) {
-				em.persist( c );
-			}
+			COMPANIES.forEach( em::persist );
 			em.getTransaction().commit();
 		}
 		finally {
@@ -116,9 +119,9 @@ public class EntityReaderTest {
 
 		try {
 			entityReader.open( null );
-			for ( int i = 0; i < COMPANIES.length; i++ ) {
-				Company c = (Company) entityReader.readItem();
-				assertEquals( COMPANIES[i].getName(), c.getName() );
+			for ( Company expected : COMPANIES ) {
+				Company actual = (Company) entityReader.readItem();
+				assertEquals( expected.getName(), actual.getName() );
 			}
 			// no more item
 			assertNull( entityReader.readItem() );

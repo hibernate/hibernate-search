@@ -68,15 +68,9 @@ public abstract class AbstractBatchIndexingIT {
 			emf = Persistence.createEntityManagerFactory( getPersistenceUnitName() );
 			em = emf.createEntityManager();
 			em.getTransaction().begin();
-			for ( Company c : companies ) {
-				em.persist( c );
-			}
-			for ( Person p : people ) {
-				em.persist( p );
-			}
-			for ( WhoAmI w : whos ) {
-				em.persist( w );
-			}
+			companies.forEach( em::persist );
+			people.forEach( em::persist );
+			whos.forEach( em::persist );
 			em.getTransaction().commit();
 		}
 		finally {
@@ -107,9 +101,7 @@ public abstract class AbstractBatchIndexingIT {
 			criteria.orderBy( criteriaBuilder.asc( id ) );
 			List<Company> companies = em.createQuery( criteria ).setMaxResults( count ).getResultList();
 			FullTextEntityManager ftEm = Search.getFullTextEntityManager( em );
-			for ( Company company : companies ) {
-				ftEm.index( company );
-			}
+			companies.forEach( ftEm::index );
 			em.getTransaction().commit();
 		}
 		finally {
