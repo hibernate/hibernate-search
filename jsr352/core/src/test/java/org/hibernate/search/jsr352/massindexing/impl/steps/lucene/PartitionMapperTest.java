@@ -15,14 +15,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,8 +39,6 @@ import static org.junit.Assert.assertNotNull;
  * @author Mincong Huang
  */
 public class PartitionMapperTest {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 	private static final int COMP_ROWS = 3;
@@ -73,11 +68,8 @@ public class PartitionMapperTest {
 			em.getTransaction().commit();
 		}
 		finally {
-			try {
+			if ( em != null ) {
 				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
 			}
 		}
 

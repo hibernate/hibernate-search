@@ -20,13 +20,10 @@ import javax.persistence.criteria.Root;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.PersistenceUnitTestUtil;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,8 +32,6 @@ import org.junit.Before;
  * @author Mincong Huang
  */
 public abstract class AbstractBatchIndexingIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
@@ -85,11 +80,8 @@ public abstract class AbstractBatchIndexingIT {
 			em.getTransaction().commit();
 		}
 		finally {
-			try {
+			if ( em != null ) {
 				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
 			}
 		}
 	}
@@ -121,11 +113,8 @@ public abstract class AbstractBatchIndexingIT {
 			em.getTransaction().commit();
 		}
 		finally {
-			try {
+			if ( em != null ) {
 				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
 			}
 		}
 	}

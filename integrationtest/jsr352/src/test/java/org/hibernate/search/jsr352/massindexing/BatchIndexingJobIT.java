@@ -7,6 +7,7 @@
 package org.hibernate.search.jsr352.massindexing;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 import org.junit.Test;
 
@@ -148,11 +148,8 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 			em.getTransaction().commit();
 		}
 		finally {
-			try {
+			if ( em != null ) {
 				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
 			}
 		}
 

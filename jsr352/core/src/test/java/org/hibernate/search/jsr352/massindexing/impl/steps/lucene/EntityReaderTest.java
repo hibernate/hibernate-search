@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.Arrays;
 import java.util.HashSet;
-
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.persistence.EntityManager;
@@ -19,20 +15,21 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit test for item reader validation.
@@ -40,8 +37,6 @@ import org.mockito.MockitoAnnotations;
  * @author Mincong Huang
  */
 public class EntityReaderTest {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
 	private static final Company[] COMPANIES = new Company[]{
@@ -72,11 +67,8 @@ public class EntityReaderTest {
 			em.getTransaction().commit();
 		}
 		finally {
-			try {
+			if ( em != null ) {
 				em.close();
-			}
-			catch (Exception e) {
-				log.error( e );
 			}
 		}
 
