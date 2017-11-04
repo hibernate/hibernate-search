@@ -142,9 +142,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 				groups.add( new CompanyGroup( "group" + index2, companies.get( index1 ), companies.get( index2 ) ) );
 				groups.add( new CompanyGroup( "group" + index3, companies.get( index3 ) ) );
 			}
-			for ( CompanyGroup group : groups ) {
-				em.persist( group );
-			}
+			groups.forEach( em::persist );
 			em.getTransaction().commit();
 		}
 		finally {
