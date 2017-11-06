@@ -26,37 +26,61 @@ import org.hibernate.search.backend.IndexingMonitor;
 public interface MassIndexerProgressMonitor extends IndexingMonitor {
 
 	/**
-	 * The number of Documents built;
-	 * This is invoked several times and concurrently during
-	 * the indexing process.
+	 * Notify the monitor that {@code increment} more documents have been built.
+	 * <p>
+	 * Summing the numbers passed to this method gives the total
+	 * number of documents that have been built so far.
+	 * <p>
+	 * This method is invoked several times during indexing,
+	 * and calls are <strong>incremental</strong>:
+	 * calling {@code documentsBuilt(3)} and then {@code documentsBuilt(1)}
+	 * should be understood as "3+1 documents, i.e. 4 documents have been built".
+	 * <p>
+	 * This method can be invoked from several threads and should thus be thread-safe.
 	 *
-	 * @param number number of {@code Document}s built
+	 * @param increment additional number of documents built
 	 */
-	void documentsBuilt(int number);
+	void documentsBuilt(int increment);
 
 	/**
-	 * The number of entities loaded from database;
-	 * This is invoked several times and concurrently during
-	 * the indexing process.
+	 * Notify the monitor that {@code increment} more entities have been loaded from the database.
+	 * <p>
+	 * Summing the numbers passed to this method gives the total
+	 * number of entities that have been loaded so far.
+	 * <p>
+	 * This method is invoked several times during indexing,
+	 * and calls are <strong>incremental</strong>:
+	 * calling {@code entitiesLoaded(3)} and then {@code entitiesLoaded(1)}
+	 * should be understood as "3+1 documents, i.e. 4 documents have been loaded".
+	 * <p>
+	 * This method can be invoked from several threads and should thus be thread-safe.
 	 *
-	 * @param size number of entities loaded from database
+	 * @param increment additional number of entities loaded from database
 	 */
-	void entitiesLoaded(int size);
+	void entitiesLoaded(int increment);
 
 	/**
-	 * The total count of entities to be indexed is
-	 * added here; It could be called more than once,
-	 * the implementation should add them up.
-	 * This is invoked several times and concurrently during
-	 * the indexing process.
+	 * Notify the monitor that {@code increment} more entities have been
+	 * detected in the database and will be indexed.
+	 * <p>
+	 * Summing the numbers passed to this method gives the total
+	 * number of entities that Hibernate Search plans to index.
+	 * This number can be incremented during indexing
+	 * as Hibernate Search moves from one entity type to the next.
+	 * <p>
+	 * This method is invoked several times during indexing,
+	 * and calls are <strong>incremental</strong>:
+	 * calling {@code addToTotalCount(3)} and then {@code addToTotalCount(1)}
+	 * should be understood as "3+1 documents, i.e. 4 documents will be indexed".
+	 * <p>
+	 * This method can be invoked from several threads and should thus be thread-safe.
 	 *
-	 * @param count number of newly indexed entities which has to
-	 * be added to total count
+	 * @param increment additional number of entities that will be indexed
 	 */
-	void addToTotalCount(long count);
+	void addToTotalCount(long increment);
 
 	/**
-	 * Invoked when the indexing is completed.
+	 * Notify the monitor that indexing is complete.
 	 */
 	void indexingCompleted();
 }
