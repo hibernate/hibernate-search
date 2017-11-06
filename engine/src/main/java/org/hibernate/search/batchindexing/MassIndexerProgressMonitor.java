@@ -36,7 +36,7 @@ public interface MassIndexerProgressMonitor extends IndexingMonitor {
 	 * calling {@code documentsBuilt(3)} and then {@code documentsBuilt(1)}
 	 * should be understood as "3+1 documents, i.e. 4 documents have been built".
 	 * <p>
-	 * This method can be invoked from several threads and should thus be thread-safe.
+	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of documents built
 	 */
@@ -53,7 +53,7 @@ public interface MassIndexerProgressMonitor extends IndexingMonitor {
 	 * calling {@code entitiesLoaded(3)} and then {@code entitiesLoaded(1)}
 	 * should be understood as "3+1 documents, i.e. 4 documents have been loaded".
 	 * <p>
-	 * This method can be invoked from several threads and should thus be thread-safe.
+	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of entities loaded from database
 	 */
@@ -73,7 +73,7 @@ public interface MassIndexerProgressMonitor extends IndexingMonitor {
 	 * calling {@code addToTotalCount(3)} and then {@code addToTotalCount(1)}
 	 * should be understood as "3+1 documents, i.e. 4 documents will be indexed".
 	 * <p>
-	 * This method can be invoked from several threads and should thus be thread-safe.
+	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of entities that will be indexed
 	 */

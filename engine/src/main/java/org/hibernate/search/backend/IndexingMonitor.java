@@ -22,7 +22,7 @@ public interface IndexingMonitor {
 	 * calling {@code documentsAdded(3)} and then {@code documentsAdded(1)}
 	 * should be understood as "3+1 documents, i.e. 4 documents have been added to the index".
 	 * <p>
-	 * This method can be invoked from several threads and should thus be thread-safe.
+	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of documents built
 	 */
