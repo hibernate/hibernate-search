@@ -246,6 +246,7 @@
                             org.hibernate.search.util.impl;version="${project.version}",
                             org.hibernate.search.util.logging.impl;version="${project.version}",
                             org.hibernate.search.util.jmx.impl;version="${project.version}",
+                            org.hibernate.search.analyzer.spi;version="${project.version}",
                             org.hibernate.search.engine.service.named.spi;version="${project.version}",
                             org.hibernate.search.engine.service.beanresolver.spi;version="${project.version}"
                         </Export-Package>
