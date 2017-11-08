@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint> {
 
@@ -36,12 +37,12 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 			ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = super.contribute( reference, collector );
 
-		ElasticsearchFieldFormatter formatter = GeoPointFieldFormatter.INSTANCE;
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( GeoPointFieldFormatter.INSTANCE );
+
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
 		mapping.setType( DataType.GEO_POINT );
 
 		String absolutePath = accessor.getStaticAbsolutePath();
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
 
 		return mapping;

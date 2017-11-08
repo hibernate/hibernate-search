@@ -22,6 +22,7 @@ import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContext<String> {
 
@@ -43,8 +44,9 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 			ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		ElasticsearchFieldFormatter formatter = StringFieldFormatter.INSTANCE;
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( StringFieldFormatter.INSTANCE );
+
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
@@ -62,7 +64,6 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 		}
 
 		String absolutePath = accessor.getStaticAbsolutePath();
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
 
 		return mapping;

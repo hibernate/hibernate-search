@@ -18,6 +18,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
+/**
+ * @author Yoann Rodiere
+ * @author Guillaume Smet
+ */
 public class JsonStringFieldModelContext implements TerminalFieldModelContext<String>,
 		ElasticsearchIndexModelNodeContributor<PropertyMapping> {
 
@@ -44,11 +48,11 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
-		ElasticsearchFieldFormatter formatter = JsonStringFieldFormatter.INSTANCE;
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( JsonStringFieldFormatter.INSTANCE );
+
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
 
 		String absolutePath = accessor.getStaticAbsolutePath();
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
 
 		return mapping;

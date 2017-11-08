@@ -19,6 +19,7 @@ import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> {
 
@@ -32,12 +33,13 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<Integer> reference, ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = super.contribute( reference, collector );
 
-		ElasticsearchFieldFormatter formatter = IntegerFieldFormatter.INSTANCE;
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( IntegerFieldFormatter.INSTANCE );
+
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
 		mapping.setType( DataType.INTEGER );
 
 		String absolutePath = accessor.getStaticAbsolutePath();
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+
 		collector.collect( absolutePath, model );
 
 		return mapping;

@@ -31,6 +31,7 @@ import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDate> {
 
@@ -57,12 +58,13 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 			ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = super.contribute( reference, collector );
 
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, formatter ) );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+
+		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
 		mapping.setType( DataType.DATE );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
 
 		String absolutePath = accessor.getStaticAbsolutePath();
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
 		collector.collect( absolutePath, model );
 
 		return mapping;
