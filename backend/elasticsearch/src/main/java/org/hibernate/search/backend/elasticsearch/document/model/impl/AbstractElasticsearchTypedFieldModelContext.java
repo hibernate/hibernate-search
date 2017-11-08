@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldReference;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitializationIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchTypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 

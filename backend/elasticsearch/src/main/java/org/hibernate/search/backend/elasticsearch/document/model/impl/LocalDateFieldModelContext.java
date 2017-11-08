@@ -18,7 +18,7 @@ import java.time.format.SignStyle;
 import java.util.Arrays;
 import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.DeferredInitializationIndexFieldReference;
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
