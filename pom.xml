@@ -693,12 +693,12 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.2</version>
+                <version>3.5.1</version>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.6</version>
             </dependency>
             <dependency>
                 <groupId>simple-jndi</groupId>
