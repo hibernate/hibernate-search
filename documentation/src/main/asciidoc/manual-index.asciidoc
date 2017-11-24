@@ -481,7 +481,7 @@ will attempt to preload everything in memory.
 |-
 |Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity
 type. Mixing this approach with the criteria restriction is not allowed. Please notice that there's
-no query validation for your input. See <<jsr-352-index-scope>> for more detail and limitations.
+no query validation for your input. See <<jsr-352-indexing-mode>> for more detail and limitations.
 
 |`customQueryCriteria` (Not available, query builder only)
 |`restrictedBy(Criterion)`
@@ -490,7 +490,7 @@ no query validation for your input. See <<jsr-352-index-scope>> for more detail 
 |Add criterion to construct a customized selection of mass-indexing under the criteria approach. You
 can call this method multiple times to add multiple criteria: only entities matching every criterion
 will be indexed. However, mixing this approach with the HQL restriction is not allowed.
-See <<jsr-352-index-scope>> for more detail and limitations.
+See <<jsr-352-indexing-mode>> for more detail and limitations.
 
 |`maxResultsPerEntity`
 |`maxResultsPerEntity(int)`
@@ -541,30 +541,30 @@ than 0, and equal to or less than the value of `checkpointInterval`.
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
 |===
 
-==== [[jsr-352-indexing-mode]] Define indexing mode for each entity
+==== [[jsr-352-indexing-mode]] Indexing mode
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
-indexation or a partial indexation through 3 different methods: selecting the desired entity types,
+indexing or a partial indexing through 3 different methods: selecting the desired entity types,
 using HQL, or using Hibernate criteria.
 
 .How to define the indexing mode?
 ====
 [source, JAVA]
 ----
-// full indexation
+// full indexing
 Properties jobProps1 = MassIndexingJob
         .parameters()
         .forEntity( MyClass.class )
         .build();
 
-// partial indexation using HQL
+// partial indexing using HQL
 Properties jobProps2 = MassIndexingJob
         .parameters()
         .forEntity( MyClass.class )
         .restrictedBy( "select c from MyClass c where c.name in ( 'Foo', 'Bar' )" )
         .build();
 
-// partial indexation using Criteria
+// partial indexing using Criteria
 Properties jobProps3 = MassIndexingJob
         .parameters()
         .forEntity( MyClass.class )
@@ -573,7 +573,7 @@ Properties jobProps3 = MassIndexingJob
 ----
 ====
 
-While the full indexation is useful when you perform the very first indexation, or
+While the full indexing is useful when you perform the very first indexing, or
 after extensive changes to your whole database, it may also be time consuming.
 If your want to reindex only part of your data, you need to add restrictions using HQL or criteria:
 they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
@@ -613,7 +613,7 @@ and only if you know that no entities matching the query will be created during 
 
 ==== Parallel indexing
 
-For better performance, indexation is performed in parallel using multiple threads. The set of
+For better performance, indexing is performed in parallel using multiple threads. The set of
 entities to index is split into multiple partitions. Each thread processes one partition at a time.
 
 The following section will explain how to tune the parallel execution.
@@ -647,12 +647,12 @@ MassIndexingJob.parameters()
 ====
 Note that the batch runtime cannot guarantee the requested number of threads are available, it will
 use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, page 34). Note also that all
-batch jobs share the same thread pool—so it's a good idea to execute jobs separately.
+batch jobs share the same thread pool, so it's not always a good idea to execute jobs concurrently.
 ====
 
 ===== Rows per partition
 
-Each partition consists of a fix number of elements to index. You may tune exactly how many elements
+Each partition consists of a fixed number of elements to index. You may tune exactly how many elements
 a partition will hold with `rowsPerPartition`.
 
 ====
