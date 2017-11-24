@@ -541,7 +541,8 @@ than 0, and equal to or less than the value of `checkpointInterval`.
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
 |===
 
-==== [[jsr-352-indexing-mode]] Indexing mode
+[[jsr-352-indexing-mode]]
+==== Indexing mode
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
 indexing or a partial indexing through 3 different methods: selecting the desired entity types,
@@ -695,7 +696,8 @@ Each partition deals with one root entity type, so two different entity types wi
 the same partition.
 ====
 
-==== [[jsr-352-chunking]] Chunking and session clearing
+[[jsr-352-chunking]]
+==== Chunking and session clearing
 
 The mass indexing job supports restart a suspended or failed job more or less from where it stopped.
 
@@ -745,7 +747,8 @@ which essentially means that the less you do it, the faster indexing will be.
 Thus having a 1-element checkpoint interval is definitely not a good idea.
 ====
 
-==== [[jsr-352-emf]] Selecting the persistence unit (EntityManagerFactory)
+[[jsr-352-emf]]
+==== Selecting the persistence unit (EntityManagerFactory)
 
 [CAUTION]
 ====
@@ -754,7 +757,8 @@ you must make sure that the entity manager factory used by the mass indexer
 will stay open during the whole mass indexing process.
 ====
 
-===== [[jsr-352-emf-jberet]] JBeret
+[[jsr-352-emf-jberet]]
+===== JBeret
 
 If your JSR-352 runtime is JBeret (used in WildFly in particular),
 you can use CDI to retrieve the `EntityManagerFactory`.
@@ -807,7 +811,8 @@ Due to limitations of the CDI APIs, it is not currently possible to reference
 an entity manager factory by its persistence unit name when using the mass indexer with CDI.
 ====
 
-===== [[jsr-352-emf-other-implementation]] Other DI-enabled JSR-352 implementations
+[[jsr-352-emf-other-implementation]]
+===== Other DI-enabled JSR-352 implementations
 
 If you want to use a different JSR-352 implementation that happens to allow dependency injection,
 you can use `hibernate-search-jsr352-core` under the following conditions:
