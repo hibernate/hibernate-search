@@ -30,14 +30,14 @@ import java.lang.invoke.MethodHandles;
  * A utility class to start the Hibernate Search JSR-352 mass indexing job.
  * <p>
  * Use it like this:
- * <code><pre>
+ * <code>
  * jobOperator.start(
  * 		MassIndexingJob.NAME,
  * 		MassIndexingJob.parameters()
  * 			.forEntities( EntityA.class, EntityB.class )
  * 			.build()
  * );
- * </pre></code>
+ * </code>
  *
  * You can also add optional parameters to tune your job execution. See our
  * documentation for more detail.
