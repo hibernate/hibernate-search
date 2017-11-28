@@ -382,11 +382,6 @@ but MySQL's JDBC driver will load all values in memory; to avoid this "optimizat
 [[jsr352-integration]]
 === Integration with JSR-352
 
-[CAUTION]
-====
-This feature is a work in progress.
-====
-
 The integration with JSR-352, Batch Applications for the Java Platform, is in development. We do
 think we have the basics covered and we are looking for feedback.
 
