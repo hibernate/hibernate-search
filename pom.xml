@@ -1804,13 +1804,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>${test.elasticsearch.host.version}</version>
                                     <type>jar</type>
                                 </dependency>
-                                
-                                <!-- The next is used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
                             </dependencies>
                             <executions>
                                 <execution >
@@ -1896,13 +1889,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${test.elasticsearch.host.version}</version>
                                 </dependency>
-                                
-                                <!-- The next is used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
                             </dependencies>
                             <executions>
                                 <execution >
@@ -1949,19 +1935,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
                                 <autoCreateIndex>false</autoCreateIndex>
                             </configuration>
-                            <dependencies>
-                                <!-- The next two are used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>2.6.2</version>
-                                </dependency>
-                            </dependencies>
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                             <executions>
                                 <execution >
@@ -2013,19 +1986,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
                                 <autoCreateIndex>false</autoCreateIndex>
                             </configuration>
-                            <dependencies>
-                                <!-- The next two are used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>2.6.2</version>
-                                </dependency>
-                            </dependencies>
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                             <executions>
                                 <execution >
