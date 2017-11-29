@@ -51,10 +51,8 @@ install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
-  # first run to download all the Maven dependencies without logging
-  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests=true
-  # we run checkstyle first to fail fast if there is a styling error
-  - ./mvnw $BUILD_OPTIONS checkstyle:check
+  # first run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
+  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests -DskipPdfDocumentation -Dcheckstyle.skip
 before_script: 
   - case $DB in
     "h2") ;;
@@ -62,4 +60,8 @@ before_script:
     "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
     esac
 script:
-  - ./mvnw $BUILD_OPTIONS clean install
+  # we run checks first to fail fast if there is a styling error
+  # then we run the actual build
+  - ./mvnw $BUILD_OPTIONS checkstyle:check
+    && ./mvnw $BUILD_OPTIONS clean install -Dcheckstyle.skip
+
