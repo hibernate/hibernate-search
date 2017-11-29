@@ -2137,7 +2137,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
-                <jdbc.driver.version>1.7.0</jdbc.driver.version>
+                <jdbc.driver.version>1.5.9</jdbc.driver.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
                 <jdbc.user>hibernate_user</jdbc.user>
