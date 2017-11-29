@@ -164,7 +164,9 @@ public class EntityReader extends AbstractItemReader {
 			String partitionIdStr,
 			String serializedLowerBound,
 			String serializedUpperBound,
-			String indexScopeName) {
+			String indexScopeName,
+			JobContext jobContext,
+			StepContext stepContext) {
 		this.serializedCacheMode = serializedCacheMode;
 		this.entityName = entityName;
 		this.serializedEntityFetchSize = serializedEntityFetchSize;
@@ -176,6 +178,8 @@ public class EntityReader extends AbstractItemReader {
 		this.serializedLowerBound = serializedLowerBound;
 		this.serializedUpperBound = serializedUpperBound;
 		this.indexScopeName = indexScopeName;
+		this.jobContext = jobContext;
+		this.stepContext = stepContext;
 	}
 
 	/**

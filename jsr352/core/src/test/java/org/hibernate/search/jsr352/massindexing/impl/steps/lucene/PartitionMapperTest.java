@@ -25,11 +25,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.strictMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,10 +44,8 @@ public class PartitionMapperTest {
 
 	private EntityManagerFactory emf;
 
-	@Mock
 	private JobContext mockedJobContext;
 
-	@InjectMocks
 	private PartitionMapper partitionMapper;
 
 	@Before
@@ -77,6 +73,8 @@ public class PartitionMapperTest {
 		final String hql = null;
 		final String maxThreads = String.valueOf( 1 );
 		final String rowsPerPartition = String.valueOf( 3 );
+
+		mockedJobContext = strictMock( JobContext.class );
 		partitionMapper = new PartitionMapper(
 				fetchSize,
 				hql,
@@ -84,10 +82,9 @@ public class PartitionMapperTest {
 				null,
 				rowsPerPartition,
 				null,
-				null
+				null,
+				mockedJobContext
 		);
-
-		MockitoAnnotations.initMocks( this );
 	}
 
 	@After
@@ -101,13 +98,9 @@ public class PartitionMapperTest {
 	 * Prove that there're N partitions for each root entity,
 	 * where N stands for the ceiling number of the division
 	 * between the rows to index and the max rows per partition.
-	 *
-	 * @throws Exception
 	 */
 	@Test
 	public void testMapPartitions() throws Exception {
-
-		// mock job context
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setCustomQueryCriteria( new HashSet<>() );
@@ -115,7 +108,8 @@ public class PartitionMapperTest {
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )
 				) );
-		Mockito.when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
+		expect( mockedJobContext.getTransientUserData() ).andReturn( jobData );
+		replay( mockedJobContext );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();
 
