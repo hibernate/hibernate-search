@@ -132,6 +132,26 @@
         </dependencySet>
 
         <dependencySet>
+            <outputDirectory>dist/lib/optional/jsr352-core</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jsr352-core</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/jsr352-jberet</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jsr352-jberet</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib/provided</outputDirectory>
             <scope>provided</scope>

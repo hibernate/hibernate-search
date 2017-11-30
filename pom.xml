@@ -247,6 +247,9 @@
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.client.http_client_configurer></test.elasticsearch.client.http_client_configurer>
 
+        <!-- JSR 352 -->
+        <jberetVersion>1.3.0.Beta2</jberetVersion>
+
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -601,6 +604,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-jsr352-jberet</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jberet</groupId>
+                <artifactId>jberet-core</artifactId>
+                <version>${jberetVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

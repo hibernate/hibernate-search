@@ -71,6 +71,26 @@
             <artifactId>hibernate-search-backend-jgroups</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.batch</groupId>
+            <artifactId>javax.batch-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-jberet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jberet</groupId>
+            <artifactId>jberet-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.spec.javax.jms</groupId>
             <artifactId>jboss-jms-api_2.0_spec</artifactId>
             <scope>provided</scope>
@@ -109,6 +129,8 @@
                         ${basedir}/../backends/jms/src/main/java;
                         ${basedir}/../elasticsearch/src/main/java;
                         ${basedir}/../elasticsearch-aws/src/main/java;
+                        ${basedir}/../jsr352/core/src/main/java;
+                        ${basedir}/../jsr352/jberet/src/main/java;
                     </sourcepath>
                     <docfilessubdirs>true</docfilessubdirs>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
@@ -119,6 +141,9 @@
                         <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
                         <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
                         <link>http://jgroups.org/javadoc</link>
+                        <!-- for javax.batch in the JSR 352 modules -->
+                        <link>https://docs.oracle.com/javaee/7/api/</link>
+                        <link>http://docs.jboss.org/jberet/${jberetVersion}/javadoc/jberet-core/</link>
                     </links>
                     <packagesheader>Hibernate Search Packages</packagesheader>
                     <doctitle>Hibernate Search ${project.version}</doctitle>

@@ -24,7 +24,6 @@
     <properties>
         <hibernate.search.version>${project.version}</hibernate.search.version>
         <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
-        <jberetVersion>1.3.0.Beta2</jberetVersion>
     </properties>
 
     <modules>
@@ -86,13 +85,6 @@
             <dependency>
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-core</artifactId>
-                <version>${jberetVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jberet</groupId>
-                <artifactId>jberet-se</artifactId>
-                <version>${jberetVersion}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
