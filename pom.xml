@@ -947,6 +947,7 @@
                         <requireMavenVersion>
                             <version>3.2.3</version>
                         </requireMavenVersion>
+                        <banDuplicatePomDependencyVersions />
                         <DependencyConvergence />
                     </rules>
                 </configuration>
