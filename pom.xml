@@ -128,6 +128,12 @@
             <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/yoann-rodiere/</url>
         </developer>
+        <developer>
+            <id>mincong-h</id>
+            <name>Mincong Huang</name>
+            <email>mincong.h@gmail.com</email>
+            <url>http://mincong-h.github.io</url>
+        </developer>
     </developers>
 
     <mailingLists>
