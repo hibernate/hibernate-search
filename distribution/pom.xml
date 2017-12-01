@@ -117,36 +117,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <sourcepath>
-                        ${basedir}/../engine/src/main/java;
-                        ${basedir}/../orm/src/main/java;
-                        ${basedir}/../serialization/avro/src/main/java;
-                        ${basedir}/../backends/jgroups/src/main/java;
-                        ${basedir}/../backends/jms/src/main/java;
-                        ${basedir}/../elasticsearch/src/main/java;
-                        ${basedir}/../elasticsearch-aws/src/main/java;
-                        ${basedir}/../jsr352/core/src/main/java;
-                        ${basedir}/../jsr352/jberet/src/main/java;
-                    </sourcepath>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <packagesheader>Hibernate Search Packages</packagesheader>
-                    <doctitle>Hibernate Search ${project.version}</doctitle>
-                    <windowtitle>Hibernate Search ${project.version}</windowtitle>
-                    <groups>
-                        <group>
-                            <title>Hibernate Search Engine and ORM Packages</title>
-                            <packages>org.hibernate.search*</packages>
-                        </group>
-                    </groups>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>aggregate-javadoc</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
+                        <!--
+                        Aggregate the javadocs of the selected modules.
+                        We reuse the same id as in the parent pom to avoid calling the javadoc plugin twice.
+                        -->
+                        <id>generate-javadoc</id>
+                        <configuration>
+                            <sourcepath>
+                                ${basedir}/../engine/src/main/java;
+                                ${basedir}/../orm/src/main/java;
+                                ${basedir}/../serialization/avro/src/main/java;
+                                ${basedir}/../backends/jgroups/src/main/java;
+                                ${basedir}/../backends/jms/src/main/java;
+                                ${basedir}/../elasticsearch/src/main/java;
+                                ${basedir}/../elasticsearch-aws/src/main/java;
+                                ${basedir}/../jsr352/core/src/main/java;
+                                ${basedir}/../jsr352/jberet/src/main/java;
+                            </sourcepath>
+                            <docfilessubdirs>true</docfilessubdirs>
+                            <packagesheader>Hibernate Search Packages</packagesheader>
+                            <doctitle>Hibernate Search ${project.version}</doctitle>
+                            <windowtitle>Hibernate Search ${project.version}</windowtitle>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

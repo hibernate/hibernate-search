@@ -1667,6 +1667,23 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <modules>
                 <module>distribution</module>
             </modules>
+
+            <build>
+                <plugins>
+                    <plugin>
+                       <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                           <execution>
+                                <id>generate-javadoc</id>
+                                <goals>
+                                    <goal>javadoc-no-fork</goal>
+                                </goals>
+                                <phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
