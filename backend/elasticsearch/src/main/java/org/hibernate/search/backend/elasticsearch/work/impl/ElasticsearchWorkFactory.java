@@ -30,8 +30,8 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> optimize(String indexName);
 
-	<T> ElasticsearchWork<SearchResult<T>> search(
-			Set<String> indexNames, JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
+	<T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, Set<String> routingKeys,
+			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);
 
 }

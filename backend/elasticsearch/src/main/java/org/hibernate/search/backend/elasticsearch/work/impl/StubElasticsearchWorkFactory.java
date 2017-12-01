@@ -71,10 +71,12 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, JsonObject payload,
-			SearchResultExtractor<T> searchResultExtractor, Long offset, Long limit) {
+	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, Set<String> routingKeys,
+			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
+			Long offset, Long limit) {
 		return new StubElasticsearchWork<SearchResult<T>>( "search", payload )
 				.addParam( "indexName", indexNames )
+				.addParam( "_routing", routingKeys )
 				.addParam( "offset", offset, String::valueOf )
 				.addParam( "limit", limit, String::valueOf )
 				.setResultFunction( searchResultExtractor::extract );

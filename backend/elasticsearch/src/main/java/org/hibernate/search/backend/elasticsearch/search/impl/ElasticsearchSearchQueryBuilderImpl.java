@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -23,6 +24,7 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
 	private final Set<String> indexNames;
+	private final Set<String> routingKeys;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
 	private JsonObject rootQueryClause;
@@ -43,11 +45,17 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
+		this.routingKeys = new HashSet<>();
 	}
 
 	@Override
 	public void setRootQueryClause(JsonObject rootQueryClause) {
 		this.rootQueryClause = rootQueryClause;
+	}
+
+	@Override
+	public void addRoutingKey(String routingKey) {
+		this.routingKeys.add( routingKey );
 	}
 
 	private SearchQuery<T> build() {
@@ -56,7 +64,8 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 		hitExtractor.contributeRequest( payload );
 		SearchResultExtractor<T> searchResultExtractor =
 				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );
-		return new ElasticsearchSearchQuery<>( queryOrchestrator, workFactory, indexNames,
+		return new ElasticsearchSearchQuery<>( queryOrchestrator, workFactory,
+				indexNames, routingKeys,
 				payload, searchResultExtractor );
 	}
 

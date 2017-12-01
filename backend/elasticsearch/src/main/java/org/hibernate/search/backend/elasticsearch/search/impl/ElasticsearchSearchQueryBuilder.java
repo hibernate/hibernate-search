@@ -19,6 +19,8 @@ public interface ElasticsearchSearchQueryBuilder<T> {
 
 	void setRootQueryClause(JsonObject rootQueryClause);
 
+	void addRoutingKey(String routingKey);
+
 	// TODO add more arguments, such as faceting options
 
 	<Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory);

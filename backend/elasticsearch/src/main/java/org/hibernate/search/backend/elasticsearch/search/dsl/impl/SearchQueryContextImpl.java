@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
+import java.util.Collection;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryBuilder;
@@ -26,6 +27,18 @@ class SearchQueryContextImpl<T, Q> implements SearchQueryContext<Q> {
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
+	}
+
+	@Override
+	public SearchQueryContext<Q> routing(String routingKey) {
+		searchQueryBuilder.addRoutingKey( routingKey );
+		return this;
+	}
+
+	@Override
+	public SearchQueryContext<Q> routing(Collection<String> routingKeys) {
+		routingKeys.forEach( searchQueryBuilder::addRoutingKey );
+		return this;
 	}
 
 	@Override

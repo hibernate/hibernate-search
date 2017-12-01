@@ -21,7 +21,9 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
+import org.hibernate.search.engine.search.SearchQuery;
 
 import org.junit.After;
 import org.junit.Before;
@@ -108,8 +110,56 @@ public class JavaBeanElasticsearchRoutingIT {
 				+ "}" );
 	}
 
-	// TODO implement and test routing predicates when searching
-	// TODO also implement filters and allow them to use routing predicates
+
+	@Test
+	public void search() throws JSONException {
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+					.asReferences()
+					.match()
+							.onField( "value" )
+							.matching( "val1" )
+							.end()
+					.routing( "category_2" )
+					.build();
+
+			StubElasticsearchClient.pushStubResponse(
+					"{"
+						+ "'hits': {"
+							+ "'hits': ["
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '0'"
+								+ "},"
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '1'"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+			);
+			query.execute();
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, IndexedEntity.INDEX, 0,
+				HOST_1, "search", null /* No ID */,
+				c -> {
+					c.accept( "_routing", "category_2" );
+				},
+				"{"
+					+ "'query': {"
+						+ "'match': {"
+							+ "'value': {"
+								+ "'value': 'val1'"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
+	}
+
+	// TODO implement filters and allow them to use routing predicates, then test this here
 
 	public enum EntityCategory {
 		CATEGORY_1,
