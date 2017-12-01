@@ -52,7 +52,7 @@ install:
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
   # first run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
-  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests -DskipPdfDocumentation -Dcheckstyle.skip
+  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests -Dcheckstyle.skip
 before_script: 
   - case $DB in
     "h2") ;;
