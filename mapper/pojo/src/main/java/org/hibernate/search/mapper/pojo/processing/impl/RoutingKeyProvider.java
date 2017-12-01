@@ -13,10 +13,10 @@ import java.util.function.Supplier;
  */
 public interface RoutingKeyProvider<E> {
 
-	String toRoutingKey(Object identifier, Supplier<E> entitySupplier);
+	String toRoutingKey(String tenantIdentifier, Object identifier, Supplier<E> entitySupplier);
 
 	static <E> RoutingKeyProvider<E> alwaysNull() {
-		return (identifier, entity) -> null;
+		return (identifier, tenantIdentifier, entity) -> null;
 	}
 
 }

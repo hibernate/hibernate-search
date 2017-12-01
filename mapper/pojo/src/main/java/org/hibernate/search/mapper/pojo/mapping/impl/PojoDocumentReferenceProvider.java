@@ -16,16 +16,19 @@ class PojoDocumentReferenceProvider<D extends DocumentState, E> implements Docum
 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 
+	private final String tenantIdentifier;
 	private final Object identifier;
 	private final String documentIdentifier;
 	private final Supplier<E> entitySupplier;
 
 	PojoDocumentReferenceProvider(
 			RoutingKeyProvider<E> routingKeyProvider,
+			String tenantIdentifier,
 			Object identifier,
 			String documentIdentifier,
 			Supplier<E> entitySupplier) {
 		this.routingKeyProvider = routingKeyProvider;
+		this.tenantIdentifier = tenantIdentifier;
 		this.identifier = identifier;
 		this.documentIdentifier = documentIdentifier;
 		this.entitySupplier = entitySupplier;
@@ -38,7 +41,7 @@ class PojoDocumentReferenceProvider<D extends DocumentState, E> implements Docum
 
 	@Override
 	public String getRoutingKey() {
-		return routingKeyProvider.toRoutingKey( identifier, entitySupplier );
+		return routingKeyProvider.toRoutingKey( tenantIdentifier, identifier, entitySupplier );
 	}
 
 }

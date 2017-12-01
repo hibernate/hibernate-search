@@ -39,7 +39,7 @@ class PojoTypeWorker<D extends DocumentState, E, C extends IndexWorker<D>> {
 	public void add(Object id, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getDelegate().add(
-				typeManager.toDocumentReferenceProvider( id, entitySupplier ),
+				typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ),
 				typeManager.toDocumentContributor( entitySupplier )
 		);
 	}
@@ -51,7 +51,7 @@ class PojoTypeWorker<D extends DocumentState, E, C extends IndexWorker<D>> {
 	public void update(Object id, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getDelegate().update(
-				typeManager.toDocumentReferenceProvider( id, entitySupplier ),
+				typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ),
 				typeManager.toDocumentContributor( entitySupplier )
 		);
 	}
@@ -62,7 +62,7 @@ class PojoTypeWorker<D extends DocumentState, E, C extends IndexWorker<D>> {
 
 	public void delete(Object id, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		getDelegate().delete( typeManager.toDocumentReferenceProvider( id, entitySupplier ) );
+		getDelegate().delete( typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ) );
 	}
 
 }

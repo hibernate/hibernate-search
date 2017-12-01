@@ -110,6 +110,28 @@ public class JavaBeanElasticsearchRoutingIT {
 				+ "}" );
 	}
 
+	@Test
+	public void index_multiTenancy() throws JSONException {
+		try (PojoSearchManager manager = mapping.createSearchManagerWithOptions()
+				.tenantId( "myTenantId" )
+				.build() ) {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setCategory( EntityCategory.CATEGORY_2 );
+			entity1.setValue( "val1" );
+
+			manager.getMainWorker().add( entity1 );
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "1",
+				c -> {
+					c.accept( "_routing", "myTenantId/category_2" );
+				},
+				"{"
+						+ "'value': 'val1'"
+						+ "}" );
+	}
 
 	@Test
 	public void search() throws JSONException {
@@ -212,16 +234,23 @@ public class JavaBeanElasticsearchRoutingIT {
 		}
 
 		@Override
-		public String toRoutingKey(Object entityIdentifier, Indexable source) {
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Indexable source) {
 			EntityCategory category = source.get( categoryReference );
+			StringBuilder keyBuilder = new StringBuilder();
+			if ( tenantIdentifier != null ) {
+				keyBuilder.append( tenantIdentifier ).append( "/" );
+			}
 			switch ( category ) {
 				case CATEGORY_1:
-					return "category_1";
+					keyBuilder.append( "category_1" );
+					break;
 				case CATEGORY_2:
-					return "category_2";
+					keyBuilder.append( "category_2" );
+					break;
 				default:
 					throw new RuntimeException( "Unknown category: " + category );
 			}
+			return keyBuilder.toString();
 		}
 	}
 

@@ -54,10 +54,12 @@ public class PojoTypeManager<I, E, D extends DocumentState> {
 		return new CachingCastingEntitySupplier<>( entityType, proxyIntrospector, entity );
 	}
 
-	public DocumentReferenceProvider toDocumentReferenceProvider(Object providedId, Supplier<E> entitySupplier) {
+	public DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContext sessionContext,
+			Object providedId, Supplier<E> entitySupplier) {
+		String tenantId = sessionContext.getTenantIdentifier();
 		I identifier = identifierMapping.getIdentifier( providedId, entitySupplier );
 		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
-		return new PojoDocumentReferenceProvider<>( routingKeyProvider, identifier, documentIdentifier, entitySupplier );
+		return new PojoDocumentReferenceProvider<>( routingKeyProvider, tenantId, identifier, documentIdentifier, entitySupplier );
 	}
 
 	public DocumentContributor<D> toDocumentContributor(Supplier<E> entitySupplier) {
