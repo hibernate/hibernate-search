@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.IndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -14,13 +16,13 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 /**
  * @author Yoann Rodiere
  */
-class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
+class PojoTypeWorker<D extends DocumentState, E, C extends IndexWorker<D>> {
 
-	private final PojoTypeManager<?, ?, D> typeManager;
+	private final PojoTypeManager<?, E, D> typeManager;
 	private final PojoSessionContext sessionContext;
 	private final C delegate;
 
-	public PojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext, C delegate) {
+	public PojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext, C delegate) {
 		this.typeManager = typeManager;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
@@ -35,9 +37,10 @@ class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
 	}
 
 	public void add(Object id, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getDelegate().add(
-				typeManager.toDocumentIdentifier( sessionContext, id, entity ),
-				typeManager.toDocumentContributor( sessionContext, entity )
+				typeManager.toDocumentReferenceProvider( id, entitySupplier ),
+				typeManager.toDocumentContributor( entitySupplier )
 		);
 	}
 
@@ -46,14 +49,20 @@ class PojoTypeWorker<D extends DocumentState, C extends IndexWorker<D>> {
 	}
 
 	public void update(Object id, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getDelegate().update(
-				typeManager.toDocumentIdentifier( sessionContext, id, entity ),
-				typeManager.toDocumentContributor( sessionContext, entity )
+				typeManager.toDocumentReferenceProvider( id, entitySupplier ),
+				typeManager.toDocumentContributor( entitySupplier )
 		);
 	}
 
-	public void delete(Object id) {
-		getDelegate().delete( typeManager.toDocumentIdentifier( sessionContext, id, null ) );
+	public void delete(Object entity) {
+		delete( null, entity );
+	}
+
+	public void delete(Object id, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		getDelegate().delete( typeManager.toDocumentReferenceProvider( id, entitySupplier ) );
 	}
 
 }

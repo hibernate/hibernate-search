@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	private final PojoSessionContext sessionContext;
-	private final Map<Class<?>, StreamPojoTypeWorker<?>> delegates = new ConcurrentHashMap<>();
+	private final Map<Class<?>, StreamPojoTypeWorker<?, ?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
 	public StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
@@ -30,7 +30,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	public void flush() {
-		for ( StreamPojoTypeWorker<?> delegate : getAllDelegates() ) {
+		for ( StreamPojoTypeWorker<?, ?> delegate : getAllDelegates() ) {
 			delegate.flush();
 		}
 	}
@@ -42,7 +42,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	public void optimize() {
-		for ( StreamPojoTypeWorker<?> delegate : getAllDelegates() ) {
+		for ( StreamPojoTypeWorker<?, ?> delegate : getAllDelegates() ) {
 			delegate.optimize();
 		}
 	}
@@ -53,11 +53,11 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 	}
 
 	@Override
-	protected StreamPojoTypeWorker<?> getDelegate(Class<?> clazz) {
+	protected StreamPojoTypeWorker<?, ?> getDelegate(Class<?> clazz) {
 		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( sessionContext ) );
 	}
 
-	private Iterable<StreamPojoTypeWorker<?>> getAllDelegates() {
+	private Iterable<StreamPojoTypeWorker<?, ?>> getAllDelegates() {
 		if ( !addedAll ) {
 			getAllTypeManagers().forEach( manager -> getDelegate( manager.getClass() ) );
 			addedAll = true;

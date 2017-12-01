@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.ProvidedToStringIdentifierConverter;
+import org.hibernate.search.mapper.pojo.processing.impl.ProvidedStringIdentifierMapping;
 
 
 /**
@@ -57,7 +57,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 		TypeModel<?> typeModel = introspector.getEntityTypeModel( javaType );
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
 				typeModel, indexManagerBuildingState, contributorProvider,
-				implicitProvidedId ? ProvidedToStringIdentifierConverter.get() : null );
+				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoTypeNodeMappingCollector collector = builder.asCollector();
 		contributorProvider.get( pojoTypeId ).forEach( c -> c.contributeMapping( collector ) );
 		typeManagerBuilders.add( builder );

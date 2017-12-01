@@ -34,7 +34,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
+		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -46,14 +46,20 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
+		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
 	@Override
-	public void delete(Class<?> clazz, Object id) {
-		PojoTypeWorker<?, ?> delegate = getDelegate( clazz );
-		delegate.delete( id );
+	public void delete(Object entity) {
+		delete( null, entity );
+	}
+
+	@Override
+	public void delete(Object id, Object entity) {
+		Class<?> clazz = introspector.getClass( entity );
+		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
+		delegate.delete( id, entity );
 	}
 
 	protected <E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
@@ -65,5 +71,5 @@ abstract class PojoWorkerImpl implements PojoWorker {
 		return typeManagers.getAll();
 	}
 
-	protected abstract PojoTypeWorker<?, ?> getDelegate(Class<?> clazz);
+	protected abstract PojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz);
 }

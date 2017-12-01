@@ -6,55 +6,69 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentContributor;
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.SearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
-import org.hibernate.search.mapper.pojo.processing.impl.IdentifierConverter;
+import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
 
 /**
  * @author Yoann Rodiere
  */
 public class PojoTypeManager<I, E, D extends DocumentState> {
 
-	private final IdentifierConverter<I, E> identifierConverter;
 	private final Class<E> entityType;
+	private final IdentifierMapping<I, E> identifierMapping;
+	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoTypeNodeProcessor processor;
 	private final IndexManager<D> indexManager;
 
-	public PojoTypeManager(IdentifierConverter<I, E> identifierMapping, Class<E> entityType,
+	public PojoTypeManager(Class<E> entityType,
+			IdentifierMapping<I, E> identifierMapping,
+			RoutingKeyProvider<E> routingKeyProvider,
 			PojoTypeNodeProcessor processor, IndexManager<D> indexManager) {
-		this.identifierConverter = identifierMapping;
 		this.entityType = entityType;
+		this.identifierMapping = identifierMapping;
+		this.routingKeyProvider = routingKeyProvider;
 		this.processor = processor;
 		this.indexManager = indexManager;
 	}
 
-	public IdentifierConverter<I, E> getIdentifierMapping() {
-		return identifierConverter;
+	public IdentifierMapping<I, E> getIdentifierMapping() {
+		return identifierMapping;
 	}
 
 	public Class<E> getEntityType() {
 		return entityType;
 	}
 
-	public String toDocumentIdentifier(PojoSessionContext sessionContext, Object providedId, Object entity) {
-		Object unproxied = sessionContext.getProxyIntrospector().unproxy( entity ); // TODO Move this to the ID converter? See HibernateOrmMapper, item 4: we don't want to unproxy needlessly.
-		return identifierConverter.toDocumentId( providedId, entityType.cast( unproxied ) );
+	public Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
+		PojoProxyIntrospector proxyIntrospector = sessionContext.getProxyIntrospector();
+		return new CachingCastingEntitySupplier<>( entityType, proxyIntrospector, entity );
 	}
 
-	public DocumentContributor<D> toDocumentContributor(PojoSessionContext sessionContext, Object entity) {
-		Object unproxied = sessionContext.getProxyIntrospector().unproxy( entity );
-		return state -> processor.process( entityType.cast( unproxied ), state );
+	public DocumentReferenceProvider toDocumentReferenceProvider(Object providedId, Supplier<E> entitySupplier) {
+		I identifier = identifierMapping.getIdentifier( providedId, entitySupplier );
+		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
+		return new PojoDocumentReferenceProvider<>( routingKeyProvider, identifier, documentIdentifier, entitySupplier );
 	}
 
-	public ChangesetPojoTypeWorker<D> createWorker(PojoSessionContext sessionContext) {
+	public DocumentContributor<D> toDocumentContributor(Supplier<E> entitySupplier) {
+		return new PojoDocumentContributor<>( processor, entitySupplier );
+	}
+
+	public ChangesetPojoTypeWorker<D, E> createWorker(PojoSessionContext sessionContext) {
 		return new ChangesetPojoTypeWorker<>( this, sessionContext, indexManager.createWorker( sessionContext ) );
 	}
 
-	public StreamPojoTypeWorker<D> createStreamWorker(PojoSessionContext sessionContext) {
+	public StreamPojoTypeWorker<D, E> createStreamWorker(PojoSessionContext sessionContext) {
 		return new StreamPojoTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
 	}
 

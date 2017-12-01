@@ -16,4 +16,11 @@ public interface IndexModelCollectorImplementor extends IndexModelCollector {
 
 	IndexModelCollector withContext(IndexModelNestingContext context);
 
+	/**
+	 * Inform the model collector that documents will always be provided along
+	 * with an explicit routing key,
+	 * to be used to route the document to a specific shard.
+	 */
+	void explicitRouting();
+
 }

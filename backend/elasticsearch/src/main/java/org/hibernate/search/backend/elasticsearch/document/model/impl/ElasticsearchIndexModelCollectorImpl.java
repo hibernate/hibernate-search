@@ -19,10 +19,12 @@ import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexModelCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -47,6 +49,8 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	private final JsonObjectAccessor accessor;
 	private final Supplier<T> mappingFactory;
 	private final Map<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> propertyContributors;
+	private RoutingType routing = null;
+
 	private final IndexModelNestingContext filter;
 
 	private ElasticsearchIndexModelCollectorImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
@@ -130,6 +134,14 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
+	public void explicitRouting() {
+		if ( !JsonAccessor.root().equals( accessor ) ) {
+			throw new AssertionFailure( "explicitRouting() was called on a non-root model collector; this should never happen." );
+		}
+		this.routing = RoutingType.REQUIRED;
+	}
+
+	@Override
 	public IndexObjectReference asReference() {
 		// TODO Object reference
 		throw new UnsupportedOperationException( "object reference not implemented yet" );
@@ -148,6 +160,9 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	@Override
 	public T contribute(ElasticsearchFieldModelCollector collector) {
 		T mapping = mappingFactory.get();
+		if ( routing != null ) {
+			mapping.setRouting( routing );
+		}
 		for ( Map.Entry<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> entry : propertyContributors.entrySet() ) {
 			String propertyName = entry.getKey();
 			ElasticsearchIndexModelNodeContributor<PropertyMapping> propertyContributor = entry.getValue();

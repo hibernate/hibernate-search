@@ -12,7 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexableModel;
@@ -30,7 +30,7 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final PojoIndexableModel indexableModel;
 	protected final MappingIndexModelCollector indexModelCollector;
 
-	protected final IdentifierMappingCollector identifierBridgeCollector;
+	protected final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
 
 	protected final Collection<ValueProcessor> processors = new ArrayList<>();
 
@@ -38,14 +38,14 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 			TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
-			IdentifierMappingCollector identifierBridgeCollector) {
+			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		this.contributorProvider = contributorProvider;
 
 		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
 		this.indexableModel = new PojoRootIndexableModel( typeModel, contributorProvider );
 		this.indexModelCollector = indexModelCollector;
 
-		this.identifierBridgeCollector = identifierBridgeCollector;
+		this.identityMappingCollector = identityMappingCollector;
 	}
 
 	@Override

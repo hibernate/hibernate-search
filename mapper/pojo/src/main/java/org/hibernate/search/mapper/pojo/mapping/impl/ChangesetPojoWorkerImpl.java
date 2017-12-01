@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
 
 	private final PojoSessionContext sessionContext;
-	private final Map<Class<?>, ChangesetPojoTypeWorker<?>> delegates = new HashMap<>();
+	private final Map<Class<?>, ChangesetPojoTypeWorker<?, ?>> delegates = new HashMap<>();
 
 	public ChangesetPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
 			PojoIntrospector introspector, PojoSessionContext sessionContext) {
@@ -31,13 +31,13 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	}
 
 	@Override
-	protected ChangesetPojoTypeWorker<?> getDelegate(Class<?> clazz) {
+	protected ChangesetPojoTypeWorker<?, ?> getDelegate(Class<?> clazz) {
 		return delegates.computeIfAbsent( clazz, c -> getTypeManager( c ).createWorker( sessionContext ) );
 	}
 
 	@Override
 	public void prepare() {
-		for ( ChangesetPojoTypeWorker<?> delegate : delegates.values() ) {
+		for ( ChangesetPojoTypeWorker<?, ?> delegate : delegates.values() ) {
 			delegate.prepare();
 		}
 	}
@@ -51,7 +51,7 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 			 * and delegates are supposed to handle execute() even without a prior call to prepare().
 			 */
 			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( ChangesetPojoTypeWorker<?> delegate : delegates.values() ) {
+			for ( ChangesetPojoTypeWorker<?, ?> delegate : delegates.values() ) {
 				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture[futures.size()] ) );

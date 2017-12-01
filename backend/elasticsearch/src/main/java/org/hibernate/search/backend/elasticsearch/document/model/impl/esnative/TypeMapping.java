@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProper
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * An object representing Elasticsearch type mappings.
@@ -35,6 +36,9 @@ public class TypeMapping {
 	private Map<String, PropertyMapping> properties;
 
 	private DynamicType dynamic;
+
+	@SerializedName( "_routing" )
+	private RoutingType routing;
 
 	@SerializeExtraProperties
 	private Map<String, JsonElement> extraAttributes;
@@ -64,6 +68,14 @@ public class TypeMapping {
 
 	public void setDynamic(DynamicType dynamic) {
 		this.dynamic = dynamic;
+	}
+
+	public RoutingType getRouting() {
+		return routing;
+	}
+
+	public void setRouting(RoutingType routing) {
+		this.routing = routing;
 	}
 
 	public Map<String, JsonElement> getExtraAttributes() {

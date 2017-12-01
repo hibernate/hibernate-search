@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
+
 /**
  * @author Yoann Rodiere
  */
-public interface IndexWorker<D> {
+public interface DocumentContributor<D> {
 
-	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
-
-	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
-
-	void delete(DocumentReferenceProvider documentReferenceProvider);
+	void contribute(D state);
 
 }

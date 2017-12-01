@@ -23,6 +23,8 @@ public interface PojoWorker {
 
 	void update(Object id, Object entity);
 
-	void delete(Class<?> clazz, Object id);
+	void delete(Object entity);
+
+	void delete(Object id, Object entity);
 
 }

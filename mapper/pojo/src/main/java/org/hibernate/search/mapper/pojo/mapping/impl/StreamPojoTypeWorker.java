@@ -13,9 +13,9 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 /**
  * @author Yoann Rodiere
  */
-class StreamPojoTypeWorker<D extends DocumentState> extends PojoTypeWorker<D, StreamIndexWorker<D>> {
+class StreamPojoTypeWorker<D extends DocumentState, E> extends PojoTypeWorker<D, E, StreamIndexWorker<D>> {
 
-	public StreamPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext,
+	public StreamPojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext,
 			StreamIndexWorker<D> delegate) {
 		super( typeManager, sessionContext, delegate );
 	}

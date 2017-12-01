@@ -14,45 +14,76 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.IdentifierConverter;
+import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessorBuilder;
-import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierConverter;
+import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierMapping;
+import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeProvider;
+import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
+import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
 import org.hibernate.search.util.SearchException;
 
 public class PojoTypeManagerBuilder<E, D extends DocumentState> {
 	private final Class<E> javaType;
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
 
+	private final PojoTypeNodeIdentityMappingCollectorImpl identityMappingCollector;
 	private final PojoTypeNodeProcessorBuilder processorBuilder;
-	private IdentifierConverter<?, E> idConverter;
 
 	public PojoTypeManagerBuilder(TypeModel<E> typeModel,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
-			IdentifierConverter<?, E> defaultIdentifierConverter) {
+			IdentifierMapping<?, E> defaultIdentifierMapping) {
 		this.javaType = typeModel.getJavaType();
 		this.indexManagerBuildingState = indexManagerBuildingState;
+		this.identityMappingCollector = new PojoTypeNodeIdentityMappingCollectorImpl( defaultIdentifierMapping );
 		this.processorBuilder = new PojoTypeNodeProcessorBuilder(
 				typeModel, contributorProvider,
 				indexManagerBuildingState.getModelCollector(),
-				this::setIdentifierBridge );
-		this.idConverter = defaultIdentifierConverter;
+				identityMappingCollector
+		);
 	}
 
 	public PojoTypeNodeMappingCollector asCollector() {
 		return processorBuilder;
 	}
 
-	private void setIdentifierBridge(PropertyHandle handle, IdentifierBridge<?> bridge) {
-		this.idConverter = new PropertyIdentifierConverter<>( handle, bridge );
-	}
-
 	public void addTo(PojoTypeManagerContainer.Builder builder) {
-		if ( idConverter == null ) {
+		IdentifierMapping<?, E> identifierMapping = identityMappingCollector.identifierMapping;
+		if ( identifierMapping == null ) {
 			throw new SearchException( "Missing identifier mapping for indexed type '" + javaType + "'" );
 		}
-		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>( idConverter, javaType,
+		RoutingKeyBridge routingKeyBridge = identityMappingCollector.routingKeyBridge;
+		RoutingKeyProvider<E> routingKeyProvider;
+		if ( routingKeyBridge == null ) {
+			routingKeyProvider = RoutingKeyProvider.alwaysNull();
+		}
+		else {
+			routingKeyProvider = new RoutingKeyBridgeProvider<>( routingKeyBridge );
+		}
+		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>( javaType,
+				identifierMapping, routingKeyProvider,
 				processorBuilder.build(), indexManagerBuildingState.build() );
 		builder.add( indexManagerBuildingState.getIndexName(), javaType, typeManager );
+	}
+
+	private class PojoTypeNodeIdentityMappingCollectorImpl implements PojoTypeNodeIdentityMappingCollector {
+		private IdentifierMapping<?, E> identifierMapping;
+		private RoutingKeyBridge routingKeyBridge;
+
+		public PojoTypeNodeIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
+			this.identifierMapping = identifierMapping;
+		}
+
+		@Override
+		public void identifierBridge(PropertyHandle handle, IdentifierBridge<?> bridge) {
+			// FIXME ensure the bridge is closed upon build failure and when closing the SearchManagerRepository
+			this.identifierMapping = new PropertyIdentifierMapping<>( handle, bridge );
+		}
+
+		@Override
+		public void routingKeyBridge(RoutingKeyBridge bridge) {
+			// FIXME ensure the bridge is closed upon build failure and when closing the SearchManagerRepository
+			this.routingKeyBridge = bridge;
+		}
 	}
 }

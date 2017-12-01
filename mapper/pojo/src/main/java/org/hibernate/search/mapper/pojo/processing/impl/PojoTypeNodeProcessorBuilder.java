@@ -9,14 +9,16 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
 
 /**
  * @author Yoann Rodiere
@@ -30,9 +32,15 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 			TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelBuilder,
-			IdentifierMappingCollector identifierBridgeCollector) {
+			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		super( typeModel, contributorProvider, indexModelBuilder,
-				identifierBridgeCollector );
+				identityMappingCollector );
+	}
+
+	@Override
+	public void routingKeyBridge(BeanReference<? extends RoutingKeyBridge> reference) {
+		RoutingKeyBridge bridge = indexModelCollector.addRoutingKeyBridge( indexableModel, reference );
+		identityMappingCollector.routingKeyBridge( bridge );
 	}
 
 	@Override
@@ -43,7 +51,8 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(String name) {
 		PropertyModel<?> propertyModel = indexableModel.property( name ).getPropertyModel();
 		return new PojoPropertyNodeProcessorBuilder( propertyModel,
-				contributorProvider, indexModelCollector, identifierBridgeCollector );
+				contributorProvider, indexModelCollector, identityMappingCollector
+		);
 	}
 
 	public PojoTypeNodeProcessor build() {

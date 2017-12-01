@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 
@@ -30,22 +31,30 @@ public abstract class ElasticsearchIndexWorker implements IndexWorker<Elasticsea
 	}
 
 	@Override
-	public void add(String id, DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+	public void add(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+		String id = toActualId( referenceProvider.getIdentifier() );
+		String routingKey = referenceProvider.getRoutingKey();
 		ElasticsearchDocumentBuilder builder = new ElasticsearchDocumentBuilder();
 		documentContributor.contribute( builder );
-		collect( factory.add( indexName, toActualId( id ), builder.build() ) );
+		collect( factory.add( indexName, id, routingKey, builder.build() ) );
 	}
 
 	@Override
-	public void update(String id, DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+	public void update(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+		String id = toActualId( referenceProvider.getIdentifier() );
+		String routingKey = referenceProvider.getRoutingKey();
 		ElasticsearchDocumentBuilder builder = new ElasticsearchDocumentBuilder();
 		documentContributor.contribute( builder );
-		collect( factory.update( indexName, toActualId( id ), builder.build() ) );
+		collect( factory.update( indexName, id, routingKey, builder.build() ) );
 	}
 
 	@Override
-	public void delete(String id) {
-		collect( factory.delete( indexName, toActualId( id ) ) );
+	public void delete(DocumentReferenceProvider referenceProvider) {
+		String id = toActualId( referenceProvider.getIdentifier() );
+		String routingKey = referenceProvider.getRoutingKey();
+		collect( factory.delete( indexName, id, routingKey ) );
 	}
 
 	protected final String toActualId(String id) {

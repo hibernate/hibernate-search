@@ -10,8 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 
 /**
  * A wrapper around {@link ChangesetIndexWorker} adding an optimization:
@@ -35,19 +36,19 @@ public class SimplifyingChangesetIndexWorker<D> implements ChangesetIndexWorker<
 	}
 
 	@Override
-	public void add(String id, DocumentContributor<D> documentContributor) {
-		getWork( id ).add( documentContributor );
+	public void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor) {
+		getWork( documentReferenceProvider ).add( documentContributor );
 
 	}
 
 	@Override
-	public void update(String id, DocumentContributor<D> documentContributor) {
-		getWork( id ).update( documentContributor );
+	public void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor) {
+		getWork( documentReferenceProvider ).update( documentContributor );
 	}
 
 	@Override
-	public void delete(String id) {
-		getWork( id ).delete();
+	public void delete(DocumentReferenceProvider documentReferenceProvider) {
+		getWork( documentReferenceProvider ).delete();
 	}
 
 	@Override
@@ -75,20 +76,26 @@ public class SimplifyingChangesetIndexWorker<D> implements ChangesetIndexWorker<
 		}
 	}
 
-	private WorkPerDocument getWork(String id) {
-		return worksPerDocument.computeIfAbsent( id, WorkPerDocument::new );
+	private WorkPerDocument getWork(DocumentReferenceProvider documentReferenceProvider) {
+		String identifier = documentReferenceProvider.getIdentifier();
+		WorkPerDocument work = worksPerDocument.get( identifier );
+		if ( work == null ) {
+			work = new WorkPerDocument( documentReferenceProvider );
+			worksPerDocument.put( identifier, work );
+		}
+		return work;
 	}
 
 	private class WorkPerDocument {
 
-		private final String id;
+		private final DocumentReferenceProvider documentReferenceProvider;
 		private DocumentContributor<D> documentContributor;
 
 		private boolean delete;
 		private boolean add;
 
-		private WorkPerDocument(String id) {
-			this.id = id;
+		private WorkPerDocument(DocumentReferenceProvider documentReferenceProvider) {
+			this.documentReferenceProvider = documentReferenceProvider;
 		}
 
 		public void add(DocumentContributor<D> contributor) {
@@ -127,14 +134,14 @@ public class SimplifyingChangesetIndexWorker<D> implements ChangesetIndexWorker<
 		public void doDelegate() {
 			if ( add ) {
 				if ( delete ) {
-					delegate.update( id, documentContributor );
+					delegate.update( documentReferenceProvider, documentContributor );
 				}
 				else {
-					delegate.add( id, documentContributor );
+					delegate.add( documentReferenceProvider, documentContributor );
 				}
 			}
 			else if ( delete ) {
-				delegate.delete( id );
+				delegate.delete( documentReferenceProvider );
 			}
 		}
 

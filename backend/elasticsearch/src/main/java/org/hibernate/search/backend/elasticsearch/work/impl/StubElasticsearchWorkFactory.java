@@ -26,24 +26,36 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> add(String indexName, String id, JsonObject document) {
-		return new StubElasticsearchWork<>( "add", document )
+	public ElasticsearchWork<?> add(String indexName, String id, String routingKey, JsonObject document) {
+		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "add", document )
 				.addParam( "indexName", indexName )
 				.addParam( "id", id );
+		if ( routingKey != null ) {
+			work.addParam( "_routing", routingKey );
+		}
+		return work;
 	}
 
 	@Override
-	public ElasticsearchWork<?> update(String indexName, String id, JsonObject document) {
-		return new StubElasticsearchWork<>( "update", document )
+	public ElasticsearchWork<?> update(String indexName, String id, String routingKey, JsonObject document) {
+		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "update", document )
 				.addParam( "indexName", indexName )
 				.addParam( "id", id );
+		if ( routingKey != null ) {
+			work.addParam( "_routing", routingKey );
+		}
+		return work;
 	}
 
 	@Override
-	public ElasticsearchWork<?> delete(String indexName, String id) {
-		return new StubElasticsearchWork<>( "delete", null )
+	public ElasticsearchWork<?> delete(String indexName, String id, String routingKey) {
+		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "delete", null )
 				.addParam( "indexName", indexName )
 				.addParam( "id", id );
+		if ( routingKey != null ) {
+			work.addParam( "_routing", routingKey );
+		}
+		return work;
 	}
 
 	@Override

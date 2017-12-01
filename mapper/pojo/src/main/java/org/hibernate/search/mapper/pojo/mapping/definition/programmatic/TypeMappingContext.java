@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
 
 /**
  * @author Yoann Rodiere
@@ -16,6 +17,12 @@ public interface TypeMappingContext {
 	TypeMappingContext indexed();
 
 	TypeMappingContext indexed(String indexName);
+
+	TypeMappingContext routingKeyBridge(String bridgeName);
+
+	TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass);
+
+	TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass);
 
 	TypeMappingContext bridge(BridgeDefinition<?> definition);
 

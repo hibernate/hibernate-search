@@ -20,11 +20,11 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> createIndex(String indexName, JsonObject model);
 
-	ElasticsearchWork<?> add(String indexName, String id, JsonObject document);
+	ElasticsearchWork<?> add(String indexName, String id, String routingKey, JsonObject document);
 
-	ElasticsearchWork<?> update(String indexName, String id, JsonObject document);
+	ElasticsearchWork<?> update(String indexName, String id, String routingKey, JsonObject document);
 
-	ElasticsearchWork<?> delete(String indexName, String id);
+	ElasticsearchWork<?> delete(String indexName, String id, String routingKey);
 
 	ElasticsearchWork<?> flush(String indexName);
 

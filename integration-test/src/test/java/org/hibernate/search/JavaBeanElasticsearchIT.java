@@ -284,7 +284,7 @@ public class JavaBeanElasticsearchIT {
 			manager.getMainWorker().add( entity1 );
 			manager.getMainWorker().add( entity2 );
 			manager.getMainWorker().add( entity4 );
-			manager.getMainWorker().delete( IndexedEntity.class, 1 );
+			manager.getMainWorker().delete( entity1 );
 			manager.getMainWorker().add( entity3 );
 		}
 

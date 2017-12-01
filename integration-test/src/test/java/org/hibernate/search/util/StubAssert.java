@@ -41,6 +41,12 @@ public final class StubAssert {
 				Arrays.asList( indexName ), host, workType, id, ignored -> { }, body );
 	}
 
+	public static void assertRequest(Map<String, List<Request>> requestQueuesByIndex, String indexName, int workPositionInQueue,
+			String host, String workType, String id, Consumer<BiConsumer<String, String>> otherParams, String body) throws JSONException {
+		assertRequest( getRequestInQueue( requestQueuesByIndex, indexName, workPositionInQueue ),
+				Arrays.asList( indexName ), host, workType, id, otherParams, body );
+	}
+
 	private static Request getRequestInQueue(Map<String, List<Request>> requestQueuesByIndex,
 			String indexName, int workPositionInQueue) {
 		List<Request> queue = requestQueuesByIndex.get( indexName );

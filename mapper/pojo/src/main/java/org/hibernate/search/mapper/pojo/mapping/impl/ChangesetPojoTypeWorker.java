@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 /**
  * @author Yoann Rodiere
  */
-class ChangesetPojoTypeWorker<D extends DocumentState> extends PojoTypeWorker<D, ChangesetIndexWorker<D>> {
+class ChangesetPojoTypeWorker<D extends DocumentState, E> extends PojoTypeWorker<D, E, ChangesetIndexWorker<D>> {
 
-	public ChangesetPojoTypeWorker(PojoTypeManager<?, ?, D> typeManager, PojoSessionContext sessionContext,
+	public ChangesetPojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext,
 			ChangesetIndexWorker<D> delegate) {
 		super( typeManager, sessionContext, delegate );
 	}

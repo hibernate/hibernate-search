@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
+import java.util.function.Supplier;
+
 /**
  * @author Yoann Rodiere
  */
-public interface IdentifierConverter<I, E> {
+public interface IdentifierMapping<I, E> {
 
-	String toDocumentId(Object providedId, E entity);
+	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
-	I fromDocumentId(String id);
+	String toDocumentIdentifier(I identifier);
+
+	I fromDocumentIdentifier(String documentId);
 
 }

@@ -59,7 +59,7 @@ public class PojoSearchTargetImpl<T> implements PojoSearchTarget<T> {
 				.orElseThrow( () -> new AssertionFailure(
 						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
 		// TODO error handling if typeManager is null
-		Object id = typeManager.getIdentifierMapping().fromDocumentId( documentReference.getId() );
+		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId() );
 		return new PojoReferenceImpl( typeManager.getEntityType(), id );
 	}
 }

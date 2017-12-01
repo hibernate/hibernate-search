@@ -14,6 +14,7 @@ import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
 
 /**
  * @author Yoann Rodiere
@@ -30,6 +31,14 @@ public final class BridgeFactory {
 
 	public IdentifierBridge<?> createIdentifierBridge(BeanReference<? extends IdentifierBridge<?>> reference) {
 		return beanResolver.resolve( reference, IdentifierBridge.class );
+	}
+
+	public RoutingKeyBridge createRoutingKeyBridge(BeanReference<? extends RoutingKeyBridge> reference) {
+		RoutingKeyBridge bridge = beanResolver.resolve( reference, RoutingKeyBridge.class );
+
+		bridge.initialize( buildContext );
+
+		return bridge;
 	}
 
 	public <A extends Annotation> Bridge<A> createBridge(BeanReference<? extends Bridge<?>> reference, A annotation) {

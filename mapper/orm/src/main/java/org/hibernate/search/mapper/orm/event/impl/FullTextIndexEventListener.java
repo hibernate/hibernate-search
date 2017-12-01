@@ -73,7 +73,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			context.getCurrentWorker( event.getSession() )
-					.delete( entity.getClass(), event.getId() );
+					.delete( event.getId(), entity );
 		}
 	}
 

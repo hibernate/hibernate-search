@@ -6,22 +6,24 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
  */
-public class ProvidedToStringIdentifierConverter implements IdentifierConverter<String, Object> {
+public class ProvidedStringIdentifierMapping implements IdentifierMapping<String, Object> {
 
-	private static final ProvidedToStringIdentifierConverter INSTANCE = new ProvidedToStringIdentifierConverter();
+	private static final ProvidedStringIdentifierMapping INSTANCE = new ProvidedStringIdentifierMapping();
 
 	@SuppressWarnings("unchecked") // This class is bivariant in E
-	public static <E> IdentifierConverter<String, E> get() {
-		return (IdentifierConverter<String, E>) INSTANCE;
+	public static <E> IdentifierMapping<String, E> get() {
+		return (IdentifierMapping<String, E>) INSTANCE;
 	}
 
 	@Override
-	public String toDocumentId(Object providedId, Object entity) {
+	public String getIdentifier(Object providedId, Supplier<?> entityProvider) {
 		if ( providedId == null ) {
 			throw new SearchException( "The identifier for this entity should always be provided,"
 					+ " but the provided identifier was null." );
@@ -30,8 +32,13 @@ public class ProvidedToStringIdentifierConverter implements IdentifierConverter<
 	}
 
 	@Override
-	public String fromDocumentId(String id) {
-		return id;
+	public String toDocumentIdentifier(String identifier) {
+		return identifier;
+	}
+
+	@Override
+	public String fromDocumentIdentifier(String documentId) {
+		return documentId;
 	}
 
 }

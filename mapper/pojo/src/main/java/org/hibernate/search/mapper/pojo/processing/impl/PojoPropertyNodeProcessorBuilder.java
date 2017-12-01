@@ -17,7 +17,7 @@ import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.IdentifierMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
@@ -38,9 +38,10 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			MappingIndexModelCollector indexModelCollector,
-			IdentifierMappingCollector identifierMappingCollector) {
+			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		super( propertyModel.getTypeModel(), contributorProvider, indexModelCollector,
-				identifierMappingCollector );
+				identityMappingCollector
+		);
 		this.propertyModel = propertyModel;
 	}
 
@@ -60,7 +61,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	@Override
 	public void identifierBridge(BeanReference<IdentifierBridge<?>> converterReference) {
 		IdentifierBridge<?> bridge = indexModelCollector.createIdentifierBridge( propertyModel.getJavaType(), converterReference );
-		identifierBridgeCollector.collect( propertyModel.getHandle(), bridge );
+		identityMappingCollector.identifierBridge( propertyModel.getHandle(), bridge );
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		nestedCollectorOptional.ifPresent( nestedCollector -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
 					propertyModel.getTypeModel(), contributorProvider, nestedCollector,
-					IdentifierMappingCollector.noOp() // Do NOT propagate the ID collector to IndexedEmbeddeds
+					PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					);
 			indexedEmbeddedProcessorBuilders.add( nestedProcessorBuilder );
 			contributorProvider.get( typeId ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
