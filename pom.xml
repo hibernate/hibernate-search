@@ -1138,6 +1138,8 @@
                         <quiet>true</quiet>
                         <verbose>false</verbose>
                         <failOnError>${failOnJavaDocError}</failOnError>
+                        <!-- Exclude implementation classes from the javadoc -->
+                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
                             <link>http://download.oracle.com/javase/8/docs/api/</link>
                             <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
