@@ -71,6 +71,12 @@ output is enabled; to also generate the PDF output use:
 
     > mvn clean install -Pdocumentation-pdf -s settings-example.xml
 
++You can then find the freshly built documentation in the following location:
+  
+    > ./documentation/target/asciidoctor/en-US
+
+##### Distribution
+
 To build the distribution bundle run:
 
     > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
