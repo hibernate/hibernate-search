@@ -1150,7 +1150,7 @@
                             <link>http://docs.jboss.org/jberet/${jberetJavadocVersion}/javadoc/jberet-core/</link>
                         </links>
                         <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved]]>
+                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
                         </bottom>
                         <additionalDependencies>
                             <additionalDependency>
