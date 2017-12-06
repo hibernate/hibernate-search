@@ -20,7 +20,7 @@ public interface IndexFieldReference<T> {
 	 * <p>
 	 * For instance, let's imagine a document with a field named {@code field} nested
 	 * in two objects, resulting in the absolute path {@code parent.child.field}.
-	 * If the document being produced is empty, and you call {@link #add(Object)}
+	 * If the document being produced is empty, and you call {@link #add(DocumentState, Object)}
 	 * on a reference to this field, the document will look like this:
 	 * <code><pre>
 	 * {
@@ -41,7 +41,7 @@ public interface IndexFieldReference<T> {
 	 *     }
 	 *   }
 	 * }
-	 * ... then calling {@link #add(Object)} will result in the following document:
+	 * ... then calling {@link #add(DocumentState, Object)} will result in the following document:
 	 * <code><pre>
 	 * {
 	 *   "parent": {
@@ -61,7 +61,7 @@ public interface IndexFieldReference<T> {
 	 *   }
 	 * }
 	 * </pre></code>
-	 * ... then calling {@link #add(Object)} will result in the following document:
+	 * ... then calling {@link #add(DocumentState, Object)} will result in the following document:
 	 * <code><pre>
 	 * {
 	 *   "parent": {
