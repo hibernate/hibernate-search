@@ -8,10 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge.mapping;
 
 import java.lang.annotation.Annotation;
 
-/**
- * @author Yoann Rodiere
- */
-public abstract class MarkerDefinitionBase<A extends Annotation> extends AnnotationDefinitionBase<A>
-		implements MarkerDefinition<A> {
+public interface AnnotationMarkerBuilder<A extends Annotation> extends MarkerBuilder {
+
+	void initialize(A annotation);
 
 }

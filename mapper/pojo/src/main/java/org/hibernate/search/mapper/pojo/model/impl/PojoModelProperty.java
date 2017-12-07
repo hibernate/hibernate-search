@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
@@ -36,7 +36,7 @@ public class PojoModelProperty extends AbstractPojoModelElement
 
 	private final PropertyModel<?> propertyModel;
 
-	private final Map<Class<? extends Annotation>, List<? extends Annotation>> markers = new HashMap<>();
+	private final Map<Class<?>, List<?>> markers = new HashMap<>();
 
 	public PojoModelProperty(AbstractPojoModelElement parent, PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
@@ -60,14 +60,14 @@ public class PojoModelProperty extends AbstractPojoModelElement
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends Annotation> Stream<M> markers(Class<M> markerType) {
+	public <M> Stream<M> markers(Class<M> markerType) {
 		return ( (List<M>) this.markers.getOrDefault( markerType, Collections.emptyList() ) )
 				.stream();
 	}
 
 	@Override
-	public final void marker(MarkerDefinition<?> definition) {
-		doAddMarker( definition );
+	public final void marker(MarkerBuilder builder) {
+		doAddMarker( builder.build() );
 	}
 
 	public PropertyHandle getHandle() {
@@ -89,9 +89,11 @@ public class PojoModelProperty extends AbstractPojoModelElement
 	}
 
 	@SuppressWarnings("unchecked")
-	private <M extends Annotation> void doAddMarker(MarkerDefinition<M> definition) {
-		M marker = definition.get();
-		Class<M> markerType = (Class<M>) marker.annotationType();
+	private <M> void doAddMarker(M marker) {
+		Class<M> markerType = (Class<M>) (
+				marker instanceof Annotation ? ((Annotation) marker).annotationType()
+				: marker.getClass()
+		);
 		List<M> list = (List<M>) markers.computeIfAbsent( markerType, ignored -> new ArrayList<M>() );
 		list.add( marker );
 	}

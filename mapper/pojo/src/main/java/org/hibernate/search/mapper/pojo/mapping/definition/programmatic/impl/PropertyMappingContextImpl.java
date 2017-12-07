@@ -13,7 +13,7 @@ import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
@@ -94,8 +94,8 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public PropertyMappingContext marker(MarkerDefinition<?> definition) {
-		children.add( new MarkerMappingContributor( definition ) );
+	public PropertyMappingContext marker(MarkerBuilder builder) {
+		children.add( new MarkerMappingContributor( builder ) );
 		return this;
 	}
 

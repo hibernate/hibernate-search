@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -44,7 +43,7 @@ public class PojoModelRoot extends AbstractPojoModelElement implements PojoModel
 	}
 
 	@Override
-	public <M extends Annotation> Stream<M> markers(Class<M> markerType) {
+	public <M> Stream<M> markers(Class<M> markerType) {
 		return Stream.empty();
 	}
 

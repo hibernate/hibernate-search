@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.mapper.model.spi.SearchModel;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
@@ -59,13 +58,13 @@ public class GeoPointBridgeImpl implements Bridge {
 		}
 		else {
 			PojoModelElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( GeoPointBridge.Latitude.class )
-							.anyMatch( m -> Objects.equals( markerSet, m.markerSet() ) ) )
+					.filter( model -> model.markers( LatitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "latitude", fieldName, markerSet ) )
 					.createAccessor( Double.class );
 			PojoModelElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( GeoPointBridge.Longitude.class )
-							.anyMatch( m -> Objects.equals( markerSet, m.markerSet() ) ) )
+					.filter( model -> model.markers( LongitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "longitude", fieldName, markerSet ) )
 					.createAccessor( Double.class );
 

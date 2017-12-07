@@ -755,7 +755,7 @@ public class JavaBeanElasticsearchIT {
 
 		private final String objectName;
 
-		private PojoModelElementAccessor<OrmElasticsearchIT.IndexedEntity> sourceAccessor;
+		private PojoModelElementAccessor<IndexedEntity> sourceAccessor;
 		private IndexFieldAccessor<String> textFieldAccessor;
 		private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
 
@@ -766,7 +766,7 @@ public class JavaBeanElasticsearchIT {
 		@Override
 		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
-			sourceAccessor = bridgedPojoModelElement.createAccessor( OrmElasticsearchIT.IndexedEntity.class );
+			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
 			IndexSchemaElement objectFieldMetadata = indexSchemaElement.childObject( objectName );
 			textFieldAccessor = objectFieldMetadata.field( "text" ).asString().createAccessor();
 			localDateFieldAccessor = objectFieldMetadata.field( "date" ).asLocalDate().createAccessor();
@@ -774,7 +774,7 @@ public class JavaBeanElasticsearchIT {
 
 		@Override
 		public void write(DocumentState target, PojoState source) {
-			OrmElasticsearchIT.IndexedEntity sourceValue = sourceAccessor.read( source );
+			IndexedEntity sourceValue = sourceAccessor.read( source );
 			if ( sourceValue != null ) {
 				textFieldAccessor.write( target, sourceValue.getText() );
 				localDateFieldAccessor.write( target, sourceValue.getLocalDate() );

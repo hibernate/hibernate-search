@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 /**
@@ -21,7 +20,7 @@ public interface PojoModelElement {
 
 	boolean isAssignableTo(Class<?> clazz);
 
-	<M extends Annotation> Stream<M> markers(Class<M> markerType);
+	<M> Stream<M> markers(Class<M> markerType);
 
 	PojoModelElement property(String relativeName);
 

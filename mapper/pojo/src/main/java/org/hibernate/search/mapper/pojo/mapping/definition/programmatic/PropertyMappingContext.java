@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 
 /**
@@ -32,7 +32,7 @@ public interface PropertyMappingContext {
 
 	PropertyMappingContext bridge(BridgeBuilder<? extends Bridge> builder);
 
-	PropertyMappingContext marker(MarkerDefinition<?> definition);
+	PropertyMappingContext marker(MarkerBuilder builder);
 
 	PropertyFieldMappingContext field();
 

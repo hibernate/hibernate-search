@@ -6,13 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
-import java.lang.annotation.Annotation;
-
 /**
  * @author Yoann Rodiere
  */
-public interface MarkerDefinition<A extends Annotation> {
+public interface MarkerBuilder {
 
-	A get();
+	/**
+	 * Build a marker.
+	 *
+	 * @return A marker instance.
+	 */
+	Object build();
 
 }

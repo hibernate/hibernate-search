@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchC
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder.LatitudeMarkerDefinition;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder.LongitudeMarkerDefinition;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarkerBuilder;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
@@ -65,13 +65,13 @@ public class JavaBeanElasticsearchGeoPointIT {
 				.property( "id" )
 						.documentId()
 				.property( "homeLatitude" )
-						.marker( new LatitudeMarkerDefinition().markerSet( "home" ) )
+						.marker( new LatitudeMarkerBuilder().markerSet( "home" ) )
 				.property( "homeLongitude" )
-						.marker( new LongitudeMarkerDefinition().markerSet( "home" ) )
+						.marker( new LongitudeMarkerBuilder().markerSet( "home" ) )
 				.property( "workLatitude" )
-						.marker( new LatitudeMarkerDefinition().markerSet( "work" ) )
+						.marker( new LatitudeMarkerBuilder().markerSet( "work" ) )
 				.property( "workLongitude" )
-						.marker( new LongitudeMarkerDefinition().markerSet( "work" ) );
+						.marker( new LongitudeMarkerBuilder().markerSet( "work" ) );
 
 		mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
 				.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
@@ -93,9 +93,9 @@ public class JavaBeanElasticsearchGeoPointIT {
 
 		mappingDefinition.type( CustomCoordinates.class )
 				.property( "lat" )
-						.marker( new LatitudeMarkerDefinition() )
+						.marker( new LatitudeMarkerBuilder() )
 				.property( "lon" )
-						.marker( new LongitudeMarkerDefinition() );
+						.marker( new LongitudeMarkerBuilder() );
 
 		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();

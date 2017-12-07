@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
@@ -57,7 +57,7 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public PropertyMappingContext marker(MarkerDefinition<?> definition) {
+	public PropertyMappingContext marker(MarkerBuilder definition) {
 		return delegate.marker( definition );
 	}
 
