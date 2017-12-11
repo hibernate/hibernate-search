@@ -221,7 +221,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		private IndexFieldAccessor<String> fieldAccessor;
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+		public void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
 				EngineHandle engineHandle) {
 			sourceReader = bridgedElementModel.createReader( String.class );
 			fieldAccessor = indexSchemaElement.field( "jsonStringField" )

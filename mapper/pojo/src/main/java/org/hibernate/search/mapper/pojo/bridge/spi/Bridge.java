@@ -25,7 +25,7 @@ public interface Bridge<A extends Annotation> extends AutoCloseable {
 		// Default does nothing
 	}
 
-	void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel, EngineHandle handle);
+	void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel, EngineHandle handle);
 
 	void write(DocumentState target, BridgedElement source);
 

@@ -720,7 +720,7 @@ public class OrmElasticsearchIT {
 		}
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+		public void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
 				EngineHandle engineHandle) {
 			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
 			IndexSchemaElement objectSchemaElement = indexSchemaElement.childObject( parameters.objectName() );

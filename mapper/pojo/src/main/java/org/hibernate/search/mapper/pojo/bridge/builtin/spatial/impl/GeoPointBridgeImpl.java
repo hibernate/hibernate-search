@@ -40,7 +40,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+	public void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
 			EngineHandle engineHandle) {
 		String fieldName = parameters.fieldName();
 
