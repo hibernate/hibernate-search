@@ -9,27 +9,27 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
-	private final IndexModelCollectorImplementor collector;
+	private final IndexSchemaCollector schemaCollector;
 	private final IndexModelNestingContextImpl nestingContext;
 
-	private IndexModelCollector collectorWithContext;
+	private IndexSchemaElement schemaElementWithNestingContext;
 
-	public IndexModelBindingContextImpl(IndexModelCollectorImplementor collector,
+	public IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
 			IndexableTypeOrdering typeOrdering) {
-		this( collector, new IndexModelNestingContextImpl( typeOrdering ) );
+		this( schemaCollector, new IndexModelNestingContextImpl( typeOrdering ) );
 	}
 
-	private IndexModelBindingContextImpl(IndexModelCollectorImplementor collector,
+	private IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
 			IndexModelNestingContextImpl nestingContext) {
-		this.collector = collector;
+		this.schemaCollector = schemaCollector;
 		this.nestingContext = nestingContext;
 	}
 
@@ -37,23 +37,23 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "collector=" ).append( collector )
+				.append( "schemaCollector=" ).append( schemaCollector )
 				.append( ",nestingContext=" ).append( nestingContext )
 				.append( "]" )
 				.toString();
 	}
 
 	@Override
-	public IndexModelCollector getModelCollector() {
-		if ( collectorWithContext == null ) {
-			collectorWithContext = collector.withContext( nestingContext );
+	public IndexSchemaElement getSchemaElement() {
+		if ( schemaElementWithNestingContext == null ) {
+			schemaElementWithNestingContext = schemaCollector.withContext( nestingContext );
 		}
-		return collectorWithContext;
+		return schemaElementWithNestingContext;
 	}
 
 	@Override
 	public void explicitRouting() {
-		collector.explicitRouting();
+		schemaCollector.explicitRouting();
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				relativePrefix,
 				f -> f.composeWithNested( parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters ),
-				collector, IndexModelCollectorImplementor::childObject,
+				schemaCollector, IndexSchemaCollector::childObject,
 				IndexModelBindingContextImpl::new
 		);
 	}

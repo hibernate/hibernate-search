@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -107,7 +107,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Bridge<?> bridge = bridgeFactory.createBridge( reference, annotation );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bridgedElementModel, bindingContext.getModelCollector() );
+		bridge.bind( bridgedElementModel, bindingContext.getSchemaElement() );
 
 		return new BridgeValueProcessor( bridge );
 	}
@@ -129,7 +129,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
 			BridgedElementReader<? extends T> bridgedElementReader,
 			FunctionBridge<T, R> bridge, String fieldName, FieldModelContributor contributor) {
-		FieldModelContext fieldContext = bindingContext.getModelCollector().field( fieldName );
+		FieldModelContext fieldContext = bindingContext.getSchemaElement().field( fieldName );
 
 		// First give the bridge a chance to contribute to the model
 		TypedFieldModelContext<R> typedFieldContext = bridge.bind( fieldContext );
@@ -137,15 +137,15 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			Class<R> returnType = FunctionBridgeUtil.inferReturnType( bridge )
 					.orElseThrow( () -> new SearchException( "Could not auto-detect the return type for bridge "
 							+ bridge + "; configure encoding explicitly in the bridge." ) );
-			typedFieldContext = fieldContext.from( returnType );
+			typedFieldContext = fieldContext.as( returnType );
 		}
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( typedFieldContext );
 
 		// FIXME if the field is filtered out, we should ignore the processor
 
-		IndexFieldReference<R> indexFieldReference = typedFieldContext.asReference();
-		return new FunctionBridgeValueProcessor<>( bridge, bridgedElementReader, indexFieldReference );
+		IndexFieldAccessor<R> indexFieldAccessor = typedFieldContext.createAccessor();
+		return new FunctionBridgeValueProcessor<>( bridge, bridgedElementReader, indexFieldAccessor );
 	}
 
 }

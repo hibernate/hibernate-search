@@ -16,15 +16,15 @@ import org.hibernate.search.engine.backend.spatial.GeoPoint;
  */
 public interface FieldModelContext {
 
-	<T> TypedFieldModelContext<T> from(Class<T> inputType);
+	<T> TypedFieldModelContext<T> as(Class<T> inputType);
 
-	TypedFieldModelContext<String> fromString();
+	TypedFieldModelContext<String> asString();
 
-	TypedFieldModelContext<Integer> fromInteger();
+	TypedFieldModelContext<Integer> asInteger();
 
-	TypedFieldModelContext<LocalDate> fromLocalDate();
+	TypedFieldModelContext<LocalDate> asLocalDate();
 
-	TypedFieldModelContext<GeoPoint> fromGeoPoint();
+	TypedFieldModelContext<GeoPoint> asGeoPoint();
 
 	// TODO NumericBridgeProvider
 	// TODO JavaTimeBridgeProvider

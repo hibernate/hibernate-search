@@ -7,24 +7,24 @@
 package org.hibernate.search.engine.backend.document.impl;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class DeferredInitializationIndexFieldReference<T> implements IndexFieldReference<T> {
+public class DeferredInitializationIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 
-	private IndexFieldReference<T> delegate;
+	private IndexFieldAccessor<T> delegate;
 
-	public void initialize(IndexFieldReference<T> delegate) {
+	public void initialize(IndexFieldAccessor<T> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public void add(DocumentState state, T value) {
+	public void write(DocumentState state, T value) {
 		if ( delegate != null ) {
-			delegate.add( state, value );
+			delegate.write( state, value );
 		}
 		// else: The field was filtered out - ignore it
 	}

@@ -14,7 +14,7 @@ public final class DefaultStringFunctionBridge implements FunctionBridge<String,
 
 	@Override
 	public TypedFieldModelContext<String> bind(FieldModelContext context) {
-		return context.fromString();
+		return context.asString();
 	}
 
 	@Override

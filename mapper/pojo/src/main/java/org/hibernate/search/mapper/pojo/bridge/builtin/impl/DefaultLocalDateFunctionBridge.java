@@ -16,7 +16,7 @@ public final class DefaultLocalDateFunctionBridge implements FunctionBridge<Loca
 
 	@Override
 	public TypedFieldModelContext<LocalDate> bind(FieldModelContext context) {
-		return context.fromLocalDate();
+		return context.asLocalDate();
 	}
 
 	@Override

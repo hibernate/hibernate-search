@@ -15,12 +15,12 @@ public interface IndexObjectReference {
 	/**
 	 * Add a new object to the given state at the target of this reference.
 	 * <p>
-	 * This method is only useful when you want to add more than one object
+	 * This method is only useful when you want to write more than one object
 	 * to a given path.
 	 * <p>
 	 * For instance, let's imagine a document with a field named {@code field} nested
 	 * in two objects, resulting in the absolute path {@code parent.child.field}.
-	 * If the document being produced is empty, and you call {@link IndexFieldReference#add(DocumentState, Object)}
+	 * If the document being produced is empty, and you call {@link IndexFieldAccessor#write(DocumentState, Object)}
 	 * on a reference to this field, the document will look like this:
 	 * <code><pre>
 	 * {
@@ -44,8 +44,8 @@ public interface IndexObjectReference {
 	 * Thus you have one parent, one child, and two fields.
 	 *
 	 * <p>If, instead of the result above, you would like one parent, two childs with each one field,
-	 * you will call {@link IndexFieldReference#add(DocumentState, Object)}, then {@link #add(DocumentState)}
-	 * on a reference to the child object, then {@link IndexFieldReference#add(DocumentState, Object)}
+	 * you will call {@link IndexFieldAccessor#write(DocumentState, Object)}, then {@link #add(DocumentState)}
+	 * on a reference to the child object, then {@link IndexFieldAccessor#write(DocumentState, Object)}
 	 * again. The document will then look like this:
 	 * <code><pre>
 	 * {

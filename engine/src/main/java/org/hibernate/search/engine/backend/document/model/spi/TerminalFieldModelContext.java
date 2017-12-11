@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 
 /**
  * @author Yoann Rodiere
  */
 public interface TerminalFieldModelContext<T> {
 
-	IndexFieldReference<T> asReference();
+	IndexFieldAccessor<T> createAccessor();
 
 }

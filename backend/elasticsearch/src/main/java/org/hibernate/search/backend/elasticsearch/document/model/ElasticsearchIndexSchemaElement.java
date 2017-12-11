@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchIndexModelCollector extends IndexModelCollector {
+public interface ElasticsearchIndexSchemaElement extends IndexSchemaElement {
 
 }

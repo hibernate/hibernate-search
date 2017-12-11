@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldReference;
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
@@ -40,13 +40,13 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<String> reference,
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
 			ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = new PropertyMapping();
 
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( StringFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );

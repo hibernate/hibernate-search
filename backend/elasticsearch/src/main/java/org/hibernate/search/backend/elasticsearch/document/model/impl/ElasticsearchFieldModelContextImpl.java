@@ -33,18 +33,18 @@ public class ElasticsearchFieldModelContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> TypedFieldModelContext<T> from(Class<T> inputType) {
+	public <T> TypedFieldModelContext<T> as(Class<T> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) fromString();
+			return (TypedFieldModelContext<T>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) fromInteger();
+			return (TypedFieldModelContext<T>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) fromLocalDate();
+			return (TypedFieldModelContext<T>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) fromGeoPoint();
+			return (TypedFieldModelContext<T>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -53,27 +53,27 @@ public class ElasticsearchFieldModelContextImpl
 	}
 
 	@Override
-	public TypedFieldModelContext<String> fromString() {
+	public TypedFieldModelContext<String> asString() {
 		return setDelegate( new StringFieldModelContext( accessor ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<Integer> fromInteger() {
+	public TypedFieldModelContext<Integer> asInteger() {
 		return setDelegate( new IntegerFieldModelContext( accessor ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<LocalDate> fromLocalDate() {
+	public TypedFieldModelContext<LocalDate> asLocalDate() {
 		return setDelegate( new LocalDateFieldModelContext( accessor ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<GeoPoint> fromGeoPoint() {
+	public TypedFieldModelContext<GeoPoint> asGeoPoint() {
 		return setDelegate( new GeoPointFieldModelContext( accessor ) );
 	}
 
 	@Override
-	public TerminalFieldModelContext<String> fromJsonString(String mappingJsonString) {
+	public TerminalFieldModelContext<String> asJsonString(String mappingJsonString) {
 		return setDelegate( new JsonStringFieldModelContext( accessor, mappingJsonString ) );
 	}
 

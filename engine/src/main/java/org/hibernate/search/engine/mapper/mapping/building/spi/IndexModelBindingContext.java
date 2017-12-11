@@ -9,12 +9,12 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 public interface IndexModelBindingContext {
 
-	IndexModelCollector getModelCollector();
+	IndexSchemaElement getSchemaElement();
 
 	/**
 	 * Inform the model collector that documents will always be provided along

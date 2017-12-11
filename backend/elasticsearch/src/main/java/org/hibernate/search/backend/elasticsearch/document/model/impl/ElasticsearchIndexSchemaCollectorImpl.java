@@ -8,15 +8,13 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexModelNestingContext;
 import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
-import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexModelCollector;
+import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
@@ -30,8 +28,8 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
-		implements ElasticsearchIndexModelCollector, IndexModelCollectorImplementor,
+public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
+		implements ElasticsearchIndexSchemaElement, IndexSchemaCollector,
 				ElasticsearchIndexModelNodeContributor<T> {
 
 	private static final Supplier<TypeMapping> TYPE_MAPPING_FACTORY = TypeMapping::new;
@@ -41,8 +39,8 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 		return mapping;
 	};
 
-	public static ElasticsearchIndexModelCollectorImpl<TypeMapping> root() {
-		return new ElasticsearchIndexModelCollectorImpl<>( JsonAccessor.root(), TYPE_MAPPING_FACTORY,
+	public static ElasticsearchIndexSchemaCollectorImpl<TypeMapping> root() {
+		return new ElasticsearchIndexSchemaCollectorImpl<>( JsonAccessor.root(), TYPE_MAPPING_FACTORY,
 				IndexModelNestingContext.includeAll() );
 	}
 
@@ -53,7 +51,7 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 
 	private final IndexModelNestingContext filter;
 
-	private ElasticsearchIndexModelCollectorImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
+	private ElasticsearchIndexSchemaCollectorImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
 			IndexModelNestingContext filter) {
 		this.accessor = accessor;
 		this.mappingFactory = mappingFactory;
@@ -61,7 +59,7 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 		this.filter = filter;
 	}
 
-	private ElasticsearchIndexModelCollectorImpl(ElasticsearchIndexModelCollectorImpl<T> original,
+	private ElasticsearchIndexSchemaCollectorImpl(ElasticsearchIndexSchemaCollectorImpl<T> original,
 			IndexModelNestingContext filter) {
 		// Share the same state as the original regarding the model itself
 		this.accessor = original.accessor;
@@ -83,12 +81,12 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public ElasticsearchIndexModelCollectorImpl<?> withContext(IndexModelNestingContext context) {
+	public ElasticsearchIndexSchemaCollectorImpl<?> withContext(IndexModelNestingContext context) {
 		/*
 		 * Note: this erases the previous filter, but that's alright since
 		 * filter composition is handled in the engine.
 		 */
-		return new ElasticsearchIndexModelCollectorImpl<>( this, context );
+		return new ElasticsearchIndexSchemaCollectorImpl<>( this, context );
 	}
 
 	@Override
@@ -107,17 +105,17 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public ElasticsearchIndexModelCollectorImpl<?> childObject(String relativeName) {
+	public ElasticsearchIndexSchemaCollectorImpl<?> childObject(String relativeName) {
 		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
 
 		// Only take the contributor into account if the child is included
 		return filter.applyIfIncluded( relativeName, (name, filter) -> {
-					ElasticsearchIndexModelCollectorImpl<PropertyMapping> childCollector =
-							new ElasticsearchIndexModelCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY, filter );
+					ElasticsearchIndexSchemaCollectorImpl<PropertyMapping> childCollector =
+							new ElasticsearchIndexSchemaCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY, filter );
 					addPropertyContributor( name, childCollector );
 					return childCollector;
 				} )
-				.orElseGet( () -> new ElasticsearchIndexModelCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
+				.orElseGet( () -> new ElasticsearchIndexSchemaCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
 						IndexModelNestingContext.excludeAll() ) );
 	}
 

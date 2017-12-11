@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
 import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
@@ -20,21 +20,21 @@ public class FunctionBridgeValueProcessor<T, R> implements ValueProcessor {
 
 	private final FunctionBridge<T, R> bridge;
 	private final BridgedElementReader<? extends T> bridgedElementReader;
-	private final IndexFieldReference<R> indexFieldReference;
+	private final IndexFieldAccessor<R> indexFieldAccessor;
 
 	public FunctionBridgeValueProcessor(FunctionBridge<T, R> bridge,
 			BridgedElementReader<? extends T> bridgedElementReader,
-			IndexFieldReference<R> indexFieldReference) {
+			IndexFieldAccessor<R> indexFieldAccessor) {
 		this.bridge = bridge;
 		this.bridgedElementReader = bridgedElementReader;
-		this.indexFieldReference = indexFieldReference;
+		this.indexFieldAccessor = indexFieldAccessor;
 	}
 
 	@Override
 	public void process(DocumentState target, BridgedElement source) {
 		T bridgedElement = bridgedElementReader.read( source );
 		R indexFieldValue = bridge.toDocument( bridgedElement );
-		indexFieldReference.add( target, indexFieldValue );
+		indexFieldAccessor.write( target, indexFieldValue );
 	}
 
 	@Override

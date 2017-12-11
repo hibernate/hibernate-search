@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
@@ -30,7 +30,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 
 	private GeoPointBridge parameters;
 
-	private IndexFieldReference<GeoPoint> fieldReference;
+	private IndexFieldAccessor<GeoPoint> fieldAccessor;
 	private Function<BridgedElement, GeoPoint> coordinatesExtractor;
 
 	@Override
@@ -39,7 +39,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
+	public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
 		String fieldName = parameters.fieldName();
 
 		if ( fieldName.isEmpty() ) {
@@ -47,7 +47,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 			throw new UnsupportedOperationException( "Default field name not implemented yet" );
 		}
 
-		fieldReference = indexModelCollector.field( fieldName ).fromGeoPoint().asReference();
+		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().createAccessor();
 
 		if ( bridgedElementModel.isAssignableTo( GeoPoint.class ) ) {
 			BridgedElementReader<GeoPoint> sourceReference = bridgedElementModel.createReader( GeoPoint.class );
@@ -93,7 +93,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	@Override
 	public void toDocument(BridgedElement source, DocumentState target) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
-		fieldReference.add( target, coordinates );
+		fieldAccessor.write( target, coordinates );
 	}
 
 }

@@ -27,9 +27,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
@@ -710,8 +710,8 @@ public class OrmElasticsearchIT {
 
 		private MyBridge parameters;
 		private BridgedElementReader<IndexedEntity> sourceReader;
-		private IndexFieldReference<String> textFieldRef;
-		private IndexFieldReference<LocalDate> localDateFieldRef;
+		private IndexFieldAccessor<String> textFieldAccessor;
+		private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
 
 		@Override
 		public void initialize(BuildContext buildContext, MyBridge parameters) {
@@ -719,19 +719,19 @@ public class OrmElasticsearchIT {
 		}
 
 		@Override
-		public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
+		public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
 			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
-			IndexModelCollector objectRef = indexModelCollector.childObject( parameters.objectName() );
-			textFieldRef = objectRef.field( "text" ).fromString().asReference();
-			localDateFieldRef = objectRef.field( "date" ).fromLocalDate().asReference();
+			IndexSchemaElement objectSchemaElement = indexSchemaElement.childObject( parameters.objectName() );
+			textFieldAccessor = objectSchemaElement.field( "text" ).asString().createAccessor();
+			localDateFieldAccessor = objectSchemaElement.field( "date" ).asLocalDate().createAccessor();
 		}
 
 		@Override
 		public void toDocument(BridgedElement source, DocumentState target) {
 			IndexedEntity sourceValue = sourceReader.read( source );
 			if ( sourceValue != null ) {
-				textFieldRef.add( target, sourceValue.getText() );
-				localDateFieldRef.add( target, sourceValue.getLocalDate() );
+				textFieldAccessor.write( target, sourceValue.getText() );
+				localDateFieldAccessor.write( target, sourceValue.getLocalDate() );
 			}
 		}
 

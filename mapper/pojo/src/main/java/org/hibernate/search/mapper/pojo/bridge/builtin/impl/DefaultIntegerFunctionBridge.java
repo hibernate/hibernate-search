@@ -14,7 +14,7 @@ public final class DefaultIntegerFunctionBridge implements FunctionBridge<Intege
 
 	@Override
 	public TypedFieldModelContext<Integer> bind(FieldModelContext context) {
-		return context.fromInteger();
+		return context.asInteger();
 	}
 
 	@Override

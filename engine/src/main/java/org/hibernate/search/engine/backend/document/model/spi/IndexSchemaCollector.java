@@ -9,12 +9,12 @@ package org.hibernate.search.engine.backend.document.model.spi;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexModelCollectorImplementor extends IndexModelCollector {
+public interface IndexSchemaCollector extends IndexSchemaElement {
 
 	@Override
-	IndexModelCollectorImplementor childObject(String relativeName);
+	IndexSchemaCollector childObject(String relativeName);
 
-	IndexModelCollector withContext(IndexModelNestingContext context);
+	IndexSchemaElement withContext(IndexModelNestingContext context);
 
 	/**
 	 * Inform the model collector that documents will always be provided along

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
@@ -30,12 +30,12 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldReference<Integer> reference, ElasticsearchFieldModelCollector collector) {
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference, ElasticsearchFieldModelCollector collector) {
 		PropertyMapping mapping = super.contribute( reference, collector );
 
 		ElasticsearchFieldModel model = new ElasticsearchFieldModel( IntegerFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldReference<>( accessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
 		mapping.setType( DataType.INTEGER );
 
 		String absolutePath = accessor.getStaticAbsolutePath();

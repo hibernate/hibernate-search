@@ -11,11 +11,11 @@ import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexModelCollector {
+public interface IndexSchemaElement {
 
 	FieldModelContext field(String relativeName);
 
-	IndexModelCollector childObject(String relativeName);
+	IndexSchemaElement childObject(String relativeName);
 
 	IndexObjectReference asReference();
 

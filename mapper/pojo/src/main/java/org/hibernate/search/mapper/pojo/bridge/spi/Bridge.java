@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.spi;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
@@ -28,7 +28,7 @@ public interface Bridge<A extends Annotation> extends AutoCloseable {
 	 * TODO add an object to define "virtual" fields: fields which are not in the index,
 	 * but can be simulated on the client side when projecting and querying.
 	 */
-	void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector);
+	void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement);
 
 	void toDocument(BridgedElement source, DocumentState target);
 

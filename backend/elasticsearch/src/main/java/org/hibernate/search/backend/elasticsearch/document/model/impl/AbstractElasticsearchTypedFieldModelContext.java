@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldReference;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchTypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 
@@ -17,10 +17,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 public abstract class AbstractElasticsearchTypedFieldModelContext<T>
 		implements ElasticsearchTypedFieldModelContext<T>, ElasticsearchIndexModelNodeContributor<PropertyMapping> {
 
-	private DeferredInitializationIndexFieldReference<T> reference = new DeferredInitializationIndexFieldReference<>();
+	private DeferredInitializationIndexFieldAccessor<T> reference = new DeferredInitializationIndexFieldAccessor<>();
 
 	@Override
-	public IndexFieldReference<T> asReference() {
+	public IndexFieldAccessor<T> createAccessor() {
 		return reference;
 	}
 
@@ -29,7 +29,7 @@ public abstract class AbstractElasticsearchTypedFieldModelContext<T>
 		return contribute( reference, collector );
 	}
 
-	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldReference<T> reference,
+	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<T> reference,
 			ElasticsearchFieldModelCollector collector);
 
 }

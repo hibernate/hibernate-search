@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollectorImplementor;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModelCollectorImpl;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -30,8 +30,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final BuildContext context;
 	private final ConfigurationPropertySource propertySource;
 
-	private final ElasticsearchIndexModelCollectorImpl<TypeMapping> collector =
-			ElasticsearchIndexModelCollectorImpl.root();
+	private final ElasticsearchIndexSchemaCollectorImpl<TypeMapping> collector =
+			ElasticsearchIndexSchemaCollectorImpl.root();
 
 	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
 			BuildContext context, ConfigurationPropertySource propertySource) {
@@ -42,7 +42,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	}
 
 	@Override
-	public IndexModelCollectorImplementor getModelCollector() {
+	public IndexSchemaCollector getSchemaCollector() {
 		return collector;
 	}
 

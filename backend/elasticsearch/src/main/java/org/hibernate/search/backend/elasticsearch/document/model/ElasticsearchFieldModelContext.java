@@ -15,6 +15,6 @@ import org.hibernate.search.engine.backend.document.model.spi.TerminalFieldModel
  */
 public interface ElasticsearchFieldModelContext extends FieldModelContext {
 
-	TerminalFieldModelContext<String> fromJsonString(String mappingJsonString);
+	TerminalFieldModelContext<String> asJsonString(String mappingJsonString);
 
 }

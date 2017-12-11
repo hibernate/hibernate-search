@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
@@ -217,24 +217,24 @@ public class JavaBeanElasticsearchExtensionIT {
 	public static final class MyElasticsearchBridgeImpl implements Bridge<MyElasticsearchBridge> {
 
 		private BridgedElementReader<String> sourceReader;
-		private IndexFieldReference<String> fieldRef;
+		private IndexFieldAccessor<String> fieldAccessor;
 
 		@Override
-		public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
+		public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
 			sourceReader = bridgedElementModel.createReader( String.class );
-			fieldRef = indexModelCollector.field( "jsonStringField" )
+			fieldAccessor = indexSchemaElement.field( "jsonStringField" )
 					.withExtension( ElasticsearchExtension.get() )
-					.fromJsonString(
+					.asJsonString(
 							"{"
 								+ "'esAttribute1': 'val1'"
 							+ "}"
-					).asReference();
+					).createAccessor();
 		}
 
 		@Override
 		public void toDocument(BridgedElement source, DocumentState target) {
 			String sourceValue = sourceReader.read( source );
-			fieldRef.add( target, sourceValue );
+			fieldAccessor.write( target, sourceValue );
 		}
 
 	}
