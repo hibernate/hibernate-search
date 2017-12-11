@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.Indexable;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.StreamHelper;
 
@@ -31,7 +31,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	private GeoPointBridge parameters;
 
 	private IndexFieldReference<GeoPoint> fieldReference;
-	private Function<Indexable, GeoPoint> coordinatesExtractor;
+	private Function<BridgedElement, GeoPoint> coordinatesExtractor;
 
 	@Override
 	public void initialize(BuildContext buildContext, GeoPointBridge parameters) {
@@ -39,7 +39,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector) {
+	public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
 		String fieldName = parameters.fieldName();
 
 		if ( fieldName.isEmpty() ) {
@@ -49,27 +49,27 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 
 		fieldReference = indexModelCollector.field( fieldName ).fromGeoPoint().asReference();
 
-		if ( indexableModel.isAssignableTo( GeoPoint.class ) ) {
-			IndexableReference<GeoPoint> sourceReference = indexableModel.asReference( GeoPoint.class );
-			coordinatesExtractor = indexable -> indexable.get( sourceReference );
+		if ( bridgedElementModel.isAssignableTo( GeoPoint.class ) ) {
+			BridgedElementReader<GeoPoint> sourceReference = bridgedElementModel.createReader( GeoPoint.class );
+			coordinatesExtractor = sourceReference::read;
 		}
 		else {
 			String markerSet = parameters.markerSet();
 
-			IndexableReference<Double> latitudeReference = indexableModel.properties()
+			BridgedElementReader<Double> latitudeReference = bridgedElementModel.properties()
 					.filter( model -> model.markers( GeoPointBridge.Latitude.class )
 							.anyMatch( m -> markerSet.equals( m.markerSet() ) ) )
 					.collect( singleMarkedProperty( "latitude", fieldName, markerSet ) )
-					.asReference( Double.class );
-			IndexableReference<Double> longitudeReference = indexableModel.properties()
+					.createReader( Double.class );
+			BridgedElementReader<Double> longitudeReference = bridgedElementModel.properties()
 					.filter( model -> model.markers( GeoPointBridge.Longitude.class )
 							.anyMatch( m -> markerSet.equals( m.markerSet() ) ) )
 					.collect( singleMarkedProperty( "longitude", fieldName, markerSet ) )
-					.asReference( Double.class );
+					.createReader( Double.class );
 
-			coordinatesExtractor = indexable -> {
-				Double latitude = indexable.get( latitudeReference );
-				Double longitude = indexable.get( longitudeReference );
+			coordinatesExtractor = bridgedElement -> {
+				Double latitude = latitudeReference.read( bridgedElement );
+				Double longitude = longitudeReference.read( bridgedElement );
 
 				if ( latitude == null || longitude == null ) {
 					return null;
@@ -80,7 +80,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 		}
 	}
 
-	private static Collector<IndexableModel, ?, IndexableModel> singleMarkedProperty(
+	private static Collector<BridgedElementModel, ?, BridgedElementModel> singleMarkedProperty(
 			String markerName, String fieldName, String markerSet) {
 		return StreamHelper.singleElement(
 				() -> new SearchException( "Could not find a property with the " + markerName
@@ -91,7 +91,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void toDocument(Indexable source, DocumentState target) {
+	public void toDocument(BridgedElement source, DocumentState target) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
 		fieldReference.add( target, coordinates );
 	}

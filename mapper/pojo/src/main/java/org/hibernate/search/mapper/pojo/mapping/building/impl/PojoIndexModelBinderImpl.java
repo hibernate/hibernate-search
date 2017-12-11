@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.document.spi.IndexFieldReference;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeFactory;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
@@ -60,9 +60,9 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, BeanReference<? extends RoutingKeyBridge> reference) {
+			BridgedElementModel bridgedElementModel, BeanReference<? extends RoutingKeyBridge> reference) {
 		RoutingKeyBridge bridge = bridgeFactory.createRoutingKeyBridge( reference );
-		bridge.bind( indexableModel );
+		bridge.bind( bridgedElementModel );
 
 		bindingContext.explicitRouting();
 
@@ -71,13 +71,13 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public ValueProcessor addBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, BridgeDefinition<?> definition) {
-		return doAddBridge( bindingContext, indexableModel, definition );
+			BridgedElementModel bridgedElementModel, BridgeDefinition<?> definition) {
+		return doAddBridge( bindingContext, bridgedElementModel, definition );
 	}
 
 	@Override
 	public ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, Class<?> sourceType,
+			BridgedElementModel bridgedElementModel, Class<?> sourceType,
 			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
 			String fieldName, FieldModelContributor contributor) {
 
@@ -90,7 +90,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		// TODO check that the bridge is suitable for the given sourceType?
 
-		return doAddFunctionBridge( bindingContext, indexableModel, bridge, fieldName, contributor );
+		return doAddFunctionBridge( bindingContext, bridgedElementModel, bridge, fieldName, contributor );
 	}
 
 	private boolean isEmpty(BeanReference<?> reference) {
@@ -98,7 +98,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	private <A extends Annotation> ValueProcessor doAddBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, BridgeDefinition<A> definition) {
+			BridgedElementModel bridgedElementModel, BridgeDefinition<A> definition) {
 		A annotation = definition.get();
 		@SuppressWarnings("unchecked")
 		Class<A> annotationType = (Class<A>) annotation.annotationType();
@@ -107,27 +107,27 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Bridge<?> bridge = bridgeFactory.createBridge( reference, annotation );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( indexableModel, bindingContext.getModelCollector() );
+		bridge.bind( bridgedElementModel, bindingContext.getModelCollector() );
 
 		return new BridgeValueProcessor( bridge );
 	}
 
 	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, FunctionBridge<T, R> bridge,
+			BridgedElementModel bridgedElementModel, FunctionBridge<T, R> bridge,
 			String fieldName, FieldModelContributor contributor) {
-		IndexableReference<? extends T> indexableReference = getReferenceForBridge( indexableModel, bridge );
-		return doAddFunctionBridge( bindingContext, indexableReference, bridge, fieldName, contributor );
+		BridgedElementReader<? extends T> bridgedElementReader = getReferenceForBridge( bridgedElementModel, bridge );
+		return doAddFunctionBridge( bindingContext, bridgedElementReader, bridge, fieldName, contributor );
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> IndexableReference<? extends T> getReferenceForBridge(IndexableModel indexableModel, FunctionBridge<T, ?> bridge) {
+	private <T> BridgedElementReader<? extends T> getReferenceForBridge(BridgedElementModel bridgedElementModel, FunctionBridge<T, ?> bridge) {
 		return FunctionBridgeUtil.inferParameterType( bridge )
-				.map( c -> indexableModel.asReference( c ) )
-				.orElse( (IndexableReference<T>) indexableModel.asReference() );
+				.map( c -> bridgedElementModel.createReader( c ) )
+				.orElse( (BridgedElementReader<T>) bridgedElementModel.createReader() );
 	}
 
 	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
-			IndexableReference<? extends T> indexableReference,
+			BridgedElementReader<? extends T> bridgedElementReader,
 			FunctionBridge<T, R> bridge, String fieldName, FieldModelContributor contributor) {
 		FieldModelContext fieldContext = bindingContext.getModelCollector().field( fieldName );
 
@@ -145,7 +145,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// FIXME if the field is filtered out, we should ignore the processor
 
 		IndexFieldReference<R> indexFieldReference = typedFieldContext.asReference();
-		return new FunctionBridgeValueProcessor<>( bridge, indexableReference, indexFieldReference );
+		return new FunctionBridgeValueProcessor<>( bridge, bridgedElementReader, indexFieldReference );
 	}
 
 }

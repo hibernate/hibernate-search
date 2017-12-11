@@ -28,9 +28,9 @@ import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.spi.Indexable;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
@@ -216,12 +216,12 @@ public class JavaBeanElasticsearchExtensionIT {
 
 	public static final class MyElasticsearchBridgeImpl implements Bridge<MyElasticsearchBridge> {
 
-		private IndexableReference<String> sourceRef;
+		private BridgedElementReader<String> sourceReader;
 		private IndexFieldReference<String> fieldRef;
 
 		@Override
-		public void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector) {
-			sourceRef = indexableModel.asReference( String.class );
+		public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
+			sourceReader = bridgedElementModel.createReader( String.class );
 			fieldRef = indexModelCollector.field( "jsonStringField" )
 					.withExtension( ElasticsearchExtension.get() )
 					.fromJsonString(
@@ -232,8 +232,8 @@ public class JavaBeanElasticsearchExtensionIT {
 		}
 
 		@Override
-		public void toDocument(Indexable source, DocumentState target) {
-			String sourceValue = source.get( sourceRef );
+		public void toDocument(BridgedElement source, DocumentState target) {
+			String sourceValue = sourceReader.read( source );
 			fieldRef.add( target, sourceValue );
 		}
 

@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
@@ -21,20 +22,20 @@ import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 /**
  * @author Yoann Rodiere
  */
-public abstract class PojoIndexableModel implements IndexableModel, PojoTypeNodeModelCollector {
+public abstract class PojoBridgedElementModel implements BridgedElementModel, PojoTypeNodeModelCollector {
 
 	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider;
 
-	private final Map<String, PojoPropertyIndexableModel> propertyModelsByName = new HashMap<>();
+	private final Map<String, PojoPropertyBridgedElementModel> propertyModelsByName = new HashMap<>();
 
 	private boolean markersForTypeInitialized = false;
 
-	public PojoIndexableModel(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+	public PojoBridgedElementModel(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
 	@Override
-	public abstract PojoIndexableReference<?> asReference();
+	public abstract BridgedElementReader<?> createReader();
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
@@ -42,19 +43,19 @@ public abstract class PojoIndexableModel implements IndexableModel, PojoTypeNode
 	}
 
 	@Override
-	public PojoPropertyIndexableModel property(String relativeName) {
+	public PojoPropertyBridgedElementModel property(String relativeName) {
 		initMarkersForType();
 		return propertyModelsByName.computeIfAbsent( relativeName, name -> {
 			PropertyModel<?> model = getTypeModel().getProperty( name );
-			return new PojoPropertyIndexableModel( this, model, modelContributorProvider );
+			return new PojoPropertyBridgedElementModel( this, model, modelContributorProvider );
 		} );
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Stream is covariant in T
 	@Override
-	public Stream<IndexableModel> properties() {
+	public Stream<BridgedElementModel> properties() {
 		initMarkersForType();
-		return (Stream<IndexableModel>) (Stream) propertyModelsByName.values().stream();
+		return (Stream<BridgedElementModel>) (Stream) propertyModelsByName.values().stream();
 	}
 
 	/*

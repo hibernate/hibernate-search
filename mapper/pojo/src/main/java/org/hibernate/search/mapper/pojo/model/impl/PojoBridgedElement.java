@@ -6,25 +6,23 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.Indexable;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoIndexable implements Indexable {
+public class PojoBridgedElement implements BridgedElement {
 
 	private final Object root;
 
-	public PojoIndexable(Object root) {
+	public PojoBridgedElement(Object root) {
 		super();
 		this.root = root;
 	}
 
-	@Override
-	public <T> T get(IndexableReference<T> key) {
-		return ((PojoIndexableReference<T>) key).get( root );
+	Object get() {
+		return root;
 	}
 
 }

@@ -16,9 +16,9 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.spi.Indexable;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -226,16 +226,16 @@ public class JavaBeanElasticsearchRoutingIT {
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
 
-		private IndexableReference<EntityCategory> categoryReference;
+		private BridgedElementReader<EntityCategory> categoryReader;
 
 		@Override
-		public void bind(IndexableModel indexableModel) {
-			categoryReference = indexableModel.property( "category" ).asReference( EntityCategory.class );
+		public void bind(BridgedElementModel bridgedElementModel) {
+			categoryReader = bridgedElementModel.property( "category" ).createReader( EntityCategory.class );
 		}
 
 		@Override
-		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Indexable source) {
-			EntityCategory category = source.get( categoryReference );
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, BridgedElement source) {
+			EntityCategory category = categoryReader.read( source );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {
 				keyBuilder.append( tenantIdentifier ).append( "/" );

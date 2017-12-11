@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexModelCollecto
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 /**
  * Provides the ability to bind the entity model to the index model
  * by creating bridges and
- * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(IndexableModel, IndexModelCollector) binding}
+ * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(BridgedElementModel, IndexModelCollector) binding}
  * them.
  * <p>
  * Incidentally, this will also generate the index model,
@@ -34,13 +34,13 @@ public interface PojoIndexModelBinder {
 			BeanReference<? extends IdentifierBridge<?>> reference);
 
 	RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, BeanReference<? extends RoutingKeyBridge> reference);
+			BridgedElementModel bridgedElementModel, BeanReference<? extends RoutingKeyBridge> reference);
 
 	ValueProcessor addBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, BridgeDefinition<?> definition);
+			BridgedElementModel bridgedElementModel, BridgeDefinition<?> definition);
 
 	ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			IndexableModel indexableModel, Class<?> sourceType,
+			BridgedElementModel bridgedElementModel, Class<?> sourceType,
 			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
 			String fieldName, FieldModelContributor contributor);
 

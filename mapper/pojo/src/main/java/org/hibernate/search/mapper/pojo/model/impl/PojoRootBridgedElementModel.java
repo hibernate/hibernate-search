@@ -10,8 +10,8 @@ import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
@@ -20,27 +20,27 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class PojoRootIndexableModel extends PojoIndexableModel implements IndexableModel {
+public class PojoRootBridgedElementModel extends PojoBridgedElementModel implements BridgedElementModel {
 
 	private final TypeModel<?> typeModel;
 
-	public PojoRootIndexableModel(TypeModel<?> typeModel,
+	public PojoRootBridgedElementModel(TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.typeModel = typeModel;
 	}
 
 	@Override
-	public <T> IndexableReference<T> asReference(Class<T> requestedType) {
+	public <T> BridgedElementReader<T> createReader(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
-			throw new SearchException( "Requested incompatible type for '" + asReference() + "': '" + requestedType + "'" );
+			throw new SearchException( "Requested incompatible type for '" + createReader() + "': '" + requestedType + "'" );
 		}
-		return new PojoRootIndexableReference<>( requestedType );
+		return new PojoRootBridgedElementReader<>( requestedType );
 	}
 
 	@Override
-	public PojoIndexableReference<?> asReference() {
-		return new PojoRootIndexableReference<>( getJavaType() );
+	public BridgedElementReader<?> createReader() {
+		return new PojoRootBridgedElementReader<>( getJavaType() );
 	}
 
 	@Override

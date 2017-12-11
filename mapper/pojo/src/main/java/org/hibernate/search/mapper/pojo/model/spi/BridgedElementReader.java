@@ -4,17 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.impl;
+package org.hibernate.search.mapper.pojo.model.spi;
 
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
 
 /**
  * @author Yoann Rodiere
  */
-public interface PojoIndexableReference<T> extends IndexableReference<T> {
+public interface BridgedElementReader<T> {
 
 	Class<T> getType();
 
-	T get(Object root);
+	T read(BridgedElement bridgedElement);
 
 }

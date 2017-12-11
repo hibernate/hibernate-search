@@ -12,19 +12,19 @@ import java.util.stream.Stream;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexableModel {
+public interface BridgedElementModel {
 
-	// FIXME what if I want a IndexableReference<List<MyType>>?
-	<T> IndexableReference<T> asReference(Class<T> type);
+	// FIXME what if I want a BridgedElementReader<List<MyType>>?
+	<T> BridgedElementReader<T> createReader(Class<T> type);
 
-	IndexableReference<?> asReference();
+	BridgedElementReader<?> createReader();
 
 	boolean isAssignableTo(Class<?> clazz);
 
 	<M extends Annotation> Stream<M> markers(Class<M> markerType);
 
-	IndexableModel property(String relativeName);
+	BridgedElementModel property(String relativeName);
 
-	Stream<IndexableModel> properties();
+	Stream<BridgedElementModel> properties();
 
 }

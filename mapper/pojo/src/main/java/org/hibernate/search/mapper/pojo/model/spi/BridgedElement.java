@@ -8,19 +8,17 @@ package org.hibernate.search.mapper.pojo.model.spi;
 
 
 /**
- * An {@link Indexable} is a value that can be processed into
+ * An {@link BridgedElement} is a value that can be processed into
  * an index document, be it composite (an entity) or atomic
  * (a primitive value).
  * <p>
- * {@link Indexable}s only provide access to a set of previously
- * registered paths, referenced by their {@link IndexableReference}.
+ * {@link BridgedElement}s only provide access to a set of previously
+ * registered paths, accessed through a {@link BridgedElementReader}.
  *
- * @see IndexableModel
+ * @see BridgedElementModel
  *
  * @author Yoann Rodiere
  */
-public interface Indexable {
-
-	<T> T get(IndexableReference<T> key);
+public interface BridgedElement {
 
 }

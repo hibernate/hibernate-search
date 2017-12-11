@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.model.impl.PojoIndexable;
+import org.hibernate.search.mapper.pojo.model.impl.PojoBridgedElement;
 import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 
 public class RoutingKeyBridgeProvider<E> implements RoutingKeyProvider<E> {
@@ -21,6 +21,6 @@ public class RoutingKeyBridgeProvider<E> implements RoutingKeyProvider<E> {
 
 	@Override
 	public String toRoutingKey(String tenantIdentifier, Object identifier, Supplier<E> entitySupplier) {
-		return bridge.toRoutingKey( tenantIdentifier, identifier, new PojoIndexable( entitySupplier.get() ) );
+		return bridge.toRoutingKey( tenantIdentifier, identifier, new PojoBridgedElement( entitySupplier.get() ) );
 	}
 }

@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-class PojoPropertyIndexableReference<T> implements PojoIndexableReference<T> {
+class PojoPropertyBridgedElementReader<T> implements BridgedElementReader<T> {
 
-	private final PojoIndexableReference<?> parent;
+	private final BridgedElementReader<?> parent;
 	private final PropertyHandle handle;
 
-	PojoPropertyIndexableReference(PojoIndexableReference<?> parent, PropertyHandle handle) {
+	PojoPropertyBridgedElementReader(BridgedElementReader<?> parent, PropertyHandle handle) {
 		this.parent = parent;
 		this.handle = handle;
 	}
@@ -25,8 +27,8 @@ class PojoPropertyIndexableReference<T> implements PojoIndexableReference<T> {
 	}
 
 	@Override
-	public T get(Object root) {
-		return (T) handle.get( parent.get( root ) );
+	public T read(BridgedElement bridgedElement) {
+		return (T) handle.get( parent.read( bridgedElement ) );
 	}
 
 }

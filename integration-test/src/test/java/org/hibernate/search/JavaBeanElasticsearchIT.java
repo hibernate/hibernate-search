@@ -32,9 +32,9 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.spi.Indexable;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
-import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
@@ -658,7 +658,7 @@ public class JavaBeanElasticsearchIT {
 	public static final class MyBridgeImpl implements Bridge<MyBridge> {
 
 		private MyBridge parameters;
-		private IndexableReference<IndexedEntity> sourceRef;
+		private BridgedElementReader<IndexedEntity> sourceReader;
 		private IndexFieldReference<String> textFieldRef;
 		private IndexFieldReference<LocalDate> localDateFieldRef;
 
@@ -668,16 +668,16 @@ public class JavaBeanElasticsearchIT {
 		}
 
 		@Override
-		public void bind(IndexableModel indexableModel, IndexModelCollector indexModelCollector) {
-			sourceRef = indexableModel.asReference( IndexedEntity.class );
+		public void bind(BridgedElementModel bridgedElementModel, IndexModelCollector indexModelCollector) {
+			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
 			IndexModelCollector objectRef = indexModelCollector.childObject( parameters.objectName() );
 			textFieldRef = objectRef.field( "text" ).fromString().asReference();
 			localDateFieldRef = objectRef.field( "date" ).fromLocalDate().asReference();
 		}
 
 		@Override
-		public void toDocument(Indexable source, DocumentState target) {
-			IndexedEntity sourceValue = source.get( sourceRef );
+		public void toDocument(BridgedElement source, DocumentState target) {
+			IndexedEntity sourceValue = sourceReader.read( source );
 			if ( sourceValue != null ) {
 				textFieldRef.add( target, sourceValue.getText() );
 				localDateFieldRef.add( target, sourceValue.getLocalDate() );
