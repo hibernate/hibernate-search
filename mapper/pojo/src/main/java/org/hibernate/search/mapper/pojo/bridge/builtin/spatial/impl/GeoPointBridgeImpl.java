@@ -39,7 +39,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
+	public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
 		String fieldName = parameters.fieldName();
 
 		if ( fieldName.isEmpty() ) {
@@ -91,7 +91,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void toDocument(BridgedElement source, DocumentState target) {
+	public void write(DocumentState target, BridgedElement source) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
 		fieldAccessor.write( target, coordinates );
 	}

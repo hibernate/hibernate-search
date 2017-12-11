@@ -630,7 +630,7 @@ public class JavaBeanElasticsearchIT {
 
 	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
 		@Override
-		public String toDocument(Integer propertyValue) {
+		public String apply(Integer propertyValue) {
 			return propertyValue == null ? null : propertyValue.toString();
 		}
 	}
@@ -668,7 +668,7 @@ public class JavaBeanElasticsearchIT {
 		}
 
 		@Override
-		public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
+		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
 			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
 			IndexSchemaElement objectSchemaElement = indexSchemaElement.childObject( parameters.objectName() );
 			textFieldAccessor = objectSchemaElement.field( "text" ).asString().createAccessor();
@@ -676,7 +676,7 @@ public class JavaBeanElasticsearchIT {
 		}
 
 		@Override
-		public void toDocument(BridgedElement source, DocumentState target) {
+		public void write(DocumentState target, BridgedElement source) {
 			IndexedEntity sourceValue = sourceReader.read( source );
 			if ( sourceValue != null ) {
 				textFieldAccessor.write( target, sourceValue.getText() );

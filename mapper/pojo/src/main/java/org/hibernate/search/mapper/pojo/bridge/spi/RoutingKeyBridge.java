@@ -20,7 +20,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 
 	void bind(BridgedElementModel bridgedElementModel);
 
-	String toRoutingKey(String tenantIdentifier, Object entityIdentifier, BridgedElement source);
+	String apply(String tenantIdentifier, Object entityIdentifier, BridgedElement source);
 
 	@Override
 	default void close() {

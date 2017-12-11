@@ -23,7 +23,7 @@ public interface FunctionBridge<T, R> extends AutoCloseable {
 		return null; // Auto-detect the return type and use default encoding
 	}
 
-	R toDocument(T propertyValue);
+	R apply(T propertyValue);
 
 	@Override
 	default void close() {

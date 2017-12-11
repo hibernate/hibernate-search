@@ -220,7 +220,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		private IndexFieldAccessor<String> fieldAccessor;
 
 		@Override
-		public void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement) {
+		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
 			sourceReader = bridgedElementModel.createReader( String.class );
 			fieldAccessor = indexSchemaElement.field( "jsonStringField" )
 					.withExtension( ElasticsearchExtension.get() )
@@ -232,7 +232,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		}
 
 		@Override
-		public void toDocument(BridgedElement source, DocumentState target) {
+		public void write(DocumentState target, BridgedElement source) {
 			String sourceValue = sourceReader.read( source );
 			fieldAccessor.write( target, sourceValue );
 		}

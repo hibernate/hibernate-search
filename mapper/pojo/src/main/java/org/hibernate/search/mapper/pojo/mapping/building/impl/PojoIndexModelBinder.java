@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 /**
  * Provides the ability to bind the entity model to the index model
  * by creating bridges and
- * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(BridgedElementModel, IndexSchemaElement) binding}
+ * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(IndexSchemaElement, BridgedElementModel) binding}
  * them.
  * <p>
  * Incidentally, this will also generate the index model,

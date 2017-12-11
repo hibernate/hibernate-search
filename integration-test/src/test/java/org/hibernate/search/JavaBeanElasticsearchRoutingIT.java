@@ -234,7 +234,7 @@ public class JavaBeanElasticsearchRoutingIT {
 		}
 
 		@Override
-		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, BridgedElement source) {
+		public String apply(String tenantIdentifier, Object entityIdentifier, BridgedElement source) {
 			EntityCategory category = categoryReader.read( source );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {

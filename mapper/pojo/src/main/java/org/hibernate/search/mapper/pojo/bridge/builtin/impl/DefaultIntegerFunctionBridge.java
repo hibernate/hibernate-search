@@ -18,7 +18,7 @@ public final class DefaultIntegerFunctionBridge implements FunctionBridge<Intege
 	}
 
 	@Override
-	public Integer toDocument(Integer propertyValue) {
+	public Integer apply(Integer propertyValue) {
 		return propertyValue;
 	}
 

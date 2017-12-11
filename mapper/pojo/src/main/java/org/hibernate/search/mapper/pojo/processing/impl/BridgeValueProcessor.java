@@ -24,7 +24,7 @@ public class BridgeValueProcessor implements ValueProcessor {
 
 	@Override
 	public void process(DocumentState target, BridgedElement source) {
-		bridge.toDocument( source, target );
+		bridge.write( target, source );
 	}
 
 	@Override

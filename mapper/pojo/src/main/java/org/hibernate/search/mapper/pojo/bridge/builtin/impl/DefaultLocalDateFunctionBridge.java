@@ -20,7 +20,7 @@ public final class DefaultLocalDateFunctionBridge implements FunctionBridge<Loca
 	}
 
 	@Override
-	public LocalDate toDocument(LocalDate propertyValue) {
+	public LocalDate apply(LocalDate propertyValue) {
 		return propertyValue;
 	}
 

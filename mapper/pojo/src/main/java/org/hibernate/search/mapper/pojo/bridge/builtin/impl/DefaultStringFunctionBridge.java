@@ -18,7 +18,7 @@ public final class DefaultStringFunctionBridge implements FunctionBridge<String,
 	}
 
 	@Override
-	public String toDocument(String propertyValue) {
+	public String apply(String propertyValue) {
 		return propertyValue;
 	}
 

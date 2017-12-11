@@ -28,9 +28,9 @@ public interface Bridge<A extends Annotation> extends AutoCloseable {
 	 * TODO add an object to define "virtual" fields: fields which are not in the index,
 	 * but can be simulated on the client side when projecting and querying.
 	 */
-	void bind(BridgedElementModel bridgedElementModel, IndexSchemaElement indexSchemaElement);
+	void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel);
 
-	void toDocument(BridgedElement source, DocumentState target);
+	void write(DocumentState target, BridgedElement source);
 
 	@Override
 	default void close() {

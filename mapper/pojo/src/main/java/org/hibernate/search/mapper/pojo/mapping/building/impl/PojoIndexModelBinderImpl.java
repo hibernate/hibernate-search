@@ -107,7 +107,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Bridge<?> bridge = bridgeFactory.createBridge( reference, annotation );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bridgedElementModel, bindingContext.getSchemaElement() );
+		bridge.bind( bindingContext.getSchemaElement(), bridgedElementModel );
 
 		return new BridgeValueProcessor( bridge );
 	}

@@ -33,7 +33,7 @@ public class FunctionBridgeValueProcessor<T, R> implements ValueProcessor {
 	@Override
 	public void process(DocumentState target, BridgedElement source) {
 		T bridgedElement = bridgedElementReader.read( source );
-		R indexFieldValue = bridge.toDocument( bridgedElement );
+		R indexFieldValue = bridge.apply( bridgedElement );
 		indexFieldAccessor.write( target, indexFieldValue );
 	}
 
