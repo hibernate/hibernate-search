@@ -16,8 +16,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.bridge.impl.BridgeFactory;
-import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -80,8 +78,6 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	public SearchMappingRepository build() {
 		ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
 		BuildContext buildContext = new BuildContextImpl( serviceManager );
-		BridgeFactory bridgeFactory = new BridgeFactory( buildContext, beanResolver );
-		BridgeReferenceResolver bridgeReferenceResolver = new BridgeReferenceResolver();
 
 		ConfigurationPropertySource propertySource;
 		if ( !overriddenProperties.isEmpty() ) {
@@ -93,15 +89,14 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 
 		IndexManagerBuildingStateHolder indexManagerBuildingStateProvider =
-				new IndexManagerBuildingStateHolder( buildContext, propertySource,
-						bridgeFactory, bridgeReferenceResolver );
+				new IndexManagerBuildingStateHolder( buildContext, propertySource );
 		// TODO close the holder (which will close the backends) if anything fails after this
 
 		TypeMetadataCollectorImpl metadataCollector = new TypeMetadataCollectorImpl();
 		contributors.forEach( c -> c.contribute( metadataCollector ) );
 
 		Map<MappingKey<?>, Mapper<?, ?>> mappers =
-				metadataCollector.createMappers( propertySource, indexManagerBuildingStateProvider );
+				metadataCollector.createMappers( buildContext, propertySource, indexManagerBuildingStateProvider );
 
 		Map<MappingKey<?>, MappingImplementor> mappings = new HashMap<>();
 		// TODO close the mappings created so far if anything fails after this
@@ -132,11 +127,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 
 		public Map<MappingKey<?>, Mapper<?, ?>> createMappers(
-				ConfigurationPropertySource propertySource,
+				BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			Map<MappingKey<?>, Mapper<?, ?>> mappers = new HashMap<>();
 			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
-				Mapper<?, ?> mapper = contribution.preBuild( propertySource, indexManagerBuildingStateProvider );
+				Mapper<?, ?> mapper = contribution.preBuild( buildContext, propertySource, indexManagerBuildingStateProvider );
 				mappers.put( mappingKey, mapper );
 			} );
 			return mappers;
@@ -157,9 +152,9 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 					.update( indexName, contributor );
 		}
 
-		public Mapper<C, M> preBuild(ConfigurationPropertySource propertySource,
+		public Mapper<C, M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-			Mapper<C, M> mapper = mapperFactory.createMapper( propertySource );
+			Mapper<C, M> mapper = mapperFactory.createMapper( buildContext, propertySource );
 			IndexableTypeOrdering typeOrdering = mapperFactory.getTypeOrdering();
 			for ( IndexedTypeIdentifier mappedType : contributionByType.keySet() ) {
 				Optional<String> indexNameOptional = typeOrdering.getAscendingSuperTypes( mappedType )

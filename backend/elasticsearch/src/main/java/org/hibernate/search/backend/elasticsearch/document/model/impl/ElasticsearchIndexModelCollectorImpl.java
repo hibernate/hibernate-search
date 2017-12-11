@@ -148,16 +148,6 @@ public class ElasticsearchIndexModelCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public <T2 extends IndexModelCollector> Optional<T2> unwrap(Class<T2> clazz) {
-		if ( clazz.isAssignableFrom( ElasticsearchIndexModelCollector.class ) ) {
-			return Optional.of( clazz.cast( this ) );
-		}
-		else {
-			return Optional.empty();
-		}
-	}
-
-	@Override
 	public T contribute(ElasticsearchFieldModelCollector collector) {
 		T mapping = mappingFactory.get();
 		if ( routing != null ) {

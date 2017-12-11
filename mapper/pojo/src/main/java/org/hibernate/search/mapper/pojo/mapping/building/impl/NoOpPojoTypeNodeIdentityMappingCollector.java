@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 
 class NoOpPojoTypeNodeIdentityMappingCollector implements PojoTypeNodeIdentityMappingCollector {
 

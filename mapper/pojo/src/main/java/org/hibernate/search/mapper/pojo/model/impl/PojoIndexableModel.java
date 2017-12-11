@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
+import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;

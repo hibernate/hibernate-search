@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 

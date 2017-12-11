@@ -10,8 +10,8 @@ import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.model.spi.IndexableModel;
-import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.IndexableModel;
+import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;

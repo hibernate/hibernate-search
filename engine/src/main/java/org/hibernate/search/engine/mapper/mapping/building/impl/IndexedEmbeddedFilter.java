@@ -16,7 +16,7 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class IndexedEmbeddedFilter {
+class IndexedEmbeddedFilter {
 
 	private final IndexableTypeOrdering typeOrdering;
 

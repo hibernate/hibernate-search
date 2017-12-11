@@ -16,7 +16,7 @@ public interface IndexManagerBuildingState<D extends DocumentState> {
 
 	String getIndexName();
 
-	MappingIndexModelCollector getModelCollector();
+	IndexModelBindingContext getRootBindingContext();
 
 	IndexManager<D> build();
 

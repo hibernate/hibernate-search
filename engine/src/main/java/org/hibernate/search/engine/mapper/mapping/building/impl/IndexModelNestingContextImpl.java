@@ -16,7 +16,7 @@ import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 /**
  * @author Yoann Rodiere
  */
-public class IndexModelNestingContextImpl implements IndexModelNestingContext {
+class IndexModelNestingContextImpl implements IndexModelNestingContext {
 
 	private final IndexedEmbeddedFilter filter;
 	private final String prefixFromFilter;

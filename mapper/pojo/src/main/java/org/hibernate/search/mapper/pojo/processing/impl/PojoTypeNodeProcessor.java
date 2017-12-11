@@ -11,9 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.mapper.model.spi.Indexable;
+import org.hibernate.search.mapper.pojo.model.spi.Indexable;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexable;
-import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 
 /**
  * @author Yoann Rodiere

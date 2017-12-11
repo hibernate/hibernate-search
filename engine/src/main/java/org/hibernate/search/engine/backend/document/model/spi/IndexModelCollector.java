@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
-import java.util.Optional;
-
 import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
 
 /**
@@ -20,7 +18,5 @@ public interface IndexModelCollector {
 	IndexModelCollector childObject(String relativeName);
 
 	IndexObjectReference asReference();
-
-	<T extends IndexModelCollector> Optional<T> unwrap(Class<T> clazz);
 
 }

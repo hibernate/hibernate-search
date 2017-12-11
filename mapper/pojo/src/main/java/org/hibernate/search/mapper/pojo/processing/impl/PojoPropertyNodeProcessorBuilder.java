@@ -11,18 +11,18 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.bridge.spi.FunctionBridge;
-import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 
 /**
  * @author Yoann Rodiere
@@ -37,11 +37,10 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	public PojoPropertyNodeProcessorBuilder(
 			PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
-			MappingIndexModelCollector indexModelCollector,
+			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
-		super( propertyModel.getTypeModel(), contributorProvider, indexModelCollector,
-				identityMappingCollector
-		);
+		super( propertyModel.getTypeModel(), contributorProvider, indexModelBinder, bindingContext,
+				identityMappingCollector );
 		this.propertyModel = propertyModel;
 	}
 
@@ -53,14 +52,14 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			defaultedFieldName = propertyModel.getName();
 		}
 
-		ValueProcessor processor = indexModelCollector.addFunctionBridge(
-				indexableModel, propertyModel.getJavaType(), reference, defaultedFieldName, fieldModelContributor );
+		ValueProcessor processor = indexModelBinder.addFunctionBridge(
+				bindingContext, indexableModel, propertyModel.getJavaType(), reference, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );
 	}
 
 	@Override
 	public void identifierBridge(BeanReference<IdentifierBridge<?>> converterReference) {
-		IdentifierBridge<?> bridge = indexModelCollector.createIdentifierBridge( propertyModel.getJavaType(), converterReference );
+		IdentifierBridge<?> bridge = indexModelBinder.createIdentifierBridge( propertyModel.getJavaType(), converterReference );
 		identityMappingCollector.identifierBridge( propertyModel.getHandle(), bridge );
 	}
 
@@ -82,11 +81,11 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 
 		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( propertyModel.getJavaType() );
 
-		Optional<MappingIndexModelCollector> nestedCollectorOptional = indexModelCollector.addIndexedEmbeddedIfIncluded(
+		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				typeId, defaultedRelativePrefix, maxDepth, pathFilters );
-		nestedCollectorOptional.ifPresent( nestedCollector -> {
+		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
-					propertyModel.getTypeModel(), contributorProvider, nestedCollector,
+					propertyModel.getTypeModel(), contributorProvider, indexModelBinder, nestedBindingContext,
 					PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					);
 			indexedEmbeddedProcessorBuilders.add( nestedProcessorBuilder );

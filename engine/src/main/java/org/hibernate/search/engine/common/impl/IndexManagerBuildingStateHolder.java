@@ -17,15 +17,13 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.bridge.impl.BridgeFactory;
-import org.hibernate.search.engine.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.impl.MappingIndexModelCollectorImpl;
+import org.hibernate.search.engine.mapper.mapping.building.impl.IndexModelBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.util.SearchException;
 
@@ -45,20 +43,15 @@ public class IndexManagerBuildingStateHolder {
 	private final BuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 	private final ConfigurationPropertySource defaultIndexPropertySource;
-	private final BridgeFactory bridgeFactory;
-	private final BridgeReferenceResolver bridgeReferenceResolver;
 
 	private final Map<String, Backend<?>> backendsByName = new HashMap<>();
 	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	public IndexManagerBuildingStateHolder(BuildContext buildContext,
-			ConfigurationPropertySource propertySource, BridgeFactory bridgeFactory,
-			BridgeReferenceResolver bridgeReferenceResolver) {
+			ConfigurationPropertySource propertySource) {
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
-		this.bridgeFactory = bridgeFactory;
-		this.bridgeReferenceResolver = bridgeReferenceResolver;
 	}
 
 	public IndexManagerBuildingState<?> startBuilding(String indexName, IndexableTypeOrdering typeOrdering) {
@@ -89,9 +82,8 @@ public class IndexManagerBuildingStateHolder {
 			IndexableTypeOrdering typeOrdering) {
 		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, buildContext, indexPropertySource );
 		IndexModelCollectorImplementor modelCollector = builder.getModelCollector();
-		MappingIndexModelCollectorImpl mappingModelCollector = new MappingIndexModelCollectorImpl(
-				bridgeFactory, bridgeReferenceResolver, modelCollector, typeOrdering );
-		return new IndexMappingBuildingStateImpl<>( indexName, builder, mappingModelCollector );
+		IndexModelBindingContext bindingContext = new IndexModelBindingContextImpl( modelCollector, typeOrdering );
+		return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
 	}
 
 	private Backend<?> createBackend(String backendName) {
@@ -108,14 +100,14 @@ public class IndexManagerBuildingStateHolder {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
-		private final MappingIndexModelCollector modelCollector;
+		private final IndexModelBindingContext bindingContext;
 
 		public IndexMappingBuildingStateImpl(String indexName,
 				IndexManagerBuilder<D> builder,
-				MappingIndexModelCollector modelCollector) {
+				IndexModelBindingContext bindingContext) {
 			this.indexName = indexName;
 			this.builder = builder;
-			this.modelCollector = modelCollector;
+			this.bindingContext = bindingContext;
 		}
 
 		@Override
@@ -124,8 +116,8 @@ public class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public MappingIndexModelCollector getModelCollector() {
-			return modelCollector;
+		public IndexModelBindingContext getRootBindingContext() {
+			return bindingContext;
 		}
 
 		@Override

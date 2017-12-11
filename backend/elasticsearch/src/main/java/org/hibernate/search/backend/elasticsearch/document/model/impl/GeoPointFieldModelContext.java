@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.engine.bridge.builtin.spatial.GeoPoint;
-import org.hibernate.search.engine.bridge.builtin.spatial.ImmutableGeoPoint;
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;

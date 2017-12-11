@@ -19,9 +19,9 @@ public interface Mapper<C, M extends MappingImplementor> {
 	 * @param indexManagerBuildingState The building state for the index to be mapped
 	 * @param contributorProvider A provider of composite mapping contributors, with contributions
 	 * guaranteed to be ordered from supertype to subtype, allowing the builder to support overrides if necessary.
-	 * All contributions for type mappings related to the same mapper are available.
 	 */
-	void addIndexed(IndexedTypeIdentifier typeId, IndexManagerBuildingState<?> indexManagerBuildingState,
+	void addIndexed(IndexedTypeIdentifier typeId,
+			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<C> contributorProvider);
 
 	M build();

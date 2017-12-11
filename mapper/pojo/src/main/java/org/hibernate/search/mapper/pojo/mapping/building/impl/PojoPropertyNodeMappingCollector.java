@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.bridge.spi.FunctionBridge;
-import org.hibernate.search.engine.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 

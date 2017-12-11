@@ -11,11 +11,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.mapper.pojo.bridge.impl.BridgeFactory;
+import org.hibernate.search.mapper.pojo.bridge.impl.BridgeReferenceResolver;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -30,6 +33,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.ProvidedStringIdentifier
  */
 public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeNodeMetadataContributor, M> {
 
+	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
 	private final PojoIntrospector introspector;
 	private final boolean implicitProvidedId;
@@ -37,11 +41,14 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
-	public PojoMapper(
-			ConfigurationPropertySource propertySource,
+	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			PojoIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory) {
+		BridgeFactory bridgeFactory = new BridgeFactory( buildContext );
+		BridgeReferenceResolver bridgeReferenceResolver = new BridgeReferenceResolver();
+		this.indexModelBinder = new PojoIndexModelBinderImpl( bridgeFactory, bridgeReferenceResolver );
+
 		this.propertySource = propertySource;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
@@ -56,7 +63,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 		Class<?> javaType = pojoTypeId.toJavaType();
 		TypeModel<?> typeModel = introspector.getEntityTypeModel( javaType );
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
-				typeModel, indexManagerBuildingState, contributorProvider,
+				typeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoTypeNodeMappingCollector collector = builder.asCollector();
 		contributorProvider.get( pojoTypeId ).forEach( c -> c.contributeMapping( collector ) );

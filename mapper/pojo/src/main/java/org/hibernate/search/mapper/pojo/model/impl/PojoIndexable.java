@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.engine.mapper.model.spi.Indexable;
-import org.hibernate.search.engine.mapper.model.spi.IndexableReference;
+import org.hibernate.search.mapper.pojo.model.spi.Indexable;
+import org.hibernate.search.mapper.pojo.model.spi.IndexableReference;
 
 
 /**

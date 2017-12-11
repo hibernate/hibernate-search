@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
-import org.hibernate.search.engine.mapper.processing.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 
 /**
  * @author Yoann Rodiere

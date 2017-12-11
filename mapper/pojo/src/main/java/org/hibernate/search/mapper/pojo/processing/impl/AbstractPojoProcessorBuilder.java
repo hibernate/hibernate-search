@@ -9,8 +9,9 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.hibernate.search.engine.bridge.mapping.BridgeDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingIndexModelCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
@@ -18,7 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetada
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexableModel;
 import org.hibernate.search.mapper.pojo.model.impl.PojoRootIndexableModel;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
-import org.hibernate.search.engine.mapper.processing.spi.ValueProcessor;
 
 /**
  * @author Yoann Rodiere
@@ -28,7 +28,8 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
 	protected final PojoIndexableModel indexableModel;
-	protected final MappingIndexModelCollector indexModelCollector;
+	protected final PojoIndexModelBinder indexModelBinder;
+	protected final IndexModelBindingContext bindingContext;
 
 	protected final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
 
@@ -37,20 +38,21 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	public AbstractPojoProcessorBuilder(
 			TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
-			MappingIndexModelCollector indexModelCollector,
+			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		this.contributorProvider = contributorProvider;
 
 		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
 		this.indexableModel = new PojoRootIndexableModel( typeModel, contributorProvider );
-		this.indexModelCollector = indexModelCollector;
+		this.indexModelBinder = indexModelBinder;
+		this.bindingContext = bindingContext;
 
 		this.identityMappingCollector = identityMappingCollector;
 	}
 
 	@Override
 	public void bridge(BridgeDefinition<?> definition) {
-		processors.add( indexModelCollector.addBridge( indexableModel, definition ) );
+		processors.add( indexModelBinder.addBridge( bindingContext, indexableModel, definition ) );
 	}
 
 }
