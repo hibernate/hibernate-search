@@ -34,6 +34,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchC
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
+import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
@@ -719,7 +720,8 @@ public class OrmElasticsearchIT {
 		}
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
+		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+				EngineHandle engineHandle) {
 			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
 			IndexSchemaElement objectSchemaElement = indexSchemaElement.childObject( parameters.objectName() );
 			textFieldAccessor = objectSchemaElement.field( "text" ).asString().createAccessor();

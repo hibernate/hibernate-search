@@ -25,6 +25,13 @@ public interface FunctionBridge<T, R> extends AutoCloseable {
 
 	R apply(T propertyValue);
 
+	/*
+	 * TODO use this method when projecting.
+	 */
+	default Object applyReverse(R fieldValue) {
+		return fieldValue;
+	}
+
 	@Override
 	default void close() {
 	}

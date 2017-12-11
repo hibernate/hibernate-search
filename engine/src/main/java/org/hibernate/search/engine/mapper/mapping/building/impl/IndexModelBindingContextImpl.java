@@ -12,6 +12,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
@@ -19,6 +20,9 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
 	private final IndexSchemaCollector schemaCollector;
 	private final IndexModelNestingContextImpl nestingContext;
+	private final EngineHandle engineHandle = new EngineHandle() {
+		// TODO provide an actual implementation when the interface defines methods
+	};
 
 	private IndexSchemaElement schemaElementWithNestingContext;
 
@@ -49,6 +53,11 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 			schemaElementWithNestingContext = schemaCollector.withContext( nestingContext );
 		}
 		return schemaElementWithNestingContext;
+	}
+
+	@Override
+	public EngineHandle getEngineHandle() {
+		return engineHandle;
 	}
 
 	@Override

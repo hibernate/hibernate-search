@@ -21,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
+import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinitionBase;
@@ -220,7 +221,8 @@ public class JavaBeanElasticsearchExtensionIT {
 		private IndexFieldAccessor<String> fieldAccessor;
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
+		public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+				EngineHandle engineHandle) {
 			sourceReader = bridgedElementModel.createReader( String.class );
 			fieldAccessor = indexSchemaElement.field( "jsonStringField" )
 					.withExtension( ElasticsearchExtension.get() )

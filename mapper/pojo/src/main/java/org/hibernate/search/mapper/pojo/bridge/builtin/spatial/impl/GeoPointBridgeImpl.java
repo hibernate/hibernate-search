@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
@@ -39,7 +40,8 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel) {
+	public void bind(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
+			EngineHandle engineHandle) {
 		String fieldName = parameters.fieldName();
 
 		if ( fieldName.isEmpty() ) {
