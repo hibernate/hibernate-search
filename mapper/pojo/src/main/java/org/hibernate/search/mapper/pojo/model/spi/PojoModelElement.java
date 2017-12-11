@@ -12,19 +12,19 @@ import java.util.stream.Stream;
 /**
  * @author Yoann Rodiere
  */
-public interface BridgedElementModel {
+public interface PojoModelElement {
 
-	// FIXME what if I want a BridgedElementReader<List<MyType>>?
-	<T> BridgedElementReader<T> createReader(Class<T> type);
+	// FIXME what if I want a PojoModelElementAccessor<List<MyType>>?
+	<T> PojoModelElementAccessor<T> createAccessor(Class<T> type);
 
-	BridgedElementReader<?> createReader();
+	PojoModelElementAccessor<?> createAccessor();
 
 	boolean isAssignableTo(Class<?> clazz);
 
 	<M extends Annotation> Stream<M> markers(Class<M> markerType);
 
-	BridgedElementModel property(String relativeName);
+	PojoModelElement property(String relativeName);
 
-	Stream<BridgedElementModel> properties();
+	Stream<PojoModelElement> properties();
 
 }

@@ -13,14 +13,14 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.StreamHelper;
 
@@ -32,7 +32,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	private GeoPointBridge parameters;
 
 	private IndexFieldAccessor<GeoPoint> fieldAccessor;
-	private Function<BridgedElement, GeoPoint> coordinatesExtractor;
+	private Function<PojoState, GeoPoint> coordinatesExtractor;
 
 	@Override
 	public void initialize(BuildContext buildContext, GeoPointBridge parameters) {
@@ -40,8 +40,8 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
-			EngineHandle engineHandle) {
+	public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+			SearchModel searchModel) {
 		String fieldName = parameters.fieldName();
 
 		if ( fieldName.isEmpty() ) {
@@ -51,27 +51,27 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 
 		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().createAccessor();
 
-		if ( bridgedElementModel.isAssignableTo( GeoPoint.class ) ) {
-			BridgedElementReader<GeoPoint> sourceReference = bridgedElementModel.createReader( GeoPoint.class );
-			coordinatesExtractor = sourceReference::read;
+		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
+			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
+			coordinatesExtractor = sourceAccessor::read;
 		}
 		else {
 			String markerSet = parameters.markerSet();
 
-			BridgedElementReader<Double> latitudeReference = bridgedElementModel.properties()
+			PojoModelElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( GeoPointBridge.Latitude.class )
 							.anyMatch( m -> markerSet.equals( m.markerSet() ) ) )
 					.collect( singleMarkedProperty( "latitude", fieldName, markerSet ) )
-					.createReader( Double.class );
-			BridgedElementReader<Double> longitudeReference = bridgedElementModel.properties()
+					.createAccessor( Double.class );
+			PojoModelElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( GeoPointBridge.Longitude.class )
 							.anyMatch( m -> markerSet.equals( m.markerSet() ) ) )
 					.collect( singleMarkedProperty( "longitude", fieldName, markerSet ) )
-					.createReader( Double.class );
+					.createAccessor( Double.class );
 
 			coordinatesExtractor = bridgedElement -> {
-				Double latitude = latitudeReference.read( bridgedElement );
-				Double longitude = longitudeReference.read( bridgedElement );
+				Double latitude = latitudeAccessor.read( bridgedElement );
+				Double longitude = longitudeAccessor.read( bridgedElement );
 
 				if ( latitude == null || longitude == null ) {
 					return null;
@@ -82,7 +82,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 		}
 	}
 
-	private static Collector<BridgedElementModel, ?, BridgedElementModel> singleMarkedProperty(
+	private static Collector<PojoModelElement, ?, PojoModelElement> singleMarkedProperty(
 			String markerName, String fieldName, String markerSet) {
 		return StreamHelper.singleElement(
 				() -> new SearchException( "Could not find a property with the " + markerName
@@ -93,7 +93,7 @@ public class GeoPointBridgeImpl implements Bridge<GeoPointBridge> {
 	}
 
 	@Override
-	public void write(DocumentState target, BridgedElement source) {
+	public void write(DocumentState target, PojoState source) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
 		fieldAccessor.write( target, coordinates );
 	}

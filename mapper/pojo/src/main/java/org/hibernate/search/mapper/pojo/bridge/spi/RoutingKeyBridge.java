@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.spi;
 
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 
 /**
  * @author Yoann Rodiere
@@ -18,9 +18,9 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	default void initialize(BuildContext buildContext) {
 	}
 
-	void bind(BridgedElementModel bridgedElementModel);
+	void bind(PojoModelElement pojoModelElement);
 
-	String apply(String tenantIdentifier, Object entityIdentifier, BridgedElement source);
+	String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoState source);
 
 	@Override
 	default void close() {

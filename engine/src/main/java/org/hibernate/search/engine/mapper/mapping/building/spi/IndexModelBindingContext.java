@@ -10,14 +10,14 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
-import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 public interface IndexModelBindingContext {
 
 	IndexSchemaElement getSchemaElement();
 
-	EngineHandle getEngineHandle();
+	SearchModel getSearchModel();
 
 	/**
 	 * Inform the model collector that documents will always be provided along

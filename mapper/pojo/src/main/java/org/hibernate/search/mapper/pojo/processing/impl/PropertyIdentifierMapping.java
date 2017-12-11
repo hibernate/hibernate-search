@@ -45,12 +45,12 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 
 	@Override
 	public String toDocumentIdentifier(I identifier) {
-		return bridge.toString( identifier );
+		return bridge.toDocumentIdentifier( identifier );
 	}
 
 	@Override
 	public I fromDocumentIdentifier(String documentId) {
-		return bridge.fromString( documentId );
+		return bridge.fromDocumentIdentifier( documentId );
 	}
 
 }

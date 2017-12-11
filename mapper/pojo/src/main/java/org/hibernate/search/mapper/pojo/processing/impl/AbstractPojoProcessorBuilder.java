@@ -16,8 +16,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.PojoBridgedElementModel;
-import org.hibernate.search.mapper.pojo.model.impl.PojoRootBridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelElement;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelRoot;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
 /**
@@ -27,7 +27,7 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
-	protected final PojoBridgedElementModel indexableModel;
+	protected final AbstractPojoModelElement indexableModel;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
@@ -43,7 +43,7 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 		this.contributorProvider = contributorProvider;
 
 		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
-		this.indexableModel = new PojoRootBridgedElementModel( typeModel, contributorProvider );
+		this.indexableModel = new PojoModelRoot( typeModel, contributorProvider );
 		this.indexModelBinder = indexModelBinder;
 		this.bindingContext = bindingContext;
 

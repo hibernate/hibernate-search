@@ -12,15 +12,15 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
 	private final IndexSchemaCollector schemaCollector;
-	private final IndexModelNestingContextImpl nestingContext;
-	private final EngineHandle engineHandle = new EngineHandle() {
+	private final IndexSchemaNestingContextImpl nestingContext;
+	private final SearchModel searchModel = new SearchModel() {
 		// TODO provide an actual implementation when the interface defines methods
 	};
 
@@ -28,11 +28,11 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
 	public IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
 			IndexableTypeOrdering typeOrdering) {
-		this( schemaCollector, new IndexModelNestingContextImpl( typeOrdering ) );
+		this( schemaCollector, new IndexSchemaNestingContextImpl( typeOrdering ) );
 	}
 
 	private IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
-			IndexModelNestingContextImpl nestingContext) {
+			IndexSchemaNestingContextImpl nestingContext) {
 		this.schemaCollector = schemaCollector;
 		this.nestingContext = nestingContext;
 	}
@@ -56,8 +56,8 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 	}
 
 	@Override
-	public EngineHandle getEngineHandle() {
-		return engineHandle;
+	public SearchModel getSearchModel() {
+		return searchModel;
 	}
 
 	@Override

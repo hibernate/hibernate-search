@@ -21,11 +21,11 @@ import org.hibernate.search.util.SearchException;
  * @author Yoann Rodiere
  */
 public class ElasticsearchFieldModelContextImpl
-		implements ElasticsearchFieldModelContext, ElasticsearchIndexModelNodeContributor<PropertyMapping> {
+		implements ElasticsearchFieldModelContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private final UnknownTypeJsonAccessor accessor;
 
-	private ElasticsearchIndexModelNodeContributor<PropertyMapping> delegate;
+	private ElasticsearchIndexSchemaNodeContributor<PropertyMapping> delegate;
 
 	public ElasticsearchFieldModelContextImpl(UnknownTypeJsonAccessor accessor) {
 		this.accessor = accessor;
@@ -83,7 +83,7 @@ public class ElasticsearchFieldModelContextImpl
 		return delegate.contribute( collector );
 	}
 
-	private <T extends ElasticsearchIndexModelNodeContributor<PropertyMapping>> T setDelegate(T context) {
+	private <T extends ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> T setDelegate(T context) {
 		if ( delegate != null ) {
 			throw new SearchException( "You cannot set the type of a field more than once" );
 		}

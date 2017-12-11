@@ -18,7 +18,7 @@ public final class DefaultStringFunctionBridge implements FunctionBridge<String,
 	}
 
 	@Override
-	public String apply(String propertyValue) {
+	public String toIndexedValue(String propertyValue) {
 		return propertyValue;
 	}
 

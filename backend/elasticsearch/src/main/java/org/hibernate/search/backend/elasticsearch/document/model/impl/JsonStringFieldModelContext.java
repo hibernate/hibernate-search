@@ -23,7 +23,7 @@ import com.google.gson.JsonNull;
  * @author Guillaume Smet
  */
 public class JsonStringFieldModelContext implements TerminalFieldModelContext<String>,
-		ElasticsearchIndexModelNodeContributor<PropertyMapping> {
+		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
 

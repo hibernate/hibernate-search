@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
@@ -18,13 +18,13 @@ import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 
 /**
- * Provides the ability to bind the entity model to the index model
+ * Provides the ability to contribute the entity model to the index model
  * by creating bridges and
- * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(IndexSchemaElement, BridgedElementModel) binding}
+ * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(IndexSchemaElement, PojoModelElement) binding}
  * them.
  * <p>
  * Incidentally, this will also generate the index model,
- * due to bridges contributing to the index model as we bind them.
+ * due to bridges contributing to the index model as we contribute them.
  *
  * @author Yoann Rodiere
  */
@@ -34,13 +34,13 @@ public interface PojoIndexModelBinder {
 			BeanReference<? extends IdentifierBridge<?>> reference);
 
 	RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
-			BridgedElementModel bridgedElementModel, BeanReference<? extends RoutingKeyBridge> reference);
+			PojoModelElement pojoModelElement, BeanReference<? extends RoutingKeyBridge> reference);
 
 	ValueProcessor addBridge(IndexModelBindingContext bindingContext,
-			BridgedElementModel bridgedElementModel, BridgeDefinition<?> definition);
+			PojoModelElement pojoModelElement, BridgeDefinition<?> definition);
 
 	ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			BridgedElementModel bridgedElementModel, Class<?> sourceType,
+			PojoModelElement pojoModelElement, Class<?> sourceType,
 			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
 			String fieldName, FieldModelContributor contributor);
 

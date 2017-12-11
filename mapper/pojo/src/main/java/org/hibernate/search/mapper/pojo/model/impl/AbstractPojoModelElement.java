@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
@@ -22,20 +22,20 @@ import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 /**
  * @author Yoann Rodiere
  */
-public abstract class PojoBridgedElementModel implements BridgedElementModel, PojoTypeNodeModelCollector {
+public abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNodeModelCollector {
 
 	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider;
 
-	private final Map<String, PojoPropertyBridgedElementModel> propertyModelsByName = new HashMap<>();
+	private final Map<String, PojoModelProperty> propertyModelsByName = new HashMap<>();
 
 	private boolean markersForTypeInitialized = false;
 
-	public PojoBridgedElementModel(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+	public AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
 	@Override
-	public abstract BridgedElementReader<?> createReader();
+	public abstract PojoModelElementAccessor<?> createAccessor();
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
@@ -43,19 +43,19 @@ public abstract class PojoBridgedElementModel implements BridgedElementModel, Po
 	}
 
 	@Override
-	public PojoPropertyBridgedElementModel property(String relativeName) {
+	public PojoModelProperty property(String relativeName) {
 		initMarkersForType();
 		return propertyModelsByName.computeIfAbsent( relativeName, name -> {
 			PropertyModel<?> model = getTypeModel().getProperty( name );
-			return new PojoPropertyBridgedElementModel( this, model, modelContributorProvider );
+			return new PojoModelProperty( this, model, modelContributorProvider );
 		} );
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Stream is covariant in T
 	@Override
-	public Stream<BridgedElementModel> properties() {
+	public Stream<PojoModelElement> properties() {
 		initMarkersForType();
-		return (Stream<BridgedElementModel>) (Stream) propertyModelsByName.values().stream();
+		return (Stream<PojoModelElement>) (Stream) propertyModelsByName.values().stream();
 	}
 
 	/*

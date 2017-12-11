@@ -16,9 +16,9 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -226,16 +226,16 @@ public class JavaBeanElasticsearchRoutingIT {
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
 
-		private BridgedElementReader<EntityCategory> categoryReader;
+		private PojoModelElementAccessor<EntityCategory> categoryAccessor;
 
 		@Override
-		public void bind(BridgedElementModel bridgedElementModel) {
-			categoryReader = bridgedElementModel.property( "category" ).createReader( EntityCategory.class );
+		public void bind(PojoModelElement pojoModelElement) {
+			categoryAccessor = pojoModelElement.property( "category" ).createAccessor( EntityCategory.class );
 		}
 
 		@Override
-		public String apply(String tenantIdentifier, Object entityIdentifier, BridgedElement source) {
-			EntityCategory category = categoryReader.read( source );
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoState source) {
+			EntityCategory category = categoryAccessor.read( source );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {
 				keyBuilder.append( tenantIdentifier ).append( "/" );

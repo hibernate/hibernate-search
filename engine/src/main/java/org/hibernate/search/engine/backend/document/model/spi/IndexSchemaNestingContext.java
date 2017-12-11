@@ -13,18 +13,18 @@ import java.util.function.Function;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexModelNestingContext {
+public interface IndexSchemaNestingContext {
 
 	<T> Optional<T> applyIfIncluded(String relativeName, Function<String, T> action);
 
-	<T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexModelNestingContext, T> action);
+	<T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action);
 
-	static IndexModelNestingContext excludeAll() {
-		return ExcludeAllIndexModelNestingContext.INSTANCE;
+	static IndexSchemaNestingContext excludeAll() {
+		return ExcludeAllIndexSchemaNestingContext.INSTANCE;
 	}
 
-	static IndexModelNestingContext includeAll() {
-		return IncludeAllIndexModelNestingContext.INSTANCE;
+	static IndexSchemaNestingContext includeAll() {
+		return IncludeAllIndexSchemaNestingContext.INSTANCE;
 	}
 
 }

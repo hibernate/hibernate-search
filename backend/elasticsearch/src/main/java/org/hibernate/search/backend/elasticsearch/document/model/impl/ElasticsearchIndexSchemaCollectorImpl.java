@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
@@ -30,7 +30,7 @@ import org.hibernate.search.util.SearchException;
  */
 public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 		implements ElasticsearchIndexSchemaElement, IndexSchemaCollector,
-				ElasticsearchIndexModelNodeContributor<T> {
+		ElasticsearchIndexSchemaNodeContributor<T> {
 
 	private static final Supplier<TypeMapping> TYPE_MAPPING_FACTORY = TypeMapping::new;
 	private static final Supplier<PropertyMapping> PROPERTY_MAPPING_FACTORY = () -> {
@@ -41,18 +41,18 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 
 	public static ElasticsearchIndexSchemaCollectorImpl<TypeMapping> root() {
 		return new ElasticsearchIndexSchemaCollectorImpl<>( JsonAccessor.root(), TYPE_MAPPING_FACTORY,
-				IndexModelNestingContext.includeAll() );
+				IndexSchemaNestingContext.includeAll() );
 	}
 
 	private final JsonObjectAccessor accessor;
 	private final Supplier<T> mappingFactory;
-	private final Map<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> propertyContributors;
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> propertyContributors;
 	private RoutingType routing = null;
 
-	private final IndexModelNestingContext filter;
+	private final IndexSchemaNestingContext filter;
 
 	private ElasticsearchIndexSchemaCollectorImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
-			IndexModelNestingContext filter) {
+			IndexSchemaNestingContext filter) {
 		this.accessor = accessor;
 		this.mappingFactory = mappingFactory;
 		this.propertyContributors = new HashMap<>();
@@ -60,7 +60,7 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 	}
 
 	private ElasticsearchIndexSchemaCollectorImpl(ElasticsearchIndexSchemaCollectorImpl<T> original,
-			IndexModelNestingContext filter) {
+			IndexSchemaNestingContext filter) {
 		// Share the same state as the original regarding the model itself
 		this.accessor = original.accessor;
 		this.mappingFactory = original.mappingFactory;
@@ -81,7 +81,7 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaCollectorImpl<?> withContext(IndexModelNestingContext context) {
+	public ElasticsearchIndexSchemaCollectorImpl<?> withContext(IndexSchemaNestingContext context) {
 		/*
 		 * Note: this erases the previous filter, but that's alright since
 		 * filter composition is handled in the engine.
@@ -116,10 +116,10 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 					return childCollector;
 				} )
 				.orElseGet( () -> new ElasticsearchIndexSchemaCollectorImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
-						IndexModelNestingContext.excludeAll() ) );
+						IndexSchemaNestingContext.excludeAll() ) );
 	}
 
-	private void addPropertyContributor(String name, ElasticsearchIndexModelNodeContributor<PropertyMapping> contributor) {
+	private void addPropertyContributor(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
 		Object previous = propertyContributors.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			// TODO more explicit error message
@@ -151,9 +151,9 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 		if ( routing != null ) {
 			mapping.setRouting( routing );
 		}
-		for ( Map.Entry<String, ElasticsearchIndexModelNodeContributor<PropertyMapping>> entry : propertyContributors.entrySet() ) {
+		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> entry : propertyContributors.entrySet() ) {
 			String propertyName = entry.getKey();
-			ElasticsearchIndexModelNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
+			ElasticsearchIndexSchemaNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
 			PropertyMapping propertyMapping = propertyContributor.contribute( collector );
 			mapping.addProperty( propertyName, propertyMapping );
 		}

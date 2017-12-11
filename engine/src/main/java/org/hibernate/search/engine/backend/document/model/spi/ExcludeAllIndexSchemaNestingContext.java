@@ -14,21 +14,21 @@ import java.util.function.Function;
 /**
  * @author Yoann Rodiere
  */
-class IncludeAllIndexModelNestingContext implements IndexModelNestingContext {
+class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
-	static final IncludeAllIndexModelNestingContext INSTANCE = new IncludeAllIndexModelNestingContext();
+	static final ExcludeAllIndexSchemaNestingContext INSTANCE = new ExcludeAllIndexSchemaNestingContext();
 
-	private IncludeAllIndexModelNestingContext() {
+	private ExcludeAllIndexSchemaNestingContext() {
 	}
 
 	@Override
 	public <T> Optional<T> applyIfIncluded(String relativeName, Function<String, T> action) {
-		return Optional.ofNullable( action.apply( relativeName ) );
+		return Optional.empty();
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexModelNestingContext, T> action) {
-		return Optional.ofNullable( action.apply( relativeName, INSTANCE ) );
+	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action) {
+		return Optional.empty();
 	}
 
 }

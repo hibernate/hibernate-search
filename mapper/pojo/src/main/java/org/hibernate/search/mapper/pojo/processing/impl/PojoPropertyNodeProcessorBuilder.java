@@ -66,7 +66,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	@Override
 	public void containedIn() {
 		// FIXME implement ContainedIn
-		// FIXME also bind containedIns to indexedEmbeddeds using the parent's metadata here, if possible?
+		// FIXME also contribute containedIns to indexedEmbeddeds using the parent's metadata here, if possible?
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 

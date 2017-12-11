@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.impl.PojoBridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.impl.PojoStateImpl;
 
 /**
  * @author Yoann Rodiere
@@ -35,7 +35,7 @@ public class PojoTypeNodeProcessor {
 			return;
 		}
 		if ( !typeScopedProcessors.isEmpty() ) {
-			BridgedElement bridgedElement = new PojoBridgedElement( source );
+			PojoState bridgedElement = new PojoStateImpl( source );
 			for ( ValueProcessor processor : typeScopedProcessors ) {
 				processor.process( destination, bridgedElement );
 			}

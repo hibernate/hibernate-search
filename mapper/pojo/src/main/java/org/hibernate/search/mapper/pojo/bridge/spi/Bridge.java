@@ -11,9 +11,9 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
-import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 
 /**
  * @author Yoann Rodiere
@@ -25,9 +25,10 @@ public interface Bridge<A extends Annotation> extends AutoCloseable {
 		// Default does nothing
 	}
 
-	void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel, EngineHandle handle);
+	void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+			SearchModel searchModel);
 
-	void write(DocumentState target, BridgedElement source);
+	void write(DocumentState target, PojoState source);
 
 	@Override
 	default void close() {

@@ -18,7 +18,7 @@ public final class DefaultIntegerFunctionBridge implements FunctionBridge<Intege
 	}
 
 	@Override
-	public Integer apply(Integer propertyValue) {
+	public Integer toIndexedValue(Integer propertyValue) {
 		return propertyValue;
 	}
 

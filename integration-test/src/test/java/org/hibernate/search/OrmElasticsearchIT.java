@@ -34,7 +34,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchC
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
-import org.hibernate.search.engine.mapper.model.spi.EngineHandle;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
@@ -42,9 +42,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinitionBase;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
@@ -682,7 +682,7 @@ public class OrmElasticsearchIT {
 
 	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
 		@Override
-		public String apply(Integer propertyValue) {
+		public String toIndexedValue(Integer propertyValue) {
 			return propertyValue == null ? null : propertyValue.toString();
 		}
 	}
@@ -710,7 +710,7 @@ public class OrmElasticsearchIT {
 	public static final class MyBridgeImpl implements Bridge<MyBridge> {
 
 		private MyBridge parameters;
-		private BridgedElementReader<IndexedEntity> sourceReader;
+		private PojoModelElementAccessor<IndexedEntity> sourceAccessor;
 		private IndexFieldAccessor<String> textFieldAccessor;
 		private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
 
@@ -720,17 +720,17 @@ public class OrmElasticsearchIT {
 		}
 
 		@Override
-		public void contribute(IndexSchemaElement indexSchemaElement, BridgedElementModel bridgedElementModel,
-				EngineHandle engineHandle) {
-			sourceReader = bridgedElementModel.createReader( IndexedEntity.class );
-			IndexSchemaElement objectSchemaElement = indexSchemaElement.childObject( parameters.objectName() );
-			textFieldAccessor = objectSchemaElement.field( "text" ).asString().createAccessor();
-			localDateFieldAccessor = objectSchemaElement.field( "date" ).asLocalDate().createAccessor();
+		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+				SearchModel searchModel) {
+			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
+			IndexSchemaElement objectFieldMetadata = indexSchemaElement.childObject( parameters.objectName() );
+			textFieldAccessor = objectFieldMetadata.field( "text" ).asString().createAccessor();
+			localDateFieldAccessor = objectFieldMetadata.field( "date" ).asLocalDate().createAccessor();
 		}
 
 		@Override
-		public void write(DocumentState target, BridgedElement source) {
-			IndexedEntity sourceValue = sourceReader.read( source );
+		public void write(DocumentState target, PojoState source) {
+			IndexedEntity sourceValue = sourceAccessor.read( source );
 			if ( sourceValue != null ) {
 				textFieldAccessor.write( target, sourceValue.getText() );
 				localDateFieldAccessor.write( target, sourceValue.getLocalDate() );

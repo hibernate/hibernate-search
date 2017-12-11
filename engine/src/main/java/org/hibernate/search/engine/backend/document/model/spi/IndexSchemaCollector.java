@@ -14,7 +14,7 @@ public interface IndexSchemaCollector extends IndexSchemaElement {
 	@Override
 	IndexSchemaCollector childObject(String relativeName);
 
-	IndexSchemaElement withContext(IndexModelNestingContext context);
+	IndexSchemaElement withContext(IndexSchemaNestingContext context);
 
 	/**
 	 * Inform the model collector that documents will always be provided along

@@ -10,23 +10,23 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexModelNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 
 /**
  * @author Yoann Rodiere
  */
-class IndexModelNestingContextImpl implements IndexModelNestingContext {
+class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 
 	private final IndexedEmbeddedFilter filter;
 	private final String prefixFromFilter;
 	private final String unconsumedPrefix;
 
-	public IndexModelNestingContextImpl(IndexableTypeOrdering typeOrdering) {
+	public IndexSchemaNestingContextImpl(IndexableTypeOrdering typeOrdering) {
 		this( new IndexedEmbeddedFilter( typeOrdering ), "", "" );
 	}
 
-	private IndexModelNestingContextImpl(IndexedEmbeddedFilter filter, String prefixFromFilter,
+	private IndexSchemaNestingContextImpl(IndexedEmbeddedFilter filter, String prefixFromFilter,
 			String unconsumedPrefix) {
 		this.filter = filter;
 		this.prefixFromFilter = prefixFromFilter;
@@ -45,12 +45,12 @@ class IndexModelNestingContextImpl implements IndexModelNestingContext {
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexModelNestingContext, T> action) {
+	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action) {
 		String nameRelativeToFilter = prefixFromFilter + relativeName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
 			String prefixedRelativeName = unconsumedPrefix + relativeName;
-			IndexModelNestingContextImpl nestedFilter =
-					new IndexModelNestingContextImpl( filter, nameRelativeToFilter + ".", "" );
+			IndexSchemaNestingContextImpl nestedFilter =
+					new IndexSchemaNestingContextImpl( filter, nameRelativeToFilter + ".", "" );
 			return Optional.of( action.apply( prefixedRelativeName, nestedFilter ) );
 		}
 		else {
@@ -74,7 +74,7 @@ class IndexModelNestingContextImpl implements IndexModelNestingContext {
 			String relativePrefix,
 			Function<IndexedEmbeddedFilter, IndexedEmbeddedFilter> filterCompositionFunction,
 			N indexModelNode, BiFunction<N, String, N> recursionFunction,
-			BiFunction<N, IndexModelNestingContextImpl, T> finisher) {
+			BiFunction<N, IndexSchemaNestingContextImpl, T> finisher) {
 		IndexedEmbeddedFilter composedFilter = filterCompositionFunction.apply( filter );
 		if ( !composedFilter.isTerminal() ) {
 			String prefixToParse = unconsumedPrefix + relativePrefix;
@@ -89,8 +89,8 @@ class IndexModelNestingContextImpl implements IndexModelNestingContext {
 			}
 			String unconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
-			IndexModelNestingContextImpl nestedContext =
-					new IndexModelNestingContextImpl( composedFilter, relativePrefix, unconsumedPrefix );
+			IndexSchemaNestingContextImpl nestedContext =
+					new IndexSchemaNestingContextImpl( composedFilter, relativePrefix, unconsumedPrefix );
 			return Optional.of( finisher.apply( currentNode, nestedContext ) );
 		}
 		else {

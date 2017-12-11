@@ -23,12 +23,12 @@ public interface FunctionBridge<T, R> extends AutoCloseable {
 		return null; // Auto-detect the return type and use default encoding
 	}
 
-	R apply(T propertyValue);
+	R toIndexedValue(T propertyValue);
 
 	/*
 	 * TODO use this method when projecting.
 	 */
-	default Object applyReverse(R fieldValue) {
+	default Object fromIndexedValue(R fieldValue) {
 		return fieldValue;
 	}
 

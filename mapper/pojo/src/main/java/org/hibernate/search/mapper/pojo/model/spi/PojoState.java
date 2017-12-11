@@ -8,17 +8,17 @@ package org.hibernate.search.mapper.pojo.model.spi;
 
 
 /**
- * An {@link BridgedElement} is a value that can be processed into
+ * A {@link PojoState} contains a value that can be processed into
  * an index document, be it composite (an entity) or atomic
  * (a primitive value).
  * <p>
- * {@link BridgedElement}s only provide access to a set of previously
- * registered paths, accessed through a {@link BridgedElementReader}.
+ * {@link PojoState}s only provide access to a set of previously
+ * registered paths, accessed through a {@link PojoModelElementAccessor}.
  *
- * @see BridgedElementModel
+ * @see PojoModelElement
  *
  * @author Yoann Rodiere
  */
-public interface BridgedElement {
+public interface PojoState {
 
 }

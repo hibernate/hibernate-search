@@ -4,16 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.spi;
+package org.hibernate.search.engine.mapper.model.spi;
 
+public interface SearchModel {
 
-/**
- * @author Yoann Rodiere
- */
-public interface BridgedElementReader<T> {
-
-	Class<T> getType();
-
-	T read(BridgedElement bridgedElement);
+	/*
+	 * TODO add a method to define how to query and project on entity properties
+	 * (using existing index fields).
+	 */
 
 }

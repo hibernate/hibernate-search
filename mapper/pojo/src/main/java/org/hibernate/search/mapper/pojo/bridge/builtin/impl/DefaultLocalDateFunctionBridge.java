@@ -20,7 +20,7 @@ public final class DefaultLocalDateFunctionBridge implements FunctionBridge<Loca
 	}
 
 	@Override
-	public LocalDate apply(LocalDate propertyValue) {
+	public LocalDate toIndexedValue(LocalDate propertyValue) {
 		return propertyValue;
 	}
 

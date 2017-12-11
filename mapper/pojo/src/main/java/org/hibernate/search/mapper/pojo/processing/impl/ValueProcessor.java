@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
 
 /**
  * @author Yoann Rodiere
  */
 public interface ValueProcessor extends AutoCloseable {
 
-	void process(DocumentState target, BridgedElement source);
+	void process(DocumentState target, PojoState source);
 
 	@Override
 	void close();

@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoBridgedElement implements BridgedElement {
+public class PojoStateImpl implements PojoState {
 
 	private final Object root;
 
-	public PojoBridgedElement(Object root) {
+	public PojoStateImpl(Object root) {
 		super();
 		this.root = root;
 	}

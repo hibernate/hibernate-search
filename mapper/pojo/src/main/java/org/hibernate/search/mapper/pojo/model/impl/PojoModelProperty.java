@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -29,16 +29,16 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class PojoPropertyBridgedElementModel extends PojoBridgedElementModel
-		implements BridgedElementModel, PojoPropertyNodeModelCollector {
+public class PojoModelProperty extends AbstractPojoModelElement
+		implements PojoModelElement, PojoPropertyNodeModelCollector {
 
-	private final PojoBridgedElementModel parent;
+	private final AbstractPojoModelElement parent;
 
 	private final PropertyModel<?> propertyModel;
 
 	private final Map<Class<? extends Annotation>, List<? extends Annotation>> markers = new HashMap<>();
 
-	public PojoPropertyBridgedElementModel(PojoBridgedElementModel parent, PropertyModel<?> propertyModel,
+	public PojoModelProperty(AbstractPojoModelElement parent, PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.parent = parent;
@@ -46,16 +46,16 @@ public class PojoPropertyBridgedElementModel extends PojoBridgedElementModel
 	}
 
 	@Override
-	public <T> BridgedElementReader<T> createReader(Class<T> requestedType) {
+	public <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
-			throw new SearchException( "Requested incompatible type for '" + this.createReader() + "': '" + requestedType + "'" );
+			throw new SearchException( "Requested incompatible type for '" + this.createAccessor() + "': '" + requestedType + "'" );
 		}
-		return new PojoPropertyBridgedElementReader<>( parent.createReader(), getHandle() );
+		return new PojoPropertyAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@Override
-	public BridgedElementReader<?> createReader() {
-		return new PojoPropertyBridgedElementReader<>( parent.createReader(), getHandle() );
+	public PojoModelElementAccessor<?> createAccessor() {
+		return new PojoPropertyAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@SuppressWarnings("unchecked")

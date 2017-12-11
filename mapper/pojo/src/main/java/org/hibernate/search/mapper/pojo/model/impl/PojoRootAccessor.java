@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElement;
-import org.hibernate.search.mapper.pojo.model.spi.BridgedElementReader;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
 
-class PojoRootBridgedElementReader<T> implements BridgedElementReader<T> {
+class PojoRootAccessor<T> implements PojoModelElementAccessor<T> {
 
 	private final Class<T> type;
 
-	PojoRootBridgedElementReader(Class<T> type) {
+	PojoRootAccessor(Class<T> type) {
 		super();
 		this.type = type;
 	}
@@ -24,8 +24,8 @@ class PojoRootBridgedElementReader<T> implements BridgedElementReader<T> {
 	}
 
 	@Override
-	public T read(BridgedElement bridgedElement) {
-		return type.cast( ((PojoBridgedElement) bridgedElement).get() );
+	public T read(PojoState bridgedElement) {
+		return type.cast( ((PojoStateImpl) bridgedElement).get() );
 	}
 
 }

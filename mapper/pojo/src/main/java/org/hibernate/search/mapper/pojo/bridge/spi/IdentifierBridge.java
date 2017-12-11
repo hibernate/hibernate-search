@@ -14,9 +14,9 @@ package org.hibernate.search.mapper.pojo.bridge.spi;
  */
 public interface IdentifierBridge<T> extends AutoCloseable {
 
-	String toString(T id);
+	String toDocumentIdentifier(T id);
 
-	T fromString(String idString);
+	T fromDocumentIdentifier(String idString);
 
 	@Override
 	default void close() {
