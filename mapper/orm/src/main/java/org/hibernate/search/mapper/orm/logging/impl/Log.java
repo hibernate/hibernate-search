@@ -21,7 +21,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 1, value = "Hibernate Search was not initialized.")
 	SearchException hibernateSearchNotInitialized();
 
-	@Message(id = 2, value = "Unexpected entity type for a search hit: %1$s. Expected one of %2$s.")
+	@Message(id = 2, value = "Unexpected entity type for a query hit: %1$s. Expected one of %2$s.")
 	SearchException unexpectedSearchHitType(Class<?> entityType, Collection<? extends Class<?>> expectedTypes);
 
 	@Message(id = 3, value = "Unknown indexing mode: %1$s")

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search;
 
-import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
+import org.hibernate.search.engine.search.spi.SearchQueryResultDefinitionContext;
 
 public final class ProjectionConstants {
 
@@ -20,15 +20,15 @@ public final class ProjectionConstants {
 	 * Project to an object representing the match.
 	 * <p>
 	 * The actual type of the object depends on the entry point
-	 * for your search query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
+	 * for your query query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
 	 * may return a Java representation of the document,
 	 * but a {@link org.hibernate.search.engine.common.SearchManager} will
 	 * return a Java representation of the mapped object.
 	 * <p>
 	 * As a general rule, a projection on {@link #OBJECT} will result in the same value
 	 * which would have been returned by the query if not using projections
-	 * (i.e. if {@link SearchResultDefinitionContext#asObjects()} was called instead of
-	 * {@link SearchResultDefinitionContext#asProjections(String...)}).
+	 * (i.e. if {@link SearchQueryResultDefinitionContext#asObjects()} was called instead of
+	 * {@link SearchQueryResultDefinitionContext#asProjections(String...)}).
 	 */
 	public static final String OBJECT = PREFIX + "object";
 
@@ -36,15 +36,15 @@ public final class ProjectionConstants {
 	 * Project to a reference to the match.
 	 * <p>
 	 * The actual type of the reference depends on the entry point
-	 * for your search query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
+	 * for your query query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
 	 * will return a {@link DocumentReference},
 	 * but a {@link org.hibernate.search.engine.common.SearchManager} may
 	 * return an implementation-specific type.
 	 * <p>
 	 * As a general rule, a projection on {@link #REFERENCE} will result in the same value
 	 * which would have been returned by the query if not using projections
-	 * (i.e. if {@link SearchResultDefinitionContext#asReferences()} was called instead of
-	 * {@link SearchResultDefinitionContext#asProjections(String...)}).
+	 * (i.e. if {@link SearchQueryResultDefinitionContext#asReferences()} was called instead of
+	 * {@link SearchQueryResultDefinitionContext#asProjections(String...)}).
 	 */
 	public static final String REFERENCE = PREFIX + "reference";
 

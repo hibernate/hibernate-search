@@ -12,12 +12,10 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoSessionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
 
 
 /**
@@ -69,9 +67,8 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	}
 
 	@Override
-	public <T> SearchResultDefinitionContext<PojoReference, ?> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTarget<T> searchTarget = mappingDelegate.createPojoSearchTarget( targetedTypes );
-		return searchTarget.search( sessionContext, ObjectLoader.identity() );
+	public <T> PojoSearchTarget<?> search(Collection<? extends Class<? extends T>> targetedTypes) {
+		return null;
 	}
 
 	protected final PojoMappingDelegate getMappingDelegate() {

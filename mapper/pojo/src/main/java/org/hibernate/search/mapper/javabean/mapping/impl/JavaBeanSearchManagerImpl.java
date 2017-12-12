@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.mapper.javabean.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
@@ -15,6 +18,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 	private JavaBeanSearchManagerImpl(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	public <T> PojoSearchTarget<?> search(Collection<? extends Class<? extends T>> targetedTypes) {
+		return getMappingDelegate().createPojoSearchTarget( targetedTypes, getSessionContext() );
 	}
 
 	static class Builder extends PojoSearchManagerImpl.Builder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {

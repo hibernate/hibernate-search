@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
 
 /**

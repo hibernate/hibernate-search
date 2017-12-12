@@ -9,19 +9,17 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmProxyIntrospector;
-import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchResultDefinitionContextImpl;
-import org.hibernate.search.mapper.orm.search.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.mapper.orm.search.impl.ObjectLoaderBuilder;
+import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTarget;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
 
 class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		implements HibernateOrmSearchManager {
@@ -33,29 +31,18 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 	}
 
 	@Override
-	public <T> SearchResultDefinitionContext<PojoReference, T> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		return searchAsSearchQuery( targetedTypes );
+	public <T> PojoSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
+		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
+				.createPojoSearchTarget( targetedTypes, getSessionContext() );
+		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
 	@Override
-	public <T> HibernateOrmSearchResultDefinitionContext<T> searchAsFullTextQuery(
-			Collection<? extends Class<? extends T>> types) {
-		return new HibernateOrmSearchResultDefinitionContextImpl<>(
-				getMappingDelegate().createPojoSearchTarget( types ),
-				getSessionContext(),
-				sessionImplementor
-		);
-	}
-
-	private <T> SearchResultDefinitionContext<PojoReference, T> searchAsSearchQuery(
+	public <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(
 			Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTarget<T> searchTarget = getMappingDelegate().createPojoSearchTarget( targetedTypes );
-		ObjectLoaderBuilder<T> objectLoaderBuilder = new ObjectLoaderBuilder<>(
-				sessionImplementor,
-				searchTarget.getTargetedIndexedTypes()
-		);
-		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
-		return searchTarget.search( getSessionContext(), objectLoaderBuilder.build( loadingOptions ) );
+		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
+				.createPojoSearchTarget( targetedTypes, getSessionContext() );
+		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
 	static class Builder extends PojoSearchManagerImpl.Builder<HibernateOrmSearchManager>

@@ -9,20 +9,23 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTarget;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.SearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentBuilder> {
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final ElasticsearchBackend backend;
 	private final String name;
@@ -59,8 +62,18 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	}
 
 	@Override
-	public SearchTarget createSearchTarget() {
-		return new ElasticsearchSearchTarget( backend, this );
+	public IndexSearchTargetBuilder createSearchTarget() {
+		return new ElasticsearchIndexSearchTargetBuilder( backend, this );
+	}
+
+	@Override
+	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
+		if ( ! (searchTargetBuilder instanceof ElasticsearchIndexSearchTargetBuilder ) ) {
+			throw log.cannotMixElasticsearchSearchTargetWithOtherType( searchTargetBuilder, this );
+		}
+
+		ElasticsearchIndexSearchTargetBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetBuilder) searchTargetBuilder;
+		esSearchTargetBuilder.add( backend, this );
 	}
 
 	@Override

@@ -334,8 +334,9 @@ public class JavaBeanElasticsearchIT {
 			SearchQuery<PojoReference> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
+					.query()
 					.asReferences()
-					.bool()
+					.predicate( root -> root.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
 									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
@@ -358,7 +359,7 @@ public class JavaBeanElasticsearchIT {
 											.above( 12 );
 								}
 							} )
-							.end()
+					)
 					.build();
 			query.setFirstResult( 2L );
 			query.setMaxResults( 10L );
@@ -390,7 +391,7 @@ public class JavaBeanElasticsearchIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				c -> {
 					c.accept( "offset", "2" );
 					c.accept( "limit", "10" );
@@ -448,6 +449,7 @@ public class JavaBeanElasticsearchIT {
 			SearchQuery<List<?>> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
+					.query()
 					.asProjections(
 							"myTextField",
 							ProjectionConstants.REFERENCE,
@@ -455,10 +457,10 @@ public class JavaBeanElasticsearchIT {
 							ProjectionConstants.DOCUMENT_REFERENCE,
 							"customBridgeOnClass.text"
 					)
-					.match()
+					.predicate( root -> root.match()
 							.onField( "myTextField" )
 							.matching( "foo" )
-							.end()
+					)
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -508,7 +510,7 @@ public class JavaBeanElasticsearchIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				null,
 				"{"
 					+ "'query': {"

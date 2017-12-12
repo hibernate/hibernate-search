@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTarget;
-import org.hibernate.search.engine.backend.index.spi.SearchTarget;
+import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.util.SearchException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.LogMessage;
@@ -30,11 +32,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 2, value = "A search query cannot target both an Elasticsearch index and other types of index."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
-	SearchException cannotMixElasticsearchSearchTargetWithOtherType(ElasticsearchSearchTarget firstTarget, SearchTarget otherTarget);
+	SearchException cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetBuilder firstTarget, ElasticsearchIndexManager otherTarget);
 
 	@Message(id = 3, value = "A search query cannot target multiple Elasticsearch backends."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
-	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(ElasticsearchSearchTarget firstTarget, ElasticsearchSearchTarget otherTarget);
+	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget, ElasticsearchIndexManager otherTarget);
 
 	@Message(id = 4, value = "Unknown field '%1$s' in indexes %2$s." )
 	SearchException unknownFieldForSearch(String absoluteFieldPath, List<String> indexNames);
@@ -50,5 +52,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 7, value = "Unknown projection %1$s in indexes %2$s." )
 	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<String> indexNames);
+
+	@Message(id = 8, value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
+			+ " Given predicate was: '%1$s'" )
+	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
+
 
 }

@@ -70,7 +70,7 @@ import static org.hibernate.search.util.StubAssert.assertRequest;
  */
 public class OrmElasticsearchIT {
 
-	private static final String PREFIX = "hibernate.search.";
+	private static final String PREFIX = "hibernate.query.";
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
@@ -329,7 +329,7 @@ public class OrmElasticsearchIT {
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.asEntities()
-					.bool()
+					.predicate( root -> root.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
 									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
@@ -352,7 +352,7 @@ public class OrmElasticsearchIT {
 											.above( 12 );
 								}
 							} )
-							.end()
+					)
 					.build();
 			query.setFirstResult( 2 );
 			query.setMaxResults( 10 );
@@ -383,7 +383,7 @@ public class OrmElasticsearchIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				c -> {
 					c.accept( "offset", "2" );
 					c.accept( "limit", "10" );
@@ -450,10 +450,10 @@ public class OrmElasticsearchIT {
 							ProjectionConstants.OBJECT,
 							"customBridgeOnClass.text"
 					)
-					.match()
+					.predicate( root -> root.match()
 							.onField( "myTextField" )
 							.matching( "foo" )
-							.end()
+					)
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -504,7 +504,7 @@ public class OrmElasticsearchIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				null,
 				"{"
 					+ "'query': {"

@@ -12,13 +12,13 @@ import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelExtension;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.ElasticsearchQueryClauseContainerContext;
-import org.hibernate.search.engine.search.dsl.QueryClauseContainerContext;
-import org.hibernate.search.engine.search.dsl.QueryClauseExtension;
+import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ElasticsearchExtension<N>
-		implements QueryClauseExtension<N, ElasticsearchQueryClauseContainerContext<N>>,
+		implements SearchPredicateContainerContextExtension<N, ElasticsearchSearchPredicateContainerContext<N>>,
 		FieldModelExtension<ElasticsearchFieldModelContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
@@ -35,9 +35,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public ElasticsearchQueryClauseContainerContext<N> extendOrFail(QueryClauseContainerContext<N> original) {
-		if ( original instanceof ElasticsearchQueryClauseContainerContext ) {
-			return (ElasticsearchQueryClauseContainerContext<N>) original;
+	public ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original) {
+		if ( original instanceof ElasticsearchSearchPredicateContainerContext ) {
+			return (ElasticsearchSearchPredicateContainerContext<N>) original;
 		}
 		else {
 			throw log.elasticsearchExtensionOnUnknownContext( original );
@@ -45,9 +45,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public Optional<ElasticsearchQueryClauseContainerContext<N>> extendOptional(QueryClauseContainerContext<N> original) {
-		if ( original instanceof ElasticsearchQueryClauseContainerContext ) {
-			return Optional.of( (ElasticsearchQueryClauseContainerContext<N>) original );
+	public Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(SearchPredicateContainerContext<N> original) {
+		if ( original instanceof ElasticsearchSearchPredicateContainerContext ) {
+			return Optional.of( (ElasticsearchSearchPredicateContainerContext<N>) original );
 		}
 		else {
 			return Optional.empty();

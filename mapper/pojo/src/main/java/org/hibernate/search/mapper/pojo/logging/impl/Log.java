@@ -34,7 +34,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToResolveBridgeFromAnnotationType(Class<? extends Annotation> annotationType,
 			Class<BridgeMapping> bridgeMappingAnnotationClass);
 
-	@Message(id = 5, value = "Cannot search on an empty target."
+	@Message(id = 5, value = "Cannot query on an empty target."
 			+ " If you want to target all indexes, put Object.class in the collection of target types,"
 			+ " or use the method of the same name, but without Class<?> parameters."
 	)

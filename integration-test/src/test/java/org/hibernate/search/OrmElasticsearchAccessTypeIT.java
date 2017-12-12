@@ -48,7 +48,7 @@ import static org.hibernate.search.util.StubAssert.assertRequest;
  */
 public class OrmElasticsearchAccessTypeIT {
 
-	private static final String PREFIX = "hibernate.search.";
+	private static final String PREFIX = "hibernate.query.";
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";

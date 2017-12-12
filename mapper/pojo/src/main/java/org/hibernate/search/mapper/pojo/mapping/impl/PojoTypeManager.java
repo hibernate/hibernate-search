@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.spi.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.SearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
@@ -74,8 +74,12 @@ public class PojoTypeManager<I, E, D extends DocumentState> {
 		return new StreamPojoTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
 	}
 
-	public SearchTarget createSearchTarget() {
+	public IndexSearchTargetBuilder createSearchTarget() {
 		return indexManager.createSearchTarget();
+	}
+
+	public void addToSearchTarget(IndexSearchTargetBuilder builder) {
+		indexManager.addToSearchTarget( builder );
 	}
 
 }

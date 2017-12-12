@@ -9,34 +9,33 @@ package org.hibernate.search.mapper.orm.mapping;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.dsl.SearchResultDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 
 public interface HibernateOrmSearchManager extends PojoSearchManager {
 
 	@Override
-	default SearchResultDefinitionContext<PojoReference, Object> search() {
+	default PojoSearchTarget<Object> search() {
 		return search( Collections.singleton( Object.class ) );
 	}
 
 	@Override
-	default <T> SearchResultDefinitionContext<PojoReference, T> search(Class<T> type) {
-		return search( Collections.singleton( type ) );
+	default <T> PojoSearchTarget<T> search(Class<T> targetedType) {
+		return search( Collections.singleton( targetedType ) );
 	}
 
 	@Override
-	<T> SearchResultDefinitionContext<PojoReference, T> search(Collection<? extends Class<? extends T>> types);
+	<T> PojoSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
 
-	default HibernateOrmSearchResultDefinitionContext<Object> searchAsFullTextQuery() {
+	default HibernateOrmSearchQueryQueryResultDefinitionContext<Object> searchAsFullTextQuery() {
 		return searchAsFullTextQuery( Collections.singleton( Object.class ) );
 	}
 
-	default <T> HibernateOrmSearchResultDefinitionContext<T> searchAsFullTextQuery(Class<T> type) {
-		return searchAsFullTextQuery( Collections.singleton( type ) );
+	default <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(Class<T> targetedType) {
+		return searchAsFullTextQuery( Collections.singleton( targetedType ) );
 	}
 
-	<T> HibernateOrmSearchResultDefinitionContext<T> searchAsFullTextQuery(Collection<? extends Class<? extends T>> types);
+	<T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(Collection<? extends Class<? extends T>> targetedTypes);
 
 }

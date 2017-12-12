@@ -137,11 +137,12 @@ public class JavaBeanElasticsearchRoutingIT {
 	public void search() throws JSONException {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+					.query()
 					.asReferences()
-					.match()
+					.predicate( root -> root.match()
 							.onField( "value" )
 							.matching( "val1" )
-							.end()
+					)
 					.routing( "category_2" )
 					.build();
 
@@ -166,7 +167,7 @@ public class JavaBeanElasticsearchRoutingIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, IndexedEntity.INDEX, 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				c -> {
 					c.accept( "_routing", "category_2" );
 				},

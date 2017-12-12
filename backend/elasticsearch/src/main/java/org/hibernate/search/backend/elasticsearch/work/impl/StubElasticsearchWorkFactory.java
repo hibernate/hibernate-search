@@ -74,7 +74,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, Set<String> routingKeys,
 			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {
-		return new StubElasticsearchWork<SearchResult<T>>( "search", payload )
+		return new StubElasticsearchWork<SearchResult<T>>( "query", payload )
 				.addParam( "indexName", indexNames )
 				.addParam( "_routing", routingKeys )
 				.addParam( "offset", offset, String::valueOf )

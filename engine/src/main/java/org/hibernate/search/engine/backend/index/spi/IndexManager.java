@@ -18,6 +18,8 @@ public interface IndexManager<D extends DocumentState> {
 
 	StreamIndexWorker<D> createStreamWorker(SessionContext context);
 
-	SearchTarget createSearchTarget();
+	IndexSearchTargetBuilder createSearchTarget();
+
+	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
 
 }

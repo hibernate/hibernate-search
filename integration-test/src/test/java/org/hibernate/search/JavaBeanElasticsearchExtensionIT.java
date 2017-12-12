@@ -21,20 +21,20 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
+import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinitionBase;
 import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchQuery;
 
@@ -126,8 +126,9 @@ public class JavaBeanElasticsearchExtensionIT {
 	public void search() throws JSONException {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+					.query()
 					.asReferences()
-					.bool()
+					.predicate( root -> root.bool()
 							.should().withExtension( ElasticsearchExtension.get() )
 									.fromJsonString( "{'es1': 'val1'}" )
 							.should().withExtensionOptional(
@@ -141,7 +142,7 @@ public class JavaBeanElasticsearchExtensionIT {
 									c -> c.fromJsonString( "{'es3': 'val3'}" ),
 									c -> c.match().onField( "fallback1" ).matching( "val1" )
 							)
-							.end()
+					)
 					.build();
 
 			query.execute();
@@ -149,7 +150,7 @@ public class JavaBeanElasticsearchExtensionIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX ), 0,
-				HOST_1, "search", null /* No ID */,
+				HOST_1, "query", null /* No ID */,
 				null,
 				"{"
 					+ "'query': {"
