@@ -1406,8 +1406,10 @@ configuration.
 Hibernate Search is included in the WildFly application server, and since WildFly 10 the module
 is automatically activated (added to the classpath of your deployment) if you are using Hibernate ORM and have any indexed entities.
 
-Alternatively you can opt to use a different version of the module by downloading and unzipping a different
-moduleset and setting the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml`.
+WildFly 11 includes an older version of Hibernate Search; if you want to use that then you won't need to download anything else and you can stop reading this chapter; however you might miss out on several new features and improvements.
+When deciding to use the older version make sure to read the version of this guide matching the version of Hibernate Search included in your application server: this guide applies to `{hibernateSearchVersion}` exclusively.
+
+We strongly suggest using the latest version. Doing so is not much harder: download the latest modules and set the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml` to the chosen version. Further details are provided below.
 
 The modules system in WildFly allows to safely run multiple versions of Hibernate ORM and
 Hibernate Search in parallel, but if you download an alternative version make sure the Hibernate Search version you choose
@@ -1416,7 +1418,8 @@ is compatible with the Hibernate ORM version you choose.
 [WARNING]
 ====
 This version of Hibernate Search `{hibernateSearchVersion}` requires an Hibernate ORM version `5.2.3.Final` or a later version
-of the 5.2 branch, such as `5.2.8.Final`.
+of the 5.2 branch, such as `{hibernateVersion}`.
+When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
 
 The modules distributed by Hibernate Search `{hibernateSearchVersion}` are meant for WildFly 11.
 
@@ -1432,7 +1435,7 @@ Not least, as the same guide explains you might need to exclude the Javassist ve
 The activation of the Hibernate Search modules in WildFly is automatic, provided you're having at least one
 entity annotated with `org.hibernate.search.annotations.Indexed`.
 
-You can control this behaviour of the JPA deployer explicitly; for example to make sure Hibernate Search
+You can control this behaviour of the JPA subsystem explicitly; for example to make sure Hibernate Search
 and Apache Lucene classes are available to your application even though you haven't annotated any entity,
 set the following property in your `persistence.xml`:
 
@@ -1456,14 +1459,17 @@ As a convenience these zip files are also distributed as Maven artifacts:
 link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-11-dist:zip].
 
 Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search and Apache Lucene.
-The Hibernate Search modules are:
+The public API modules of Hibernate Search modules are:
 
 * _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
 * _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
 * _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
+* _org.hibernate.search.elasticsearch_, to use the Elasticsearch integration.
+
+The package includes several more modules but you should not need to refer to the other ones directly.
 
 
-Next you will need to make sure the JPA deployer of WildFly provides you with the version you have chosen, instead of the default version
+Next you will need to make sure the JPA subsystem of WildFly provides you with the version you have chosen, instead of the default version
 bundled with the application server.
 Set the following property in your `persistence.xml`:
 
@@ -1473,7 +1479,8 @@ Set the following property in your `persistence.xml`:
 wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:{hibernateSearchVersion}
 ====
 
-See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration]
+Setting this property will also prevent WildFly to pollute your classpath with the older copy of Hibernate Search which is included in the server.
+See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration Wiki].
 
 
 ==== More about modules
@@ -1497,12 +1504,4 @@ you might need to update Infinispan as well.
 The process is very similar: download the modules from
 link:http://infinispan.org/download/[Infinispan project downloads], picking a compatible version,
 and decompress the modules into the `modules` directory of your WildFly installation.
-
-Hibernate Search version `{hibernateSearchVersion}` was compiled and tested with Infinispan version
-`{infinispanVersion}`; generally a more recent version of either project is expected to be backwards
-compatible for cross-project integration purposes as long as they have the same "major.minor" family
-version.
-
-For example for a version of Hibernate Search depending on Infinispan `8.2.4.Final` it should be
-safe to upgrade Infinispan to `8.2.6.Final`, but an upgrade to `8.3.0.Final` might not work.
 
