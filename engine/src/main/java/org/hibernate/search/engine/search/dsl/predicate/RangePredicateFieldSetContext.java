@@ -12,10 +12,22 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<RangePredicateFieldSetContext<N>> {
 
-	RangePredicateFromContext<N> from(Object value);
+	RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion);
 
-	RangePredicateTerminalContext<N> above(Object value);
+	default RangePredicateFromContext<N> from(Object value) {
+		return from( value, RangeBoundInclusion.INCLUDED );
+	}
 
-	RangePredicateTerminalContext<N> below(Object value);
+	N above(Object value, RangeBoundInclusion inclusion);
+
+	default N above(Object value) {
+		return above( value, RangeBoundInclusion.INCLUDED );
+	}
+
+	N below(Object value, RangeBoundInclusion inclusion);
+
+	default N below(Object value) {
+		return below( value, RangeBoundInclusion.INCLUDED );
+	}
 
 }

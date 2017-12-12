@@ -46,6 +46,7 @@ import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 
 import org.junit.After;
 import org.junit.Before;
@@ -343,12 +344,10 @@ public class JavaBeanElasticsearchIT {
 									.onField( "myTextField" ).boostedTo( 1.5f )
 									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
-									.end()
 							.should().range()
 									.onField( "myLocalDateField" )
-									.from( LocalDate.of( 2017, 10, 01 ) ).excludeLimit()
+									.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
 									.to( LocalDate.of( 2017, 11, 01 ) )
-									.end()
 							/*
 							 * Alternative syntax taking advantage of lambdas,
 							 * allowing to introduce if/else statements in the query building code
@@ -455,21 +454,18 @@ public class JavaBeanElasticsearchIT {
 			SearchPredicate nestedPredicate = target.predicate()
 					.range()
 							.onField( "myLocalDateField" )
-							.from( LocalDate.of( 2017, 10, 01 ) ).excludeLimit()
-							.to( LocalDate.of( 2017, 11, 01 ) )
-							.end();
+							.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
+							.to( LocalDate.of( 2017, 11, 01 ) );
 			SearchPredicate otherNestedPredicate = target.predicate()
 					.range()
 							.onField( "numeric" )
-							.above( 12 )
-							.end();
+							.above( 12 );
 			SearchPredicate predicate = target.predicate()
 					.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
 									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
-									.end()
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
 					.end();

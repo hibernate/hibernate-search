@@ -54,6 +54,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContribu
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 import org.junit.After;
@@ -334,12 +335,10 @@ public class OrmElasticsearchIT {
 									.onField( "myTextField" ).boostedTo( 1.5f )
 									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
-									.end()
 							.should().range()
 									.onField( "myLocalDateField" )
-									.from( LocalDate.of( 2017, 10, 01 ) ).excludeLimit()
+									.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
 									.to( LocalDate.of( 2017, 11, 01 ) )
-									.end()
 							/*
 							 * Alternative syntax taking advantage of lambdas,
 							 * allowing to introduce if/else statements in the query building code

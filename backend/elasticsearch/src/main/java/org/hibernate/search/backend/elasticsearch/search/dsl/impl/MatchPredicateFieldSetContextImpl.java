@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateTerminalContext;
 
 import com.google.gson.JsonObject;
 
@@ -54,7 +53,7 @@ class MatchPredicateFieldSetContextImpl<N>
 	}
 
 	@Override
-	public MatchPredicateTerminalContext<N> matching(Object value) {
+	public N matching(Object value) {
 		return commonState.matching( value );
 	}
 
@@ -63,25 +62,19 @@ class MatchPredicateFieldSetContextImpl<N>
 		queryBuilders.stream().map( SearchPredicateBuilder::build ).forEach( collector );
 	}
 
-	public static class CommonState<N> extends MultiFieldPredicateCommonState<N, MatchPredicateFieldSetContextImpl<N>>
-			implements MatchPredicateTerminalContext<N> {
+	public static class CommonState<N> extends MultiFieldPredicateCommonState<N, MatchPredicateFieldSetContextImpl<N>> {
 
 		public CommonState(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
 			super( targetContext, nextContextProvider );
 		}
 
-		public MatchPredicateTerminalContext<N> matching(Object value) {
+		public N matching(Object value) {
 			getQueryBuilders().forEach( b -> b.value( value ) );
-			return this;
+			return getNextContextProvider().get();
 		}
 
 		private Stream<MatchPredicateBuilder> getQueryBuilders() {
 			return getFieldSetContexts().stream().flatMap( f -> f.queryBuilders.stream() );
-		}
-
-		@Override
-		public N end() {
-			return getNextContextProvider().get();
 		}
 
 	}

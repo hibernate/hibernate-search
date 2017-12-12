@@ -12,8 +12,10 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface RangePredicateFromContext<N> {
 
-	RangePredicateFromContext<N> excludeLimit();
+	default N to(Object value) {
+		return to( value, RangeBoundInclusion.INCLUDED );
+	}
 
-	RangePredicateTerminalContext<N> to(Object value);
+	N to(Object value, RangeBoundInclusion inclusion);
 
 }

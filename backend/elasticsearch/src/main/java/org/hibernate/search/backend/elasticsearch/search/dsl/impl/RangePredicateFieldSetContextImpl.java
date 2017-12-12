@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilder;
+import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
-import org.hibernate.search.engine.search.dsl.predicate.RangePredicateTerminalContext;
 
 import com.google.gson.JsonObject;
 
@@ -55,18 +55,18 @@ class RangePredicateFieldSetContextImpl<N>
 	}
 
 	@Override
-	public RangePredicateFromContext<N> from(Object value) {
-		return commonState.from( value );
+	public RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
+		return commonState.from( value, inclusion );
 	}
 
 	@Override
-	public RangePredicateTerminalContext<N> above(Object value) {
-		return commonState.above( value );
+	public N above(Object value, RangeBoundInclusion inclusion) {
+		return commonState.above( value, inclusion );
 	}
 
 	@Override
-	public RangePredicateTerminalContext<N> below(Object value) {
-		return commonState.below( value );
+	public N below(Object value, RangeBoundInclusion inclusion) {
+		return commonState.below( value, inclusion );
 	}
 
 	@Override
@@ -80,52 +80,42 @@ class RangePredicateFieldSetContextImpl<N>
 			super( targetContext, nextContextProvider );
 		}
 
-		public RangePredicateFromContext<N> from(Object value) {
-			RangePredicateTerminalContext<N> above = above( value );
+		public RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
+			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			switch ( inclusion ) {
+				case EXCLUDED:
+					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
+				case INCLUDED:
+					break;
+			}
 			return new RangePredicateFromContext<N>() {
 				@Override
-				public RangePredicateFromContext<N> excludeLimit() {
-					above.excludeLimit();
-					return this;
-				}
-
-				@Override
-				public RangePredicateTerminalContext<N> to(Object value) {
-					return below( value );
+				public N to(Object value, RangeBoundInclusion inclusion) {
+					return below( value, inclusion );
 				}
 			};
 		}
 
-		public RangePredicateTerminalContext<N> above(Object value) {
+		public N above(Object value, RangeBoundInclusion inclusion) {
 			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
-			return new RangePredicateTerminalContext<N>() {
-				@Override
-				public RangePredicateTerminalContext<N> excludeLimit() {
-					getQueryBuilders().forEach( q -> q.excludeLowerLimit() );
-					return this;
-				}
-
-				@Override
-				public N end() {
-					return getNextContextProvider().get();
-				}
-			};
+			switch ( inclusion ) {
+				case EXCLUDED:
+					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
+				case INCLUDED:
+					break;
+			}
+			return getNextContextProvider().get();
 		}
 
-		public RangePredicateTerminalContext<N> below(Object value) {
+		public N below(Object value, RangeBoundInclusion inclusion) {
 			getQueryBuilders().forEach( q -> q.upperLimit( value ) );
-			return new RangePredicateTerminalContext<N>() {
-				@Override
-				public RangePredicateTerminalContext<N> excludeLimit() {
-					getQueryBuilders().forEach( q -> q.excludeUpperLimit() );
-					return this;
-				}
-
-				@Override
-				public N end() {
-					return getNextContextProvider().get();
-				}
-			};
+			switch ( inclusion ) {
+				case EXCLUDED:
+					getQueryBuilders().forEach( RangePredicateBuilder::excludeUpperLimit );
+				case INCLUDED:
+					break;
+			}
+			return getNextContextProvider().get();
 		}
 
 		private Stream<RangePredicateBuilder> getQueryBuilders() {

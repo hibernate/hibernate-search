@@ -12,6 +12,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<MatchPredicateFieldSetContext<N>> {
 
-	MatchPredicateTerminalContext<N> matching(Object value);
+	N matching(Object value);
 
 }

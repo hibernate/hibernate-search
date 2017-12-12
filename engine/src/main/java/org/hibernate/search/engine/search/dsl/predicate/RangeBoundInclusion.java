@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+public enum RangeBoundInclusion {
 
-/**
- * @author Yoann Rodiere
- */
-public interface RangePredicateTerminalContext<N> extends ExplicitEndContext<N> {
-
-	RangePredicateTerminalContext<N> excludeLimit();
+	/**
+	 * Include the bound in the matched range.
+	 */
+	INCLUDED,
+	/**
+	 * Exclude the bound from the matched range.
+	 */
+	EXCLUDED;
 
 }
