@@ -1497,6 +1497,33 @@ Hibernate Search and come with a different edition of this guide specifically ta
 See the https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.0/html/development_guide/hibernate_search[Chapter 13 of the Red Hat JBoss Enterprise Application Platform 7 Development Guide].
 ====
 
+[[modules-tika]]
+==== Using Apache Tika and other extensions with modules for WildFly
+
+Apache Tika requires additional dependencies depending on the media formats you need.
+Since it is not practical to package all possible extensions you might possibly need into Hibernate Search modules, we leave it up to our users to define an "org.apache.tika" module where you can add any extensions you might need.
+
+This version of Hibernate Search expects Apache Tika version `{tikaModuleVersion}` so the module should be defined as:
+
+.Example definition of a custom Tika module
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<module xmlns="urn:jboss:module:1.1" name="org.apache.tika" slot="{tikaModuleVersion}">
+====
+
+Include Apache Tika {tikaModuleVersion} and any extensions and dependencies from Tika that you might need in the module.
+
+Next, you need to have your application depend on this same module as well:
+
+.Manifest header to add in your application
+====
+[source]
+[subs="verbatim,attributes"]
+Dependencies: org.apache.tika:{tikaModuleVersion}
+====
+
 ==== Using Infinispan with Hibernate Search on WildFly
 
 If you are updating the version of Hibernate Search in WildFly as described in the previous paragraph,

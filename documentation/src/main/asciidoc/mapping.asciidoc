@@ -1632,6 +1632,7 @@ for these classes in the `java.time` package store the values as string padded w
 `java.lang.Class`:: Classes are converted to their fully qualified class name. The thread context
 classloader is used when the class is rehydrated
 
+[[mapping-tika-bridge]]
 ==== Tika bridge
 
 Hibernate Search allows you to extract text from various document types using the built-in
@@ -1708,6 +1709,11 @@ metadata.
 ====
 `TikaBridge` does not implement `TwoWayFieldBridge`: queries built using the DSL (as in the
 <<example-tika-mapping>>) need to explicitly enable the option ignoreFieldBridge().
+====
+
+[TIP]
+====
+To use the `@TikaBridge` in combination with WildFly modules, make sure to package your Tika extensions as described in <<modules-tika>>.
 ====
 
 [[section-custom-bridges]]

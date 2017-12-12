@@ -175,6 +175,7 @@
                         <luceneVersion>${luceneVersion}</luceneVersion>
                         <infinispanVersion>${infinispanVersion}</infinispanVersion>
                         <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
+                        <tikaModuleVersion>${tikaVersion}</tikaModuleVersion>
                     </attributes>
                 </configuration>
             </plugin>
