@@ -38,10 +38,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -438,6 +440,112 @@ public class JavaBeanElasticsearchIT {
 									+ "}"
 								+ "}"
 							+ "]"
+						+ "}"
+					+ "}"
+				+ "}" );
+	}
+
+	@Test
+	public void search_separatePredicate() throws JSONException {
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			PojoSearchTarget<?> target = manager.search(
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			);
+
+			SearchPredicate nestedPredicate = target.predicate()
+					.range()
+							.onField( "myLocalDateField" )
+							.from( LocalDate.of( 2017, 10, 01 ) ).excludeLimit()
+							.to( LocalDate.of( 2017, 11, 01 ) )
+							.end();
+			SearchPredicate otherNestedPredicate = target.predicate()
+					.range()
+							.onField( "numeric" )
+							.above( 12 )
+							.end();
+			SearchPredicate predicate = target.predicate()
+					.bool()
+							.must().match()
+									.onField( "myTextField" ).boostedTo( 1.5f )
+									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.matching( "foo" )
+									.end()
+							.should( nestedPredicate )
+							.mustNot().predicate( otherNestedPredicate )
+					.end();
+			SearchQuery<PojoReference> query = target.query()
+					.asReferences()
+					.predicate( predicate )
+					.build();
+			query.setFirstResult( 2L );
+			query.setMaxResults( 10L );
+
+			StubElasticsearchClient.pushStubResponse(
+					"{"
+						+ "'hits': {"
+							+ "'hits': ["
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '0'"
+								+ "},"
+								+ "{"
+									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_id': '1'"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+			);
+			query.execute();
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
+				HOST_1, "query", null /* No ID */,
+				c -> {
+					c.accept( "offset", "2" );
+					c.accept( "limit", "10" );
+				},
+				"{"
+					+ "'query': {"
+						+ "'bool': {"
+							+ "'must': {"
+								+ "'bool': {"
+									+ "'should': ["
+										+ "{"
+											+ "'match': {"
+												+ "'myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 1.5"
+												+ "}"
+											+ "}"
+										+ "},"
+										+ "{"
+											+ "'match': {"
+												+ "'embedded.myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 0.9"
+												+ "}"
+											+ "}"
+										+ "}"
+									+ "]"
+								+ "}"
+							+ "},"
+							+ "'should': {"
+								+ "'range': {"
+									+ "'myLocalDateField': {"
+										+ "'gt': '2017-10-01',"
+										+ "'lte': '2017-11-01'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'must_not': {"
+								+ "'range': {"
+									+ "'numeric': {"
+										+ "'gte': 12"
+									+ "}"
+								+ "}"
+							+ "}"
 						+ "}"
 					+ "}"
 				+ "}" );
