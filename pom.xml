@@ -253,6 +253,8 @@
         <jmhVersion>1.20</jmhVersion>
         <h2Version>1.4.178</h2Version>
         <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
+        <jpa22patch.version>1.0.0.Beta1</jpa22patch.version>
+        <jpa22patch.filename>hibernate-jpa-api-2.2-wildflymodules-${jpa22patch.version}-wildfly-${wildflyVersion}-patch.zip</jpa22patch.filename>
 
         <!-- Elasticsearch -->
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
