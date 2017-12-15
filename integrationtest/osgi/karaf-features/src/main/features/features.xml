@@ -18,7 +18,7 @@
         <bundle start-level="30">mvn:org.apache.aries.transaction/org.apache.aries.transaction.manager/1.0.1</bundle>
 
         <!-- JPA -->
-        <bundle start-level="30">mvn:org.hibernate.javax.persistence/hibernate-jpa-2.1-api/1.0.0.Final</bundle>
+        <bundle start-level="30">mvn:javax.persistence/javax.persistence-api/2.2</bundle>
 
         <!-- JBoss Logging and Hibernate Commons Annotations -->
         <bundle>mvn:org.jboss.logging/jboss-logging/${jbossLoggingVersion}</bundle>

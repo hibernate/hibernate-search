@@ -33,8 +33,10 @@ import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.query.ParameterMetadata;
+import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.spi.QueryImplementor;
+import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -407,27 +409,32 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
+	protected QueryParameterBindings getQueryParameterBindings() {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
 	public FullTextQueryImpl setParameter(int position, Calendar value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public Parameter<?> getParameter(String name) {
+	public QueryParameter<?> getParameter(String name) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public Parameter<?> getParameter(int position) {
+	public QueryParameter<?> getParameter(int position) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override // No generics, see unwrap() (same issue)
-	public Parameter getParameter(String name, Class type) {
+	public QueryParameter getParameter(String name, Class type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override // No generics, see unwrap() (same issue)
-	public Parameter getParameter(int position, Class type) {
+	public QueryParameter getParameter(int position, Class type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
