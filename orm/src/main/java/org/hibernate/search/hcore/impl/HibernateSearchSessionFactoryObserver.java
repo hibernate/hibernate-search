@@ -73,7 +73,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			listener.initialize( extendedSearchIntegratorFuture );
 
 			if ( environmentSynchronizer != null ) {
-				environmentSynchronizer.whenEnvironmentReady( () -> boot( factory ) );
+				environmentSynchronizer.whenEnvironmentReady( () -> {
+					try {
+						boot( factory );
+					}
+					catch (RuntimeException e) {
+						factory.close();
+					}
+				} );
 			}
 			else {
 				boot( factory );
@@ -103,7 +110,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( extendedSearchIntegratorFuture.isDone() ) {
 			return;
 		}
-		boolean failedBoot = true;
 		try {
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
@@ -121,17 +127,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
 			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
-
-			failedBoot = false;
 		}
 		catch (RuntimeException e) {
 			extendedSearchIntegratorFuture.completeExceptionally( e );
+			// This will make the SessionFactory abort and close itself
 			throw e;
-		}
-		finally {
-			if ( failedBoot ) {
-				factory.close();
-			}
 		}
 	}
 
