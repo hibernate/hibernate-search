@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.wildfly.cdi.integration;
+package org.hibernate.search.test.integration.wildfly.cdi.beans.integration;
 
 import java.util.Set;
 
@@ -43,7 +43,7 @@ public class CDIBeanResolver implements BeanResolver {
 	}
 
 	private <T> T getBeanInstance(Bean<T> bean) {
-		CreationalContext<T> context = beanManager.createCreationalContext( null );
+		CreationalContext<T> context = beanManager.createCreationalContext( bean );
 		return bean.create( context );
 	}
 

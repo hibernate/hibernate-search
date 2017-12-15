@@ -6,21 +6,24 @@
  */
 package org.hibernate.search.test.integration.wildfly.cdi;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
-import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
-
 import java.util.List;
 import java.util.function.Function;
-
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
-import org.hibernate.search.test.integration.wildfly.cdi.i18n.InternationalizedValue;
-import org.hibernate.search.test.integration.wildfly.cdi.model.EntityWithCDIAwareBridges;
-import org.hibernate.search.test.integration.wildfly.cdi.model.EntityWithCDIAwareBridgesDao;
+import org.hibernate.search.test.integration.wildfly.cdi.beans.CDIBeansPackage;
+import org.hibernate.search.test.integration.wildfly.cdi.beans.event.BridgeCDILifecycleEventCounter;
+import org.hibernate.search.test.integration.wildfly.cdi.beans.i18n.InternationalizedValue;
+import org.hibernate.search.test.integration.wildfly.cdi.beans.model.EntityWithCDIAwareBridges;
+import org.hibernate.search.test.integration.wildfly.cdi.beans.model.EntityWithCDIAwareBridgesDao;
 import org.hibernate.search.testsupport.TestForIssue;
+
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -31,9 +34,10 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 /**
  * @author Yoann Rodiere
@@ -46,7 +50,8 @@ public class CDIInjectionIT {
 	public static Archive<?> createTestArchive() throws Exception {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, CDIInjectionIT.class.getSimpleName() + ".war" )
-				.addPackages( true /* recursive */, CDIInjectionIT.class.getPackage() )
+				.addClass( CDIInjectionIT.class )
+				.addPackages( true /* recursive */, CDIBeansPackage.class.getPackage() )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "cdi/META-INF/services", "META-INF/services" )
 				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
@@ -71,6 +76,9 @@ public class CDIInjectionIT {
 			.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
+
+	@Produces
+	private BridgeCDILifecycleEventCounter counter = BridgeCDILifecycleEventCounter.noOp();
 
 	@Inject
 	private EntityWithCDIAwareBridgesDao dao;
