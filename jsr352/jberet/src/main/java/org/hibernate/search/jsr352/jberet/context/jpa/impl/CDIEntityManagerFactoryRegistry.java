@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jsr352.jberet.context.jpa.impl;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Vetoed;
@@ -17,7 +18,6 @@ import javax.enterprise.inject.spi.InjectionTargetFactory;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
@@ -82,7 +82,7 @@ public class EntityManagerFactoriesProducer {
  *
  * @author Yoann Rodiere
  */
-@Singleton
+@ApplicationScoped
 public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
