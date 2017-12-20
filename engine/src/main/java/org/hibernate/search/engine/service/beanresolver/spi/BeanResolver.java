@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.service.beanresolver.spi;
 
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.Stoppable;
 
 
 /**
@@ -19,7 +20,7 @@ import org.hibernate.search.engine.service.spi.Service;
  *    You should be prepared for incompatible changes in future releases.
  * @since 5.8
  */
-public interface BeanResolver extends Service {
+public interface BeanResolver extends Service, Stoppable {
 
 	<T> T resolve(Class<?> reference, Class<T> expectedClass);
 

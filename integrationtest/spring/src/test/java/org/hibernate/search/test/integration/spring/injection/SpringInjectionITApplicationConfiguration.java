@@ -8,7 +8,8 @@ package org.hibernate.search.test.integration.spring.injection;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.spring.injection.integration.SpringBeanResolverContributor;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.search.test.integration.spring.injection.integration.SpringBeanContainer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringBootConfiguration;
@@ -32,7 +33,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 public class SpringInjectionITApplicationConfiguration {
 
 	@Bean
-	public BeanPostProcessor addJpaBeanFactoryProperty() {
+	public BeanPostProcessor addBeanContainerProperty() {
 		return new BeanPostProcessor() {
 			@Inject
 			private ApplicationContext applicationContext;
@@ -42,7 +43,7 @@ public class SpringInjectionITApplicationConfiguration {
 				if ( bean instanceof LocalContainerEntityManagerFactoryBean ) {
 					LocalContainerEntityManagerFactoryBean factoryBean = (LocalContainerEntityManagerFactoryBean) bean;
 					factoryBean.getJpaPropertyMap()
-							.put( SpringBeanResolverContributor.BEAN_FACTORY, applicationContext );
+							.put( AvailableSettings.BEAN_CONTAINER, new SpringBeanContainer( applicationContext ) );
 				}
 				return bean;
 			}

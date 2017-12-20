@@ -9,9 +9,10 @@ package org.hibernate.search.hcore.spi;
 import org.hibernate.service.Service;
 
 /**
- * A service allowing to postpone Hibernate initialization works
+ * A service allowing to postpone Hibernate Search initialization
  * to a later time, when the environment (e.g. provided services
- * such as {@link BeanResolver}) will be ready to accept requests.
+ * such as {@link org.hibernate.resource.beans.spi.ManagedBeanRegistry})
+ * will be ready to accept requests.
  *
  * @hsearch.experimental This type is under active development.
  *    You should be prepared for incompatible changes in future releases.

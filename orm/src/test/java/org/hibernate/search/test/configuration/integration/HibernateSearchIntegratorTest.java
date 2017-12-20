@@ -28,13 +28,13 @@ import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
+import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
-import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -156,7 +156,7 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 			.andReturn( mockClassLoaderService )
 			.anyTimes();
 
-		expect( mockSessionFactoryServiceRegistry.locateServiceBinding( BeanResolver.class ) )
+		expect( mockSessionFactoryServiceRegistry.locateServiceBinding( ManagedBeanRegistry.class ) )
 			.andReturn( null )
 			.anyTimes();
 

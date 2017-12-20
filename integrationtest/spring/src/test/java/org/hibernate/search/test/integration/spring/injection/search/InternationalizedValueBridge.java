@@ -7,12 +7,12 @@
 package org.hibernate.search.test.integration.spring.injection.search;
 
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
-import org.hibernate.search.test.integration.spring.injection.integration.ResolveInHibernateSearch;
+import org.hibernate.search.test.integration.spring.injection.integration.ResolveInHibernate;
 
 /**
  * @author Yoann Rodiere
  */
-@ResolveInHibernateSearch
+@ResolveInHibernate
 public interface InternationalizedValueBridge extends MetadataProvidingFieldBridge {
 
 }

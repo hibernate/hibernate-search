@@ -66,7 +66,6 @@ public class CDIInjectionLifecycleEventsIT {
 				.addClass( CDIInjectionLifecycleEventsIT.class )
 				.addPackages( true /* recursive */, CDIBeansPackage.class.getPackage() )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "cdi/META-INF/services", "META-INF/services" )
 				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchTestingLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -97,7 +96,6 @@ public class CDIInjectionLifecycleEventsIT {
 				.addClass( CDIInjectionLifecycleEventsIT.class )
 				.addPackage( BridgeCDILifecycleEventCounter.class.getPackage() )
 				.addClasses( EventCounts.class, JndiBridgeCDILifecycleEventCounter.class )
-				.addAsResource( "cdi/META-INF/services", "META-INF/services" )
 				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchTestingLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );

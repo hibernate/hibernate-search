@@ -22,6 +22,8 @@ import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.resource.beans.container.spi.BeanContainer;
+import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
@@ -53,7 +55,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	public SearchConfigurationFromHibernateCore(Metadata metadata, ConfigurationService configurationService,
 			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateOrmClassLoaderService,
-			org.hibernate.search.hcore.spi.BeanResolver hibernateOrmBeanResolver,
+			ManagedBeanRegistry managedBeanRegistry,
 			HibernateSessionFactoryService sessionService, JndiService namingService) {
 		this.metadata = metadata;
 		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
@@ -67,7 +69,21 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			throw new NullPointerException( "ClassLoaderService is null" );
 		}
 		this.classLoaderService = new DelegatingClassLoaderService( hibernateOrmClassLoaderService );
-		this.beanResolver = hibernateOrmBeanResolver != null ? new DelegatingBeanResolver( hibernateOrmBeanResolver ) : null;
+
+		if ( managedBeanRegistry != null ) {
+			BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
+			if ( beanContainer != null ) {
+				// Only use the primary registry, so that we can implement our own fallback when beans are not found
+				this.beanResolver = new HibernateOrmBeanContainerBeanResolver( beanContainer );
+			}
+			else {
+				// The given ManagedBeanRegistry only implements fallback: let's ignore it
+				this.beanResolver = null;
+			}
+		}
+		else {
+			this.beanResolver = null;
+		}
 
 		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
 		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );

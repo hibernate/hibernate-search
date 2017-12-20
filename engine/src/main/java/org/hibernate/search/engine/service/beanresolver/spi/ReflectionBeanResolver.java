@@ -4,17 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.service.beanresolver.impl;
+package org.hibernate.search.engine.service.beanresolver.spi;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 
 /**
@@ -69,4 +68,8 @@ public class ReflectionBeanResolver implements BeanResolver {
 		return expectedClass.cast( instance );
 	}
 
+	@Override
+	public void stop() {
+		// Nothing to do
+	}
 }

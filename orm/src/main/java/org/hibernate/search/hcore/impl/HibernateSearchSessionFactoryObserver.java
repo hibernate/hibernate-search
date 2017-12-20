@@ -15,11 +15,11 @@ import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -40,7 +40,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
 	private final EnvironmentSynchronizer environmentSynchronizer;
-	private final BeanResolver beanResolver;
+	private final ManagedBeanRegistry managedBeanRegistry;
 	private final FullTextIndexEventListener listener;
 	private final Metadata metadata;
 
@@ -55,14 +55,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			FullTextIndexEventListener listener,
 			ClassLoaderService classLoaderService,
 			EnvironmentSynchronizer environmentSynchronizer,
-			BeanResolver beanResolver,
+			ManagedBeanRegistry managedBeanRegistry,
 			JndiService namingService) {
 		this.metadata = metadata;
 		this.configurationService = configurationService;
 		this.listener = listener;
 		this.classLoaderService = classLoaderService;
 		this.environmentSynchronizer = environmentSynchronizer;
-		this.beanResolver = beanResolver;
+		this.managedBeanRegistry = managedBeanRegistry;
 		this.namingService = namingService;
 	}
 
@@ -114,7 +114,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
 					.configuration( new SearchConfigurationFromHibernateCore(
-							metadata, configurationService, classLoaderService, beanResolver, sessionService, namingService
+							metadata, configurationService, classLoaderService, managedBeanRegistry, sessionService, namingService
 							) )
 					.buildSearchIntegrator();
 			ExtendedSearchIntegrator extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );

@@ -13,13 +13,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enables the resolution of a spring bean in Hibernate Search.
+ * Enables the resolution of a spring bean in Hibernate.
  *
  * @author Yoann Rodiere
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ResolveInHibernateSearch {
+public @interface ResolveInHibernate {
 
 }

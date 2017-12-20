@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.service.beanresolver.impl.ReflectionBeanResolver;
+import org.hibernate.search.engine.service.beanresolver.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.service.beanresolver.impl.ReflectionFallbackBeanResolver;
 import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
@@ -160,6 +160,8 @@ public class StandardServiceManager implements ServiceManager {
 
 		cachedServices.clear();
 		allServicesReleased = true;
+
+		beanResolver.stop();
 
 		if ( failOnUnreleasedService && !unreleasedServicesToReport.isEmpty() ) {
 			throw new AssertionFailure( "The following services have been used but not released: "

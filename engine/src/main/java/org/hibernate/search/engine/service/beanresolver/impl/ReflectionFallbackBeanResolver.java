@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.service.beanresolver.impl;
 
 import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
+import org.hibernate.search.engine.service.beanresolver.spi.ReflectionBeanResolver;
+import org.hibernate.search.util.impl.Closer;
 
 /**
  * A bean resolver implementing fallback: it attempts to resolve beans
@@ -42,4 +44,11 @@ public class ReflectionFallbackBeanResolver implements BeanResolver {
 		return result;
 	}
 
+	@Override
+	public void stop() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( delegate::stop );
+			closer.push( fallback::stop );
+		}
+	}
 }
