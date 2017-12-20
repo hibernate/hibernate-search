@@ -255,6 +255,9 @@
         <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
         <jpa22patch.version>1.0.0.Beta1</jpa22patch.version>
         <jpa22patch.filename>hibernate-jpa-api-2.2-wildflymodules-${jpa22patch.version}-wildfly-${wildflyVersion}-patch.zip</jpa22patch.filename>
+        <cdi20patch.version>3.0.2.Final</cdi20patch.version>
+        <cdi20patch.filename>wildfly-${wildflyVersion}-weld-${cdi20patch.version}-patch.zip</cdi20patch.filename>
+        <cdi20patch.url>http://download.jboss.org/weld/${cdi20patch.version}/${cdi20patch.filename}</cdi20patch.url>
 
         <!-- Elasticsearch -->
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
@@ -1719,6 +1722,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>org.bitstrings.maven.plugins</groupId>
                     <artifactId>dependencypath-maven-plugin</artifactId>
                     <version>1.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.googlecode.maven-download-plugin</groupId>
+                    <artifactId>download-maven-plugin</artifactId>
+                    <version>1.4.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

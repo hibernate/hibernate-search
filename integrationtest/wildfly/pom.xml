@@ -446,12 +446,31 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>fetch-cdi20-patch</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipWildFlyPreparation}</skip>
+                                    <url>${cdi20patch.url}</url>
+                                    <unpack>false</unpack>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.wildfly.plugins</groupId>
                         <artifactId>wildfly-maven-plugin</artifactId>
                         <executions>
                             <!-- Install JPA 2.2 patch on node1 -->
                             <execution>
-                                <id>apply-wildfly-node1-patch-file</id>
+                                <id>apply-wildfly-node1-jpa22-patch-file</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>execute-commands</goal>
@@ -469,7 +488,7 @@
                             </execution>
                             <!-- Install JPA 2.2 patch on node2 -->
                             <execution>
-                                <id>apply-wildfly-node2-patch-file</id>
+                                <id>apply-wildfly-node2-jpa22-patch-file</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>execute-commands</goal>
@@ -482,6 +501,42 @@
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
                                         <command>patch apply --override-all --path ${project.build.directory}/${jpa22patch.filename}</command>
+                                    </commands>
+                                </configuration>
+                            </execution>
+                            <!-- Install CDI 2.0 patch on node1 -->
+                            <execution>
+                                <id>apply-wildfly-node1-cdi20-patch-file</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipWildFlyPreparation}</skip>
+                                    <offline>true</offline>
+                                    <jbossHome>${jbossHome.node1}</jbossHome>
+                                    <!-- The CLI script below will fail if the patch was already applied in a previous build -->
+                                    <fail-on-error>false</fail-on-error>
+                                    <commands>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${cdi20patch.filename}</command>
+                                    </commands>
+                                </configuration>
+                            </execution>
+                            <!-- Install CDI 2.0 patch on node2 -->
+                            <execution>
+                                <id>apply-wildfly-node2-cdi20-patch-file</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipWildFlyPreparation}</skip>
+                                    <offline>true</offline>
+                                    <jbossHome>${jbossHome.node2}</jbossHome>
+                                    <!-- The CLI script below will fail if the patch was already applied in a previous build -->
+                                    <fail-on-error>false</fail-on-error>
+                                    <commands>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${cdi20patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
