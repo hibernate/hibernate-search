@@ -19,16 +19,6 @@
 
     <files>
         <file>
-            <source>${module.xml.basedir}/lucene/module.xml</source>
-            <outputDirectory>org/apache/lucene/${lucene.module.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/lucene_internal/module.xml</source>
-            <outputDirectory>org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
             <outputDirectory>org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -71,26 +61,6 @@
         <file>
             <source>${module.xml.basedir}/search/elasticsearch-aws/module.xml</source>
             <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/es-client/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/es-sniffer/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch-sniffer/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/gson/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch-gson/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/aws-v4-signer-java/module.xml</source>
-            <outputDirectory>org/hibernate/search/aws-v4-signer-java/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
@@ -158,21 +128,6 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/apache/lucene/${lucene.module.slot}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.apache.lucene:lucene-core</include>
-                <include>org.apache.lucene:lucene-queryparser</include>
-                <include>org.apache.lucene:lucene-queries</include>
-                <include>org.apache.lucene:lucene-facet</include>
-                <include>org.apache.lucene:lucene-analyzers-common</include>
-                <include>org.apache.lucene:lucene-grouping</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
@@ -188,57 +143,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.elasticsearch.client:elasticsearch-rest-client</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch-sniffer/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.elasticsearch.client:elasticsearch-rest-client-sniffer</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch-gson/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>com.google.code.gson:gson</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/aws-v4-signer-java/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>uk.co.lucasweb:aws-v4-signer-java</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.apache.lucene:lucene-backward-codecs</include>
-                <include>org.apache.lucene:lucene-misc</include>
             </includes>
         </dependencySet>
 

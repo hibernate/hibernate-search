@@ -12,7 +12,7 @@
     <dependencies>
         <module name="org.hibernate.search.engine" slot="${hibernate.search.version}"/>
         <module name="org.hibernate.search.elasticsearch" slot="${hibernate.search.version}"/>
-        <module name="org.hibernate.search.aws-v4-signer-java" slot="${hibernate.search.version}"/>
+        <module name="uk.co.lucasweb.aws-v4-signer-java" slot="${aws-v4-signer-java.module.slot}"/>
         <module name="org.apache.httpcomponents"/>
         <module name="org.apache.commons.codec"/>
     </dependencies>

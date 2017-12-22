@@ -11,9 +11,9 @@
     </resources>
     <dependencies>
         <module name="org.hibernate.search.engine" slot="${hibernate.search.version}"/>
-        <module name="org.hibernate.search.elasticsearch-client" slot="${hibernate.search.version}"/>
-        <module name="org.hibernate.search.elasticsearch-gson" slot="${hibernate.search.version}"/>
-        <module name="org.hibernate.search.elasticsearch-sniffer" slot="${hibernate.search.version}"/>
+        <module name="org.elasticsearch.client.elasticsearch-rest-client" slot="${elasticsearch-client.module.slot}"/>
+        <module name="com.google.code.gson" slot="${gson.module.slot}"/>
+        <module name="org.elasticsearch.client.elasticsearch-rest-client-sniffer" slot="${elasticsearch-client.module.slot}"/>
         <module name="javax.xml.bind.api"/>
         <module name="org.hibernate.commons-annotations"/>
         <module name="org.jboss.logging"/>

@@ -27,6 +27,7 @@
         -->
         <enforcer.skip>true</enforcer.skip>
         <scenario></scenario>
+        <jbosshome>${project.build.directory}/wildfly-${wildflyVersion}/</jbosshome>
     </properties>
 
     <dependencyManagement>
@@ -236,7 +237,7 @@
                                     <classifier>wildfly-11-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -245,7 +246,43 @@
                                     <classifier>wildfly-11-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate.lucene-jbossmodules</groupId>
+                                    <artifactId>lucene-jbossmodules</artifactId>
+                                    <version>${luceneTestingModuleVersion}</version>
+                                    <classifier>dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
+                                    <artifactId>elasticsearch-client-jbossmodules</artifactId>
+                                    <version>${elasticsearchClientTestingModuleVersion}</version>
+                                    <classifier>dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate.gson-jbossmodules</groupId>
+                                    <artifactId>gson-jbossmodules</artifactId>
+                                    <version>${gsonTestingModuleVersion}</version>
+                                    <classifier>dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
+                                    <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
+                                    <version>${awsV4SignerJavaTestingModuleVersion}</version>
+                                    <classifier>dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -264,7 +301,7 @@
                                     <artifactId>${jdbc.driver.artifactId}</artifactId>
                                     <version>${jdbc.driver.version}</version>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/standalone/deployments</outputDirectory>
+                                    <outputDirectory>${jbosshome}/standalone/deployments</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

@@ -37,12 +37,12 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client-sniffer</artifactId>
-            <version>${elasticsearchSnifferVersion}</version>
+            <version>${elasticsearchClientVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${elasticsearchGsonVersion}</version>
+            <version>${gsonVersion}</version>
         </dependency>
 
         <!-- Test -->

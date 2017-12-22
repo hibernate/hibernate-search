@@ -179,19 +179,20 @@
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.2 requires Java 8 -->
         <minJdkVersion>1.8</minJdkVersion>
 
-        <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <lucene.module.slot>5.5</lucene.module.slot>
-        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
+        <!-- Slot definitions for JBoss Modules (generated modules) -->
         <hibernate-search.module.slot>${project.version}</hibernate-search.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.5</luceneVersion>
+        <lucene.module.slot>5.5</lucene.module.slot>
+        <luceneTestingModuleVersion>5.5.5.hibernate04</luceneTestingModuleVersion>
         <infinispanVersion>9.0.1.Final</infinispanVersion>
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.2.11.Final</hibernateVersion>
+        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.3.Final</jandexVersion>
         <classMateVersion>1.3.0</classMateVersion>
@@ -232,9 +233,14 @@
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
         <elasticsearchClientVersion>5.6.4</elasticsearchClientVersion>
-        <elasticsearchSnifferVersion>5.6.4</elasticsearchSnifferVersion>
-        <elasticsearchGsonVersion>2.8.2</elasticsearchGsonVersion>
-        <elasticsearchAWSV4SignerVersion>1.3</elasticsearchAWSV4SignerVersion>
+        <elasticsearch-client.module.slot>5.6</elasticsearch-client.module.slot>
+        <elasticsearchClientTestingModuleVersion>5.6.4.hibernate02</elasticsearchClientTestingModuleVersion>
+        <gsonVersion>2.8.2</gsonVersion>
+        <gson.module.slot>2.8</gson.module.slot>
+        <gsonTestingModuleVersion>2.8.2.hibernate02</gsonTestingModuleVersion>
+        <awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
+        <aws-v4-signer-java.module.slot>${awsV4SignerJavaVersion}</aws-v4-signer-java.module.slot>
+        <awsV4SignerJavaTestingModuleVersion>1.3.0.hibernate02</awsV4SignerJavaTestingModuleVersion>
 
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
