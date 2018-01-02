@@ -158,12 +158,12 @@ semi private.
 
 ### Latest Documentation:
 
-* [http://search.hibernate.org](http://hibernate.org/search/documentation/)
+* [http://hibernate.org/search/documentation/](http://hibernate.org/search/documentation/)
 
 ### Bug Reports:
 
 * Hibernate JIRA [HSEARCH](https://hibernate.atlassian.net/browse/HSEARCH) (preferred)
-* hibernate-dev@lists.jboss.org
+* [hibernate-dev@lists.jboss.org](mailto:hibernate-dev@lists.jboss.org)
 
 ### Free Technical Support:
 
