@@ -35,6 +35,8 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private static final ElasticsearchAnalysisDefinitionRegistryPopulator NOOP_DEFINITION_REGISTRY_POPULATOR = (r) -> { };
+
 	protected final String name;
 
 	private ElasticsearchAnalysisDefinitionRegistryPopulator definitionRegistryPopulator;
@@ -77,7 +79,7 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 	protected ElasticsearchAnalysisDefinitionRegistryPopulator createRegistryPopulator(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		AnalyzerDefinition analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
 		if ( analyzerDefinition == null ) {
-			return (r) -> { }; // No-op
+			return NOOP_DEFINITION_REGISTRY_POPULATOR; // No-op
 		}
 
 		String tokenizerName = analyzerDefinition.getTokenizer();
@@ -114,8 +116,10 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
 		sb.append( name );
-		sb.append( "," );
-		sb.append( definitionRegistryPopulator );
+		if ( definitionRegistryPopulator != NOOP_DEFINITION_REGISTRY_POPULATOR ) {
+			sb.append( "," );
+			sb.append( definitionRegistryPopulator );
+		}
 		sb.append( ">" );
 		return sb.toString();
 	}
