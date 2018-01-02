@@ -167,7 +167,7 @@ semi private.
 
 ### Free Technical Support:
 
-* [Hibernate Forum](http://forum.hibernate.org/viewforum.php?f=9)
+* [Hibernate Forum](https://discourse.hibernate.org/c/hibernate-search)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/hibernate-search); please use tag `hibernate-search`.
 
 ## License
