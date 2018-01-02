@@ -48,6 +48,7 @@ class Coffee {
 	public void setDescription(String description) { this.description = description; }
 	private String description;
 
+	@Field
 	public int getIntensity() { return intensity; }
 	public void setIntensity(int intensity) { this.intensity = intensity; }
 	private int intensity;

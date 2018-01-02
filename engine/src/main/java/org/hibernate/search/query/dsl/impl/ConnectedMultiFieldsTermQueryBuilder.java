@@ -66,14 +66,21 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		final int size = fieldsContext.size();
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldsContext.getFirst(), conversionContext ) ).createQuery();
+			FieldContext fieldContext = fieldsContext.getFirst();
+			return queryCustomizer.setWrappedQuery(
+					fieldContext.getFieldCustomizer().setWrappedQuery(
+							createQuery( fieldContext, conversionContext )
+					).createQuery()
+			).createQuery();
 		}
 		else {
 			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
 			for ( FieldContext fieldContext : fieldsContext ) {
 				aggregatedFieldsQueryBuilder.add(
-					createQuery( fieldContext, conversionContext ),
-					BooleanClause.Occur.SHOULD
+						fieldContext.getFieldCustomizer().setWrappedQuery(
+								createQuery( fieldContext, conversionContext ) )
+						.createQuery(),
+						BooleanClause.Occur.SHOULD
 				);
 			}
 			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
@@ -82,7 +89,6 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	}
 
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
-		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		final boolean applyTokenization;
 
@@ -107,19 +113,17 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		final String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
 
 		if ( !applyTokenization || BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, IgnoreAnalyzerBridge.class ) != null ) {
-			perFieldQuery = createTermQuery( fieldContext, searchTerm );
+			return createTermQuery( fieldContext, searchTerm );
+		}
+
+		// we need to build differentiated queries depending on if the search terms should be analyzed
+		// locally or not
+		if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
+			return createRemoteQuery( fieldContext, searchTerm );
 		}
 		else {
-			// we need to build differentiated queries depending of if the search terms should be analyzed
-			// locally or not
-			if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
-				perFieldQuery = createRemoteQuery( fieldContext, searchTerm );
-			}
-			else {
-				perFieldQuery = createLuceneQuery( fieldContext, searchTerm );
-			}
+			return createLuceneQuery( fieldContext, searchTerm );
 		}
-		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
 	private void validateNullValueIsSearchable(FieldContext fieldContext) {

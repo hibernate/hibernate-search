@@ -406,10 +406,10 @@ public class SimpleQueryStringDSLTest {
 		);
 	}
 
-	private void createCoffee(String title, String summary, String description, int intensity, CoffeeBrand brand) {
+	private void createCoffee(String name, String summary, String description, int intensity, CoffeeBrand brand) {
 		Coffee coffee = new Coffee();
-		coffee.setId( title );
-		coffee.setName( title );
+		coffee.setId( name );
+		coffee.setName( name );
 		coffee.setSummary( summary );
 		coffee.setDescription( description );
 		coffee.setIntensity( intensity );
