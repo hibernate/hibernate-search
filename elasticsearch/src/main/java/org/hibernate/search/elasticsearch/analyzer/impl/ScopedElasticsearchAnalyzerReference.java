@@ -63,6 +63,20 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 		return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( "global=" );
+		sb.append( globalAnalyzerReference );
+		sb.append( "," );
+		sb.append( "scoped=" );
+		sb.append( scopedAnalyzerReferences );
+		sb.append( ">" );
+		return sb.toString();
+	}
+
 	private ElasticsearchAnalyzerReference getDelegate(String fieldName) {
 		ElasticsearchAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
 		if ( analyzerReference == null ) {

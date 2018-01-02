@@ -83,7 +83,8 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 	public String toString(String field) {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() ).append( "<" );
-		sb.append( field ).append( ":" );
+		// the field parameter is the default field name and, in our case, it will be the empty string
+		sb.append( this.field ).append( ":" );
 		sb.append( searchTerms );
 		if ( maxEditDistance != 0 ) {
 			sb.append( "~" ).append( maxEditDistance );
