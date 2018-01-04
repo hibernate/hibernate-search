@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -14,7 +16,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder {
+abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<Float> BOOST = JsonAccessor.root().property( "boost" ).asFloat();
 
@@ -36,6 +38,6 @@ abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder 
 	}
 
 	@Override
-	public abstract JsonObject build();
+	public abstract void contribute(ElasticsearchSearchPredicateCollector collector);
 
 }

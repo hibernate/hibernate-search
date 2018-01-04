@@ -10,13 +10,13 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 /**
  * @author Yoann Rodiere
  */
-public interface SearchTargetContext {
+public interface ElasticsearchSearchTargetContext extends SearchTargetContext<ElasticsearchSearchPredicateCollector> {
 
 	Set<String> getIndexNames();
 
@@ -25,7 +25,5 @@ public interface SearchTargetContext {
 	ElasticsearchWorkFactory getWorkFactory();
 
 	ElasticsearchWorkOrchestrator getQueryOrchestrator();
-
-	ElasticsearchSearchPredicateFactory getSearchPredicateFactory();
 
 }

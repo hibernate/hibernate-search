@@ -14,34 +14,39 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 // TODO have one version of the clause factory per dialect, if necessary
-public class ElasticsearchSearchPredicateFactoryImpl implements ElasticsearchSearchPredicateFactory {
+public class SearchPredicateFactoryImpl implements SearchPredicateFactory<ElasticsearchSearchPredicateCollector> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final Collection<ElasticsearchIndexModel> indexModels;
 
-	public ElasticsearchSearchPredicateFactoryImpl(Collection<ElasticsearchIndexModel> indexModels) {
+	public SearchPredicateFactoryImpl(Collection<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder bool() {
+	public BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateCollector> bool() {
 		return new BooleanJunctionPredicateBuilderImpl();
 	}
 
 	@Override
-	public MatchPredicateBuilder match(String absoluteFieldPath) {
+	public MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> match(String absoluteFieldPath) {
 		return new MatchPredicateBuilderImpl( absoluteFieldPath, getFormatter( absoluteFieldPath ) );
 	}
 
 	@Override
-	public RangePredicateBuilder range(String absoluteFieldPath) {
+	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> range(String absoluteFieldPath) {
 		return new RangePredicateBuilderImpl( absoluteFieldPath, getFormatter( absoluteFieldPath ) );
 	}
 

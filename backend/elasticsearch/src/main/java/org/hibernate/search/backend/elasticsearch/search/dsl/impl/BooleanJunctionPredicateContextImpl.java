@@ -11,31 +11,33 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 
 
 /**
  * @author Yoann Rodiere
  */
-class BooleanJunctionPredicateContextImpl<N>
-		implements BooleanJunctionPredicateContext<N>, ElasticsearchSearchPredicateContributor {
+class BooleanJunctionPredicateContextImpl<N, C>
+		implements BooleanJunctionPredicateContext<N>, SearchPredicateContributor<C> {
 
-	private final SearchTargetContext context;
+	private final SearchTargetContext<C> context;
 
 	private final Supplier<N> nextContextProvider;
 
-	private final BooleanJunctionPredicateBuilder builder;
+	private final BooleanJunctionPredicateBuilder<C> builder;
 
 	private final OccurContext must;
 	private final OccurContext mustNot;
 	private final OccurContext should;
 	private final OccurContext filter;
 
-	public BooleanJunctionPredicateContextImpl(SearchTargetContext context,
+	BooleanJunctionPredicateContextImpl(SearchTargetContext<C> context,
 			Supplier<N> nextContextProvider) {
 		this.context = context;
 		this.nextContextProvider = nextContextProvider;
@@ -54,56 +56,75 @@ class BooleanJunctionPredicateContextImpl<N>
 
 	@Override
 	public BooleanJunctionPredicateContext<N> must(SearchPredicate searchPredicate) {
-		must().add( ElasticsearchSearchPredicate.cast( searchPredicate ) );
-		return this;
+		return must().predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> mustNot(SearchPredicate searchPredicate) {
-		mustNot().add( ElasticsearchSearchPredicate.cast( searchPredicate ) );
-		return this;
+		return mustNot().predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> should(SearchPredicate searchPredicate) {
-		should().add( ElasticsearchSearchPredicate.cast( searchPredicate ) );
-		return this;
+		return should().predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate) {
-		filter().add( ElasticsearchSearchPredicate.cast( searchPredicate ) );
+		return filter().predicate( searchPredicate );
+	}
+
+	@Override
+	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> must() {
+		return must.containerContext;
+	}
+
+	@Override
+	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> mustNot() {
+		return mustNot.containerContext;
+	}
+
+	@Override
+	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> should() {
+		return should.containerContext;
+	}
+
+	@Override
+	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> filter() {
+		return filter.containerContext;
+	}
+
+	@Override
+	public BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+		clauseContributor.accept( must() );
 		return this;
 	}
 
 	@Override
-	public OccurContext must() {
-		return must;
+	public BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+		clauseContributor.accept( mustNot() );
+		return this;
 	}
 
 	@Override
-	public OccurContext mustNot() {
-		return mustNot;
+	public BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+		clauseContributor.accept( should() );
+		return this;
 	}
 
 	@Override
-	public OccurContext should() {
-		return should;
+	public BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+		clauseContributor.accept( filter() );
+		return this;
 	}
 
 	@Override
-	public OccurContext filter() {
-		return filter;
-	}
-
-	@Override
-	public void contribute(Consumer<JsonObject> collector) {
-		must.contribute( builder::must );
-		mustNot.contribute( builder::mustNot );
-		should.contribute( builder::should );
-		filter.contribute( builder::filter );
-		JsonObject booleanPredicate = builder.build();
-		collector.accept( booleanPredicate );
+	public void contribute(C collector) {
+		must.contribute( builder.getMustCollector() );
+		mustNot.contribute( builder.getMustNotCollector() );
+		should.contribute( builder.getShouldCollector() );
+		filter.contribute( builder.getFilterCollector() );
+		builder.contribute( collector );
 	}
 
 	@Override
@@ -111,26 +132,37 @@ class BooleanJunctionPredicateContextImpl<N>
 		return nextContextProvider.get();
 	}
 
-	private class OccurContext extends AbstractSearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> {
+	private class OccurContext implements SearchDslContext<BooleanJunctionPredicateContext<N>, C>,
+			SearchPredicateContributor<C> {
 
-		private final List<ElasticsearchSearchPredicateContributor> children = new ArrayList<>();
+		private final List<SearchPredicateContributor<C>> children = new ArrayList<>();
+
+		private final SearchPredicateContainerContextImpl<BooleanJunctionPredicateContext<N>, C> containerContext;
 
 		public OccurContext() {
-			super( BooleanJunctionPredicateContextImpl.this.context );
+			this.containerContext = new SearchPredicateContainerContextImpl<>(
+					BooleanJunctionPredicateContextImpl.this.context, this );
 		}
 
 		@Override
-		protected void add(ElasticsearchSearchPredicateContributor child) {
+		public void addContributor(SearchPredicateContributor<C> child) {
 			children.add( child );
 		}
 
-		public void contribute(Consumer<JsonObject> collector) {
-			children.forEach( c -> c.contribute( collector ) );
+		public void addPredicate(SearchPredicate child) {
+			SearchPredicateContributor<C> contributor =
+					BooleanJunctionPredicateContextImpl.this.context.toContributor( child );
+			addContributor( contributor );
 		}
 
 		@Override
-		protected BooleanJunctionPredicateContext<N> getNext() {
+		public BooleanJunctionPredicateContext<N> getNextContext() {
 			return BooleanJunctionPredicateContextImpl.this;
+		}
+
+		@Override
+		public void contribute(C collector) {
+			children.forEach( c -> c.contribute( collector ) );
 		}
 
 	}

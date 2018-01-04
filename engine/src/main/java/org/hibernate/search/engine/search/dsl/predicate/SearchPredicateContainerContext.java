@@ -10,6 +10,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;
 
 /**
  * @author Yoann Rodiere

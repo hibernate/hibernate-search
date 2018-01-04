@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -15,7 +17,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder {
+		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonObject> MUST = JsonAccessor.root().property( "must" ).asObject();
 	private static final JsonAccessor<JsonObject> MUST_NOT = JsonAccessor.root().property( "must_not" ).asObject();
@@ -23,30 +25,46 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private static final JsonAccessor<JsonObject> FILTER = JsonAccessor.root().property( "filter" ).asObject();
 
 	@Override
-	public void must(JsonObject query) {
+	public ElasticsearchSearchPredicateCollector getMustCollector() {
+		return this::must;
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateCollector getMustNotCollector() {
+		return this::mustNot;
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateCollector getShouldCollector() {
+		return this::should;
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateCollector getFilterCollector() {
+		return this::filter;
+	}
+
+	private void must(JsonObject query) {
 		MUST.add( getInnerObject(), query );
 	}
 
-	@Override
-	public void mustNot(JsonObject query) {
+	private void mustNot(JsonObject query) {
 		MUST_NOT.add( getInnerObject(), query );
 	}
 
-	@Override
-	public void should(JsonObject query) {
+	private void should(JsonObject query) {
 		SHOULD.add( getInnerObject(), query );
 	}
 
-	@Override
-	public void filter(JsonObject query) {
+	private void filter(JsonObject query) {
 		FILTER.add( getInnerObject(), query );
 	}
 
 	@Override
-	public JsonObject build() {
+	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		outerObject.add( "bool", getInnerObject() );
-		return outerObject;
+		collector.collect( outerObject );
 	}
 
 }

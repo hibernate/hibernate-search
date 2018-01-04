@@ -28,13 +28,13 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	 * calls from time to time to mark the end of a nested context.
 	 */
 
-	SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> must();
+	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> must();
 
-	SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> mustNot();
+	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> mustNot();
 
-	SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> should();
+	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> should();
 
-	SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> filter();
+	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> filter();
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
@@ -42,24 +42,12 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	 * and removing the need to call .end() on nested clause contexts.
 	 */
 
-	default BooleanJunctionPredicateContext<N> must(Consumer<SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( must() );
-		return this;
-	}
+	BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
-	default BooleanJunctionPredicateContext<N> mustNot(Consumer<SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( mustNot() );
-		return this;
-	}
+	BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
-	default BooleanJunctionPredicateContext<N> should(Consumer<SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( should() );
-		return this;
-	}
+	BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
-	default BooleanJunctionPredicateContext<N> filter(Consumer<SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( filter() );
-		return this;
-	}
+	BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
 }

@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchQueryWrappingDefinitionResultContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchTargetContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
@@ -41,7 +41,7 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final SearchTargetContext targetContext;
+	private final ElasticsearchSearchTargetContext targetContext;
 
 	private final SessionContext sessionContext;
 
@@ -49,7 +49,7 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 
 	private final ObjectLoader<R, O> objectLoader;
 
-	public SearchQueryResultDefinitionContextImpl(SearchTargetContext targetContext,
+	public SearchQueryResultDefinitionContextImpl(ElasticsearchSearchTargetContext targetContext,
 			SessionContext sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {
@@ -65,7 +65,7 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 				new ObjectHitExtractor<>( documentReferenceTransformer );
 		HitAggregator<LoadingHitCollector<R>, List<O>> hitAggregator =
 				new ObjectHitAggregator<>( objectLoader );
-		ElasticsearchSearchQueryBuilder<O> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
+		SearchQueryBuilderImpl<?, O> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
@@ -75,7 +75,7 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 				new DocumentReferenceHitExtractor<>( documentReferenceTransformer );
 		HitAggregator<HitCollector<R>, List<T>> hitAggregator =
 				new SimpleHitAggregator<>( hitTransformer );
-		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
+		SearchQueryBuilderImpl<?, T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
@@ -113,7 +113,7 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 		HitAggregator<ProjectionHitCollector<R>, List<T>> hitAggregator =
 				new ProjectionHitAggregator<>( objectLoader, hitTransformer, projections.length, expectedLoadPerHit );
 
-		ElasticsearchSearchQueryBuilder<T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
+		SearchQueryBuilderImpl<?, T> builder = createSearchQueryBuilder( hitExtractor, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
@@ -151,9 +151,9 @@ public class SearchQueryResultDefinitionContextImpl<R, O> implements SearchQuery
 		return new CompositeHitExtractor<>( extractors );
 	}
 
-	private <C, T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
+	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
-		return new ElasticsearchSearchQueryBuilderImpl<>(
+		return new SearchQueryBuilderImpl<>(
 				targetContext.getQueryOrchestrator(),
 				targetContext.getWorkFactory(),
 				targetContext.getIndexNames(),

@@ -7,24 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
 /**
  * @author Yoann Rodiere
  */
-class RangePredicateContextImpl<N> implements RangePredicateContext<N>, ElasticsearchSearchPredicateContributor {
+class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, SearchPredicateContributor<C> {
 
-	private final RangePredicateFieldSetContextImpl.CommonState<N> commonState;
+	private final RangePredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public RangePredicateContextImpl(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
-		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<N>( targetContext, nextContextProvider );
+	public RangePredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
+		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( targetContext, nextContextProvider );
 	}
 
 	@Override
@@ -33,7 +32,7 @@ class RangePredicateContextImpl<N> implements RangePredicateContext<N>, Elastics
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
+	public void contribute(C collector) {
 		commonState.contribute( collector );
 	}
 }

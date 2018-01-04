@@ -13,8 +13,13 @@ import org.hibernate.search.engine.backend.document.model.spi.FieldModelExtensio
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ElasticsearchExtension<N>
@@ -35,19 +40,22 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original) {
-		if ( original instanceof ElasticsearchSearchPredicateContainerContext ) {
-			return (ElasticsearchSearchPredicateContainerContext<N>) original;
+	public <C> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
+			SearchTargetContext<C> targetContext, SearchDslContext<N, C> dslContext) {
+		if ( targetContext instanceof ElasticsearchSearchTargetContext ) {
+			return extendUnsafe( original, targetContext, dslContext );
 		}
 		else {
-			throw log.elasticsearchExtensionOnUnknownContext( original );
+			throw log.elasticsearchExtensionOnUnknownContext( targetContext );
 		}
 	}
 
 	@Override
-	public Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(SearchPredicateContainerContext<N> original) {
-		if ( original instanceof ElasticsearchSearchPredicateContainerContext ) {
-			return Optional.of( (ElasticsearchSearchPredicateContainerContext<N>) original );
+	public <C> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
+			SearchPredicateContainerContext<N> original, SearchTargetContext<C> targetContext,
+			SearchDslContext<N, C> dslContext) {
+		if ( targetContext instanceof ElasticsearchSearchTargetContext ) {
+			return Optional.of( extendUnsafe( original, targetContext, dslContext ) );
 		}
 		else {
 			return Optional.empty();
@@ -62,5 +70,16 @@ public final class ElasticsearchExtension<N>
 		else {
 			throw log.elasticsearchExtensionOnUnknownContext( original );
 		}
+	}
+
+	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchPredicateCollector
+	private <C> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
+			SearchPredicateContainerContext<N> original, SearchTargetContext<C> targetContext,
+			SearchDslContext<N, C> dslContext) {
+		return new ElasticsearchSearchPredicateContainerContextImpl<>(
+				original,
+				(ElasticsearchSearchTargetContext) targetContext,
+				(SearchDslContext<N, ElasticsearchSearchPredicateCollector>) dslContext
+		);
 	}
 }

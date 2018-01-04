@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryBuilder;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
@@ -17,13 +17,13 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 /**
  * @author Yoann Rodiere
  */
-class SearchQueryContextImpl<T, Q> implements SearchQueryContext<Q> {
+class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 
-	private final ElasticsearchSearchQueryBuilder<T> searchQueryBuilder;
+	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
 
-	public SearchQueryContextImpl(ElasticsearchSearchQueryBuilder<T> searchQueryBuilder,
+	public SearchQueryContextImpl(SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;

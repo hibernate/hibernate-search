@@ -11,25 +11,26 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 
-import com.google.gson.JsonObject;
+class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonState.FieldSetContext<C>>
+		implements SearchPredicateContributor<C> {
 
-class MultiFieldPredicateCommonState<N, F extends MultiFieldPredicateCommonState.FieldSetContext>
-		implements ElasticsearchSearchPredicateContributor {
-
-	private final SearchTargetContext targetContext;
+	private final SearchTargetContext<C> targetContext;
 
 	private final Supplier<N> nextContextProvider;
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	public MultiFieldPredicateCommonState(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
+	public MultiFieldPredicateCommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
 		this.targetContext = targetContext;
 		this.nextContextProvider = nextContextProvider;
 	}
 
-	public SearchTargetContext getTargetContext() {
+	public SearchTargetContext<C> getTargetContext() {
 		return targetContext;
 	}
 
@@ -46,22 +47,23 @@ class MultiFieldPredicateCommonState<N, F extends MultiFieldPredicateCommonState
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
-		List<JsonObject> queries = new ArrayList<>();
+	public void contribute(C collector) {
+		List<SearchPredicateBuilder<? super C>> predicateBuilders = new ArrayList<>();
 		for ( F fieldSetContext : fieldSetContexts ) {
-			fieldSetContext.contribute( queries::add );
+			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );
 		}
-		if ( queries.size() > 1 ) {
-			BooleanJunctionPredicateBuilder boolBuilder = targetContext.getSearchPredicateFactory().bool();
-			queries.stream().forEach( boolBuilder::should );
-			collector.accept( boolBuilder.build() );
+		if ( predicateBuilders.size() > 1 ) {
+			BooleanJunctionPredicateBuilder<C> boolBuilder = targetContext.getSearchPredicateFactory().bool();
+			C shouldCollector = boolBuilder.getShouldCollector();
+			predicateBuilders.forEach( b -> b.contribute( shouldCollector ) );
+			boolBuilder.contribute( collector );
 		}
 		else {
-			collector.accept( queries.get( 0 ) );
+			predicateBuilders.get( 0 ).contribute( collector );
 		}
 	}
 
-	public interface FieldSetContext {
-		void contribute(Consumer<JsonObject> collector);
+	public interface FieldSetContext<C> {
+		void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector);
 	}
 }

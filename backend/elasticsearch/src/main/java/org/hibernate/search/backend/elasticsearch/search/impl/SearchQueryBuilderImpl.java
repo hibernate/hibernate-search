@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSingleSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -19,7 +21,7 @@ import org.hibernate.search.engine.search.spi.HitAggregator;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQueryBuilder<T> {
+class SearchQueryBuilderImpl<C, T> implements SearchQueryBuilder<T, ElasticsearchSearchPredicateCollector> {
 
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
@@ -27,9 +29,9 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 	private final Set<String> routingKeys;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
-	private JsonObject rootQueryClause;
+	private final ElasticsearchSingleSearchPredicateCollector predicateCollector;
 
-	public ElasticsearchSearchQueryBuilderImpl(
+	public SearchQueryBuilderImpl(
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			ElasticsearchWorkFactory workFactory,
 			Set<String> indexNames,
@@ -46,11 +48,12 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
 		this.routingKeys = new HashSet<>();
+		this.predicateCollector = new ElasticsearchSingleSearchPredicateCollector();
 	}
 
 	@Override
-	public void setRootQueryClause(JsonObject rootQueryClause) {
-		this.rootQueryClause = rootQueryClause;
+	public ElasticsearchSearchPredicateCollector getPredicateCollector() {
+		return predicateCollector;
 	}
 
 	@Override
@@ -60,7 +63,7 @@ class ElasticsearchSearchQueryBuilderImpl<C, T> implements ElasticsearchSearchQu
 
 	private SearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
-		payload.add( "query", rootQueryClause );
+		payload.add( "query", predicateCollector.toJson() );
 		hitExtractor.contributeRequest( payload );
 		SearchResultExtractor<T> searchResultExtractor =
 				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );

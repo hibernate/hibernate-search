@@ -12,12 +12,17 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchTargetContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SingleSearchPredicateContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchTargetContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSingleSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.QuerySearchPredicateBuildingRootContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchPredicateContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryResultDefinitionContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactoryImpl;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -26,16 +31,19 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.spi.SearchQueryResultDefinitionContext;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
-class ElasticsearchIndexSearchTarget implements IndexSearchTarget, SearchTargetContext {
+class ElasticsearchIndexSearchTarget implements IndexSearchTarget, ElasticsearchSearchTargetContext {
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final ElasticsearchBackend backend;
 
-	private final ElasticsearchSearchPredicateFactory searchPredicateFactory;
+	private final SearchPredicateFactory<ElasticsearchSearchPredicateCollector> searchPredicateFactory;
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 
@@ -43,7 +51,7 @@ class ElasticsearchIndexSearchTarget implements IndexSearchTarget, SearchTargetC
 
 	ElasticsearchIndexSearchTarget(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels) {
 		this.backend = backend;
-		this.searchPredicateFactory = new ElasticsearchSearchPredicateFactoryImpl( indexModels );
+		this.searchPredicateFactory = new SearchPredicateFactoryImpl( indexModels );
 		this.indexModels = indexModels;
 		this.indexNames = indexModels.stream()
 				.map( ElasticsearchIndexModel::getIndexName )
@@ -61,7 +69,8 @@ class ElasticsearchIndexSearchTarget implements IndexSearchTarget, SearchTargetC
 
 	@Override
 	public SearchPredicateContainerContext<SearchPredicate> predicate() {
-		return new SingleSearchPredicateContainerContext( this );
+		return new SearchPredicateContainerContextImpl<>(
+				this, new QuerySearchPredicateBuildingRootContextImpl<>( this ) );
 	}
 
 	@Override
@@ -75,7 +84,22 @@ class ElasticsearchIndexSearchTarget implements IndexSearchTarget, SearchTargetC
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateFactory getSearchPredicateFactory() {
+	public SearchPredicate toSearchPredicate(SearchPredicateContributor<ElasticsearchSearchPredicateCollector> contributor) {
+		ElasticsearchSingleSearchPredicateCollector collector = new ElasticsearchSingleSearchPredicateCollector();
+		contributor.contribute( collector );
+		return new ElasticsearchSearchPredicate( collector.toJson() );
+	}
+
+	@Override
+	public SearchPredicateContributor<ElasticsearchSearchPredicateCollector> toContributor(SearchPredicate predicate) {
+		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
+		}
+		return (ElasticsearchSearchPredicate) predicate;
+	}
+
+	@Override
+	public SearchPredicateFactory<ElasticsearchSearchPredicateCollector> getSearchPredicateFactory() {
 		return searchPredicateFactory;
 	}
 

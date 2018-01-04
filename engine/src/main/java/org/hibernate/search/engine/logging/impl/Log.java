@@ -34,4 +34,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 6, value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
+
+	@Message(id = 11, value = "Cannot add multiple predicates to the query root.")
+	SearchException cannotAddMultiplePredicatesToQueryRoot();
 }

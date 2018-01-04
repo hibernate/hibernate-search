@@ -13,28 +13,27 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-
-import com.google.gson.JsonObject;
 
 
 /**
  * @author Yoann Rodiere
  */
-class MatchPredicateFieldSetContextImpl<N>
-		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext {
+class MatchPredicateFieldSetContextImpl<N, C>
+		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
 
-	private final CommonState<N> commonState;
+	private final CommonState<N, C> commonState;
 
-	private final List<MatchPredicateBuilder> queryBuilders = new ArrayList<>();
+	private final List<MatchPredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	public MatchPredicateFieldSetContextImpl(CommonState<N> commonState, List<String> fieldNames) {
+	public MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		ElasticsearchSearchPredicateFactory clauseFactory =
+		SearchPredicateFactory<C> clauseFactory =
 				commonState.getTargetContext().getSearchPredicateFactory();
 		for ( String fieldName : fieldNames ) {
 			queryBuilders.add( clauseFactory.match( fieldName ) );
@@ -58,13 +57,13 @@ class MatchPredicateFieldSetContextImpl<N>
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
-		queryBuilders.stream().map( SearchPredicateBuilder::build ).forEach( collector );
+	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector) {
+		queryBuilders.forEach( collector );
 	}
 
-	public static class CommonState<N> extends MultiFieldPredicateCommonState<N, MatchPredicateFieldSetContextImpl<N>> {
+	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, MatchPredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
+		public CommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
 			super( targetContext, nextContextProvider );
 		}
 
@@ -73,7 +72,7 @@ class MatchPredicateFieldSetContextImpl<N>
 			return getNextContextProvider().get();
 		}
 
-		private Stream<MatchPredicateBuilder> getQueryBuilders() {
+		private Stream<MatchPredicateBuilder<C>> getQueryBuilders() {
 			return getFieldSetContexts().stream().flatMap( f -> f.queryBuilders.stream() );
 		}
 

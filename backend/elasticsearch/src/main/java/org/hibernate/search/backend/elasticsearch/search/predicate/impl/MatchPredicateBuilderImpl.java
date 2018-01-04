@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,7 +17,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder implements MatchPredicateBuilder {
+class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+		implements MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonElement> VALUE = JsonAccessor.root().property( "value" );
 
@@ -34,12 +37,12 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder implement
 	}
 
 	@Override
-	public JsonObject build() {
+	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( fieldName, getInnerObject() );
 		outerObject.add( "match", middleObject );
-		return outerObject;
+		collector.collect( outerObject );
 	}
 
 }

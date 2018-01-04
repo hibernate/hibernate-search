@@ -4,16 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
-
-import com.google.gson.JsonObject;
+package org.hibernate.search.engine.search.predicate.spi;
 
 /**
  * @author Yoann Rodiere
  */
-public interface SearchPredicateBuilder {
+public interface BooleanJunctionPredicateBuilder<C> extends SearchPredicateBuilder<C> {
 
-	void boost(float boost);
+	C getMustCollector();
 
-	JsonObject build();
+	C getMustNotCollector();
+
+	C getShouldCollector();
+
+	C getFilterCollector();
+
 }

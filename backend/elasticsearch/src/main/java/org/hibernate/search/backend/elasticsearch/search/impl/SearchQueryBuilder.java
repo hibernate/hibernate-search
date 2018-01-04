@@ -10,14 +10,12 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchQuery;
 
-import com.google.gson.JsonObject;
-
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchSearchQueryBuilder<T> {
+public interface SearchQueryBuilder<T, C> {
 
-	void setRootQueryClause(JsonObject rootQueryClause);
+	C getPredicateCollector();
 
 	void addRoutingKey(String routingKey);
 

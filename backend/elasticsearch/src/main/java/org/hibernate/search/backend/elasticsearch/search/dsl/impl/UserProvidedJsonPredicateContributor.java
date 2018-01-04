@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
-import java.util.function.Consumer;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class UserProvidedJsonPredicateContributor implements ElasticsearchSearchPredicateContributor {
+class UserProvidedJsonPredicateContributor implements SearchPredicateContributor<ElasticsearchSearchPredicateCollector> {
 
 	private static final Gson GSON = new GsonBuilder().create();
 
@@ -27,8 +27,8 @@ class UserProvidedJsonPredicateContributor implements ElasticsearchSearchPredica
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
-		collector.accept( json );
+	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+		collector.collect( json );
 	}
 
 }

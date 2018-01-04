@@ -7,24 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-
-import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
 /**
  * @author Yoann Rodiere
  */
-class MatchPredicateContextImpl<N> implements MatchPredicateContext<N>, ElasticsearchSearchPredicateContributor {
+class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, SearchPredicateContributor<C> {
 
-	private final MatchPredicateFieldSetContextImpl.CommonState<N> commonState;
+	private final MatchPredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public MatchPredicateContextImpl(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
-		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<N>( targetContext, nextContextProvider );
+	public MatchPredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
+		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( targetContext, nextContextProvider );
 	}
 
 	@Override
@@ -33,7 +32,7 @@ class MatchPredicateContextImpl<N> implements MatchPredicateContext<N>, Elastics
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
+	public void contribute(C collector) {
 		commonState.contribute( collector );
 	}
 

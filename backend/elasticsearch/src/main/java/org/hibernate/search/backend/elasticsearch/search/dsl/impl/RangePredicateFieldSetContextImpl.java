@@ -13,30 +13,29 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilder;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
-
-import com.google.gson.JsonObject;
 
 
 /**
  * @author Yoann Rodiere
  */
-class RangePredicateFieldSetContextImpl<N>
-		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext {
+class RangePredicateFieldSetContextImpl<N, C>
+		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
 
-	private final CommonState<N> commonState;
+	private final CommonState<N, C> commonState;
 
-	private final List<RangePredicateBuilder> queryBuilders = new ArrayList<>();
+	private final List<RangePredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	public RangePredicateFieldSetContextImpl(CommonState<N> commonState, List<String> fieldNames) {
+	public RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		ElasticsearchSearchPredicateFactory clauseFactory =
+		SearchPredicateFactory<C> clauseFactory =
 				commonState.getTargetContext().getSearchPredicateFactory();
 		for ( String fieldName : fieldNames ) {
 			queryBuilders.add( clauseFactory.range( fieldName ) );
@@ -70,13 +69,13 @@ class RangePredicateFieldSetContextImpl<N>
 	}
 
 	@Override
-	public void contribute(Consumer<JsonObject> collector) {
-		queryBuilders.stream().map( SearchPredicateBuilder::build ).forEach( collector );
+	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector) {
+		queryBuilders.forEach( collector );
 	}
 
-	public static class CommonState<N> extends MultiFieldPredicateCommonState<N, RangePredicateFieldSetContextImpl<N>> {
+	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchTargetContext targetContext, Supplier<N> nextContextProvider) {
+		public CommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
 			super( targetContext, nextContextProvider );
 		}
 
@@ -118,7 +117,7 @@ class RangePredicateFieldSetContextImpl<N>
 			return getNextContextProvider().get();
 		}
 
-		private Stream<RangePredicateBuilder> getQueryBuilders() {
+		private Stream<RangePredicateBuilder<C>> getQueryBuilders() {
 			return getFieldSetContexts().stream().flatMap( f -> f.queryBuilders.stream() );
 		}
 

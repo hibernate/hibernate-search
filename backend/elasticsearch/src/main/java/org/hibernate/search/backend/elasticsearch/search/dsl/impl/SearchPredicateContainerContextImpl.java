@@ -9,74 +9,67 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchSearchContainerContextExtension;
-import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractSearchPredicateContainerContext<N> implements ElasticsearchSearchPredicateContainerContext<N> {
+public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicateContainerContext<N> {
 
-	private final SearchTargetContext targetContext;
+	private final SearchTargetContext<C> targetContext;
 
-	public AbstractSearchPredicateContainerContext(SearchTargetContext targetContext) {
+	private final SearchDslContext<N, C> dslContext;
+
+	public SearchPredicateContainerContextImpl(SearchTargetContext<C> targetContext, SearchDslContext<N, C> dslContext) {
 		this.targetContext = targetContext;
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> bool() {
-		BooleanJunctionPredicateContextImpl<N> child = new BooleanJunctionPredicateContextImpl<>( targetContext, this::getNext );
-		add( child );
+		BooleanJunctionPredicateContextImpl<N, C> child = new BooleanJunctionPredicateContextImpl<>( targetContext, dslContext::getNextContext );
+		dslContext.addContributor( child );
 		return child;
 	}
 
 	@Override
 	public MatchPredicateContext<N> match() {
-		MatchPredicateContextImpl<N> child = new MatchPredicateContextImpl<>( targetContext, this::getNext );
-		add( child );
+		MatchPredicateContextImpl<N, C> child = new MatchPredicateContextImpl<>( targetContext, dslContext::getNextContext );
+		dslContext.addContributor( child );
 		return child;
 	}
 
 	@Override
 	public RangePredicateContext<N> range() {
-		RangePredicateContextImpl<N> child = new RangePredicateContextImpl<>( targetContext, this::getNext );
-		add( child );
+		RangePredicateContextImpl<N, C> child = new RangePredicateContextImpl<>( targetContext, dslContext::getNextContext );
+		dslContext.addContributor( child );
 		return child;
 	}
 
 	@Override
 	public N predicate(SearchPredicate predicate) {
-		add( ElasticsearchSearchPredicate.cast( predicate ) );
-		return getNext();
+		dslContext.addContributor( targetContext.toContributor( predicate ) );
+		return dslContext.getNextContext();
 	}
-
-	@Override
-	public N fromJsonString(String jsonString) {
-		add( new UserProvidedJsonPredicateContributor( jsonString ) );
-		return getNext();
-	}
-
-	protected abstract void add(ElasticsearchSearchPredicateContributor child);
-
-	protected abstract N getNext();
 
 	@Override
 	public <T> T withExtension(SearchPredicateContainerContextExtension<N, T> extension) {
-		return extension.extendOrFail( this );
+		return extension.extendOrFail( this, targetContext, dslContext );
 	}
 
 	@Override
 	public <T> N withExtensionOptional(
 			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> clauseContributor) {
-		extension.extendOptional( this ).ifPresent( clauseContributor );
-		return getNext();
+		extension.extendOptional( this, targetContext, dslContext ).ifPresent( clauseContributor );
+		return dslContext.getNextContext();
 	}
 
 	@Override
@@ -84,18 +77,14 @@ abstract class AbstractSearchPredicateContainerContext<N> implements Elasticsear
 			SearchPredicateContainerContextExtension<N, T> extension,
 			Consumer<T> clauseContributor,
 			Consumer<SearchPredicateContainerContext<N>> fallbackClauseContributor) {
-		Optional<T> optional = extension.extendOptional( this );
+		Optional<T> optional = extension.extendOptional( this, targetContext, dslContext );
 		if ( optional.isPresent() ) {
 			clauseContributor.accept( optional.get() );
 		}
 		else {
 			fallbackClauseContributor.accept( this );
 		}
-		return getNext();
-	}
-
-	private <T extends SearchPredicateContainerContext<N>> boolean supportsExtension(SearchPredicateContainerContextExtension<N, T> extension) {
-		return extension == ElasticsearchSearchContainerContextExtension.get();
+		return dslContext.getNextContext();
 	}
 
 }
