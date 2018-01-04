@@ -19,8 +19,6 @@ public final class ObjectHitAggregator<R, O> implements HitAggregator<LoadingHit
 
 	private final ArrayList<R> referencesToLoad = new ArrayList<>();
 
-	private boolean currentHitCollected = false;
-
 	public ObjectHitAggregator(ObjectLoader<R, O> objectLoader) {
 		this.objectLoader = objectLoader;
 	}
