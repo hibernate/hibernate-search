@@ -160,6 +160,9 @@
                 <include>org.jboss.spec.javax.annotation:*</include>
                 <include>org.hibernate.javax.persistence:*</include>
                 <include>org.jboss.spec.javax.transaction:*</include>
+                <include>javax.batch:javax.batch-api</include>
+                <include>javax.inject:javax.inject</include>
+                <include>javax.enterprise:cdi-api</include>
             </includes>
         </dependencySet>
 
