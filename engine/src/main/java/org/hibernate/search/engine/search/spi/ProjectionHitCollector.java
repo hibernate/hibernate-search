@@ -6,5 +6,16 @@
  */
 package org.hibernate.search.engine.search.spi;
 
+/**
+ * A hit collector used when projecting: it allows both to retrieve hits as is,
+ * and to mark references for later loading.
+ * <p>
+ * Instances are usually provided by {@link HitAggregator#nextCollector()}.
+ *
+ * @param <R> The type of references that can be loaded.
+ *
+ * @see HitCollector
+ * @see LoadingHitCollector
+ */
 public interface ProjectionHitCollector<R> extends HitCollector<Object>, LoadingHitCollector<R> {
 }

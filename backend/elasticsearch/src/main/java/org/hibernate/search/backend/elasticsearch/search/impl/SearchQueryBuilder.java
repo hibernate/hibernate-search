@@ -11,7 +11,10 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchQuery;
 
 /**
- * @author Yoann Rodiere
+ * A builder for search queries.
+ *
+ * @param <T> The type of query results
+ * @param <C> The type of predicate collector
  */
 public interface SearchQueryBuilder<T, C> {
 

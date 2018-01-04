@@ -7,7 +7,13 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 /**
- * @author Yoann Rodiere
+ * A factory for search predicates.
+ * <p>
+ * This is the main entry point for the engine
+ * to ask the backend to build search predicates.
+ *
+ * @param <C> The type of predicate collector the builders contributor will contribute to.
+ * This type is backend-specific. See {@link SearchPredicateBuilder#contribute(Object)}
  */
 public interface SearchPredicateFactory<C> {
 

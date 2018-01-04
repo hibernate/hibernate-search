@@ -8,7 +8,9 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * @author Yoann Rodiere
+ * A context that can be ended explicitly, to get a result or get back to the parent context.
+ *
+ * @param <N> The type of the next context (returned by {@link #end()}).
  */
 public interface ExplicitEndContext<N> {
 

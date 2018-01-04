@@ -6,10 +6,22 @@
  */
 package org.hibernate.search.engine.search.dsl.spi;
 
+/**
+ * Represents the current context in the search DSL,
+ * i.e. the current position in the predicate tree.
+ */
 public interface SearchDslContext<N, C> {
 
+	/**
+	 * Add a predicate contributor at the current position in the predicate tree.
+	 *
+	 * @param child The contributor to add.
+	 */
 	void addContributor(SearchPredicateContributor<C> child);
 
+	/**
+	 * @return The context that should be exposed to the user after the current predicate has been fully defined.
+	 */
 	N getNextContext();
 
 }

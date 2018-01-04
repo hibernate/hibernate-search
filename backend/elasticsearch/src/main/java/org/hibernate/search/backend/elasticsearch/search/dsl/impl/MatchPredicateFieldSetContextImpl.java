@@ -20,9 +20,6 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 class MatchPredicateFieldSetContextImpl<N, C>
 		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
 

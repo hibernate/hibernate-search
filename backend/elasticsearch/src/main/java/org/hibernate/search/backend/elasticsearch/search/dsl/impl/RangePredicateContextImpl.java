@@ -15,9 +15,6 @@ import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, SearchPredicateContributor<C> {
 
 	private final RangePredicateFieldSetContextImpl.CommonState<N, C> commonState;

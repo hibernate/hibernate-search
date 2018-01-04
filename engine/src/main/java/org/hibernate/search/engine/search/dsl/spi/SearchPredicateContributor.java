@@ -6,8 +6,19 @@
  */
 package org.hibernate.search.engine.search.dsl.spi;
 
+/**
+ * A search predicate contributor, i.e. an object that will push search predicates to a collector.
+ *
+ * @param <C> The type of predicate collector this contributor will contribute to.
+ * This type is backend-specific.
+ */
 public interface SearchPredicateContributor<C> {
 
+	/**
+	 * Add zero or more predicates to the given collector.
+	 *
+	 * @param collector The collector to push search predicates to.
+	 */
 	void contribute(C collector);
 
 }

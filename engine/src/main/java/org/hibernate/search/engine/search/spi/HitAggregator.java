@@ -6,6 +6,16 @@
  */
 package org.hibernate.search.engine.search.spi;
 
+/**
+ * The class responsible for aggregating hits when running a search query.
+ * <p>
+ * Provides one collector per hit, and builds the aggregated result
+ * when all hits have been processed.
+ *
+ * @param <C> The hit collector type. See {@link HitCollector}, {@link LoadingHitCollector}
+ * and {@link ProjectionHitCollector} in particular.
+ * @param <T> The type of the aggregated result.
+ */
 public interface HitAggregator<C, T> {
 
 	/**

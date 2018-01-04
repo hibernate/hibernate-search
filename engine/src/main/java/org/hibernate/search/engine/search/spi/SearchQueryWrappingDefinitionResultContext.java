@@ -11,7 +11,9 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
 /**
- * @author Yoann Rodiere
+ * The context used when building a query, when a query wrapper can be defined.
+ * <p>
+ * The query wrapper will be applied when the query is finally built.
  */
 public interface SearchQueryWrappingDefinitionResultContext<Q> extends SearchQueryResultContext<Q> {
 

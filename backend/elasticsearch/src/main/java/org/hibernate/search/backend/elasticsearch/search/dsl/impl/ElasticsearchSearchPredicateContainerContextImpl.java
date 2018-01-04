@@ -8,12 +8,10 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.spi.DelegatingSearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public class ElasticsearchSearchPredicateContainerContextImpl<N>
 		extends DelegatingSearchPredicateContainerContextImpl<N>
 		implements ElasticsearchSearchPredicateContainerContext<N> {

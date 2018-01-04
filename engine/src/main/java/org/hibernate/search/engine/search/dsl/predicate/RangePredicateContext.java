@@ -8,7 +8,10 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * @author Yoann Rodiere
+ * The context used when starting to define a range predicate.
+ *
+ * @param <N> The type of the next context (returned by {@link RangePredicateFieldSetContext#above(Object)}
+ * or {@link RangePredicateFromContext#to(Object)} for example).
  */
 public interface RangePredicateContext<N> {
 

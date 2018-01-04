@@ -13,9 +13,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
 class UserProvidedJsonPredicateContributor implements SearchPredicateContributor<ElasticsearchSearchPredicateCollector> {
 
 	private static final Gson GSON = new GsonBuilder().create();

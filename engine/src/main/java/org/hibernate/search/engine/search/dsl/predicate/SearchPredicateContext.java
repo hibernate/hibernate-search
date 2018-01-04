@@ -8,7 +8,9 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * @author Yoann Rodiere
+ * A superinterface for contexts allowing to define predicates.
+ *
+ * @param <S> The "self" type (the actual type of this context)
  */
 public interface SearchPredicateContext<S> {
 

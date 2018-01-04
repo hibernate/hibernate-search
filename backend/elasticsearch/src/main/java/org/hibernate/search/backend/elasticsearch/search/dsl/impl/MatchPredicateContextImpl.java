@@ -15,9 +15,6 @@ import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, SearchPredicateContributor<C> {
 
 	private final MatchPredicateFieldSetContextImpl.CommonState<N, C> commonState;

@@ -8,6 +8,15 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
 
 import com.google.gson.JsonObject;
 
+
+/**
+ * A predicate collector for Elasticsearch, using JSON to represent predicates.
+ * <p>
+ * Used by Elasticsearch-specific predicate contributors.
+ *
+ * @see org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor
+ * @see org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder
+ */
 public interface ElasticsearchSearchPredicateCollector {
 
 	void collect(JsonObject jsonQuery);

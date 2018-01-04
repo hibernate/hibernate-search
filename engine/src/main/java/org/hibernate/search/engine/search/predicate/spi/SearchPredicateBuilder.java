@@ -8,9 +8,6 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
 
-/**
- * @author Yoann Rodiere
- */
 public interface SearchPredicateBuilder<C> extends SearchPredicateContributor<C> {
 
 	void boost(float boost);

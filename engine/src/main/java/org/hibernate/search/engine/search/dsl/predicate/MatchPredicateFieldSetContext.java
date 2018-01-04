@@ -8,7 +8,9 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * @author Yoann Rodiere
+ * The context used when defining a match predicate, after at least one field was mentioned.
+ *
+ * @param <N> The type of the next context (returned by {@link #matching(Object)}).
  */
 public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<MatchPredicateFieldSetContext<N>> {
 

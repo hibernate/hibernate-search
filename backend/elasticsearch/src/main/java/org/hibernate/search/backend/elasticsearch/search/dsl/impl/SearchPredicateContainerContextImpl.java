@@ -19,9 +19,6 @@ import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicateContainerContext<N> {
 
 	private final SearchTargetContext<C> targetContext;

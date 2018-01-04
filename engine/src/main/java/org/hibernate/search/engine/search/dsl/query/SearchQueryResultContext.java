@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 
 /**
- * @author Yoann Rodiere
+ * The context used when building a query, after the search result type has been defined.
  */
 public interface SearchQueryResultContext<Q> {
 

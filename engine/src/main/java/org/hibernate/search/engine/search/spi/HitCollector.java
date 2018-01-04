@@ -6,6 +6,14 @@
  */
 package org.hibernate.search.engine.search.spi;
 
+/**
+ * A simple hit collector that stores the provided hit for later retrieval,
+ * potentially transforming it in the process.
+ * <p>
+ * Instances are usually provided by {@link HitAggregator#nextCollector()}.
+ *
+ * @param <T> The type of hit this collector can collect.
+ */
 public interface HitCollector<T> {
 
 	void collect(T hit);

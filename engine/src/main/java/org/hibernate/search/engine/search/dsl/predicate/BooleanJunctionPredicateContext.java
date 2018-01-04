@@ -11,7 +11,9 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.SearchPredicate;
 
 /**
- * @author Yoann Rodiere
+ * The context used when defining a boolean junction, allowing in particular to add clauses.
+ *
+ * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
  */
 public interface BooleanJunctionPredicateContext<N> extends SearchPredicateContext<BooleanJunctionPredicateContext<N>>, ExplicitEndContext<N> {
 

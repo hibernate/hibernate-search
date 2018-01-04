@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.Collection;
 
 /**
- * @author Yoann Rodiere
+ * The context used when building a query, after the search predicate has been defined.
  */
 public interface SearchQueryContext<Q> {
 

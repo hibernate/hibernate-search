@@ -13,7 +13,10 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;
 
 /**
- * @author Yoann Rodiere
+ * A context allowing to specify the type of a predicate.
+ *
+ * @param <N> The type of the next context (returned by terminal calls such as {@link BooleanJunctionPredicateContext#end()}
+ * or {@link MatchPredicateFieldSetContext#matching(Object)}).
  */
 public interface SearchPredicateContainerContext<N> {
 
