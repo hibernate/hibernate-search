@@ -4,22 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
+package org.hibernate.search.engine.search.dsl.spi;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.spi.SearchQueryWrappingDefinitionResultContext;
 
 
-public class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
+public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 		implements SearchQueryResultContext<Q>, SearchQueryWrappingDefinitionResultContext<Q> {
 
 	private final SearchTargetContext<C> targetContext;

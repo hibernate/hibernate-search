@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchTargetContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.SearchQueryWrappingDefinitionResultContextImpl;
+import org.hibernate.search.engine.search.dsl.spi.SearchQueryWrappingDefinitionResultContextImpl;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;

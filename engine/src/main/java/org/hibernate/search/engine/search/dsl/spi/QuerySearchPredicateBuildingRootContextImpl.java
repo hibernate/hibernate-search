@@ -4,16 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
+package org.hibernate.search.engine.search.dsl.spi;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.util.spi.LoggerFactory;
 
-public class QuerySearchPredicateBuildingRootContextImpl<C>
+final class QuerySearchPredicateBuildingRootContextImpl<C>
 		implements SearchDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
@@ -22,7 +19,7 @@ public class QuerySearchPredicateBuildingRootContextImpl<C>
 
 	private SearchPredicateContributor<C> singlePredicateContributor;
 
-	public QuerySearchPredicateBuildingRootContextImpl(SearchTargetContext<C> targetContext) {
+	QuerySearchPredicateBuildingRootContextImpl(SearchTargetContext<C> targetContext) {
 		this.targetContext = targetContext;
 	}
 
