@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.engine.search;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Loads objects into memory using a reference and implementation-specific context.
@@ -30,18 +27,7 @@ public interface ObjectLoader<R, O> {
 	 * @return A list of loaded objects, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.
 	 */
-	default List<O> load(List<R> references) {
-		List<O> result = new ArrayList<>( references.size() );
-		Map<R, O> objectsByReference = new HashMap<>( references.size() );
-		for ( R reference : references ) {
-			objectsByReference.put( reference, null );
-		}
-		load( references );
-		for ( R reference : references ) {
-			result.add( objectsByReference.get( reference ) );
-		}
-		return result;
-	}
+	List<O> load(List<R> references);
 
 	static <T> ObjectLoader<T, T> identity() {
 		return IdentityObjectLoader.get();
