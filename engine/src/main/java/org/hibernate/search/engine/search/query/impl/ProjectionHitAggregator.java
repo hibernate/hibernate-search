@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.spi;
+package org.hibernate.search.engine.search.query.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,6 +14,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 public final class ProjectionHitAggregator<R, T> implements HitAggregator<ProjectionHitCollector<R>, List<T>> {
 

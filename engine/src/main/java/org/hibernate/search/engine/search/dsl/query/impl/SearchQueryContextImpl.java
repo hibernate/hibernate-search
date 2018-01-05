@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.query.impl;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 

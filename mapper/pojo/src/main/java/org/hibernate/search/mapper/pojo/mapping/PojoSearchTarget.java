@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.spi.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface PojoSearchTarget<T> {
 

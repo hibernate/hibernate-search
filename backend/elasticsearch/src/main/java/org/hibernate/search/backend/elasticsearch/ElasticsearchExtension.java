@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateContainerContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchTargetContext;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;

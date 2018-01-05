@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.dsl.spi;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.impl.QuerySearchPredicateBuildingRootContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
 
 public final class SearchTargetPredicateRootContext<C> extends SearchPredicateContainerContextImpl<SearchPredicate, C> {
