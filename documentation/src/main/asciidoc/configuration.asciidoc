@@ -1409,7 +1409,9 @@ is automatically activated (added to the classpath of your deployment) if you ar
 WildFly 11 includes an older version of Hibernate Search; if you want to use that then you won't need to download anything else and you can stop reading this chapter; however you might miss out on several new features and improvements.
 When deciding to use the older version make sure to read the version of this guide matching the version of Hibernate Search included in your application server: this guide applies to `{hibernateSearchVersion}` exclusively.
 
-We strongly suggest using the latest version. Doing so is not much harder: download the latest modules and set the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml` to the chosen version. Further details are provided below.
+We strongly suggest using the latest version. Doing so is not much harder: install the latest modules and their dependencies,
+and set the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml` to the chosen version.
+Further details are provided below.
 
 The modules system in WildFly allows to safely run multiple versions of Hibernate ORM and
 Hibernate Search in parallel, but if you download an alternative version make sure the Hibernate Search version you choose
@@ -1417,16 +1419,12 @@ is compatible with the Hibernate ORM version you choose.
 
 [WARNING]
 ====
-This version of Hibernate Search `{hibernateSearchVersion}` requires an Hibernate ORM version `5.2.3.Final` or a later version
-of the 5.2 branch, such as `{hibernateVersion}`.
-When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
-
 The modules distributed by Hibernate Search `{hibernateSearchVersion}` are meant for WildFly 11.
 
-WildFly includes an older version of Hibernate ORM, so you will need to upgrade this dependency as well.
-The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
-
-Not least, as the same guide explains you might need to exclude the Javassist version.
+WildFly 11 includes older versions of Hibernate Search dependencies,
+so in order to update Hibernate Search, you will need to upgrade the dependencies as well,
+otherwise your application will not start.
+See <<updating-wildfly-hibernatesearch-versions>> for more information.
 ====
 
 [[using-wildfly-provided-hibernatesearch-versions]]
@@ -1445,6 +1443,7 @@ set the following property in your `persistence.xml`:
 wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:main
 ====
 
+[[updating-wildfly-hibernatesearch-versions]]
 ==== Update and activate latest Hibernate Search version in WildFly
 
 You can download the latest Hibernate Search provided module and install it. This is often the
@@ -1458,7 +1457,7 @@ http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearc
 As a convenience these zip files are also distributed as Maven artifacts:
 link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-11-dist:zip].
 
-Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search and Apache Lucene.
+Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search.
 The public API modules of Hibernate Search modules are:
 
 * _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
@@ -1468,6 +1467,36 @@ The public API modules of Hibernate Search modules are:
 
 The package includes several more modules but you should not need to refer to the other ones directly.
 
+You will also need to update the dependencies of Hibernate Search. Here is a list of the dependencies to update:
+
+* Hibernate ORM version `5.2.3.Final` or a later version of the 5.2 branch, such as `{hibernateVersion}`.
+  When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
+  The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
+* Lucene version `{luceneVersion}`.
+  The Hibernate team publishes JBoss modules of Lucene as part of
+  https://github.com/hibernate/lucene-jbossmodules[this project].
+  See the README for download and usage instructions.
+  The modules are published to Maven repositories as ZIPs
+  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/lucene-jbossmodules/lucene-jbossmodules/[here] for downloads),
+  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
+* Elasticsearch-client version `{elasticsearchClientVersion}`.
+  The Hibernate team publishes JBoss modules of Elasticsearch-client as part of
+  https://github.com/hibernate/elasticsearch-client-jbossmodules[this project].
+  The modules are published to Maven repositories as ZIPs
+  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/elasticsearch-client-jbossmodules/elasticsearch-client-jbossmodules/[here] for downloads),
+  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
+* Gson version `{gsonVersion}`.
+  The Hibernate team publishes JBoss modules of Gson as part of
+  https://github.com/hibernate/gson-jbossmodules[this project].
+  The modules are published to Maven repositories as ZIPs
+  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/gson-jbossmodules/gson-jbossmodules/[here] for downloads),
+  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
+* AWSv4 signer for Java version `{awsV4SignerJavaVersion}`.
+  The Hibernate team publishes JBoss modules of AWSv4 signer for Java as part of
+  https://github.com/hibernate/aws-v4-signer-java-jbossmodules[this project].
+  The modules are published to Maven repositories as ZIPs
+  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/aws-v4-signer-java-jbossmodules/aws-v4-signer-java-jbossmodules/[here] for downloads),
+  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
 
 Next you will need to make sure the JPA subsystem of WildFly provides you with the version you have chosen, instead of the default version
 bundled with the application server.

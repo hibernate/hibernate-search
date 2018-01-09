@@ -176,6 +176,9 @@
                         <infinispanVersion>${infinispanVersion}</infinispanVersion>
                         <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
                         <tikaModuleVersion>${tikaVersion}</tikaModuleVersion>
+                        <elasticsearchClientVersion>${elasticsearchClientVersion}</elasticsearchClientVersion>
+                        <gsonVersion>${gsonVersion}</gsonVersion>
+                        <awsV4SignerJavaVersion>${awsV4SignerJavaVersion}</awsV4SignerJavaVersion>
                     </attributes>
                 </configuration>
             </plugin>
