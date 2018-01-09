@@ -1464,6 +1464,7 @@ The public API modules of Hibernate Search modules are:
 * _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
 * _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
 * _org.hibernate.search.elasticsearch_, to use the Elasticsearch integration.
+* _org.hibernate.search.jsr352_, to use the JSR-352 integration.
 
 The package includes several more modules but you should not need to refer to the other ones directly.
 
