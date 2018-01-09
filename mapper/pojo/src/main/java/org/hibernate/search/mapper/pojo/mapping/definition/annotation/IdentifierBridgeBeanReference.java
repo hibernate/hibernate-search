@@ -20,14 +20,14 @@ import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 // TODO repeatable
-public @interface IdentifierConverterBeanReference {
+public @interface IdentifierBridgeBeanReference {
 
 	String name() default "";
 
 	Class<? extends IdentifierBridge<?>> type() default UndefinedImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of the {@link IdentifierConverterBeanReference#type()} attribute.
+	 * Class used as a marker for the default value of the {@link IdentifierBridgeBeanReference#type()} attribute.
 	 */
 	abstract class UndefinedImplementationType implements IdentifierBridge<Object> {
 		private UndefinedImplementationType() {

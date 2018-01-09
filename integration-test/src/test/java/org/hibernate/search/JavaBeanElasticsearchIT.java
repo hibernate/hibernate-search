@@ -111,7 +111,7 @@ public class JavaBeanElasticsearchIT {
 		secondMappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
 				.property( "id" )
-						.documentId().bridge( DefaultIntegerIdentifierBridge.class )
+						.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 				.property( "numeric" )
 						.field()
 						.field().name( "numericAsString" ).bridge( IntegerAsStringFunctionBridge.class );

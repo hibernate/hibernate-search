@@ -21,6 +21,6 @@ import java.lang.annotation.Target;
 // TODO repeatable
 public @interface DocumentId {
 
-	IdentifierConverterBeanReference converter() default @IdentifierConverterBeanReference;
+	IdentifierBridgeBeanReference identifierBridge() default @IdentifierBridgeBeanReference;
 
 }

@@ -13,10 +13,10 @@ import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
  */
 public interface PropertyDocumentIdMappingContext extends PropertyMappingContext {
 
-	PropertyDocumentIdMappingContext bridge(String bridgeName);
+	PropertyDocumentIdMappingContext identifierBridge(String bridgeName);
 
-	PropertyDocumentIdMappingContext bridge(Class<? extends IdentifierBridge<?>> bridgeClass);
+	PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass);
 
-	PropertyDocumentIdMappingContext bridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass);
+	PropertyDocumentIdMappingContext identifierBridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass);
 
 }

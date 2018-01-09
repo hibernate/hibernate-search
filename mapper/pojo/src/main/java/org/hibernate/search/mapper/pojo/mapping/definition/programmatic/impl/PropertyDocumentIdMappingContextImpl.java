@@ -40,19 +40,19 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext bridge(String bridgeName) {
+	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName) {
 		this.bridgeReference = new ImmutableBeanReference<>( bridgeName );
 		return this;
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext bridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
+	public PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
 		this.bridgeReference = new ImmutableBeanReference<>( bridgeClass );
 		return this;
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext bridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass) {
+	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass) {
 		this.bridgeReference = new ImmutableBeanReference<>( bridgeName, bridgeClass );
 		return this;
 	}
