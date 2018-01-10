@@ -399,13 +399,20 @@ public class QueryHits {
 	}
 
 	private ArrayList<Facet> updateStringFacets(DiscreteFacetRequest facetRequest, FacetMetadata facetMetadata) throws IOException {
+		ArrayList<Facet> facets = new ArrayList<>();
 		SortedSetDocValuesReaderState docValuesReaderState;
 		try {
 			docValuesReaderState = new DefaultSortedSetDocValuesReaderState( searcher.getIndexReader() );
 		}
 		catch (IllegalArgumentException e) {
-			// happens in case there are no facets at all configured for the matching documents
-			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+			/*
+			 * Happens in case there are no facets at all stored in the matching documents.
+			 * But we know the target field is correctly configured to generate facets,
+			 * because we managed to retrieve the FacetMetadata.
+			 * So we can safely return an empty list: the matching documents simply do not have
+			 * any value for this field.
+			 */
+			return facets;
 		}
 		SortedSetDocValuesFacetCounts facetCounts = new SortedSetDocValuesFacetCounts(
 				docValuesReaderState,
@@ -425,10 +432,16 @@ public class QueryHits {
 			facetResult = facetCounts.getTopChildren( maxFacetCount, facetRequest.getFieldName() );
 		}
 		catch (IllegalArgumentException e) {
-			// happens in case there are facets in general, but not for this specific field
-			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+			/*
+			 * Happens in case there are facets stored in the matching documents in general,
+			 * but not for this specific field.
+			 * But we know this field is correctly configured to generate facets,
+			 * because we managed to retrieve the FacetMetadata.
+			 * So we can safely return an empty list: the matching documents simply do not have
+			 * any value for this field.
+			 */
+			return facets;
 		}
-		ArrayList<Facet> facets = new ArrayList<>();
 		if ( facetResult != null ) {
 			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
 				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
