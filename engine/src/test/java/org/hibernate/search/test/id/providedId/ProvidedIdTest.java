@@ -99,7 +99,7 @@ public class ProvidedIdTest {
 		);
 
 		QueryHits queryHits = new QueryHits(
-				lowLevelSearcher, QueryFilters.EMPTY_FILTERSET, null,
+				lowLevelSearcher, QueryFilters.EMPTY_FILTERSET, null, true,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, extendedIntegrator.getTimingSource() ),
 				null,
 				null,
