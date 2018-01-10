@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 /**
  * @author Yoann Rodiere
  */
-public interface HibernateOrmSearchQueryQueryResultDefinitionContext<O>
+public interface HibernateOrmSearchQueryResultDefinitionContext<O>
 		extends org.hibernate.search.mapper.orm.jpa.HibernateOrmSearchQueryResultDefinitionContext<O> {
 
 	@Override

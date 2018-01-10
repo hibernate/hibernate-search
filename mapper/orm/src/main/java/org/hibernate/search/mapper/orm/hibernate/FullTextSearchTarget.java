@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.hibernate;
 
-public interface HibernateOrmSearchTarget<T>
-		extends org.hibernate.search.mapper.orm.jpa.HibernateOrmSearchTarget<T> {
+public interface FullTextSearchTarget<T>
+		extends org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget<T> {
 
 	@Override
-	HibernateOrmSearchQueryResultDefinitionContext<T> jpaQuery();
+	HibernateOrmSearchQueryResultDefinitionContext<T> query();
 
 }

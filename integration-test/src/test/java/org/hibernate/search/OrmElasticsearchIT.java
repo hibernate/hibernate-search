@@ -35,6 +35,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchC
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.mapper.model.spi.SearchModel;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
@@ -54,6 +55,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContribu
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
@@ -329,6 +331,7 @@ public class OrmElasticsearchIT {
 			FullTextQuery<ParentIndexedEntity> query = ftSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
+					.query()
 					.asEntities()
 					.predicate( root -> root.bool()
 							.must().match()
@@ -435,12 +438,117 @@ public class OrmElasticsearchIT {
 	}
 
 	@Test
+	public void search_separatePredicate() throws JSONException {
+		try (Session session = sessionFactory.openSession()) {
+			FullTextSession ftSession = Search.getFullTextSession( session );
+			FullTextSearchTarget<ParentIndexedEntity> target = ftSession.search(
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			);
+
+			SearchPredicate nestedPredicate = target.predicate()
+					.range()
+							.onField( "myLocalDateField" )
+							.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
+							.to( LocalDate.of( 2017, 11, 01 ) );
+			SearchPredicate otherNestedPredicate = target.predicate()
+					.range()
+							.onField( "numeric" )
+							.above( 12 );
+			SearchPredicate predicate = target.predicate()
+					.bool()
+							.must().match()
+									.onField( "myTextField" ).boostedTo( 1.5f )
+									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.matching( "foo" )
+							.should( nestedPredicate )
+							.mustNot().predicate( otherNestedPredicate )
+					.end();
+			FullTextQuery<ParentIndexedEntity> query = target.query()
+					.asEntities()
+					.predicate( predicate )
+					.build();
+			query.setFirstResult( 2 );
+			query.setMaxResults( 10 );
+
+			StubElasticsearchClient.pushStubResponse(
+					"{"
+						+ "'hits': {"
+							+ "'hits': ["
+								+ "{"
+									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_id': '0'"
+								+ "},"
+								+ "{"
+									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_id': '1'"
+								+ "}"
+							+ "]"
+						+ "}"
+					+ "}"
+			);
+			query.list();
+		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
+				HOST_1, "query", null /* No ID */,
+				c -> {
+					c.accept( "offset", "2" );
+					c.accept( "limit", "10" );
+				},
+				"{"
+					+ "'query': {"
+						+ "'bool': {"
+							+ "'must': {"
+								+ "'bool': {"
+									+ "'should': ["
+										+ "{"
+											+ "'match': {"
+												+ "'myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 1.5"
+												+ "}"
+											+ "}"
+										+ "},"
+										+ "{"
+											+ "'match': {"
+												+ "'embedded.myTextField': {"
+													+ "'value': 'foo',"
+													+ "'boost': 0.9"
+												+ "}"
+											+ "}"
+										+ "}"
+									+ "]"
+								+ "}"
+							+ "},"
+							+ "'should': {"
+								+ "'range': {"
+									+ "'myLocalDateField': {"
+										+ "'gt': '2017-10-01',"
+										+ "'lte': '2017-11-01'"
+									+ "}"
+								+ "}"
+							+ "},"
+							+ "'must_not': {"
+								+ "'range': {"
+									+ "'numeric': {"
+										+ "'gte': 12"
+									+ "}"
+								+ "}"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
+	}
+
+	@Test
 	public void search_projection() throws JSONException {
 		try (Session session = sessionFactory.openSession()) {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			FullTextQuery<List<?>> query = ftSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
+					.query()
 					.asProjections(
 							"myTextField",
 							ProjectionConstants.REFERENCE,

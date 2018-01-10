@@ -14,12 +14,12 @@ import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 public interface FullTextSession extends Session, FullTextEntityManager {
 
 	@Override
-	HibernateOrmSearchQueryQueryResultDefinitionContext<Object> search();
+	FullTextSearchTarget<Object> search();
 
 	@Override
-	<T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> search(Class<T> type);
+	<T> FullTextSearchTarget<T> search(Class<T> type);
 
 	@Override
-	<T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types);
+	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);
 
 }

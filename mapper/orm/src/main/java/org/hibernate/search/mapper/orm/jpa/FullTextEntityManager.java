@@ -11,10 +11,10 @@ import javax.persistence.EntityManager;
 
 public interface FullTextEntityManager extends EntityManager {
 
-	HibernateOrmSearchQueryResultDefinitionContext<Object> search();
+	FullTextSearchTarget<Object> search();
 
-	<T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Class<T> type);
+	<T> FullTextSearchTarget<T> search(Class<T> type);
 
-	<T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types);
+	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);
 
 }

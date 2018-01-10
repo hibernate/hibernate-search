@@ -9,13 +9,11 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmProxyIntrospector;
-import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
@@ -31,18 +29,10 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 	}
 
 	@Override
-	public <T> PojoSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
+	public <T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
 		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
 				.createPojoSearchTarget( targetedTypes, getSessionContext() );
 		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
-	}
-
-	@Override
-	public <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(
-			Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
-				.createPojoSearchTarget( targetedTypes, getSessionContext() );
-		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
 	static class Builder extends PojoSearchManagerImpl.Builder<HibernateOrmSearchManager>

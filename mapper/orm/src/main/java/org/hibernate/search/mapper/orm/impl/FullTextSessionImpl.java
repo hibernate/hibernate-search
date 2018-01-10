@@ -10,10 +10,10 @@ import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 
 public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession {
 
@@ -38,18 +38,18 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 	}
 
 	@Override
-	public HibernateOrmSearchQueryQueryResultDefinitionContext<Object> search() {
-		return getSearchManager().searchAsFullTextQuery();
+	public FullTextSearchTarget<Object> search() {
+		return new FullTextSearchTargetImpl<>( getSearchManager().search() );
 	}
 
 	@Override
-	public final <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> search(Class<T> type) {
-		return getSearchManager().searchAsFullTextQuery( type );
+	public final <T> FullTextSearchTarget<T> search(Class<T> type) {
+		return new FullTextSearchTargetImpl<>( getSearchManager().search( type ) );
 	}
 
 	@Override
-	public final <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
-		return getSearchManager().searchAsFullTextQuery( types );
+	public final <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types) {
+		return new FullTextSearchTargetImpl<>( getSearchManager().search( types ) );
 	}
 
 	private HibernateOrmSearchManager getSearchManager() {

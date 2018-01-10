@@ -9,33 +9,22 @@ package org.hibernate.search.mapper.orm.mapping;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 
 public interface HibernateOrmSearchManager extends PojoSearchManager {
 
 	@Override
-	default PojoSearchTarget<Object> search() {
+	default HibernateOrmSearchTarget<Object> search() {
 		return search( Collections.singleton( Object.class ) );
 	}
 
 	@Override
-	default <T> PojoSearchTarget<T> search(Class<T> targetedType) {
+	default <T> HibernateOrmSearchTarget<T> search(Class<T> targetedType) {
 		return search( Collections.singleton( targetedType ) );
 	}
 
 	@Override
-	<T> PojoSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
-
-	default HibernateOrmSearchQueryQueryResultDefinitionContext<Object> searchAsFullTextQuery() {
-		return searchAsFullTextQuery( Collections.singleton( Object.class ) );
-	}
-
-	default <T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(Class<T> targetedType) {
-		return searchAsFullTextQuery( Collections.singleton( targetedType ) );
-	}
-
-	<T> HibernateOrmSearchQueryQueryResultDefinitionContext<T> searchAsFullTextQuery(Collection<? extends Class<? extends T>> targetedTypes);
+	<T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
 
 }

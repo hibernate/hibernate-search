@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.search.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -27,7 +27,7 @@ public class HibernateOrmSearchTargetImpl<T> implements HibernateOrmSearchTarget
 	}
 
 	@Override
-	public HibernateOrmSearchQueryQueryResultDefinitionContext<T> jpaQuery() {
+	public HibernateOrmSearchQueryResultDefinitionContext<T> jpaQuery() {
 		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
