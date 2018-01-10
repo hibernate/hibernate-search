@@ -257,33 +257,6 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${jbosshome}/modules</outputDirectory>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
-                                    <artifactId>elasticsearch-client-jbossmodules</artifactId>
-                                    <version>${elasticsearchClientTestingModuleVersion}</version>
-                                    <classifier>dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.gson-jbossmodules</groupId>
-                                    <artifactId>gson-jbossmodules</artifactId>
-                                    <version>${gsonTestingModuleVersion}</version>
-                                    <classifier>dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
-                                    <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
-                                    <version>${awsV4SignerJavaTestingModuleVersion}</version>
-                                    <classifier>dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
