@@ -33,8 +33,7 @@
         <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>modules</module>
-        <module>integrationtest/testing-jbossmodules</module>
+        <module>jbossmodules</module>
         <module>integrationtest/elasticsearch</module>
         <module>integrationtest/wildfly</module>
         <module>integrationtest/jms</module>

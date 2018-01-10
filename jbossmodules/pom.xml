@@ -1,0 +1,32 @@
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <version>5.9.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hibernate-search-jbossmodules-parent</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search JBoss Modules Aggregator</name>
+    <description>Hibernate Search JBoss Modules Aggregator POM</description>
+
+    <modules>
+        <module>core</module>
+        <module>testing</module>
+    </modules>
+
+    <properties>
+        <hibernate.search.version>${project.version}</hibernate.search.version>
+        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
+        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.module.slot}</infinispan.integration.slot>
+        <tika.module.slot>${tikaVersion}</tika.module.slot>
+    </properties>
+</project>

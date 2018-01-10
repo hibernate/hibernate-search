@@ -8,23 +8,19 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-jbossmodules-parent</artifactId>
         <version>5.9.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>hibernate-search-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Wildfly Module</name>
-    <description>Hibernate Search modules creation to use in JBoss AS / Wildfly</description>
+    <name>Hibernate Search core JBoss Module</name>
+    <description>Hibernate Search core modules creation to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
-        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
-        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.module.slot}</infinispan.integration.slot>
-        <tika.module.slot>${tikaVersion}</tika.module.slot>
     </properties>
 
     <dependencies>
