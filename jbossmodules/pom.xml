@@ -20,6 +20,7 @@
 
     <modules>
         <module>core</module>
+        <module>elasticsearch</module>
         <module>testing</module>
     </modules>
 

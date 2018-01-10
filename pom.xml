@@ -577,6 +577,13 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
+                <version>${project.version}</version>
+                <classifier>wildfly-11-dist</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-sharedtestresources</artifactId>
                 <classifier>build-resources</classifier>
                 <type>zip</type>

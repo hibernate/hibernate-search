@@ -54,16 +54,6 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${module.xml.basedir}/search/elasticsearch/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/search/elasticsearch-aws/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/jsr352/module.xml</source>
             <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -123,26 +113,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jms</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-search-elasticsearch</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
             </includes>
         </dependencySet>
 
