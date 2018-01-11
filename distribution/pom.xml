@@ -113,6 +113,13 @@
             <artifactId>cdi-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-modules</artifactId>
+            <classifier>wildfly-11-dist</classifier>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -156,6 +163,7 @@
                     </descriptors>
                     <finalName>hibernate-search-${project.version}</finalName>
                     <tarLongFileMode>gnu</tarLongFileMode>
+                    <outputDirectory>${project.build.directory}/dist/</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -164,6 +172,25 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-jbossmodules-to-dist</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <phase>install</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dist/</outputDirectory>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeTypes>zip</includeTypes>
+                            <includeClassifiers>wildfly-11-dist</includeClassifiers>
+                            <excludeTransitive>true</excludeTransitive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
