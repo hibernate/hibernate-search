@@ -453,7 +453,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-testing-jbossmodules</artifactId>
+                                            <artifactId>hibernate-search-jbossmodules-testing</artifactId>
                                             <version>${project.version}</version>
                                             <classifier>testing-modules-dist</classifier>
                                             <type>zip</type>
@@ -462,7 +462,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-testing-jbossmodules</artifactId>
+                                            <artifactId>hibernate-search-jbossmodules-testing</artifactId>
                                             <version>${project.version}</version>
                                             <classifier>testing-modules-dist</classifier>
                                             <type>zip</type>
