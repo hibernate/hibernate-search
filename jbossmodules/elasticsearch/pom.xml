@@ -20,6 +20,7 @@
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
+        <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
     </properties>
 
     <dependencies>

@@ -23,6 +23,11 @@
             <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${aliases.xml.basedir}/search/elasticsearch/module.xml</source>
+            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
 
     <dependencySets>
