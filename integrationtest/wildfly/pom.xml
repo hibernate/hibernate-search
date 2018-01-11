@@ -585,6 +585,13 @@
                                 <classifier>wildfly-11-dist</classifier>
                                 <type>zip</type>
                             </dependency>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
+                                <version>${project.version}</version>
+                                <classifier>testing-modules-dist</classifier>
+                                <type>zip</type>
+                            </dependency>
                         </dependencies>
                     </plugin>
                 </plugins>
