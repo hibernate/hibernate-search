@@ -21,6 +21,7 @@
     <modules>
         <module>core</module>
         <module>elasticsearch</module>
+        <module>elasticsearch-aws</module>
         <module>testing</module>
     </modules>
 
