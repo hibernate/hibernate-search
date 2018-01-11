@@ -19,8 +19,8 @@
 
     <files>
         <file>
-            <source>${module.xml.basedir}/search/elasticsearch/module.xml</source>
-            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
+            <source>${module.xml.basedir}/search/elasticsearch-aws/module.xml</source>
+            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -28,11 +28,11 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch-aws/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.hibernate:hibernate-search-elasticsearch</include>
+                <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
             </includes>
         </dependencySet>
     </dependencySets>
