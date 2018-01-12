@@ -25,6 +25,6 @@ public interface BeanResolver extends Service {
 
 	<T> T resolve(String implementationName, Class<T> expectedClass);
 
-	<T> T resolve(BeanReference<? extends T> reference, Class<T> expectedClass);
+	<T> T resolve(BeanReference reference, Class<T> expectedClass);
 
 }

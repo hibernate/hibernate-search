@@ -8,20 +8,20 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
-import org.hibernate.search.engine.common.spi.BeanReference;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 
 /**
  * @author Yoann Rodiere
  */
 public interface PojoPropertyNodeMappingCollector extends PojoNodeMappingCollector {
 
-	void functionBridge(BeanReference<? extends FunctionBridge<?, ?>> reference,
+	void functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor fieldModelContributor);
 
-	void identifierBridge(BeanReference<IdentifierBridge<?>> bridgeReference);
+	void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> reference);
 
 	void containedIn();
 

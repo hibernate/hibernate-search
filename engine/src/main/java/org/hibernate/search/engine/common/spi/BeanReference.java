@@ -9,18 +9,18 @@ package org.hibernate.search.engine.common.spi;
 /**
  * @author Yoann Rodiere
  */
-public interface BeanReference<T> {
+public interface BeanReference {
 
 	/**
 	 * @return The name of the referenced bean.
-	 * {@code null} implies no naming constraint.
+	 * {@code null} implies no name reference.
 	 */
 	String getName();
 
 	/**
 	 * @return The type of the referenced bean.
-	 * {@code null} implies no type constraint.
+	 * {@code null} implies no type reference.
 	 */
-	Class<? extends T> getType();
+	Class<?> getType();
 
 }

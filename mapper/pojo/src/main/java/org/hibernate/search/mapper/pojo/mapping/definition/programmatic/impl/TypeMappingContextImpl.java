@@ -9,11 +9,13 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
+import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
@@ -33,7 +35,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final Class<?> type;
 
 	private String indexName;
-	private BeanReference<RoutingKeyBridge> routingKeyBridgeReference;
+	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
 
 	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
@@ -55,8 +57,8 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
-		if ( routingKeyBridgeReference != null ) {
-			collector.routingKeyBridge( routingKeyBridgeReference );
+		if ( routingKeyBridgeBuilder != null ) {
+			collector.routingKeyBridge( routingKeyBridgeBuilder );
 		}
 		children.stream().forEach( c -> c.contributeMapping( collector ) );
 	}
@@ -74,26 +76,51 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public TypeMappingContext routingKeyBridge(String bridgeName) {
-		this.routingKeyBridgeReference = new ImmutableBeanReference<>( bridgeName );
-		return this;
+		return routingKeyBridge( new ImmutableBeanReference( bridgeName ) );
 	}
 
 	@Override
 	public TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
-		this.routingKeyBridgeReference = new ImmutableBeanReference<>( bridgeClass );
+		return routingKeyBridge( new ImmutableBeanReference( bridgeClass ) );
+	}
+
+	@Override
+	public TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass) {
+		return routingKeyBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+	}
+
+	private TypeMappingContext routingKeyBridge(BeanReference bridgeReference) {
+		return routingKeyBridge( new BeanResolverBridgeBuilder<>( RoutingKeyBridge.class, bridgeReference ) );
+	}
+
+	@Override
+	public TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
+		this.routingKeyBridgeBuilder = builder;
 		return this;
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(
-			String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass) {
-		this.routingKeyBridgeReference = new ImmutableBeanReference<>( bridgeName, bridgeClass );
-		return this;
+	public TypeMappingContext bridge(String bridgeName) {
+		return bridge( new ImmutableBeanReference( bridgeName ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(BridgeDefinition<?> definition) {
-		children.add( new BridgeMappingContributor( definition ) );
+	public TypeMappingContext bridge(Class<? extends Bridge> bridgeClass) {
+		return bridge( new ImmutableBeanReference( bridgeClass ) );
+	}
+
+	@Override
+	public TypeMappingContext bridge(String bridgeName, Class<? extends Bridge> bridgeClass) {
+		return bridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+	}
+
+	private TypeMappingContext bridge(BeanReference bridgeReference) {
+		return bridge( new BeanResolverBridgeBuilder<>( Bridge.class, bridgeReference ) );
+	}
+
+	@Override
+	public TypeMappingContext bridge(BridgeBuilder<? extends Bridge> builder) {
+		children.add( new BridgeMappingContributor( builder ) );
 		return this;
 	}
 

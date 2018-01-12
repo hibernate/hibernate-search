@@ -21,9 +21,24 @@ import java.lang.annotation.Target;
 // TODO repeatable
 public @interface Field {
 
+	/**
+	 * @return The name of the index field.
+	 */
 	String name() default "";
 
+	/**
+	 * @return A reference to the function bridge to use for this field.
+	 * Cannot be used in the same {@code @Field} annotation as {@link #bridgeBuilder()}:
+	 * either a bridge or a bridge builder can be provided, but never both.
+	 */
 	FunctionBridgeBeanReference bridge() default @FunctionBridgeBeanReference;
+
+	/**
+	 * @return A reference to the builder to use to build a function bridge for this field.
+	 * Cannot be used in the same {@code @Field} annotation as {@link #bridge()}:
+	 * either a bridge or a bridge builder can be provided, but never both.
+	 */
+	FunctionBridgeBuilderBeanReference bridgeBuilder() default @FunctionBridgeBuilderBeanReference;
 
 	// TODO index, analyze, store, norms, termVector
 	// TODO analyzer, normalizer

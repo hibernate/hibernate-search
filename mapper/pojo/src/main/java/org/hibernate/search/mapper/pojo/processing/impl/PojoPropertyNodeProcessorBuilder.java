@@ -11,10 +11,10 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
@@ -45,7 +45,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	}
 
 	@Override
-	public void functionBridge(BeanReference<? extends FunctionBridge<?, ?>> reference,
+	public void functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor fieldModelContributor) {
 		String defaultedFieldName = fieldName;
 		if ( defaultedFieldName == null ) {
@@ -53,13 +53,13 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		}
 
 		ValueProcessor processor = indexModelBinder.addFunctionBridge(
-				bindingContext, indexableModel, propertyModel.getJavaType(), reference, defaultedFieldName, fieldModelContributor );
+				bindingContext, indexableModel, propertyModel.getJavaType(), builder, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );
 	}
 
 	@Override
-	public void identifierBridge(BeanReference<IdentifierBridge<?>> converterReference) {
-		IdentifierBridge<?> bridge = indexModelBinder.createIdentifierBridge( propertyModel.getJavaType(), converterReference );
+	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+		IdentifierBridge<?> bridge = indexModelBinder.createIdentifierBridge( propertyModel.getJavaType(), builder );
 		identityMappingCollector.identifierBridge( propertyModel.getHandle(), bridge );
 	}
 

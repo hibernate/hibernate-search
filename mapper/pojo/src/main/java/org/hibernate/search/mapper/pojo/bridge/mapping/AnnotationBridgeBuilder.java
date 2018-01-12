@@ -8,21 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge.mapping;
 
 import java.lang.annotation.Annotation;
 
-/**
- * @author Yoann Rodiere
- */
-public final class ImmutableBridgeDefinition<A extends Annotation> implements BridgeDefinition<A> {
+public interface AnnotationBridgeBuilder<B, A extends Annotation> extends BridgeBuilder<B> {
 
-	private final A annotation;
-
-	public ImmutableBridgeDefinition(A annotation) {
-		super();
-		this.annotation = annotation;
-	}
-
-	@Override
-	public A get() {
-		return annotation;
-	}
+	void initialize(A annotation);
 
 }

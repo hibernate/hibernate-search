@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 
 /**
@@ -24,7 +25,15 @@ public interface TypeMappingContext {
 
 	TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass);
 
-	TypeMappingContext bridge(BridgeDefinition<?> definition);
+	TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder);
+
+	TypeMappingContext bridge(String bridgeName);
+
+	TypeMappingContext bridge(Class<? extends Bridge> bridgeClass);
+
+	TypeMappingContext bridge(String bridgeName, Class<? extends Bridge> bridgeClass);
+
+	TypeMappingContext bridge(BridgeBuilder<? extends Bridge> builder);
 
 	PropertyMappingContext property(String propertyName);
 

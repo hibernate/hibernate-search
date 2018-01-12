@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
@@ -29,7 +31,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 		implements PropertyFieldMappingContext,
 				PojoNodeMetadataContributor<PojoPropertyNodeModelCollector, PojoPropertyNodeMappingCollector> {
 
-	private BeanReference<FunctionBridge<?, ?>> bridgeReference;
+	private BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder;
 
 	private String fieldName;
 
@@ -46,7 +48,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.functionBridge( bridgeReference, fieldName, fieldModelContributor );
+		collector.functionBridge( bridgeBuilder, fieldName, fieldModelContributor );
 	}
 
 	@Override
@@ -56,20 +58,32 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	}
 
 	@Override
-	public PropertyFieldMappingContext bridge(String bridgeName) {
-		this.bridgeReference = new ImmutableBeanReference<>( bridgeName );
-		return this;
+	public PropertyFieldMappingContext functionBridge(String bridgeName) {
+		return functionBridge( new ImmutableBeanReference( bridgeName ) );
 	}
 
 	@Override
-	public PropertyFieldMappingContext bridge(Class<? extends FunctionBridge<?, ?>> bridgeClass) {
-		this.bridgeReference = new ImmutableBeanReference<>( bridgeClass );
-		return this;
+	public PropertyFieldMappingContext functionBridge(Class<? extends FunctionBridge<?, ?>> bridgeClass) {
+		return functionBridge( new ImmutableBeanReference( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyFieldMappingContext bridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass) {
-		this.bridgeReference = new ImmutableBeanReference<>( bridgeName, bridgeClass );
+	public PropertyFieldMappingContext functionBridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass) {
+		return functionBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+	}
+
+	// The builder will return an object of some class T where T extends FunctionBridge<?, ?>, so this is safe
+	@SuppressWarnings( "unchecked" )
+	private PropertyFieldMappingContext functionBridge(BeanReference bridgeReference) {
+		return functionBridge(
+				(BeanResolverBridgeBuilder<? extends FunctionBridge<?, ?>>)
+						new BeanResolverBridgeBuilder( FunctionBridge.class, bridgeReference )
+		);
+	}
+
+	@Override
+	public PropertyFieldMappingContext functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder) {
+		this.bridgeBuilder = builder;
 		return this;
 	}
 

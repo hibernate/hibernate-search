@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.common.spi.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
 
 /**
@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
  */
 public interface PojoTypeNodeMappingCollector extends PojoNodeMappingCollector {
 
-	void routingKeyBridge(BeanReference<? extends RoutingKeyBridge> reference);
+	void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> reference);
 
 	PojoPropertyNodeMappingCollector property(String name);
 

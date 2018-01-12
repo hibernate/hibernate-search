@@ -7,33 +7,47 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
 
 import org.hibernate.search.engine.backend.document.model.Store;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinitionBase;
+import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridgeImpl;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerDefinitionBase;
+import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class GeoPointBridgeDefinition extends BridgeDefinitionBase<GeoPointBridge> {
+public class GeoPointBridgeBuilder implements AnnotationBridgeBuilder<Bridge, GeoPointBridge> {
+
+	private String fieldName;
+	private Store store;
+	private String markerSet;
 
 	@Override
-	protected Class<GeoPointBridge> getAnnotationClass() {
-		return GeoPointBridge.class;
+	public void initialize(GeoPointBridge annotation) {
+		fieldName( annotation.fieldName() );
+		markerSet( annotation.markerSet() );
+		store( annotation.store() );
 	}
 
-	public GeoPointBridgeDefinition fieldName(String name) {
-		addParameter( "fieldName", name );
+	public GeoPointBridgeBuilder fieldName(String fieldName) {
+		this.fieldName = fieldName;
 		return this;
 	}
 
-	public GeoPointBridgeDefinition store(Store store) {
-		addParameter( "store", store );
+	public GeoPointBridgeBuilder store(Store store) {
+		this.store = store;
 		return this;
 	}
 
-	public GeoPointBridgeDefinition markerSet(String markerSet) {
-		addParameter( "markerSet", markerSet );
+	public GeoPointBridgeBuilder markerSet(String markerSet) {
+		this.markerSet = markerSet;
 		return this;
+	}
+
+	@Override
+	public Bridge build(BuildContext buildContext) {
+		return new GeoPointBridgeImpl( fieldName, store, markerSet );
 	}
 
 	public static class LatitudeMarkerDefinition extends MarkerDefinitionBase<GeoPointBridge.Latitude> {

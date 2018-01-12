@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelCollector;
@@ -18,10 +19,10 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelColle
 public class BridgeMappingContributor
 		implements PojoNodeMetadataContributor<PojoNodeModelCollector, PojoNodeMappingCollector> {
 
-	private final BridgeDefinition<?> definition;
+	private final BridgeBuilder<? extends Bridge> bridgeBuilder;
 
-	public BridgeMappingContributor(BridgeDefinition<?> definition) {
-		this.definition = definition;
+	public BridgeMappingContributor(BridgeBuilder<? extends Bridge> bridgeBuilder) {
+		this.bridgeBuilder = bridgeBuilder;
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class BridgeMappingContributor
 
 	@Override
 	public void contributeMapping(PojoNodeMappingCollector collector) {
-		collector.bridge( definition );
+		collector.bridge( bridgeBuilder );
 	}
 
 }

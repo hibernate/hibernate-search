@@ -35,7 +35,7 @@ final class DelegatingBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(BeanReference<? extends T> reference, Class<T> expectedClass) {
+	public <T> T resolve(BeanReference reference, Class<T> expectedClass) {
 		return hibernateOrmBeanResolver.resolve( reference, expectedClass );
 	}
 

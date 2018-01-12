@@ -41,7 +41,7 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(BeanReference<? extends T> reference, Class<T> expectedClass) {
+	public <T> T resolve(BeanReference reference, Class<T> expectedClass) {
 		String implementationName = reference.getName();
 		Class<?> implementationType = reference.getType();
 		boolean nameProvided = implementationName != null && !implementationName.isEmpty();

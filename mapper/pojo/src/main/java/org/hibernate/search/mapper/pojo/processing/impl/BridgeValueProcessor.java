@@ -16,9 +16,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoState;
  */
 public class BridgeValueProcessor implements ValueProcessor {
 
-	private final Bridge<?> bridge;
+	private final Bridge bridge;
 
-	public BridgeValueProcessor(Bridge<?> bridge) {
+	public BridgeValueProcessor(Bridge bridge) {
 		this.bridge = bridge;
 	}
 

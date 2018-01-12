@@ -21,6 +21,18 @@ import java.lang.annotation.Target;
 // TODO repeatable
 public @interface DocumentId {
 
+	/**
+	 * @return A reference to the identifier bridge to use for document IDs.
+	 * Cannot be used in the same {@code @DocumentId} annotation as {@link #identifierBridgeBuilder()}:
+	 * either a bridge or a bridge builder can be provided, but never both.
+	 */
 	IdentifierBridgeBeanReference identifierBridge() default @IdentifierBridgeBeanReference;
+
+	/**
+	 * @return A reference to the builder to use to builder an identifier bridge for document IDs.
+	 * Cannot be used in the same {@code @DocumentId} annotation as {@link #identifierBridge()}:
+	 * either a bridge or a bridge builder can be provided, but never both.
+	 */
+	IdentifierBridgeBuilderBeanReference identifierBridgeBuilder() default @IdentifierBridgeBuilderBeanReference;
 
 }

@@ -6,17 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.spi;
 
-import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
 import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoState;
 
 /**
  * @author Yoann Rodiere
  */
 public interface RoutingKeyBridge extends AutoCloseable {
-
-	default void initialize(BuildContext buildContext) {
-	}
 
 	void bind(PojoModelElement pojoModelElement);
 

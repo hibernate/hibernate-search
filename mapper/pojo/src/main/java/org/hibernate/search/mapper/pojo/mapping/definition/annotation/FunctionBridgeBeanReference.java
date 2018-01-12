@@ -27,7 +27,7 @@ public @interface FunctionBridgeBeanReference {
 	Class<? extends FunctionBridge<?, ?>> type() default UndefinedImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of the {@link FunctionBridgeBeanReference#type()} attribute.
+	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
 	abstract class UndefinedImplementationType implements FunctionBridge<Object, Object> {
 		private UndefinedImplementationType() {

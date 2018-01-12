@@ -10,21 +10,21 @@ package org.hibernate.search.engine.common.spi;
 /**
  * @author Yoann Rodiere
  */
-public final class ImmutableBeanReference<T> implements BeanReference<T> {
+public final class ImmutableBeanReference implements BeanReference {
 
 	private final String name;
 
-	private final Class<? extends T> type;
+	private final Class<?> type;
 
 	public ImmutableBeanReference(String name) {
 		this( name, null );
 	}
 
-	public ImmutableBeanReference(Class<? extends T> type) {
+	public ImmutableBeanReference(Class<?> type) {
 		this( null, type );
 	}
 
-	public ImmutableBeanReference(String name, Class<? extends T> type) {
+	public ImmutableBeanReference(String name, Class<?> type) {
 		this.name = name;
 		this.type = type;
 	}
@@ -35,7 +35,7 @@ public final class ImmutableBeanReference<T> implements BeanReference<T> {
 	}
 
 	@Override
-	public Class<? extends T> getType() {
+	public Class<?> getType() {
 		return type;
 	}
 

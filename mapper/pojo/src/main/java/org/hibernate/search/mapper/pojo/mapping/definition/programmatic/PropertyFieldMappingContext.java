@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 
 /**
@@ -16,11 +17,13 @@ public interface PropertyFieldMappingContext extends PropertyMappingContext {
 
 	PropertyFieldMappingContext name(String name);
 
-	PropertyFieldMappingContext bridge(String bridgeName);
+	PropertyFieldMappingContext functionBridge(String bridgeName);
 
-	PropertyFieldMappingContext bridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	PropertyFieldMappingContext functionBridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);
 
-	PropertyFieldMappingContext bridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	PropertyFieldMappingContext functionBridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass);
+
+	PropertyFieldMappingContext functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder);
 
 	PropertyFieldMappingContext store(Store store);
 

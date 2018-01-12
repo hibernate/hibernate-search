@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
-import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeDefinition;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 
 /**
@@ -31,17 +31,17 @@ import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 public interface PojoIndexModelBinder {
 
 	<T> IdentifierBridge<T> createIdentifierBridge(Class<T> sourceType,
-			BeanReference<? extends IdentifierBridge<?>> reference);
+			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
 	RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BeanReference<? extends RoutingKeyBridge> reference);
+			PojoModelElement pojoModelElement, BridgeBuilder<? extends RoutingKeyBridge> bridgeBuilder);
 
 	ValueProcessor addBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeDefinition<?> definition);
+			PojoModelElement pojoModelElement, BridgeBuilder<? extends Bridge> bridgeBuilder);
 
 	ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoModelElement pojoModelElement, Class<?> sourceType,
-			BeanReference<? extends FunctionBridge<?, ?>> bridgeReference,
+			BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
 			String fieldName, FieldModelContributor contributor);
 
 }
