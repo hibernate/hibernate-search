@@ -232,9 +232,9 @@
         <!-- Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
-        <elasticsearchClientVersion>5.6.4</elasticsearchClientVersion>
+        <elasticsearchClientVersion>5.6.5</elasticsearchClientVersion>
         <elasticsearch-client.module.slot>5.6</elasticsearch-client.module.slot>
-        <elasticsearchClientTestingModuleVersion>5.6.4.hibernate02</elasticsearchClientTestingModuleVersion>
+        <elasticsearchClientTestingModuleVersion>5.6.5.hibernate01</elasticsearchClientTestingModuleVersion>
         <gsonVersion>2.8.2</gsonVersion>
         <gson.module.slot>2.8</gson.module.slot>
         <gsonTestingModuleVersion>2.8.2.hibernate02</gsonTestingModuleVersion>
@@ -2036,7 +2036,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.6.4</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>5.6.5</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
