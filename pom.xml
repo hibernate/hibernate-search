@@ -1018,6 +1018,13 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.wildfly.build</groupId>
+                    <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+                    <!-- Do not use 1.2.4 nor 1.2.5 at the moment: regression!
+                        See http://lists.jboss.org/pipermail/wildfly-dev/2018-January/006325.html -->
+                    <version>1.2.0.Final</version>
+                </plugin>
+                <plugin>
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
                     <version>0.4.0</version>

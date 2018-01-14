@@ -1,0 +1,7 @@
+<server-provisioning xmlns="urn:wildfly:server-provisioning:1.1">
+    <feature-packs>
+
+        <feature-pack groupId="org.wildfly" artifactId="wildfly-feature-pack" version="${wildflyVersion}" />
+
+    </feature-packs>
+</server-provisioning>
