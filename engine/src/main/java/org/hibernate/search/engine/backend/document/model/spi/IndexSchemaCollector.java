@@ -9,9 +9,8 @@ package org.hibernate.search.engine.backend.document.model.spi;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexSchemaCollector extends IndexSchemaElement {
+public interface IndexSchemaCollector {
 
-	@Override
 	IndexSchemaCollector childObject(String relativeName);
 
 	IndexSchemaElement withContext(IndexSchemaNestingContext context);
