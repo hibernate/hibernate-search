@@ -68,7 +68,7 @@ public class ElasticsearchIndexSchemaCollectorImpl<T extends TypeMapping>
 	public ElasticsearchIndexSchemaCollectorImpl<?> childObject(String relativeName) {
 		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
 		ElasticsearchIndexSchemaPropertyNodeContributorMap nestedPropertyContributors =
-				new ElasticsearchIndexSchemaPropertyNodeContributorMap( accessor );
+				new ElasticsearchIndexSchemaPropertyNodeContributorMap( propertyAccessor );
 
 		ElasticsearchIndexSchemaCollectorImpl<PropertyMapping> childCollector =
 				new ElasticsearchIndexSchemaCollectorImpl<>( propertyAccessor,

@@ -74,7 +74,7 @@ class ElasticsearchIndexSchemaElementImpl<T extends TypeMapping>
 	public ElasticsearchIndexSchemaElementImpl<?> childObject(String relativeName) {
 		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
 		ElasticsearchIndexSchemaPropertyNodeContributorMap nestedPropertyContributors =
-				new ElasticsearchIndexSchemaPropertyNodeContributorMap( accessor );
+				new ElasticsearchIndexSchemaPropertyNodeContributorMap( propertyAccessor );
 
 		// Only take the contributor into account if the child is included
 		return nestingContext.applyIfIncluded( relativeName, (name, filter) -> {
