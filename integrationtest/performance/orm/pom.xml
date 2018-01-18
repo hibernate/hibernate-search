@@ -252,6 +252,15 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-11-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-orm-modules</artifactId>
                                     <version>${hibernateVersion}</version>
                                     <classifier>wildfly-11-dist</classifier>
@@ -301,6 +310,13 @@
                     <dependency>
                         <groupId>org.hibernate</groupId>
                         <artifactId>hibernate-search-modules</artifactId>
+                        <version>${project.version}</version>
+                        <classifier>wildfly-11-dist</classifier>
+                        <type>zip</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-search-jbossmodules-orm</artifactId>
                         <version>${project.version}</version>
                         <classifier>wildfly-11-dist</classifier>
                         <type>zip</type>

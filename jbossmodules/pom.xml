@@ -20,6 +20,7 @@
 
     <modules>
         <module>core</module>
+        <module>orm</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
         <module>testing</module>

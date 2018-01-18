@@ -430,6 +430,24 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-11-dist</classifier>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-11-dist</classifier>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
                                             <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
                                             <version>${project.version}</version>
                                             <classifier>wildfly-11-dist</classifier>
@@ -612,6 +630,13 @@
                             <dependency>
                                 <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-modules</artifactId>
+                                <version>${project.version}</version>
+                                <classifier>wildfly-11-dist</classifier>
+                                <type>zip</type>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
                                 <version>${project.version}</version>
                                 <classifier>wildfly-11-dist</classifier>
                                 <type>zip</type>

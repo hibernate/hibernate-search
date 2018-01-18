@@ -576,6 +576,13 @@
                 <type>zip</type>
             </dependency>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                <version>${project.version}</version>
+                <classifier>wildfly-11-dist</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
                 <version>${project.version}</version>

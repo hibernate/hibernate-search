@@ -12,11 +12,11 @@
         <version>5.9.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hibernate-search-modules</artifactId>
+    <artifactId>hibernate-search-jbossmodules-orm</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search core JBoss Module</name>
-    <description>Hibernate Search core modules creation to use in JBoss AS / Wildfly</description>
+    <name>Hibernate Search ORM JBoss Module</name>
+    <description>Hibernate Search ORM modules creation to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
@@ -26,15 +26,29 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-serialization-avro</artifactId>
+            <artifactId>hibernate-search-orm</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-commons-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-backend-jms</artifactId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-backend-jgroups</artifactId>
+            <artifactId>hibernate-search-jsr352-jberet</artifactId>
         </dependency>
     </dependencies>
 

@@ -29,16 +29,6 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${module.xml.basedir}/search/orm/module.xml</source>
-            <outputDirectory>org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${aliases.xml.basedir}/search/orm/module.xml</source>
-            <outputDirectory>org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/backend-jms/module.xml</source>
             <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -51,16 +41,6 @@
         <file>
             <source>${module.xml.basedir}/search/backend-jgroups/module.xml</source>
             <outputDirectory>org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/search/jsr352/module.xml</source>
-            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${aliases.xml.basedir}/search/jsr352/module.xml</source>
-            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -98,32 +78,11 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-search-orm</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jms</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-search-jsr352-core</include>
-                <include>org.hibernate:hibernate-search-jsr352-jberet</include>
             </includes>
         </dependencySet>
 

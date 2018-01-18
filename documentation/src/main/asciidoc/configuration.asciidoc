@@ -1481,10 +1481,8 @@ See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPA
 
 This package includes all the main modules:
 
-* _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
 * _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
 * _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
-* _org.hibernate.search.jsr352_, to use the JSR-352 integration.
 
 The package includes several more modules but you should not need to refer to the other ones directly.
 
@@ -1493,9 +1491,6 @@ and is also published as a Maven artifact: link:$$https://repository.jboss.org/n
 
 When installing this package, do not forget to also install the dependencies:
 
-* Hibernate ORM version `5.2.3.Final` or a later version of the 5.2 branch, such as `{hibernateVersion}`.
-  When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
-  The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
 * Lucene version `{luceneVersion}`.
   The Hibernate team publishes JBoss modules of Lucene as part of
   https://github.com/hibernate/lucene-jbossmodules[this project].
@@ -1503,6 +1498,25 @@ When installing this package, do not forget to also install the dependencies:
   The modules are published to Maven repositories as ZIPs
   (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/lucene-jbossmodules/lucene-jbossmodules/[here] for downloads),
   and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
+
+[[hibernatesearch-jboss-modules-packages-orm]]
+===== ORM package
+
+This package includes the following modules:
+
+* _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate ORM.
+* _org.hibernate.search.jsr352_, to use the JSR-352 integration.
+
+The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-orm-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
+and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-orm~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-orm-{hibernateSearchVersion}-wildfly-11-dist:zip].
+
+When installing this package, do not forget to also install the dependencies:
+
+* The <<main Hibernate Search package,hibernatesearch-jboss-modules-packages-main>>,
+  along with each of its own dependencies.
+* Hibernate ORM version `5.2.3.Final` or a later version of the 5.2 branch, such as `{hibernateVersion}`.
+  When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
+  The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
 
 [[hibernatesearch-jboss-modules-packages-elasticsearch]]
 ===== Elasticsearch package
