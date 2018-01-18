@@ -19,7 +19,7 @@
     <description>Hibernate Search JBoss Modules Aggregator POM</description>
 
     <modules>
-        <module>core</module>
+        <module>engine</module>
         <module>orm</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>

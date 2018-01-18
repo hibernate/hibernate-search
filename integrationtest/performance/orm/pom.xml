@@ -243,7 +243,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-modules</artifactId>
+                                    <artifactId>hibernate-search-jbossmodules-engine</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>wildfly-11-dist</classifier>
                                     <type>zip</type>
@@ -309,7 +309,7 @@
                      -->
                     <dependency>
                         <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-modules</artifactId>
+                        <artifactId>hibernate-search-jbossmodules-engine</artifactId>
                         <version>${project.version}</version>
                         <classifier>wildfly-11-dist</classifier>
                         <type>zip</type>

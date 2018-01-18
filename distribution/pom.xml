@@ -116,7 +116,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-modules</artifactId>
+            <artifactId>hibernate-search-jbossmodules-engine</artifactId>
             <classifier>wildfly-11-dist</classifier>
             <type>zip</type>
         </dependency>

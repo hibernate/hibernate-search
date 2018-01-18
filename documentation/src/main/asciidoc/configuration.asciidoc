@@ -1476,8 +1476,8 @@ See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPA
 [[hibernatesearch-jboss-modules-packages]]
 ==== List of the Hibernate Search WildFly/JBoss module packages
 
-[[hibernatesearch-jboss-modules-packages-main]]
-===== Main package
+[[hibernatesearch-jboss-modules-packages-engine]]
+===== Engine package
 
 This package includes all the main modules:
 
@@ -1486,8 +1486,8 @@ This package includes all the main modules:
 
 The package includes several more modules but you should not need to refer to the other ones directly.
 
-The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-modules-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-11-dist:zip].
+The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-engine-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
+and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-engine~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-engine-{hibernateSearchVersion}-wildfly-11-dist:zip].
 
 When installing this package, do not forget to also install the dependencies:
 
@@ -1512,7 +1512,7 @@ and is also published as a Maven artifact: link:$$https://repository.jboss.org/n
 
 When installing this package, do not forget to also install the dependencies:
 
-* The <<main Hibernate Search package,hibernatesearch-jboss-modules-packages-main>>,
+* The <<Hibernate Search engine package,hibernatesearch-jboss-modules-packages-engine>>,
   along with each of its own dependencies.
 * Hibernate ORM version `5.2.3.Final` or a later version of the 5.2 branch, such as `{hibernateVersion}`.
   When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
@@ -1528,7 +1528,7 @@ and is also published as a Maven artifact: link:$$https://repository.jboss.org/n
 
 When installing this package, do not forget to also install the dependencies:
 
-* The <<main Hibernate Search package,hibernatesearch-jboss-modules-packages-main>>,
+* The <<Hibernate Search engine package,hibernatesearch-jboss-modules-packages-engine>>,
   along with each of its own dependencies.
 * Elasticsearch-client version `{elasticsearchClientVersion}`.
   The Hibernate team publishes JBoss modules of Elasticsearch-client as part of
@@ -1550,7 +1550,7 @@ This package includes an internal module enabling the <<elasticsearch-integratio
 when connecting to an Elasticsearch cluster.
 
 The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-elasticsearch-aws-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-aws-{hibernateSearchVersion}-wildfly-11-dist:zip].
+and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-aws-{hibernateSearchVersion}-wildfly-11-dist:zip].
 
 When installing this package, do not forget to also install the dependencies:
 

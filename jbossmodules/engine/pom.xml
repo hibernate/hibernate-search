@@ -12,11 +12,11 @@
         <version>5.9.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hibernate-search-modules</artifactId>
+    <artifactId>hibernate-search-jbossmodules-engine</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search core JBoss Module</name>
-    <description>Hibernate Search core modules creation to use in JBoss AS / Wildfly</description>
+    <name>Hibernate Search engine JBoss Module</name>
+    <description>Hibernate Search engine modules creation to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
