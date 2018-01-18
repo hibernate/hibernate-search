@@ -15,8 +15,8 @@
     <artifactId>hibernate-search-jbossmodules-engine</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search engine JBoss Module</name>
-    <description>Hibernate Search engine modules creation to use in JBoss AS / Wildfly</description>
+    <name>Hibernate Search JBoss Modules Engine</name>
+    <description>Hibernate Search Engine modules to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>

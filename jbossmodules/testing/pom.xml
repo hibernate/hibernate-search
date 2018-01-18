@@ -15,8 +15,8 @@
     <artifactId>hibernate-search-jbossmodules-testing</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Testing WildFly Modules</name>
-    <description>Additional WildFly modules which are meant for testing exclusively</description>
+    <name>Hibernate Search JBoss Modules Testing</name>
+    <description>Additional JBoss modules which are meant for internal testing exclusively</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>

@@ -15,7 +15,7 @@
     <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Elasticsearch JBoss Modules</name>
+    <name>Hibernate Search JBoss Modules Elasticsearch</name>
     <description>Hibernate Search Elasticsearch modules to use in JBoss AS / Wildfly</description>
 
     <properties>
