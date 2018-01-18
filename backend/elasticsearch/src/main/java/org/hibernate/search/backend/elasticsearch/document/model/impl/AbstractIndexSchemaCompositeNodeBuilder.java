@@ -15,22 +15,19 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.util.SearchException;
 
 /**
- * A map of name to property node contributors.
- * <p>
- * Allows sharing of contributed properties across multiple
- * {@link org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement},
- * in order to avoid conflicting contributions.
+ * A schema node builder.
  */
-class ElasticsearchIndexSchemaPropertyNodeContributorMap {
+abstract class AbstractIndexSchemaCompositeNodeBuilder<T extends TypeMapping>
+		implements ElasticsearchIndexSchemaNodeContributor<T> {
 
-	private final JsonObjectAccessor accessor;
+	protected final JsonObjectAccessor accessor;
 	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> content = new HashMap<>();
 
-	public ElasticsearchIndexSchemaPropertyNodeContributorMap(JsonObjectAccessor accessor) {
+	public AbstractIndexSchemaCompositeNodeBuilder(JsonObjectAccessor accessor) {
 		this.accessor = accessor;
 	}
 
-	public void put(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
+	public void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			// TODO more explicit error message
@@ -42,13 +39,18 @@ class ElasticsearchIndexSchemaPropertyNodeContributorMap {
 		}
 	}
 
-	public void contribute(ElasticsearchFieldModelCollector collector, TypeMapping mapping) {
+	@Override
+	public T contribute(ElasticsearchFieldModelCollector collector) {
+		T mapping = createMapping();
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> entry : content.entrySet() ) {
 			String propertyName = entry.getKey();
 			ElasticsearchIndexSchemaNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
 			PropertyMapping propertyMapping = propertyContributor.contribute( collector );
 			mapping.addProperty( propertyName, propertyMapping );
 		}
+		return mapping;
 	}
+
+	protected abstract T createMapping();
 
 }

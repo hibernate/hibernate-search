@@ -71,7 +71,7 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				relativePrefix,
 				f -> f.composeWithNested( parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters ),
-				schemaCollector, IndexSchemaCollector::childObject,
+				schemaCollector, IndexSchemaCollector::objectField,
 				IndexModelBindingContextImpl::new
 		);
 	}

@@ -819,7 +819,7 @@ public class OrmElasticsearchIT {
 		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
-			IndexSchemaElement objectFieldMetadata = indexSchemaElement.childObject( objectName );
+			IndexSchemaElement objectFieldMetadata = indexSchemaElement.objectField( objectName );
 			textFieldAccessor = objectFieldMetadata.field( "text" ).asString().createAccessor();
 			localDateFieldAccessor = objectFieldMetadata.field( "date" ).asLocalDate().createAccessor();
 		}

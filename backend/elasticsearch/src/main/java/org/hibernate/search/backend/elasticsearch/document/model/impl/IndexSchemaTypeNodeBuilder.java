@@ -1,0 +1,33 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.backend.elasticsearch.document.model.impl;
+
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+
+public class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaCompositeNodeBuilder<TypeMapping> {
+
+	private RoutingType routing = null;
+
+	public IndexSchemaTypeNodeBuilder(JsonObjectAccessor accessor) {
+		super( accessor );
+	}
+
+	public void setRouting(RoutingType routing) {
+		this.routing = routing;
+	}
+
+	@Override
+	protected TypeMapping createMapping() {
+		TypeMapping mapping = new TypeMapping();
+		if ( routing != null ) {
+			mapping.setRouting( routing );
+		}
+		return mapping;
+	}
+}

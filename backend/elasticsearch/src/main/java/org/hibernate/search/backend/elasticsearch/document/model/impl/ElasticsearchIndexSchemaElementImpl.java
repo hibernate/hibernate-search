@@ -6,42 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.function.Supplier;
-
+import org.hibernate.search.engine.backend.document.IndexObjectAccessor;
 import org.hibernate.search.engine.backend.document.model.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.backend.document.IndexObjectReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 /**
  * @author Yoann Rodiere
  */
-class ElasticsearchIndexSchemaElementImpl<T extends TypeMapping>
-		implements ElasticsearchIndexSchemaElement, ElasticsearchIndexSchemaNodeContributor<T> {
+class ElasticsearchIndexSchemaElementImpl
+		implements ElasticsearchIndexSchemaElement {
 
-	static final Supplier<TypeMapping> TYPE_MAPPING_FACTORY = TypeMapping::new;
-	static final Supplier<PropertyMapping> PROPERTY_MAPPING_FACTORY = () -> {
-		PropertyMapping mapping = new PropertyMapping();
-		mapping.setType( DataType.OBJECT );
-		return mapping;
-	};
-
-	private final JsonObjectAccessor accessor;
-	private final Supplier<T> mappingFactory;
-	private final ElasticsearchIndexSchemaPropertyNodeContributorMap propertyContributors;
+	protected final JsonObjectAccessor accessor;
+	private final AbstractIndexSchemaCompositeNodeBuilder<?> nodeBuilder;
 	private final IndexSchemaNestingContext nestingContext;
 
-	ElasticsearchIndexSchemaElementImpl(JsonObjectAccessor accessor, Supplier<T> mappingFactory,
-			ElasticsearchIndexSchemaPropertyNodeContributorMap propertyContributors,
-			IndexSchemaNestingContext nestingContext) {
+	ElasticsearchIndexSchemaElementImpl(JsonObjectAccessor accessor,
+			AbstractIndexSchemaCompositeNodeBuilder<?> nodeBuilder, IndexSchemaNestingContext nestingContext) {
 		this.accessor = accessor;
-		this.mappingFactory = mappingFactory;
-		this.propertyContributors = propertyContributors;
+		this.nodeBuilder = nodeBuilder;
 		this.nestingContext = nestingContext;
 	}
 
@@ -63,7 +48,7 @@ class ElasticsearchIndexSchemaElementImpl<T extends TypeMapping>
 
 		// Only take the contributor into account if the field is included
 		nestingContext.applyIfIncluded( relativeName, name -> {
-			propertyContributors.put( name, fieldContext );
+			nodeBuilder.putProperty( name, fieldContext );
 			return null;
 		} );
 
@@ -71,34 +56,23 @@ class ElasticsearchIndexSchemaElementImpl<T extends TypeMapping>
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaElementImpl<?> childObject(String relativeName) {
+	public ElasticsearchIndexSchemaElement objectField(String relativeName) {
 		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
-		ElasticsearchIndexSchemaPropertyNodeContributorMap nestedPropertyContributors =
-				new ElasticsearchIndexSchemaPropertyNodeContributorMap( propertyAccessor );
+		IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
+				new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
 
 		// Only take the contributor into account if the child is included
 		return nestingContext.applyIfIncluded( relativeName, (name, filter) -> {
-					ElasticsearchIndexSchemaElementImpl<PropertyMapping> childCollector =
-							new ElasticsearchIndexSchemaElementImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
-									nestedPropertyContributors, filter );
-					propertyContributors.put( name, childCollector );
-					return childCollector;
+					nodeBuilder.putProperty( name, nestedNodeBuilder );
+					return new ElasticsearchIndexSchemaElementImpl( propertyAccessor, nestedNodeBuilder, filter );
 				} )
-				.orElseGet( () -> new ElasticsearchIndexSchemaElementImpl<>( propertyAccessor, PROPERTY_MAPPING_FACTORY,
-						nestedPropertyContributors, IndexSchemaNestingContext.excludeAll() ) );
+				.orElseGet( () -> new ElasticsearchIndexSchemaElementImpl( propertyAccessor,
+						nestedNodeBuilder, IndexSchemaNestingContext.excludeAll() ) );
 	}
 
 	@Override
-	public IndexObjectReference asReference() {
-		// TODO Object reference
-		throw new UnsupportedOperationException( "object reference not implemented yet" );
+	public IndexObjectAccessor createAccessor() {
+		// TODO Object accessors
+		throw new UnsupportedOperationException( "object accessors not implemented yet" );
 	}
-
-	@Override
-	public T contribute(ElasticsearchFieldModelCollector collector) {
-		T mapping = mappingFactory.get();
-		propertyContributors.contribute( collector, mapping );
-		return mapping;
-	}
-
 }

@@ -9,8 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaCollectorImpl;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -30,8 +29,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final BuildContext context;
 	private final ConfigurationPropertySource propertySource;
 
-	private final ElasticsearchIndexSchemaCollectorImpl<TypeMapping> collector =
-			ElasticsearchIndexSchemaCollectorImpl.root();
+	private final ElasticsearchRootIndexSchemaCollectorImpl collector = new ElasticsearchRootIndexSchemaCollectorImpl();
 
 	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
 			BuildContext context, ConfigurationPropertySource propertySource) {
