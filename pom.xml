@@ -210,7 +210,7 @@
         <jbossLoggingOsgiRangeVersion>[3.3,4.0.0)</jbossLoggingOsgiRangeVersion>
 
         <tikaVersion>1.4</tikaVersion>
-        <bytemanVersion>4.0.0-BETA4</bytemanVersion>
+        <bytemanVersion>4.0.0</bytemanVersion>
         <jbossLoggingVersion>3.3.1.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.1.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.5.30.Final</narayanaVersion>
