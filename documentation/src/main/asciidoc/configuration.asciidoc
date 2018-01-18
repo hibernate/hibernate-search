@@ -1409,7 +1409,7 @@ is automatically activated (added to the classpath of your deployment) if you ar
 WildFly 11 includes an older version of Hibernate Search; if you want to use that then you won't need to download anything else and you can stop reading this chapter; however you might miss out on several new features and improvements.
 When deciding to use the older version make sure to read the version of this guide matching the version of Hibernate Search included in your application server: this guide applies to `{hibernateSearchVersion}` exclusively.
 
-We strongly suggest using the latest version. Doing so is not much harder: install the latest modules and their dependencies,
+We strongly suggest using the latest version. Doing so is not much harder: provision a WildFly server using the dedicated tool,
 and set the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml` to the chosen version.
 Further details are provided below.
 
@@ -1446,19 +1446,84 @@ wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:main
 [[updating-wildfly-hibernatesearch-versions]]
 ==== Update and activate latest Hibernate Search version in WildFly
 
-You can download the latest Hibernate Search provided module and install it. This is often the
-best approach as you will benefit from all the latest improvements of
-Hibernate Search. Because of the modular design in WildFly, these additional modules can
-coexist with the embedded modules and won't affect any other application, unless you
-explicitly reconfigure it to use the newer module.
+To use an updated version of Hibernate Search within WildFly,
+you will need to follow two steps:
 
-You can find a <<hibernatesearch-jboss-modules-packages,list of packages containing Hibernate Search modules>> below.
+. Provision a WildFly server with an updated version of Hibernate Search,
+  either <<provisioning-wildfly-maven,via Maven>> or <<provisioning-wildfly-nonmaven,via another tool>>.
+. <<activating-updated-hibernate-search-version,Activate>> the updated Hibernate Search version
 
-Simply unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search.
+[[provisioning-wildfly-maven]]
+===== Server provisioning via Maven
 
-You will also need to update the dependencies of the installed modules;
-refer to <<hibernatesearch-jboss-modules-packages,the list of packages>>
-for the detailed information about dependencies.
+Maven users can use the `wildfly-server-provisioning-maven-plugin`
+to create a custom WildFly server including the Hibernate Search modules:
+
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<plugins>
+	<plugin>
+	<groupId>org.wildfly.build</groupId>
+	<artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+	<version>1.2.0.Final</version>
+	<executions>
+		<execution>
+		<id>server-provisioning</id>
+		<goals>
+			<goal>build</goal>
+		</goals>
+		<phase>compile</phase>
+		<configuration>
+			<config-file>server-provisioning.xml</config-file>
+			<server-name>wildfly-with-updated-hibernate-search</server-name>
+		</configuration>
+		</execution>
+	</executions>
+</plugin>
+====
+
+You will also need a `server-provisioning.xml` in the root of your project:
+
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<server-provisioning xmlns="urn:wildfly:server-provisioning:1.1">
+	<feature-packs>
+
+		<feature-pack
+			groupId="org.hibernate"
+			artifactId="hibernate-search-jbossmodules-orm"
+			version="{hibernateSearchVersion}"/>
+
+		<feature-pack
+			groupId="org.wildfly"
+			artifactId="wildfly-feature-pack"
+			version="{wildflyVersion}" />
+
+	</feature-packs>
+</server-provisioning>
+====
+
+[WARNING]
+====
+Depending on the WildFly feature pack you chose, some transitive dependencies may not be available in Maven Central.
+In that case, you should https://developer.jboss.org/wiki/MavenGettingStarted-Users[set up the JBoss Nexus repository].
+====
+
+[[provisioning-wildfly-nonmaven]]
+===== Server provisioning via other build tools
+
+Plugins for other build tools have not been implemented yet, but this should be quite straight forward to do:
+the above Maven plugin is just a thin wrapper invoking other libraries;
+these other libraries are build agnostic and are responsible for performing most of the work.
+
+See also https://github.com/wildfly/wildfly-build-tools[WildFly provisioning build tools].
+
+[[activating-updated-hibernate-search-version]]
+===== Activating the updated Hibernate Search version in WildFly
 
 Next you will need to make sure the JPA subsystem of WildFly provides you with the version you have chosen,
 instead of the default version bundled with the application server.
@@ -1473,95 +1538,45 @@ wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:{hibernateSearchVer
 Setting this property will also prevent WildFly to pollute your classpath with the older copy of Hibernate Search which is included in the server.
 See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration Wiki].
 
-[[hibernatesearch-jboss-modules-packages]]
-==== List of the Hibernate Search WildFly/JBoss module packages
+[[hibernatesearch-jboss-modules-feature-packs]]
+==== List of the Hibernate Search WildFly/JBoss feature packs
 
-[[hibernatesearch-jboss-modules-packages-engine]]
-===== Engine package
+===== Engine feature pack
 
-This package includes all the main modules:
+This feature pack includes all the main modules:
 
 * _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
 * _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
 
-The package includes several more modules but you should not need to refer to the other ones directly.
+Several more modules are included but you should not need to refer to the other ones directly.
 
-The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-engine-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-engine~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-engine-{hibernateSearchVersion}-wildfly-11-dist:zip].
+The feature pack is published on the JBoss Nexus repository and Maven Central as
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-engine~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-engine:{hibernateSearchVersion}:zip].
 
-When installing this package, do not forget to also install the dependencies:
+===== ORM feature pack
 
-* Lucene version `{luceneVersion}`.
-  The Hibernate team publishes JBoss modules of Lucene as part of
-  https://github.com/hibernate/lucene-jbossmodules[this project].
-  See the README for download and usage instructions.
-  The modules are published to Maven repositories as ZIPs
-  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/lucene-jbossmodules/lucene-jbossmodules/[here] for downloads),
-  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
-
-[[hibernatesearch-jboss-modules-packages-orm]]
-===== ORM package
-
-This package includes the following modules:
+This feature pack includes the following modules:
 
 * _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate ORM.
 * _org.hibernate.search.jsr352_, to use the JSR-352 integration.
 
-The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-orm-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-orm~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-orm-{hibernateSearchVersion}-wildfly-11-dist:zip].
+The feature pack is published on the JBoss Nexus repository and Maven Central as
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-orm~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-orm:{hibernateSearchVersion}:zip].
 
-When installing this package, do not forget to also install the dependencies:
+===== Elasticsearch feature pack
 
-* The <<Hibernate Search engine package,hibernatesearch-jboss-modules-packages-engine>>,
-  along with each of its own dependencies.
-* Hibernate ORM version `5.2.3.Final` or a later version of the 5.2 branch, such as `{hibernateVersion}`.
-  When in doubt, refer to the http://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix on the website].
-  The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
+This feature pack includes the module _org.hibernate.search.elasticsearch_, to use the Elasticsearch integration.
 
-[[hibernatesearch-jboss-modules-packages-elasticsearch]]
-===== Elasticsearch package
+The feature pack is published on the JBoss Nexus repository and Maven Central as
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch:{hibernateSearchVersion}:zip].
 
-This package includes the module _org.hibernate.search.elasticsearch_, to use the Elasticsearch integration.
-
-The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-elasticsearch-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-{hibernateSearchVersion}-wildfly-11-dist:zip].
-
-When installing this package, do not forget to also install the dependencies:
-
-* The <<Hibernate Search engine package,hibernatesearch-jboss-modules-packages-engine>>,
-  along with each of its own dependencies.
-* Elasticsearch-client version `{elasticsearchClientVersion}`.
-  The Hibernate team publishes JBoss modules of Elasticsearch-client as part of
-  https://github.com/hibernate/elasticsearch-client-jbossmodules[this project].
-  The modules are published to Maven repositories as ZIPs
-  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/elasticsearch-client-jbossmodules/elasticsearch-client-jbossmodules/[here] for downloads),
-  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
-* Gson version `{gsonVersion}`.
-  The Hibernate team publishes JBoss modules of Gson as part of
-  https://github.com/hibernate/gson-jbossmodules[this project].
-  The modules are published to Maven repositories as ZIPs
-  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/gson-jbossmodules/gson-jbossmodules/[here] for downloads),
-  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
-
-[[hibernatesearch-jboss-modules-packages-elasticsearch-aws]]
-===== Elasticsearch-AWS package
+===== Elasticsearch-AWS feature pack
 
 This package includes an internal module enabling the <<elasticsearch-integration-configuration-aws,AWS authentication mechanism>>
 when connecting to an Elasticsearch cluster.
 
-The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-elasticsearch-aws-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-aws-{hibernateSearchVersion}-wildfly-11-dist:zip].
-
-When installing this package, do not forget to also install the dependencies:
-
-* The <<Hibernate Search Elasticsearch package,hibernatesearch-jboss-modules-packages-elasticsearch>>,
-  along with each of its own dependencies.
-* AWSv4 signer for Java version `{awsV4SignerJavaVersion}`.
-  The Hibernate team publishes JBoss modules of AWSv4 signer for Java as part of
-  https://github.com/hibernate/aws-v4-signer-java-jbossmodules[this project].
-  The modules are published to Maven repositories as ZIPs
-  (see https://repository.jboss.org/nexus/content/groups/public/org/hibernate/aws-v4-signer-java-jbossmodules/aws-v4-signer-java-jbossmodules/[here] for downloads),
-  and can be deployed to your WildFly instance by unpacking the ZIPs to the WildFly `modules` directory.
+The feature pack is published on the JBoss Nexus repository and Maven Central as
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-aws:{hibernateSearchVersion}:zip].
 
 ==== More about modules
 

@@ -19,24 +19,91 @@
     <description>Hibernate Search Elasticsearch AWS modules to use in JBoss AS / Wildfly</description>
 
     <properties>
-        <module.xml.basedir>src/main/modules</module.xml.basedir>
+        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
+        <template.dir>${featurepack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-elasticsearch-aws</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
+            <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>gen-module-elasticsearch-aws</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/elasticsearch-aws/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/search/elasticsearch-aws</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-feature-pack-buildfile</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/feature-pack-def</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.build</groupId>
+                <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>feature-pack-build</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <config-file>feature-pack-template.xml</config-file>
+                            <config-dir>${featurepack.dir}</config-dir>
+                            <resourcesDir>/</resourcesDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <finalName>${project.artifactId}-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                        <descriptor>${basedir}/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

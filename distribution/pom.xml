@@ -24,6 +24,18 @@
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+
+        <!--
+        We depend on our own WildFly feature packs, which themselves depend on
+        WildFly feature packs, whose dependencies do not converge.
+        The dependencies are excluded as per dependency management in the parent pom,
+        but unfortunately the Maven Enforcer plugin ignores wildcard exclusions:
+        https://issues.apache.org/jira/browse/MENFORCER-195
+        Thus we need to ignore the dependency convergence rule completely.
+        This should be okay though, since most distributed artifacts were checked
+        during their own build.
+         -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
 
     <dependencies>
@@ -117,25 +129,26 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-            <classifier>wildfly-11-dist</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-            <classifier>wildfly-11-dist</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-jbossmodules-hibernate-orm</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
-            <classifier>wildfly-11-dist</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
-            <classifier>wildfly-11-dist</classifier>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -206,7 +219,6 @@
                             <outputDirectory>${project.build.directory}/dist/</outputDirectory>
                             <includeGroupIds>${project.groupId}</includeGroupIds>
                             <includeTypes>zip</includeTypes>
-                            <includeClassifiers>wildfly-11-dist</includeClassifiers>
                             <excludeTransitive>true</excludeTransitive>
                         </configuration>
                     </execution>

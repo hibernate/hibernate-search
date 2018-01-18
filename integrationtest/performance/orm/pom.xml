@@ -227,58 +227,30 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!--
+                          This allows to run mvn clean install -am -pl :thismodule
+                          and have Maven re-build WildFly modules automatically.
+                          Otherwise the plugin would simply try to fetch the
+                          version in the local repository.
+                     -->
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-search-jbossmodules-engine</artifactId>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-11-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-11-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${hibernateVersion}</version>
-                                    <classifier>wildfly-11-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.lucene-jbossmodules</groupId>
-                                    <artifactId>lucene-jbossmodules</artifactId>
-                                    <version>${luceneTestingModuleVersion}</version>
-                                    <classifier>dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${jbosshome}/modules</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>copy-drivers</id>
                         <phase>process-test-resources</phase>
@@ -299,28 +271,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <!--
-                          This allows to run mvn clean install -am -pl :thismodule
-                          and have Maven re-build WildFly modules automatically.
-                          Otherwise the plugin would simply try to fetch the
-                          version in the local repository.
-                     -->
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                        <version>${project.version}</version>
-                        <classifier>wildfly-11-dist</classifier>
-                        <type>zip</type>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                        <version>${project.version}</version>
-                        <classifier>wildfly-11-dist</classifier>
-                        <type>zip</type>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
 

@@ -20,6 +20,7 @@
 
     <modules>
         <module>engine</module>
+        <module>hibernate-orm</module>
         <module>orm</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
@@ -27,12 +28,45 @@
     </modules>
 
     <properties>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
-        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
-        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.module.slot}</infinispan.integration.slot>
+        <hibernate.search.slot.full.id>${project.version}</hibernate.search.slot.full.id>
+        <hibernate.search.slot.simple.id>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.slot.simple.id>
+        <hibernate.orm.slot.full.id>${hibernateVersion}</hibernate.orm.slot.full.id>
+        <hibernate.orm.slot.simple.id>${hibernateShortVersion}</hibernate.orm.slot.simple.id>
+        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.slot.simple.id}</infinispan.integration.slot>
         <tika.module.slot>${tikaVersion}</tika.module.slot>
 
         <!-- Skip javadoc generation -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!--
+        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
+        -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <configuration>
+                        <rules>
+                            <requireJavaVersion>
+                                <!-- require JDK 1.8 to run the build -->
+                                <version>[${minJdkVersion},)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>${minMavenVersion}</version>
+                            </requireMavenVersion>
+                            <banDuplicatePomDependencyVersions />
+                            <!-- Disable the dependency convergence rule, because the dependencies of WildFly artifacts
+                                 do not converge
+                            <DependencyConvergence />
+                             -->
+                        </rules>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

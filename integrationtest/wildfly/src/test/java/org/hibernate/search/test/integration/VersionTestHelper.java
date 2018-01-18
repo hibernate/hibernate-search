@@ -59,7 +59,7 @@ public class VersionTestHelper {
 
 	public static synchronized String getHibernateORMModuleName() {
 		if ( hibernateOrmModuleName == null ) {
-			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${hibernate-orm.module.slot}" );
+			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${test.hibernate.orm.module.slot}" );
 		}
 		return hibernateOrmModuleName;
 	}

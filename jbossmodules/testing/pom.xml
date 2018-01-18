@@ -19,8 +19,8 @@
     <description>Additional JBoss modules which are meant for internal testing exclusively</description>
 
     <properties>
-        <module.xml.basedir>src/main/modules</module.xml.basedir>
-        <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
+        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
+        <template.dir>${featurepack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
@@ -32,23 +32,77 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-feature-pack</artifactId>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>gen-module-tika</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/apache/tika/${tika.module.slot}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/tika</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-feature-pack-buildfile</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/feature-pack-def</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.build</groupId>
+                <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>feature-pack-build</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <config-file>feature-pack-template.xml</config-file>
+                            <config-dir>${featurepack.dir}</config-dir>
+                            <resourcesDir>/</resourcesDir>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <finalName>${project.artifactId}-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                        <descriptor>${basedir}/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

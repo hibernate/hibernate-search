@@ -30,6 +30,7 @@
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>
         <test.hibernate.search.module.slot>main</test.hibernate.search.module.slot>
+        <test.hibernate.orm.module.slot>${hibernateShortVersion}</test.hibernate.orm.module.slot>
     </properties>
 
     <dependencyManagement>
@@ -375,6 +376,44 @@
                                 </configuration>
                             </execution>
                         </executions>
+                        <dependencies>
+                            <!--
+                                  This allows to run mvn clean install -am -pl :thismodule
+                                  and have Maven re-build WildFly modules automatically.
+                                  Otherwise the plugin would simply try to fetch the
+                                  version in the local repository.
+                             -->
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-engine</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
@@ -400,198 +439,6 @@
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>unpack-modules</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>${skipWildFlyPreparation}</skip>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-orm-modules</artifactId>
-                                            <version>${hibernateVersion}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-orm-modules</artifactId>
-                                            <version>${hibernateVersion}</version>
-                                            <classifier>wildfly-11-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-testing</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>testing-modules-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-search-jbossmodules-testing</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>testing-modules-dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.lucene-jbossmodules</groupId>
-                                            <artifactId>lucene-jbossmodules</artifactId>
-                                            <version>${luceneTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.lucene-jbossmodules</groupId>
-                                            <artifactId>lucene-jbossmodules</artifactId>
-                                            <version>${luceneTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
-                                            <artifactId>elasticsearch-client-jbossmodules</artifactId>
-                                            <version>${elasticsearchClientTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
-                                            <artifactId>elasticsearch-client-jbossmodules</artifactId>
-                                            <version>${elasticsearchClientTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.gson-jbossmodules</groupId>
-                                            <artifactId>gson-jbossmodules</artifactId>
-                                            <version>${gsonTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.gson-jbossmodules</groupId>
-                                            <artifactId>gson-jbossmodules</artifactId>
-                                            <version>${gsonTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
-                                            <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
-                                            <version>${awsV4SignerJavaTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/modules</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
-                                            <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
-                                            <version>${awsV4SignerJavaTestingModuleVersion}</version>
-                                            <classifier>dist</classifier>
-                                            <type>zip</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/modules</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>copy-drivers</id>
                                 <phase>pre-integration-test</phase>
@@ -619,42 +466,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                        <dependencies>
-                            <!--
-                                  This allows to run mvn clean install -am -pl :thismodule
-                                  and have Maven re-build WildFly modules automatically.
-                                  Otherwise the plugin would simply try to fetch the
-                                  version in the local repository.
-                             -->
-                            <dependency>
-                                <groupId>org.hibernate</groupId>
-                                <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                                <version>${project.version}</version>
-                                <classifier>wildfly-11-dist</classifier>
-                                <type>zip</type>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.hibernate</groupId>
-                                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                                <version>${project.version}</version>
-                                <classifier>wildfly-11-dist</classifier>
-                                <type>zip</type>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.hibernate</groupId>
-                                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
-                                <version>${project.version}</version>
-                                <classifier>testing-modules-dist</classifier>
-                                <type>zip</type>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.hibernate</groupId>
-                                <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
-                                <version>${project.version}</version>
-                                <classifier>wildfly-11-dist</classifier>
-                                <type>zip</type>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
@@ -670,7 +481,7 @@
                 </property>
             </activation>
             <properties>
-                <hibernate-orm.module.slot>main</hibernate-orm.module.slot>
+                <test.hibernate.orm.module.slot>main</test.hibernate.orm.module.slot>
             </properties>
         </profile>
     </profiles>

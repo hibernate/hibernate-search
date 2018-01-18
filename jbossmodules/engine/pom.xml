@@ -19,33 +19,167 @@
     <description>Hibernate Search Engine modules to use in JBoss AS / Wildfly</description>
 
     <properties>
-        <module.xml.basedir>src/main/modules</module.xml.basedir>
-        <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
+        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
+        <template.dir>${featurepack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-serialization-avro</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-backend-jms</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-backend-jgroups</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.lucene-jbossmodules</groupId>
+            <artifactId>lucene-jbossmodules</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-feature-pack</artifactId>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>gen-module-engine</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/engine/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/search/engine</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-alias-engine</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/engine/${hibernate.search.slot.simple.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/aliases/search/engine</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-module-serialization-avro</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/serialization-avro/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/search/serialization-avro</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-module-backend-jms</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/backend-jms/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/search/backend-jms</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-module-backend-jgroups</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/backend-jgroups/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules/search/backend-jgroups</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>gen-feature-pack-buildfile</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/feature-pack-def</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.build</groupId>
+                <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>feature-pack-build</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <config-file>feature-pack-template.xml</config-file>
+                            <config-dir>${featurepack.dir}</config-dir>
+                            <resourcesDir>/</resourcesDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <finalName>${project.artifactId}-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                        <descriptor>${basedir}/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

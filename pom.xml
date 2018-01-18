@@ -188,13 +188,13 @@
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.5</luceneVersion>
         <lucene.module.slot>5.5</lucene.module.slot>
-        <luceneTestingModuleVersion>5.5.5.hibernate04</luceneTestingModuleVersion>
+        <lucene.feature-pack.version>5.5.5.hibernate05</lucene.feature-pack.version>
         <infinispanVersion>9.0.1.Final</infinispanVersion>
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.2.11.Final</hibernateVersion>
-        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
+        <hibernateShortVersion>5.2</hibernateShortVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.3.Final</jandexVersion>
         <classMateVersion>1.3.0</classMateVersion>
@@ -236,13 +236,13 @@
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
         <elasticsearchClientVersion>5.6.5</elasticsearchClientVersion>
         <elasticsearch-client.module.slot>5.6</elasticsearch-client.module.slot>
-        <elasticsearchClientTestingModuleVersion>5.6.5.hibernate01</elasticsearchClientTestingModuleVersion>
+        <elasticsearch-client.feature-pack.version>5.6.5.hibernate02</elasticsearch-client.feature-pack.version>
         <gsonVersion>2.8.2</gsonVersion>
         <gson.module.slot>2.8</gson.module.slot>
-        <gsonTestingModuleVersion>2.8.2.hibernate02</gsonTestingModuleVersion>
+        <gson.feature-pack.version>2.8.2.hibernate03</gson.feature-pack.version>
         <awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
         <aws-v4-signer-java.module.slot>${awsV4SignerJavaVersion}</aws-v4-signer-java.module.slot>
-        <awsV4SignerJavaTestingModuleVersion>1.3.0.hibernate02</awsV4SignerJavaTestingModuleVersion>
+        <aws-v4-signer-java.feature-pack.version>1.3.0.hibernate03</aws-v4-signer-java.feature-pack.version>
 
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -575,29 +575,73 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-jbossmodules-engine</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-11-dist</classifier>
                 <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-jbossmodules-orm</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-11-dist</classifier>
                 <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-11-dist</classifier>
                 <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-11-dist</classifier>
                 <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-hibernate-orm</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -890,6 +934,73 @@
                 <artifactId>h2</artifactId>
                 <version>${h2Version}</version>
             </dependency>
+
+            <!-- External WildFly feature packs (to build our own feature packs) -->
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-feature-pack</artifactId>
+                <type>zip</type>
+                <version>${wildflyVersion}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.lucene-jbossmodules</groupId>
+                <artifactId>lucene-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${lucene.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
+                <artifactId>elasticsearch-client-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${elasticsearch-client.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.gson-jbossmodules</groupId>
+                <artifactId>gson-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${gson.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
+                <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${aws-v4-signer-java.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1038,6 +1149,11 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.wildfly.build</groupId>
+                    <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                    <version>1.2.5.Final</version>
+                </plugin>
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
