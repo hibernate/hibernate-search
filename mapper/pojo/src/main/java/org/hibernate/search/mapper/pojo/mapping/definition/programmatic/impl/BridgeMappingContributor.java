@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelCollector;

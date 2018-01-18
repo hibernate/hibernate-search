@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 
 
 /**

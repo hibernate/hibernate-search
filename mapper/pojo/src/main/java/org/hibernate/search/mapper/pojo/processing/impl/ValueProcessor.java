@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.mapper.pojo.model.PojoState;
 
 /**
  * @author Yoann Rodiere

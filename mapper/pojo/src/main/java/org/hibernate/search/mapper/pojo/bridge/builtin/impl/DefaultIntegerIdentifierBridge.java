@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 
 public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<Integer> {
 

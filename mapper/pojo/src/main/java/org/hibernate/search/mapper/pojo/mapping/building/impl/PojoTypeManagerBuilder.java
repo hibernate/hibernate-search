@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;

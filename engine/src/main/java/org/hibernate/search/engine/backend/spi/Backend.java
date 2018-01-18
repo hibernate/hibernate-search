@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 /**

@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.Store;
-import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;

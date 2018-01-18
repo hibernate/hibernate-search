@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
 
 /**
  * @author Yoann Rodiere

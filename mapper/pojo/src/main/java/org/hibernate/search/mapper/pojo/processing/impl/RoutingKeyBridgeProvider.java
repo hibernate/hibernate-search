@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.model.impl.PojoStateImpl;
-import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 
 public class RoutingKeyBridgeProvider<E> implements RoutingKeyProvider<E> {
 

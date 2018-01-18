@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMappingBuilderReference;
-import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
 
 /**
  * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 

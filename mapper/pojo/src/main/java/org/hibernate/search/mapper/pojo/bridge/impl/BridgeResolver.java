@@ -15,8 +15,8 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateFunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringFunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.spi.LoggerFactory;
 

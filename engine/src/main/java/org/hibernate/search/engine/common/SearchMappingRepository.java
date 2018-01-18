@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.engine.common;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.impl.SearchMappingRepositoryBuilderImpl;
-import org.hibernate.search.engine.mapper.mapping.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 /**
  * @author Yoann Rodiere

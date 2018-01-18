@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model;
 
-import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.spi.TerminalFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.TerminalFieldModelContext;
 
 
 /**

@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.processing.impl.BridgeValueProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeValueProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;

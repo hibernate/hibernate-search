@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.mapper.pojo.bridge.declaration.spi.BridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;

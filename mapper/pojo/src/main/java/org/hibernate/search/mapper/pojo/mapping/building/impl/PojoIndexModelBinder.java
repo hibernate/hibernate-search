@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 
 /**
  * Provides the ability to contribute the entity model to the index model
  * by creating bridges and
- * {@link org.hibernate.search.mapper.pojo.bridge.spi.Bridge#bind(IndexSchemaElement, PojoModelElement) binding}
+ * {@link Bridge#bind(IndexSchemaElement, PojoModelElement) binding}
  * them.
  * <p>
  * Incidentally, this will also generate the index model,

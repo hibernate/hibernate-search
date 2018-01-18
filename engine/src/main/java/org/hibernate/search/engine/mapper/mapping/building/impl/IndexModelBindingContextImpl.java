@@ -9,10 +9,10 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.model.spi.SearchModel;
+import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 

@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.model.impl;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;

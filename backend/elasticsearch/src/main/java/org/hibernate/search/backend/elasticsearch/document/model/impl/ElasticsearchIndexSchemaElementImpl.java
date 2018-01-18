@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.model.spi.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.backend.document.spi.IndexObjectReference;
+import org.hibernate.search.engine.backend.document.IndexObjectReference;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;

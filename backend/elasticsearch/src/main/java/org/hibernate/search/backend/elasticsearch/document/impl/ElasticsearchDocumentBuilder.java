@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;

@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 
 /**
  * @author Yoann Rodiere

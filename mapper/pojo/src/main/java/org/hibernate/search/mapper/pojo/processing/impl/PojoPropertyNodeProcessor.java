@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.mapper.pojo.model.PojoState;
 import org.hibernate.search.mapper.pojo.model.impl.PojoStateImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 

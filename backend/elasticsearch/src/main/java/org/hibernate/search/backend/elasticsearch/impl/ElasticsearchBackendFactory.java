@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.StubElasticsearchWor
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 
 

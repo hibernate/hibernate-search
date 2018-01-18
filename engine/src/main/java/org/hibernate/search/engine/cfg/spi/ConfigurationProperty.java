@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.KeyContextImpl;
 
 public interface ConfigurationProperty<T> {

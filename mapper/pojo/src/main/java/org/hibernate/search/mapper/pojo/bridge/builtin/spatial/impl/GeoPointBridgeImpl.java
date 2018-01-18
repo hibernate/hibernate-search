@@ -11,16 +11,16 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 
 import org.hibernate.search.engine.backend.document.model.Store;
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
-import org.hibernate.search.engine.mapper.model.spi.SearchModel;
-import org.hibernate.search.mapper.pojo.bridge.spi.Bridge;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.spi.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.engine.mapper.model.SearchModel;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoState;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.StreamHelper;
 

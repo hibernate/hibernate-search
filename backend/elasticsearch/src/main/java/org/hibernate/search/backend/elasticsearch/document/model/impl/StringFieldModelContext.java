@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.Store;
-import org.hibernate.search.engine.backend.document.model.spi.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoState;
 
 
 /**

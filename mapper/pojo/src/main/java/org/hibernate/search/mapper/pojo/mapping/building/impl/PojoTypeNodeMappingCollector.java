@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.spi.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 
 /**
  * @author Yoann Rodiere

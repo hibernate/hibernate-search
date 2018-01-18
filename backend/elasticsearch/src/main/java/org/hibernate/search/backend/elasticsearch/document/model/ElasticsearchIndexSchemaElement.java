@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 
 /**
  * @author Yoann Rodiere

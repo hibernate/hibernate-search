@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.impl;
 
-import org.hibernate.search.engine.backend.document.spi.DocumentState;
-import org.hibernate.search.engine.backend.document.spi.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 
 
 /**

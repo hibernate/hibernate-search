@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.spi.LoggerFactory;
 

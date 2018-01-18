@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.bridge.spi.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 
 /**
  * @author Yoann Rodiere

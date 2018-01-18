@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.backend.document.model.spi;
 
 
+import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+
 /**
  * @author Yoann Rodiere
  */
