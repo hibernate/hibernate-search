@@ -20,9 +20,16 @@ class ExtendedBeanManagerSynchronizer
 
 	private final CompletableFuture<Void> environmentInitialized = new CompletableFuture<>();
 
+	private final CompletableFuture<Void> environmentDestroying = new CompletableFuture<>();
+
 	@Override
 	public void whenEnvironmentReady(Runnable runnable) {
 		environmentInitialized.thenRun( runnable );
+	}
+
+	@Override
+	public void whenEnvironmentDestroying(Runnable runnable) {
+		environmentDestroying.thenRun( runnable );
 	}
 
 	@Override
@@ -32,6 +39,6 @@ class ExtendedBeanManagerSynchronizer
 
 	@Override
 	public void beforeBeanManagerDestroyed(BeanManager beanManager) {
-		// No-op
+		environmentDestroying.complete( null );
 	}
 }

@@ -23,6 +23,7 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.util.impl.Closer;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase. This observer will
@@ -45,6 +46,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final Metadata metadata;
 
 	private final CompletableFuture<ExtendedSearchIntegrator> extendedSearchIntegratorFuture = new CompletableFuture<>();
+	private final CompletableFuture<?> extendedSearchIntegratorClosingTrigger = new CompletableFuture<>();
 
 	//Guarded by synchronization on this
 	private JMXHook jmx;
@@ -64,6 +66,15 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		this.environmentSynchronizer = environmentSynchronizer;
 		this.managedBeanRegistry = managedBeanRegistry;
 		this.namingService = namingService;
+
+		/*
+		 * Make sure that if a Search integrator is created, it will eventually get closed,
+		 * either when the environment is destroyed (see the use of EnvironmentSynchronizer in #sessionFactoryCreated)
+		 * or when the session factory is closed (see #sessionFactoryClosed),
+		 * whichever happens first.
+		 */
+		extendedSearchIntegratorFuture.thenAcceptBoth( extendedSearchIntegratorClosingTrigger,
+				(integrator, ignored) -> this.cleanup( integrator ) );
 	}
 
 	@Override
@@ -73,6 +84,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			listener.initialize( extendedSearchIntegratorFuture );
 
 			if ( environmentSynchronizer != null ) {
+				environmentSynchronizer.whenEnvironmentDestroying( () -> {
+					// Trigger integrator closing if the integrator actually exists and wasn't already closed
+					extendedSearchIntegratorClosingTrigger.complete( null );
+				} );
 				environmentSynchronizer.whenEnvironmentReady( () -> {
 					try {
 						boot( factory );
@@ -154,14 +169,24 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	@Override
 	public void sessionFactoryClosed(SessionFactory factory) {
-		extendedSearchIntegratorFuture.thenAccept( this::cleanup );
+		/*
+		 * Trigger integrator closing if the integrator actually exists and wasn't already closed
+		 * The closing might have been triggered already if an EnvironmentSynchronizer is being used
+		 * (see #sessionFactoryCreated).
+		 */
+		extendedSearchIntegratorClosingTrigger.complete( null );
 	}
 
 	private synchronized void cleanup(ExtendedSearchIntegrator extendedIntegrator) {
-		if ( extendedIntegrator != null ) {
-			extendedIntegrator.close();
+		try (Closer<RuntimeException> closer = new Closer<>()) {
+			if ( extendedIntegrator != null ) {
+				closer.push( extendedIntegrator::close );
+			}
+			if ( jmx != null ) {
+				closer.push( jmx::unRegisterIfRegistered );
+				jmx = null;
+			}
 		}
-		jmx.unRegisterIfRegistered();
 	}
 
 }

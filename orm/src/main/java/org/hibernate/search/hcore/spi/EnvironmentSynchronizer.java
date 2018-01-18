@@ -32,4 +32,16 @@ public interface EnvironmentSynchronizer extends Service {
 	 */
 	void whenEnvironmentReady(Runnable runnable);
 
+	/**
+	 * Run the given work just before the environment is
+	 * destroyed (exactly what "destroyed" means is
+	 * implementation-dependent).
+	 * <p>
+	 * If the environment is already "destroyed", run the
+	 * work now, synchronously.
+	 *
+	 * @param runnable
+	 */
+	void whenEnvironmentDestroying(Runnable runnable);
+
 }
