@@ -1524,7 +1524,7 @@ When installing this package, do not forget to also install the dependencies:
 This package includes the module _org.hibernate.search.elasticsearch_, to use the Elasticsearch integration.
 
 The package can be downloaded from http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-jbossmodules-elasticsearch-{hibernateSearchVersion}-wildfly-11-dist.zip/download[Sourceforge],
-and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-{hibernateSearchVersion}-wildfly-11-dist:zip].
+and is also published as a Maven artifact: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-elasticsearch~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-elasticsearch-{hibernateSearchVersion}-wildfly-11-dist:zip].
 
 When installing this package, do not forget to also install the dependencies:
 
