@@ -6,11 +6,17 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 
 /**
@@ -73,28 +79,30 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 		}
 	}
 
-	public <N, T> Optional<T> addIndexedEmbeddedIfIncluded(
+	public Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(
 			String relativePrefix,
 			Function<IndexedEmbeddedFilter, IndexedEmbeddedFilter> filterCompositionFunction,
-			N indexModelNode, BiFunction<N, String, N> recursionFunction,
-			BiFunction<N, IndexSchemaNestingContextImpl, T> finisher) {
+			IndexSchemaCollector indexModelNode) {
 		IndexedEmbeddedFilter composedFilter = filterCompositionFunction.apply( filter );
 		if ( !composedFilter.isTerminal() ) {
 			String prefixToParse = unconsumedPrefix + relativePrefix;
-			N currentNode = indexModelNode;
+			IndexSchemaCollector currentNode = indexModelNode;
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
+			List<IndexObjectFieldAccessor> parentObjectAccessors = new ArrayList<>();
 			while ( nextDotIndex >= 0 ) {
 				String objectName = prefixToParse.substring( afterPreviousDotIndex, nextDotIndex );
-				currentNode = recursionFunction.apply( currentNode, objectName );
+				ObjectFieldIndexSchemaCollector nextNode = currentNode.objectField( objectName );
+				parentObjectAccessors.add( nextNode.withContext( IndexSchemaNestingContext.includeAll() ).createAccessor() );
 				afterPreviousDotIndex = nextDotIndex + 1;
 				nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
+				currentNode = nextNode;
 			}
 			String unconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
 			IndexSchemaNestingContextImpl nestedContext =
 					new IndexSchemaNestingContextImpl( composedFilter, relativePrefix, unconsumedPrefix );
-			return Optional.of( finisher.apply( currentNode, nestedContext ) );
+			return Optional.of( new IndexModelBindingContextImpl( currentNode, parentObjectAccessors, nestedContext ) );
 		}
 		else {
 			return Optional.empty();

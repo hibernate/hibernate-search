@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -23,7 +23,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentBuilder> {
+public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentObjectBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -52,12 +52,12 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	}
 
 	@Override
-	public ChangesetIndexWorker<ElasticsearchDocumentBuilder> createWorker(SessionContext context) {
+	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext context) {
 		return new ElasticsearchChangesetIndexWorker( workFactory, changesetOrchestrator, name, context );
 	}
 
 	@Override
-	public StreamIndexWorker<ElasticsearchDocumentBuilder> createStreamWorker(SessionContext context) {
+	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext context) {
 		return new ElasticsearchStreamIndexWorker( workFactory, streamOrchestrator, name, context );
 	}
 

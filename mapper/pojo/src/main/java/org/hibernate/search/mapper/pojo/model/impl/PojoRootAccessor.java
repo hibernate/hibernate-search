@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 
 class PojoRootAccessor<T> implements PojoModelElementAccessor<T> {
@@ -24,8 +24,8 @@ class PojoRootAccessor<T> implements PojoModelElementAccessor<T> {
 	}
 
 	@Override
-	public T read(PojoState bridgedElement) {
-		return type.cast( ((PojoStateImpl) bridgedElement).get() );
+	public T read(PojoElement bridgedElement) {
+		return type.cast( ((PojoElementImpl) bridgedElement).get() );
 	}
 
 }

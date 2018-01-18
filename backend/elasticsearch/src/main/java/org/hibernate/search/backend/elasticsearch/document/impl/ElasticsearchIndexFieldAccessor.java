@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -24,15 +24,14 @@ public class ElasticsearchIndexFieldAccessor<T> implements IndexFieldAccessor<T>
 
 	private final ElasticsearchFieldModel model;
 
-	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor,
-			ElasticsearchFieldModel model) {
+	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor, ElasticsearchFieldModel model) {
 		this.accessor = accessor;
 		this.model = model;
 	}
 
 	@Override
-	public void write(DocumentState state, T value) {
-		((ElasticsearchDocumentBuilder) state).add( accessor, model.getFormatter().format( value ) );
+	public void write(DocumentElement state, T value) {
+		((ElasticsearchDocumentObjectBuilder) state).add( model.getParent(), accessor, model.getFormatter().format( value ) );
 	}
 
 }

@@ -9,11 +9,14 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 
 public interface IndexModelBindingContext {
+
+	Iterable<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
 
 	IndexSchemaElement getSchemaElement();
 

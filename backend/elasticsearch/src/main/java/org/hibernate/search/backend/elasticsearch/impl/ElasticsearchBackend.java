@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElasticsearchWorkOrchestrator;
@@ -21,7 +21,7 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilder> {
+public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchClient client;
 
@@ -42,7 +42,7 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentBuilde
 	}
 
 	@Override
-	public IndexManagerBuilder<ElasticsearchDocumentBuilder> createIndexManagerBuilder(
+	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
 			String name, BuildContext context, ConfigurationPropertySource propertySource) {
 		return new ElasticsearchIndexManagerBuilder( this, name, context, propertySource );
 	}

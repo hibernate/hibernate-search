@@ -10,8 +10,8 @@ import org.hibernate.search.engine.backend.document.impl.DeferredInitializationI
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -23,23 +23,25 @@ import com.google.gson.JsonPrimitive;
  */
 class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> {
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 
-	public IntegerFieldModelContext(UnknownTypeJsonAccessor accessor) {
-		this.accessor = accessor;
+	public IntegerFieldModelContext(String relativeName) {
+		this.relativeName = relativeName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference, ElasticsearchFieldModelCollector collector) {
-		PropertyMapping mapping = super.contribute( reference, collector );
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
+			ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
+		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( IntegerFieldFormatter.INSTANCE );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, IntegerFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
 		mapping.setType( DataType.INTEGER );
 
-		String absolutePath = accessor.getStaticAbsolutePath();
-
+		String absolutePath = parentModel.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, model );
 
 		return mapping;

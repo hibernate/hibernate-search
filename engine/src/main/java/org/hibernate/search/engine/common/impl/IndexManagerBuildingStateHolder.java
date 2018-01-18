@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
-import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.backend.index.impl.SimplifyingIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -77,7 +77,7 @@ public class IndexManagerBuildingStateHolder {
 		return createIndexManagerBuildingState( backend, indexName, indexPropertySource, typeOrdering );
 	}
 
-	private <D extends DocumentState> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
+	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
 			Backend<D> backend, String indexName, ConfigurationPropertySource indexPropertySource,
 			IndexableTypeOrdering typeOrdering) {
 		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, buildContext, indexPropertySource );
@@ -96,7 +96,7 @@ public class IndexManagerBuildingStateHolder {
 		return backendFactory.create( backendName, buildContext, backendPropertySource );
 	}
 
-	private static class IndexMappingBuildingStateImpl<D extends DocumentState> implements IndexManagerBuildingState<D> {
+	private static class IndexMappingBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;

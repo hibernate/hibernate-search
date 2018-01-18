@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.index.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Yoann Rodiere
  */
-public class SimplifyingIndexManager<D extends DocumentState> implements IndexManager<D> {
+public class SimplifyingIndexManager<D extends DocumentElement> implements IndexManager<D> {
 
 	private final IndexManager<D> delegate;
 

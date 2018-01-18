@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Yoann Rodiere
  */
-public abstract class ElasticsearchIndexWorker implements IndexWorker<ElasticsearchDocumentBuilder> {
+public abstract class ElasticsearchIndexWorker implements IndexWorker<ElasticsearchDocumentObjectBuilder> {
 
 	protected final ElasticsearchWorkFactory factory;
 	protected final String indexName;
@@ -32,20 +32,20 @@ public abstract class ElasticsearchIndexWorker implements IndexWorker<Elasticsea
 
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
 		String id = toActualId( referenceProvider.getIdentifier() );
 		String routingKey = referenceProvider.getRoutingKey();
-		ElasticsearchDocumentBuilder builder = new ElasticsearchDocumentBuilder();
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
 		documentContributor.contribute( builder );
 		collect( factory.add( indexName, id, routingKey, builder.build() ) );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentBuilder> documentContributor) {
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
 		String id = toActualId( referenceProvider.getIdentifier() );
 		String routingKey = referenceProvider.getRoutingKey();
-		ElasticsearchDocumentBuilder builder = new ElasticsearchDocumentBuilder();
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
 		documentContributor.contribute( builder );
 		collect( factory.update( indexName, id, routingKey, builder.build() ) );
 	}

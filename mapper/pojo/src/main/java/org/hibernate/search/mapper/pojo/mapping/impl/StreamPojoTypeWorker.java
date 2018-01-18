@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
 /**
  * @author Yoann Rodiere
  */
-class StreamPojoTypeWorker<D extends DocumentState, E> extends PojoTypeWorker<D, E, StreamIndexWorker<D>> {
+class StreamPojoTypeWorker<D extends DocumentElement, E> extends PojoTypeWorker<D, E, StreamIndexWorker<D>> {
 
 	public StreamPojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext,
 			StreamIndexWorker<D> delegate) {

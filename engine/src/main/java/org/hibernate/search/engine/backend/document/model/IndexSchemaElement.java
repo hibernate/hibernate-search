@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.model;
 
-import org.hibernate.search.engine.backend.document.IndexObjectAccessor;
+
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
 
 /**
  * @author Yoann Rodiere
@@ -15,8 +16,6 @@ public interface IndexSchemaElement {
 
 	FieldModelContext field(String relativeName);
 
-	IndexSchemaElement objectField(String relativeName);
-
-	IndexObjectAccessor createAccessor();
+	IndexSchemaObjectField objectField(String relativeName);
 
 }

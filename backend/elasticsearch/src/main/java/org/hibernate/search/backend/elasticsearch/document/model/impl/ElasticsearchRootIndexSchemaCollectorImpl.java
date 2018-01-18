@@ -10,14 +10,12 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNesting
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 public class ElasticsearchRootIndexSchemaCollectorImpl
-		extends AbstractElasticsearchIndexSchemaCollector<IndexSchemaTypeNodeBuilder>
-		implements ElasticsearchIndexSchemaNodeContributor<TypeMapping> {
+		extends AbstractElasticsearchIndexSchemaCollector<IndexSchemaTypeNodeBuilder> {
 
 	public ElasticsearchRootIndexSchemaCollectorImpl() {
-		super( JsonAccessor.root(), new IndexSchemaTypeNodeBuilder( JsonAccessor.root() ) );
+		super( new IndexSchemaTypeNodeBuilder() );
 	}
 
 	@Override
@@ -26,7 +24,7 @@ public class ElasticsearchRootIndexSchemaCollectorImpl
 		 * Note: this ignores any previous nesting context, but that's alright since
 		 * nesting context composition is handled in the engine.
 		 */
-		return new ElasticsearchIndexSchemaElementImpl( accessor, nodeBuilder, context );
+		return new ElasticsearchIndexSchemaElementImpl( nodeBuilder, context );
 	}
 
 	@Override
@@ -34,7 +32,6 @@ public class ElasticsearchRootIndexSchemaCollectorImpl
 		nodeBuilder.setRouting( RoutingType.REQUIRED );
 	}
 
-	@Override
 	public TypeMapping contribute(ElasticsearchFieldModelCollector collector) {
 		return nodeBuilder.contribute( collector );
 	}

@@ -11,9 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
@@ -34,7 +36,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingD
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -755,6 +757,7 @@ public class JavaBeanElasticsearchIT {
 		private final String objectName;
 
 		private PojoModelElementAccessor<IndexedEntity> sourceAccessor;
+		private IndexObjectFieldAccessor objectFieldAccessor;
 		private IndexFieldAccessor<String> textFieldAccessor;
 		private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
 
@@ -766,17 +769,19 @@ public class JavaBeanElasticsearchIT {
 		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
-			IndexSchemaElement objectFieldMetadata = indexSchemaElement.objectField( objectName );
-			textFieldAccessor = objectFieldMetadata.field( "text" ).asString().createAccessor();
-			localDateFieldAccessor = objectFieldMetadata.field( "date" ).asLocalDate().createAccessor();
+			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
+			objectFieldAccessor = objectField.createAccessor();
+			textFieldAccessor = objectField.field( "text" ).asString().createAccessor();
+			localDateFieldAccessor = objectField.field( "date" ).asLocalDate().createAccessor();
 		}
 
 		@Override
-		public void write(DocumentState target, PojoState source) {
+		public void write(DocumentElement target, PojoElement source) {
 			IndexedEntity sourceValue = sourceAccessor.read( source );
 			if ( sourceValue != null ) {
-				textFieldAccessor.write( target, sourceValue.getText() );
-				localDateFieldAccessor.write( target, sourceValue.getLocalDate() );
+				DocumentElement object = objectFieldAccessor.add( target );
+				textFieldAccessor.write( object, sourceValue.getText() );
+				localDateFieldAccessor.write( object, sourceValue.getLocalDate() );
 			}
 		}
 

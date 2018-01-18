@@ -12,7 +12,6 @@ import org.hibernate.search.engine.backend.document.model.TerminalFieldModelCont
 import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
@@ -23,12 +22,12 @@ import org.hibernate.search.util.SearchException;
 public class ElasticsearchFieldModelContextImpl
 		implements ElasticsearchFieldModelContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 
 	private ElasticsearchIndexSchemaNodeContributor<PropertyMapping> delegate;
 
-	public ElasticsearchFieldModelContextImpl(UnknownTypeJsonAccessor accessor) {
-		this.accessor = accessor;
+	public ElasticsearchFieldModelContextImpl(String relativeName) {
+		this.relativeName = relativeName;
 	}
 
 	@Override
@@ -54,33 +53,34 @@ public class ElasticsearchFieldModelContextImpl
 
 	@Override
 	public TypedFieldModelContext<String> asString() {
-		return setDelegate( new StringFieldModelContext( accessor ) );
+		return setDelegate( new StringFieldModelContext( relativeName ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<Integer> asInteger() {
-		return setDelegate( new IntegerFieldModelContext( accessor ) );
+		return setDelegate( new IntegerFieldModelContext( relativeName ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateFieldModelContext( accessor ) );
+		return setDelegate( new LocalDateFieldModelContext( relativeName ) );
 	}
 
 	@Override
 	public TypedFieldModelContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointFieldModelContext( accessor ) );
+		return setDelegate( new GeoPointFieldModelContext( relativeName ) );
 	}
 
 	@Override
 	public TerminalFieldModelContext<String> asJsonString(String mappingJsonString) {
-		return setDelegate( new JsonStringFieldModelContext( accessor, mappingJsonString ) );
+		return setDelegate( new JsonStringFieldModelContext( relativeName, mappingJsonString ) );
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector) {
+	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
 		// TODO error if delegate is null
-		return delegate.contribute( collector );
+		return delegate.contribute( collector, parentModel );
 	}
 
 	private <T extends ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> T setDelegate(T context) {

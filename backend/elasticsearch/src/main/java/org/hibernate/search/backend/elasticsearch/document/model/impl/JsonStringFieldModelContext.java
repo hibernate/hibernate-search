@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.TerminalFieldModelContext;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,12 +30,12 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 	private DeferredInitializationIndexFieldAccessor<String> reference =
 			new DeferredInitializationIndexFieldAccessor<>();
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 
 	private final String mappingJsonString;
 
-	public JsonStringFieldModelContext(UnknownTypeJsonAccessor accessor, String mappingJsonString) {
-		this.accessor = accessor;
+	public JsonStringFieldModelContext(String relativeName, String mappingJsonString) {
+		this.relativeName = relativeName;
 		this.mappingJsonString = mappingJsonString;
 	}
 
@@ -45,14 +45,16 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector) {
+	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( JsonStringFieldFormatter.INSTANCE );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, JsonStringFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
 
-		String absolutePath = accessor.getStaticAbsolutePath();
+		String absolutePath = parentModel.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, model );
 
 		return mapping;

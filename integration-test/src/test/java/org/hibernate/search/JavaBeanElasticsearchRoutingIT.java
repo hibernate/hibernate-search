@@ -16,7 +16,7 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -235,7 +235,7 @@ public class JavaBeanElasticsearchRoutingIT {
 		}
 
 		@Override
-		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoState source) {
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source) {
 			EntityCategory category = categoryAccessor.read( source );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {

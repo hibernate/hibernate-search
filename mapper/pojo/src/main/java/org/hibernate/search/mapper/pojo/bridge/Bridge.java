@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 
 /**
  * @author Yoann Rodiere
@@ -20,7 +20,7 @@ public interface Bridge extends AutoCloseable {
 	void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 			SearchModel searchModel);
 
-	void write(DocumentState target, PojoState source);
+	void write(DocumentElement target, PojoElement source);
 
 	@Override
 	default void close() {

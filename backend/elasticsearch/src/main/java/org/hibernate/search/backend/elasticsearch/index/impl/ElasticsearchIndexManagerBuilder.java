@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
@@ -22,7 +22,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentBuilder> {
+public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchBackend backend;
 	private final String indexName;

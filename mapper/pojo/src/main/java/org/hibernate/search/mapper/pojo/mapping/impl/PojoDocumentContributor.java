@@ -8,11 +8,11 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
 
-class PojoDocumentContributor<D extends DocumentState, E> implements DocumentContributor<D> {
+class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentContributor<D> {
 
 	private final PojoTypeNodeProcessor processor;
 

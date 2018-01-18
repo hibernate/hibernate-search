@@ -8,20 +8,18 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractElasticsearchIndexSchemaCollector<B extends AbstractIndexSchemaCompositeNodeBuilder<?>>
+abstract class AbstractElasticsearchIndexSchemaCollector<B extends AbstractIndexSchemaObjectNodeBuilder>
 		implements IndexSchemaCollector {
 
-	protected final JsonObjectAccessor accessor;
 	protected final B nodeBuilder;
 
-	AbstractElasticsearchIndexSchemaCollector(JsonObjectAccessor accessor, B nodeBuilder) {
-		this.accessor = accessor;
+	AbstractElasticsearchIndexSchemaCollector(B nodeBuilder) {
 		this.nodeBuilder = nodeBuilder;
 	}
 
@@ -29,28 +27,20 @@ abstract class AbstractElasticsearchIndexSchemaCollector<B extends AbstractIndex
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "accessor=" ).append( accessor )
 				.append( ",nodeBuilder=" ).append( nodeBuilder )
 				.append( "]" )
 				.toString();
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaElement withContext(IndexSchemaNestingContext context) {
-		/*
-		 * Note: this ignores any previous nesting context, but that's alright since
-		 * nesting context composition is handled in the engine.
-		 */
-		return new ElasticsearchIndexSchemaElementImpl( accessor, nodeBuilder, context );
-	}
+	public abstract ElasticsearchIndexSchemaElement withContext(IndexSchemaNestingContext context);
 
 	@Override
-	public IndexSchemaCollector objectField(String relativeName) {
-		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
+	public ObjectFieldIndexSchemaCollector objectField(String relativeName) {
 		IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-				new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
+				new IndexSchemaObjectPropertyNodeBuilder( relativeName );
 		nodeBuilder.putProperty( relativeName, nestedNodeBuilder );
-		return new ElasticsearchObjectFieldIndexSchemaCollectorImpl( propertyAccessor, nestedNodeBuilder );
+		return new ElasticsearchObjectFieldIndexSchemaCollectorImpl( nestedNodeBuilder );
 	}
 
 }

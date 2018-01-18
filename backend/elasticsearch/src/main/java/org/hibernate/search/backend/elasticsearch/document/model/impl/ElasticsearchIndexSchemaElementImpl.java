@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.IndexObjectAccessor;
 import org.hibernate.search.engine.backend.document.model.FieldModelContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaObjectField;
 
 /**
  * @author Yoann Rodiere
@@ -19,13 +17,11 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAcces
 class ElasticsearchIndexSchemaElementImpl
 		implements ElasticsearchIndexSchemaElement {
 
-	protected final JsonObjectAccessor accessor;
-	private final AbstractIndexSchemaCompositeNodeBuilder<?> nodeBuilder;
+	protected final AbstractIndexSchemaObjectNodeBuilder nodeBuilder;
 	private final IndexSchemaNestingContext nestingContext;
 
-	ElasticsearchIndexSchemaElementImpl(JsonObjectAccessor accessor,
-			AbstractIndexSchemaCompositeNodeBuilder<?> nodeBuilder, IndexSchemaNestingContext nestingContext) {
-		this.accessor = accessor;
+	ElasticsearchIndexSchemaElementImpl(AbstractIndexSchemaObjectNodeBuilder nodeBuilder,
+			IndexSchemaNestingContext nestingContext) {
 		this.nodeBuilder = nodeBuilder;
 		this.nestingContext = nestingContext;
 	}
@@ -34,7 +30,7 @@ class ElasticsearchIndexSchemaElementImpl
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "accessor=" ).append( accessor )
+				.append( "absolutePath=" ).append( nodeBuilder.getAbsolutePath() )
 				.append( ",nestingContext=" ).append( nestingContext )
 				.append( "]" )
 				.toString();
@@ -46,46 +42,35 @@ class ElasticsearchIndexSchemaElementImpl
 				relativeName,
 				// If the field is included
 				prefixedName -> {
-					UnknownTypeJsonAccessor propertyAccessor = accessor.property( prefixedName );
 					ElasticsearchFieldModelContextImpl fieldContext =
-							new ElasticsearchFieldModelContextImpl( propertyAccessor );
+							new ElasticsearchFieldModelContextImpl( prefixedName );
 					// Only take the contributor into account if the field is included
 					nodeBuilder.putProperty( prefixedName, fieldContext );
 					return fieldContext;
 				},
 				// If the field is filtered out
-				prefixedName -> {
-					UnknownTypeJsonAccessor propertyAccessor = accessor.property( prefixedName );
-					return new ElasticsearchFieldModelContextImpl( propertyAccessor );
-				} );
+				ElasticsearchFieldModelContextImpl::new
+				);
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaElement objectField(String relativeName) {
-
-		// Only take the contributor into account if the child is included
+	public ElasticsearchIndexSchemaObjectField objectField(String relativeName) {
 		return nestingContext.nest(
 				relativeName,
 				// If the field is included
 				(prefixedName, filter) -> {
-					JsonObjectAccessor propertyAccessor = accessor.property( prefixedName ).asObject();
 					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-							new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
+							new IndexSchemaObjectPropertyNodeBuilder( nodeBuilder.getAbsolutePath(), prefixedName );
+					// Only take the contributor into account if the field is included
 					nodeBuilder.putProperty( prefixedName, nestedNodeBuilder );
-					return new ElasticsearchIndexSchemaElementImpl( propertyAccessor, nestedNodeBuilder, filter );
+					return new ElasticsearchIndexSchemaObjectFieldImpl( nestedNodeBuilder, filter );
 				},
 				// If the field is filtered out
 				(prefixedName, filter) -> {
-					JsonObjectAccessor propertyAccessor = accessor.property( prefixedName ).asObject();
 					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-							new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
-					return new ElasticsearchIndexSchemaElementImpl( propertyAccessor, nestedNodeBuilder, filter );
+							new IndexSchemaObjectPropertyNodeBuilder( nodeBuilder.getAbsolutePath(), prefixedName );
+					return new ElasticsearchIndexSchemaObjectFieldImpl( nestedNodeBuilder, filter );
 				} );
 	}
 
-	@Override
-	public IndexObjectAccessor createAccessor() {
-		// TODO Object accessors
-		throw new UnsupportedOperationException( "object accessors not implemented yet" );
-	}
 }

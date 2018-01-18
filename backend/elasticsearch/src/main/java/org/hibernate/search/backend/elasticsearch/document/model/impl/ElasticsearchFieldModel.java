@@ -11,10 +11,17 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
  */
 public class ElasticsearchFieldModel {
 
+	private final ElasticsearchObjectNodeModel parent;
+
 	private final ElasticsearchFieldFormatter formatter;
 
-	public ElasticsearchFieldModel(ElasticsearchFieldFormatter formatter) {
+	public ElasticsearchFieldModel(ElasticsearchObjectNodeModel parent, ElasticsearchFieldFormatter formatter) {
+		this.parent = parent;
 		this.formatter = formatter;
+	}
+
+	public ElasticsearchObjectNodeModel getParent() {
+		return parent;
 	}
 
 	public ElasticsearchFieldFormatter getFormatter() {

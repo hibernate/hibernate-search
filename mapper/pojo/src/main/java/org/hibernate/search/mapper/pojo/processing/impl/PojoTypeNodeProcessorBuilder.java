@@ -57,7 +57,8 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	}
 
 	public PojoTypeNodeProcessor build() {
-		return new PojoTypeNodeProcessor( processors, propertyProcessorBuilders.values() );
+		return new PojoTypeNodeProcessor( bindingContext.getParentIndexObjectAccessors(),
+				processors, propertyProcessorBuilders.values() );
 	}
 
 }

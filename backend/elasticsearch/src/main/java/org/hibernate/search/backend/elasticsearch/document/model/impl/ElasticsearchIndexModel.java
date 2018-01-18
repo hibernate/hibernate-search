@@ -20,7 +20,7 @@ public class ElasticsearchIndexModel {
 	private final TypeMapping mapping;
 	private final Map<String, ElasticsearchFieldModel> fieldModels = new HashMap<>();
 
-	public ElasticsearchIndexModel(String indexName, ElasticsearchIndexSchemaNodeContributor<TypeMapping> collector) {
+	public ElasticsearchIndexModel(String indexName, ElasticsearchRootIndexSchemaCollectorImpl collector) {
 		this.indexName = indexName;
 		this.mapping = collector.contribute( fieldModels::put );
 	}

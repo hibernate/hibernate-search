@@ -8,11 +8,11 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
 
-class PojoDocumentReferenceProvider<D extends DocumentState, E> implements DocumentReferenceProvider {
+class PojoDocumentReferenceProvider<D extends DocumentElement, E> implements DocumentReferenceProvider {
 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 

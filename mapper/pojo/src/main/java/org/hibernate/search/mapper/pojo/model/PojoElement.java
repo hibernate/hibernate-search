@@ -8,17 +8,17 @@ package org.hibernate.search.mapper.pojo.model;
 
 
 /**
- * A {@link PojoState} contains a value that can be processed into
+ * A {@link PojoElement} contains a value that can be processed into
  * an index document, be it composite (an entity) or atomic
  * (a primitive value).
  * <p>
- * {@link PojoState}s only provide access to a set of previously
+ * {@link PojoElement}s only provide access to a set of previously
  * registered paths, accessed through a {@link PojoModelElementAccessor}.
  *
  * @see PojoModelElement
  *
  * @author Yoann Rodiere
  */
-public interface PojoState {
+public interface PojoElement {
 
 }

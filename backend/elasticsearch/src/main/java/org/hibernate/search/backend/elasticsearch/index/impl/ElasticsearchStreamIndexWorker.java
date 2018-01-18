@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentBuilder;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
  * @author Yoann Rodiere
  */
 public class ElasticsearchStreamIndexWorker extends ElasticsearchIndexWorker
-		implements StreamIndexWorker<ElasticsearchDocumentBuilder> {
+		implements StreamIndexWorker<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
 

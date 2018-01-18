@@ -10,39 +10,47 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.backend.document.DocumentState;
-import org.hibernate.search.mapper.pojo.model.PojoState;
-import org.hibernate.search.mapper.pojo.model.impl.PojoStateImpl;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 
 /**
  * @author Yoann Rodiere
  */
 public class PojoTypeNodeProcessor {
 
+	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
 	private final Collection<ValueProcessor> typeScopedProcessors;
 	private final Collection<PojoPropertyNodeProcessor> propertyScopedProcessors;
 
-	public PojoTypeNodeProcessor(Collection<ValueProcessor> typeScopedProcessors,
+	public PojoTypeNodeProcessor(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
+			Collection<ValueProcessor> typeScopedProcessors,
 			Collection<PojoPropertyNodeProcessorBuilder> propertyScopedProcessorBuilders) {
+		this.parentObjectAccessors = parentObjectAccessors;
 		this.typeScopedProcessors = typeScopedProcessors.isEmpty() ? Collections.emptyList() : new ArrayList<>( typeScopedProcessors );
 		this.propertyScopedProcessors = propertyScopedProcessorBuilders.isEmpty() ?
 				Collections.emptyList() : new ArrayList<>( propertyScopedProcessorBuilders.size() );
 		propertyScopedProcessorBuilders.forEach( builder -> this.propertyScopedProcessors.add( builder.build() ) );
 	}
 
-	public final void process(Object source, DocumentState destination) {
+	public final void process(Object source, DocumentElement destination) {
 		if ( source == null ) {
 			return;
 		}
+		DocumentElement parentObject = destination;
+		for ( IndexObjectFieldAccessor objectAccessor : parentObjectAccessors ) {
+			parentObject = objectAccessor.add( parentObject );
+		}
 		if ( !typeScopedProcessors.isEmpty() ) {
-			PojoState bridgedElement = new PojoStateImpl( source );
+			PojoElement bridgedElement = new PojoElementImpl( source );
 			for ( ValueProcessor processor : typeScopedProcessors ) {
-				processor.process( destination, bridgedElement );
+				processor.process( parentObject, bridgedElement );
 			}
 		}
 		for ( PojoPropertyNodeProcessor processor : propertyScopedProcessors ) {
 			// Recursion here
-			processor.process( source, destination );
+			processor.process( source, parentObject );
 		}
 	}
 

@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -22,12 +18,16 @@ import org.hibernate.search.engine.backend.document.impl.DeferredInitializationI
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
+
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.YEAR;
 
 /**
  * @author Yoann Rodiere
@@ -46,25 +46,27 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 							.withResolverStyle( ResolverStyle.STRICT )
 			);
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 	private final LocalDateFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
 
-	public LocalDateFieldModelContext(UnknownTypeJsonAccessor accessor) {
-		this.accessor = accessor;
+	public LocalDateFieldModelContext(String relativeName) {
+		this.relativeName = relativeName;
 	}
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<LocalDate> reference,
-			ElasticsearchFieldModelCollector collector) {
-		PropertyMapping mapping = super.contribute( reference, collector );
+			ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
+		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( formatter );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, formatter );
 
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
 		mapping.setType( DataType.DATE );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
 
-		String absolutePath = accessor.getStaticAbsolutePath();
+		String absolutePath = parentModel.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, model );
 
 		return mapping;

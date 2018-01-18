@@ -8,6 +8,9 @@ package org.hibernate.search.engine.backend.document;
 
 
 /**
+ * An accessor to a specific field of an index document,
+ * allowing to add new values to this field for a given document.
+ *
  * @author Yoann Rodiere
  */
 public interface IndexFieldAccessor<T> {
@@ -15,69 +18,12 @@ public interface IndexFieldAccessor<T> {
 	/**
 	 * Add a new value to the given state for the field targeted by this reference.
 	 * <p>
-	 * If the field is part of nested objects, these nested objects will be created
-	 * as necessary.
-	 * <p>
-	 * For instance, let's imagine a document with a field named {@code field} nested
-	 * in two objects, resulting in the absolute path {@code parent.child.field}.
-	 * If the document being produced is empty, and you call {@link #write(DocumentState, Object)}
-	 * on a reference to this field, the document will look like this:
-	 * <code><pre>
-	 * {
-	 *   "parent": {
-	 *     "child": {
-	 *       "field": (some value)
-	 *     }
-	 *   }
-	 * }
-	 * </pre></code>
-	 * The {@code parent} and {@code child} objects have been created automatically.
-	 * <p>
-	 * If, instead, the document is in the following state:
-	 * <code><pre>
-	 * {
-	 *   "parent": {
-	 *     "child": {
-	 *     }
-	 *   }
-	 * }
-	 * ... then calling {@link #write(DocumentState, Object)} will result in the following document:
-	 * <code><pre>
-	 * {
-	 *   "parent": {
-	 *     "child": {
-	 *       "field": (some value)
-	 *     }
-	 *   }
-	 * }
-	 * </pre></code>
-	 * The existing {@code parent} and {@code child} objects have been used.
-	 * <p>
-	 * Finally, if the document is in the following state:
-	 * <code><pre>
-	 * {
-	 *   "parent": {
-	 *     "child": null
-	 *   }
-	 * }
-	 * </pre></code>
-	 * ... then calling {@link #write(DocumentState, Object)} will result in the following document:
-	 * <code><pre>
-	 * {
-	 *   "parent": {
-	 *     "child": [
-	 *       null,
-	 *       {
-	 *         "field": (some value)
-	 *       }
-	 *     ]
-	 *   }
-	 * }
-	 * </pre></code>
+	 * This method can be called multiple times for the same target, which will result
+	 * in multiple values being added to the same field.
 	 *
-	 * @param target
-	 * @param value
+	 * @param target The parent to which the field value will be added.
+	 * @param value The value to add to the field.
 	 */
-	void write(DocumentState target, T value);
+	void write(DocumentElement target, T value);
 
 }

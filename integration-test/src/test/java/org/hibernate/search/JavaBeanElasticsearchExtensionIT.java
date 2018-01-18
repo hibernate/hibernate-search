@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.DocumentState;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchQuery;
 
@@ -207,7 +207,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		}
 
 		@Override
-		public void write(DocumentState target, PojoState source) {
+		public void write(DocumentElement target, PojoElement source) {
 			String sourceValue = sourceAccessor.read( source );
 			fieldAccessor.write( target, sourceValue );
 		}

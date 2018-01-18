@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchInd
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -26,11 +26,11 @@ import com.google.gson.JsonPrimitive;
  */
 class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContext<String> {
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 	private Store store;
 
-	public StringFieldModelContext(UnknownTypeJsonAccessor accessor) {
-		this.accessor = accessor;
+	public StringFieldModelContext(String relativeName) {
+		this.relativeName = relativeName;
 	}
 
 	@Override
@@ -41,12 +41,14 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
-			ElasticsearchFieldModelCollector collector) {
+			ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( StringFieldFormatter.INSTANCE );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, StringFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
@@ -63,7 +65,7 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 			}
 		}
 
-		String absolutePath = accessor.getStaticAbsolutePath();
+		String absolutePath = parentModel.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, model );
 
 		return mapping;

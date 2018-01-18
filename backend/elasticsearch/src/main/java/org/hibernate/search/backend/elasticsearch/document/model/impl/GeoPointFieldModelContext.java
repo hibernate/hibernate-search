@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 
@@ -26,23 +25,25 @@ import com.google.gson.JsonObject;
  */
 class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint> {
 
-	private final UnknownTypeJsonAccessor accessor;
+	private final String relativeName;
 
-	public GeoPointFieldModelContext(UnknownTypeJsonAccessor accessor) {
-		this.accessor = accessor;
+	public GeoPointFieldModelContext(String relativeName) {
+		this.relativeName = relativeName;
 	}
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<GeoPoint> reference,
-			ElasticsearchFieldModelCollector collector) {
-		PropertyMapping mapping = super.contribute( reference, collector );
+			ElasticsearchFieldModelCollector collector,
+			ElasticsearchObjectNodeModel parentModel) {
+		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( GeoPointFieldFormatter.INSTANCE );
+		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, GeoPointFieldFormatter.INSTANCE );
 
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( accessor, model ) );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
 		mapping.setType( DataType.GEO_POINT );
 
-		String absolutePath = accessor.getStaticAbsolutePath();
+		String absolutePath = parentModel.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, model );
 
 		return mapping;

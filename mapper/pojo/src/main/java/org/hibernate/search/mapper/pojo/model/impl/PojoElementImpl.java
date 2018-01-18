@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.PojoState;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoStateImpl implements PojoState {
+public class PojoElementImpl implements PojoElement {
 
 	private final Object root;
 
-	public PojoStateImpl(Object root) {
+	public PojoElementImpl(Object root) {
 		super();
 		this.root = root;
 	}

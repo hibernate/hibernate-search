@@ -14,6 +14,6 @@ public interface PojoModelElementAccessor<T> {
 
 	Class<T> getType();
 
-	T read(PojoState bridgedElement);
+	T read(PojoElement bridgedElement);
 
 }

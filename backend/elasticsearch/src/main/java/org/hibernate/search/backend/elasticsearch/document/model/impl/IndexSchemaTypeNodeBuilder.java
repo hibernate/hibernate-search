@@ -6,28 +6,36 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
-public class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaCompositeNodeBuilder<TypeMapping> {
+class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 
 	private RoutingType routing = null;
-
-	public IndexSchemaTypeNodeBuilder(JsonObjectAccessor accessor) {
-		super( accessor );
-	}
 
 	public void setRouting(RoutingType routing) {
 		this.routing = routing;
 	}
 
 	@Override
-	protected TypeMapping createMapping() {
+	public String getAbsolutePath() {
+		return null;
+	}
+
+	protected TypeMapping contribute(ElasticsearchFieldModelCollector collector) {
+		ElasticsearchObjectNodeModel model = ElasticsearchObjectNodeModel.root();
+
+		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), model ) );
+
 		TypeMapping mapping = new TypeMapping();
 		if ( routing != null ) {
 			mapping.setRouting( routing );
 		}
+
+		contributeChildren( mapping, model, collector );
+
 		return mapping;
 	}
 }
