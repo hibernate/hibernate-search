@@ -22,10 +22,9 @@
 
     <properties>
         <!--
-        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
-        here due to dependency conflicts with specific versions of WildFly
+        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
         -->
-        <enforcer.skip>true</enforcer.skip>
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <scenario></scenario>
         <serverName>wildfly-${wildflyVersion}</serverName>
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>

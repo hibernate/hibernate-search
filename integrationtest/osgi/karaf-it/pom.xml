@@ -23,7 +23,7 @@
     <description>Hibernate Search integration tests for OSGi using Apache Karaf</description>
 
     <properties>
-        <enforcer.skip>true</enforcer.skip>
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
 
         <karaf.version>4.1.2</karaf.version>
         <pax.exam.version>4.11.0</pax.exam.version>

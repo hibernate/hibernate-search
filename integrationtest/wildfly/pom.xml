@@ -23,10 +23,9 @@
 
     <properties>
         <!--
-        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
-        here due to dependency conflicts with specific versions of WildFly
+        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
         -->
-        <enforcer.skip>true</enforcer.skip>
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>

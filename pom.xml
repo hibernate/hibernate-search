@@ -171,12 +171,15 @@
     </mailingLists>
 
     <prerequisites>
-        <maven>3.2.3</maven>
+        <maven>${minMavenVersion}</maven>
     </prerequisites>
 
     <properties>
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.2 requires Java 8 -->
         <minJdkVersion>1.8</minJdkVersion>
+        <minMavenVersion>3.2.3</minMavenVersion>
+        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
+        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
         <!-- Slot definitions for JBoss Modules (generated modules) -->
         <hibernate-search.module.slot>${project.version}</hibernate-search.module.slot>
@@ -983,25 +986,36 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>enforce-rules</id>
+                        <id>enforce-common-rules</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <!-- require JDK 1.8 to run the build -->
+                                    <version>[${minJdkVersion},)</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>${minMavenVersion}</version>
+                                </requireMavenVersion>
+                                <banDuplicatePomDependencyVersions />
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-dependency-convergence</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${enforcer.dependencyconvergence.skip}</skip>
+                            <rules>
+                                <DependencyConvergence />
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <rules>
-                        <requireJavaVersion>
-                            <!-- require JDK 1.8 to run the build -->
-                            <version>[${minJdkVersion},)</version>
-                        </requireJavaVersion>
-                        <requireMavenVersion>
-                            <version>3.2.3</version>
-                        </requireMavenVersion>
-                        <banDuplicatePomDependencyVersions />
-                        <DependencyConvergence />
-                    </rules>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
