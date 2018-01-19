@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<build xmlns="urn:wildfly:feature-pack-build:1.1">
+    <dependencies>
+        <artifact name="org.hibernate:hibernate-search-jbossmodules-engine"/>
+        <artifact name="org.hibernate.elasticsearch-client-jbossmodules:elasticsearch-client-jbossmodules"/>
+        <artifact name="org.hibernate.gson-jbossmodules:gson-jbossmodules"/>
+    </dependencies>
+</build>
