@@ -1677,6 +1677,19 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                         <ignore />
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.wildfly.build</groupId>
+                                        <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+                                        <versionRange>[1.2.0.Final,)</versionRange>
+                                        <goals>
+                                            <goal>build</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
