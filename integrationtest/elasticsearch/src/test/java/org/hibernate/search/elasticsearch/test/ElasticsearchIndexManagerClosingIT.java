@@ -207,7 +207,7 @@ public class ElasticsearchIndexManagerClosingIT {
 	@Indexed(index = Entity.INDEX_NAME)
 	private static class Entity {
 
-		private static final String INDEX_NAME = "index_name";
+		public static final String INDEX_NAME = "index_name";
 
 		private static final IndexedTypeIdentifier TYPE_IDENTIFIER = PojoIndexedTypeIdentifier.convertFromLegacy( Entity.class );
 
