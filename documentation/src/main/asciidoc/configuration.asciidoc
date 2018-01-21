@@ -1520,9 +1520,11 @@ In that case, you should https://developer.jboss.org/wiki/MavenGettingStarted-Us
 [[provisioning-wildfly-nonmaven]]
 ===== Server provisioning via other build tools
 
-Plugins for other build tools have not been implemented yet, but this should be quite straight forward to do:
-the above Maven plugin is just a thin wrapper invoking other libraries;
-these other libraries are build agnostic and are responsible for performing most of the work.
+The provisioning tools have been developed mainly for Maven users, but there are options for users of other build tools too.
+
+Gradle users can use the link:https://plugins.gradle.org/plugin/org.wildfly.build.provision[org.wildfly.build.provision] plugin, available on the official Gradle plugin portal.
+
+Both the Maven and the Gradle plugins are just thin wrappers invoking a standalone provisioning library, so you could also integrate this library with any other JVM based tool.
 
 See also https://github.com/wildfly/wildfly-build-tools[WildFly provisioning build tools].
 
