@@ -1149,14 +1149,12 @@
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
-                    <version>1.2.5.Final</version>
+                    <version>1.2.6.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                    <!-- Do not use 1.2.4 nor 1.2.5 at the moment: regression!
-                        See http://lists.jboss.org/pipermail/wildfly-dev/2018-January/006325.html -->
-                    <version>1.2.0.Final</version>
+                    <version>1.2.6.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.marschall</groupId>
@@ -1681,7 +1679,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <pluginExecutionFilter>
                                         <groupId>org.wildfly.build</groupId>
                                         <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                                        <versionRange>[1.2.0.Final,)</versionRange>
+                                        <versionRange>[1.2.6.Final,)</versionRange>
                                         <goals>
                                             <goal>build</goal>
                                         </goals>

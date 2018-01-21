@@ -1464,7 +1464,7 @@ to create a custom WildFly server including the Hibernate Search modules:
 	<plugin>
 	<groupId>org.wildfly.build</groupId>
 	<artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-	<version>1.2.0.Final</version>
+	<version>1.2.6.Final</version>
 	<executions>
 		<execution>
 		<id>server-provisioning</id>
