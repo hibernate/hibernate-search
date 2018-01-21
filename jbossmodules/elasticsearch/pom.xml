@@ -27,21 +27,45 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-elasticsearch</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
             <artifactId>elasticsearch-client-jbossmodules</artifactId>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-jbossmodules-engine</artifactId>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate.gson-jbossmodules</groupId>
             <artifactId>gson-jbossmodules</artifactId>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

@@ -27,16 +27,34 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-elasticsearch-aws</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
             <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
