@@ -181,9 +181,6 @@
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
-        <!-- Slot definitions for JBoss Modules (generated modules) -->
-        <hibernate-search.module.slot>${project.version}</hibernate-search.module.slot>
-
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.5</luceneVersion>
