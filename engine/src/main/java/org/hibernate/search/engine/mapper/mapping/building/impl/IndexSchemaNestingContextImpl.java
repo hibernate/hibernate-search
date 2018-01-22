@@ -45,28 +45,31 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action) {
+	public <T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+			Function<String, T> nestedElementFactoryIfExcluded) {
 		String nameRelativeToFilter = prefixFromFilter + relativeName;
+		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
-			String prefixedRelativeName = unconsumedPrefix + relativeName;
-			IndexSchemaNestingContextImpl nestedFilter =
-					new IndexSchemaNestingContextImpl( filter, nameRelativeToFilter + ".", "" );
-			return Optional.of( action.apply( prefixedRelativeName, nestedFilter ) );
+			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName );
 		}
 		else {
-			return Optional.empty();
+			return nestedElementFactoryIfExcluded.apply( prefixedRelativeName );
 		}
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, Function<String, T> action) {
+	public <T> T nest(String relativeName,
+			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
+			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
 		String nameRelativeToFilter = prefixFromFilter + relativeName;
+		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
-			String prefixedRelativeName = unconsumedPrefix + relativeName;
-			return Optional.ofNullable( action.apply( prefixedRelativeName ) );
+			IndexSchemaNestingContextImpl nestedFilter =
+					new IndexSchemaNestingContextImpl( filter, nameRelativeToFilter + ".", "" );
+			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName, nestedFilter );
 		}
 		else {
-			return Optional.empty();
+			return nestedElementFactoryIfExcluded.apply( prefixedRelativeName, IndexSchemaNestingContext.excludeAll() );
 		}
 	}
 

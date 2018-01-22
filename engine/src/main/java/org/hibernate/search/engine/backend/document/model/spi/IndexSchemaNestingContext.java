@@ -15,9 +15,11 @@ import java.util.function.Function;
  */
 public interface IndexSchemaNestingContext {
 
-	<T> Optional<T> applyIfIncluded(String relativeName, Function<String, T> action);
+	<T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+			Function<String, T> nestedElementFactoryIfExcluded);
 
-	<T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action);
+	<T> T nest(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
+			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded);
 
 	static IndexSchemaNestingContext excludeAll() {
 		return ExcludeAllIndexSchemaNestingContext.INSTANCE;

@@ -42,32 +42,45 @@ class ElasticsearchIndexSchemaElementImpl
 
 	@Override
 	public FieldModelContext field(String relativeName) {
-		UnknownTypeJsonAccessor propertyAccessor = accessor.property( relativeName );
-		ElasticsearchFieldModelContextImpl fieldContext =
-				new ElasticsearchFieldModelContextImpl( propertyAccessor );
-
-		// Only take the contributor into account if the field is included
-		nestingContext.applyIfIncluded( relativeName, name -> {
-			nodeBuilder.putProperty( name, fieldContext );
-			return null;
-		} );
-
-		return fieldContext;
+		return nestingContext.nest(
+				relativeName,
+				// If the field is included
+				prefixedName -> {
+					UnknownTypeJsonAccessor propertyAccessor = accessor.property( prefixedName );
+					ElasticsearchFieldModelContextImpl fieldContext =
+							new ElasticsearchFieldModelContextImpl( propertyAccessor );
+					// Only take the contributor into account if the field is included
+					nodeBuilder.putProperty( prefixedName, fieldContext );
+					return fieldContext;
+				},
+				// If the field is filtered out
+				prefixedName -> {
+					UnknownTypeJsonAccessor propertyAccessor = accessor.property( prefixedName );
+					return new ElasticsearchFieldModelContextImpl( propertyAccessor );
+				} );
 	}
 
 	@Override
 	public ElasticsearchIndexSchemaElement objectField(String relativeName) {
-		JsonObjectAccessor propertyAccessor = accessor.property( relativeName ).asObject();
-		IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-				new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
 
 		// Only take the contributor into account if the child is included
-		return nestingContext.applyIfIncluded( relativeName, (name, filter) -> {
-					nodeBuilder.putProperty( name, nestedNodeBuilder );
+		return nestingContext.nest(
+				relativeName,
+				// If the field is included
+				(prefixedName, filter) -> {
+					JsonObjectAccessor propertyAccessor = accessor.property( prefixedName ).asObject();
+					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
+							new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
+					nodeBuilder.putProperty( prefixedName, nestedNodeBuilder );
 					return new ElasticsearchIndexSchemaElementImpl( propertyAccessor, nestedNodeBuilder, filter );
-				} )
-				.orElseGet( () -> new ElasticsearchIndexSchemaElementImpl( propertyAccessor,
-						nestedNodeBuilder, IndexSchemaNestingContext.excludeAll() ) );
+				},
+				// If the field is filtered out
+				(prefixedName, filter) -> {
+					JsonObjectAccessor propertyAccessor = accessor.property( prefixedName ).asObject();
+					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
+							new IndexSchemaObjectPropertyNodeBuilder( propertyAccessor );
+					return new ElasticsearchIndexSchemaElementImpl( propertyAccessor, nestedNodeBuilder, filter );
+				} );
 	}
 
 	@Override

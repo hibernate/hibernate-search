@@ -22,13 +22,16 @@ class IncludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, Function<String, T> action) {
-		return Optional.ofNullable( action.apply( relativeName ) );
+	public <T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+			Function<String, T> nestedElementFactoryIfExcluded) {
+		return nestedElementFactoryIfIncluded.apply( relativeName );
 	}
 
 	@Override
-	public <T> Optional<T> applyIfIncluded(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> action) {
-		return Optional.ofNullable( action.apply( relativeName, INSTANCE ) );
+	public <T> T nest(String relativeName,
+			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
+			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
+		return nestedElementFactoryIfIncluded.apply( relativeName, INSTANCE );
 	}
 
 }
