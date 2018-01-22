@@ -89,8 +89,9 @@ public class JavaBeanElasticsearchIT {
 								.name( "myTextField" )
 				.property( "embedded" )
 						.indexedEmbedded()
+								.prefix( "embedded.prefix_" )
 								.maxDepth( 1 )
-								.includePaths( "embedded.customBridgeOnClass.text" );
+								.includePaths( "embedded.prefix_customBridgeOnClass.text" );
 
 		MappingDefinition secondMappingDefinition = contributor.programmaticMapping();
 		secondMappingDefinition.type( ParentIndexedEntity.class )
@@ -191,7 +192,7 @@ public class JavaBeanElasticsearchIT {
 							+ "'embedded': {"
 								+ "'type': 'object',"
 								+ "'properties': {"
-									+ "'customBridgeOnClass': {"
+									+ "'prefix_customBridgeOnClass': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -203,7 +204,7 @@ public class JavaBeanElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'customBridgeOnProperty': {"
+									+ "'prefix_customBridgeOnProperty': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -215,10 +216,10 @@ public class JavaBeanElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'embedded': {"
+									+ "'prefix_embedded': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
-											+ "'customBridgeOnClass': {"
+											+ "'prefix_customBridgeOnClass': {"
 												+ "'type': 'object',"
 												+ "'properties': {"
 													+ "'text': {"
@@ -228,11 +229,11 @@ public class JavaBeanElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'myLocalDateField': {"
+									+ "'prefix_myLocalDateField': {"
 										+ "'type': 'date',"
 										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
 									+ "},"
-									+ "'myTextField': {"
+									+ "'prefix_myTextField': {"
 										+ "'type': 'keyword'"
 									+ "}"
 								+ "}"
@@ -300,12 +301,12 @@ public class JavaBeanElasticsearchIT {
 						+ "'date': '2017-11-03'"
 					+ "},"
 					+ "'embedded': {"
-						+ "'customBridgeOnClass': {"
+						+ "'prefix_customBridgeOnClass': {"
 							+ "'text': 'some more text (3)',"
 							+ "'date': '2017-11-03'"
 						+ "},"
-						+ "'myLocalDateField': '2017-11-03',"
-						+ "'myTextField': 'some more text (3)'"
+						+ "'prefix_myLocalDateField': '2017-11-03',"
+						+ "'prefix_myTextField': 'some more text (3)'"
 					+ "},"
 					+ "'myTextField': 'some more text (2)'"
 				+ "}" );
@@ -336,7 +337,7 @@ public class JavaBeanElasticsearchIT {
 					.predicate( root -> root.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should().range()
 									.onField( "myLocalDateField" )
@@ -407,7 +408,7 @@ public class JavaBeanElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
@@ -458,7 +459,7 @@ public class JavaBeanElasticsearchIT {
 					.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
@@ -512,7 +513,7 @@ public class JavaBeanElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
