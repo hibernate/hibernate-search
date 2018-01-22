@@ -1413,10 +1413,6 @@ We strongly suggest using the latest version. Doing so is not much harder: provi
 and set the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml` to the chosen version.
 Further details are provided below.
 
-The modules system in WildFly allows to safely run multiple versions of Hibernate ORM and
-Hibernate Search in parallel, but if you download an alternative version make sure the Hibernate Search version you choose
-is compatible with the Hibernate ORM version you choose.
-
 [WARNING]
 ====
 The modules distributed by Hibernate Search `{hibernateSearchVersion}` are meant for WildFly 11.
@@ -1424,7 +1420,8 @@ The modules distributed by Hibernate Search `{hibernateSearchVersion}` are meant
 WildFly 11 includes older versions of Hibernate Search dependencies,
 so in order to update Hibernate Search, you will need to upgrade the dependencies as well,
 otherwise your application will not start.
-See <<updating-wildfly-hibernatesearch-versions>> for more information.
+Fortunately, there are tools to automate this for you:
+see <<updating-wildfly-hibernatesearch-versions>> for more information.
 ====
 
 [[using-wildfly-provided-hibernatesearch-versions]]
@@ -1507,6 +1504,13 @@ You will also need a `server-provisioning.xml` in the root of your project:
 </server-provisioning>
 ====
 
+This will populate the server with the Hibernate Search ORM integration,
+along with an updated version of every required module: the Hibernate Search engine, Lucene, Hibernate ORM, ...
+
+You may want to also include other, optional modules.
+If so, check out the <<hibernatesearch-jboss-modules-feature-packs,list of available feature packs>>
+and add a `<feature-pack>` markup with the coordinates of the feature pack you want.
+
 [WARNING]
 ====
 Depending on the WildFly feature pack you chose, some transitive dependencies may not be available in Maven Central.
@@ -1523,11 +1527,23 @@ these other libraries are build agnostic and are responsible for performing most
 See also https://github.com/wildfly/wildfly-build-tools[WildFly provisioning build tools].
 
 [[activating-updated-hibernate-search-version]]
-===== Activating the updated Hibernate Search version in WildFly
+===== Activating the updated Hibernate ORM/Hibernate Search versions in WildFly
 
 Next you will need to make sure the JPA subsystem of WildFly provides you with the version you have chosen,
 instead of the default version bundled with the application server.
-Set the following property in your `persistence.xml`:
+
+First, you will have to activate the updated version of Hibernate ORM.
+If you followed the instructions above,
+the server will include just the right version of Hibernate ORM: {hibernateVersion}.
+You just need to activate it by setting the following property in your `persistence.xml`:
+
+====
+[source]
+[subs="verbatim,attributes"]
+jboss.as.jpa.providerModule=org.hibernate:{hibernateShortVersion}
+====
+
+Then activate the updated version of Hibernate Search by setting this other property:
 
 ====
 [source]
@@ -1535,8 +1551,16 @@ Set the following property in your `persistence.xml`:
 wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:{hibernateSearchVersion}
 ====
 
-Setting this property will also prevent WildFly to pollute your classpath with the older copy of Hibernate Search which is included in the server.
-See also link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration Wiki].
+Setting these properties will also prevent WildFly to pollute your classpath
+with the older copies of Hibernate ORM and Hibernate Search which are included in the server.
+
+[TIP]
+====
+For more information about configuring Hibernate ORM and Hibernate Search in WildFly, see:
+
+* https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide[the WildFly JPA Reference Guide];
+* link:https://docs.jboss.org/author/display/WFLY/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the specific section about Hibernate Search].
+====
 
 [[hibernatesearch-jboss-modules-feature-packs]]
 ==== List of the Hibernate Search WildFly/JBoss feature packs
