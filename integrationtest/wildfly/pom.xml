@@ -31,6 +31,9 @@
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>
         <test.hibernate.search.module.slot>main</test.hibernate.search.module.slot>
         <test.hibernate.orm.module.slot>${hibernateShortVersion}</test.hibernate.orm.module.slot>
+
+        <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
+        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests}</additionalRuntimeArgLine>
     </properties>
 
     <dependencyManagement>

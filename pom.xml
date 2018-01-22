@@ -1888,7 +1888,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <additionalRuntimeArgLine>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLine>
+                <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
+                <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
