@@ -1441,14 +1441,14 @@ wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:main
 ====
 
 [[updating-wildfly-hibernatesearch-versions]]
-==== Update and activate latest Hibernate Search version in WildFly
+==== Update and select the latest Hibernate Search version in WildFly
 
 To use an updated version of Hibernate Search within WildFly,
 you will need to follow two steps:
 
 . Provision a WildFly server with an updated version of Hibernate Search,
   either <<provisioning-wildfly-maven,via Maven>> or <<provisioning-wildfly-nonmaven,via another tool>>.
-. <<activating-updated-hibernate-search-version,Activate>> the updated Hibernate Search version
+. <<selecting-updated-hibernate-search-version,Select>> the updated Hibernate Search version
 
 [[provisioning-wildfly-maven]]
 ===== Server provisioning via Maven
@@ -1526,16 +1526,16 @@ these other libraries are build agnostic and are responsible for performing most
 
 See also https://github.com/wildfly/wildfly-build-tools[WildFly provisioning build tools].
 
-[[activating-updated-hibernate-search-version]]
-===== Activating the updated Hibernate ORM/Hibernate Search versions in WildFly
+[[selecting-updated-hibernate-search-version]]
+===== Selecting the updated Hibernate ORM/Hibernate Search versions in WildFly
 
 Next you will need to make sure the JPA subsystem of WildFly provides you with the version you have chosen,
 instead of the default version bundled with the application server.
 
-First, you will have to activate the updated version of Hibernate ORM.
+First, you will have to select the updated version of Hibernate ORM.
 If you followed the instructions above,
 the server will include just the right version of Hibernate ORM: {hibernateVersion}.
-You just need to activate it by setting the following property in your `persistence.xml`:
+You just need to select it by setting the following property in your `persistence.xml`:
 
 ====
 [source]
@@ -1543,7 +1543,7 @@ You just need to activate it by setting the following property in your `persiste
 jboss.as.jpa.providerModule=org.hibernate:{hibernateShortVersion}
 ====
 
-Then activate the updated version of Hibernate Search by setting this other property:
+Then select the updated version of Hibernate Search by setting this other property:
 
 ====
 [source]
