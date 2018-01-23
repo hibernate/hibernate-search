@@ -23,6 +23,8 @@ public interface UnknownTypeJsonAccessor extends JsonAccessor<JsonElement> {
 
 	JsonAccessor<Integer> asInteger();
 
+	JsonAccessor<Long> asLong();
+
 	JsonAccessor<Float> asFloat();
 
 	JsonAccessor<Double> asDouble();

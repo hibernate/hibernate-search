@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
@@ -19,8 +20,14 @@ import com.google.gson.JsonObject;
 
 public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
 
+	private static final JsonObjectAccessor HITS_ACCESSOR =
+			JsonAccessor.root().property( "hits" ).asObject();
+
 	private static final JsonAccessor<JsonArray> HITS_HITS_ACCESSOR =
-			JsonAccessor.root().property( "hits" ).property( "hits" ).asArray();
+			HITS_ACCESSOR.property( "hits" ).asArray();
+
+	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
+			HITS_ACCESSOR.property( "total" ).asLong();
 
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
@@ -34,6 +41,8 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 
 	@Override
 	public SearchResult<T> extract(JsonObject responseBody) {
+		Long hitCount = HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
+
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 
 		hitAggregator.init( jsonHits.size() );
@@ -48,7 +57,7 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 		return new SearchResult<T>() {
 			@Override
 			public long getHitCount() {
-				return finalHits.size();
+				return hitCount;
 			}
 
 			@Override

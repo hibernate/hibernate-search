@@ -357,12 +357,13 @@ public class JavaBeanElasticsearchIT {
 							} )
 					)
 					.build();
-			query.setFirstResult( 2L );
-			query.setMaxResults( 10L );
+			query.setFirstResult( 3L );
+			query.setMaxResults( 2L );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 6,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -382,15 +383,15 @@ public class JavaBeanElasticsearchIT {
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
 							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
 					);
-			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 6 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
 				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
+					c.accept( "offset", "3" );
+					c.accept( "limit", "2" );
 				},
 				"{"
 					+ "'query': {"
@@ -468,12 +469,11 @@ public class JavaBeanElasticsearchIT {
 					.asReferences()
 					.predicate( predicate )
 					.build();
-			query.setFirstResult( 2L );
-			query.setMaxResults( 10L );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -493,10 +493,7 @@ public class JavaBeanElasticsearchIT {
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
-				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
-				},
+				null,
 				"{"
 					+ "'query': {"
 						+ "'bool': {"
@@ -565,6 +562,7 @@ public class JavaBeanElasticsearchIT {
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"

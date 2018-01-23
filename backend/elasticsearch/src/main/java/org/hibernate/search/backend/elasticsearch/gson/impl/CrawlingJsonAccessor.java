@@ -103,6 +103,11 @@ abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAc
 	}
 
 	@Override
+	public JsonAccessor<Long> asLong() {
+		return new JsonLongAccessorImpl( this );
+	}
+
+	@Override
 	public JsonAccessor<Float> asFloat() {
 		return new JsonFloatAccessorImpl( this );
 	}
