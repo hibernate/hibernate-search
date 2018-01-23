@@ -37,9 +37,9 @@ install:
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
   # first run to download all the Maven dependencies without logging
-  - ./mvnw -s settings-example.xml -B -q clean install -DskipTests=true
+  - ./mvnw -B -q clean install -DskipTests=true
   # we run checkstyle first to fail fast if there is a styling error
-  - ./mvnw -s settings-example.xml checkstyle:check
+  - ./mvnw checkstyle:check
 before_script: 
   - case $DB in
     "h2") ;;
@@ -58,4 +58,4 @@ script:
     5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
     5.2) ;;
     esac
-  - ./mvnw -s settings-example.xml -Pdist $BUILD_OPTIONS clean install
+  - ./mvnw -Pdist $BUILD_OPTIONS clean install

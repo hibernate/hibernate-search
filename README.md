@@ -61,7 +61,7 @@ installation directory. Then read the documentation available in *docs/reference
 
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
-    > mvn clean install -s settings-example.xml
+    > mvn clean install
 
 #### Build options (profiles and properties)
 
@@ -70,7 +70,7 @@ installation directory. Then read the documentation available in *docs/reference
 The documentation is based on [Asciidoctor](http://asciidoctor.org/) and is
 automatically generated from the standard maven build.
 
-    > mvn clean install -s settings-example.xml
+    > mvn clean install
 
 This will produce both documentation in both `HTML` and `PDF` formats.
 
