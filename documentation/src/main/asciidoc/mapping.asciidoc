@@ -1859,64 +1859,7 @@ An example is a bridge that deals with enums in a custom fashion but needs to ac
 type. Any bridge implementing `AppliedOnTypeAwareBridge` will get the type the bridge is applied on
 injected. Like parameters, the type injected needs no particular care with regard to thread-safety.
 
-[[section-two-way-bridge]]
-====== Two-way bridge
-
-If you expect to use your bridge implementation on an id property (ie annotated with `@DocumentId`
-), you need to use a slightly extended version of `StringBridge` named `TwoWayStringBridge`. Hibernate
-Search needs to read the string representation of the identifier and generate the object out of it.
-There is no difference in the way the `@FieldBridge` annotation is used.
-
-
-.Implementing a `TwoWayStringBridge` usable for id properties
-====
-[source, JAVA]
-----
-public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
-
-    public static String PADDING_PROPERTY = "padding";
-    private int padding = 5; //default
-
-    public void setParameterValues(Map parameters) {
-        Object padding = parameters.get(PADDING_PROPERTY);
-        if (padding != null) this.padding = (Integer) padding;
-    }
-
-    public String objectToString(Object object) {
-        String rawInteger = ((Integer) object).toString();
-        if (rawInteger.length() > padding)
-            throw new IllegalArgumentException("Number too big to be padded");
-        StringBuilder paddedInteger = new StringBuilder();
-        for (int padIndex = rawInteger.length(); padIndex < padding ; padIndex++) {
-            paddedInteger.append('0');
-        }
-        return paddedInteger.append(rawInteger).toString();
-    }
-
-    public Object stringToObject(String stringValue) {
-        return new Integer(stringValue);
-    }
-}
-----
-
-[source, JAVA]
-----
-//On an id property:
-@DocumentId
-@FieldBridge(impl = PaddedIntegerBridge.class,
-             params = @Parameter(name="padding", value="10")
-private Integer id;
-----
-====
-
-
-[IMPORTANT]
-====
-It is important for the two-way process to be idempotent
-(ie `object = stringToObject(objectToString( object ) )` ).
-====
-
-[[section-filed-bridge]]
+[[section-field-bridge]]
 ===== FieldBridge
 
 Some use cases require more than a simple object to string translation when mapping a property to a
@@ -2055,6 +1998,99 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 
 In this example, the particular `CatFieldsClassBridge` is applied to the `department` instance, the
 field bridge then concatenate both branch and network and index the concatenation.
+
+[[section-two-way-bridge]]
+====== Two-way bridge
+
+If you expect to retrieve values from the index (for example when using <<projections,projections>>),
+you need to use what Hibernate Search calls "two-way bridges".
+Bridges applied to document identifiers in particular must be two-way bridges.
+
+Those bridges are applied to your model using the `@FieldBridge` annotation just like any other bridge,
+but their implementation is slightly different.
+
+The simpler two-way bridge interface, `TwoWayStringBridge`, is similar to `StringBridge` but exposes two methods:
+
+* The `String objectToString(Object)` method transforms the property value into a String.
+This allows Hibernate Search to generate the value of the field when indexing.
+The method is also used to generate search queries when filtering on the field.
+* The `Object stringToObject(String)` method transforms the value stored in the index
+back into the value of the associated entity property.
+This allows Hibernate Search to fetch a value when projecting.
+In the case of document identifiers, it also allows to load entities from index documents when fetching search results.
+
+.Implementing a `TwoWayStringBridge` usable for id properties
+====
+[source, JAVA]
+----
+public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map parameters) {
+        Object padding = parameters.get(PADDING_PROPERTY);
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() > padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex < padding ; padIndex++) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append(rawInteger).toString();
+    }
+
+    public Object stringToObject(String stringValue) {
+        return new Integer(stringValue);
+    }
+}
+----
+
+[source, JAVA]
+----
+//On an id property:
+@DocumentId
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10")
+private Integer id;
+----
+====
+
+The more powerful `TwoWayFieldBridge` interface allows you to store more than one field into the index,
+which can be useful for composite properties, but is more complex to implement:
+
+* The `void set(String name, Object value, Document document, LuceneOptions luceneOptions)` method
+transforms the property value into one or several fields.
+This allows Hibernate Search to generate the document when indexing.
+* The `Object get(String name, Document document)` method transforms the value stored in the index
+back into the value of the associated entity property.
+This allows Hibernate Search to fetch a value when projecting.
+In the case of document identifiers, it also allows to load entities from index documents when fetching search results.
+* The `String objectToString(Object)` method transforms the property value into a String.
+The method is used to generate search queries when filtering on the main field
+(the field whose name is passed to the `get`/`set` methods).
+
+[IMPORTANT]
+====
+It is important for the two-way process to be idempotent, i.e.:
+
+* for `TwoWayStringBridge`: `object.equals(stringToObject(objectToString(object)))`.
+* for `TwoWayFieldBridge`: for a given document, the object returned by `get()`
+must be the same as the one that was originally passed to `set()`.
+
+Also, in order for `TwoWayFieldBridge` implementations to work correctly when used on a document identifier,
+the `void set(String name, Object value, Document document, LuceneOptions luceneOptions)` method
+*must* add a field to the document following these conventions:
+
+* the field name must be the name provided in the `name` parameter
+* the field value must be encoded as a String
+* the field value must be unique to the given value of the `value` parameter
+* the field value must match what the `objectToString` method would return for the given `value` parameter.
+====
 
 ==== BridgeProvider: associate a bridge to a given return type
 
