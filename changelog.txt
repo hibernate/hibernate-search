@@ -1,6 +1,53 @@
 Hibernate Search Changelog
 ==========================
 
+5.9.0.CR1 (23-01-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-2983 Take boost into account when building numeric or null encoding queries with the DSL
+    * HSEARCH-2972 Missing provided dependencies in the distribution ZIP
+    * HSEARCH-2955 Faceting query fails when the facet field is not populated for any document
+    * HSEARCH-1885 BridgeFactory unable to create instances of custom bridges in a modular environment
+
+** Improvement
+    * HSEARCH-2985 Split JBoss module distribution zip to make external dependencies optional
+    * HSEARCH-2981 Improve toString() of RemoteMatchQuery
+    * HSEARCH-2977 Revisit the documentation about using modules on WildFly
+    * HSEARCH-2964 Include the JSR 352 module in the distribution
+    * HSEARCH-2880 Improve documentation regarding field bridges on IDs
+    * HSEARCH-2191 Make Hibernate Search Modules a valid Wildfly Feature pack file.
+
+** Task
+    * HSEARCH-2996 Upgrade Elasticsearch dependencies to 5.6.6
+    * HSEARCH-2995 Upgrade to JMH 1.20
+    * HSEARCH-2994 Upgrade to Hibernate ORM 5.2.12.Final
+    * HSEARCH-2993 Upgrade to Byteman 4.0.0
+    * HSEARCH-2991 Avoid needing jsr250-api during project build
+    * HSEARCH-2990 Skip javadoc generation in JBoss modules artifacts
+    * HSEARCH-2989 Split JBoss module distribution zip to make ORM dependencies optional
+    * HSEARCH-2988 Make sure Hibernate Search can be used without relying on JBoss's Nexus repo
+    * HSEARCH-2987 Use Server Provisioning plugin to setup WildFly based integration tests
+    * HSEARCH-2986 Put the distribution files to upload into distribution/target/dir so that release scripts find them
+    * HSEARCH-2984 Remove an unnecessary jberet dependency in the distribution module
+    * HSEARCH-2976 Upgrade to Elasticsearch 5.6.5
+    * HSEARCH-2975 Skip exploding the built WildFly modules by default
+    * HSEARCH-2974 JGroups backend not needing to import OSGi module org.hibernate.annotations.common
+    * HSEARCH-2971 Update the copyright in the Javadoc footer
+    * HSEARCH-2969 Use the default style for JavaDoc
+    * HSEARCH-2968 Align the JBeret dependency on WildFly
+    * HSEARCH-2967 Remove internal classes from the Javadoc
+    * HSEARCH-2965 Do not generate the PDF documentation by default
+    * HSEARCH-2963 Remove duplicate dependency declarations in integration tests
+    * HSEARCH-2961 Downgrade the version of the MariaDB plugin
+    * HSEARCH-2960 Avoid duplicate build step executions in the Travis build
+    * HSEARCH-2959 Reduce the verbosity of the build when testing against Elasticsearch 2
+    * HSEARCH-2958 Move the few tests using Mockito to Easymock
+    * HSEARCH-2957 Remove the warning "this feature is work in progress" in the JSR-352 integration documentation
+    * HSEARCH-2951 Validate tests running on JDK9 with the illegal-access=deny flag enabled
+    * HSEARCH-2942 Move Wildfly module packaging of dependencies to external repositories
+    * HSEARCH-2778 The non-release builds with -Pdist should validate all javadocs by default
+
 5.9.0.Beta1 (27-11-2017)
 -------------------------
 
