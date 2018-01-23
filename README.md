@@ -44,18 +44,18 @@ installation directory. Then read the documentation available in *docs/reference
 
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
-    > mvn clean install -s settings-example.xml
+    > mvn clean install
 
 #### Build options (profiles)
 
 The documentation is based on [AsciiDoctor](http://asciidoctor.org/). Per default only the html
 output is enabled. To also generate the docbok output and build the documentation from there use:
 
-    > mvn clean install -Pdocbook -s settings-example.xml
+    > mvn clean install -Pdocbook
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdocbook,dist -s settings-example.xml
+    > mvn clean install -Pdocbook,dist
 
 You can also build the above mentioned modules directly by changing into these directories and
 executing maven in the module directory.
