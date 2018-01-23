@@ -446,9 +446,9 @@ It is also always string encoded, even if the id is a number.
 
 [NOTE]
 ====
-It is not recommended to sort on the id field as it will lead to erratic behaviors.
+We strongly suggest avoiding to sort on the id field as it will lead to erratic behaviors.
 If you want to sort on your document id,
-it is recommended to declare another field specifically for sorting using the `@Field` annotation.
+we suggest declaring another field specifically for sorting using the `@Field` annotation.
 ====
 
 If you use JPA and if you mapped a property with `@Id`,
