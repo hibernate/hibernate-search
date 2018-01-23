@@ -11,13 +11,13 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<Integer> {
 
 	@Override
-	public String toDocumentIdentifier(Integer id) {
-		return id.toString();
+	public String toDocumentIdentifier(Integer propertyValue) {
+		return propertyValue.toString();
 	}
 
 	@Override
-	public Integer fromDocumentIdentifier(String idString) {
-		return Integer.parseInt( idString );
+	public Integer fromDocumentIdentifier(String documentIdentifier) {
+		return Integer.parseInt( documentIdentifier );
 	}
 
 }

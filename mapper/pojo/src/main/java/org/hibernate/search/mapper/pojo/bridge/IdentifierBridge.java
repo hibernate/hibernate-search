@@ -8,16 +8,36 @@ package org.hibernate.search.mapper.pojo.bridge;
 
 
 /**
- * Converts an identifier to a unique String representation and back.
+ * A bridge between a POJO property of type {@code T} and a document identifier.
  *
  * @author Yoann Rodiere
  */
 public interface IdentifierBridge<T> extends AutoCloseable {
 
-	String toDocumentIdentifier(T id);
+	/**
+	 * Transform the given POJO property value to the value of the document identifier.
+	 * <p>
+	 * Must return a unique value for each value of {@code propertyValue}
+	 *
+	 * @param propertyValue The POJO property value to be transformed.
+	 * @return The value of the document identifier.
+	 */
+	String toDocumentIdentifier(T propertyValue);
 
-	T fromDocumentIdentifier(String idString);
+	/**
+	 * Transform the given document identifier value back to the value of the POJO property.
+	 * <p>
+	 * Must be the exact inverse function of {@link #toDocumentIdentifier(Object)},
+	 * i.e. {@code object.equals(fromDocumentIdentifier(toDocumentIdentifier(object)))} must always be true.
+	 *
+	 * @param documentIdentifier The document identifier value to be transformed.
+	 * @return The value of the document identifier.
+	 */
+	T fromDocumentIdentifier(String documentIdentifier);
 
+	/**
+	 * Close any resource before the bridge is discarded.
+	 */
 	@Override
 	default void close() {
 	}
