@@ -67,7 +67,7 @@ for more information about how to customize conversion.
 The following attributes of the `@Field` annotation help you control the indexing outcome:
 
 * `name`: describes under which name the property should be stored in the Lucene Document. The
-default value is the property name (following the JavaBeans convention)
+default value is the property name following the JavaBeans convention (in particular it is de-capitalized).
 
 * [[field-annotation-store]]`store`: describes whether or not the property is stored in the Lucene index. You can store the
 value `Store.YES` (consuming more space in the index but allowing <<projections, projection>>),
@@ -437,16 +437,27 @@ For instance you may leave this to the default (`false`) during testing to ident
 and set it to `true` in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
 
 [[id-annotation]]
-===== @Id
+===== Document identifier: @DocumentId or @Id
 
-Finally, the id property of an entity is a special property used by Hibernate Search to ensure index
-unicity of a given entity. By design, an id has to be stored and must not be tokenized. It is also
-always string encoded, even if the id is a number. To mark a property as index id, use the
-`@DocumentId` annotation. If you are using JPA and you are using `@Id` you can omit `@DocumentId`.
-The chosen entity id will also be used as document id.
+Finally, the document identifier is a special field used by Hibernate Search to ensure
+there will only ever be one document per entity in the index, and to identify documents when they should be deleted.
+By design, a document identifier has to be stored and must not be tokenized.
+It is also always string encoded, even if the id is a number.
 
-[[example-annotated-entity]]
-.Specifying indexed properties
+[NOTE]
+====
+We strongly suggest avoiding to sort on the id field as it will lead to erratic behaviors.
+If you want to sort on your document id,
+we suggest declaring another field specifically for sorting using the `@Field` annotation.
+====
+
+If you use JPA and if you mapped a property with `@Id`,
+Hibernate Search will use this entity identifier as a document identifier by default.
+<<example-document-id-default-orm>> takes advantage of the `@Id` annotation:
+the document identifier will be the `id` property.
+
+[[example-document-id-default-orm]]
+.Using the ORM entity identifier as document identifier
 ====
 [source, JAVA]
 ----
@@ -456,32 +467,40 @@ public class Essay {
     ...
 
     @Id
-    @DocumentId
     public Long getId() { return id; }
 
-    @Field(name="Abstract", store=Store.YES)
-    public String getSummary() { return summary; }
-
-    @Lob
-    @Field
-    public String getText() { return text; }
-
-    @Field
-    @NumericField(precisionStep = 6)
-    public float getGrade() { return grade; }
+    ...
 }
 ----
 ====
 
-<<example-annotated-entity>> defines an index with four fields: `id`, `Abstract`, `text` and
-`grade`. Note that by default the field name is de-capitalized, following the JavaBean
-specification. The `grade` field is annotated as numeric with a slightly larger `precisionStep` than
-the default.
+If you don't use JPA, or if you need to set your document ID to some other property than the entity ID,
+you can use the `@DocumentId` annotation.
+This annotation also allows to set the document identifier field name explicitly.
+<<example-document-id-explicit>> takes advantage of the `@DocumentId` annotation:
+the document identifier will be generated from the `orderNumber` property and stored into the `id_order_number` field.
 
-[NOTE]
+[[example-document-id-explicit]]
+.Specifying the document identifier explicitly
 ====
-It is not recommended to sort on the id field as it will lead to erratic behaviors. If you want to sort on your
-document id, it is recommended to declare another field specifically for sorting using the `@Field` annotation.
+[source, JAVA]
+----
+@Entity
+@Indexed
+public class Order {
+    ...
+
+    @Id
+    @GeneratedValue
+    public Long getId() { return id; }
+
+    @DocumentId(name = "id_order_number")
+    @NaturalId
+    public String orderNumber;
+
+    ...
+}
+----
 ====
 
 [[fields-annotation]]
