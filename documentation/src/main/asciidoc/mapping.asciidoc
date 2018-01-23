@@ -503,6 +503,16 @@ public class Order {
 ----
 ====
 
+====== Supported identifier types
+
+By default, Hibernate Search can handle document identifiers
+of any type mentioned in the <<section-built-in-bridges>> section.
+For those types, you will not have anything more to do than selecting a property using `@Id` or `@DocumentId`.
+
+If your identifier has a different type, for instance because you are using a JPA `@EmbeddedId`,
+you will have to write a custom two-way bridge and apply it using the `@FieldBridge` annotation on your property
+<<section-two-way-bridge,as explained further down>>.
+
 [[fields-annotation]]
 ==== Mapping properties multiple times
 
@@ -1849,6 +1859,7 @@ An example is a bridge that deals with enums in a custom fashion but needs to ac
 type. Any bridge implementing `AppliedOnTypeAwareBridge` will get the type the bridge is applied on
 injected. Like parameters, the type injected needs no particular care with regard to thread-safety.
 
+[[section-two-way-bridge]]
 ====== Two-way bridge
 
 If you expect to use your bridge implementation on an id property (ie annotated with `@DocumentId`
