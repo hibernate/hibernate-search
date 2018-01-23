@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 5.8.0.Final - 13-09-2017*
+*Version: 5.9.0.Beta1 - 27-11-2017*
 
 ## Description
 
@@ -48,7 +48,7 @@ Include the following to your dependency list:
     <dependency>
        <groupId>org.hibernate</groupId>
        <artifactId>hibernate-search-orm</artifactId>
-       <version>5.8.0.Final</version>
+       <version>5.9.0.Beta1</version>
     </dependency>
 
 ### Sourceforge Bundle
@@ -66,17 +66,20 @@ installation directory. Then read the documentation available in *docs/reference
 #### Build options (profiles and properties)
 
 ##### Documentation
+The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
+output is enabled; to also generate the PDF output use:
 
-The documentation is based on [Asciidoctor](http://asciidoctor.org/) and is
-automatically generated from the standard maven build.
+    > mvn clean install -Pdocumentation-pdf -s settings-example.xml
 
-    > mvn clean install -s settings-example.xml
-
-This will produce both documentation in both `HTML` and `PDF` formats.
-
-You can then find the freshly built documentation in the following location:
-
++You can then find the freshly built documentation in the following location:
+  
     > ./documentation/target/asciidoctor/en-US
+
+##### Distribution
+
+To build the distribution bundle run:
+
+    > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
 
 ##### Elasticsearch
 
@@ -155,16 +158,16 @@ semi private.
 
 ### Latest Documentation:
 
-* [http://search.hibernate.org](http://hibernate.org/search/documentation/)
+* [http://hibernate.org/search/documentation/](http://hibernate.org/search/documentation/)
 
 ### Bug Reports:
 
 * Hibernate JIRA [HSEARCH](https://hibernate.atlassian.net/browse/HSEARCH) (preferred)
-* hibernate-dev@lists.jboss.org
+* [hibernate-dev@lists.jboss.org](mailto:hibernate-dev@lists.jboss.org)
 
 ### Free Technical Support:
 
-* [Hibernate Forum](http://forum.hibernate.org/viewforum.php?f=9)
+* [Hibernate Forum](https://discourse.hibernate.org/c/hibernate-search)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/hibernate-search); please use tag `hibernate-search`.
 
 ## License

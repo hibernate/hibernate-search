@@ -32,21 +32,10 @@ env:
   # for now, let's test only with H2
   #- DB=pgsql
   #- DB=mariadb
-install:
-  # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
-  - mvn -N io.takari:maven:wrapper
-  - ./mvnw -v
-  # first run to download all the Maven dependencies without logging
-  - ./mvnw -s settings-example.xml -B -q clean install -DskipTests=true
-  # we run checkstyle first to fail fast if there is a styling error
-  - ./mvnw -s settings-example.xml checkstyle:check
-before_script: 
-  - case $DB in
-    "h2") ;;
-    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
-    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
-    esac
-script:
+before_install:
+  # Build options must be set before install, so that
+  # we properly retrieve *all* the necessary dependencies
+  - BUILD_OPTIONS='-s settings-example.xml -Pdist'
   - case $DB in
     "h2") ;;
     "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
@@ -58,4 +47,24 @@ script:
     5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
     5.2) ;;
     esac
-  - ./mvnw -s settings-example.xml -Pdist $BUILD_OPTIONS clean install
+install:
+  # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
+  - mvn -N io.takari:maven:wrapper
+  - ./mvnw -v
+  # first run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
+  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests -Dcheckstyle.skip
+before_script: 
+  - case $DB in
+    "h2") ;;
+    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
+    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
+    esac
+script:
+  # we run checks first to fail fast if there is a styling error
+  # then we run the actual build
+  - ./mvnw $BUILD_OPTIONS checkstyle:check
+    && ./mvnw $BUILD_OPTIONS clean install -Dcheckstyle.skip
+before_cache:
+  # Do not put Hibernate Search artifacts into the cache
+  - rm -r $HOME/.m2/repository/org/hibernate/hibernate-search*
+

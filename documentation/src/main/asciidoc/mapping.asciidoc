@@ -67,7 +67,7 @@ for more information about how to customize conversion.
 The following attributes of the `@Field` annotation help you control the indexing outcome:
 
 * `name`: describes under which name the property should be stored in the Lucene Document. The
-default value is the property name (following the JavaBeans convention)
+default value is the property name following the JavaBeans convention (in particular it is de-capitalized).
 
 * [[field-annotation-store]]`store`: describes whether or not the property is stored in the Lucene index. You can store the
 value `Store.YES` (consuming more space in the index but allowing <<projections, projection>>),
@@ -437,16 +437,27 @@ For instance you may leave this to the default (`false`) during testing to ident
 and set it to `true` in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
 
 [[id-annotation]]
-===== @Id
+===== Document identifier: @DocumentId or @Id
 
-Finally, the id property of an entity is a special property used by Hibernate Search to ensure index
-unicity of a given entity. By design, an id has to be stored and must not be tokenized. It is also
-always string encoded, even if the id is a number. To mark a property as index id, use the
-`@DocumentId` annotation. If you are using JPA and you are using `@Id` you can omit `@DocumentId`.
-The chosen entity id will also be used as document id.
+Finally, the document identifier is a special field used by Hibernate Search to ensure
+there will only ever be one document per entity in the index, and to identify documents when they should be deleted.
+By design, a document identifier has to be stored and must not be tokenized.
+It is also always string encoded, even if the id is a number.
 
-[[example-annotated-entity]]
-.Specifying indexed properties
+[NOTE]
+====
+We strongly suggest avoiding to sort on the id field as it will lead to erratic behaviors.
+If you want to sort on your document id,
+we suggest declaring another field specifically for sorting using the `@Field` annotation.
+====
+
+If you use JPA and if you mapped a property with `@Id`,
+Hibernate Search will use this entity identifier as a document identifier by default.
+<<example-document-id-default-orm>> takes advantage of the `@Id` annotation:
+the document identifier will be the `id` property.
+
+[[example-document-id-default-orm]]
+.Using the ORM entity identifier as document identifier
 ====
 [source, JAVA]
 ----
@@ -456,33 +467,51 @@ public class Essay {
     ...
 
     @Id
-    @DocumentId
     public Long getId() { return id; }
 
-    @Field(name="Abstract", store=Store.YES)
-    public String getSummary() { return summary; }
-
-    @Lob
-    @Field
-    public String getText() { return text; }
-
-    @Field
-    @NumericField(precisionStep = 6)
-    public float getGrade() { return grade; }
+    ...
 }
 ----
 ====
 
-<<example-annotated-entity>> defines an index with four fields: `id`, `Abstract`, `text` and
-`grade`. Note that by default the field name is de-capitalized, following the JavaBean
-specification. The `grade` field is annotated as numeric with a slightly larger `precisionStep` than
-the default.
+If you don't use JPA, or if you need to set your document ID to some other property than the entity ID,
+you can use the `@DocumentId` annotation.
+This annotation also allows to set the document identifier field name explicitly.
+<<example-document-id-explicit>> takes advantage of the `@DocumentId` annotation:
+the document identifier will be generated from the `orderNumber` property and stored into the `id_order_number` field.
 
-[NOTE]
+[[example-document-id-explicit]]
+.Specifying the document identifier explicitly
 ====
-It is not recommended to sort on the id field as it will lead to erratic behaviors. If you want to sort on your
-document id, it is recommended to declare another field specifically for sorting using the `@Field` annotation.
+[source, JAVA]
+----
+@Entity
+@Indexed
+public class Order {
+    ...
+
+    @Id
+    @GeneratedValue
+    public Long getId() { return id; }
+
+    @DocumentId(name = "id_order_number")
+    @NaturalId
+    public String orderNumber;
+
+    ...
+}
+----
 ====
+
+====== Supported identifier types
+
+By default, Hibernate Search can handle document identifiers
+of any type mentioned in the <<section-built-in-bridges>> section.
+For those types, you will not have anything more to do than selecting a property using `@Id` or `@DocumentId`.
+
+If your identifier has a different type, for instance because you are using a JPA `@EmbeddedId`,
+you will have to write a custom two-way bridge and apply it using the `@FieldBridge` annotation on your property
+<<section-two-way-bridge,as explained further down>>.
 
 [[fields-annotation]]
 ==== Mapping properties multiple times
@@ -1632,6 +1661,7 @@ for these classes in the `java.time` package store the values as string padded w
 `java.lang.Class`:: Classes are converted to their fully qualified class name. The thread context
 classloader is used when the class is rehydrated
 
+[[mapping-tika-bridge]]
 ==== Tika bridge
 
 Hibernate Search allows you to extract text from various document types using the built-in
@@ -1708,6 +1738,11 @@ metadata.
 ====
 `TikaBridge` does not implement `TwoWayFieldBridge`: queries built using the DSL (as in the
 <<example-tika-mapping>>) need to explicitly enable the option ignoreFieldBridge().
+====
+
+[TIP]
+====
+To use the `@TikaBridge` in combination with WildFly modules, make sure to package your Tika extensions as described in <<modules-tika>>.
 ====
 
 [[section-custom-bridges]]
@@ -1824,63 +1859,7 @@ An example is a bridge that deals with enums in a custom fashion but needs to ac
 type. Any bridge implementing `AppliedOnTypeAwareBridge` will get the type the bridge is applied on
 injected. Like parameters, the type injected needs no particular care with regard to thread-safety.
 
-====== Two-way bridge
-
-If you expect to use your bridge implementation on an id property (ie annotated with `@DocumentId`
-), you need to use a slightly extended version of `StringBridge` named `TwoWayStringBridge`. Hibernate
-Search needs to read the string representation of the identifier and generate the object out of it.
-There is no difference in the way the `@FieldBridge` annotation is used.
-
-
-.Implementing a `TwoWayStringBridge` usable for id properties
-====
-[source, JAVA]
-----
-public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
-
-    public static String PADDING_PROPERTY = "padding";
-    private int padding = 5; //default
-
-    public void setParameterValues(Map parameters) {
-        Object padding = parameters.get(PADDING_PROPERTY);
-        if (padding != null) this.padding = (Integer) padding;
-    }
-
-    public String objectToString(Object object) {
-        String rawInteger = ((Integer) object).toString();
-        if (rawInteger.length() > padding)
-            throw new IllegalArgumentException("Number too big to be padded");
-        StringBuilder paddedInteger = new StringBuilder();
-        for (int padIndex = rawInteger.length(); padIndex < padding ; padIndex++) {
-            paddedInteger.append('0');
-        }
-        return paddedInteger.append(rawInteger).toString();
-    }
-
-    public Object stringToObject(String stringValue) {
-        return new Integer(stringValue);
-    }
-}
-----
-
-[source, JAVA]
-----
-//On an id property:
-@DocumentId
-@FieldBridge(impl = PaddedIntegerBridge.class,
-             params = @Parameter(name="padding", value="10")
-private Integer id;
-----
-====
-
-
-[IMPORTANT]
-====
-It is important for the two-way process to be idempotent
-(ie `object = stringToObject(objectToString( object ) )` ).
-====
-
-[[section-filed-bridge]]
+[[section-field-bridge]]
 ===== FieldBridge
 
 Some use cases require more than a simple object to string translation when mapping a property to a
@@ -2019,6 +1998,99 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 
 In this example, the particular `CatFieldsClassBridge` is applied to the `department` instance, the
 field bridge then concatenate both branch and network and index the concatenation.
+
+[[section-two-way-bridge]]
+====== Two-way bridge
+
+If you expect to retrieve values from the index (for example when using <<projections,projections>>),
+you need to use what Hibernate Search calls "two-way bridges".
+Bridges applied to document identifiers in particular must be two-way bridges.
+
+Those bridges are applied to your model using the `@FieldBridge` annotation just like any other bridge,
+but their implementation is slightly different.
+
+The simpler two-way bridge interface, `TwoWayStringBridge`, is similar to `StringBridge` but exposes two methods:
+
+* The `String objectToString(Object)` method transforms the property value into a String.
+This allows Hibernate Search to generate the value of the field when indexing.
+The method is also used to generate search queries when filtering on the field.
+* The `Object stringToObject(String)` method transforms the value stored in the index
+back into the value of the associated entity property.
+This allows Hibernate Search to fetch a value when projecting.
+In the case of document identifiers, it also allows to load entities from index documents when fetching search results.
+
+.Implementing a `TwoWayStringBridge` usable for id properties
+====
+[source, JAVA]
+----
+public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map parameters) {
+        Object padding = parameters.get(PADDING_PROPERTY);
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() > padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex < padding ; padIndex++) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append(rawInteger).toString();
+    }
+
+    public Object stringToObject(String stringValue) {
+        return new Integer(stringValue);
+    }
+}
+----
+
+[source, JAVA]
+----
+//On an id property:
+@DocumentId
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10")
+private Integer id;
+----
+====
+
+The more powerful `TwoWayFieldBridge` interface allows you to store more than one field into the index,
+which can be useful for composite properties, but is more complex to implement:
+
+* The `void set(String name, Object value, Document document, LuceneOptions luceneOptions)` method
+transforms the property value into one or several fields.
+This allows Hibernate Search to generate the document when indexing.
+* The `Object get(String name, Document document)` method transforms the value stored in the index
+back into the value of the associated entity property.
+This allows Hibernate Search to fetch a value when projecting.
+In the case of document identifiers, it also allows to load entities from index documents when fetching search results.
+* The `String objectToString(Object)` method transforms the property value into a String.
+The method is used to generate search queries when filtering on the main field
+(the field whose name is passed to the `get`/`set` methods).
+
+[IMPORTANT]
+====
+It is important for the two-way process to be idempotent, i.e.:
+
+* for `TwoWayStringBridge`: `object.equals(stringToObject(objectToString(object)))`.
+* for `TwoWayFieldBridge`: for a given document, the object returned by `get()`
+must be the same as the one that was originally passed to `set()`.
+
+Also, in order for `TwoWayFieldBridge` implementations to work correctly when used on a document identifier,
+the `void set(String name, Object value, Document document, LuceneOptions luceneOptions)` method
+*must* add a field to the document following these conventions:
+
+* the field name must be the name provided in the `name` parameter
+* the field value must be encoded as a String
+* the field value must be unique to the given value of the `value` parameter
+* the field value must match what the `objectToString` method would return for the given `value` parameter.
+====
 
 ==== BridgeProvider: associate a bridge to a given return type
 

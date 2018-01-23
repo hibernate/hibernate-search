@@ -37,6 +37,8 @@ import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.StringHelper;
 
+import org.junit.Assert;
+
 /**
  * A helper for Hibernate Search integration tests.
  * <p>
@@ -419,14 +421,19 @@ public class SearchITHelper {
 
 		public AssertFacetContext includes(String value, int count) {
 			ListIterator<Facet> it = unmatchedFacets.listIterator();
-			while ( it.hasNext() ) {
+			boolean found = false;
+			while ( it.hasNext() && !found ) {
 				Facet facet = it.next();
 				if ( Objects.equals( value, facet.getValue() ) ) {
 					Assertions.assertThat( facet.getCount() )
 							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query " + queryContext )
 							.isEqualTo( count );
 					it.remove();
+					found = true;
 				}
+			}
+			if ( !found ) {
+				Assert.fail( "Could not find facet '" + value + "' for faceting request '" + facetingRequestName + "' on query " + queryContext );
 			}
 			return this;
 		}

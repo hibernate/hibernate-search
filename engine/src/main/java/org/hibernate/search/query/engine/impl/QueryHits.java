@@ -79,6 +79,10 @@ public class QueryHits {
 	private final LazyQueryState searcher;
 	private final QueryFilters filters;
 	private final Sort sort;
+	/**
+	 * True to collect hits, false to only collect hit count.
+	 */
+	private final boolean collectHits;
 	private final Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata;
 	private final TimeoutManagerImpl timeoutManager;
 
@@ -94,6 +98,7 @@ public class QueryHits {
 	public QueryHits(LazyQueryState searcher,
 			QueryFilters filters,
 			Sort sort,
+			boolean collectHits,
 			TimeoutManagerImpl timeoutManager,
 			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
 			Coordinates spatialSearchCenter,
@@ -104,6 +109,7 @@ public class QueryHits {
 				filters,
 				sort,
 				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
+				collectHits,
 				timeoutManager,
 				facetingRequestsAndMetadata,
 				spatialSearchCenter,
@@ -115,6 +121,7 @@ public class QueryHits {
 			QueryFilters filters,
 			Sort sort,
 			Integer n,
+			boolean collectHits,
 			TimeoutManagerImpl timeoutManager,
 			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
 			Coordinates spatialSearchCenter,
@@ -124,6 +131,7 @@ public class QueryHits {
 		this.searcher = searcher;
 		this.filters = filters;
 		this.sort = sort;
+		this.collectHits = collectHits;
 		this.facetingRequestsAndMetadata = facetingRequestsAndMetadata;
 		this.spatialSearchCenter = spatialSearchCenter;
 		this.spatialFieldName = spatialFieldName;
@@ -205,10 +213,14 @@ public class QueryHits {
 		final int totalMaxDocs = searcher.maxDoc();
 		final int maxDocs = Math.min( n, totalMaxDocs );
 
+		// We cannot collect top docs if 0 document is requested
+		boolean collectTopDocs = collectHits && maxDocs != 0;
+
 		final TopDocsCollector<?> topDocCollector;
 		final TotalHitCountCollector hitCountCollector;
 		Collector collector;
-		if ( maxDocs != 0 ) {
+
+		if ( collectTopDocs ) {
 			topDocCollector = createTopDocCollector( maxDocs );
 			hitCountCollector = null;
 			collector = topDocCollector;
@@ -235,17 +247,22 @@ public class QueryHits {
 		}
 
 		// update top docs and totalHits
-		if ( maxDocs != 0 ) {
+		if ( collectTopDocs ) {
 			this.topDocs = topDocCollector.topDocs();
 			this.totalHits = topDocs.totalHits;
-			// if we were collecting facet data we have to update our instance state
-			if ( facetsCollector != null ) {
-				updateFacets();
-			}
 		}
 		else {
 			this.topDocs = null;
 			this.totalHits = hitCountCollector.getTotalHits();
+		}
+		/*
+		 * If we need to collect facet data we have to update our instance state.
+		 * Note that collecting facets may make sense even if we didn't collect top docs,
+		 * in particular if facets were pre-defined as is the case with range facets.
+		 * In that case we would just set the count to 0 for each facet.
+		 */
+		if ( collectHits && facetingRequestsAndMetadata != null && !facetingRequestsAndMetadata.isEmpty() ) {
+			updateFacets();
 		}
 		timeoutManager.isTimedOut();
 	}
@@ -330,7 +347,8 @@ public class QueryHits {
 
 		DoubleRangeFacetCounts facetCount = new DoubleRangeFacetCounts(
 				facetRequest.getFieldName(),
-				facetsCollector,
+				// Use an empty collector if we didn't collect facets (empty index for instance)
+				facetsCollector != null ? facetsCollector : new FacetsCollector(),
 				ranges
 		);
 		return facetCount.getTopChildren(
@@ -370,7 +388,8 @@ public class QueryHits {
 
 		LongRangeFacetCounts facetCount = new LongRangeFacetCounts(
 				facetRequest.getFieldName(),
-				facetsCollector,
+				// Use an empty collector if we didn't collect facets (empty index for instance)
+				facetsCollector != null ? facetsCollector : new FacetsCollector(),
 				ranges
 		);
 		return facetCount.getTopChildren(
@@ -380,16 +399,25 @@ public class QueryHits {
 	}
 
 	private ArrayList<Facet> updateStringFacets(DiscreteFacetRequest facetRequest, FacetMetadata facetMetadata) throws IOException {
+		ArrayList<Facet> facets = new ArrayList<>();
 		SortedSetDocValuesReaderState docValuesReaderState;
 		try {
 			docValuesReaderState = new DefaultSortedSetDocValuesReaderState( searcher.getIndexReader() );
 		}
 		catch (IllegalArgumentException e) {
-			// happens in case there are no facets at all configured for the matching documents
-			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+			/*
+			 * Happens in case there are no facets at all stored in the matching documents.
+			 * But we know the target field is correctly configured to generate facets,
+			 * because we managed to retrieve the FacetMetadata.
+			 * So we can safely return an empty list: the matching documents simply do not have
+			 * any value for this field.
+			 */
+			return facets;
 		}
 		SortedSetDocValuesFacetCounts facetCounts = new SortedSetDocValuesFacetCounts(
-				docValuesReaderState, facetsCollector
+				docValuesReaderState,
+				// Use an empty collector if we didn't collect facets (empty index for instance)
+				facetsCollector != null ? facetsCollector : new FacetsCollector()
 		);
 
 		Set<String> termValues = Collections.emptySet();
@@ -404,10 +432,16 @@ public class QueryHits {
 			facetResult = facetCounts.getTopChildren( maxFacetCount, facetRequest.getFieldName() );
 		}
 		catch (IllegalArgumentException e) {
-			// happens in case there are facets in general, but not for this specific field
-			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+			/*
+			 * Happens in case there are facets stored in the matching documents in general,
+			 * but not for this specific field.
+			 * But we know this field is correctly configured to generate facets,
+			 * because we managed to retrieve the FacetMetadata.
+			 * So we can safely return an empty list: the matching documents simply do not have
+			 * any value for this field.
+			 */
+			return facets;
 		}
-		ArrayList<Facet> facets = new ArrayList<>();
 		if ( facetResult != null ) {
 			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
 				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );

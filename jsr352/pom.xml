@@ -21,97 +21,9 @@
     <name>Hibernate Search JSR-352 Aggregator</name>
     <description>Hibernate Search JSR-352 integration aggregator POM</description>
 
-    <properties>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
-        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
-        <jberetVersion>1.3.0.Beta2</jberetVersion>
-        <mockitoVersion>1.10.19</mockitoVersion>
-    </properties>
-
     <modules>
         <module>core</module>
         <module>jberet</module>
     </modules>
-
-    <issueManagement>
-        <system>GitHub Issue</system>
-        <url>https://github.com/mincong-h/gsoc-hsearch/issues</url>
-    </issueManagement>
-
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License</name>
-            <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
-            <comments>See also: http://hibernate.org/license</comments>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>mincong-h</id>
-            <name>Mincong Huang</name>
-            <email>mincong.h@gmail.com</email>
-            <url>http://mincong-h.github.io</url>
-        </developer>
-        <developer>
-            <id>gunnarmorling</id>
-            <name>Gunnar Morling</name>
-            <email>gunnar@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Gunnar</url>
-        </developer>
-        <developer>
-            <id>epbernard</id>
-            <name>Emmanuel Bernard</name>
-            <email>emmanuel@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Emmanuel</url>
-        </developer>
-    </developers>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
-        </dependency>
-        <!-- Test -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Test -->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>${mockitoVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jberet</groupId>
-                <artifactId>jberet-core</artifactId>
-                <version>${jberetVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jberet</groupId>
-                <artifactId>jberet-se</artifactId>
-                <version>${jberetVersion}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

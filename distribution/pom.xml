@@ -24,6 +24,18 @@
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+
+        <!--
+        We depend on our own WildFly feature packs, which themselves depend on
+        WildFly feature packs, whose dependencies do not converge.
+        The dependencies are excluded as per dependency management in the parent pom,
+        but unfortunately the Maven Enforcer plugin ignores wildcard exclusions:
+        https://issues.apache.org/jira/browse/MENFORCER-195
+        Thus we need to ignore the dependency convergence rule completely.
+        This should be okay though, since most distributed artifacts were checked
+        during their own build.
+         -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
 
     <dependencies>
@@ -71,6 +83,14 @@
             <artifactId>hibernate-search-backend-jgroups</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-jberet</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.spec.javax.jms</groupId>
             <artifactId>jboss-jms-api_2.0_spec</artifactId>
             <scope>provided</scope>
@@ -90,6 +110,21 @@
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.batch</groupId>
+            <artifactId>javax.batch-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -97,47 +132,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <verbose>false</verbose>
-                    <failOnError>${failOnJavaDocError}</failOnError>
-                    <sourcepath>
-                        ${basedir}/../engine/src/main/java;
-                        ${basedir}/../orm/src/main/java;
-                        ${basedir}/../serialization/avro/src/main/java;
-                        ${basedir}/../backends/jgroups/src/main/java;
-                        ${basedir}/../backends/jms/src/main/java;
-                        ${basedir}/../elasticsearch/src/main/java;
-                        ${basedir}/../elasticsearch-aws/src/main/java;
-                    </sourcepath>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-                    <links>
-                        <link>http://download.oracle.com/javase/8/docs/api/</link>
-                        <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
-                        <link>http://lucene.apache.org/core/5_5_4/core/</link>
-                        <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
-                        <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
-                        <link>http://jgroups.org/javadoc</link>
-                    </links>
-                    <packagesheader>Hibernate Search Packages</packagesheader>
-                    <doctitle>Hibernate Search ${project.version}</doctitle>
-                    <windowtitle>Hibernate Search ${project.version}</windowtitle>
-                    <groups>
-                        <group>
-                            <title>Hibernate Search Engine and ORM Packages</title>
-                            <packages>org.hibernate.search*</packages>
-                        </group>
-                    </groups>
-                    <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved]]></bottom>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>aggregate-javadoc</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
+                        <!--
+                        Aggregate the javadocs of the selected modules.
+                        We reuse the same id as in the parent pom to avoid calling the javadoc plugin twice.
+                        -->
+                        <id>generate-javadoc</id>
+                        <configuration>
+                            <sourcepath>
+                                ${basedir}/../engine/src/main/java;
+                                ${basedir}/../orm/src/main/java;
+                                ${basedir}/../serialization/avro/src/main/java;
+                                ${basedir}/../backends/jgroups/src/main/java;
+                                ${basedir}/../backends/jms/src/main/java;
+                                ${basedir}/../elasticsearch/src/main/java;
+                                ${basedir}/../elasticsearch-aws/src/main/java;
+                                ${basedir}/../jsr352/core/src/main/java;
+                                ${basedir}/../jsr352/jberet/src/main/java;
+                            </sourcepath>
+                            <docfilessubdirs>true</docfilessubdirs>
+                            <packagesheader>Hibernate Search Packages</packagesheader>
+                            <doctitle>Hibernate Search ${project.version}</doctitle>
+                            <windowtitle>Hibernate Search ${project.version}</windowtitle>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -150,6 +168,7 @@
                     </descriptors>
                     <finalName>hibernate-search-${project.version}</finalName>
                     <tarLongFileMode>gnu</tarLongFileMode>
+                    <outputDirectory>${project.build.directory}/dist/</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>

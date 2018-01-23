@@ -9,7 +9,6 @@ package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.persistence.EntityManager;
@@ -25,11 +24,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.niceMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -50,13 +48,10 @@ public class EntityReaderTest {
 
 	private EntityManagerFactory emf;
 
-	@Mock
 	private JobContext mockedJobContext;
 
-	@Mock
 	private StepContext mockedStepContext;
 
-	@InjectMocks
 	private EntityReader entityReader;
 
 	@Before
@@ -83,6 +78,10 @@ public class EntityReaderTest {
 		final String hql = null;
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
+
+		mockedJobContext = niceMock( JobContext.class );
+		mockedStepContext = niceMock( StepContext.class );
+
 		entityReader = new EntityReader( cacheMode,
 				entityName,
 				entityFetchSize,
@@ -93,9 +92,9 @@ public class EntityReaderTest {
 				partitionId,
 				null,
 				null,
-				IndexScope.FULL_ENTITY.name() );
-
-		MockitoAnnotations.initMocks( this );
+				IndexScope.FULL_ENTITY.name(),
+				mockedJobContext,
+				mockedStepContext );
 	}
 
 	@After
@@ -107,15 +106,14 @@ public class EntityReaderTest {
 
 	@Test
 	public void testReadItem_withoutBoundary() throws Exception {
-		// mock job context
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setCustomQueryCriteria( new HashSet<>() );
 		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );
-		Mockito.when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
-		// mock step context
-		Mockito.doNothing().when( mockedStepContext ).setTransientUserData( Mockito.any() );
+		expect( mockedJobContext.getTransientUserData() ).andReturn( jobData );
+		mockedStepContext.setTransientUserData( anyObject() );
+		replay( mockedJobContext, mockedStepContext );
 
 		try {
 			entityReader.open( null );

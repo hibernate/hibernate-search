@@ -115,7 +115,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				String serializedMaxResultsPerEntity,
 				String serializedRowsPerPartition,
 				String serializedCheckpointInterval,
-				String tenantId) {
+				String tenantId,
+				JobContext jobContext) {
 		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.customQueryHql = customQueryHql;
 		this.serializedMaxThreads = serializedMaxThreads;
@@ -123,6 +124,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		this.serializedRowsPerPartition = serializedRowsPerPartition;
 		this.serializedCheckpointInterval = serializedCheckpointInterval;
 		this.tenantId = tenantId;
+		this.jobContext = jobContext;
 	}
 
 	@Override

@@ -1,0 +1,72 @@
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <version>5.9.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hibernate-search-jbossmodules-parent</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search JBoss Modules Aggregator</name>
+    <description>Hibernate Search JBoss Modules Aggregator POM</description>
+
+    <modules>
+        <module>engine</module>
+        <module>hibernate-orm</module>
+        <module>orm</module>
+        <module>elasticsearch</module>
+        <module>elasticsearch-aws</module>
+        <module>testing</module>
+    </modules>
+
+    <properties>
+        <hibernate.search.slot.full.id>${project.version}</hibernate.search.slot.full.id>
+        <hibernate.search.slot.simple.id>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.slot.simple.id>
+        <hibernate.orm.slot.full.id>${hibernateVersion}</hibernate.orm.slot.full.id>
+        <hibernate.orm.slot.simple.id>${hibernateShortVersion}</hibernate.orm.slot.simple.id>
+        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.slot.simple.id}</infinispan.integration.slot>
+        <tika.module.slot>${tikaVersion}</tika.module.slot>
+
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!--
+        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
+        -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <configuration>
+                        <rules>
+                            <requireJavaVersion>
+                                <!-- require JDK 1.8 to run the build -->
+                                <version>[${minJdkVersion},)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>${minMavenVersion}</version>
+                            </requireMavenVersion>
+                            <banDuplicatePomDependencyVersions />
+                            <!-- Disable the dependency convergence rule, because the dependencies of WildFly artifacts
+                                 do not converge
+                            <DependencyConvergence />
+                             -->
+                        </rules>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

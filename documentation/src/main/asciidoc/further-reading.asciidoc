@@ -12,7 +12,7 @@ of a copy of link:$$http://www.manning.com/bauer3/$$[Java Persistence with Hiber
 
 If you have any further questions regarding Hibernate Search or want to share some of your use cases
 have a look at the link:$$https://community.jboss.org/en/hibernate/search$$[Hibernate Search Wiki]
-and the link:$$https://forum.hibernate.org/viewforum.php?f=9$$[Hibernate Search Forum]. We are
+and the link:$$https://discourse.hibernate.org/c/hibernate-search$$[Hibernate Search Forum]. We are
 looking forward hearing from you.
 
 In case you would like to report a bug use the

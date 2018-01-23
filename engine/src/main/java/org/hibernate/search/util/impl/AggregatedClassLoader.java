@@ -17,6 +17,7 @@ import java.util.Iterator;
  *
  * @author Steve Ebersole
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class AggregatedClassLoader extends ClassLoader {
 	private ClassLoader[] individualClassLoaders;
@@ -69,7 +70,7 @@ public class AggregatedClassLoader extends ClassLoader {
 			try {
 				return classLoader.loadClass( name );
 			}
-			catch (Exception ignore) {
+			catch (Exception | LinkageError ignore) {
 			}
 		}
 		throw new ClassNotFoundException( "Could not load requested class : " + name );

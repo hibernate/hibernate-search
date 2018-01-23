@@ -60,7 +60,7 @@ public class DefaultClassLoaderService implements ClassLoaderService {
 		try {
 			return (Class<T>) Class.forName( className, true, aggregatedClassLoader );
 		}
-		catch (Exception e) {
+		catch (Exception | LinkageError e) {
 			throw new ClassLoadingException( "Unable to load class [" + className + "]", e );
 		}
 	}

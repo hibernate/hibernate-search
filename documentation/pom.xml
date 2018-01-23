@@ -36,6 +36,8 @@
 
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <build>
@@ -169,10 +171,15 @@
 
                         <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
                         <hibernateVersion>${hibernateVersion}</hibernateVersion>
-                        <hibernateShortVersion>${hibernate-orm.module.slot}</hibernateShortVersion>
+                        <hibernateShortVersion>${hibernateShortVersion}</hibernateShortVersion>
                         <luceneVersion>${luceneVersion}</luceneVersion>
                         <infinispanVersion>${infinispanVersion}</infinispanVersion>
                         <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
+                        <tikaModuleVersion>${tikaVersion}</tikaModuleVersion>
+                        <elasticsearchClientVersion>${elasticsearchClientVersion}</elasticsearchClientVersion>
+                        <gsonVersion>${gsonVersion}</gsonVersion>
+                        <awsV4SignerJavaVersion>${awsV4SignerJavaVersion}</awsV4SignerJavaVersion>
+                        <wildflyVersion>${wildflyVersion}</wildflyVersion>
                     </attributes>
                 </configuration>
             </plugin>
@@ -181,11 +188,6 @@
     <profiles>
         <profile>
             <id>documentation-pdf</id>
-            <activation>
-                <property>
-                    <name>!skipPdfDocumentation</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

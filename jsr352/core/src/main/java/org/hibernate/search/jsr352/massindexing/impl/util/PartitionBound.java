@@ -12,7 +12,7 @@ import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.IndexScope;
  * Information about a target partition which can not be stored in the partition properties as String values. In
  * particular, the boundary properties help us to identify the lower boundary and upper boundary of a given partition,
  * with which the two ends of the scrollable results can be defined and be applied to
- * {@link org.hibernate.search.jsr352.internal.steps.lucene.ItemReader#open}.
+ * {@link javax.batch.api.chunk.ItemReader#open}.
  *
  * @author Mincong Huang
  */

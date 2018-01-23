@@ -97,8 +97,7 @@ This means that you don't need to package it along with your application, unless
 than the one included.
 Since WildFly version 10 the embedded version of Hibernate Search is automatically activated when your application uses it. See <<search-configuration-deploy-on-wildfly>> for details.
 
-Since this version of Hibernate Search requires Hibernate ORM version `5.2.3+` - which is more recent than the Hibernate ORM
-version included in WildFly - you will also need to follow the instructions in the http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[Hibernate ORM WildFly upgrade guide].
+If you want to use another version than the one included in WildFly, have a look at <<search-configuration-deploy-on-wildfly>>.
 
 === Configuration
 

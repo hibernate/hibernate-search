@@ -22,11 +22,15 @@
 
     <properties>
         <!--
-        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
-        here due to dependency conflicts with specific versions of WildFly
+        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
         -->
-        <enforcer.skip>true</enforcer.skip>
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <scenario></scenario>
+        <serverName>wildfly-${wildflyVersion}</serverName>
+        <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
+
+        <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
+        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests}</additionalRuntimeArgLine>
     </properties>
 
     <dependencyManagement>
@@ -73,6 +77,11 @@
         <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -199,46 +208,52 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.build</groupId>
+                <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>process-test-resources</phase>
+                        <id>server-provisioning</id>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>build</goal>
                         </goals>
+                        <phase>process-test-resources</phase>
                         <configuration>
                             <skip>${skipWildFlyPreparation}</skip>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildflyVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-11-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${hibernateVersion}</version>
-                                    <classifier>wildfly-11-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
+                            <config-file>server-provisioning.xml</config-file>
+                            <server-name>${serverName}</server-name>
                         </configuration>
                     </execution>
+                </executions>
+                <dependencies>
+                    <!--
+                          This allows to run mvn clean install -am -pl :thismodule
+                          and have Maven re-build WildFly modules automatically.
+                          Otherwise the plugin would simply try to fetch the
+                          version in the local repository.
+                     -->
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-search-jbossmodules-engine</artifactId>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
                     <execution>
                         <id>copy-drivers</id>
                         <phase>process-test-resources</phase>
@@ -253,27 +268,12 @@
                                     <artifactId>${jdbc.driver.artifactId}</artifactId>
                                     <version>${jdbc.driver.version}</version>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/standalone/deployments</outputDirectory>
+                                    <outputDirectory>${jbosshome}/standalone/deployments</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <!--
-                          This allows to run mvn clean install -am -pl :thismodule
-                          and have Maven re-build WildFly modules automatically.
-                          Otherwise the plugin would simply try to fetch the
-                          version in the local repository.
-                     -->
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-modules</artifactId>
-                        <version>${project.version}</version>
-                        <classifier>wildfly-11-dist</classifier>
-                        <type>zip</type>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
 
@@ -310,4 +310,61 @@
         </profile>
     </profiles>
 
+    <!--
+        Enable a hard-coded JBoss repository configuration in WildFly-related tests.
+        This allows us to run a CI job with default Maven settings,
+        checking that any other module only relies on dependencies available in Maven Central.
+     -->
+    <repositories>
+        <!-- Use Central first -->
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>http://repo.maven.apache.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <!-- Use Central first -->
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>http://repo.maven.apache.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

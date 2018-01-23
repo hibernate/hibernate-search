@@ -646,6 +646,7 @@ public class DefaultElasticsearchWorkSequenceBuilderTest {
 		expect( bulkItemResultExtractorMock.extract( work2, 1 ) ).andThrow( exception2 );
 		errorHandlerMock.markAsFailed( work1, exception1 );
 		errorHandlerMock.markAsFailed( work2, exception2 );
+		errorHandlerMock.markAsSkipped( work3 );
 		expect( contextMock.flush() ).andReturn( flushFuture );
 		replay();
 		bulkResultFuture.complete( bulkResultMock );

@@ -21,7 +21,7 @@
 
     <container qualifier="wildfly" default="true">
         <configuration>
-            <property name="jbossHome">${project.build.directory}/wildfly-${wildflyVersion}</property>
+            <property name="jbossHome">${jbosshome}</property>
             <property name="javaVmArguments">
                 -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
                 -Dscenario=${scenario}

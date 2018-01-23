@@ -18,7 +18,10 @@
     <formats>
         <format>tar.gz</format>
         <format>zip</format>
+        <!-- Uncomment the following line to simplify content inspection: -->
+        <!--
         <format>dir</format>
+        -->
     </formats>
 
     <!-- Configure the module artifacts which make it into the distribution bundle -->
@@ -132,6 +135,26 @@
         </dependencySet>
 
         <dependencySet>
+            <outputDirectory>dist/lib/optional/jsr352-core</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jsr352-core</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/jsr352-jberet</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jsr352-jberet</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib/provided</outputDirectory>
             <scope>provided</scope>
@@ -140,6 +163,9 @@
                 <include>org.jboss.spec.javax.annotation:*</include>
                 <include>org.hibernate.javax.persistence:*</include>
                 <include>org.jboss.spec.javax.transaction:*</include>
+                <include>javax.batch:javax.batch-api</include>
+                <include>javax.inject:javax.inject</include>
+                <include>javax.enterprise:cdi-api</include>
             </includes>
         </dependencySet>
 

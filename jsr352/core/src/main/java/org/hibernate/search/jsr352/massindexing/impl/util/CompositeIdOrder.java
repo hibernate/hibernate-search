@@ -29,8 +29,7 @@ import org.hibernate.type.ComponentType;
  * This class should be used when target entity has multiple ID attributes,
  * e.g. an entity annotated {@link IdClass}, or an entity having an
  * {@link EmbeddedId}.
- *
- * <h4>Why this class?</h4>
+ * <p>
  * By default, {@code Restrictions.ge} and similar on
  * a composite property will generate a non-lexicographical "greater or equal" condition.
  * <p>

@@ -148,7 +148,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			return Collections.emptyList();
 		}
 		try {
-			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize(), true );
 			final int first = firstResult;
 			final int max = max( first, queryHits.getTotalHits() );
 			final int size = max - first + 1;
@@ -203,7 +203,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		LazyQueryState openSearcher = buildSearcher();
 		//FIXME: handle null searcher
 		try {
-			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize() );
+			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize(), true );
 			int max = max( firstResult, queryHits.getTotalHits() );
 			return buildDocumentExtractor( openSearcher, queryHits, firstResult, max );
 		}
@@ -225,7 +225,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			}
 			else {
 				try {
-					QueryHits queryHits = getQueryHits( searcher, 0 );
+					QueryHits queryHits = getQueryHits( searcher, 0, false );
 					resultSize = queryHits.getTotalHits();
 				}
 				catch (IOException e) {
@@ -316,7 +316,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private QueryHits getQueryHits(LazyQueryState searcher, Integer n) throws IOException {
+	private QueryHits getQueryHits(LazyQueryState searcher, Integer n, boolean collectHits) throws IOException {
 		QueryFilters filters = createFilters();
 		QueryHits queryHits;
 
@@ -335,6 +335,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					searcher,
 					filters,
 					sort,
+					collectHits,
 					getTimeoutManager(),
 					facetingRequestsAndMetadata,
 					spatialSearchCenter,
@@ -347,6 +348,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					filters,
 					null,
 					0,
+					collectHits,
 					getTimeoutManager(),
 					null,
 					spatialSearchCenter,
@@ -359,6 +361,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					filters,
 					sort,
 					n,
+					collectHits,
 					getTimeoutManager(),
 					facetingRequestsAndMetadata,
 					spatialSearchCenter,

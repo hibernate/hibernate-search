@@ -33,7 +33,7 @@
         <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>modules</module>
+        <module>jbossmodules</module>
         <module>integrationtest/elasticsearch</module>
         <module>integrationtest/wildfly</module>
         <module>integrationtest/jms</module>
@@ -128,6 +128,12 @@
             <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/yoann-rodiere/</url>
         </developer>
+        <developer>
+            <id>mincong-h</id>
+            <name>Mincong Huang</name>
+            <email>mincong.h@gmail.com</email>
+            <url>http://mincong-h.github.io</url>
+        </developer>
     </developers>
 
     <mailingLists>
@@ -165,30 +171,32 @@
     </mailingLists>
 
     <prerequisites>
-        <maven>3.2.3</maven>
+        <maven>${minMavenVersion}</maven>
     </prerequisites>
 
     <properties>
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.2 requires Java 8 -->
         <minJdkVersion>1.8</minJdkVersion>
-
-        <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <lucene.module.slot>5.5</lucene.module.slot>
-        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
-        <hibernate-search.module.slot>${project.version}</hibernate-search.module.slot>
+        <minMavenVersion>3.2.3</minMavenVersion>
+        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
+        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.5</luceneVersion>
+        <lucene.module.slot>5.5</lucene.module.slot>
+        <lucene.feature-pack.version>5.5.5.hibernate05</lucene.feature-pack.version>
         <infinispanVersion>9.0.1.Final</infinispanVersion>
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.2.11.Final</hibernateVersion>
+        <hibernateShortVersion>5.2</hibernateShortVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.3.Final</jandexVersion>
         <classMateVersion>1.3.0</classMateVersion>
         <javassistVersion>3.20.0-GA</javassistVersion>
+        <bytebuddyVersion>1.6.14</bytebuddyVersion>
 
         <!-- OSGi ranges for some primary dependencies -->
         <!-- Warning:
@@ -202,9 +210,9 @@
         <jbossLoggingOsgiRangeVersion>[3.3,4.0.0)</jbossLoggingOsgiRangeVersion>
 
         <tikaVersion>1.4</tikaVersion>
-        <bytemanVersion>4.0.0-BETA4</bytemanVersion>
-        <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>2.0.1.Final</jbossLoggingProcessorVersion>
+        <bytemanVersion>4.0.0</bytemanVersion>
+        <jbossLoggingVersion>3.3.1.Final</jbossLoggingVersion>
+        <jbossLoggingProcessorVersion>2.1.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.5.30.Final</narayanaVersion>
         <avroVersion>1.7.6</avroVersion>
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
@@ -223,10 +231,15 @@
         <!-- Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
-        <elasticsearchClientVersion>5.6.3</elasticsearchClientVersion>
-        <elasticsearchSnifferVersion>5.6.3</elasticsearchSnifferVersion>
-        <elasticsearchGsonVersion>2.8.2</elasticsearchGsonVersion>
-        <elasticsearchAWSV4SignerVersion>1.3</elasticsearchAWSV4SignerVersion>
+        <elasticsearchClientVersion>5.6.5</elasticsearchClientVersion>
+        <elasticsearch-client.module.slot>5.6</elasticsearch-client.module.slot>
+        <elasticsearch-client.feature-pack.version>5.6.5.hibernate02</elasticsearch-client.feature-pack.version>
+        <gsonVersion>2.8.2</gsonVersion>
+        <gson.module.slot>2.8</gson.module.slot>
+        <gson.feature-pack.version>2.8.2.hibernate03</gson.feature-pack.version>
+        <awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
+        <aws-v4-signer-java.module.slot>${awsV4SignerJavaVersion}</aws-v4-signer-java.module.slot>
+        <aws-v4-signer-java.feature-pack.version>1.3.0.hibernate03</aws-v4-signer-java.feature-pack.version>
 
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -245,6 +258,12 @@
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.client.http_client_configurer></test.elasticsearch.client.http_client_configurer>
+
+        <!-- JSR 352 -->
+        <!-- in line with the version used in WildFly 11 -->
+        <jberetVersion>1.2.4.Final</jberetVersion>
+        <!-- they didn't publish the javadoc for the other 1.2.x -->
+        <jberetJavadocVersion>1.2.0.Final</jberetJavadocVersion>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -292,6 +311,11 @@
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
                 <version>1.0.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddyVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
@@ -546,6 +570,78 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-jbossmodules-engine</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-hibernate-orm</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-sharedtestresources</artifactId>
                 <classifier>build-resources</classifier>
                 <type>zip</type>
@@ -595,6 +691,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-jsr352-jberet</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jberet</groupId>
+                <artifactId>jberet-core</artifactId>
+                <version>${jberetVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -687,12 +788,12 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.2</version>
+                <version>3.5.1</version>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.6</version>
             </dependency>
             <dependency>
                 <groupId>simple-jndi</groupId>
@@ -830,6 +931,73 @@
                 <artifactId>h2</artifactId>
                 <version>${h2Version}</version>
             </dependency>
+
+            <!-- External WildFly feature packs (to build our own feature packs) -->
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-feature-pack</artifactId>
+                <type>zip</type>
+                <version>${wildflyVersion}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.lucene-jbossmodules</groupId>
+                <artifactId>lucene-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${lucene.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
+                <artifactId>elasticsearch-client-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${elasticsearch-client.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.gson-jbossmodules</groupId>
+                <artifactId>gson-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${gson.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
+                <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
+                <type>zip</type>
+                <version>${aws-v4-signer-java.feature-pack.version}</version>
+                <!-- We just need the ZIP, not the dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -926,24 +1094,36 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>enforce-rules</id>
+                        <id>enforce-common-rules</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <!-- require JDK 1.8 to run the build -->
+                                    <version>[${minJdkVersion},)</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>${minMavenVersion}</version>
+                                </requireMavenVersion>
+                                <banDuplicatePomDependencyVersions />
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-dependency-convergence</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${enforcer.dependencyconvergence.skip}</skip>
+                            <rules>
+                                <DependencyConvergence />
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <rules>
-                        <requireJavaVersion>
-                            <!-- require JDK 1.8 to run the build -->
-                            <version>[${minJdkVersion},)</version>
-                        </requireJavaVersion>
-                        <requireMavenVersion>
-                            <version>3.2.3</version>
-                        </requireMavenVersion>
-                        <DependencyConvergence />
-                    </rules>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -966,6 +1146,16 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.wildfly.build</groupId>
+                    <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
+                    <version>1.2.6.Final</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.build</groupId>
+                    <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+                    <version>1.2.6.Final</version>
+                </plugin>
                 <plugin>
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
@@ -1018,7 +1208,9 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <compilerArguments>-source 1.8 -target 1.8</compilerArguments>
+                                <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
+                                <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
+                                <compilerArguments>-source 1.8 -target 1.8 -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
@@ -1027,12 +1219,6 @@
                             <groupId>org.jboss.logging</groupId>
                             <artifactId>jboss-logging-processor</artifactId>
                             <version>${jbossLoggingProcessorVersion}</version>
-                            <scope>compile</scope>
-                        </dependency>
-                        <dependency>
-                            <groupId>javax.annotation</groupId>
-                            <artifactId>jsr250-api</artifactId>
-                            <version>1.0</version>
                             <scope>compile</scope>
                         </dependency>
                     </dependencies>
@@ -1057,6 +1243,8 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
+                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
+                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${additionalRuntimeArgLine}</argLine>
                         <additionalClasspathElements>
@@ -1109,6 +1297,25 @@
                     <configuration>
                         <!-- Fail on error alternative -->
                         <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
+                        <quiet>true</quiet>
+                        <verbose>false</verbose>
+                        <failOnError>${failOnJavaDocError}</failOnError>
+                        <!-- Exclude implementation classes from the javadoc -->
+                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
+                        <links>
+                            <link>http://download.oracle.com/javase/8/docs/api/</link>
+                            <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
+                            <link>http://lucene.apache.org/core/5_5_4/core/</link>
+                            <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
+                            <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
+                            <link>http://jgroups.org/javadoc</link>
+                            <!-- for javax.batch in the JSR 352 modules -->
+                            <link>https://docs.oracle.com/javaee/7/api/</link>
+                            <link>http://docs.jboss.org/jberet/${jberetJavadocVersion}/javadoc/jberet-core/</link>
+                        </links>
+                        <bottom>
+                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
+                        </bottom>
                         <additionalDependencies>
                             <additionalDependency>
                                 <groupId>org.jboss.logging</groupId>
@@ -1159,6 +1366,8 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
+                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
+                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${additionalRuntimeArgLine}</argLine>
                         <additionalClasspathElements>
@@ -1462,6 +1671,19 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                         <ignore />
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.wildfly.build</groupId>
+                                        <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+                                        <versionRange>[1.2.6.Final,)</versionRange>
+                                        <goals>
+                                            <goal>build</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -1625,6 +1847,23 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <modules>
                 <module>distribution</module>
             </modules>
+
+            <build>
+                <plugins>
+                    <plugin>
+                       <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                           <execution>
+                                <id>generate-javadoc</id>
+                                <goals>
+                                    <goal>javadoc-no-fork</goal>
+                                </goals>
+                                <phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
@@ -1645,7 +1884,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <additionalRuntimeArgLine>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLine>
+                <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
+                <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -1678,12 +1918,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>org.jboss.logging</groupId>
                     <artifactId>jboss-logging-processor</artifactId>
                     <version>${jbossLoggingProcessorVersion}</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                    <version>1.0</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
@@ -1793,13 +2027,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <version>${test.elasticsearch.host.version}</version>
                                     <type>jar</type>
                                 </dependency>
-                                
-                                <!-- The next is used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
                             </dependencies>
                             <executions>
                                 <execution >
@@ -1885,13 +2112,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${test.elasticsearch.host.version}</version>
                                 </dependency>
-                                
-                                <!-- The next is used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
                             </dependencies>
                             <executions>
                                 <execution >
@@ -1938,19 +2158,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
                                 <autoCreateIndex>false</autoCreateIndex>
                             </configuration>
-                            <dependencies>
-                                <!-- The next two are used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>2.6.2</version>
-                                </dependency>
-                            </dependencies>
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                             <executions>
                                 <execution >
@@ -1985,7 +2192,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.6.3</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>5.6.5</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -2002,19 +2209,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
                                 <autoCreateIndex>false</autoCreateIndex>
                             </configuration>
-                            <dependencies>
-                                <!-- The next two are used to get ES log output into the Maven console -->
-                                <dependency>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
-                                    <version>${project.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>2.6.2</version>
-                                </dependency>
-                            </dependencies>
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                             <executions>
                                 <execution >
