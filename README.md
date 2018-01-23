@@ -61,18 +61,18 @@ installation directory. Then read the documentation available in *docs/reference
 
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
-    > mvn clean install -s settings-example.xml
+    > mvn clean install
 
 #### Build options (profiles and properties)
 
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
 output is enabled; to also generate the PDF output use:
 
-    > mvn clean install -Pdocumentation-pdf -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf,dist
 
 The Elasticsearch module tests against one single version of Elasticsearch at a time.
 You may redefine the version to use by specifying the right profile and using the
