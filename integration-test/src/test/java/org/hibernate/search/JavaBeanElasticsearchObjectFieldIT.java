@@ -208,7 +208,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 		}
 
 		@Override
-		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( List.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );

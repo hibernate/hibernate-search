@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
  */
 public interface Bridge extends AutoCloseable {
 
-	void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+	void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 			SearchModel searchModel);
 
 	void write(DocumentElement target, PojoElement source);

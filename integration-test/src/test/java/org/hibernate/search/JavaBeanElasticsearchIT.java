@@ -766,7 +766,7 @@ public class JavaBeanElasticsearchIT {
 		}
 
 		@Override
-		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );

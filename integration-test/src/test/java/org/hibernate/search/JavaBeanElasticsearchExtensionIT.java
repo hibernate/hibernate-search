@@ -194,7 +194,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		private IndexFieldAccessor<String> fieldAccessor;
 
 		@Override
-		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( String.class );
 			fieldAccessor = indexSchemaElement.field( "jsonStringField" )

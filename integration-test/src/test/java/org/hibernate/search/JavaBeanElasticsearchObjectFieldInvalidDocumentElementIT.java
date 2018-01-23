@@ -152,7 +152,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 		}
 
 		@Override
-		public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( String.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );

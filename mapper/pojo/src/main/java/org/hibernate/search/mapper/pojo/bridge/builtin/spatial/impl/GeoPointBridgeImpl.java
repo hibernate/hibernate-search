@@ -43,7 +43,7 @@ public class GeoPointBridgeImpl implements Bridge {
 	}
 
 	@Override
-	public void contribute(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+	public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 			SearchModel searchModel) {
 		if ( fieldName == null || fieldName.isEmpty() ) {
 			// TODO retrieve the default name somehow when parameters.name() is empty
