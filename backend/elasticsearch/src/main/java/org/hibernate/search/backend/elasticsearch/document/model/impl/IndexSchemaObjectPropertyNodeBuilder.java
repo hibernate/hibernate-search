@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
@@ -17,6 +18,8 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 
 	private final String absolutePath;
 	private final String relativeName;
+
+	private ObjectFieldStorage storage;
 
 	IndexSchemaObjectPropertyNodeBuilder(String relativeName) {
 		this( null, relativeName );
@@ -32,17 +35,34 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 		return absolutePath;
 	}
 
+	public void setStorage(ObjectFieldStorage storage) {
+		this.storage = storage;
+	}
+
 	@Override
 	public PropertyMapping contribute(
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
-		ElasticsearchObjectNodeModel model = new ElasticsearchObjectNodeModel( parentModel, absolutePath );
+		ElasticsearchObjectNodeModel model = new ElasticsearchObjectNodeModel( parentModel, absolutePath, storage );
+		collector.collect( absolutePath, model );
+
 		JsonObjectAccessor jsonAccessor = JsonAccessor.root().property( relativeName ).asObject();
 
 		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( jsonAccessor, model ) );
 
 		PropertyMapping mapping = new PropertyMapping();
-		mapping.setType( DataType.OBJECT );
+		DataType dataType = DataType.OBJECT;
+		switch ( storage ) {
+			case DEFAULT:
+				break;
+			case FLATTENED:
+				dataType = DataType.OBJECT;
+				break;
+			case NESTED:
+				dataType = DataType.NESTED;
+				break;
+		}
+		mapping.setType( dataType );
 
 		contributeChildren( mapping, model, collector );
 

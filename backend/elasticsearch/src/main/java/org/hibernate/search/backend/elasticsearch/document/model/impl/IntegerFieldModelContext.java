@@ -31,7 +31,7 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 

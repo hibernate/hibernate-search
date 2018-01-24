@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchObjectNodeModel {
 
-	private static final ElasticsearchObjectNodeModel ROOT = new ElasticsearchObjectNodeModel( null, null );
+	private static final ElasticsearchObjectNodeModel ROOT =
+			new ElasticsearchObjectNodeModel( null, null, null );
 
 	public static ElasticsearchObjectNodeModel root() {
 		return ROOT;
@@ -21,9 +24,13 @@ public class ElasticsearchObjectNodeModel {
 
 	private final String absolutePath;
 
-	public ElasticsearchObjectNodeModel(ElasticsearchObjectNodeModel parent, String absolutePath) {
+	private final ObjectFieldStorage storage;
+
+	public ElasticsearchObjectNodeModel(ElasticsearchObjectNodeModel parent, String absolutePath,
+			ObjectFieldStorage storage) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
+		this.storage = storage;
 	}
 
 	public ElasticsearchObjectNodeModel getParent() {
@@ -36,5 +43,9 @@ public class ElasticsearchObjectNodeModel {
 
 	public String getAbsolutePath(String relativeName) {
 		return absolutePath == null ? relativeName : absolutePath + "." + relativeName;
+	}
+
+	public ObjectFieldStorage getStorage() {
+		return storage;
 	}
 }

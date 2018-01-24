@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 
@@ -43,6 +44,11 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
+	public NestedPredicateContext<N> nested() {
+		return delegate.nested();
+	}
+
+	@Override
 	public N predicate(SearchPredicate predicate) {
 		return delegate.predicate( predicate );
 	}
@@ -65,5 +71,9 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 			Consumer<T> clauseContributor,
 			Consumer<SearchPredicateContainerContext<N>> fallbackClauseContributor) {
 		return delegate.withExtensionOptional( extension, clauseContributor, fallbackClauseContributor );
+	}
+
+	protected SearchPredicateContainerContext<N> getDelegate() {
+		return delegate;
 	}
 }

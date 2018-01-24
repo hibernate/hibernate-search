@@ -25,13 +25,13 @@ public abstract class AbstractElasticsearchTypedFieldModelContext<T>
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector,
+	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		return contribute( reference, collector, parentModel );
 	}
 
 	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<T> reference,
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel);
 
 }

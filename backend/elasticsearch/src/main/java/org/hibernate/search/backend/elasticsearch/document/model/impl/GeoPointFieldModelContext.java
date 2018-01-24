@@ -33,7 +33,7 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<GeoPoint> reference,
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 

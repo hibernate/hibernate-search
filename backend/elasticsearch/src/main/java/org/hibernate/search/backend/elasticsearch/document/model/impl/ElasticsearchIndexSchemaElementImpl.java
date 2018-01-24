@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaObjectField;
@@ -54,22 +55,24 @@ class ElasticsearchIndexSchemaElementImpl
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaObjectField objectField(String relativeName) {
+	public ElasticsearchIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage) {
 		return nestingContext.nest(
 				relativeName,
 				// If the field is included
 				(prefixedName, filter) -> {
-					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-							new IndexSchemaObjectPropertyNodeBuilder( nodeBuilder.getAbsolutePath(), prefixedName );
+					IndexSchemaObjectPropertyNodeBuilder nodeBuilder =
+							new IndexSchemaObjectPropertyNodeBuilder( this.nodeBuilder.getAbsolutePath(), prefixedName );
+					nodeBuilder.setStorage( storage );
 					// Only take the contributor into account if the field is included
-					nodeBuilder.putProperty( prefixedName, nestedNodeBuilder );
-					return new ElasticsearchIndexSchemaObjectFieldImpl( nestedNodeBuilder, filter );
+					this.nodeBuilder.putProperty( prefixedName, nodeBuilder );
+					return new ElasticsearchIndexSchemaObjectFieldImpl( nodeBuilder, filter );
 				},
 				// If the field is filtered out
 				(prefixedName, filter) -> {
-					IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
-							new IndexSchemaObjectPropertyNodeBuilder( nodeBuilder.getAbsolutePath(), prefixedName );
-					return new ElasticsearchIndexSchemaObjectFieldImpl( nestedNodeBuilder, filter );
+					IndexSchemaObjectPropertyNodeBuilder nodeBuilder =
+							new IndexSchemaObjectPropertyNodeBuilder( this.nodeBuilder.getAbsolutePath(), prefixedName );
+					nodeBuilder.setStorage( storage );
+					return new ElasticsearchIndexSchemaObjectFieldImpl( nodeBuilder, filter );
 				} );
 	}
 

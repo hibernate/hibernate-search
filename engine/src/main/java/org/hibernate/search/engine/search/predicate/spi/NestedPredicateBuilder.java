@@ -4,13 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.impl;
+package org.hibernate.search.engine.search.predicate.spi;
 
-/**
- * @author Yoann Rodiere
- */
-public interface ElasticsearchFieldModelCollector {
+public interface NestedPredicateBuilder<C> extends SearchPredicateBuilder<C> {
 
-	void collect(String absolutePath, ElasticsearchFieldModel model);
+	C getNestedCollector();
 
 }

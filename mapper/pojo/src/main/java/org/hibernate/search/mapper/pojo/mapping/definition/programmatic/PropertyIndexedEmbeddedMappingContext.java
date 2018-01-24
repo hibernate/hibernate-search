@@ -9,12 +9,16 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+
 /**
  * @author Yoann Rodiere
  */
 public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingContext {
 
 	PropertyIndexedEmbeddedMappingContext prefix(String prefix);
+
+	PropertyIndexedEmbeddedMappingContext storage(ObjectFieldStorage storage);
 
 	PropertyIndexedEmbeddedMappingContext maxDepth(Integer depth);
 

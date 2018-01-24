@@ -24,7 +24,7 @@ class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 		return null;
 	}
 
-	protected TypeMapping contribute(ElasticsearchFieldModelCollector collector) {
+	protected TypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
 		ElasticsearchObjectNodeModel model = ElasticsearchObjectNodeModel.root();
 
 		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), model ) );

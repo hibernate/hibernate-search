@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
@@ -26,6 +27,8 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private String prefix;
 
+	private ObjectFieldStorage storage = ObjectFieldStorage.DEFAULT;
+
 	private Integer maxDepth;
 
 	private final Set<String> pathFilters = new HashSet<>();
@@ -41,12 +44,18 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.indexedEmbedded( prefix, maxDepth, pathFilters );
+		collector.indexedEmbedded( prefix, storage, maxDepth, pathFilters );
 	}
 
 	@Override
 	public PropertyIndexedEmbeddedMappingContext prefix(String prefix) {
 		this.prefix = prefix;
+		return this;
+	}
+
+	@Override
+	public PropertyIndexedEmbeddedMappingContext storage(ObjectFieldStorage storage) {
+		this.storage = storage;
 		return this;
 	}
 

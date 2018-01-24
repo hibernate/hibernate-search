@@ -55,7 +55,7 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<LocalDate> reference,
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
 

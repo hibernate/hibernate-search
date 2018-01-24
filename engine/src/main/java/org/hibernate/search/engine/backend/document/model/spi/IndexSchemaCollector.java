@@ -7,13 +7,14 @@
 package org.hibernate.search.engine.backend.document.model.spi;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 
 /**
  * @author Yoann Rodiere
  */
 public interface IndexSchemaCollector {
 
-	ObjectFieldIndexSchemaCollector objectField(String relativeName);
+	ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage);
 
 	IndexSchemaElement withContext(IndexSchemaNestingContext context);
 

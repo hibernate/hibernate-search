@@ -9,8 +9,10 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchIndexSchemaNodeContributor<T> {
+public interface ElasticsearchIndexSchemaNodeCollector {
 
-	T contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchObjectNodeModel parentModel);
+	void collect(String absolutePath, ElasticsearchObjectNodeModel model);
+
+	void collect(String absolutePath, ElasticsearchFieldModel model);
 
 }

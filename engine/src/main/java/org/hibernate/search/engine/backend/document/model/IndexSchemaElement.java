@@ -16,6 +16,10 @@ public interface IndexSchemaElement {
 
 	FieldModelContext field(String relativeName);
 
-	IndexSchemaObjectField objectField(String relativeName);
+	default IndexSchemaObjectField objectField(String relativeName) {
+		return objectField( relativeName, ObjectFieldStorage.DEFAULT );
+	}
+
+	IndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage);
 
 }

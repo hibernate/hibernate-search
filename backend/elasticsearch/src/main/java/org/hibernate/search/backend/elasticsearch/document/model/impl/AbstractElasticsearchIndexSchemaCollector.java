@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
@@ -36,11 +37,12 @@ abstract class AbstractElasticsearchIndexSchemaCollector<B extends AbstractIndex
 	public abstract ElasticsearchIndexSchemaElement withContext(IndexSchemaNestingContext context);
 
 	@Override
-	public ObjectFieldIndexSchemaCollector objectField(String relativeName) {
-		IndexSchemaObjectPropertyNodeBuilder nestedNodeBuilder =
+	public ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage) {
+		IndexSchemaObjectPropertyNodeBuilder nodeBuilder =
 				new IndexSchemaObjectPropertyNodeBuilder( relativeName );
-		nodeBuilder.putProperty( relativeName, nestedNodeBuilder );
-		return new ElasticsearchObjectFieldIndexSchemaCollectorImpl( nestedNodeBuilder );
+		nodeBuilder.setStorage( storage );
+		this.nodeBuilder.putProperty( relativeName, nodeBuilder );
+		return new ElasticsearchObjectFieldIndexSchemaCollectorImpl( nodeBuilder );
 	}
 
 }

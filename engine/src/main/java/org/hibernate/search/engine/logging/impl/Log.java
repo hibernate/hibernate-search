@@ -35,9 +35,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 6, value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
 
-	@Message(id = 7, value = "Cannot add multiple predicates to the query root.")
+	@Message(id = 7, value = "Cannot add multiple predicates to the query root; use an explicit boolean predicate instead.")
 	SearchException cannotAddMultiplePredicatesToQueryRoot();
 
 	@Message(id = 8, value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
 	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
+
+	@Message(id = 9, value = "Cannot add multiple predicates to a nested predicate; use an explicit boolean predicate instead.")
+	SearchException cannotAddMultiplePredicatesToNestedPredicate();
 }

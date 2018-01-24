@@ -41,7 +41,7 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
-			ElasticsearchFieldModelCollector collector,
+			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = new PropertyMapping();
 

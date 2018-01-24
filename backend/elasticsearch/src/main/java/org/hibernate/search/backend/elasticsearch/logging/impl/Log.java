@@ -57,5 +57,10 @@ public interface Log extends BasicLogger {
 			+ " Given predicate was: '%1$s'" )
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
+	@Message(id = 9, value = "Field '%2$s' is not an object field in index '%1$s'." )
+	SearchException nonObjectFieldForNestedQuery(String indexName, String absoluteFieldPath);
+
+	@Message(id = 10, value = "Object field '%2$s' is not stored as nested in index '%1$s'." )
+	SearchException nonNestedFieldForNestedQuery(String indexName, String absoluteFieldPath);
 
 }

@@ -45,7 +45,7 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector,
+	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 

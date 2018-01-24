@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 
 /**
  * @author Yoann Rodiere
@@ -14,6 +15,10 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 public interface ElasticsearchIndexSchemaElement extends IndexSchemaElement {
 
 	@Override
-	ElasticsearchIndexSchemaObjectField objectField(String relativeName);
+	default ElasticsearchIndexSchemaObjectField objectField(String relativeName) {
+		return objectField( relativeName, ObjectFieldStorage.DEFAULT );
+	}
 
+	@Override
+	ElasticsearchIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage);
 }

@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
@@ -80,7 +81,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	public Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(
-			String relativePrefix,
+			String relativePrefix, ObjectFieldStorage storage,
 			Function<IndexedEmbeddedFilter, IndexedEmbeddedFilter> filterCompositionFunction,
 			IndexSchemaCollector indexModelNode) {
 		IndexedEmbeddedFilter composedFilter = filterCompositionFunction.apply( filter );
@@ -92,7 +93,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 			List<IndexObjectFieldAccessor> parentObjectAccessors = new ArrayList<>();
 			while ( nextDotIndex >= 0 ) {
 				String objectName = prefixToParse.substring( afterPreviousDotIndex, nextDotIndex );
-				ObjectFieldIndexSchemaCollector nextNode = currentNode.objectField( objectName );
+				ObjectFieldIndexSchemaCollector nextNode = currentNode.objectField( objectName, storage );
 				parentObjectAccessors.add( nextNode.withContext( IndexSchemaNestingContext.includeAll() ).createAccessor() );
 				afterPreviousDotIndex = nextDotIndex + 1;
 				nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );

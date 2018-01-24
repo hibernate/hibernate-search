@@ -77,7 +77,7 @@ public class ElasticsearchFieldModelContextImpl
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchFieldModelCollector collector,
+	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchObjectNodeModel parentModel) {
 		// TODO error if delegate is null
 		return delegate.contribute( collector, parentModel );

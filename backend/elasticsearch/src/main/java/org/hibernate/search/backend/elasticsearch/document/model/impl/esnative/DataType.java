@@ -24,6 +24,13 @@ public enum DataType {
 			return true;
 		}
 	},
+	@SerializedName("nested")
+	NESTED {
+		@Override
+		public boolean isComposite() {
+			return true;
+		}
+	},
 	/**
 	 * @deprecated Only used in Elasticsearch 2.x. Use TEXT or KEYWORD instead.
 	 */

@@ -1,0 +1,65 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.engine.search.dsl.predicate.impl;
+
+import java.util.function.Supplier;
+
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
+import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+import org.hibernate.search.util.spi.LoggerFactory;
+
+
+class NestedPredicateContextImpl<N, C>
+		implements NestedPredicateContext<N>, SearchPredicateContributor<C>, SearchDslContext<N, C> {
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
+	private final SearchTargetContext<C> targetContext;
+	private final Supplier<N> nextContextProvider;
+
+	private final SearchPredicateContainerContextImpl<N, C> containerContext;
+
+	private NestedPredicateBuilder<C> builder;
+	private SearchPredicateContributor<C> singlePredicateContributor;
+
+	NestedPredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
+		this.targetContext = targetContext;
+		this.nextContextProvider = nextContextProvider;
+		this.containerContext = new SearchPredicateContainerContextImpl<>( targetContext, this );
+	}
+
+	@Override
+	public NestedPredicateFieldContext<N> onObjectField(String fieldName) {
+		this.builder = targetContext.getSearchPredicateFactory()
+				.nested( fieldName );
+		return new NestedPredicateFieldContextImpl<>( containerContext, builder );
+	}
+
+	@Override
+	public void contribute(C collector) {
+		singlePredicateContributor.contribute( builder.getNestedCollector() );
+		builder.contribute( collector );
+	}
+
+	@Override
+	public void addContributor(SearchPredicateContributor<C> child) {
+		if ( this.singlePredicateContributor != null ) {
+			throw log.cannotAddMultiplePredicatesToNestedPredicate();
+		}
+		this.singlePredicateContributor = child;
+	}
+
+	@Override
+	public N getNextContext() {
+		return nextContextProvider.get();
+	}
+}

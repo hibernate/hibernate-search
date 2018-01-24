@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -71,7 +72,8 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	}
 
 	@Override
-	public void indexedEmbedded(String relativePrefix, Integer maxDepth, Set<String> pathFilters) {
+	public void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage,
+			Integer maxDepth, Set<String> pathFilters) {
 		// TODO handle collections
 
 		String defaultedRelativePrefix = relativePrefix;
@@ -82,7 +84,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( propertyModel.getJavaType() );
 
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				typeId, defaultedRelativePrefix, maxDepth, pathFilters );
+				typeId, defaultedRelativePrefix, storage, maxDepth, pathFilters );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
 					this, propertyModel.getTypeModel(),

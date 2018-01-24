@@ -32,7 +32,7 @@ public class ElasticsearchRootIndexSchemaCollectorImpl
 		nodeBuilder.setRouting( RoutingType.REQUIRED );
 	}
 
-	public TypeMapping contribute(ElasticsearchFieldModelCollector collector) {
+	public TypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
 		return nodeBuilder.contribute( collector );
 	}
 }

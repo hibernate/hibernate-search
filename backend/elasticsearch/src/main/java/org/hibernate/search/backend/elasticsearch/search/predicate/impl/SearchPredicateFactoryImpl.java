@@ -10,13 +10,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchObjectNodeModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
@@ -50,12 +53,17 @@ public class SearchPredicateFactoryImpl implements SearchPredicateFactory<Elasti
 		return new RangePredicateBuilderImpl( absoluteFieldPath, getFormatter( absoluteFieldPath ) );
 	}
 
+	@Override
+	public NestedPredicateBuilder<ElasticsearchSearchPredicateCollector> nested(String absoluteFieldPath) {
+		checkNestedField( absoluteFieldPath );
+		return new NestedPredicateBuilderImpl( absoluteFieldPath );
+	}
+
 	private ElasticsearchFieldFormatter getFormatter(String absoluteFieldPath) {
 		ElasticsearchIndexModel indexModelForSelectedFormatter = null;
 		ElasticsearchFieldFormatter selectedFormatter = null;
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchFieldModel fieldModel =
-					indexModel.getFieldModel( absoluteFieldPath );
+			ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( absoluteFieldPath );
 			if ( fieldModel != null ) {
 				ElasticsearchFieldFormatter formatter = fieldModel.getFormatter();
 				if ( selectedFormatter == null ) {
@@ -72,12 +80,33 @@ public class SearchPredicateFactoryImpl implements SearchPredicateFactory<Elasti
 			}
 		}
 		if ( selectedFormatter == null ) {
-			throw log.unknownFieldForSearch(
-					absoluteFieldPath,
-					getIndexNames()
-					);
+			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
 		}
 		return selectedFormatter;
+	}
+
+	private void checkNestedField(String absoluteFieldPath) {
+		boolean found = false;
+
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			ElasticsearchObjectNodeModel nodeModel =
+					indexModel.getObjectNodeModel( absoluteFieldPath );
+			if ( nodeModel != null ) {
+				found = true;
+				if ( !ObjectFieldStorage.NESTED.equals( nodeModel.getStorage() ) ) {
+					throw log.nonNestedFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
+				}
+			}
+		}
+		if ( !found ) {
+			for ( ElasticsearchIndexModel indexModel : indexModels ) {
+				ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( absoluteFieldPath );
+				if ( fieldModel != null ) {
+					throw log.nonObjectFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
+				}
+			}
+			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
+		}
 	}
 
 	private List<String> getIndexNames() {
