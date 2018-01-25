@@ -8,9 +8,12 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.hibernate.search.engine.backend.document.model.Store;
 
 /**
  * @author Yoann Rodiere
@@ -18,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-// TODO repeatable
+@Repeatable( Field.List.class )
 public @interface Field {
 
 	/**
@@ -28,20 +31,29 @@ public @interface Field {
 
 	/**
 	 * @return A reference to the function bridge to use for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #bridgeBuilder()}:
+	 * Cannot be used in the same {@code @Field} annotation as {@link #functionBridgeBuilder()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	FunctionBridgeBeanReference bridge() default @FunctionBridgeBeanReference;
+	FunctionBridgeBeanReference functionBridge() default @FunctionBridgeBeanReference;
 
 	/**
 	 * @return A reference to the builder to use to build a function bridge for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #bridge()}:
+	 * Cannot be used in the same {@code @Field} annotation as {@link #functionBridge()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	FunctionBridgeBuilderBeanReference bridgeBuilder() default @FunctionBridgeBuilderBeanReference;
+	FunctionBridgeBuilderBeanReference functionBridgeBuilder() default @FunctionBridgeBuilderBeanReference;
 
-	// TODO index, analyze, store, norms, termVector
+	Store store() default Store.NO;
+
+	// TODO index, analyze, norms, termVector
 	// TODO analyzer, normalizer
 	// TODO indexNullAs? => Maybe we should rather use "missing" queries?
+
+	@Documented
+	@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface List {
+		Field[] value();
+	}
 
 }

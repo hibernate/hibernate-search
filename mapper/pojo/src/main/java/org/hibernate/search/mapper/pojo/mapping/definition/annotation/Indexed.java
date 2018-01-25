@@ -12,26 +12,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
-
 /**
  * @author Yoann Rodiere
  */
 @Documented
-@Target({ ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IndexedEmbedded {
+public @interface Indexed {
 
-	String prefix() default "";
-
-	int maxDepth() default -1;
-
-	String[] includePaths() default {};
-
-	ObjectFieldStorage storage() default ObjectFieldStorage.DEFAULT;
-
-	// TODO includeEmbeddedObjectId?
-	// TODO targetElement?
-	// TODO indexNullAs? => Maybe we should rather use "missing" queries?
+	String index() default "";
 
 }

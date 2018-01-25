@@ -17,6 +17,8 @@ import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
 
 /**
  * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,
@@ -61,7 +63,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
  */
-@BridgeMapping(builderType = @BridgeMappingBuilderReference(type = GeoPointBridgeBuilder.class))
+@BridgeMapping(builder = @BridgeMappingBuilderReference(type = GeoPointBridgeBuilder.class))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
@@ -99,10 +101,11 @@ public @interface GeoPointBridge {
 	 *
 	 * @author Nicolas Helleringer
 	 */
+	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = LatitudeMarkerBuilder.class))
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.METHOD, ElementType.FIELD } )
 	@Documented
-	public @interface Latitude {
+	@interface Latitude {
 
 		/**
 		 * @return The name of the marker set this marker belongs to.
@@ -119,10 +122,11 @@ public @interface GeoPointBridge {
 	 *
 	 * @author Nicolas Helleringer
 	 */
+	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = LongitudeMarkerBuilder.class))
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.METHOD, ElementType.FIELD } )
 	@Documented
-	public @interface Longitude {
+	@interface Longitude {
 
 		/**
 		 * @return The name of the marker set this marker belongs to.
@@ -136,7 +140,7 @@ public @interface GeoPointBridge {
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE } )
 	@Documented
-	public @interface List {
+	@interface List {
 
 		GeoPointBridge[] value();
 

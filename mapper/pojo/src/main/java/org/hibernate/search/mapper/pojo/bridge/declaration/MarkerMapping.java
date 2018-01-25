@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BridgeMapping {
+public @interface MarkerMapping {
 
-	BridgeMappingBuilderReference builder();
+	MarkerMappingBuilderReference builder();
 
 }
