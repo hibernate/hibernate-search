@@ -8,16 +8,17 @@ package org.hibernate.search.mapper.pojo.mapping;
 
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 
 /**
  * @author Yoann Rodiere
  */
 public interface PojoMappingContributor<M> {
 
-	MappingDefinition programmaticMapping();
+	ProgrammaticMappingDefinition programmaticMapping();
 
-	void annotationMapping(Set<Class<?>> classes);
+	AnnotationMappingDefinition annotationMapping();
 
 	M getResult();
 

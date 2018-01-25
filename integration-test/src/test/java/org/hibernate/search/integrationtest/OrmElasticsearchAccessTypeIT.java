@@ -32,7 +32,7 @@ import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFacto
 import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 import org.junit.After;
@@ -206,7 +206,7 @@ public class OrmElasticsearchAccessTypeIT {
 	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
 		@Override
 		public void contribute(HibernateOrmMappingContributor contributor) {
-			MappingDefinition mapping = contributor.programmaticMapping();
+			ProgrammaticMappingDefinition mapping = contributor.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.property( "id" ).documentId()

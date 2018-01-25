@@ -13,8 +13,9 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.MappingDefinitionImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionImpl;
 
 /**
  * @author Yoann Rodiere
@@ -34,14 +35,14 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 	}
 
 	@Override
-	public MappingDefinition programmaticMapping() {
-		MappingDefinitionImpl definition = new MappingDefinitionImpl( mapperFactory );
+	public ProgrammaticMappingDefinition programmaticMapping() {
+		ProgrammaticMappingDefinitionImpl definition = new ProgrammaticMappingDefinitionImpl( mapperFactory );
 		mappingRepositoryBuilder.addMapping( definition );
 		return definition;
 	}
 
 	@Override
-	public void annotationMapping(Set<Class<?>> classes) {
+	public AnnotationMappingDefinition annotationMapping() {
 		// TODO Annotation processing
 		throw new UnsupportedOperationException( "Annotation processing is not implemented yet" );
 	}

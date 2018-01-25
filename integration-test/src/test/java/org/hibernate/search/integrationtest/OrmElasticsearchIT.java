@@ -45,7 +45,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -627,7 +627,7 @@ public class OrmElasticsearchIT {
 	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
 		@Override
 		public void contribute(HibernateOrmMappingContributor contributor) {
-			MappingDefinition mapping = contributor.programmaticMapping();
+			ProgrammaticMappingDefinition mapping = contributor.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.bridge(
@@ -645,7 +645,7 @@ public class OrmElasticsearchIT {
 									.maxDepth( 1 )
 									.includePaths( "embedded.prefix_customBridgeOnClass.text" );
 
-			MappingDefinition secondMapping = contributor.programmaticMapping();
+			ProgrammaticMappingDefinition secondMapping = contributor.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )
 					.property( "localDate" )
 							.field()

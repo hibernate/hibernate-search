@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 /**
  * @author Yoann Rodiere
  */
-public interface MappingDefinition {
+public interface ProgrammaticMappingDefinition {
 
 	TypeMappingContext type(Class<?> clazz);
 

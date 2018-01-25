@@ -12,19 +12,19 @@ import java.util.Map;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 
 /**
  * @author Yoann Rodiere
  */
-public class MappingDefinitionImpl implements MappingDefinition, MetadataContributor {
+public class ProgrammaticMappingDefinitionImpl implements ProgrammaticMappingDefinition, MetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
 
 	private final Map<Class<?>, TypeMappingContextImpl> entities = new HashMap<>();
 
-	public MappingDefinitionImpl(PojoMapperFactory<?> mapperFactory) {
+	public ProgrammaticMappingDefinitionImpl(PojoMapperFactory<?> mapperFactory) {
 		super();
 		this.mapperFactory = mapperFactory;
 	}

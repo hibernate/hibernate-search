@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -77,7 +77,7 @@ public class JavaBeanElasticsearchIT {
 
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
-		MappingDefinition mappingDefinition = contributor.programmaticMapping();
+		ProgrammaticMappingDefinition mappingDefinition = contributor.programmaticMapping();
 		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
 				.bridge(
@@ -95,7 +95,7 @@ public class JavaBeanElasticsearchIT {
 								.maxDepth( 1 )
 								.includePaths( "embedded.prefix_customBridgeOnClass.text" );
 
-		MappingDefinition secondMappingDefinition = contributor.programmaticMapping();
+		ProgrammaticMappingDefinition secondMappingDefinition = contributor.programmaticMapping();
 		secondMappingDefinition.type( ParentIndexedEntity.class )
 				.property( "localDate" )
 						.field()
