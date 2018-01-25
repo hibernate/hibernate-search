@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +28,9 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
@@ -35,21 +39,25 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocum
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
@@ -67,7 +75,7 @@ import static org.hibernate.search.integrationtest.util.StubAssert.assertRequest
 /**
  * @author Yoann Rodiere
  */
-public class OrmElasticsearchIT {
+public class OrmElasticsearchAnnotationMappingIT {
 
 	private static final String PREFIX = "hibernate.search.";
 
@@ -84,8 +92,7 @@ public class OrmElasticsearchIT {
 				.applySetting( PREFIX + "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "backend.elasticsearchBackend_2.host", HOST_2 )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
-				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
-				.applySetting( AvailableSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
+				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" );
 
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 
@@ -624,59 +631,21 @@ public class OrmElasticsearchIT {
 				+ "}" );
 	}
 
-	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
+	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
 		@Override
-		public void contribute(HibernateOrmMappingContributor contributor) {
-			ProgrammaticMappingDefinition mapping = contributor.programmaticMapping();
-			mapping.type( IndexedEntity.class )
-					.indexed( IndexedEntity.INDEX )
-					.bridge(
-							new MyBridgeBuilder()
-							.objectName( "customBridgeOnClass" )
-					)
-					.property( "id" )
-							.documentId()
-					.property( "text" )
-							.field()
-									.name( "myTextField" )
-					.property( "embedded" )
-							.indexedEmbedded()
-									.prefix( "embedded.prefix_" )
-									.maxDepth( 1 )
-									.includePaths( "embedded.prefix_customBridgeOnClass.text" );
-
-			ProgrammaticMappingDefinition secondMapping = contributor.programmaticMapping();
-			secondMapping.type( ParentIndexedEntity.class )
-					.property( "localDate" )
-							.field()
-									.name( "myLocalDateField" )
-					.property( "embedded" )
-							.bridge(
-									new MyBridgeBuilder()
-									.objectName( "customBridgeOnProperty" )
-							);
-			secondMapping.type( OtherIndexedEntity.class )
-					.indexed( OtherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
-					.property( "numeric" )
-							.field()
-							.field().name( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
-			secondMapping.type( YetAnotherIndexedEntity.class )
-					.indexed( YetAnotherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId()
-					.property( "numeric" )
-							.field();
+		public String toIndexedValue(Integer propertyValue) {
+			return propertyValue == null ? null : propertyValue.toString();
 		}
 	}
 
 	@MappedSuperclass
 	public static class ParentIndexedEntity {
 
+		@Field(name = "myLocalDateField")
 		private LocalDate localDate;
 
 		@ManyToOne
+		@MyBridge(objectName = "customBridgeOnProperty")
 		private IndexedEntity embedded;
 
 		public LocalDate getLocalDate() {
@@ -699,13 +668,17 @@ public class OrmElasticsearchIT {
 
 	@Entity
 	@Table(name = "indexed")
+	@Indexed(index = IndexedEntity.INDEX)
+	@MyBridge(objectName = "customBridgeOnClass")
 	public static class IndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
 
 		@Id
+		@DocumentId
 		private Integer id;
 
+		@Field(name = "myTextField")
 		private String text;
 
 		public Integer getId() {
@@ -724,10 +697,17 @@ public class OrmElasticsearchIT {
 			this.text = text;
 		}
 
+		@Override
+		@IndexedEmbedded(prefix = "embedded.prefix_", maxDepth = 1,
+				includePaths = "embedded.prefix_customBridgeOnClass.text")
+		public IndexedEntity getEmbedded() {
+			return super.getEmbedded();
+		}
 	}
 
 	@Entity
 	@Table(name = "other")
+	@Indexed(index = OtherIndexedEntity.INDEX)
 	public static class OtherIndexedEntity {
 
 		public static final String INDEX = "OtherIndexedEntity";
@@ -735,8 +715,10 @@ public class OrmElasticsearchIT {
 		@Id
 		private Integer id;
 
+		@Field(name = "numericAsString", functionBridge = @FunctionBridgeBeanReference(type = IntegerAsStringFunctionBridge.class))
 		private Integer numeric;
 
+		@DocumentId(identifierBridge = @IdentifierBridgeBeanReference(type = DefaultIntegerIdentifierBridge.class))
 		public Integer getId() {
 			return id;
 		}
@@ -745,6 +727,7 @@ public class OrmElasticsearchIT {
 			this.id = id;
 		}
 
+		@Field
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -757,13 +740,16 @@ public class OrmElasticsearchIT {
 
 	@Entity
 	@Table(name = "yetanother")
+	@Indexed(index = YetAnotherIndexedEntity.INDEX)
 	public static class YetAnotherIndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "YetAnotherIndexedEntity";
 
 		@Id
+		@DocumentId
 		private Integer id;
 
+		@Field
 		private Integer numeric;
 
 		public Integer getId() {
@@ -783,20 +769,27 @@ public class OrmElasticsearchIT {
 		}
 	}
 
-	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
-		@Override
-		public String toIndexedValue(Integer propertyValue) {
-			return propertyValue == null ? null : propertyValue.toString();
-		}
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+	@BridgeMapping(builder = @BridgeMappingBuilderReference(type = MyBridgeBuilder.class))
+	public @interface MyBridge {
+
+		String objectName();
+
 	}
 
-	public static final class MyBridgeBuilder implements BridgeBuilder<Bridge> {
+	public static final class MyBridgeBuilder implements AnnotationBridgeBuilder<Bridge, MyBridge> {
 
 		private String objectName;
 
 		public MyBridgeBuilder objectName(String value) {
 			this.objectName = value;
 			return this;
+		}
+
+		@Override
+		public void initialize(MyBridge annotation) {
+			objectName( annotation.objectName() );
 		}
 
 		@Override
