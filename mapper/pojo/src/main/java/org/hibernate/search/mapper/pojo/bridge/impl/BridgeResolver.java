@@ -56,7 +56,7 @@ public final class BridgeResolver {
 		BridgeBuilder<? extends FunctionBridge<? super T, ?>> result =
 				(BridgeBuilder<? extends FunctionBridge<? super T, ?>>) defaultFunctionBridgeBySourceType.get( sourceType );
 		if ( result == null ) {
-			throw log.unableToResolveDefaultIdentifierBridgeFromSourceType( sourceType );
+			throw log.unableToResolveDefaultFunctionBridgeFromSourceType( sourceType );
 		}
 		return result;
 	}
