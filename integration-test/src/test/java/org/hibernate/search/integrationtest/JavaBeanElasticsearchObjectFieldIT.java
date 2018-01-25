@@ -4,7 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search;
+package org.hibernate.search.integrationtest;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -12,6 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -26,18 +32,19 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingD
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.util.SearchException;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import org.json.JSONException;
+
+import static org.hibernate.search.integrationtest.util.StubAssert.assertRequest;
 
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
+public class JavaBeanElasticsearchObjectFieldIT {
 
 	private SearchMappingRepository mappingRepository;
 
@@ -45,11 +52,8 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 
 	private static final String HOST = "http://es1.mycompany.com:9200/";
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Before
-	public void setup() {
+	public void setup() throws JSONException {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
 				.setProperty( "backend.elasticsearchBackend.type", ElasticsearchBackendFactory.class.getName() )
 				.setProperty( "backend.elasticsearchBackend.host", HOST )
@@ -62,7 +66,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 				.indexed( IndexedEntity.INDEX )
 				.property( "id" )
 						.documentId()
-				.property( "text" )
+				.property( "texts" )
 						.bridge(
 								new MyBridgeBuilder()
 										.objectName( "customBridgeOnProperty" )
@@ -71,7 +75,23 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
 
-		StubElasticsearchClient.drainRequestsByIndex();
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST, "createIndex", null,
+				"{"
+					+ "'mapping': {"
+						+ "'properties': {"
+							+ "'customBridgeOnProperty': {"
+								+ "'type': 'object',"
+								+ "'properties': {"
+									+ "'text': {"
+										+ "'type': 'keyword'"
+									+ "}"
+								+ "}"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}" );
 	}
 
 	@After
@@ -83,19 +103,55 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 	}
 
 	@Test
-	public void index() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000008" );
-		thrown.expectMessage( "Invalid parent object for this field accessor" );
-		thrown.expectMessage( "expected path 'customBridgeOnProperty', got 'null'." );
-
+	public void index() throws JSONException {
 		try (PojoSearchManager manager = mapping.createSearchManager()) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
-			entity1.setText( "foo" );
+			entity1.setTexts( Arrays.asList(
+					"value1_1,value1_2",
+					"value2_1",
+					null,
+					"value3_1,value3_2,value3_3"
+			) );
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setTexts( Collections.singletonList(
+					"value1_1,value1_2"
+			) );
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setTexts( Collections.emptyList() );
 
 			manager.getMainWorker().add( entity1 );
+			manager.getMainWorker().add( entity2 );
+			manager.getMainWorker().add( entity3 );
 		}
+
+		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST, "add", "1",
+				"{"
+					+ "'customBridgeOnProperty': ["
+						+ "{"
+							+ "'text': ['value1_1', 'value1_2']"
+						+ "},"
+						+ "{"
+							+ "'text': 'value2_1'"
+						+ "},"
+						+ "null,"
+						+ "{"
+							+ "'text': ['value3_1', 'value3_2', 'value3_3']"
+						+ "}"
+					+ "]"
+				+ "}" );
+		assertRequest( requests, IndexedEntity.INDEX, 1, HOST, "add", "2",
+				"{"
+					+ "'customBridgeOnProperty': {"
+							+ "'text': ['value1_1', 'value1_2']"
+					+ "}"
+				+ "}" );
+		assertRequest( requests, IndexedEntity.INDEX, 2, HOST, "add", "3",
+				"{"
+				+ "}" );
 	}
 
 
@@ -105,7 +161,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 
 		private Integer id;
 
-		private String text;
+		private List<String> texts;
 
 		public Integer getId() {
 			return id;
@@ -115,12 +171,12 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 			this.id = id;
 		}
 
-		public String getText() {
-			return text;
+		public List<String> getTexts() {
+			return texts;
 		}
 
-		public void setText(String text) {
-			this.text = text;
+		public void setTexts(List<String> texts) {
+			this.texts = texts;
 		}
 
 	}
@@ -143,7 +199,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 	private static final class MyBridgeImpl implements Bridge {
 
 		private final String objectName;
-		private PojoModelElementAccessor<String> sourceAccessor;
+		private PojoModelElementAccessor<List> sourceAccessor;
 		private IndexObjectFieldAccessor objectFieldAccessor;
 		private IndexFieldAccessor<String> textFieldAccessor;
 
@@ -154,7 +210,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 		@Override
 		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
-			sourceAccessor = bridgedPojoModelElement.createAccessor( String.class );
+			sourceAccessor = bridgedPojoModelElement.createAccessor( List.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
 			objectFieldAccessor = objectField.createAccessor();
 			textFieldAccessor = objectField.field( "text" ).asString().createAccessor();
@@ -162,10 +218,20 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source) {
-			String sourceValue = sourceAccessor.read( source );
+			List<String> sourceValue = sourceAccessor.read( source );
 			if ( sourceValue != null ) {
-				// Intentionally do not use the object field accessor
-				textFieldAccessor.write( target, sourceValue );
+				for ( String item : sourceValue ) {
+					if ( item != null ) {
+						String[] subItems = item.split( "," );
+						DocumentElement object = objectFieldAccessor.add( target );
+						for ( String subItem : subItems ) {
+							textFieldAccessor.write( object, subItem );
+						}
+					}
+					else {
+						objectFieldAccessor.addMissing( target );
+					}
+				}
 			}
 		}
 

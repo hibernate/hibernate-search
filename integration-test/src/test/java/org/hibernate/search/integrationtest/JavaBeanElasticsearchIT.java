@@ -4,25 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search;
+package org.hibernate.search.integrationtest;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
@@ -32,28 +20,29 @@ import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchC
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
+import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.engine.mapper.model.SearchModel;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 import org.junit.After;
 import org.junit.Before;
@@ -62,43 +51,76 @@ import org.junit.Test;
 import org.fest.assertions.Assertions;
 import org.json.JSONException;
 
-import static org.hibernate.search.util.StubAssert.assertRequest;
+import static org.hibernate.search.integrationtest.util.StubAssert.assertRequest;
 
 /**
  * @author Yoann Rodiere
  */
-public class OrmElasticsearchIT {
+public class JavaBeanElasticsearchIT {
 
-	private static final String PREFIX = "hibernate.query.";
+	private SearchMappingRepository mappingRepository;
+
+	private JavaBeanMapping mapping;
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
 
-	private SessionFactory sessionFactory;
-
 	@Before
 	public void setup() throws JSONException {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.host", HOST_1 )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_2.host", HOST_2 )
-				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
-				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
-				.applySetting( AvailableSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
+				.setProperty( "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
+				.setProperty( "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend_2.host", HOST_2 )
+				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
+				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" );
 
-		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
+		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( ParentIndexedEntity.class )
-				.addAnnotatedClass( OtherIndexedEntity.class )
-				.addAnnotatedClass( YetAnotherIndexedEntity.class );
+		MappingDefinition mappingDefinition = contributor.programmaticMapping();
+		mappingDefinition.type( IndexedEntity.class )
+				.indexed( IndexedEntity.INDEX )
+				.bridge(
+						new MyBridgeBuilder()
+						.objectName( "customBridgeOnClass" )
+				)
+				.property( "id" )
+						.documentId()
+				.property( "text" )
+						.field()
+								.name( "myTextField" )
+				.property( "embedded" )
+						.indexedEmbedded()
+								.prefix( "embedded.prefix_" )
+								.maxDepth( 1 )
+								.includePaths( "embedded.prefix_customBridgeOnClass.text" );
 
-		Metadata metadata = ms.buildMetadata();
+		MappingDefinition secondMappingDefinition = contributor.programmaticMapping();
+		secondMappingDefinition.type( ParentIndexedEntity.class )
+				.property( "localDate" )
+						.field()
+								.name( "myLocalDateField" )
+				.property( "embedded" )
+						.bridge(
+								new MyBridgeBuilder()
+								.objectName( "customBridgeOnProperty" )
+						);
+		secondMappingDefinition.type( OtherIndexedEntity.class )
+				.indexed( OtherIndexedEntity.INDEX )
+				.property( "id" )
+						.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
+				.property( "numeric" )
+						.field()
+						.field().name( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
+		secondMappingDefinition.type( YetAnotherIndexedEntity.class )
+				.indexed( YetAnotherIndexedEntity.INDEX )
+				.property( "id" )
+						.documentId()
+				.property( "numeric" )
+						.field();
 
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-		this.sessionFactory = sfb.build();
+		mappingRepository = mappingRepositoryBuilder.build();
+		mapping = contributor.getResult();
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 
@@ -172,7 +194,7 @@ public class OrmElasticsearchIT {
 							+ "'embedded': {"
 								+ "'type': 'object',"
 								+ "'properties': {"
-									+ "'customBridgeOnClass': {"
+									+ "'prefix_customBridgeOnClass': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -184,7 +206,7 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'customBridgeOnProperty': {"
+									+ "'prefix_customBridgeOnProperty': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -196,10 +218,10 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'embedded': {"
+									+ "'prefix_embedded': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
-											+ "'customBridgeOnClass': {"
+											+ "'prefix_customBridgeOnClass': {"
 												+ "'type': 'object',"
 												+ "'properties': {"
 													+ "'text': {"
@@ -209,11 +231,11 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'myLocalDateField': {"
+									+ "'prefix_myLocalDateField': {"
 										+ "'type': 'date',"
 										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
 									+ "},"
-									+ "'myTextField': {"
+									+ "'prefix_myTextField': {"
 										+ "'type': 'keyword'"
 									+ "}"
 								+ "}"
@@ -233,52 +255,38 @@ public class OrmElasticsearchIT {
 	@After
 	public void cleanup() {
 		StubElasticsearchClient.drainRequestsByIndex();
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
+		if ( mappingRepository != null ) {
+			mappingRepository.close();
 		}
 	}
 
 	@Test
 	public void index() throws JSONException {
-		try ( Session session = sessionFactory.openSession() ) {
-			Transaction tx = session.beginTransaction();
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setText( "this is text (1)" );
+			entity1.setLocalDate( LocalDate.of( 2017, 11, 1 ) );
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setText( "some more text (2)" );
+			entity2.setLocalDate( LocalDate.of( 2017, 11, 2 ) );
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setText( "some more text (3)" );
+			entity3.setLocalDate( LocalDate.of( 2017, 11, 3 ) );
+			OtherIndexedEntity entity4 = new OtherIndexedEntity();
+			entity4.setId( 4 );
+			entity4.setNumeric( 404 );
 
-			try {
-				IndexedEntity entity1 = new IndexedEntity();
-				entity1.setId( 1 );
-				entity1.setText( "this is text (1)" );
-				entity1.setLocalDate( LocalDate.of( 2017, 11, 1 ) );
-				IndexedEntity entity2 = new IndexedEntity();
-				entity2.setId( 2 );
-				entity2.setText( "some more text (2)" );
-				entity2.setLocalDate( LocalDate.of( 2017, 11, 2 ) );
-				IndexedEntity entity3 = new IndexedEntity();
-				entity3.setId( 3 );
-				entity3.setText( "some more text (3)" );
-				entity3.setLocalDate( LocalDate.of( 2017, 11, 3 ) );
-				OtherIndexedEntity entity4 = new OtherIndexedEntity();
-				entity4.setId( 4 );
-				entity4.setNumeric( 404 );
+			entity1.setEmbedded( entity2 );
+			entity2.setEmbedded( entity3 );
 
-				entity1.setEmbedded( entity2 );
-				entity2.setEmbedded( entity3 );
-
-				session.persist( entity1 );
-				session.persist( entity2 );
-				session.persist( entity4 );
-				session.delete( entity1 );
-				session.persist( entity3 );
-				tx.commit();
-			}
-			catch (Throwable t) {
-				try {
-					tx.rollback();
-				}
-				catch (Throwable t2) {
-					t.addSuppressed( t2 );
-				}
-				throw t;
-			}
+			manager.getMainWorker().add( entity1 );
+			manager.getMainWorker().add( entity2 );
+			manager.getMainWorker().add( entity4 );
+			manager.getMainWorker().delete( entity1 );
+			manager.getMainWorker().add( entity3 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
@@ -295,12 +303,12 @@ public class OrmElasticsearchIT {
 						+ "'date': '2017-11-03'"
 					+ "},"
 					+ "'embedded': {"
-						+ "'customBridgeOnClass': {"
+						+ "'prefix_customBridgeOnClass': {"
 							+ "'text': 'some more text (3)',"
 							+ "'date': '2017-11-03'"
 						+ "},"
-						+ "'myLocalDateField': '2017-11-03',"
-						+ "'myTextField': 'some more text (3)'"
+						+ "'prefix_myLocalDateField': '2017-11-03',"
+						+ "'prefix_myTextField': 'some more text (3)'"
 					+ "},"
 					+ "'myTextField': 'some more text (2)'"
 				+ "}" );
@@ -322,17 +330,16 @@ public class OrmElasticsearchIT {
 
 	@Test
 	public void search() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<ParentIndexedEntity> query = ftSession.search(
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			SearchQuery<PojoReference> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.query()
-					.asEntities()
+					.asReferences()
 					.predicate( root -> root.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should().range()
 									.onField( "myLocalDateField" )
@@ -352,12 +359,13 @@ public class OrmElasticsearchIT {
 							} )
 					)
 					.build();
-			query.setFirstResult( 2 );
-			query.setMaxResults( 10 );
+			query.setFirstResult( 3L );
+			query.setMaxResults( 2L );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 6,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -371,20 +379,21 @@ public class OrmElasticsearchIT {
 						+ "}"
 					+ "}"
 			);
-			List<ParentIndexedEntity> result = query.list();
-			Assertions.assertThat( result ).hasSize( 2 )
+			SearchResult<PojoReference> result = query.execute();
+			Assertions.assertThat( result.getHits() ).hasSize( 2 )
 					.containsExactly(
-							session.get( IndexedEntity.class, 0 ),
-							session.get( YetAnotherIndexedEntity.class, 1 )
+							new PojoReferenceImpl( IndexedEntity.class, 0 ),
+							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
 					);
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 6 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
 				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
+					c.accept( "offset", "3" );
+					c.accept( "limit", "2" );
 				},
 				"{"
 					+ "'query': {"
@@ -402,7 +411,7 @@ public class OrmElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
@@ -435,9 +444,8 @@ public class OrmElasticsearchIT {
 
 	@Test
 	public void search_separatePredicate() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextSearchTarget<ParentIndexedEntity> target = ftSession.search(
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			PojoSearchTarget<?> target = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
@@ -454,21 +462,20 @@ public class OrmElasticsearchIT {
 					.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
 					.end();
-			FullTextQuery<ParentIndexedEntity> query = target.query()
-					.asEntities()
+			SearchQuery<PojoReference> query = target.query()
+					.asReferences()
 					.predicate( predicate )
 					.build();
-			query.setFirstResult( 2 );
-			query.setMaxResults( 10 );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -482,16 +489,13 @@ public class OrmElasticsearchIT {
 						+ "}"
 					+ "}"
 			);
-			query.list();
+			query.execute();
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
-				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
-				},
+				null,
 				"{"
 					+ "'query': {"
 						+ "'bool': {"
@@ -508,7 +512,7 @@ public class OrmElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
@@ -539,9 +543,8 @@ public class OrmElasticsearchIT {
 
 	@Test
 	public void search_projection() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<List<?>> query = ftSession.search(
+		try (PojoSearchManager manager = mapping.createSearchManager()) {
+			SearchQuery<List<?>> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.query()
@@ -550,7 +553,6 @@ public class OrmElasticsearchIT {
 							ProjectionConstants.REFERENCE,
 							"myLocalDateField",
 							ProjectionConstants.DOCUMENT_REFERENCE,
-							ProjectionConstants.OBJECT,
 							"customBridgeOnClass.text"
 					)
 					.predicate( root -> root.match()
@@ -562,6 +564,7 @@ public class OrmElasticsearchIT {
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -583,15 +586,14 @@ public class OrmElasticsearchIT {
 						+ "}"
 					+ "}"
 			);
-			List<List<?>> result = query.list();
-			Assertions.assertThat( result ).hasSize( 2 )
+			SearchResult<List<?>> result = query.execute();
+			Assertions.assertThat( result.getHits() ).hasSize( 2 )
 					.containsExactly(
 							Arrays.asList(
 									"text1",
 									new PojoReferenceImpl( IndexedEntity.class, 0 ),
 									LocalDate.of( 2017, 11, 1 ),
 									new ElasticsearchDocumentReference( IndexedEntity.INDEX, "0" ),
-									session.get( IndexedEntity.class, 0 ),
 									"text2"
 							),
 							Arrays.asList(
@@ -599,10 +601,10 @@ public class OrmElasticsearchIT {
 									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
 									LocalDate.of( 2017, 11, 2 ),
 									new ElasticsearchDocumentReference( YetAnotherIndexedEntity.INDEX, "1" ),
-									session.get( YetAnotherIndexedEntity.class, 1 ),
 									null
 							)
 					);
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
@@ -625,58 +627,10 @@ public class OrmElasticsearchIT {
 				+ "}" );
 	}
 
-	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
-		@Override
-		public void contribute(HibernateOrmMappingContributor contributor) {
-			MappingDefinition mapping = contributor.programmaticMapping();
-			mapping.type( IndexedEntity.class )
-					.indexed( IndexedEntity.INDEX )
-					.bridge(
-							new MyBridgeBuilder()
-							.objectName( "customBridgeOnClass" )
-					)
-					.property( "id" )
-							.documentId()
-					.property( "text" )
-							.field()
-									.name( "myTextField" )
-					.property( "embedded" )
-							.indexedEmbedded()
-									.maxDepth( 1 )
-									.includePaths( "embedded.customBridgeOnClass.text" );
-
-			MappingDefinition secondMapping = contributor.programmaticMapping();
-			secondMapping.type( ParentIndexedEntity.class )
-					.property( "localDate" )
-							.field()
-									.name( "myLocalDateField" )
-					.property( "embedded" )
-							.bridge(
-									new MyBridgeBuilder()
-									.objectName( "customBridgeOnProperty" )
-							);
-			secondMapping.type( OtherIndexedEntity.class )
-					.indexed( OtherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
-					.property( "numeric" )
-							.field()
-							.field().name( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
-			secondMapping.type( YetAnotherIndexedEntity.class )
-					.indexed( YetAnotherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId()
-					.property( "numeric" )
-							.field();
-		}
-	}
-
-	@MappedSuperclass
 	public static class ParentIndexedEntity {
 
 		private LocalDate localDate;
 
-		@ManyToOne
 		private IndexedEntity embedded;
 
 		public LocalDate getLocalDate() {
@@ -697,13 +651,11 @@ public class OrmElasticsearchIT {
 
 	}
 
-	@Entity
-	@Table(name = "indexed")
-	public static class IndexedEntity extends ParentIndexedEntity {
+	public static final class IndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
 
-		@Id
+		// TODO make it work with a primitive int too
 		private Integer id;
 
 		private String text;
@@ -726,13 +678,11 @@ public class OrmElasticsearchIT {
 
 	}
 
-	@Entity
-	@Table(name = "other")
-	public static class OtherIndexedEntity {
+	public static final class OtherIndexedEntity {
 
 		public static final String INDEX = "OtherIndexedEntity";
 
-		@Id
+		// TODO make it work with a primitive int too
 		private Integer id;
 
 		private Integer numeric;
@@ -755,13 +705,10 @@ public class OrmElasticsearchIT {
 
 	}
 
-	@Entity
-	@Table(name = "yetanother")
-	public static class YetAnotherIndexedEntity extends ParentIndexedEntity {
+	public static final class YetAnotherIndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "YetAnotherIndexedEntity";
 
-		@Id
 		private Integer id;
 
 		private Integer numeric;
@@ -839,4 +786,5 @@ public class OrmElasticsearchIT {
 		}
 
 	}
+
 }
