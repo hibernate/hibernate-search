@@ -35,11 +35,11 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	private final Collection<PojoTypeNodeProcessorBuilder> indexedEmbeddedProcessorBuilders = new ArrayList<>();
 
 	public PojoPropertyNodeProcessorBuilder(
-			PropertyModel<?> propertyModel,
+			PojoTypeNodeProcessorBuilder parent, PropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
-		super( propertyModel.getTypeModel(), contributorProvider, indexModelBinder, bindingContext,
+		super( parent, propertyModel.getTypeModel(), contributorProvider, indexModelBinder, bindingContext,
 				identityMappingCollector );
 		this.propertyModel = propertyModel;
 	}
@@ -85,12 +85,18 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 				typeId, defaultedRelativePrefix, maxDepth, pathFilters );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
-					propertyModel.getTypeModel(), contributorProvider, indexModelBinder, nestedBindingContext,
+					this, propertyModel.getTypeModel(),
+					contributorProvider, indexModelBinder, nestedBindingContext,
 					PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					);
 			indexedEmbeddedProcessorBuilders.add( nestedProcessorBuilder );
 			contributorProvider.get( typeId ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 		} );
+	}
+
+	@Override
+	protected void appendSelfPath(StringBuilder builder) {
+		builder.append( "." ).append( propertyModel.getName() );
 	}
 
 	public PojoPropertyNodeProcessor build() {

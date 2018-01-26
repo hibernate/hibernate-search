@@ -40,7 +40,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		this.identityMappingCollector = new PojoTypeNodeIdentityMappingCollectorImpl( defaultIdentifierMapping );
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
 		this.processorBuilder = new PojoTypeNodeProcessorBuilder(
-				typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
+				null, typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
 	}
 

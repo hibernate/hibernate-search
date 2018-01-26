@@ -10,14 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelRoot;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
@@ -28,7 +27,8 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
-	protected final AbstractPojoModelElement indexableModel;
+	private final AbstractPojoProcessorBuilder parent;
+	protected final PojoModelRoot indexableModel;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
@@ -37,12 +37,13 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final Collection<ValueProcessor> processors = new ArrayList<>();
 
 	public AbstractPojoProcessorBuilder(
-			TypeModel<?> typeModel,
+			AbstractPojoProcessorBuilder parent, TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		this.contributorProvider = contributorProvider;
 
+		this.parent = parent;
 		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
 		this.indexableModel = new PojoModelRoot( typeModel, contributorProvider );
 		this.indexModelBinder = indexModelBinder;
@@ -52,8 +53,30 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	}
 
 	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" );
+		appendPath( builder);
+		builder.append( "]" );
+		return builder.toString();
+	}
+
+	@Override
 	public void bridge(BridgeBuilder<? extends Bridge> builder) {
 		processors.add( indexModelBinder.addBridge( bindingContext, indexableModel, builder ) );
 	}
+
+	private void appendPath(StringBuilder builder) {
+		if ( parent == null ) {
+			appendSelfPath( builder );
+		}
+		else {
+			parent.appendPath( builder );
+			builder.append( " => " );
+			appendSelfPath( builder );
+		}
+	}
+
+	protected abstract void appendSelfPath(StringBuilder builder);
 
 }

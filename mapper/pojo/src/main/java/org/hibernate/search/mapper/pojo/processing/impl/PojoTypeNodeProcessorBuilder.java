@@ -30,11 +30,11 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private final Map<String, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
-			TypeModel<?> typeModel,
+			PojoPropertyNodeProcessorBuilder parent, TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
-		super( typeModel, contributorProvider, indexModelBinder, bindingContext,
+		super( parent, typeModel, contributorProvider, indexModelBinder, bindingContext,
 				identityMappingCollector );
 	}
 
@@ -51,9 +51,15 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 
 	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(String name) {
 		PropertyModel<?> propertyModel = indexableModel.property( name ).getPropertyModel();
-		return new PojoPropertyNodeProcessorBuilder( propertyModel,
+		return new PojoPropertyNodeProcessorBuilder(
+				this, propertyModel,
 				contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
+	}
+
+	@Override
+	protected void appendSelfPath(StringBuilder builder) {
+		builder.append( "type " ).append( indexableModel.getTypeModel().getJavaType().getSimpleName() );
 	}
 
 	public PojoTypeNodeProcessor build() {
