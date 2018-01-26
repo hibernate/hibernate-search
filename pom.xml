@@ -175,6 +175,7 @@
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
         <wildflyVersion>10.0.0.Final</wildflyVersion>
         <jmhVersion>1.11.2</jmhVersion>
+        <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
