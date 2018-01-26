@@ -172,7 +172,7 @@ public class OrmElasticsearchIT {
 							+ "'embedded': {"
 								+ "'type': 'object',"
 								+ "'properties': {"
-									+ "'customBridgeOnClass': {"
+									+ "'prefix_customBridgeOnClass': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -184,7 +184,7 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'customBridgeOnProperty': {"
+									+ "'prefix_customBridgeOnProperty': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
 											+ "'date': {"
@@ -196,10 +196,10 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'embedded': {"
+									+ "'prefix_embedded': {"
 										+ "'type': 'object',"
 										+ "'properties': {"
-											+ "'customBridgeOnClass': {"
+											+ "'prefix_customBridgeOnClass': {"
 												+ "'type': 'object',"
 												+ "'properties': {"
 													+ "'text': {"
@@ -209,11 +209,11 @@ public class OrmElasticsearchIT {
 											+ "}"
 										+ "}"
 									+ "},"
-									+ "'myLocalDateField': {"
+									+ "'prefix_myLocalDateField': {"
 										+ "'type': 'date',"
 										+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
 									+ "},"
-									+ "'myTextField': {"
+									+ "'prefix_myTextField': {"
 										+ "'type': 'keyword'"
 									+ "}"
 								+ "}"
@@ -295,12 +295,12 @@ public class OrmElasticsearchIT {
 						+ "'date': '2017-11-03'"
 					+ "},"
 					+ "'embedded': {"
-						+ "'customBridgeOnClass': {"
+						+ "'prefix_customBridgeOnClass': {"
 							+ "'text': 'some more text (3)',"
 							+ "'date': '2017-11-03'"
 						+ "},"
-						+ "'myLocalDateField': '2017-11-03',"
-						+ "'myTextField': 'some more text (3)'"
+						+ "'prefix_myLocalDateField': '2017-11-03',"
+						+ "'prefix_myTextField': 'some more text (3)'"
 					+ "},"
 					+ "'myTextField': 'some more text (2)'"
 				+ "}" );
@@ -332,7 +332,7 @@ public class OrmElasticsearchIT {
 					.predicate( root -> root.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should().range()
 									.onField( "myLocalDateField" )
@@ -352,12 +352,13 @@ public class OrmElasticsearchIT {
 							} )
 					)
 					.build();
-			query.setFirstResult( 2 );
-			query.setMaxResults( 10 );
+			query.setFirstResult( 3 );
+			query.setMaxResults( 2 );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 6,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -377,14 +378,15 @@ public class OrmElasticsearchIT {
 							session.get( IndexedEntity.class, 0 ),
 							session.get( YetAnotherIndexedEntity.class, 1 )
 					);
+			// TODO getResultSize
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
 				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
+					c.accept( "offset", "3" );
+					c.accept( "limit", "2" );
 				},
 				"{"
 					+ "'query': {"
@@ -402,7 +404,7 @@ public class OrmElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
@@ -454,7 +456,7 @@ public class OrmElasticsearchIT {
 					.bool()
 							.must().match()
 									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.myTextField" ).boostedTo( 0.9f )
+									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
 									.matching( "foo" )
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
@@ -463,12 +465,11 @@ public class OrmElasticsearchIT {
 					.asEntities()
 					.predicate( predicate )
 					.build();
-			query.setFirstResult( 2 );
-			query.setMaxResults( 10 );
 
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -488,10 +489,7 @@ public class OrmElasticsearchIT {
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
 				HOST_1, "query", null /* No ID */,
-				c -> {
-					c.accept( "offset", "2" );
-					c.accept( "limit", "10" );
-				},
+				null,
 				"{"
 					+ "'query': {"
 						+ "'bool': {"
@@ -508,7 +506,7 @@ public class OrmElasticsearchIT {
 										+ "},"
 										+ "{"
 											+ "'match': {"
-												+ "'embedded.myTextField': {"
+												+ "'embedded.prefix_myTextField': {"
 													+ "'value': 'foo',"
 													+ "'boost': 0.9"
 												+ "}"
@@ -562,6 +560,7 @@ public class OrmElasticsearchIT {
 			StubElasticsearchClient.pushStubResponse(
 					"{"
 						+ "'hits': {"
+							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
 									+ "'_index': '" + IndexedEntity.INDEX + "',"
@@ -642,8 +641,9 @@ public class OrmElasticsearchIT {
 									.name( "myTextField" )
 					.property( "embedded" )
 							.indexedEmbedded()
+									.prefix( "embedded.prefix_" )
 									.maxDepth( 1 )
-									.includePaths( "embedded.customBridgeOnClass.text" );
+									.includePaths( "embedded.prefix_customBridgeOnClass.text" );
 
 			MappingDefinition secondMapping = contributor.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )
