@@ -28,6 +28,7 @@
         <module>backend/elasticsearch</module>
         <module>backend/lucene</module>
         <module>mapper/pojo</module>
+        <module>mapper/javabean</module>
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
         <module>integration-test</module>
@@ -60,6 +61,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-mapper-pojo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-mapper-javabean</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
