@@ -52,14 +52,14 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
-			if ( store != null && Store.NO.equals( store ) ) {
+			if ( store != null && Store.YES.equals( store ) ) {
 				// TODO what about Store.COMPRESS?
 				mapping.setFieldData( FieldDataType.TRUE );
 			}
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
-			if ( store != null && Store.NO.equals( store ) ) {
+			if ( store != null && Store.YES.equals( store ) ) {
 				// TODO what about Store.COMPRESS?
 				mapping.setStore( true );
 			}
