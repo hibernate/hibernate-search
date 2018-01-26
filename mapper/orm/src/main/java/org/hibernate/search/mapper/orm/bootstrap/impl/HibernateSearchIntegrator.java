@@ -61,7 +61,7 @@ public class HibernateSearchIntegrator implements Integrator {
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		ConfigurationPropertySource propertySource = new HibernateOrmConfigurationPropertySource( configurationService )
-				.withMask( "hibernate.query" );
+				.withMask( "hibernate.search" );
 		JndiService namingService = serviceRegistry.getService( JndiService.class );
 
 		if ( ! AUTOREGISTER_LISTENERS.get( propertySource ) ) {

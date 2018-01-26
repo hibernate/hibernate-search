@@ -43,7 +43,7 @@ public class ObjectLoaderBuilder<O> {
 			MutableObjectLoadingOptions mutableLoadingOptions, Class<? extends O> concreteIndexedType,
 			Function<? super O, T> hitTransformer) {
 		// TODO Add support for entities whose document ID is not the entity ID (natural ID, or other)
-		// TODO Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.query.query.hibernate.impl.ObjectLoaderBuilder#getObjectInitializer
+		// TODO Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.ObjectLoaderBuilder#getObjectInitializer
 		return new SingleTypeByIdObjectLoader<>( session, concreteIndexedType, mutableLoadingOptions, hitTransformer );
 	}
 

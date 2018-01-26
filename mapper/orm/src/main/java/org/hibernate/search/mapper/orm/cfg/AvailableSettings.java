@@ -12,7 +12,7 @@ package org.hibernate.search.mapper.orm.cfg;
  */
 public final class AvailableSettings {
 
-	public static final String PREFIX = "hibernate.query.";
+	public static final String PREFIX = "hibernate.search.";
 
 	/**
 	 * Enable listeners auto registration in Hibernate Annotations and EntityManager. Default to true.

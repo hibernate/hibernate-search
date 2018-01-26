@@ -116,7 +116,7 @@ public class HibernateSearchContextService implements Service {
 			 * TODO handle the "simulated" transaction when "a Flush listener is registered".
 			 * See:
 			 *  - FullTextIndexEventListener (in Search 5 and here)
-			 *  - the else block in org.hibernate.query.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
+			 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
 			 * CAUTION: take into account the fact that the key must not be referenced from the value,
 			 * even indirectly (otherwise it's pointless to use a "WeakKey" map).
 			 * So we cannot use the session itself as a key in particular.
