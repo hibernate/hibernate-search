@@ -10,7 +10,9 @@ package org.hibernate.search.engine.logging.impl;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -43,4 +45,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 9, value = "Cannot add multiple predicates to a nested predicate; use an explicit boolean predicate instead.")
 	SearchException cannotAddMultiplePredicatesToNestedPredicate();
+
+	@LogMessage(level = Logger.Level.INFO)
+	@Message(id = 10, value = "Cannot access the value of containing annotation '%1$s'."
+			+ " Ignoring annotation.")
+	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
 }

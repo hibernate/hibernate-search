@@ -59,7 +59,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider) {
 		PojoIndexedTypeIdentifier pojoTypeId = (PojoIndexedTypeIdentifier) typeId;
 		Class<?> javaType = pojoTypeId.toJavaType();
-		TypeModel<?> typeModel = introspector.getEntityTypeModel( javaType );
+		TypeModel<?> typeModel = introspector.getTypeModel( javaType );
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
 				typeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );

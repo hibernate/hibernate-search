@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
+import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapperFactory;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingImpl;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 
 /**
@@ -27,8 +29,14 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<HibernateOrmMapping, HibernateOrmMappingImpl> {
 
 	public HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			SessionFactoryImplementor sessionFactoryImplementor) {
-		super( mappingRepositoryBuilder, new HibernateOrmMapperFactory( sessionFactoryImplementor ) );
+			Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
+		this( mappingRepositoryBuilder, new HibernateOrmIntrospector( metadata, sessionFactoryImplementor ),
+				sessionFactoryImplementor );
+	}
+
+	private HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			HibernateOrmIntrospector introspector, SessionFactoryImplementor sessionFactoryImplementor) {
+		super( mappingRepositoryBuilder, new HibernateOrmMapperFactory( introspector, sessionFactoryImplementor ), introspector );
 	}
 
 	@Override

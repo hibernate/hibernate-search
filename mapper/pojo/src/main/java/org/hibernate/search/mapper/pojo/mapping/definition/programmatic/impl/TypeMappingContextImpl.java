@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.engine.common.spi.BeanReference;
@@ -25,6 +26,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -32,7 +36,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
-	private final Class<?> type;
+	private final TypeModel<?> typeModel;
 
 	private String indexName;
 	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
@@ -40,14 +44,14 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
 
-	public TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, Class<?> type) {
+	public TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, TypeModel<?> typeModel) {
 		this.mapperFactory = mapperFactory;
-		this.type = type;
+		this.typeModel = typeModel;
 	}
 
 	@Override
-	public void contribute(TypeMetadataCollector collector) {
-		collector.collect( mapperFactory, new PojoIndexedTypeIdentifier( type ), indexName, this );
+	public void contribute(BuildContext buildContext, TypeMetadataCollector collector) {
+		collector.collect( mapperFactory, new PojoIndexedTypeIdentifier( typeModel.getJavaType() ), indexName, this );
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public TypeMappingContext indexed() {
-		return indexed( type.getName() );
+		return indexed( typeModel.getJavaType().getName() );
 	}
 
 	@Override
@@ -126,7 +130,9 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public PropertyMappingContext property(String propertyName) {
-		PropertyMappingContextImpl child = new PropertyMappingContextImpl( this, propertyName );
+		PropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
+		PropertyHandle propertyHandle = propertyModel.getHandle();
+		PropertyMappingContextImpl child = new PropertyMappingContextImpl( this, propertyHandle );
 		children.add( child );
 		return child;
 	}

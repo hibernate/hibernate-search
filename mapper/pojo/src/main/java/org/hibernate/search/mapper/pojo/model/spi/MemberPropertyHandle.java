@@ -19,24 +19,31 @@ import org.hibernate.search.util.SearchException;
  */
 public final class MemberPropertyHandle implements PropertyHandle {
 
+	private final String name;
 	private final Member member;
 	private final MethodHandle getter;
 
-	public MemberPropertyHandle(Field field) throws IllegalAccessException {
-		this( field, MethodHandles.lookup().unreflectGetter( field ) );
+	public MemberPropertyHandle(String name, Field field) throws IllegalAccessException {
+		this( name, field, MethodHandles.lookup().unreflectGetter( field ) );
 	}
 
-	public MemberPropertyHandle(Method method) throws IllegalAccessException {
-		this( method, MethodHandles.lookup().unreflect( method ) );
+	public MemberPropertyHandle(String name, Method method) throws IllegalAccessException {
+		this( name, method, MethodHandles.lookup().unreflect( method ) );
 	}
 
-	private MemberPropertyHandle(Member member, MethodHandle getter) {
+	private MemberPropertyHandle(String name, Member member, MethodHandle getter) {
+		this.name = name;
 		this.member = member;
 		this.getter = getter;
 	}
 
 	@Override
-	public Class<?> getType() {
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Class<?> getJavaType() {
 		return getter.type().returnType();
 	}
 
@@ -67,7 +74,7 @@ public final class MemberPropertyHandle implements PropertyHandle {
 			return false;
 		}
 		MemberPropertyHandle other = (MemberPropertyHandle) obj;
-		return member.equals( other.member );
+		return name.equals( other.name ) && member.equals( other.member );
 	}
 
 }

@@ -80,12 +80,8 @@ public class PojoModelProperty extends AbstractPojoModelElement
 	}
 
 	@Override
-	protected TypeModel<?> getTypeModel() {
+	public TypeModel<?> getTypeModel() {
 		return propertyModel.getTypeModel();
-	}
-
-	public PropertyModel<?> getPropertyModel() {
-		return propertyModel;
 	}
 
 	@SuppressWarnings("unchecked")

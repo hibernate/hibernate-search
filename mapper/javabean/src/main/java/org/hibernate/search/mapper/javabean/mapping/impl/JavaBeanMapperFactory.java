@@ -17,14 +17,8 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
  */
 public final class JavaBeanMapperFactory extends PojoMapperFactory<JavaBeanMappingImpl> {
 
-	private static final JavaBeanMapperFactory INSTANCE = new JavaBeanMapperFactory();
-
-	private JavaBeanMapperFactory() {
-		super( JavaBeanIntrospector.get(), false );
-	}
-
-	public static JavaBeanMapperFactory get() {
-		return INSTANCE;
+	public JavaBeanMapperFactory(JavaBeanIntrospector introspector) {
+		super( introspector, false );
 	}
 
 	@Override

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,8 +16,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
@@ -28,6 +30,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.orm.spi.BeanResolver;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase.
@@ -110,7 +113,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		boolean failedBoot = true;
 		try {
 			SearchMappingRepositoryBuilder builder = SearchMappingRepository.builder( propertySource );
-			HibernateOrmMappingContributor mappingContributor = new HibernateOrmMappingContributor( builder, sessionFactoryImplementor );
+			HibernateOrmMappingContributor mappingContributor = new HibernateOrmMappingContributor(
+					builder, metadata, sessionFactoryImplementor
+			);
 
 			org.hibernate.search.engine.common.spi.BeanResolver searchBeanResolver;
 			if ( beanResolver != null ) {
@@ -121,18 +126,12 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			}
 			builder.setBeanResolver( searchBeanResolver );
 
-					// TODO annotation mapping
-//			Set<Class<?>> annotatedClasses = metadata.getEntityBindings().stream()
-//					.map( PersistentClass::getMappedClass )
-//					// getMappedClass() can return null and should be ignored
-//					.filter( Objects::nonNull )
-//					.collect( Collectors.toSet() );
-//			if ( !annotatedClasses.isEmpty() ) {
-//				mappingContributor.annotationMapping( annotatedClasses );
-//			}
-
-			Optional<String> userMappingContributorReference;
-
+			AnnotationMappingDefinition annotationMapping = mappingContributor.annotationMapping();
+			metadata.getEntityBindings().stream()
+					.map( PersistentClass::getMappedClass )
+					// getMappedClass() can return null, which should be ignored
+					.filter( Objects::nonNull )
+					.forEach( annotationMapping::add );
 
 			ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
 					ConfigurationProperty.forKey( AvailableSettings.Radicals.MAPPING_CONTRIBUTOR )

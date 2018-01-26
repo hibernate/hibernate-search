@@ -7,9 +7,15 @@
 package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.beans.IntrospectionException;
+import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -21,20 +27,16 @@ import org.hibernate.search.util.SearchException;
  */
 public class JavaBeanIntrospector implements PojoIntrospector {
 
-	private static final JavaBeanIntrospector INSTANCE = new JavaBeanIntrospector();
+	private final AnnotationHelper annotationHelper;
 
-	public static JavaBeanIntrospector get() {
-		return INSTANCE;
-	}
-
-	private JavaBeanIntrospector() {
-		// Private constructor, use get() instead
+	public JavaBeanIntrospector(MethodHandles.Lookup lookup) {
+		this.annotationHelper = new AnnotationHelper( lookup );
 	}
 
 	@Override
-	public <T> TypeModel<T> getEntityTypeModel(Class<T> type) {
+	public <T> TypeModel<T> getTypeModel(Class<T> type) {
 		try {
-			return new JavaBeanTypeModel<>( type );
+			return new JavaBeanTypeModel<>( this, type );
 		}
 		catch (IntrospectionException | RuntimeException e) {
 			throw new SearchException( "Exception while retrieving the type model for '" + type + "'", e );
@@ -45,5 +47,20 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
 	public <T> Class<? extends T> getClass(T entity) {
 		return entity == null ? null : (Class<? extends T>) entity.getClass();
+	}
+
+	<A extends Annotation> Optional<A> getAnnotationByType(AnnotatedElement annotatedElement,
+			Class<A> annotationType) {
+		return annotationHelper.getAnnotationByType( annotatedElement, annotationType );
+	}
+
+	<A extends Annotation> Stream<A> getAnnotationsByType(AnnotatedElement annotatedElement,
+			Class<A> annotationType) {
+		return annotationHelper.getAnnotationsByType( annotatedElement, annotationType );
+	}
+
+	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(AnnotatedElement annotatedElement,
+			Class<? extends Annotation> metaAnnotationType) {
+		return annotationHelper.getAnnotationsByMetaAnnotationType( annotatedElement, metaAnnotationType );
 	}
 }

@@ -93,7 +93,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		// TODO close the holder (which will close the backends) if anything fails after this
 
 		TypeMetadataCollectorImpl metadataCollector = new TypeMetadataCollectorImpl();
-		contributors.forEach( c -> c.contribute( metadataCollector ) );
+		contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
 
 		Map<MappingKey<?>, Mapper<?, ?>> mappers =
 				metadataCollector.createMappers( buildContext, propertySource, indexManagerBuildingStateProvider );

@@ -11,7 +11,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
  */
 public interface PojoIntrospector {
 
-	<T> TypeModel<T> getEntityTypeModel(Class<T> type);
+	<T> TypeModel<T> getTypeModel(Class<T> type);
 
 	/**
 	 * @param <T> the type of the entity

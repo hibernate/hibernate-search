@@ -11,14 +11,14 @@ import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
 /**
@@ -27,15 +27,14 @@ import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 		implements PojoTypeNodeMappingCollector {
 
-	private final Map<String, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
+	private final Map<PropertyHandle, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
 			PojoPropertyNodeProcessorBuilder parent, TypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
-		super( parent, typeModel, contributorProvider, indexModelBinder, bindingContext,
-				identityMappingCollector );
+		super( parent, typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector );
 	}
 
 	@Override
@@ -45,14 +44,13 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	}
 
 	@Override
-	public PojoPropertyNodeMappingCollector property(String name) {
-		return propertyProcessorBuilders.computeIfAbsent( name, this::createPropertyProcessorBuilder );
+	public PojoPropertyNodeMappingCollector property(PropertyHandle propertyHandle) {
+		return propertyProcessorBuilders.computeIfAbsent( propertyHandle, this::createPropertyProcessorBuilder );
 	}
 
-	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(String name) {
-		PropertyModel<?> propertyModel = indexableModel.property( name ).getPropertyModel();
+	private PojoPropertyNodeProcessorBuilder createPropertyProcessorBuilder(PropertyHandle propertyHandle) {
 		return new PojoPropertyNodeProcessorBuilder(
-				this, propertyModel,
+				this, propertyHandle, indexableModel.property( propertyHandle.getName() ).getTypeModel(),
 				contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
 	}

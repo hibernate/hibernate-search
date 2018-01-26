@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -15,19 +17,20 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
-public class JavaBeanPropertyModel<T> implements PropertyModel<T> {
+class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 
+	private final JavaBeanIntrospector introspector;
 	private final TypeModel<?> parentTypeModel;
 
 	private final Class<T> type;
-
 	private final PropertyDescriptor descriptor;
-
 	private PropertyHandle handle;
 
 	private TypeModel<T> typeModel;
 
-	public JavaBeanPropertyModel(TypeModel<?> parentTypeModel, Class<T> type, PropertyDescriptor descriptor) {
+	JavaBeanPropertyModel(JavaBeanIntrospector introspector, TypeModel<?> parentTypeModel,
+			Class<T> type, PropertyDescriptor descriptor) {
+		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
 		this.type = type;
 		this.descriptor = descriptor;
@@ -44,10 +47,20 @@ public class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 	}
 
 	@Override
+	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
+		return introspector.getAnnotationsByType( descriptor.getReadMethod(), annotationType );
+	}
+
+	@Override
+	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
+		return introspector.getAnnotationsByMetaAnnotationType( descriptor.getReadMethod(), metaAnnotationType );
+	}
+
+	@Override
 	public TypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = new JavaBeanTypeModel( descriptor.getPropertyType() );
+				typeModel = new JavaBeanTypeModel<>( introspector, type );
 			}
 			catch (IntrospectionException | RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property type model for '"
@@ -61,7 +74,7 @@ public class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 	public PropertyHandle getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = new MemberPropertyHandle( descriptor.getReadMethod() );
+				handle = new MemberPropertyHandle( getName(), descriptor.getReadMethod() );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property handle for '"

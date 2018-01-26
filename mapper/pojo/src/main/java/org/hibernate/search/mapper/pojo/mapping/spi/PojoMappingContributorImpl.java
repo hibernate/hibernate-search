@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import java.util.Set;
-
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionImpl;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
 /**
  * @author Yoann Rodiere
@@ -27,24 +27,39 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	private final PojoMapperFactory<MI> mapperFactory;
 
-	protected PojoMappingContributorImpl(
-			SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			PojoMapperFactory<MI> mapperFactory) {
+	private final PojoIntrospector introspector;
+
+	private AnnotationMappingDefinitionImpl annotationMappingDefinition;
+
+	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			PojoMapperFactory<MI> mapperFactory,
+			PojoIntrospector introspector) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mapperFactory = mapperFactory;
+		this.introspector = introspector;
 	}
 
 	@Override
 	public ProgrammaticMappingDefinition programmaticMapping() {
-		ProgrammaticMappingDefinitionImpl definition = new ProgrammaticMappingDefinitionImpl( mapperFactory );
+		ProgrammaticMappingDefinitionImpl definition = new ProgrammaticMappingDefinitionImpl( mapperFactory, introspector );
 		mappingRepositoryBuilder.addMapping( definition );
 		return definition;
 	}
 
 	@Override
 	public AnnotationMappingDefinition annotationMapping() {
-		// TODO Annotation processing
-		throw new UnsupportedOperationException( "Annotation processing is not implemented yet" );
+		/*
+		 * Make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
+		 * which would lead to duplicate field definitions.
+		 */
+		if ( annotationMappingDefinition == null ) {
+			AnnotationMappingDefinitionImpl definition = new AnnotationMappingDefinitionImpl(
+					mapperFactory, introspector
+			);
+			mappingRepositoryBuilder.addMapping( definition );
+			annotationMappingDefinition = definition;
+		}
+		return annotationMappingDefinition;
 	}
 
 	@Override

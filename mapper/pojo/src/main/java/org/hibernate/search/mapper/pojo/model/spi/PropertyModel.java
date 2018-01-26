@@ -6,11 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import java.lang.annotation.Annotation;
+import java.util.stream.Stream;
+
 public interface PropertyModel<T> {
 
 	String getName();
 
 	Class<T> getJavaType();
+
+	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);
+
+	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
 
 	TypeModel<T> getTypeModel();
 

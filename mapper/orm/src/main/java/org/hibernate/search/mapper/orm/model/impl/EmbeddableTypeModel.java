@@ -6,43 +6,36 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import java.util.List;
 import javax.persistence.metamodel.EmbeddableType;
 
+import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.metamodel.internal.EmbeddableTypeImpl;
 import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.tuple.component.ComponentTuplizer;
 import org.hibernate.type.ComponentType;
 
-class EmbeddableTypeModel<T> implements TypeModel<T> {
+class EmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
-	private final HibernateOrmIntrospector introspector;
-	private final Class<T> type;
 	private final ComponentType componentType;
 
-	EmbeddableTypeModel(
-			HibernateOrmIntrospector introspector,
-			EmbeddableType<T> embeddableType) {
-		this.introspector = introspector;
-		this.type = embeddableType.getJavaType();
+	EmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType) {
+		super( introspector, embeddableType.getJavaType() );
 		// FIXME find a way to avoid depending on Hibernate ORM internal APIs
 		EmbeddableTypeImpl<T> embeddableTypeImpl = (EmbeddableTypeImpl<T>) embeddableType;
 		this.componentType = embeddableTypeImpl.getHibernateType();
 	}
 
 	@Override
-	public Class<T> getJavaType() {
-		return type;
-	}
-
-	@Override
-	public PropertyModel<?> getProperty(String propertyName) {
+	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		Integer index = getPropertyIndexOrNull( componentType, propertyName );
 		if ( index != null ) {
 			ComponentTuplizer tuplizer = componentType.getComponentTuplizer();
 			Getter getter = tuplizer.getGetter( index );
-			return new HibernateOrmPropertyModel<>( introspector, this, propertyName, getter );
+			return new HibernateOrmPropertyModel<>(
+					introspector, this, propertyName, xProperties, getter
+			);
 		}
 		else {
 			// The property is not part of the Hibernate ORM metamodel, probably because it's marked as @Transient
@@ -51,7 +44,8 @@ class EmbeddableTypeModel<T> implements TypeModel<T> {
 					// FIXME: try to take the embeddable's default access type into account even in this case
 					null,
 					componentType.getEntityMode(),
-					propertyName
+					propertyName,
+					xProperties
 			);
 		}
 	}

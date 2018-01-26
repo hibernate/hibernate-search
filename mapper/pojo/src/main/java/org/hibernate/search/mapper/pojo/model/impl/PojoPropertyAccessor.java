@@ -23,7 +23,7 @@ class PojoPropertyAccessor<T> implements PojoModelElementAccessor<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Class<T> getType() {
-		return (Class<T>) handle.getType();
+		return (Class<T>) handle.getJavaType();
 	}
 
 	@Override

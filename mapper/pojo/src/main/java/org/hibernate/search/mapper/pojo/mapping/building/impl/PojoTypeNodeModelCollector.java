@@ -11,6 +11,6 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
  */
 public interface PojoTypeNodeModelCollector extends PojoNodeModelCollector {
 
-	PojoPropertyNodeModelCollector property(String relativeName);
+	PojoPropertyNodeModelCollector property(String propertyName);
 
 }

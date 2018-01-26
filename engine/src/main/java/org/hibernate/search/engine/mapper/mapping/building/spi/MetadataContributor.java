@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.common.spi.BuildContext;
+
 /**
  * @author Yoann Rodiere
  */
 public interface MetadataContributor {
 
-	void contribute(TypeMetadataCollector collector);
+	void contribute(BuildContext buildContext, TypeMetadataCollector collector);
 
 }

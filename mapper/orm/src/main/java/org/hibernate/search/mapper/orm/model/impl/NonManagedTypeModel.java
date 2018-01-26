@@ -6,34 +6,26 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import java.util.List;
+
 import org.hibernate.EntityMode;
+import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 
-class NonManagedTypeModel<T> implements TypeModel<T> {
+class NonManagedTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
-	private final HibernateOrmIntrospector introspector;
-	private final Class<T> type;
-
-	NonManagedTypeModel(
-			HibernateOrmIntrospector introspector,
-			Class<T> type) {
-		this.introspector = introspector;
-		this.type = type;
+	NonManagedTypeModel(HibernateOrmIntrospector introspector, Class<T> type) {
+		super( introspector, type );
 	}
 
 	@Override
-	public Class<T> getJavaType() {
-		return type;
-	}
-
-	@Override
-	public PropertyModel<?> getProperty(String propertyName) {
+	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		return introspector.createFallbackPropertyModel(
 				this,
 				null,
 				EntityMode.POJO,
-				propertyName
+				propertyName,
+				xProperties
 		);
 	}
 }

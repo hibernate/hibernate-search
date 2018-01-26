@@ -23,7 +23,7 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 
 	@SuppressWarnings("unchecked")
 	public PropertyIdentifierMapping(PropertyHandle property, IdentifierBridge<I> bridge) {
-		this.type = (Class<I>) property.getType();
+		this.type = (Class<I>) property.getJavaType();
 		this.property = property;
 		this.bridge = bridge;
 	}

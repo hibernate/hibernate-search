@@ -9,35 +9,42 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
-import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 @MessageLogger(projectCode = "HSEARCH-POJO")
 public interface Log extends BasicLogger {
 
-	@Message(id = 1, value = "Unable to create annotation for definition of type %1$s")
-	SearchException unableToCreateAnnotationForDefinition(Class<? extends Annotation> annotationType, @Cause Exception e);
-
-	@Message(id = 2, value = "Unable to find a default identifier bridge implementation for type '%1$s'")
+	@Message(id = 1, value = "Unable to find a default identifier bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(Class<?> sourceType);
 
-	@Message(id = 3, value = "Unable to find a default function bridge implementation for type '%1$s'")
+	@Message(id = 2, value = "Unable to find a default function bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultFunctionBridgeFromSourceType(Class<?> sourceType);
 
-	@Message(id = 4, value = "A annotation of type '%1$s' was passed as a bridge definition,"
-			+ " but this annotation type is missing the '%2$s' meta-annotation.")
-	SearchException unableToResolveBridgeFromAnnotationType(Class<? extends Annotation> annotationType,
-			Class<BridgeMapping> bridgeMappingAnnotationClass);
+	@Message(id = 3, value = "Annotation type '%1$s' is annotated with @BridgeMapping,"
+			+ " but the bridge builder reference is empty.")
+	SearchException missingBuilderReferenceInBridgeMapping(Class<? extends Annotation> annotationType);
 
-	@Message(id = 5, value = "Cannot query on an empty target."
+	@Message(id = 4, value = "Annotation type '%1$s' is annotated with @MarkerMapping,"
+			+ " but the marker builder reference is empty.")
+	SearchException missingBuilderReferenceInMarkerMapping(Class<? extends Annotation> annotationType);
+
+	@Message(id = 5, value = "Annotation @Field on property '%1$s' defines both functionBridge and functionBridgeBuilder."
+			+ " Only one of those can be defined, not both."
+	)
+	SearchException invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
+
+	@Message(id = 6, value = "Annotation @DocumentId on property '%1$s' defines both identifierBridge and identifierBridgeBuilder."
+			+ " Only one of those can be defined, not both."
+	)
+	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
+
+	@Message(id = 7, value = "Cannot query on an empty target."
 			+ " If you want to target all indexes, put Object.class in the collection of target types,"
 			+ " or use the method of the same name, but without Class<?> parameters."
 	)
 	SearchException cannotSearchOnEmptyTarget();
-
 }

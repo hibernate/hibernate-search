@@ -13,16 +13,23 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public final class GetterPropertyHandle implements PropertyHandle {
+final class GetterPropertyHandle implements PropertyHandle {
 
+	private final String propertyName;
 	private final Getter getter;
 
-	public GetterPropertyHandle(Getter getter) {
+	GetterPropertyHandle(String propertyName, Getter getter) {
+		this.propertyName = propertyName;
 		this.getter = getter;
 	}
 
 	@Override
-	public Class<?> getType() {
+	public String getName() {
+		return propertyName;
+	}
+
+	@Override
+	public Class<?> getJavaType() {
 		return getter.getReturnType();
 	}
 

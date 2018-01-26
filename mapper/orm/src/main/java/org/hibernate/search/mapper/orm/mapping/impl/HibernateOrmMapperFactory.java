@@ -20,8 +20,9 @@ public final class HibernateOrmMapperFactory extends PojoMapperFactory<Hibernate
 
 	private final SessionFactoryImplementor sessionFactoryImplementor;
 
-	public HibernateOrmMapperFactory(SessionFactoryImplementor sessionFactoryImplementor) {
-		super( new HibernateOrmIntrospector( sessionFactoryImplementor ), false );
+	public HibernateOrmMapperFactory(HibernateOrmIntrospector introspector,
+			SessionFactoryImplementor sessionFactoryImplementor) {
+		super( introspector, false );
 		this.sessionFactoryImplementor = sessionFactoryImplementor;
 	}
 

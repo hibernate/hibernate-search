@@ -11,21 +11,21 @@ package org.hibernate.search.mapper.pojo.model.spi;
  */
 public interface PropertyHandle {
 
-	Class<?> getType();
+	String getName();
+
+	Class<?> getJavaType();
 
 	Object get(Object thiz);
 
-	/*
-	 * Note to implementors: you must override equals to treat two references
-	 * to the same property (with the same access mode, i.e. field or method)
-	 * as equal.
+	/**
+	 * @return {@code true} if {@code obj} is a {@link PropertyHandle} referencing the exact same property
+	 * with the exact same access mode (for instance direct field access or getter access), {@code false} otherwise.
 	 */
 	@Override
 	boolean equals(Object obj);
 
 	/*
-	 * Note to implementors: you must override hash to return the same hash code
-	 * for two references to the same property (with the same access mode, i.e. field or method).
+	 * Note to implementors: you must override hashCode to be consistent with equals().
 	 */
 	@Override
 	int hashCode();

@@ -26,7 +26,4 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 3, value = "Unknown indexing mode: %1$s")
 	SearchException unknownIndexingMode(String indexingMode);
-
-	@Message(id = 4, value = "Cannot create mapping for non-entity type: %1$s")
-	SearchException cannotMapNonEntityType(Class<?> type);
 }

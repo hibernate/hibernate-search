@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.mapper.javabean;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapperFactory;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
+import org.hibernate.search.mapper.javabean.model.impl.JavaBeanIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 
 
@@ -18,7 +21,16 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 public final class JavaBeanMappingContributor extends PojoMappingContributorImpl<JavaBeanMapping, JavaBeanMappingImpl> {
 
 	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder) {
-		super( mappingRepositoryBuilder, JavaBeanMapperFactory.get() );
+		this( mappingRepositoryBuilder, MethodHandles.publicLookup() );
+	}
+
+	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder, MethodHandles.Lookup lookup) {
+		this( mappingRepositoryBuilder, new JavaBeanIntrospector( lookup ) );
+	}
+
+	private JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			JavaBeanIntrospector introspector) {
+		super( mappingRepositoryBuilder, new JavaBeanMapperFactory( introspector ), introspector );
 	}
 
 	@Override
