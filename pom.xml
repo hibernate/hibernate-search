@@ -231,7 +231,8 @@
         <shrinkwrapResolverVersion>2.2.2</shrinkwrapResolverVersion>
         <wildflyVersion>11.0.0.Final</wildflyVersion>
         <jmhVersion>1.19</jmhVersion>
-        
+        <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
+
         <!-- Elasticsearch -->
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
