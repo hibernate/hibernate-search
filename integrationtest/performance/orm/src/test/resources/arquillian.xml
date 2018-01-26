@@ -22,10 +22,21 @@
     <container qualifier="wildfly" default="true">
         <configuration>
             <property name="jbossHome">${jbosshome}</property>
+
+            <!--
+              Some arguments below are JBoss modules settings taken from
+              https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
+              - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
+              - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
+             -->
             <property name="javaVmArguments">
-                -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
                 -Dscenario=${scenario}
                 -Dorg.hibernate.search.enable_performance_tests=${org.hibernate.search.enable_performance_tests}
+                -Xmx512m
+                -Djava.net.preferIPv4Stack=true
+                -Djgroups.bind_addr=127.0.0.1
+                -Dremote.maven.repo=${repository.jboss-public.url}
+                -Dmaven.repo.local=${settings.localRepository}
             </property>
         </configuration>
     </container>
