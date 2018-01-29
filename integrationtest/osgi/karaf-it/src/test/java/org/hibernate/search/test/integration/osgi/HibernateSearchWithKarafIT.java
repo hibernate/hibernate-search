@@ -8,6 +8,9 @@ package org.hibernate.search.test.integration.osgi;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -94,7 +97,7 @@ public class HibernateSearchWithKarafIT {
 	private ServiceReference serviceReference;
 
 	@Configuration
-	public Option[] config() {
+	public Option[] config() throws IOException {
 		MavenArtifactUrlReference karafUrl = maven()
 				.groupId( "org.apache.karaf" )
 				.artifactId( "apache-karaf" )
@@ -114,6 +117,11 @@ public class HibernateSearchWithKarafIT {
 				.classifier( "features" )
 				.type( "xml" )
 				.versionAsInProject();
+
+		Properties mavenProperties = new Properties();
+		try ( final InputStream inputStream = getClass().getResourceAsStream( "/maven.properties" ) ) {
+			mavenProperties.load( inputStream );
+		}
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
@@ -157,6 +165,21 @@ public class HibernateSearchWithKarafIT {
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.logging.cfg",
 						"log4j.rootLogger", "INFO, out"
+				),
+				/*
+				 * Use the same local Maven repository as the build job.
+				 * This allows to retrieve the just-installed artifacts in case
+				 * the local repo was overridden from the command line.
+				 */
+				editConfigurationFilePut(
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.defaultRepositories",
+						"file://" + mavenProperties.getProperty( "maven.settings.localRepository" )
+				),
+				editConfigurationFilePut(
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.localRepository",
+						mavenProperties.getProperty( "maven.settings.localRepository" )
 				)
 		};
 	}
