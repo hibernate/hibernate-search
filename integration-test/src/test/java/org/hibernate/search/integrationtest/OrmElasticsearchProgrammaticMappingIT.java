@@ -16,17 +16,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
@@ -41,19 +39,20 @@ import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.integrationtest.util.OrmUtils;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -87,7 +86,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
 				.applySetting( AvailableSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
 
-		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
+		ServiceRegistry serviceRegistry = registryBuilder.build();
 
 		MetadataSources ms = new MetadataSources( serviceRegistry )
 				.addAnnotatedClass( IndexedEntity.class )
@@ -240,46 +239,32 @@ public class OrmElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void index() throws JSONException {
-		try ( Session session = sessionFactory.openSession() ) {
-			Transaction tx = session.beginTransaction();
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setText( "this is text (1)" );
+			entity1.setLocalDate( LocalDate.of( 2017, 11, 1 ) );
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setText( "some more text (2)" );
+			entity2.setLocalDate( LocalDate.of( 2017, 11, 2 ) );
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setText( "some more text (3)" );
+			entity3.setLocalDate( LocalDate.of( 2017, 11, 3 ) );
+			OtherIndexedEntity entity4 = new OtherIndexedEntity();
+			entity4.setId( 4 );
+			entity4.setNumeric( 404 );
 
-			try {
-				IndexedEntity entity1 = new IndexedEntity();
-				entity1.setId( 1 );
-				entity1.setText( "this is text (1)" );
-				entity1.setLocalDate( LocalDate.of( 2017, 11, 1 ) );
-				IndexedEntity entity2 = new IndexedEntity();
-				entity2.setId( 2 );
-				entity2.setText( "some more text (2)" );
-				entity2.setLocalDate( LocalDate.of( 2017, 11, 2 ) );
-				IndexedEntity entity3 = new IndexedEntity();
-				entity3.setId( 3 );
-				entity3.setText( "some more text (3)" );
-				entity3.setLocalDate( LocalDate.of( 2017, 11, 3 ) );
-				OtherIndexedEntity entity4 = new OtherIndexedEntity();
-				entity4.setId( 4 );
-				entity4.setNumeric( 404 );
+			entity1.setEmbedded( entity2 );
+			entity2.setEmbedded( entity3 );
 
-				entity1.setEmbedded( entity2 );
-				entity2.setEmbedded( entity3 );
-
-				session.persist( entity1 );
-				session.persist( entity2 );
-				session.persist( entity4 );
-				session.delete( entity1 );
-				session.persist( entity3 );
-				tx.commit();
-			}
-			catch (Throwable t) {
-				try {
-					tx.rollback();
-				}
-				catch (Throwable t2) {
-					t.addSuppressed( t2 );
-				}
-				throw t;
-			}
-		}
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity4 );
+			session.delete( entity1 );
+			session.persist( entity3 );
+		} );
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		// We expect the first add to be removed due to the delete
@@ -322,7 +307,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
+		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			FullTextQuery<ParentIndexedEntity> query = ftSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -379,7 +364,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 							session.get( YetAnotherIndexedEntity.class, 1 )
 					);
 			// TODO getResultSize
-		}
+		} );
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
@@ -437,7 +422,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search_separatePredicate() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
+		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			FullTextSearchTarget<ParentIndexedEntity> target = ftSession.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -484,7 +469,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 					+ "}"
 			);
 			query.list();
-		}
+		} );
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
@@ -537,7 +522,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search_projection() throws JSONException {
-		try (Session session = sessionFactory.openSession()) {
+		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			FullTextQuery<List<?>> query = ftSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -602,7 +587,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 									null
 							)
 					);
-		}
+		} );
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,

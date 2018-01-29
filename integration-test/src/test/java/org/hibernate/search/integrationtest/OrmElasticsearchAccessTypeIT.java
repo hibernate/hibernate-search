@@ -19,9 +19,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
@@ -33,7 +31,8 @@ import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.hibernate.search.integrationtest.util.OrmUtils;
+import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -66,7 +65,7 @@ public class OrmElasticsearchAccessTypeIT {
 				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
 				.applySetting( AvailableSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
 
-		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
+		ServiceRegistry serviceRegistry = registryBuilder.build();
 
 		MetadataSources ms = new MetadataSources( serviceRegistry )
 				.addAnnotatedClass( IndexedEntity.class )
@@ -142,44 +141,30 @@ public class OrmElasticsearchAccessTypeIT {
 
 	@Test
 	public void index() throws JSONException {
-		try ( Session session = sessionFactory.openSession() ) {
-			Transaction tx = session.beginTransaction();
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.id = 1;
+			entity1.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";
+			entity1.fieldWithDefaultFieldAccess = "defaultFieldAccess";
+			entity1.setFieldWithDefaultMethodAccess( "defaultMethodAccess" );
+			entity1.setFieldWithNonDefaultMethodAccess( "nonDefaultMethodAccess" );
 
-			try {
-				IndexedEntity entity1 = new IndexedEntity();
-				entity1.id = 1;
-				entity1.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";
-				entity1.fieldWithDefaultFieldAccess = "defaultFieldAccess";
-				entity1.setFieldWithDefaultMethodAccess( "defaultMethodAccess" );
-				entity1.setFieldWithNonDefaultMethodAccess( "nonDefaultMethodAccess" );
+			EmbeddableWithDefaultFieldAccess embeddableWithDefaultFieldAccess = new EmbeddableWithDefaultFieldAccess();
+			entity1.setEmbeddedWithDefaultFieldAccess( embeddableWithDefaultFieldAccess );
+			embeddableWithDefaultFieldAccess.fieldWithDefaultFieldAccess = "defaultFieldAccess";
+			embeddableWithDefaultFieldAccess.setFieldWithNonDefaultMethodAccess( "nonDefaultMethodAccess" );
 
-				EmbeddableWithDefaultFieldAccess embeddableWithDefaultFieldAccess = new EmbeddableWithDefaultFieldAccess();
-				entity1.setEmbeddedWithDefaultFieldAccess( embeddableWithDefaultFieldAccess );
-				embeddableWithDefaultFieldAccess.fieldWithDefaultFieldAccess = "defaultFieldAccess";
-				embeddableWithDefaultFieldAccess.setFieldWithNonDefaultMethodAccess( "nonDefaultMethodAccess" );
+			EmbeddableWithDefaultMethodAccess embeddableWithDefaultMethodAccess = new EmbeddableWithDefaultMethodAccess();
+			entity1.setEmbeddedWithDefaultMethodAccess( embeddableWithDefaultMethodAccess );
+			embeddableWithDefaultMethodAccess.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";
+			embeddableWithDefaultMethodAccess.setFieldWithDefaultMethodAccess( "defaultMethodAccess" );
 
-				EmbeddableWithDefaultMethodAccess embeddableWithDefaultMethodAccess = new EmbeddableWithDefaultMethodAccess();
-				entity1.setEmbeddedWithDefaultMethodAccess( embeddableWithDefaultMethodAccess );
-				embeddableWithDefaultMethodAccess.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";
-				embeddableWithDefaultMethodAccess.setFieldWithDefaultMethodAccess( "defaultMethodAccess" );
+			NonManaged nonManaged = new NonManaged();
+			entity1.setNonManaged( nonManaged );
+			nonManaged.setField( "value" );
 
-				NonManaged nonManaged = new NonManaged();
-				entity1.setNonManaged( nonManaged );
-				nonManaged.setField( "value" );
-
-				session.persist( entity1 );
-				tx.commit();
-			}
-			catch (Throwable t) {
-				try {
-					tx.rollback();
-				}
-				catch (Throwable t2) {
-					t.addSuppressed( t2 );
-				}
-				throw t;
-			}
-		}
+			session.persist( entity1 );
+		} );
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		// We expect the first add to be removed due to the delete
