@@ -508,7 +508,7 @@
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <url>${repository.jboss-public.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -534,7 +534,7 @@
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <url>${repository.jboss-public.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>

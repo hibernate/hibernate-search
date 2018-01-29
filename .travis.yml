@@ -35,7 +35,7 @@ env:
 before_install:
   # Build options must be set before install, so that
   # we properly retrieve *all* the necessary dependencies
-  - BUILD_OPTIONS='-s settings-example.xml -Pdist'
+  - BUILD_OPTIONS='-Pdist'
   - case $DB in
     "h2") ;;
     "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;

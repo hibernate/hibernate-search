@@ -25,9 +25,33 @@
                 <property name="jbossHome">${jbossHome.node1}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full.xml</property>
-                <property name="javaVmArguments">-javaagent:${byteman.agent.path}=${byteman.agent.options} -Djboss.modules.system.pkgs=org.jboss.byteman -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
-                <!-- To debug the Arquillian managed application server: -->
-                <!-- property name="javaVmArguments">-javaagent:${byteman.agent.path}=${byteman.agent.options} -Djboss.modules.system.pkgs=org.jboss.byteman -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -Dorg.jboss.remoting-jmx.timeout=300  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property -->
+                <!--
+                  Some arguments below are JBoss modules settings taken from
+                  https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
+                  - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
+                  - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
+                 -->
+                <property name="javaVmArguments">
+                    -javaagent:${byteman.agent.path}=${byteman.agent.options}
+                    -Djboss.modules.system.pkgs=org.jboss.byteman
+                    -Xmx512m
+                    -Djava.net.preferIPv4Stack=true
+                    -Djgroups.bind_addr=127.0.0.1
+                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dmaven.repo.local=${settings.localRepository}
+                </property>
+                <!-- To debug the Arquillian managed application server:
+                <property name="javaVmArguments">
+                    -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y
+                    -javaagent:${byteman.agent.path}=${byteman.agent.options}
+                    -Djboss.modules.system.pkgs=org.jboss.byteman
+                    -Xmx512m
+                    -Djava.net.preferIPv4Stack=true
+                    -Djgroups.bind_addr=127.0.0.1
+                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dmaven.repo.local=${settings.localRepository}
+                </property>
+                 -->
             </configuration>
         </container>
         <!-- Copy of the above, except a port offset is applied and running from a different copy -->
@@ -36,7 +60,14 @@
                 <property name="jbossHome">${jbossHome.node2}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full.xml</property>
-                <property name="javaVmArguments">-Djboss.socket.binding.port-offset=10000 -Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
+                <property name="javaVmArguments">
+                    -Djboss.socket.binding.port-offset=10000
+                    -Xmx512m
+                    -Djava.net.preferIPv4Stack=true
+                    -Djgroups.bind_addr=127.0.0.1
+                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dmaven.repo.local=${settings.localRepository}
+                </property>
                 <property name="managementPort">19990</property>
             </configuration>
         </container>

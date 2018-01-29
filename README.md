@@ -61,7 +61,7 @@ installation directory. Then read the documentation available in *docs/reference
 
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
-    > mvn clean install -s settings-example.xml
+    > mvn clean install
 
 #### Build options (profiles and properties)
 
@@ -69,7 +69,7 @@ installation directory. Then read the documentation available in *docs/reference
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
 output is enabled; to also generate the PDF output use:
 
-    > mvn clean install -Pdocumentation-pdf -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf
 
 +You can then find the freshly built documentation in the following location:
   
@@ -79,7 +79,7 @@ output is enabled; to also generate the PDF output use:
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf,dist
 
 ##### Elasticsearch
 
