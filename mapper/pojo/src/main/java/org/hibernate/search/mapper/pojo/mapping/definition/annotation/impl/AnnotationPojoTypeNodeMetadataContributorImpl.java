@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -50,7 +51,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetadataContributor {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final TypeModel<?> typeModel;

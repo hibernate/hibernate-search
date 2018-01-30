@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ import com.google.gson.JsonObject;
  */
 public class StubElasticsearchClient implements ElasticsearchClient {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

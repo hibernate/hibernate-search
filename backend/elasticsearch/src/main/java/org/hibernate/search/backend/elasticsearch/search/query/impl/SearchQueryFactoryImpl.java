@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -33,7 +34,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 class SearchQueryFactoryImpl
 		implements SearchQueryFactory<ElasticsearchSearchQueryElementCollector> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchBackend backend;
 

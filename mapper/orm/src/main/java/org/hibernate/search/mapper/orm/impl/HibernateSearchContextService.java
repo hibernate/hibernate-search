@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.transaction.Status;
@@ -58,7 +59,7 @@ public class HibernateSearchContextService implements Service {
 			return mappingRepository;
 		}
 		else {
-			throw LoggerFactory.make( Log.class ).hibernateSearchNotInitialized();
+			throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();
 		}
 	}
 
@@ -67,7 +68,7 @@ public class HibernateSearchContextService implements Service {
 			return mapping;
 		}
 		else {
-			throw LoggerFactory.make( Log.class ).hibernateSearchNotInitialized();
+			throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();
 		}
 	}
 
@@ -218,7 +219,7 @@ public class HibernateSearchContextService implements Service {
 	private static class SynchronizationAdapter implements Synchronization,
 			BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
 
-		private static final Log log = LoggerFactory.make( Log.class );
+		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 		private final Synchronization delegate;
 		private boolean beforeExecuted = false;

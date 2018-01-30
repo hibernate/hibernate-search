@@ -7,6 +7,7 @@
 
 package org.hibernate.search.mapper.orm.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.transaction.Synchronization;
@@ -22,7 +23,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
  */
 class InTransactionWorkQueueSynchronization implements Synchronization {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ChangesetPojoWorker worker;
 	private final Map<?, ?> workerPerTransaction;

@@ -7,6 +7,8 @@
 
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
@@ -37,7 +39,7 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
  */
 public class HibernateSearchIntegrator implements Integrator {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> AUTOREGISTER_LISTENERS =
 			ConfigurationProperty.forKey( AvailableSettings.Radicals.AUTOREGISTER_LISTENERS )

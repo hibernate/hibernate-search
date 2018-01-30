@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
  */
 class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchBackend backend;
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.search.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,7 +20,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 public class ByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType;
 

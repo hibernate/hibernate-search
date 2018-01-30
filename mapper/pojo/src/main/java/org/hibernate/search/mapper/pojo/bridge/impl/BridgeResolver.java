@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
  */
 public final class BridgeResolver {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<Class<?>, BridgeBuilder<? extends IdentifierBridge<?>>> defaultIdentifierBridgeBySourceType = new HashMap<>();
 	private final Map<Class<?>, BridgeBuilder<? extends FunctionBridge<?, ?>>> defaultFunctionBridgeBySourceType = new HashMap<>();

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -21,7 +22,7 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchIndexSchemaObjectNode schemaNode;
 	private final JsonObject content;

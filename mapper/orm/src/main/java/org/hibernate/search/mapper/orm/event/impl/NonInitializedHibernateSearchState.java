@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.event.impl;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -38,7 +39,7 @@ final class NonInitializedHibernateSearchState implements EventsHibernateSearchS
 	private SearchException notInitialized() {
 		// do not make a static field as we want this class to be disposable.
 		// we're unlikely to ever need this logger anyway!
-		return LoggerFactory.make( Log.class ).hibernateSearchNotInitialized();
+		return LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();
 	}
 
 }

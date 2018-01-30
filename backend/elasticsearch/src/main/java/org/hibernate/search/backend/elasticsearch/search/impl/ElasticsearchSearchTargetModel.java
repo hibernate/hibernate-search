@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 public class ElasticsearchSearchTargetModel {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> indexNames;

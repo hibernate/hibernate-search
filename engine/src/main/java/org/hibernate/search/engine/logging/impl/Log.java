@@ -16,6 +16,8 @@ import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
+import static org.jboss.logging.Logger.Level.ERROR;
+
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
 
@@ -50,4 +52,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 10, value = "Cannot access the value of containing annotation '%1$s'."
 			+ " Ignoring annotation.")
 	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
+
+	// Pre-existing message
+	@LogMessage(level = ERROR)
+	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
+	void interruptedWorkError(Runnable r);
 }

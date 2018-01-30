@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
@@ -25,7 +27,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
  */
 public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentObjectBuilder> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchBackend backend;
 	private final String name;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ConvertUtils {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ConvertUtils() {
 		// Private constructor, do not use

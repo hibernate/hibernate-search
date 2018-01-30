@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -16,7 +17,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 class FunctionConfigurationProperty<T> implements ConfigurationProperty<T> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String key;
 	private final Function<Optional<?>, T> function;

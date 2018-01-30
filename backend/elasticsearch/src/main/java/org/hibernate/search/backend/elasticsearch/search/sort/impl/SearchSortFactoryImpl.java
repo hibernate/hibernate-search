@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
@@ -25,7 +27,7 @@ import com.google.gson.JsonObject;
 // TODO have one version of the factory per dialect, if necessary
 public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Gson GSON = new GsonBuilder().create();
 

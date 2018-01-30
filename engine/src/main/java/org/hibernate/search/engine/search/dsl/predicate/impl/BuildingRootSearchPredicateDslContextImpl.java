@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
@@ -16,7 +18,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 public final class BuildingRootSearchPredicateDslContextImpl<C>
 		implements SearchPredicateDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchPredicateFactory<C> factory;
 

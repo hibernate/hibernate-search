@@ -23,7 +23,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class AnnotationHelper {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MethodHandles.Lookup lookup;
 

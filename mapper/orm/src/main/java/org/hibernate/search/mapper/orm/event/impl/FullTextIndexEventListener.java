@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Session;
@@ -44,7 +45,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean eventProcessingEnabled;
 	private final boolean dirtyCheckingEnabled;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
@@ -35,7 +36,7 @@ public final class ElasticsearchExtension<N>
 		SearchSortContainerContextExtension<N, ElasticsearchSearchSortContainerContext<N>>,
 		FieldModelExtension<ElasticsearchIndexSchemaFieldContext> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchExtension INSTANCE = new ElasticsearchExtension();
 
