@@ -14,6 +14,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
@@ -70,6 +71,7 @@ public class OrmElasticsearchAccessTypeIT {
 		MetadataSources ms = new MetadataSources( serviceRegistry )
 				.addAnnotatedClass( IndexedEntity.class )
 				.addAnnotatedClass( ParentIndexedEntity.class )
+				.addAnnotatedClass( IndexedEntityWithoutIdSetter.class )
 				.addAnnotatedClass( EmbeddableWithDefaultFieldAccess.class )
 				.addAnnotatedClass( EmbeddableWithDefaultMethodAccess.class );
 
@@ -127,6 +129,12 @@ public class OrmElasticsearchAccessTypeIT {
 								+ "}"
 							+ "}"
 						+ "}"
+					+ "}"
+				+ "}" );
+
+		assertRequest( requests, IndexedEntityWithoutIdSetter.INDEX, 0, HOST_1, "createIndex", null,
+				"{"
+					+ "'mapping': {"
 					+ "}"
 				+ "}" );
 	}
@@ -202,6 +210,9 @@ public class OrmElasticsearchAccessTypeIT {
 					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded()
 					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded()
 					.property( "nonManaged" ).indexedEmbedded();
+			mapping.type( IndexedEntityWithoutIdSetter.class )
+					.indexed( IndexedEntityWithoutIdSetter.INDEX )
+					.property( "id" ).documentId();
 			mapping.type( EmbeddableWithDefaultFieldAccess.class )
 					.property( "fieldWithDefaultFieldAccess" ).field()
 					.property( "fieldWithNonDefaultMethodAccess" ).field();
@@ -299,6 +310,18 @@ public class OrmElasticsearchAccessTypeIT {
 		public void setNonManaged(NonManaged nonManaged) {
 			this.nonManaged = nonManaged;
 		}
+	}
+
+	@Entity
+	@Table(name = "withoutidsetter")
+	public static class IndexedEntityWithoutIdSetter {
+
+		public static final String INDEX = "IndexedEntityWithoutIdSetter";
+
+		@Id
+		@GeneratedValue
+		private Integer id;
+
 	}
 
 	@javax.persistence.Embeddable

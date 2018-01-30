@@ -28,9 +28,17 @@ class EntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		EntityMetamodel metamodel = persister.getEntityMetamodel();
 		Integer index = metamodel.getPropertyIndexOrNull( propertyName );
+
 		if ( index != null ) {
 			EntityTuplizer tuplizer = persister.getEntityTuplizer();
 			Getter getter = tuplizer.getGetter( index );
+			return new HibernateOrmPropertyModel<>(
+					introspector, this, propertyName, xProperties, getter
+			);
+		}
+		else if ( propertyName.equals( metamodel.getIdentifierProperty().getName() ) ) {
+			EntityTuplizer tuplizer = persister.getEntityTuplizer();
+			Getter getter = tuplizer.getIdentifierGetter();
 			return new HibernateOrmPropertyModel<>(
 					introspector, this, propertyName, xProperties, getter
 			);
