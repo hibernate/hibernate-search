@@ -31,7 +31,7 @@
         <module>mapper/javabean</module>
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
-        <module>integration-test</module>
+        <module>integrationtest</module>
         <module>reports</module>
     </modules>
     
@@ -86,7 +86,22 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-search-integration-test</artifactId>
+                <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-integrationtest-orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
