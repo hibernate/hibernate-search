@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.util.spi.Closer;
 
 
 /**
@@ -70,8 +71,10 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObject
 	@Override
 	public void close() {
 		// TODO use a Closer
-		client.close();
-		streamOrchestrator.close();
+		try (Closer<RuntimeException> closer = new Closer<>()) {
+			closer.push( client::close );
+			closer.push( streamOrchestrator::close );
+		}
 	}
 
 	@Override
