@@ -32,17 +32,17 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchObjectNodeModel parentModel) {
-		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
+			ElasticsearchIndexSchemaObjectNode parentNode) {
+		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, IntegerFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		mapping.setType( DataType.INTEGER );
 
-		String absolutePath = parentModel.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, model );
+		String absolutePath = parentNode.getAbsolutePath( relativeName );
+		collector.collect( absolutePath, node );
 
 		return mapping;
 	}

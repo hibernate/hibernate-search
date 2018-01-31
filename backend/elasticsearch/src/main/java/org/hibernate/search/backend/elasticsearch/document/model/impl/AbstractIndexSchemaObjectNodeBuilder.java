@@ -52,12 +52,12 @@ abstract class AbstractIndexSchemaObjectNodeBuilder {
 		}
 	}
 
-	final void contributeChildren(TypeMapping mapping, ElasticsearchObjectNodeModel model,
+	final void contributeChildren(TypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
 			ElasticsearchIndexSchemaNodeCollector collector) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> entry : content.entrySet() ) {
 			String propertyName = entry.getKey();
 			ElasticsearchIndexSchemaNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
-			PropertyMapping propertyMapping = propertyContributor.contribute( collector, model );
+			PropertyMapping propertyMapping = propertyContributor.contribute( collector, node );
 			mapping.addProperty( propertyName, propertyMapping );
 		}
 	}

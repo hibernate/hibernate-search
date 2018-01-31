@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonElement;
@@ -22,16 +22,16 @@ public class ElasticsearchIndexFieldAccessor<T> implements IndexFieldAccessor<T>
 
 	private final JsonAccessor<JsonElement> accessor;
 
-	private final ElasticsearchFieldModel model;
+	private final ElasticsearchIndexSchemaFieldNode schemaNode;
 
-	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor, ElasticsearchFieldModel model) {
+	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor, ElasticsearchIndexSchemaFieldNode schemaNode) {
 		this.accessor = accessor;
-		this.model = model;
+		this.schemaNode = schemaNode;
 	}
 
 	@Override
 	public void write(DocumentElement state, T value) {
-		((ElasticsearchDocumentObjectBuilder) state).add( model.getParent(), accessor, model.getFormatter().format( value ) );
+		((ElasticsearchDocumentObjectBuilder) state).add( schemaNode.getParent(), accessor, schemaNode.getFormatter().format( value ) );
 	}
 
 }

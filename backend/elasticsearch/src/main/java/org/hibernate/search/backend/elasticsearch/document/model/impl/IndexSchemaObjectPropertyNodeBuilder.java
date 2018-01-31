@@ -42,13 +42,13 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 	@Override
 	public PropertyMapping contribute(
 			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchObjectNodeModel parentModel) {
-		ElasticsearchObjectNodeModel model = new ElasticsearchObjectNodeModel( parentModel, absolutePath, storage );
-		collector.collect( absolutePath, model );
+			ElasticsearchIndexSchemaObjectNode parentNode) {
+		ElasticsearchIndexSchemaObjectNode node = new ElasticsearchIndexSchemaObjectNode( parentNode, absolutePath, storage );
+		collector.collect( absolutePath, node );
 
 		JsonObjectAccessor jsonAccessor = JsonAccessor.root().property( relativeName ).asObject();
 
-		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( jsonAccessor, model ) );
+		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( jsonAccessor, node ) );
 
 		PropertyMapping mapping = new PropertyMapping();
 		DataType dataType = DataType.OBJECT;
@@ -64,7 +64,7 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 		}
 		mapping.setType( dataType );
 
-		contributeChildren( mapping, model, collector );
+		contributeChildren( mapping, node, collector );
 
 		return mapping;
 	}

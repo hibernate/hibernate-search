@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchObjectNodeModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -63,9 +63,9 @@ public class SearchPredicateFactoryImpl implements SearchPredicateFactory<Elasti
 		ElasticsearchIndexModel indexModelForSelectedFormatter = null;
 		ElasticsearchFieldFormatter selectedFormatter = null;
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( absoluteFieldPath );
-			if ( fieldModel != null ) {
-				ElasticsearchFieldFormatter formatter = fieldModel.getFormatter();
+			ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+			if ( schemaNode != null ) {
+				ElasticsearchFieldFormatter formatter = schemaNode.getFormatter();
 				if ( selectedFormatter == null ) {
 					selectedFormatter = formatter;
 					indexModelForSelectedFormatter = indexModel;
@@ -89,19 +89,18 @@ public class SearchPredicateFactoryImpl implements SearchPredicateFactory<Elasti
 		boolean found = false;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchObjectNodeModel nodeModel =
-					indexModel.getObjectNodeModel( absoluteFieldPath );
-			if ( nodeModel != null ) {
+			ElasticsearchIndexSchemaObjectNode schemaNode = indexModel.getObjectNode( absoluteFieldPath );
+			if ( schemaNode != null ) {
 				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( nodeModel.getStorage() ) ) {
+				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
 					throw log.nonNestedFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
 				}
 			}
 		}
 		if ( !found ) {
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( absoluteFieldPath );
-				if ( fieldModel != null ) {
+				ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
 				}
 			}

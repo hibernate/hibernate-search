@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -119,10 +119,10 @@ class SearchQueryFactoryImpl implements SearchQueryFactory<ElasticsearchSearchPr
 					extractors.add( new DocumentReferenceHitExtractor<>( Function.identity() ) );
 					break;
 				default:
-					ElasticsearchFieldModel fieldModel = indexModel.getFieldModel( projection );
-					if ( fieldModel != null ) {
+					ElasticsearchIndexSchemaFieldNode node = indexModel.getFieldNode( projection );
+					if ( node != null ) {
 						projectionFound.set( i );
-						extractors.add( new SourceHitExtractor( projection, fieldModel.getFormatter() ) );
+						extractors.add( new SourceHitExtractor( projection, node.getFormatter() ) );
 					}
 					else {
 						// Make sure that the result list will have the correct indices and size

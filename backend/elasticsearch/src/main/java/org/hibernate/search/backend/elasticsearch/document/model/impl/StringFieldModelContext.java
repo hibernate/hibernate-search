@@ -42,13 +42,13 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchObjectNodeModel parentModel) {
+			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, StringFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, StringFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
@@ -65,8 +65,8 @@ class StringFieldModelContext extends AbstractElasticsearchTypedFieldModelContex
 			}
 		}
 
-		String absolutePath = parentModel.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, model );
+		String absolutePath = parentNode.getAbsolutePath( relativeName );
+		collector.collect( absolutePath, node );
 
 		return mapping;
 	}

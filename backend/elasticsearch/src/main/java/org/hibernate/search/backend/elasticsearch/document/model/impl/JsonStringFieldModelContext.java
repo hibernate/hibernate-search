@@ -46,16 +46,16 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 
 	@Override
 	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchObjectNodeModel parentModel) {
+			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, JsonStringFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, JsonStringFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
-		String absolutePath = parentModel.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, model );
+		String absolutePath = parentNode.getAbsolutePath( relativeName );
+		collector.collect( absolutePath, node );
 
 		return mapping;
 	}

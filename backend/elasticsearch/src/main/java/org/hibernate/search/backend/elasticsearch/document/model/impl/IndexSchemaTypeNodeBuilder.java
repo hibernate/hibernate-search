@@ -25,16 +25,16 @@ class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 	}
 
 	protected TypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
-		ElasticsearchObjectNodeModel model = ElasticsearchObjectNodeModel.root();
+		ElasticsearchIndexSchemaObjectNode node = ElasticsearchIndexSchemaObjectNode.root();
 
-		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), model ) );
+		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), node ) );
 
 		TypeMapping mapping = new TypeMapping();
 		if ( routing != null ) {
 			mapping.setRouting( routing );
 		}
 
-		contributeChildren( mapping, model, collector );
+		contributeChildren( mapping, node, collector );
 
 		return mapping;
 	}

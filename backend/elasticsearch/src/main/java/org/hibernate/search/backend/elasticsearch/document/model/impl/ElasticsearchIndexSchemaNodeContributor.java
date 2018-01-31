@@ -11,6 +11,6 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
  */
 public interface ElasticsearchIndexSchemaNodeContributor<T> {
 
-	T contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchObjectNodeModel parentModel);
+	T contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexSchemaObjectNode parentNode);
 
 }

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchObjectNodeModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;
@@ -21,23 +21,23 @@ public class ElasticsearchIndexObjectFieldAccessor implements IndexObjectFieldAc
 
 	private final JsonAccessor<JsonObject> relativeAccessor;
 
-	private final ElasticsearchObjectNodeModel model;
+	private final ElasticsearchIndexSchemaObjectNode node;
 
 	public ElasticsearchIndexObjectFieldAccessor(JsonAccessor<JsonObject> relativeAccessor,
-			ElasticsearchObjectNodeModel model) {
+			ElasticsearchIndexSchemaObjectNode node) {
 		this.relativeAccessor = relativeAccessor;
-		this.model = model;
+		this.node = node;
 	}
 
 	@Override
 	public DocumentElement add(DocumentElement target) {
 		JsonObject jsonObject = new JsonObject();
-		((ElasticsearchDocumentObjectBuilder) target).add( model.getParent(), relativeAccessor, jsonObject );
-		return new ElasticsearchDocumentObjectBuilder( model, jsonObject );
+		((ElasticsearchDocumentObjectBuilder) target).add( node.getParent(), relativeAccessor, jsonObject );
+		return new ElasticsearchDocumentObjectBuilder( node, jsonObject );
 	}
 
 	@Override
 	public void addMissing(DocumentElement target) {
-		((ElasticsearchDocumentObjectBuilder) target).add( model.getParent(), relativeAccessor, null );
+		((ElasticsearchDocumentObjectBuilder) target).add( node.getParent(), relativeAccessor, null );
 	}
 }

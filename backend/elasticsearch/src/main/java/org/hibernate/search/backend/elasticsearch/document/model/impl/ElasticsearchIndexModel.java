@@ -18,20 +18,20 @@ public class ElasticsearchIndexModel {
 
 	private final String indexName;
 	private final TypeMapping mapping;
-	private final Map<String, ElasticsearchObjectNodeModel> objectFieldModels = new HashMap<>();
-	private final Map<String, ElasticsearchFieldModel> fieldModels = new HashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
 
 	public ElasticsearchIndexModel(String indexName, ElasticsearchRootIndexSchemaCollectorImpl collector) {
 		this.indexName = indexName;
 		this.mapping = collector.contribute( new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
-			public void collect(String absolutePath, ElasticsearchObjectNodeModel model) {
-				objectFieldModels.put( absolutePath, model );
+			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node) {
+				objectNodes.put( absolutePath, node );
 			}
 
 			@Override
-			public void collect(String absolutePath, ElasticsearchFieldModel model) {
-				fieldModels.put( absolutePath, model );
+			public void collect(String absolutePath, ElasticsearchIndexSchemaFieldNode node) {
+				fieldNodes.put( absolutePath, node );
 			}
 		} );
 	}
@@ -44,12 +44,12 @@ public class ElasticsearchIndexModel {
 		return mapping;
 	}
 
-	public ElasticsearchObjectNodeModel getObjectNodeModel(String absolutePath) {
-		return objectFieldModels.get( absolutePath );
+	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath) {
+		return objectNodes.get( absolutePath );
 	}
 
-	public ElasticsearchFieldModel getFieldModel(String absolutePath) {
-		return fieldModels.get( absolutePath );
+	public ElasticsearchIndexSchemaFieldNode getFieldNode(String absolutePath) {
+		return fieldNodes.get( absolutePath );
 	}
 
 	@Override

@@ -34,17 +34,17 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<GeoPoint> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchObjectNodeModel parentModel) {
-		PropertyMapping mapping = super.contribute( reference, collector, parentModel );
+			ElasticsearchIndexSchemaObjectNode parentNode) {
+		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
 
-		ElasticsearchFieldModel model = new ElasticsearchFieldModel( parentModel, GeoPointFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, GeoPointFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, model ) );
+		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		mapping.setType( DataType.GEO_POINT );
 
-		String absolutePath = parentModel.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, model );
+		String absolutePath = parentNode.getAbsolutePath( relativeName );
+		collector.collect( absolutePath, node );
 
 		return mapping;
 	}

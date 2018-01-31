@@ -11,29 +11,29 @@ import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchObjectNodeModel {
+public class ElasticsearchIndexSchemaObjectNode {
 
-	private static final ElasticsearchObjectNodeModel ROOT =
-			new ElasticsearchObjectNodeModel( null, null, null );
+	private static final ElasticsearchIndexSchemaObjectNode ROOT =
+			new ElasticsearchIndexSchemaObjectNode( null, null, null );
 
-	public static ElasticsearchObjectNodeModel root() {
+	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
 	}
 
-	private final ElasticsearchObjectNodeModel parent;
+	private final ElasticsearchIndexSchemaObjectNode parent;
 
 	private final String absolutePath;
 
 	private final ObjectFieldStorage storage;
 
-	public ElasticsearchObjectNodeModel(ElasticsearchObjectNodeModel parent, String absolutePath,
+	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath,
 			ObjectFieldStorage storage) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
 		this.storage = storage;
 	}
 
-	public ElasticsearchObjectNodeModel getParent() {
+	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
 	}
 
