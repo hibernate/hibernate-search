@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.engine.backend.document.model;
 
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+
 /**
  * @author Yoann Rodiere
  */
-public interface TypedFieldModelContext<T> extends TerminalFieldModelContext<T> {
+public interface IndexSchemaFieldTerminalContext<T> {
 
-	// TODO add common options: stored, sortable, ...
-
-	TypedFieldModelContext<T> store(Store store);
+	IndexFieldAccessor<T> createAccessor();
 
 }

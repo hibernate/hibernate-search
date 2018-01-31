@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 
 public final class DefaultStringFunctionBridge implements FunctionBridge<String, String> {
 
 	@Override
-	public TypedFieldModelContext<String> bind(FieldModelContext context) {
+	public IndexSchemaFieldTypedContext<String> bind(IndexSchemaFieldContext context) {
 		return context.asString();
 	}
 

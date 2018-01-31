@@ -7,8 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
@@ -21,25 +24,46 @@ import com.google.gson.JsonPrimitive;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> {
+class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
 	private final String relativeName;
+	private Store store;
 
-	public IntegerFieldModelContext(String relativeName) {
+	public IndexSchemaFieldStringContext(String relativeName) {
 		this.relativeName = relativeName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
+	public IndexSchemaFieldTypedContext<String> store(Store store) {
+		this.store = store;
+		return this;
+	}
+
+	@Override
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
-		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
+		PropertyMapping mapping = new PropertyMapping();
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, StringFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setType( DataType.INTEGER );
+		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
+		if ( false ) {
+			mapping.setType( DataType.TEXT );
+			if ( store != null && Store.YES.equals( store ) ) {
+				// TODO what about Store.COMPRESS?
+				mapping.setFieldData( FieldDataType.TRUE );
+			}
+		}
+		else {
+			mapping.setType( DataType.KEYWORD );
+			if ( store != null && Store.YES.equals( store ) ) {
+				// TODO what about Store.COMPRESS?
+				mapping.setStore( true );
+			}
+		}
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, node );
@@ -47,11 +71,11 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 		return mapping;
 	}
 
-	private static final class IntegerFieldFormatter implements ElasticsearchFieldFormatter {
+	private static final class StringFieldFormatter implements ElasticsearchFieldFormatter {
 		// Must be a singleton so that equals() works as required by the interface
-		public static final IntegerFieldFormatter INSTANCE = new IntegerFieldFormatter();
+		public static final StringFieldFormatter INSTANCE = new StringFieldFormatter();
 
-		private IntegerFieldFormatter() {
+		private StringFieldFormatter() {
 		}
 
 		@Override
@@ -59,7 +83,7 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 			if ( object == null ) {
 				return JsonNull.INSTANCE;
 			}
-			Integer value = (Integer) object;
+			String value = (String) object;
 			return new JsonPrimitive( value );
 		}
 
@@ -68,7 +92,7 @@ class IntegerFieldModelContext extends AbstractScalarFieldModelContext<Integer> 
 			if ( element == null || element.isJsonNull() ) {
 				return null;
 			}
-			return JsonElementType.INTEGER.fromElement( element );
+			return JsonElementType.STRING.fromElement( element );
 		}
 	}
 }

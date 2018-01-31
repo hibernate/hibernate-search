@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 
 /**
  * A bridge between a POJO property of type {@code T} and an index field of type {@code R}.
@@ -33,7 +33,7 @@ public interface FunctionBridge<T, R> extends AutoCloseable {
 	 * (for instance {@code return context.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code FunctionBridge}'s generic type parameters.
 	 */
-	default TypedFieldModelContext<R> bind(FieldModelContext context) {
+	default IndexSchemaFieldTypedContext<R> bind(IndexSchemaFieldContext context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 

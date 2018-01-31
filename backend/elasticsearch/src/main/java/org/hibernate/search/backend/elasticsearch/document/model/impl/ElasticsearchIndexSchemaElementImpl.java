@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
@@ -38,19 +38,19 @@ class ElasticsearchIndexSchemaElementImpl
 	}
 
 	@Override
-	public FieldModelContext field(String relativeName) {
+	public IndexSchemaFieldContext field(String relativeName) {
 		return nestingContext.nest(
 				relativeName,
 				// If the field is included
 				prefixedName -> {
-					ElasticsearchFieldModelContextImpl fieldContext =
-							new ElasticsearchFieldModelContextImpl( prefixedName );
+					ElasticsearchIndexSchemaFieldContextImpl fieldContext =
+							new ElasticsearchIndexSchemaFieldContextImpl( prefixedName );
 					// Only take the contributor into account if the field is included
 					nodeBuilder.putProperty( prefixedName, fieldContext );
 					return fieldContext;
 				},
 				// If the field is filtered out
-				ElasticsearchFieldModelContextImpl::new
+				ElasticsearchIndexSchemaFieldContextImpl::new
 				);
 	}
 

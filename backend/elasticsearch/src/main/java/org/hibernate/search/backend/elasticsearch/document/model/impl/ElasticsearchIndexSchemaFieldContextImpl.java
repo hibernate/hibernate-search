@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.model.TerminalFieldModelContext;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
-import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
@@ -19,31 +19,31 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchFieldModelContextImpl
-		implements ElasticsearchFieldModelContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+public class ElasticsearchIndexSchemaFieldContextImpl
+		implements ElasticsearchIndexSchemaFieldContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private final String relativeName;
 
 	private ElasticsearchIndexSchemaNodeContributor<PropertyMapping> delegate;
 
-	public ElasticsearchFieldModelContextImpl(String relativeName) {
+	public ElasticsearchIndexSchemaFieldContextImpl(String relativeName) {
 		this.relativeName = relativeName;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> TypedFieldModelContext<T> as(Class<T> inputType) {
+	public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) asString();
+			return (IndexSchemaFieldTypedContext<T>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) asInteger();
+			return (IndexSchemaFieldTypedContext<T>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) asLocalDate();
+			return (IndexSchemaFieldTypedContext<T>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (TypedFieldModelContext<T>) asGeoPoint();
+			return (IndexSchemaFieldTypedContext<T>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -52,28 +52,28 @@ public class ElasticsearchFieldModelContextImpl
 	}
 
 	@Override
-	public TypedFieldModelContext<String> asString() {
-		return setDelegate( new StringFieldModelContext( relativeName ) );
+	public IndexSchemaFieldTypedContext<String> asString() {
+		return setDelegate( new IndexSchemaFieldStringContext( relativeName ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<Integer> asInteger() {
-		return setDelegate( new IntegerFieldModelContext( relativeName ) );
+	public IndexSchemaFieldTypedContext<Integer> asInteger() {
+		return setDelegate( new IndexSchemaFieldIntegerContext( relativeName ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateFieldModelContext( relativeName ) );
+	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
+		return setDelegate( new IndexSchemaFieldLocalDateContext( relativeName ) );
 	}
 
 	@Override
-	public TypedFieldModelContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointFieldModelContext( relativeName ) );
+	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
+		return setDelegate( new IndexSchemaFieldGeoPointContext( relativeName ) );
 	}
 
 	@Override
-	public TerminalFieldModelContext<String> asJsonString(String mappingJsonString) {
-		return setDelegate( new JsonStringFieldModelContext( relativeName, mappingJsonString ) );
+	public IndexSchemaFieldTerminalContext<String> asJsonString(String mappingJsonString) {
+		return setDelegate( new IndexSchemaFieldJsonStringContext( relativeName, mappingJsonString ) );
 	}
 
 	@Override

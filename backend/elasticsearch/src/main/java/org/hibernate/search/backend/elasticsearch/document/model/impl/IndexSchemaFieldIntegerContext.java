@@ -12,36 +12,34 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint> {
+class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Integer> {
 
 	private final String relativeName;
 
-	public GeoPointFieldModelContext(String relativeName) {
+	public IndexSchemaFieldIntegerContext(String relativeName) {
 		this.relativeName = relativeName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<GeoPoint> reference,
+	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, GeoPointFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldFormatter.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setType( DataType.GEO_POINT );
+		mapping.setType( DataType.INTEGER );
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, node );
@@ -49,16 +47,11 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 		return mapping;
 	}
 
-	private static final class GeoPointFieldFormatter implements ElasticsearchFieldFormatter {
+	private static final class IntegerFieldFormatter implements ElasticsearchFieldFormatter {
 		// Must be a singleton so that equals() works as required by the interface
-		public static final GeoPointFieldFormatter INSTANCE = new GeoPointFieldFormatter();
+		public static final IntegerFieldFormatter INSTANCE = new IntegerFieldFormatter();
 
-		private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
-				JsonAccessor.root().property( "lat" ).asDouble();
-		private static final JsonAccessor<Double> LONGITUDE_ACCESSOR =
-				JsonAccessor.root().property( "lon" ).asDouble();
-
-		private GeoPointFieldFormatter() {
+		private IntegerFieldFormatter() {
 		}
 
 		@Override
@@ -66,11 +59,8 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 			if ( object == null ) {
 				return JsonNull.INSTANCE;
 			}
-			GeoPoint value = (GeoPoint) object;
-			JsonObject result = new JsonObject();
-			LATITUDE_ACCESSOR.set( result, value.getLatitude() );
-			LONGITUDE_ACCESSOR.set( result, value.getLongitude() );
-			return result;
+			Integer value = (Integer) object;
+			return new JsonPrimitive( value );
 		}
 
 		@Override
@@ -78,11 +68,7 @@ class GeoPointFieldModelContext extends AbstractScalarFieldModelContext<GeoPoint
 			if ( element == null || element.isJsonNull() ) {
 				return null;
 			}
-			JsonObject object = JsonElementType.OBJECT.fromElement( element );
-			double latitude = LATITUDE_ACCESSOR.get( object ).get();
-			double longitude = LONGITUDE_ACCESSOR.get( object ).get();
-			return new ImmutableGeoPoint( latitude, longitude );
+			return JsonElementType.INTEGER.fromElement( element );
 		}
 	}
-
 }

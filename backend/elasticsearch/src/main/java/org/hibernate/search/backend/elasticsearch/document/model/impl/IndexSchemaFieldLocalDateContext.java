@@ -33,7 +33,7 @@ import static java.time.temporal.ChronoField.YEAR;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDate> {
+class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<LocalDate> {
 
 	private static final LocalDateFormatter DEFAULT_FORMATTER = new LocalDateFormatter(
 					new DateTimeFormatterBuilder()
@@ -49,7 +49,7 @@ class LocalDateFieldModelContext extends AbstractScalarFieldModelContext<LocalDa
 	private final String relativeName;
 	private final LocalDateFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
 
-	public LocalDateFieldModelContext(String relativeName) {
+	public IndexSchemaFieldLocalDateContext(String relativeName) {
 		this.relativeName = relativeName;
 	}
 

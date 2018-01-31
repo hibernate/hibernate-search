@@ -8,21 +8,21 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.Store;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractScalarFieldModelContext<T> extends AbstractElasticsearchTypedFieldModelContext<T> {
+abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchIndexSchemaFieldTypedContext<T> {
 
 	private Store store;
 
-	public AbstractScalarFieldModelContext() {
+	public AbstractScalarFieldTypedContext() {
 	}
 
 	@Override
-	public TypedFieldModelContext<T> store(Store store) {
+	public IndexSchemaFieldTypedContext<T> store(Store store) {
 		this.store = store;
 		return this;
 	}

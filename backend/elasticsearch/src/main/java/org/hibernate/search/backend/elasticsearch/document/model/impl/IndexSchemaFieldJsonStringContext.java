@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.TerminalFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -22,7 +22,7 @@ import com.google.gson.JsonNull;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class JsonStringFieldModelContext implements TerminalFieldModelContext<String>,
+class IndexSchemaFieldJsonStringContext implements IndexSchemaFieldTerminalContext<String>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
@@ -34,7 +34,7 @@ public class JsonStringFieldModelContext implements TerminalFieldModelContext<St
 
 	private final String mappingJsonString;
 
-	public JsonStringFieldModelContext(String relativeName, String mappingJsonString) {
+	public IndexSchemaFieldJsonStringContext(String relativeName, String mappingJsonString) {
 		this.relativeName = relativeName;
 		this.mappingJsonString = mappingJsonString;
 	}

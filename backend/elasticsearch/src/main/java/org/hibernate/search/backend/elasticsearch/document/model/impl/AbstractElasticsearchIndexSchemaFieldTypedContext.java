@@ -8,14 +8,14 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchTypedFieldModelContext;
+import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractElasticsearchTypedFieldModelContext<T>
-		implements ElasticsearchTypedFieldModelContext<T>, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<T>
+		implements ElasticsearchIndexSchemaFieldTypedContext<T>, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private DeferredInitializationIndexFieldAccessor<T> reference = new DeferredInitializationIndexFieldAccessor<>();
 

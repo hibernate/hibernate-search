@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 
 /**
  * @author Yoann Rodiere
  */
 public interface FieldModelContributor {
 
-	void contribute(TypedFieldModelContext<?> context);
+	void contribute(IndexSchemaFieldTypedContext<?> context);
 
 }

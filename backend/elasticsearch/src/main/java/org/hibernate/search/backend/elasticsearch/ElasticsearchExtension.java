@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelExtension;
-import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchFieldModelContext;
+import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
@@ -24,7 +24,7 @@ import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ElasticsearchExtension<N>
 		implements SearchPredicateContainerContextExtension<N, ElasticsearchSearchPredicateContainerContext<N>>,
-		FieldModelExtension<ElasticsearchFieldModelContext> {
+		FieldModelExtension<ElasticsearchIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -63,9 +63,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public ElasticsearchFieldModelContext extendOrFail(FieldModelContext original) {
-		if ( original instanceof ElasticsearchFieldModelContext ) {
-			return (ElasticsearchFieldModelContext) original;
+	public ElasticsearchIndexSchemaFieldContext extendOrFail(IndexSchemaFieldContext original) {
+		if ( original instanceof ElasticsearchIndexSchemaFieldContext ) {
+			return (ElasticsearchIndexSchemaFieldContext) original;
 		}
 		else {
 			throw log.elasticsearchExtensionOnUnknownContext( original );

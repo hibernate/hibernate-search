@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
@@ -116,10 +116,10 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoModelElementAccessor<? extends T> pojoModelElementAccessor,
 			FunctionBridge<T, R> bridge, String fieldName, FieldModelContributor contributor) {
-		FieldModelContext fieldContext = bindingContext.getSchemaElement().field( fieldName );
+		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement().field( fieldName );
 
 		// First give the bridge a chance to contribute to the model
-		TypedFieldModelContext<R> typedFieldContext = bridge.bind( fieldContext );
+		IndexSchemaFieldTypedContext<R> typedFieldContext = bridge.bind( fieldContext );
 		if ( typedFieldContext == null ) {
 			Class<R> returnType = FunctionBridgeUtil.inferReturnType( bridge )
 					.orElseThrow( () -> new SearchException( "Could not auto-detect the return type for bridge "

@@ -8,14 +8,14 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.model.FieldModelContext;
-import org.hibernate.search.engine.backend.document.model.TypedFieldModelContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 
 public final class DefaultLocalDateFunctionBridge implements FunctionBridge<LocalDate, LocalDate> {
 
 	@Override
-	public TypedFieldModelContext<LocalDate> bind(FieldModelContext context) {
+	public IndexSchemaFieldTypedContext<LocalDate> bind(IndexSchemaFieldContext context) {
 		return context.asLocalDate();
 	}
 
