@@ -35,7 +35,7 @@ import static java.time.temporal.ChronoField.YEAR;
  */
 class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<LocalDate> {
 
-	private static final LocalDateFormatter DEFAULT_FORMATTER = new LocalDateFormatter(
+	private static final LocalDateFieldFormatter DEFAULT_FORMATTER = new LocalDateFieldFormatter(
 					new DateTimeFormatterBuilder()
 							.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
 							.appendLiteral( '-' )
@@ -47,7 +47,7 @@ class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<L
 			);
 
 	private final String relativeName;
-	private final LocalDateFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
+	private final LocalDateFieldFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
 
 	public IndexSchemaFieldLocalDateContext(String relativeName) {
 		this.relativeName = relativeName;
@@ -72,11 +72,11 @@ class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<L
 		return mapping;
 	}
 
-	private static final class LocalDateFormatter implements ElasticsearchFieldFormatter {
+	private static final class LocalDateFieldFormatter implements ElasticsearchFieldFormatter {
 
 		private final DateTimeFormatter delegate;
 
-		protected LocalDateFormatter(DateTimeFormatter delegate) {
+		protected LocalDateFieldFormatter(DateTimeFormatter delegate) {
 			this.delegate = delegate;
 		}
 
@@ -103,7 +103,7 @@ class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<L
 			if ( obj == null || obj.getClass() != getClass() ) {
 				return false;
 			}
-			LocalDateFormatter other = (LocalDateFormatter) obj;
+			LocalDateFieldFormatter other = (LocalDateFieldFormatter) obj;
 			return delegate.equals( other.delegate );
 		}
 
