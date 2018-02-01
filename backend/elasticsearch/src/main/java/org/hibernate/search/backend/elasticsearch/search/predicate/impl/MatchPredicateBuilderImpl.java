@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
-	private static final JsonAccessor<JsonElement> VALUE = JsonAccessor.root().property( "value" );
+	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
 
 	private final String fieldName;
 
@@ -33,7 +33,7 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	@Override
 	public void value(Object value) {
-		VALUE.set( getInnerObject(), formatter.format( value ) );
+		QUERY.set( getInnerObject(), formatter.format( value ) );
 	}
 
 	@Override

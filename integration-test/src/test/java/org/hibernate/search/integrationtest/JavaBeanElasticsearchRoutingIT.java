@@ -175,7 +175,7 @@ public class JavaBeanElasticsearchRoutingIT {
 					+ "'query': {"
 						+ "'match': {"
 							+ "'value': {"
-								+ "'value': 'val1'"
+								+ "'query': 'val1'"
 							+ "}"
 						+ "}"
 					+ "}"
