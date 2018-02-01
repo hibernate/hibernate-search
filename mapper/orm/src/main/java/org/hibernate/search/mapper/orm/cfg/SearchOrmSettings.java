@@ -10,7 +10,7 @@ package org.hibernate.search.mapper.orm.cfg;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public final class AvailableSettings {
+public final class SearchOrmSettings {
 
 	public static final String PREFIX = "hibernate.search.";
 
@@ -51,7 +51,7 @@ public final class AvailableSettings {
 		}
 	}
 
-	private AvailableSettings() {
+	private SearchOrmSettings() {
 	}
 
 }

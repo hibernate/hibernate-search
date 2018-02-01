@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.spi.LoggerFactory;
 
@@ -39,7 +40,7 @@ public enum IndexingMode {
 
 	/**
 	 * Returns the {@link IndexingMode} matching the given external representation as specified via
-	 * {@link org.hibernate.search.mapper.orm.cfg.AvailableSettings#INDEXING_STRATEGY}
+	 * {@link SearchOrmSettings#INDEXING_STRATEGY}
 	 * @param indexingMode the indexing mode external representation
 	 * @return the {@link IndexingMode}
 	 */

@@ -25,7 +25,7 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
@@ -49,7 +49,7 @@ import static org.hibernate.search.integrationtest.util.common.StubAssert.assert
  */
 public class OrmElasticsearchAccessTypeIT {
 
-	private static final String PREFIX = AvailableSettings.PREFIX;
+	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
@@ -65,7 +65,7 @@ public class OrmElasticsearchAccessTypeIT {
 				.applySetting( PREFIX + "backend.elasticsearchBackend_2.host", HOST_2 )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
-				.applySetting( AvailableSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
+				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 

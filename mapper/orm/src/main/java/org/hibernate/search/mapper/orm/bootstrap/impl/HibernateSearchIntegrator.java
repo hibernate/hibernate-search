@@ -20,7 +20,7 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -42,19 +42,19 @@ public class HibernateSearchIntegrator implements Integrator {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> AUTOREGISTER_LISTENERS =
-			ConfigurationProperty.forKey( AvailableSettings.Radicals.AUTOREGISTER_LISTENERS )
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.AUTOREGISTER_LISTENERS )
 					.asBoolean()
 					.withDefault( true )
 					.build();
 
 	private static final ConfigurationProperty<IndexingMode> INDEXING_MODE =
-			ConfigurationProperty.forKey( AvailableSettings.Radicals.INDEXING_STRATEGY )
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.INDEXING_STRATEGY )
 					.as( IndexingMode.class, IndexingMode::fromExternalRepresentation )
 					.withDefault( IndexingMode.EVENT )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_PROCESSING_ENABLED =
-			ConfigurationProperty.forKey( AvailableSettings.Radicals.ENABLE_DIRTY_CHECK )
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_DIRTY_CHECK )
 					.asBoolean()
 					.withDefault( true )
 					.build();

@@ -34,7 +34,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocum
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
@@ -80,7 +80,7 @@ import static org.hibernate.search.integrationtest.util.common.StubAssert.assert
  */
 public class OrmElasticsearchAnnotationMappingIT {
 
-	private static final String PREFIX = AvailableSettings.PREFIX;
+	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
 	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
 	private static final String HOST_2 = "http://es2.mycompany.com:9200/";

@@ -22,7 +22,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
-import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
@@ -134,7 +134,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 					.forEach( annotationMapping::add );
 
 			ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
-					ConfigurationProperty.forKey( AvailableSettings.Radicals.MAPPING_CONTRIBUTOR )
+					ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONTRIBUTOR )
 							.as(
 									HibernateOrmSearchMappingContributor.class,
 									reference -> searchBeanResolver.resolve( reference, HibernateOrmSearchMappingContributor.class )

@@ -14,9 +14,9 @@ import java.util.List;
  *
  * @author Gunnar Morling
  */
-public final class ElasticsearchBackendSettings {
+public final class SearchBackendElasticsearchSettings {
 
-	private ElasticsearchBackendSettings() {
+	private SearchBackendElasticsearchSettings() {
 	}
 
 	public static final String HOST = "host";
