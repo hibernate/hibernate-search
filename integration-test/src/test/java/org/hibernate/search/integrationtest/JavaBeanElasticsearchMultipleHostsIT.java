@@ -83,8 +83,7 @@ public class JavaBeanElasticsearchMultipleHostsIT {
 		}
 
 		requests = StubElasticsearchClient.drainRequestsByIndex();
-		// We expect the first add to be removed due to the delete
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_2, "add", "2", "{}" );
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_2, "add", "1", "{}" );
 	}
 
 

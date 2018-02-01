@@ -124,7 +124,7 @@ public class JavaBeanElasticsearchRoutingIT {
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "1",
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "myTenantId_1",
 				c -> {
 					c.accept( "_routing", "myTenantId/category_2" );
 				},

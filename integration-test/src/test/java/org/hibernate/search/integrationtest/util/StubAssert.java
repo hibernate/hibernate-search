@@ -91,7 +91,7 @@ public final class StubAssert {
 			for ( String key : parameters.keySet() ) {
 				// Check that the expected parameters are there, in any order
 				Collection<String> expected = new ArrayList<>( parameters.get( key ) );
-				Collection<String> actual = new ArrayList<>( parameters.get( key ) );
+				Collection<String> actual = new ArrayList<>( request.getParameters().get( key ) );
 				Iterator<String> actualIt = actual.iterator();
 				while ( sameParameters && actualIt.hasNext() ) {
 					String next = actualIt.next();

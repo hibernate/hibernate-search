@@ -104,8 +104,7 @@ public class JavaBeanElasticsearchExtensionIT {
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		// We expect the first add to be removed due to the delete
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "2",
+		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "1",
 				"{"
 					+ "'jsonStringField': {"
 						+ "'esProperty1': 'val1'"
