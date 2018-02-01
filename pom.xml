@@ -31,6 +31,7 @@
         <module>mapper/javabean</module>
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
+        <module>sharedtestresources</module>
         <module>integrationtest</module>
         <module>reports</module>
     </modules>
@@ -374,6 +375,29 @@
                         </relativeReportDirs>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <executions>
+                        <execution>
+                            <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
+                            <!-- This will only be effective if hibernate-search-sharedtestresources is actually a project dependency -->
+                            <id>unpack-shared-test-build-resources</id>
+                            <goals>
+                                <goal>unpack-dependencies</goal>
+                            </goals>
+                            <phase>generate-test-resources</phase>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/</outputDirectory>
+                                <includeGroupIds>${project.groupId}</includeGroupIds>
+                                <includeArtifacIds>hibernate-search-sharedtestresources</includeArtifacIds>
+                                <includeTypes>zip</includeTypes>
+                                <excludeTransitive>true</excludeTransitive>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -460,6 +484,288 @@
                         </executions>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+
+        <!-- =============================== -->
+        <!-- Elasticsearch IT profiles       -->
+        <!-- =============================== -->
+        <!--
+             Different profiles are needed to handle the environment setup (which is handled in Maven,
+             on contrary to the various database profiles).
+
+             To run tests against a different version of Elasticsearch, use the appropriate profile
+             and provide the Elasticsearch version:
+
+                 mvn clean test -Pelasticsearch-2.0 -Dtest.elasticsearch.version=2.1.0
+          -->
+
+        <!-- Elasticsearch [2.0,2.2) test environment -->
+        <profile>
+            <id>elasticsearch-2.0</id>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>unpack-es-plugins</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                    <configuration>
+                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <artifactItems>
+                                            <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.plugin</groupId>
+                                                <artifactId>delete-by-query</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                            </artifactItem>
+                                        </artifactItems>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <tcpPort>9300</tcpPort>
+                                <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
+                                <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
+                                <configPath>${project.build.directory}/elasticsearch-maven-plugin/2.0/configuration/</configPath>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${test.elasticsearch.host.version}</version>
+                                </dependency>
+
+                                <!-- Groovy is in a core module named "org.elasticsearch:elasticsearch-groovy" in Elasticsearch 2.0.x and 2.1.x
+                                     Also, in ES 2.0/2.1, core modules are not located in the plugin directory as with newer versions, but are
+                                     simply expected to be in the classpath.
+                                -->
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch-groovy</artifactId>
+                                    <version>${test.elasticsearch.host.version}</version>
+                                    <type>jar</type>
+                                </dependency>
+                            </dependencies>
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>start</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 2.2+ test environment -->
+        <profile>
+            <id>elasticsearch-2.2</id>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>2.4.6</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>unpack-es-plugins</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                    </goals>
+                                    <configuration>
+                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <artifactItems>
+                                            <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.plugin</groupId>
+                                                <artifactId>delete-by-query</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                            </artifactItem>
+                                            <!-- Groovy is in a plugin named "org.elasticsearch.module:lang-groovy" in Elasticsearch 2.2+ -->
+                                            <artifactItem>
+                                                <groupId>org.elasticsearch.module</groupId>
+                                                <artifactId>lang-groovy</artifactId>
+                                                <version>${test.elasticsearch.host.version}</version>
+                                                <type>zip</type>
+                                                <overWrite>true</overWrite>
+                                                <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
+                                            </artifactItem>
+                                        </artifactItems>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <tcpPort>9300</tcpPort>
+                                <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
+                                <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
+                                <configPath>${project.build.directory}/elasticsearch-maven-plugin/2.0/configuration/</configPath>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${test.elasticsearch.host.version}</version>
+                                </dependency>
+                            </dependencies>
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>start</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 5.0/5.1 test environment -->
+        <profile>
+            <id>elasticsearch-5.0</id>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <version>${test.elasticsearch.host.version}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
+                                <autoCreateIndex>false</autoCreateIndex>
+                            </configuration>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 5.2+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-5.2</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.version</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>5.6.7</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <version>${test.elasticsearch.host.version}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
+                                <autoCreateIndex>false</autoCreateIndex>
+                            </configuration>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
 

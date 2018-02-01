@@ -1,0 +1,69 @@
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       This file overrides those reasonable settings for testing purposes
+#       and is unlikely to be suited for any other goal: do not take this as
+#       an example to run a production system.
+#
+# Please see the documentation for further information on configuration options:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html>
+#
+# ---------------------------------- Cluster -----------------------------------
+# Use a descriptive name for your cluster:
+cluster.name: hsearch-testing
+#
+# ------------------------------------ Node ------------------------------------
+# Use a descriptive name for the node:
+node.name: node-1
+
+#
+# Lock the memory on startup; requires system permissions to be effective,
+# but shouldn't be harmful when the permissions are not granted.
+bootstrap.mlockall: true
+#
+# ---------------------------------- Network -----------------------------------
+# Set the bind address to a specific IP (IPv4 or IPv6):
+network.host: 127.0.0.1
+http.port: 9200
+
+
+# --------------------------------- Discovery ----------------------------------
+# Disable discovery to speedup forming a single node cluster:
+discovery.zen.ping.multicast.enabled: false
+discovery.zen.minimum_master_nodes: 1
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html>
+
+# ---------------------------------- Gateway -----------------------------------
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html>
+
+# ---------------------------------- Various -----------------------------------
+#
+# Disable starting multiple nodes on a single system:
+#
+node.max_local_storage_nodes: 1
+
+# Additional customizations to run a singleton node:
+
+node.local: true
+index.number_of_shards: 1
+index.number_of_replicas: 0
+
+# Enable Groovy scripting support for search: useful for spatial queries
+script.engine.groovy.inline.search: on
+
+# Enable slowlogs - useful when debugging
+index.search.slowlog.level: debug
+index.search.slowlog.threshold.query.warn: 5s
+index.search.slowlog.threshold.query.info: 500s
+index.search.slowlog.threshold.query.debug: 100ms
+index.search.slowlog.threshold.query.trace: 10ms
+index.search.slowlog.threshold.fetch.warn: 1s
+index.search.slowlog.threshold.fetch.info: 200ms
+index.search.slowlog.threshold.fetch.debug: 100ms
+index.search.slowlog.threshold.fetch.trace: 10ms
+index.indexing.slowlog.level: debug
+index.indexing.slowlog.threshold.index.warn: 2s
+index.indexing.slowlog.threshold.index.info: 500s
+index.indexing.slowlog.threshold.index.debug: 100ms
+index.indexing.slowlog.threshold.index.trace: 10ms

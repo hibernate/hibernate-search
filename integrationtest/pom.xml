@@ -33,6 +33,13 @@
                 <artifactId>hibernate-search-integrationtest-util-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-sharedtestresources</artifactId>
+                <classifier>build-resources</classifier>
+                <type>zip</type>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
