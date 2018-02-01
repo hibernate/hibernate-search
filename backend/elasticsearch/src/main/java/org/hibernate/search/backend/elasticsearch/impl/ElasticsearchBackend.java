@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.io.IOException;
+
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
@@ -16,6 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.spi.Closer;
 
 
@@ -52,10 +55,6 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObject
 		return workFactory;
 	}
 
-	public ElasticsearchClient getClient() {
-		return client;
-	}
-
 	public ElasticsearchWorkOrchestrator createChangesetOrchestrator() {
 		return new StubElasticsearchWorkOrchestrator( client );
 	}
@@ -70,10 +69,12 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObject
 
 	@Override
 	public void close() {
-		// TODO use a Closer
-		try (Closer<RuntimeException> closer = new Closer<>()) {
+		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( client::close );
 			closer.push( streamOrchestrator::close );
+		}
+		catch (IOException | RuntimeException e) {
+			throw new SearchException( "Failed to shut down the Elasticsearch backend", e );
 		}
 	}
 

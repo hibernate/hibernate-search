@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -24,8 +25,9 @@ public class ElasticsearchStreamIndexWorker extends ElasticsearchIndexWorker
 
 	public ElasticsearchStreamIndexWorker(ElasticsearchWorkFactory factory,
 			ElasticsearchWorkOrchestrator orchestrator,
-			String indexName, SessionContext context) {
-		super( factory, indexName, context );
+			URLEncodedString indexName, URLEncodedString typeName,
+			SessionContext context) {
+		super( factory, indexName, typeName, context );
 		this.orchestrator = orchestrator;
 	}
 

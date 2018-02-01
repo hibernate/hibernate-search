@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -24,7 +25,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
-	private final Set<String> indexNames;
+	private final Set<URLEncodedString> indexNames;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
 	private final SearchResultExtractor<T> searchResultExtractor;
@@ -33,7 +34,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private Long maxResultsCount;
 
 	public ElasticsearchSearchQuery(ElasticsearchWorkOrchestrator queryOrchestrator,
-			ElasticsearchWorkFactory workFactory, Set<String> indexNames, Set<String> routingKeys,
+			ElasticsearchWorkFactory workFactory, Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, SearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;

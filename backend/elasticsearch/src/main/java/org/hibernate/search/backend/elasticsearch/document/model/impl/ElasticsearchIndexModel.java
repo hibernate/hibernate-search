@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 
 /**
@@ -16,12 +17,12 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.T
  */
 public class ElasticsearchIndexModel {
 
-	private final String indexName;
+	private final URLEncodedString indexName;
 	private final TypeMapping mapping;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
 
-	public ElasticsearchIndexModel(String indexName, ElasticsearchRootIndexSchemaCollectorImpl collector) {
+	public ElasticsearchIndexModel(URLEncodedString indexName, ElasticsearchRootIndexSchemaCollectorImpl collector) {
 		this.indexName = indexName;
 		this.mapping = collector.contribute( new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
@@ -36,7 +37,7 @@ public class ElasticsearchIndexModel {
 		} );
 	}
 
-	public String getIndexName() {
+	public URLEncodedString getIndexName() {
 		return indexName;
 	}
 

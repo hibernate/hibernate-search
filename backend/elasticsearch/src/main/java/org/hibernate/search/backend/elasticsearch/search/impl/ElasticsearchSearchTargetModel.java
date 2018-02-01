@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -23,7 +24,7 @@ public class ElasticsearchSearchTargetModel {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Set<String> indexNames;
+	private final Set<URLEncodedString> indexNames;
 
 	public ElasticsearchSearchTargetModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
@@ -32,7 +33,7 @@ public class ElasticsearchSearchTargetModel {
 				.collect( Collectors.toSet() );
 	}
 
-	public Set<String> getIndexNames() {
+	public Set<URLEncodedString> getIndexNames() {
 		return indexNames;
 	}
 

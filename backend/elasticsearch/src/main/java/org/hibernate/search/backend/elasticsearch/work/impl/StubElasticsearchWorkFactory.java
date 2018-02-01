@@ -7,7 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -20,66 +24,115 @@ import com.google.gson.JsonObject;
 public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
-	public ElasticsearchWork<?> createIndex(String indexName, JsonObject model) {
-		return new StubElasticsearchWork<>( "createIndex", model )
-				.addParam( "indexName", indexName );
+	public ElasticsearchWork<?> dropIndexIfExists(URLEncodedString indexName) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.delete()
+				.pathComponent( indexName );
+		return new StubElasticsearchWork<>( builder.build() );
 	}
 
 	@Override
-	public ElasticsearchWork<?> add(String indexName, String id, String routingKey, JsonObject document) {
-		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "add", document )
-				.addParam( "indexName", indexName )
-				.addParam( "id", id );
+	public ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName, JsonObject mapping) {
+		JsonObject mappingMap = new JsonObject();
+		mappingMap.add( typeName.original, mapping );
+		JsonObject payload = new JsonObject();
+		payload.add( "mappings", mappingMap );
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( indexName )
+				.body( payload );
+		return new StubElasticsearchWork<>( builder.build() );
+	}
+
+	@Override
+	public ElasticsearchWork<?> add(URLEncodedString indexName, URLEncodedString typeName,
+			String id, String routingKey, JsonObject document) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( indexName )
+				.pathComponent( typeName )
+				.pathComponent( URLEncodedString.fromString( id ) )
+				.body( document );
+		builder.param( "refresh", true );
 		if ( routingKey != null ) {
-			work.addParam( "_routing", routingKey );
+			builder.param( "_routing", routingKey );
 		}
-		return work;
+		return new StubElasticsearchWork<>( builder.build() );
 	}
 
 	@Override
-	public ElasticsearchWork<?> update(String indexName, String id, String routingKey, JsonObject document) {
-		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "update", document )
-				.addParam( "indexName", indexName )
-				.addParam( "id", id );
+	public ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName,
+			String id, String routingKey, JsonObject document) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( indexName )
+				.pathComponent( typeName )
+				.pathComponent( URLEncodedString.fromString( id ) )
+				.body( document );
+		builder.param( "refresh", true );
 		if ( routingKey != null ) {
-			work.addParam( "_routing", routingKey );
+			builder.param( "_routing", routingKey );
 		}
-		return work;
+		return new StubElasticsearchWork<>( builder.build() );
 	}
 
 	@Override
-	public ElasticsearchWork<?> delete(String indexName, String id, String routingKey) {
-		StubElasticsearchWork<?> work = new StubElasticsearchWork<>( "delete", null )
-				.addParam( "indexName", indexName )
-				.addParam( "id", id );
+	public ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName,
+			String id, String routingKey) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.delete()
+				.pathComponent( indexName )
+				.pathComponent( typeName )
+				.pathComponent( URLEncodedString.fromString( id ) );
 		if ( routingKey != null ) {
-			work.addParam( "_routing", routingKey );
+			builder.param( "_routing", routingKey );
 		}
-		return work;
+		return new StubElasticsearchWork<>( builder.build() );
 	}
 
 	@Override
-	public ElasticsearchWork<?> flush(String indexName) {
-		return new StubElasticsearchWork<>( "flush", null )
-				.addParam( "indexName", indexName );
+	public ElasticsearchWork<?> flush(URLEncodedString indexName) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( Paths._FLUSH );
+		ElasticsearchWork<?> flushWork = new StubElasticsearchWork<>( builder.build() );
+		builder = ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( Paths._REFRESH );
+		ElasticsearchWork<Object> refreshWork = new StubElasticsearchWork<>( builder.build() );
+		return context -> flushWork.execute( context )
+					.thenCompose( ignored -> refreshWork.execute( context ) );
 	}
 
 	@Override
-	public ElasticsearchWork<?> optimize(String indexName) {
-		return new StubElasticsearchWork<>( "optimize", null )
-				.addParam( "indexName", indexName );
+	public ElasticsearchWork<?> optimize(URLEncodedString indexName) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( Paths._FORCEMERGE );
+		return new StubElasticsearchWork<>( builder.build() );
 	}
 
 	@Override
-	public <T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, Set<String> routingKeys,
+	public <T> ElasticsearchWork<SearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {
-		return new StubElasticsearchWork<SearchResult<T>>( "query", payload )
-				.addParam( "indexName", indexNames )
-				.addParam( "_routing", routingKeys )
-				.addParam( "offset", offset, String::valueOf )
-				.addParam( "limit", limit, String::valueOf )
-				.setResultFunction( searchResultExtractor::extract );
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.multiValuedPathComponent( indexNames )
+				.pathComponent( Paths._SEARCH )
+				.body( payload );
+
+		if ( offset != null && limit != null ) {
+			builder.param( "from", offset );
+			builder.param( "size", limit );
+		}
+
+		if ( !routingKeys.isEmpty() ) {
+			builder.param( "_routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+		}
+
+		/* TODO scroll
+		if ( scrollSize != null && scrollTimeout != null ) {
+			builder.param( "size", scrollSize );
+			builder.param( "scroll", scrollTimeout );
+		}
+		*/
+
+		return new StubElasticsearchWork<>( builder.build(), searchResultExtractor::extract );
 	}
 
 }

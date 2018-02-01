@@ -17,9 +17,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
-import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -34,6 +31,9 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
+import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
+import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.SearchException;
 
@@ -45,6 +45,8 @@ import org.junit.rules.ExpectedException;
 
 import org.json.JSONException;
 
+import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
+import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
 import static org.hibernate.search.integrationtest.util.common.StubAssert.assertRequest;
 
 /**
@@ -64,7 +66,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 	@Before
 	public void setup() throws JSONException {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.elasticsearchBackend.type", ElasticsearchBackendFactory.class.getName() )
+				.setProperty( "backend.elasticsearchBackend.type", StubClientElasticsearchBackendFactory.class.getName() )
 				.setProperty( "backend.elasticsearchBackend.host", HOST )
 				.setProperty( "index.default.backend", "elasticsearchBackend" );
 
@@ -92,24 +94,22 @@ public class JavaBeanElasticsearchObjectFieldIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST, "createIndex", null,
+		assertDropAndCreateIndexRequests( requests, IndexedEntity.INDEX, HOST,
 				"{"
-					+ "'mapping': {"
-						+ "'properties': {"
-							+ "'flattenedTexts': {"
-								+ "'type': 'object',"
-								+ "'properties': {"
-									+ "'text': {"
-										+ "'type': 'keyword'"
-									+ "}"
+					+ "'properties': {"
+						+ "'flattenedTexts': {"
+							+ "'type': 'object',"
+							+ "'properties': {"
+								+ "'text': {"
+									+ "'type': 'keyword'"
 								+ "}"
-							+ "},"
-							+ "'nestedTexts': {"
-								+ "'type': 'nested',"
-								+ "'properties': {"
-									+ "'text': {"
-										+ "'type': 'keyword'"
-									+ "}"
+							+ "}"
+						+ "},"
+						+ "'nestedTexts': {"
+							+ "'type': 'nested',"
+							+ "'properties': {"
+								+ "'text': {"
+									+ "'type': 'keyword'"
 								+ "}"
 							+ "}"
 						+ "}"
@@ -151,7 +151,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 		}
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST, "add", "1",
+		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST, "1",
 				"{"
 					+ "'flattenedTexts': ["
 						+ "{"
@@ -179,7 +179,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 						+ "}"
 					+ "]"
 				+ "}" );
-		assertRequest( requests, IndexedEntity.INDEX, 1, HOST, "add", "2",
+		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 1, HOST, "2",
 				"{"
 					+ "'flattenedTexts': {"
 							+ "'text': ['value2', 'value3']"
@@ -188,7 +188,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 							+ "'text': ['value2', 'value3']"
 					+ "}"
 				+ "}" );
-		assertRequest( requests, IndexedEntity.INDEX, 2, HOST, "add", "3",
+		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 2, HOST, "3",
 				"{"
 				+ "}" );
 	}
@@ -214,7 +214,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		assertRequest( requests, IndexedEntity.INDEX, 0,
-				HOST, "query", null /* No ID */,
+				HOST, "POST", "/_search",
 				"{"
 					+ "'query': {"
 						+ "'nested': {"

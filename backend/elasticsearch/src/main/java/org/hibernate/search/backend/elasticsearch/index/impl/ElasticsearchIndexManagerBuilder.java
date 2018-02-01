@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.util.Arrays;
+
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaCollectorImpl;
@@ -46,18 +49,22 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	@Override
 	public ElasticsearchIndexManager build() {
-		ElasticsearchIndexModel model = new ElasticsearchIndexModel( indexName, collector );
+		URLEncodedString encodedIndexName = URLEncodedString.fromString( indexName );
+		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
+		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
+
+		ElasticsearchIndexModel model = new ElasticsearchIndexModel( encodedIndexName, collector );
 
 		Gson gson = new Gson();
 		JsonObject mappingAsJson = gson.toJsonTree( model.getMapping() ).getAsJsonObject();
-		JsonObject modelAsJson = new JsonObject();
-		modelAsJson.add( "mapping", mappingAsJson );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
-		ElasticsearchWork<?> work = backend.getWorkFactory().createIndex( indexName, modelAsJson );
-		backend.getStreamOrchestrator().submit( work );
+		ElasticsearchWork<?> dropWork = backend.getWorkFactory().dropIndexIfExists( encodedIndexName );
+		ElasticsearchWork<?> createWork = backend.getWorkFactory().createIndex( encodedIndexName, encodedTypeName, mappingAsJson );
+		backend.getStreamOrchestrator().submit( Arrays.asList( dropWork, createWork ) )
+				.join();
 
-		return new ElasticsearchIndexManager( backend, indexName, model );
+		return new ElasticsearchIndexManager( backend, encodedIndexName, encodedTypeName, model );
 	}
 
 }

@@ -25,14 +25,14 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient.Request;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.mapper.orm.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.integrationtest.util.orm.OrmUtils;
+import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
+import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
+import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -41,7 +41,8 @@ import org.junit.Test;
 
 import org.json.JSONException;
 
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertRequest;
+import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
+import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
 
 /**
  * @author Yoann Rodiere
@@ -58,9 +59,9 @@ public class OrmElasticsearchAccessTypeIT {
 	@Before
 	public void setup() throws JSONException {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
+				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", StubClientElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "backend.elasticsearchBackend_1.host", HOST_1 )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_2.type", ElasticsearchBackendFactory.class.getName() )
+				.applySetting( PREFIX + "backend.elasticsearchBackend_2.type", StubClientElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "backend.elasticsearchBackend_2.host", HOST_2 )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
@@ -82,60 +83,56 @@ public class OrmElasticsearchAccessTypeIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "createIndex", null,
+		assertDropAndCreateIndexRequests( requests, IndexedEntity.INDEX, HOST_1,
 				"{"
-					+ "'mapping': {"
-						+ "'properties': {"
-							+ "'fieldWithNonDefaultFieldAccess': {"
-								+ "'type': 'keyword'"
-							+ "},"
-							+ "'fieldWithDefaultFieldAccess': {"
+					+ "'properties': {"
+						+ "'fieldWithNonDefaultFieldAccess': {"
 							+ "'type': 'keyword'"
-							+ "},"
-							+ "'fieldWithNonDefaultMethodAccess': {"
-								+ "'type': 'keyword'"
-							+ "},"
-							+ "'fieldWithDefaultMethodAccess': {"
-								+ "'type': 'keyword'"
-							+ "},"
-							+ "'embeddedWithDefaultFieldAccess': {"
-								+ "'type': 'object',"
-								+ "'properties': {"
-									+ "'fieldWithDefaultFieldAccess': {"
-										+ "'type': 'keyword'"
-									+ "},"
-									+ "'fieldWithNonDefaultMethodAccess': {"
-										+ "'type': 'keyword'"
-									+ "}"
+						+ "},"
+						+ "'fieldWithDefaultFieldAccess': {"
+						+ "'type': 'keyword'"
+						+ "},"
+						+ "'fieldWithNonDefaultMethodAccess': {"
+							+ "'type': 'keyword'"
+						+ "},"
+						+ "'fieldWithDefaultMethodAccess': {"
+							+ "'type': 'keyword'"
+						+ "},"
+						+ "'embeddedWithDefaultFieldAccess': {"
+							+ "'type': 'object',"
+							+ "'properties': {"
+								+ "'fieldWithDefaultFieldAccess': {"
+									+ "'type': 'keyword'"
+								+ "},"
+								+ "'fieldWithNonDefaultMethodAccess': {"
+									+ "'type': 'keyword'"
 								+ "}"
-							+ "},"
-							+ "'embeddedWithDefaultMethodAccess': {"
-								+ "'type': 'object',"
-								+ "'properties': {"
-									+ "'fieldWithNonDefaultFieldAccess': {"
-										+ "'type': 'keyword'"
-									+ "},"
-									+ "'fieldWithDefaultMethodAccess': {"
-										+ "'type': 'keyword'"
-									+ "}"
+							+ "}"
+						+ "},"
+						+ "'embeddedWithDefaultMethodAccess': {"
+							+ "'type': 'object',"
+							+ "'properties': {"
+								+ "'fieldWithNonDefaultFieldAccess': {"
+									+ "'type': 'keyword'"
+								+ "},"
+								+ "'fieldWithDefaultMethodAccess': {"
+									+ "'type': 'keyword'"
 								+ "}"
-							+ "},"
-							+ "'nonManaged': {"
-								+ "'type': 'object',"
-								+ "'properties': {"
-									+ "'field': {"
-										+ "'type': 'keyword'"
-									+ "}"
+							+ "}"
+						+ "},"
+						+ "'nonManaged': {"
+							+ "'type': 'object',"
+							+ "'properties': {"
+								+ "'field': {"
+									+ "'type': 'keyword'"
 								+ "}"
 							+ "}"
 						+ "}"
 					+ "}"
 				+ "}" );
 
-		assertRequest( requests, IndexedEntityWithoutIdSetter.INDEX, 0, HOST_1, "createIndex", null,
+		assertDropAndCreateIndexRequests( requests, IndexedEntityWithoutIdSetter.INDEX, HOST_1,
 				"{"
-					+ "'mapping': {"
-					+ "}"
 				+ "}" );
 	}
 
@@ -176,7 +173,7 @@ public class OrmElasticsearchAccessTypeIT {
 
 		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
 		// We expect the first add to be removed due to the delete
-		assertRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "add", "1",
+		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "1",
 				"{"
 					+ "'fieldWithNonDefaultFieldAccess': 'nonDefaultFieldAccess',"
 					+ "'fieldWithDefaultFieldAccess': 'defaultFieldAccess',"

@@ -75,7 +75,7 @@ class SearchQueryFactoryImpl
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				HitExtractor<? super ProjectionHitCollector> indexHitExtractor =
 						createProjectionHitExtractor( indexModel, projections, projectionFound );
-				extractorByIndex.put( indexModel.getIndexName(), indexHitExtractor );
+				extractorByIndex.put( indexModel.getIndexName().original, indexHitExtractor );
 			}
 			hitExtractor = new IndexSensitiveHitExtractor<>( extractorByIndex );
 		}

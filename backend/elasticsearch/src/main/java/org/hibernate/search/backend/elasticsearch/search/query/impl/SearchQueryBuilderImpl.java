@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -27,7 +28,7 @@ class SearchQueryBuilderImpl<C, T>
 
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
-	private final Set<String> indexNames;
+	private final Set<URLEncodedString> indexNames;
 	private final Set<String> routingKeys;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
@@ -36,7 +37,7 @@ class SearchQueryBuilderImpl<C, T>
 	public SearchQueryBuilderImpl(
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			ElasticsearchWorkFactory workFactory,
-			Set<String> indexNames,
+			Set<URLEncodedString> indexNames,
 			SessionContext context,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {

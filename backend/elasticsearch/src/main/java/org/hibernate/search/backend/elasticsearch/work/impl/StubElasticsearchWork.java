@@ -6,16 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.StubElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchResponse;
 
 import com.google.gson.JsonObject;
 
@@ -24,50 +19,28 @@ import com.google.gson.JsonObject;
  */
 public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
 
-	private final String workType;
+	private final ElasticsearchRequest request;
 
-	private final JsonObject document;
+	private final Function<JsonObject, T> resultFunction;
 
-	private final Map<String, List<String>> parameters;
-
-	private Function<JsonObject, T> resultFunction = ignored -> null;
-
-	public StubElasticsearchWork(String workType, JsonObject document) {
-		super();
-		this.workType = workType;
-		this.document = document;
-		this.parameters = new LinkedHashMap<>();
+	public StubElasticsearchWork(ElasticsearchRequest request) {
+		this( request, ignored -> null );
 	}
 
-	public StubElasticsearchWork<T> addParam(String name, String value) {
-		if ( value != null ) {
-			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( value );
-		}
-		return this;
-	}
-
-	public <U> StubElasticsearchWork<T> addParam(String name, U value, Function<U, String> renderer) {
-		if ( value != null ) {
-			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).add( renderer.apply( value ) );
-		}
-		return this;
-	}
-
-	public StubElasticsearchWork<T> addParam(String name, Collection<String> values) {
-		if ( values != null && values.stream().anyMatch( Objects::nonNull ) ) {
-			parameters.computeIfAbsent( name, ignored -> new ArrayList<>() ).addAll( values );
-		}
-		return this;
-	}
-
-	public StubElasticsearchWork<T> setResultFunction(Function<JsonObject, T> resultFunction) {
+	public StubElasticsearchWork(ElasticsearchRequest request, Function<JsonObject, T> resultFunction) {
+		this.request = request;
 		this.resultFunction = resultFunction;
-		return this;
 	}
 
 	@Override
 	public CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context) {
-		return ((StubElasticsearchClient) context.getClient()).execute( workType, parameters, document, resultFunction );
+		CompletableFuture<ElasticsearchResponse> response = context.getClient().submit( request );
+		if ( resultFunction != null ) {
+			return response.thenApply( ElasticsearchResponse::getBody ).thenApply( resultFunction );
+		}
+		else {
+			return response.thenApply( r -> null );
+		}
 	}
 
 }

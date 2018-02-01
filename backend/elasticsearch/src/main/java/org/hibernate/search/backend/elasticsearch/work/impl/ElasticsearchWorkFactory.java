@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -16,21 +17,24 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
+// TODO restore the full work factory from Search 5
 public interface ElasticsearchWorkFactory {
 
-	ElasticsearchWork<?> createIndex(String indexName, JsonObject model);
+	ElasticsearchWork<?> dropIndexIfExists(URLEncodedString indexName);
 
-	ElasticsearchWork<?> add(String indexName, String id, String routingKey, JsonObject document);
+	ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName, JsonObject mapping);
 
-	ElasticsearchWork<?> update(String indexName, String id, String routingKey, JsonObject document);
+	ElasticsearchWork<?> add(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
 
-	ElasticsearchWork<?> delete(String indexName, String id, String routingKey);
+	ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
 
-	ElasticsearchWork<?> flush(String indexName);
+	ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey);
 
-	ElasticsearchWork<?> optimize(String indexName);
+	ElasticsearchWork<?> flush(URLEncodedString indexName);
 
-	<T> ElasticsearchWork<SearchResult<T>> search(Set<String> indexNames, Set<String> routingKeys,
+	ElasticsearchWork<?> optimize(URLEncodedString indexName);
+
+	<T> ElasticsearchWork<SearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);
 

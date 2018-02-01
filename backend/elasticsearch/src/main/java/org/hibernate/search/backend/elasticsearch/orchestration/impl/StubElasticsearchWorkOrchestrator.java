@@ -11,30 +11,51 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.util.spi.Futures;
 
 
 /**
+ * A simplistic, badly performing orchestrator that just executes works one after another.
+ *
  * @author Yoann Rodiere
  */
 public class StubElasticsearchWorkOrchestrator implements ElasticsearchWorkOrchestrator {
 
 	private final StubElasticsearchWorkExecutionContext context;
 
+	// Protected by synchronization on updates
+	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
+
 	public StubElasticsearchWorkOrchestrator(ElasticsearchClient client) {
 		this.context = new StubElasticsearchWorkExecutionContext( client );
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		return work.execute( context );
+	public void close() {
+		latestFuture.join();
 	}
 
 	@Override
-	public CompletableFuture<?> submit(List<ElasticsearchWork<?>> works) {
+	public synchronized <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
+		// Ignore errors in unrelated changesets
+		latestFuture = latestFuture.exceptionally( ignore -> null );
+		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
+				ignored -> work.execute( context )
+		) );
+		latestFuture = future;
+		return future;
+	}
+
+	@Override
+	public synchronized CompletableFuture<?> submit(List<ElasticsearchWork<?>> works) {
+		// Ignore errors in unrelated changesets
+		latestFuture = latestFuture.exceptionally( ignore -> null );
 		for ( ElasticsearchWork<?> work : works ) {
-			work.execute( context );
+			latestFuture = latestFuture.thenCompose( Futures.safeComposer(
+					ignored -> work.execute( context )
+			) );
 		}
-		return CompletableFuture.completedFuture( null );
+		return latestFuture;
 	}
 
 }

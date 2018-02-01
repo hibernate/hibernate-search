@@ -45,6 +45,7 @@
         <jbossLoggingProcessorVersion>2.0.1.Final</jbossLoggingProcessorVersion>
         <h2Version>1.4.178</h2Version>
         <hibernateVersion>5.2.10.Final</hibernateVersion>
+        <elasticsearchClientVersion>5.6.6</elasticsearchClientVersion>
     </properties>
 
     <dependencyManagement>
@@ -114,6 +115,16 @@
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>5.0.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${elasticsearchClientVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client-sniffer</artifactId>
+                <version>${elasticsearchClientVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
