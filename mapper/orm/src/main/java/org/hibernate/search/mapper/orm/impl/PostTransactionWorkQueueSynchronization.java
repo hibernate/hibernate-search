@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.impl;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
@@ -45,7 +46,13 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
 				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
-				worker.execute();
+				CompletableFuture<?> future = worker.execute();
+				/*
+				 * TODO decide whether we want the sync/async setting to be scoped per index,
+				 * or per EntityManager/SearchManager, or both (with one scope overriding the other).
+				 * See also PojoSearchManagerImpl#close, InTransactionWorkQueueSynchronization#beforeCompletion
+				 */
+				future.join();
 			}
 			else {
 				log.tracef(

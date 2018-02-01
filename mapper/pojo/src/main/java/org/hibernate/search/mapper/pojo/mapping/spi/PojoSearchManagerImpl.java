@@ -61,6 +61,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 			/*
 			 * TODO decide whether we want the sync/async setting to be scoped per index,
 			 * or per EntityManager/SearchManager, or both (with one scope overriding the other)
+			 * See also PostTransactionWorkQueueSynchronization#afterCompletion, InTransactionWorkQueueSynchronization#beforeCompletion
 			 */
 			future.join();
 		}
