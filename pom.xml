@@ -2193,7 +2193,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.6.5</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>5.6.7</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
