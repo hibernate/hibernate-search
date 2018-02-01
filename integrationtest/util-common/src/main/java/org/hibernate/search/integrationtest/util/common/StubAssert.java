@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
 
 import org.junit.Assert;
@@ -84,12 +85,14 @@ public final class StubAssert {
 
 	private static Request getRequestInQueue(Map<String, List<Request>> requestQueuesByIndex,
 			String indexName, int workPositionInQueue) {
-		List<Request> queue = requestQueuesByIndex.get( indexName );
+		String normalizedIndexName = ElasticsearchIndexNameNormalizer.normalize( indexName );
+		List<Request> queue = requestQueuesByIndex.get( normalizedIndexName );
 		Request request = null;
 		if ( queue != null && queue.size() > workPositionInQueue ) {
 			request = queue.get( workPositionInQueue );
 		}
-		assertNotNull( "No request found in queue for index '" + indexName + "' at position '" + workPositionInQueue + "'", queue );
+		assertNotNull( "No request found in queue for index '" + normalizedIndexName
+				+ "' at position '" + workPositionInQueue + "'", queue );
 		return request;
 	}
 
@@ -105,7 +108,8 @@ public final class StubAssert {
 	public static void assertRequest(Request request, Collection<String> indexNames, String host, String method,
 			String pathAfterIndexPathComponent, Consumer<BiConsumer<String, String>> params, String body) throws JSONException {
 		assertEquals( host, request.getHost() );
-		assertThat( request.getIndexNames() ).containsOnly( indexNames.toArray() );
+		assertThat( request.getIndexNames() )
+				.containsOnly( indexNames.stream().map( ElasticsearchIndexNameNormalizer::normalize ).toArray() );
 		assertEquals( method, request.getMethod() );
 		assertEquals( pathAfterIndexPathComponent, request.getPathAfterIndexPathComponent() );
 

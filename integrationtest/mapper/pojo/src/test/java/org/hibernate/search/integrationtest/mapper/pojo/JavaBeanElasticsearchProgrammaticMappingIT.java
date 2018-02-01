@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -369,11 +370,11 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 							+ "'total': 6,"
 							+ "'hits': ["
 								+ "{"
-									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
 									+ "'_id': '0'"
 								+ "},"
 								+ "{"
-									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
 									+ "'_id': '1'"
 								+ "}"
 							+ "]"
@@ -496,11 +497,11 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
-									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
 									+ "'_id': '0'"
 								+ "},"
 								+ "{"
-									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
 									+ "'_id': '1'"
 								+ "}"
 							+ "]"
@@ -591,7 +592,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 							+ "'total': 2,"
 							+ "'hits': ["
 								+ "{"
-									+ "'_index': '" + IndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
 									+ "'_id': '0',"
 									+ "_source: {"
 										+ "'myLocalDateField': '2017-11-01',"
@@ -600,7 +601,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 									+ "}"
 								+ "},"
 								+ "{"
-									+ "'_index': '" + YetAnotherIndexedEntity.INDEX + "',"
+									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
 									+ "'_id': '1',"
 									+ "_source: {"
 										+ "'myLocalDateField': '2017-11-02'"
@@ -617,14 +618,20 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 									"text1",
 									new PojoReferenceImpl( IndexedEntity.class, 0 ),
 									LocalDate.of( 2017, 11, 1 ),
-									new ElasticsearchDocumentReference( IndexedEntity.INDEX, "0" ),
+									new ElasticsearchDocumentReference(
+											ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ),
+											"0"
+									),
 									"text2"
 							),
 							Arrays.asList(
 									null,
 									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
 									LocalDate.of( 2017, 11, 2 ),
-									new ElasticsearchDocumentReference( YetAnotherIndexedEntity.INDEX, "1" ),
+									new ElasticsearchDocumentReference(
+											ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ),
+											"1"
+									),
 									null
 							)
 					);

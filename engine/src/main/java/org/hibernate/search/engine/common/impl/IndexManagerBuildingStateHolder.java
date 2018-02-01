@@ -17,22 +17,21 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexModelBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
-import org.hibernate.search.util.SearchException;
 
 
 /**
  * @author Yoann Rodiere
  */
 // TODO close every backend built so far (which should close index managers) in case of failure
-public class IndexManagerBuildingStateHolder {
+class IndexManagerBuildingStateHolder {
 
 	private static final ConfigurationProperty<Optional<String>> INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( "backend" ).asString().build();
@@ -45,7 +44,7 @@ public class IndexManagerBuildingStateHolder {
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
 	private final Map<String, Backend<?>> backendsByName = new HashMap<>();
-	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
+	private final Map<String, IndexManagerBuildingState<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	public IndexManagerBuildingStateHolder(BuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
@@ -54,40 +53,33 @@ public class IndexManagerBuildingStateHolder {
 		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
 	}
 
-	public IndexManagerBuildingState<?> startBuilding(String indexName, IndexableTypeOrdering typeOrdering) {
-		return indexManagerBuildingStateByName.compute(
-				indexName,
-				(k, v) -> {
-					if ( v == null ) {
-						ConfigurationPropertySource indexPropertySource = propertySource.withMask("index." + indexName )
-								.withFallback( defaultIndexPropertySource );
-						return createIndexManagerBuildingState( indexName, indexPropertySource, typeOrdering );
-					}
-					else {
-						throw new SearchException( "Multiple entity mappings target the same index, which is forbidden" );
-					}
-				} );
-	}
-
-	private IndexMappingBuildingStateImpl<?> createIndexManagerBuildingState(
-			String indexName, ConfigurationPropertySource indexPropertySource, IndexableTypeOrdering typeOrdering) {
+	public IndexManagerBuildingState<?> startBuilding(String rawIndexName, IndexableTypeOrdering typeOrdering) {
+		ConfigurationPropertySource indexPropertySource = propertySource.withMask("index." + rawIndexName )
+				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
 		Backend<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
-		return createIndexManagerBuildingState( backend, indexName, indexPropertySource, typeOrdering );
+		String normalizedIndexName = backend.normalizeIndexName( rawIndexName );
+
+		IndexManagerBuildingState<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
+		if ( state == null ) {
+			state = createIndexManagerBuildingState( backend, normalizedIndexName, indexPropertySource, typeOrdering );
+			indexManagerBuildingStateByName.put( normalizedIndexName, state );
+		}
+		return state;
 	}
 
 	public Map<String, Backend<?>> getBackendsByName() {
 		return backendsByName;
 	}
 
-	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
-			Backend<D> backend, String indexName, ConfigurationPropertySource indexPropertySource,
+	private <D extends DocumentElement> IndexManagerBuildingState<D> createIndexManagerBuildingState(
+			Backend<D> backend, String normalizedIndexName, ConfigurationPropertySource indexPropertySource,
 			IndexableTypeOrdering typeOrdering) {
-		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, buildContext, indexPropertySource );
+		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, buildContext, indexPropertySource );
 		IndexSchemaCollector schemaCollector = builder.getSchemaCollector();
 		IndexModelBindingContext bindingContext = new IndexModelBindingContextImpl( schemaCollector, typeOrdering );
-		return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
+		return new IndexMappingBuildingStateImpl<>( normalizedIndexName, builder, bindingContext );
 	}
 
 	private Backend<?> createBackend(String backendName) {

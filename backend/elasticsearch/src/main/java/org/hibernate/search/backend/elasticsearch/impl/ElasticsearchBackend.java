@@ -46,6 +46,11 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObject
 	}
 
 	@Override
+	public String normalizeIndexName(String rawIndexName) {
+		return ElasticsearchIndexNameNormalizer.normalize( rawIndexName );
+	}
+
+	@Override
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
 			String name, BuildContext context, ConfigurationPropertySource propertySource) {
 		return new ElasticsearchIndexManagerBuilder( this, name, context, propertySource );
