@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
@@ -131,7 +132,8 @@ public final class ConvertUtils {
 			return Optional.of( result );
 		}
 		else if ( value instanceof String ) {
-			List<T> result = separatorPattern.splitAsStream( (String) value )
+			List<T> result = optionalTrimmedNonEmpty( (String) value )
+					.map( separatorPattern::splitAsStream ).orElse( Stream.empty() )
 					.map( elementConverter )
 					.filter( Optional::isPresent )
 					.map( Optional::get )
