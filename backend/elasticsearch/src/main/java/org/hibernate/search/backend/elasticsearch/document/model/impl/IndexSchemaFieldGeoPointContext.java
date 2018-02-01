@@ -28,6 +28,7 @@ class IndexSchemaFieldGeoPointContext extends AbstractScalarFieldTypedContext<Ge
 	private final String relativeName;
 
 	public IndexSchemaFieldGeoPointContext(String relativeName) {
+		super( relativeName, DataType.GEO_POINT );
 		this.relativeName = relativeName;
 	}
 
@@ -41,7 +42,6 @@ class IndexSchemaFieldGeoPointContext extends AbstractScalarFieldTypedContext<Ge
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setType( DataType.GEO_POINT );
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, node );

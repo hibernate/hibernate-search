@@ -6,19 +6,44 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchIndexSchemaFieldTypedContext<T> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final String relativeName;
+	private final DataType dataType;
+	private String analyzerName;
+	private String normalizerName;
 	private Store store = Store.DEFAULT;
 
-	public AbstractScalarFieldTypedContext() {
+	public AbstractScalarFieldTypedContext(String relativeName, DataType dataType) {
+		this.relativeName = relativeName;
+		this.dataType = dataType;
+	}
+
+	@Override
+	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
+		this.analyzerName = analyzerName;
+		return this;
+	}
+
+	@Override
+	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
+		this.normalizerName = normalizerName;
+		return this;
 	}
 
 	@Override
@@ -33,6 +58,15 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
+
+		mapping.setType( dataType );
+
+		if ( analyzerName != null ) {
+			throw log.cannotUseAnalyzerOnFieldType( parentNode.getAbsolutePath( relativeName ), dataType );
+		}
+		if ( normalizerName != null ) {
+			throw log.cannotUseNormalizerOnFieldType( parentNode.getAbsolutePath( relativeName ), dataType );
+		}
 
 		// TODO set docvalues if sortable
 
@@ -51,4 +85,5 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 
 		return mapping;
 	}
+
 }

@@ -50,6 +50,7 @@ class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<L
 	private final LocalDateFieldFormatter formatter = DEFAULT_FORMATTER; // TODO add method to allow customization
 
 	public IndexSchemaFieldLocalDateContext(String relativeName) {
+		super( relativeName, DataType.DATE );
 		this.relativeName = relativeName;
 	}
 
@@ -63,10 +64,10 @@ class IndexSchemaFieldLocalDateContext extends AbstractScalarFieldTypedContext<L
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setType( DataType.DATE );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );
+
 		collector.collect( absolutePath, node );
 
 		return mapping;

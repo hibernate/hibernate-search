@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -64,6 +65,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 11, value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
 			+ " Given sort was: '%1$s'" )
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
+
+	@Message(id = 12, value = "An analyzer was set on field '%1$s' of type '%2$s', but fields of this type cannot be analyzed." )
+	SearchException cannotUseAnalyzerOnFieldType(String fieldName, DataType fieldType);
+
+	@Message(id = 13, value = "A normalizer was set on field '%1$s' of type '%2$s', but fields of this type cannot be analyzed." )
+	SearchException cannotUseNormalizerOnFieldType(String fieldName, DataType fieldType);
 
 	// -----------------------
 	// Pre-existing messages

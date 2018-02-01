@@ -275,7 +275,12 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 			if ( !Store.DEFAULT.equals( annotation.store() ) ) {
 				context.store( annotation.store() );
 			}
-			// TODO handle analyzer, etc.
+			if ( !annotation.analyzer().isEmpty() ) {
+				context.analyzer( annotation.analyzer() );
+			}
+			if ( !annotation.normalizer().isEmpty() ) {
+				context.normalizer( annotation.normalizer() );
+			}
 		}
 	}
 }

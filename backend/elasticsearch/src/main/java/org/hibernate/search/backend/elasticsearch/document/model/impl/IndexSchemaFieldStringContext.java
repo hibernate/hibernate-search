@@ -26,10 +26,24 @@ import com.google.gson.JsonPrimitive;
 class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
 	private final String relativeName;
+	private String analyzerName;
+	private String normalizerName;
 	private Store store = Store.DEFAULT;
 
 	public IndexSchemaFieldStringContext(String relativeName) {
 		this.relativeName = relativeName;
+	}
+
+	@Override
+	public IndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+		this.analyzerName = analyzerName;
+		return this;
+	}
+
+	@Override
+	public IndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+		this.normalizerName = normalizerName;
+		return this;
 	}
 
 	@Override
@@ -48,14 +62,16 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
-		if ( false ) {
+		// TODO Use sub-fields? (but in that case, adjust projections accordingly)
+		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
+			mapping.setAnalyzer( analyzerName );
 
 			// TODO set fielddata if sortable
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
+			mapping.setNormalizer( normalizerName );
 
 			// TODO set docvalues if sortable
 		}

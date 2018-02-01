@@ -13,6 +13,10 @@ public interface IndexSchemaFieldTypedContext<T> extends IndexSchemaFieldTermina
 
 	// TODO add common options: stored, sortable, ...
 
+	IndexSchemaFieldTypedContext<T> analyzer(String analyzerName);
+
+	IndexSchemaFieldTypedContext<T> normalizer(String normalizerName);
+
 	IndexSchemaFieldTypedContext<T> store(Store store);
 
 }

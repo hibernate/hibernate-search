@@ -26,6 +26,7 @@ class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Int
 	private final String relativeName;
 
 	public IndexSchemaFieldIntegerContext(String relativeName) {
+		super( relativeName, DataType.INTEGER );
 		this.relativeName = relativeName;
 	}
 
@@ -39,7 +40,6 @@ class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Int
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setType( DataType.INTEGER );
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );
 		collector.collect( absolutePath, node );
