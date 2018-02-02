@@ -63,7 +63,7 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		outerObject.add( "bool", getInnerObject() );
-		collector.collect( outerObject );
+		collector.collectPredicate( outerObject );
 	}
 
 }

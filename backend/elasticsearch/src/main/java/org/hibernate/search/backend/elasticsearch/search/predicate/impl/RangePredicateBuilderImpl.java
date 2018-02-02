@@ -76,7 +76,7 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		middleObject.add( fieldName, innerObject );
 		outerObject.add( "range", middleObject );
 
-		collector.collect( outerObject );
+		collector.collectPredicate( outerObject );
 	}
 
 }

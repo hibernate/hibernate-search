@@ -11,10 +11,12 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
 /**
  * The target context during a search, aware of the targeted indexes and of the underlying technology (backend).
+ *
+ * @param <C> The type of query element collector
  */
 public interface SearchTargetContext<C> {
 
-	SearchPredicateFactory<C> getSearchPredicateFactory();
+	SearchPredicateFactory<? super C> getSearchPredicateFactory();
 
 	SearchQueryFactory<C> getSearchQueryFactory();
 

@@ -15,11 +15,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
@@ -31,7 +31,8 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
-class SearchQueryFactoryImpl implements SearchQueryFactory<ElasticsearchSearchPredicateCollector> {
+class SearchQueryFactoryImpl
+		implements SearchQueryFactory<ElasticsearchSearchQueryElementCollector> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -49,7 +50,7 @@ class SearchQueryFactoryImpl implements SearchQueryFactory<ElasticsearchSearchPr
 	}
 
 	@Override
-	public <R, O> SearchQueryBuilder<O, ElasticsearchSearchPredicateCollector> asObjects(
+	public <R, O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObjects(
 			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
 			HitAggregator<LoadingHitCollector<R>, List<O>> hitAggregator) {
 		HitExtractor<LoadingHitCollector<? super R>> hitExtractor =
@@ -58,7 +59,7 @@ class SearchQueryFactoryImpl implements SearchQueryFactory<ElasticsearchSearchPr
 	}
 
 	@Override
-	public <R, T> SearchQueryBuilder<T, ElasticsearchSearchPredicateCollector> asReferences(
+	public <R, T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
 			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
 			HitAggregator<HitCollector<R>, List<T>> hitAggregator) {
 		HitExtractor<HitCollector<? super R>> hitExtractor =
@@ -67,7 +68,7 @@ class SearchQueryFactoryImpl implements SearchQueryFactory<ElasticsearchSearchPr
 	}
 
 	@Override
-	public <R, T> SearchQueryBuilder<T, ElasticsearchSearchPredicateCollector> asProjections(
+	public <R, T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjections(
 			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
 			HitAggregator<ProjectionHitCollector<R>, List<T>> hitAggregator, String... projections) {
 		BitSet projectionFound = new BitSet( projections.length );

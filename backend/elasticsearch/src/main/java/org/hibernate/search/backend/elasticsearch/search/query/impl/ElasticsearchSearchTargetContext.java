@@ -11,16 +11,18 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
-public class ElasticsearchSearchTargetContext implements SearchTargetContext<ElasticsearchSearchPredicateCollector> {
+public class ElasticsearchSearchTargetContext
+		implements SearchTargetContext<ElasticsearchSearchQueryElementCollector> {
 
 	private final SearchPredicateFactory<ElasticsearchSearchPredicateCollector> searchPredicateFactory;
-	private final SearchQueryFactory<ElasticsearchSearchPredicateCollector> searchQueryFactory;
+	private final SearchQueryFactory<ElasticsearchSearchQueryElementCollector> searchQueryFactory;
 
 	public ElasticsearchSearchTargetContext(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( indexModels );
@@ -36,7 +38,7 @@ public class ElasticsearchSearchTargetContext implements SearchTargetContext<Ela
 	}
 
 	@Override
-	public SearchQueryFactory<ElasticsearchSearchPredicateCollector> getSearchQueryFactory() {
+	public SearchQueryFactory<ElasticsearchSearchQueryElementCollector> getSearchQueryFactory() {
 		return searchQueryFactory;
 	}
 }

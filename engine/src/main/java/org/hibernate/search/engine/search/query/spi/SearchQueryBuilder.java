@@ -14,11 +14,11 @@ import org.hibernate.search.engine.search.SearchQuery;
  * A builder for search queries.
  *
  * @param <T> The type of query results
- * @param <C> The type of predicate collector
+ * @param <C> The type of query element collector
  */
 public interface SearchQueryBuilder<T, C> {
 
-	C getPredicateCollector();
+	C getQueryElementCollector();
 
 	void addRoutingKey(String routingKey);
 

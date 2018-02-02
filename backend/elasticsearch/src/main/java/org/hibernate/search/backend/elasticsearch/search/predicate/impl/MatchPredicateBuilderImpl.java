@@ -41,7 +41,7 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( fieldName, getInnerObject() );
 		outerObject.add( "match", middleObject );
-		collector.collect( outerObject );
+		collector.collectPredicate( outerObject );
 	}
 
 }

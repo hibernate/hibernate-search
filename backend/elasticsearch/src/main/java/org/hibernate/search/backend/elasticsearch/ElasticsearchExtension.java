@@ -13,12 +13,12 @@ import org.hibernate.search.engine.backend.document.model.spi.FieldModelExtensio
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateContainerContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 

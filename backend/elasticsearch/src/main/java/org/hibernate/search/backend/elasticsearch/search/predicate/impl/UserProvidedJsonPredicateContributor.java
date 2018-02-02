@@ -21,7 +21,7 @@ class UserProvidedJsonPredicateContributor implements SearchPredicateContributor
 
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
-		collector.collect( json );
+		collector.collectPredicate( json );
 	}
 
 }

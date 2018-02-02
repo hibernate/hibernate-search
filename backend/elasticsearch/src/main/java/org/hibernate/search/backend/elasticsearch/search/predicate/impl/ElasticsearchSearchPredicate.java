@@ -22,7 +22,7 @@ class ElasticsearchSearchPredicate
 
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
-		collector.collect( jsonObject );
+		collector.collectPredicate( jsonObject );
 	}
 
 }

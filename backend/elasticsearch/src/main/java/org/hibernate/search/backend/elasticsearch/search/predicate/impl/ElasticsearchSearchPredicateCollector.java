@@ -21,6 +21,6 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchSearchPredicateCollector {
 
-	void collect(JsonObject jsonQuery);
+	void collectPredicate(JsonObject jsonQuery);
 
 }

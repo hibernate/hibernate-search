@@ -42,7 +42,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		JsonObject innerObject = getInnerObject();
 		PATH.set( innerObject, fieldName );
 		outerObject.add( "nested", getInnerObject() );
-		collector.collect( outerObject );
+		collector.collectPredicate( outerObject );
 	}
 
 }

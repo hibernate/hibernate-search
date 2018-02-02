@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.DocumentReference;
  * This is the main entry point for the engine
  * to ask the backend to build search queries.
  *
- * @param <C> The type of predicate collector
+ * @param <C> The type of query element collector
  */
 public interface SearchQueryFactory<C> {
 
