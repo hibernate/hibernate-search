@@ -11,27 +11,27 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonState.FieldSetContext<C>>
 		implements SearchPredicateContributor<C> {
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchPredicateFactory<C> factory;
 
 	private final Supplier<N> nextContextProvider;
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	public MultiFieldPredicateCommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-		this.targetContext = targetContext;
+	public MultiFieldPredicateCommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
 
-	public SearchTargetContext<C> getTargetContext() {
-		return targetContext;
+	public SearchPredicateFactory<C> getFactory() {
+		return factory;
 	}
 
 	public void add(F fieldSetContext) {
@@ -53,7 +53,7 @@ class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonSt
 			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
-			BooleanJunctionPredicateBuilder<C> boolBuilder = targetContext.getSearchPredicateFactory().bool();
+			BooleanJunctionPredicateBuilder<C> boolBuilder = factory.bool();
 			C shouldCollector = boolBuilder.getShouldCollector();
 			predicateBuilders.forEach( b -> b.contribute( shouldCollector ) );
 			boolBuilder.contribute( collector );

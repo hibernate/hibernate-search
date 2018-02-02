@@ -11,16 +11,16 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, SearchPredicateContributor<C> {
 
 	private final MatchPredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public MatchPredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( targetContext, nextContextProvider );
+	public MatchPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
 	@Override

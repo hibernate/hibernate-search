@@ -12,30 +12,52 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSingleSearchPredicateCollector;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.util.spi.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-// TODO have one version of the clause factory per dialect, if necessary
-public class SearchPredicateFactoryImpl implements SearchPredicateFactory<ElasticsearchSearchPredicateCollector> {
+// TODO have one version of the factory per dialect, if necessary
+public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class );
+
+	private static final Gson GSON = new GsonBuilder().create();
 
 	private final Collection<ElasticsearchIndexModel> indexModels;
 
 	public SearchPredicateFactoryImpl(Collection<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
+	}
+
+	@Override
+	public SearchPredicate toSearchPredicate(SearchPredicateContributor<ElasticsearchSearchPredicateCollector> contributor) {
+		ElasticsearchSingleSearchPredicateCollector collector = new ElasticsearchSingleSearchPredicateCollector();
+		contributor.contribute( collector );
+		return new ElasticsearchSearchPredicate( collector.toJson() );
+	}
+
+	@Override
+	public SearchPredicateContributor<ElasticsearchSearchPredicateCollector> toContributor(SearchPredicate predicate) {
+		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
+		}
+		return (ElasticsearchSearchPredicate) predicate;
 	}
 
 	@Override
@@ -57,6 +79,11 @@ public class SearchPredicateFactoryImpl implements SearchPredicateFactory<Elasti
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateCollector> nested(String absoluteFieldPath) {
 		checkNestedField( absoluteFieldPath );
 		return new NestedPredicateBuilderImpl( absoluteFieldPath );
+	}
+
+	@Override
+	public SearchPredicateContributor<ElasticsearchSearchPredicateCollector> fromJsonString(String jsonString) {
+		return new UserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private ElasticsearchFieldFormatter getFormatter(String absoluteFieldPath) {

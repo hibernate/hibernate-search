@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * The context used when defining a boolean junction, allowing in particular to add clauses.

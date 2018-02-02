@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -20,9 +20,9 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetPredicateRootContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchTargetPredicateRootContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
 
 
 /**
@@ -35,7 +35,7 @@ class ElasticsearchIndexSearchTarget implements IndexSearchTarget {
 	private final Set<String> indexNames;
 
 	ElasticsearchIndexSearchTarget(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels) {
-		this.searchTargetContext = new ElasticsearchSearchTargetContextImpl( backend, indexModels );
+		this.searchTargetContext = new ElasticsearchSearchTargetContext( backend, indexModels );
 		this.indexNames = indexModels.stream()
 				.map( ElasticsearchIndexModel::getIndexName )
 				.collect( Collectors.toSet() );
@@ -52,7 +52,7 @@ class ElasticsearchIndexSearchTarget implements IndexSearchTarget {
 
 	@Override
 	public SearchPredicateContainerContext<SearchPredicate> predicate() {
-		return new SearchTargetPredicateRootContext<>( searchTargetContext );
+		return new SearchTargetPredicateRootContext<>( searchTargetContext.getSearchPredicateFactory() );
 	}
 
 	@Override

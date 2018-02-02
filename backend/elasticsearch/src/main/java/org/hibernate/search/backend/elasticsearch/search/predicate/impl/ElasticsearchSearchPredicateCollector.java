@@ -4,7 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.dsl.impl;
+package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
+
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 import com.google.gson.JsonObject;
 
@@ -14,7 +16,7 @@ import com.google.gson.JsonObject;
  * <p>
  * Used by Elasticsearch-specific predicate contributors.
  *
- * @see org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor
+ * @see SearchPredicateContributor
  * @see org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder
  */
 public interface ElasticsearchSearchPredicateCollector {

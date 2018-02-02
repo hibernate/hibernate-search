@@ -12,14 +12,14 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContex
 import org.hibernate.search.engine.backend.document.model.spi.FieldModelExtension;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.ElasticsearchSearchPredicateContainerContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateContainerContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ElasticsearchExtension<N>
@@ -41,21 +41,21 @@ public final class ElasticsearchExtension<N>
 
 	@Override
 	public <C> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchTargetContext<C> targetContext, SearchDslContext<N, C> dslContext) {
-		if ( targetContext instanceof ElasticsearchSearchTargetContext ) {
-			return extendUnsafe( original, targetContext, dslContext );
+			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, C> dslContext) {
+		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
+			return extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext );
 		}
 		else {
-			throw log.elasticsearchExtensionOnUnknownContext( targetContext );
+			throw log.elasticsearchExtensionOnUnknownType( factory );
 		}
 	}
 
 	@Override
 	public <C> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
-			SearchPredicateContainerContext<N> original, SearchTargetContext<C> targetContext,
-			SearchDslContext<N, C> dslContext) {
-		if ( targetContext instanceof ElasticsearchSearchTargetContext ) {
-			return Optional.of( extendUnsafe( original, targetContext, dslContext ) );
+			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C> factory,
+			SearchPredicateDslContext<N, C> dslContext) {
+		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
+			return Optional.of( extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext ) );
 		}
 		else {
 			return Optional.empty();
@@ -68,18 +68,17 @@ public final class ElasticsearchExtension<N>
 			return (ElasticsearchIndexSchemaFieldContext) original;
 		}
 		else {
-			throw log.elasticsearchExtensionOnUnknownContext( original );
+			throw log.elasticsearchExtensionOnUnknownType( original );
 		}
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchPredicateCollector
 	private <C> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
-			SearchPredicateContainerContext<N> original, SearchTargetContext<C> targetContext,
-			SearchDslContext<N, C> dslContext) {
+			SearchPredicateContainerContext<N> original, ElasticsearchSearchPredicateFactory factory,
+			SearchPredicateDslContext<N, C> dslContext) {
 		return new ElasticsearchSearchPredicateContainerContextImpl<>(
-				original,
-				(ElasticsearchSearchTargetContext) targetContext,
-				(SearchDslContext<N, ElasticsearchSearchPredicateCollector>) dslContext
+				original, factory,
+				(SearchPredicateDslContext<N, ElasticsearchSearchPredicateCollector>) dslContext
 		);
 	}
 }

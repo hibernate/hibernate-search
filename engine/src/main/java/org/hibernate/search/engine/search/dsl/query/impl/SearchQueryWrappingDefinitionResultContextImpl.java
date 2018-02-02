@@ -11,13 +11,14 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.impl.QuerySearchPredicateBuildingRootContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.impl.QuerySearchPredicateBuildingRootContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
@@ -51,16 +52,19 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 
 	@Override
 	public SearchQueryContext<Q> predicate(SearchPredicate predicate) {
-		targetContext.toContributor( predicate ).contribute( searchQueryBuilder.getPredicateCollector() );
+		SearchPredicateFactory<C> factory = targetContext.getSearchPredicateFactory();
+		factory.toContributor( predicate )
+				.contribute( searchQueryBuilder.getPredicateCollector() );
 		return getNext();
 	}
 
 	@Override
 	public SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> predicateContributor) {
+		SearchPredicateFactory<C> factory = targetContext.getSearchPredicateFactory();
 		QuerySearchPredicateBuildingRootContextImpl<C> dslContext =
-				new QuerySearchPredicateBuildingRootContextImpl<>( targetContext );
+				new QuerySearchPredicateBuildingRootContextImpl<>( factory );
 		SearchPredicateContainerContext<SearchPredicate> containerContext =
-				new SearchPredicateContainerContextImpl<>( targetContext, dslContext );
+				new SearchPredicateContainerContextImpl<>( factory, dslContext );
 		predicateContributor.accept( containerContext );
 		dslContext.contribute( searchQueryBuilder.getPredicateCollector() );
 		return getNext();

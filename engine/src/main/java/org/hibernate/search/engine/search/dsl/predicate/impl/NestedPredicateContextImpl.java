@@ -11,19 +11,19 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 
 class NestedPredicateContextImpl<N, C>
-		implements NestedPredicateContext<N>, SearchPredicateContributor<C>, SearchDslContext<N, C> {
+		implements NestedPredicateContext<N>, SearchPredicateContributor<C>, SearchPredicateDslContext<N, C> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchPredicateFactory<C> factory;
 	private final Supplier<N> nextContextProvider;
 
 	private final SearchPredicateContainerContextImpl<N, C> containerContext;
@@ -31,16 +31,15 @@ class NestedPredicateContextImpl<N, C>
 	private NestedPredicateBuilder<C> builder;
 	private SearchPredicateContributor<C> singlePredicateContributor;
 
-	NestedPredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-		this.targetContext = targetContext;
+	NestedPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
-		this.containerContext = new SearchPredicateContainerContextImpl<>( targetContext, this );
+		this.containerContext = new SearchPredicateContainerContextImpl<>( factory, this );
 	}
 
 	@Override
 	public NestedPredicateFieldContext<N> onObjectField(String fieldName) {
-		this.builder = targetContext.getSearchPredicateFactory()
-				.nested( fieldName );
+		this.builder = factory.nested( fieldName );
 		return new NestedPredicateFieldContextImpl<>( containerContext, builder );
 	}
 

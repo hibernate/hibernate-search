@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.dsl.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 
 import com.google.gson.JsonObject;

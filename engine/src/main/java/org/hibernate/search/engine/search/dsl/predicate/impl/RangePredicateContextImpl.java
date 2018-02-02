@@ -11,16 +11,16 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, SearchPredicateContributor<C> {
 
 	private final RangePredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public RangePredicateContextImpl(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( targetContext, nextContextProvider );
+	public RangePredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
 	@Override

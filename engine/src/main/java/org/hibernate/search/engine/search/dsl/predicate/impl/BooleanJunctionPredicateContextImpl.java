@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class BooleanJunctionPredicateContextImpl<N, C>
 		implements BooleanJunctionPredicateContext<N>, SearchPredicateContributor<C> {
 
-	private final SearchTargetContext<C> context;
+	private final SearchPredicateFactory<C> factory;
 
 	private final Supplier<N> nextContextProvider;
 
@@ -34,11 +34,11 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	private final OccurContext should;
 	private final OccurContext filter;
 
-	BooleanJunctionPredicateContextImpl(SearchTargetContext<C> context,
+	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<C> factory,
 			Supplier<N> nextContextProvider) {
-		this.context = context;
+		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
-		this.builder = context.getSearchPredicateFactory().bool();
+		this.builder = factory.bool();
 		this.must = new OccurContext();
 		this.mustNot = new OccurContext();
 		this.should = new OccurContext();
@@ -129,7 +129,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 		return nextContextProvider.get();
 	}
 
-	private class OccurContext implements SearchDslContext<BooleanJunctionPredicateContext<N>, C>,
+	private class OccurContext implements SearchPredicateDslContext<BooleanJunctionPredicateContext<N>, C>,
 			SearchPredicateContributor<C> {
 
 		private final List<SearchPredicateContributor<C>> children = new ArrayList<>();
@@ -138,7 +138,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 
 		public OccurContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
-					BooleanJunctionPredicateContextImpl.this.context, this );
+					BooleanJunctionPredicateContextImpl.this.factory, this );
 		}
 
 		@Override
@@ -148,7 +148,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 
 		public void addPredicate(SearchPredicate child) {
 			SearchPredicateContributor<C> contributor =
-					BooleanJunctionPredicateContextImpl.this.context.toContributor( child );
+					BooleanJunctionPredicateContextImpl.this.factory.toContributor( child );
 			addContributor( contributor );
 		}
 

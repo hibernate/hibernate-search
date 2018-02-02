@@ -13,11 +13,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class MatchPredicateFieldSetContextImpl<N, C>
@@ -30,10 +29,9 @@ class MatchPredicateFieldSetContextImpl<N, C>
 	public MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchPredicateFactory<C> clauseFactory =
-				commonState.getTargetContext().getSearchPredicateFactory();
+		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
 		for ( String fieldName : fieldNames ) {
-			queryBuilders.add( clauseFactory.match( fieldName ) );
+			queryBuilders.add( predicateFactory.match( fieldName ) );
 		}
 	}
 
@@ -60,8 +58,8 @@ class MatchPredicateFieldSetContextImpl<N, C>
 
 	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, MatchPredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-			super( targetContext, nextContextProvider );
+		public CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+			super( factory, nextContextProvider );
 		}
 
 		public N matching(Object value) {

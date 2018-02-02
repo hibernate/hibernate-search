@@ -4,26 +4,26 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.impl;
+package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.spi.SearchDslContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class QuerySearchPredicateBuildingRootContextImpl<C>
-		implements SearchDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
+		implements SearchPredicateDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchPredicateFactory<C> factory;
 
 	private SearchPredicateContributor<C> singlePredicateContributor;
 
-	public QuerySearchPredicateBuildingRootContextImpl(SearchTargetContext<C> targetContext) {
-		this.targetContext = targetContext;
+	public QuerySearchPredicateBuildingRootContextImpl(SearchPredicateFactory<C> factory) {
+		this.factory = factory;
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public final class QuerySearchPredicateBuildingRootContextImpl<C>
 
 	@Override
 	public SearchPredicate getNextContext() {
-		return targetContext.toSearchPredicate( singlePredicateContributor );
+		return factory.toSearchPredicate( singlePredicateContributor );
 	}
 
 	@Override

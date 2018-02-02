@@ -46,9 +46,9 @@ public interface Log extends BasicLogger {
 			ElasticsearchFieldFormatter formatter1, String indexName1,
 			ElasticsearchFieldFormatter formatter2, String indexName2);
 
-	@Message(id = 6, value = "The Elasticsearch extension can only be applied to contexts"
+	@Message(id = 6, value = "The Elasticsearch extension can only be applied to objects"
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
-	SearchException elasticsearchExtensionOnUnknownContext(Object context);
+	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = 7, value = "Unknown projection %1$s in indexes %2$s." )
 	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<String> indexNames);

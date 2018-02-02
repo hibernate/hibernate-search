@@ -13,13 +13,12 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
+import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class RangePredicateFieldSetContextImpl<N, C>
@@ -32,10 +31,9 @@ class RangePredicateFieldSetContextImpl<N, C>
 	public RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchPredicateFactory<C> clauseFactory =
-				commonState.getTargetContext().getSearchPredicateFactory();
+		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
 		for ( String fieldName : fieldNames ) {
-			queryBuilders.add( clauseFactory.range( fieldName ) );
+			queryBuilders.add( predicateFactory.range( fieldName ) );
 		}
 	}
 
@@ -72,8 +70,8 @@ class RangePredicateFieldSetContextImpl<N, C>
 
 	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchTargetContext<C> targetContext, Supplier<N> nextContextProvider) {
-			super( targetContext, nextContextProvider );
+		public CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+			super( factory, nextContextProvider );
 		}
 
 		public RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
