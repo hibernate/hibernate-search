@@ -39,7 +39,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget, ElasticsearchIndexManager otherTarget);
 
 	@Message(id = 4, value = "Unknown field '%1$s' in indexes %2$s." )
-	SearchException unknownFieldForSearch(String absoluteFieldPath, List<String> indexNames);
+	SearchException unknownFieldForSearch(String absoluteFieldPath, Collection<String> indexNames);
 
 	@Message(id = 5, value = "Multiple conflicting types for field '%1$s': '%2$s' in index '%3$s', but '%4$s' in index '%5$s'." )
 	SearchException conflictingFieldFormattersForSearch(String absoluteFieldPath,

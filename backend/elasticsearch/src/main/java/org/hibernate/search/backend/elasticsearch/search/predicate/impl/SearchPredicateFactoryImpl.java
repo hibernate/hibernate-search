@@ -6,17 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -39,10 +31,10 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 
 	private static final Gson GSON = new GsonBuilder().create();
 
-	private final Collection<ElasticsearchIndexModel> indexModels;
+	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	public SearchPredicateFactoryImpl(Collection<ElasticsearchIndexModel> indexModels) {
-		this.indexModels = indexModels;
+	public SearchPredicateFactoryImpl(ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
@@ -67,76 +59,23 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> match(String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( absoluteFieldPath, getFormatter( absoluteFieldPath ) );
+		return new MatchPredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldFormatter( absoluteFieldPath ) );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> range(String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( absoluteFieldPath, getFormatter( absoluteFieldPath ) );
+		return new RangePredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldFormatter( absoluteFieldPath ) );
 	}
 
 	@Override
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateCollector> nested(String absoluteFieldPath) {
-		checkNestedField( absoluteFieldPath );
+		searchTargetModel.checkNestedField( absoluteFieldPath );
 		return new NestedPredicateBuilderImpl( absoluteFieldPath );
 	}
 
 	@Override
 	public SearchPredicateContributor<ElasticsearchSearchPredicateCollector> fromJsonString(String jsonString) {
 		return new UserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
-	}
-
-	private ElasticsearchFieldFormatter getFormatter(String absoluteFieldPath) {
-		ElasticsearchIndexModel indexModelForSelectedFormatter = null;
-		ElasticsearchFieldFormatter selectedFormatter = null;
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
-			if ( schemaNode != null ) {
-				ElasticsearchFieldFormatter formatter = schemaNode.getFormatter();
-				if ( selectedFormatter == null ) {
-					selectedFormatter = formatter;
-					indexModelForSelectedFormatter = indexModel;
-				}
-				else if ( !selectedFormatter.equals( formatter ) ) {
-					throw log.conflictingFieldFormattersForSearch(
-							absoluteFieldPath,
-							selectedFormatter, indexModelForSelectedFormatter.getIndexName(),
-							formatter, indexModel.getIndexName()
-							);
-				}
-			}
-		}
-		if ( selectedFormatter == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
-		}
-		return selectedFormatter;
-	}
-
-	private void checkNestedField(String absoluteFieldPath) {
-		boolean found = false;
-
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectNode schemaNode = indexModel.getObjectNode( absoluteFieldPath );
-			if ( schemaNode != null ) {
-				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
-					throw log.nonNestedFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
-				}
-			}
-		}
-		if ( !found ) {
-			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
-				if ( schemaNode != null ) {
-					throw log.nonObjectFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
-				}
-			}
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
-		}
-	}
-
-	private List<String> getIndexNames() {
-		return indexModels.stream().map( ElasticsearchIndexModel::getIndexName ).collect( Collectors.toList() );
 	}
 
 }

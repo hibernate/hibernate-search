@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
@@ -24,12 +21,9 @@ public class ElasticsearchSearchTargetContext
 	private final SearchPredicateFactory<ElasticsearchSearchPredicateCollector> searchPredicateFactory;
 	private final SearchQueryFactory<ElasticsearchSearchQueryElementCollector> searchQueryFactory;
 
-	public ElasticsearchSearchTargetContext(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels) {
-		this.searchPredicateFactory = new SearchPredicateFactoryImpl( indexModels );
-		Set<String> indexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getIndexName )
-				.collect( Collectors.toSet() );
-		this.searchQueryFactory = new SearchQueryFactoryImpl( backend, indexModels, indexNames );
+	public ElasticsearchSearchTargetContext(ElasticsearchBackend backend, ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
+		this.searchQueryFactory = new SearchQueryFactoryImpl( backend, searchTargetModel );
 	}
 
 	@Override

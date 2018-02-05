@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
@@ -38,15 +39,11 @@ class SearchQueryFactoryImpl
 
 	private final ElasticsearchBackend backend;
 
-	private final Set<ElasticsearchIndexModel> indexModels;
+	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	private final Set<String> indexNames;
-
-	SearchQueryFactoryImpl(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels,
-			Set<String> indexNames) {
+	SearchQueryFactoryImpl(ElasticsearchBackend backend, ElasticsearchSearchTargetModel searchTargetModel) {
 		this.backend = backend;
-		this.indexModels = indexModels;
-		this.indexNames = indexNames;
+		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
@@ -74,6 +71,7 @@ class SearchQueryFactoryImpl
 		BitSet projectionFound = new BitSet( projections.length );
 
 		HitExtractor<? super ProjectionHitCollector<R>> hitExtractor;
+		Set<ElasticsearchIndexModel> indexModels = searchTargetModel.getIndexModels();
 		if ( indexModels.size() == 1 ) {
 			ElasticsearchIndexModel indexModel = indexModels.iterator().next();
 			hitExtractor = createProjectionHitExtractor(
@@ -94,7 +92,7 @@ class SearchQueryFactoryImpl
 			List<String> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
-			throw log.unknownProjectionForSearch( unknownProjections, indexNames );
+			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getIndexNames() );
 		}
 
 		return createSearchQueryBuilder( sessionContext, hitExtractor, hitAggregator );
@@ -140,7 +138,7 @@ class SearchQueryFactoryImpl
 		return new SearchQueryBuilderImpl<>(
 				backend.getQueryOrchestrator(),
 				backend.getWorkFactory(),
-				indexNames,
+				searchTargetModel.getIndexNames(),
 				sessionContext,
 				hitExtractor, hitAggregator
 		);
