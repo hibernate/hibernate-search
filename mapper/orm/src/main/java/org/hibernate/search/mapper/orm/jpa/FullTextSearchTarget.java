@@ -7,12 +7,16 @@
 package org.hibernate.search.mapper.orm.jpa;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface FullTextSearchTarget<T> {
 
 	HibernateOrmSearchQueryResultDefinitionContext<T> query();
 
 	SearchPredicateContainerContext<SearchPredicate> predicate();
+
+	SearchSortContainerContext<SearchSort> sort();
 
 }

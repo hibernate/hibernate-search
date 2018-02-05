@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 class SearchQueryBuilderImpl<C, T>
@@ -67,6 +68,10 @@ class SearchQueryBuilderImpl<C, T>
 		JsonObject jsonPredicate = elementCollector.toJsonPredicate();
 		if ( jsonPredicate != null ) {
 			payload.add( "query", jsonPredicate );
+		}
+		JsonArray jsonSort = elementCollector.toJsonSort();
+		if ( jsonSort != null ) {
+			payload.add( "sort", jsonSort );
 		}
 		hitExtractor.contributeRequest( payload );
 		SearchResultExtractor<T> searchResultExtractor =

@@ -14,16 +14,25 @@ import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIn
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 public final class ElasticsearchExtension<N>
 		implements SearchPredicateContainerContextExtension<N, ElasticsearchSearchPredicateContainerContext<N>>,
+		SearchSortContainerContextExtension<N, ElasticsearchSearchSortContainerContext<N>>,
 		FieldModelExtension<ElasticsearchIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
@@ -63,6 +72,29 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
+	public <C> ElasticsearchSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
+			SearchSortFactory<C> factory, SearchSortDslContext<N, C> dslContext) {
+		if ( factory instanceof ElasticsearchSearchSortFactory ) {
+			return extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext );
+		}
+		else {
+			throw log.elasticsearchExtensionOnUnknownType( factory );
+		}
+	}
+
+	@Override
+	public <C> Optional<ElasticsearchSearchSortContainerContext<N>> extendOptional(
+			SearchSortContainerContext<N> original, SearchSortFactory<C> factory,
+			SearchSortDslContext<N, C> dslContext) {
+		if ( factory instanceof ElasticsearchSearchSortFactory ) {
+			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext ) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
 	public ElasticsearchIndexSchemaFieldContext extendOrFail(IndexSchemaFieldContext original) {
 		if ( original instanceof ElasticsearchIndexSchemaFieldContext ) {
 			return (ElasticsearchIndexSchemaFieldContext) original;
@@ -79,6 +111,16 @@ public final class ElasticsearchExtension<N>
 		return new ElasticsearchSearchPredicateContainerContextImpl<>(
 				original, factory,
 				(SearchPredicateDslContext<N, ElasticsearchSearchPredicateCollector>) dslContext
+		);
+	}
+
+	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchSortCollector
+	private <C> ElasticsearchSearchSortContainerContext<N> extendUnsafe(
+			SearchSortContainerContext<N> original, ElasticsearchSearchSortFactory factory,
+			SearchSortDslContext<N, C> dslContext) {
+		return new ElasticsearchSearchSortContainerContextImpl<>(
+				original, factory,
+				(SearchSortDslContext<N, ElasticsearchSearchSortCollector>) dslContext
 		);
 	}
 }

@@ -60,6 +60,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.integrationtest.util.OrmUtils;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.service.ServiceRegistry;
 
@@ -344,6 +345,11 @@ public class OrmElasticsearchAnnotationMappingIT {
 								}
 							} )
 					)
+					.sort( c ->
+							c.byField( "numeric" ).desc()
+									.then().byField( "myLocalDateField" )
+									.then().byScore()
+					)
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );
@@ -424,7 +430,16 @@ public class OrmElasticsearchAnnotationMappingIT {
 								+ "}"
 							+ "]"
 						+ "}"
-					+ "}"
+					+ "},"
+					+ "'sort': ["
+						+ "{"
+							+ "'numeric': {"
+								+ "'order': 'desc'"
+							+ "}"
+						+ "},"
+						+ "'myLocalDateField',"
+						+ "'_score'"
+					+ "]"
 				+ "}" );
 	}
 
@@ -454,9 +469,17 @@ public class OrmElasticsearchAnnotationMappingIT {
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
 					.end();
+			SearchSort nestedSort = target.sort().byField( "numeric" ).desc().end();
+			SearchSort otherNestedSort = target.sort().byScore().end();
+			SearchSort sort = target.sort()
+					.by( nestedSort )
+					.then().byField( "myLocalDateField" )
+					.then().by( otherNestedSort )
+					.end();
 			FullTextQuery<ParentIndexedEntity> query = target.query()
 					.asEntities()
 					.predicate( predicate )
+					.sort( sort )
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -524,7 +547,16 @@ public class OrmElasticsearchAnnotationMappingIT {
 								+ "}"
 							+ "}"
 						+ "}"
-					+ "}"
+					+ "},"
+					+ "'sort': ["
+						+ "{"
+							+ "'numeric': {"
+								+ "'order': 'desc'"
+							+ "}"
+						+ "},"
+						+ "'myLocalDateField',"
+						+ "'_score'"
+					+ "]"
 				+ "}" );
 	}
 

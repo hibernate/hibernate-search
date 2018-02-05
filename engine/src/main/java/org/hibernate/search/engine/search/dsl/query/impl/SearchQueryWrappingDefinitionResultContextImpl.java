@@ -78,7 +78,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	private SearchQueryContext<Q> getNext() {
-		return new SearchQueryContextImpl<>( searchQueryBuilder, searchQueryWrapperFactory );
+		return new SearchQueryContextImpl<>( targetContext, searchQueryBuilder, searchQueryWrapperFactory );
 	}
 
 }

@@ -8,6 +8,10 @@ package org.hibernate.search.engine.search.dsl.query;
 
 
 import java.util.Collection;
+import java.util.function.Consumer;
+
+import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * The context used when building a query, after the search predicate has been defined.
@@ -17,6 +21,10 @@ public interface SearchQueryContext<Q> {
 	SearchQueryContext<Q> routing(String routingKey);
 
 	SearchQueryContext<Q> routing(Collection<String> routingKeys);
+
+	SearchQueryContext<Q> sort(SearchSort sort);
+
+	SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor);
 
 	Q build();
 

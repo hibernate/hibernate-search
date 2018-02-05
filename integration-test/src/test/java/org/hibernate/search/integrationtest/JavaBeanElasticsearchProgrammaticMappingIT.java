@@ -42,6 +42,7 @@ import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 
 import org.junit.After;
@@ -358,6 +359,11 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 								}
 							} )
 					)
+					.sort( c ->
+							c.byField( "numeric" ).desc()
+							.then().byField( "myLocalDateField" )
+							.then().byScore()
+					)
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -438,7 +444,16 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 								+ "}"
 							+ "]"
 						+ "}"
-					+ "}"
+					+ "},"
+					+ "'sort': ["
+						+ "{"
+							+ "'numeric': {"
+								+ "'order': 'desc'"
+							+ "}"
+						+ "},"
+						+ "'myLocalDateField',"
+						+ "'_score'"
+					+ "]"
 				+ "}" );
 	}
 
@@ -467,9 +482,17 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 							.should( nestedPredicate )
 							.mustNot().predicate( otherNestedPredicate )
 					.end();
+			SearchSort nestedSort = target.sort().byField( "numeric" ).desc().end();
+			SearchSort otherNestedSort = target.sort().byScore().end();
+			SearchSort sort = target.sort()
+					.by( nestedSort )
+					.then().byField( "myLocalDateField" )
+					.then().by( otherNestedSort )
+					.end();
 			SearchQuery<PojoReference> query = target.query()
 					.asReferences()
 					.predicate( predicate )
+					.sort( sort )
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -537,7 +560,16 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 								+ "}"
 							+ "}"
 						+ "}"
-					+ "}"
+					+ "},"
+					+ "'sort': ["
+						+ "{"
+							+ "'numeric': {"
+								+ "'order': 'desc'"
+							+ "}"
+						+ "},"
+						+ "'myLocalDateField',"
+						+ "'_score'"
+					+ "]"
 				+ "}" );
 	}
 

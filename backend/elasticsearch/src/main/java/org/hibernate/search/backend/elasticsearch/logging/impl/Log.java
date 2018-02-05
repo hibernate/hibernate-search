@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
@@ -62,5 +63,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 10, value = "Object field '%2$s' is not stored as nested in index '%1$s'." )
 	SearchException nonNestedFieldForNestedQuery(String indexName, String absoluteFieldPath);
+
+	@Message(id = 11, value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
+			+ " Given sort was: '%1$s'" )
+	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
 }
