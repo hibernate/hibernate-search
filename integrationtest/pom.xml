@@ -21,6 +21,7 @@
         <module>backend/elasticsearch</module>
         <module>mapper/pojo</module>
         <module>mapper/orm</module>
+        <module>showcase/library</module>
     </modules>
 
     <dependencyManagement>
