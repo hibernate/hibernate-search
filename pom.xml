@@ -288,7 +288,7 @@
         <asciidoctorj-pdf.version>1.5.0-alpha.11</asciidoctorj-pdf.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.8.2.Final</previous.stable>
+        <previous.stable>5.9.0.Final</previous.stable>
     </properties>
 
     <dependencyManagement>
