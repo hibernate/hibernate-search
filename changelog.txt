@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+5.9.0.Final (06-02-2018)
+-------------------------
+
+** Task
+    * HSEARCH-2999 Upgrade to Elasticsearch 5.6.7
+    * HSEARCH-2998 Make sure the integration tests work without any specific Maven configuration from the developper
+    * HSEARCH-2997 Ensure hibernate-search-jbossmodules-testing will not be released anymore
+    * HSEARCH-2992 Remove settings-example.xml and any reference to it
+
 5.9.0.CR1 (23-01-2018)
 -------------------------
 
