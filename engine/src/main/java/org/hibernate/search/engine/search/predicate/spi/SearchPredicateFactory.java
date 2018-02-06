@@ -23,6 +23,8 @@ public interface SearchPredicateFactory<C> {
 
 	SearchPredicateContributor<C> toContributor(SearchPredicate predicate);
 
+	AllPredicateBuilder<C> all();
+
 	BooleanJunctionPredicateBuilder<C> bool();
 
 	MatchPredicateBuilder<C> match(String absoluteFieldPath);
