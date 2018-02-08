@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
  */
 abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchIndexSchemaFieldTypedContext<T> {
 
-	private Store store;
+	private Store store = Store.DEFAULT;
 
 	public AbstractScalarFieldTypedContext() {
 	}
@@ -34,9 +34,17 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		if ( store != null && !store.equals( Store.NO ) ) {
-			// TODO what about Store.COMPRESS?
-			mapping.setStore( true );
+		switch ( store ) {
+			case DEFAULT:
+				break;
+			case NO:
+				mapping.setStore( false );
+				break;
+			case YES:
+			case COMPRESS:
+				// TODO what about Store.COMPRESS?
+				mapping.setStore( true );
+				break;
 		}
 
 		return mapping;

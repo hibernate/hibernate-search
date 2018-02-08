@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
@@ -270,8 +271,9 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 
 		@Override
 		public void contribute(IndexSchemaFieldTypedContext<?> context) {
-			// TODO only call methods for non-default value (add a Store.DEFAULT value?)
-			context.store( annotation.store() );
+			if ( !Store.DEFAULT.equals( annotation.store() ) ) {
+				context.store( annotation.store() );
+			}
 			// TODO handle analyzer, etc.
 		}
 	}

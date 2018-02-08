@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
@@ -27,7 +27,7 @@ import com.google.gson.JsonPrimitive;
 class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
 	private final String relativeName;
-	private Store store;
+	private Store store = Store.DEFAULT;
 
 	public IndexSchemaFieldStringContext(String relativeName) {
 		this.relativeName = relativeName;
@@ -52,16 +52,32 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
-			if ( store != null && Store.YES.equals( store ) ) {
-				// TODO what about Store.COMPRESS?
-				mapping.setFieldData( FieldDataType.TRUE );
+			switch ( store ) {
+				case DEFAULT:
+					break;
+				case NO:
+					mapping.setFieldData( FieldDataType.FALSE );
+					break;
+				case YES:
+				case COMPRESS:
+					// TODO what about Store.COMPRESS?
+					mapping.setFieldData( FieldDataType.TRUE );
+					break;
 			}
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
-			if ( store != null && Store.YES.equals( store ) ) {
-				// TODO what about Store.COMPRESS?
-				mapping.setStore( true );
+			switch ( store ) {
+				case DEFAULT:
+					break;
+				case NO:
+					mapping.setStore( false );
+					break;
+				case YES:
+				case COMPRESS:
+					// TODO what about Store.COMPRESS?
+					mapping.setStore( true );
+					break;
 			}
 		}
 

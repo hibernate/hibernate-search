@@ -14,6 +14,10 @@ package org.hibernate.search.engine.backend.document.model;
  */
 public enum Store {
 	/**
+	 * Use the backend-specific default.
+	 */
+	DEFAULT,
+	/**
 	 * does not store the value in the index
 	 */
 	NO,

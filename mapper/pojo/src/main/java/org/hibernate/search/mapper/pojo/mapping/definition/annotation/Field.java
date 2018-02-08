@@ -43,7 +43,7 @@ public @interface Field {
 	 */
 	FunctionBridgeBuilderBeanReference functionBridgeBuilder() default @FunctionBridgeBuilderBeanReference;
 
-	Store store() default Store.NO;
+	Store store() default Store.DEFAULT;
 
 	// TODO index, analyze, norms, termVector
 	// TODO analyzer, normalizer
