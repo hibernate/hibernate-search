@@ -3,7 +3,7 @@ module hibernate.search.integrationtest.jdk9.modules.client {
 	requires hibernate.search.engine;
 	requires hibernate.search.orm;
 	requires java.persistence;
-	requires hibernate.core;
+	requires org.hibernate.orm.core;
 	requires lucene.analyzers.common;
 	requires lucene.core;
 }
