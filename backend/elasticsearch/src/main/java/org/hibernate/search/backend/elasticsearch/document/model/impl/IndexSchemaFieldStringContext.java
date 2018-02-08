@@ -52,33 +52,26 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 		// TODO auto-select type, or use sub-fields (but in that case, adjust projections accordingly)
 		if ( false ) {
 			mapping.setType( DataType.TEXT );
-			switch ( store ) {
-				case DEFAULT:
-					break;
-				case NO:
-					mapping.setFieldData( FieldDataType.FALSE );
-					break;
-				case YES:
-				case COMPRESS:
-					// TODO what about Store.COMPRESS?
-					mapping.setFieldData( FieldDataType.TRUE );
-					break;
-			}
+
+			// TODO set fielddata if sortable
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
-			switch ( store ) {
-				case DEFAULT:
-					break;
-				case NO:
-					mapping.setStore( false );
-					break;
-				case YES:
-				case COMPRESS:
-					// TODO what about Store.COMPRESS?
-					mapping.setStore( true );
-					break;
-			}
+
+			// TODO set docvalues if sortable
+		}
+
+		switch ( store ) {
+			case DEFAULT:
+				break;
+			case NO:
+				mapping.setFieldData( FieldDataType.FALSE );
+				break;
+			case YES:
+			case COMPRESS:
+				// TODO what about Store.COMPRESS?
+				mapping.setFieldData( FieldDataType.TRUE );
+				break;
 		}
 
 		String absolutePath = parentNode.getAbsolutePath( relativeName );

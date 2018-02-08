@@ -34,6 +34,8 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
+		// TODO set docvalues if sortable
+
 		switch ( store ) {
 			case DEFAULT:
 				break;
