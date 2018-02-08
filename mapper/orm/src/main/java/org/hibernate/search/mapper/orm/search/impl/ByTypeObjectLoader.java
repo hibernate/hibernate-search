@@ -28,13 +28,6 @@ public class ByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> 
 	}
 
 	@Override
-	public T load(PojoReference reference) {
-		Class<?> referenceType = reference.getType();
-		ComposableObjectLoader<PojoReference, ? extends T> delegate = getDelegate( referenceType );
-		return delegate.load( reference );
-	}
-
-	@Override
 	public List<T> load(List<PojoReference> references) {
 		LinkedHashMap<PojoReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<ComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();

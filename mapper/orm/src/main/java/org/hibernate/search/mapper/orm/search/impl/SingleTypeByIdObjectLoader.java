@@ -40,12 +40,6 @@ class SingleTypeByIdObjectLoader<O, T> implements ComposableObjectLoader<PojoRef
 	}
 
 	@Override
-	public T load(PojoReference reference) {
-		O loadedObject = getSingleAccess().load( (Serializable) reference.getId() );
-		return hitTransformer.apply( loadedObject );
-	}
-
-	@Override
 	public List<T> load(List<PojoReference> references) {
 		List<O> loadedObjects = loadEntities( references );
 

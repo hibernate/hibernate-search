@@ -17,12 +17,6 @@ import java.util.List;
 public interface ObjectLoader<R, O> {
 
 	/**
-	 * @param reference A reference to the object to load.
-	 * @return The loaded object, or {@code null} if not found.
-	 */
-	O load(R reference);
-
-	/**
 	 * @param references A list of references to the objects to load.
 	 * @return A list of loaded objects, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.

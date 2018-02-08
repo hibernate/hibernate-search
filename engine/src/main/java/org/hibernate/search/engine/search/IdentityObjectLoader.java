@@ -18,11 +18,6 @@ class IdentityObjectLoader<T> implements ObjectLoader<T, T> {
 	}
 
 	@Override
-	public T load(T reference) {
-		return reference;
-	}
-
-	@Override
 	public List<T> load(List<T> references) {
 		return references;
 	}
