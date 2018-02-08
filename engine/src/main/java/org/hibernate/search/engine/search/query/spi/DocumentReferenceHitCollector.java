@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import org.hibernate.search.engine.search.DocumentReference;
+
 /**
- * A simple hit collector that stores the provided hit for later retrieval,
- * potentially transforming it in the process.
+ * A hit collector that expects a document reference.
+ * <p>
+ * The reference will be returned as part of the results,
+ * potentially after having been transformed.
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()}.
- *
- * @param <T> The type of hit this collector can collect.
  */
-public interface HitCollector<T> {
+public interface DocumentReferenceHitCollector {
 
-	void collect(T hit);
+	void collectReference(DocumentReference reference);
 
 }

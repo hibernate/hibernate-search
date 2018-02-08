@@ -13,14 +13,16 @@ import java.util.ListIterator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public final class ProjectionHitAggregator<R, T> implements HitAggregator<ProjectionHitCollector<R>, List<T>> {
+public final class ProjectionHitAggregator<R, T> implements HitAggregator<ProjectionHitCollector, List<T>> {
 
 	private static final Object ELEMENT_TO_LOAD_MARKER = new Object();
 
+	private final Function<DocumentReference, R> documentReferenceTransformer;
 	private final ObjectLoader<R, ?> objectLoader;
 	private final Function<List<?>, T> hitTransformer;
 	private final int expectedHitSize;
@@ -31,8 +33,10 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 	private final ArrayList<List<Object>> hits = new ArrayList<>();
 
 	public ProjectionHitAggregator(
+			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, ?> objectLoader, Function<List<?>, T> hitTransformer,
 			int expectedHitSize, int expectedLoadCountPerHit) {
+		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
 		this.hitTransformer = hitTransformer;
 		this.expectedHitSize = expectedHitSize;
@@ -48,7 +52,7 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 	}
 
 	@Override
-	public ProjectionHitCollector<R> nextCollector() {
+	public ProjectionHitCollector nextCollector() {
 		List<Object> currentHitItems = new ArrayList<>( expectedHitSize );
 		hits.add( currentHitItems );
 		hitCollector.reset( currentHitItems );
@@ -78,7 +82,7 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 		return hits.stream().map( hitTransformer ).collect( Collectors.toList());
 	}
 
-	private class HitCollectorImpl implements ProjectionHitCollector<R> {
+	private class HitCollectorImpl implements ProjectionHitCollector {
 
 		private List<Object> currentHitItems;
 
@@ -87,14 +91,19 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 		}
 
 		@Override
-		public void collect(Object hit) {
+		public void collectProjection(Object hit) {
 			currentHitItems.add( hit );
 		}
 
 		@Override
-		public void collectForLoading(R reference) {
+		public void collectReference(DocumentReference reference) {
+			currentHitItems.add( documentReferenceTransformer.apply( reference ) );
+		}
+
+		@Override
+		public void collectForLoading(DocumentReference reference) {
 			currentHitItems.add( ELEMENT_TO_LOAD_MARKER );
-			referencesToLoad.add( reference );
+			referencesToLoad.add( documentReferenceTransformer.apply( reference ) );
 		}
 
 	}

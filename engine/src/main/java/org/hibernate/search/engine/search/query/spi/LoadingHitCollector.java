@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import org.hibernate.search.engine.search.DocumentReference;
+
 /**
  * A loading hit collector that expects references in place of hits,
  * and will make sure the given reference is later loaded from an external data source
@@ -13,11 +15,9 @@ package org.hibernate.search.engine.search.query.spi;
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()},
  * loading is usually performed by an {@link org.hibernate.search.engine.search.ObjectLoader}.
- *
- * @param <R> The type of references that can be loaded.
  */
-public interface LoadingHitCollector<R> {
+public interface LoadingHitCollector {
 
-	void collectForLoading(R reference);
+	void collectForLoading(DocumentReference reference);
 
 }

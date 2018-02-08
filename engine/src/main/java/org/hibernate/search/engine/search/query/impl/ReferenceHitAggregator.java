@@ -10,20 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.HitCollector;
+import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.util.AssertionFailure;
 
-public final class SimpleHitAggregator<T, U> implements HitAggregator<HitCollector<T>, List<U>> {
+public final class ReferenceHitAggregator<T> implements HitAggregator<DocumentReferenceHitCollector, List<T>> {
 
-	private final Function<T, U> hitTransformer;
-
+	private final Function<DocumentReference, T> documentReferenceTransformer;
 	private final HitCollectorImpl hitCollector = new HitCollectorImpl();
 
-	private List<U> hits;
+	private List<T> hits;
 
-	public SimpleHitAggregator(Function<T, U> hitTransformer) {
-		this.hitTransformer = hitTransformer;
+	public ReferenceHitAggregator(Function<DocumentReference, T> documentReferenceTransformer) {
+		this.documentReferenceTransformer = documentReferenceTransformer;
 	}
 
 	@Override
@@ -32,27 +32,27 @@ public final class SimpleHitAggregator<T, U> implements HitAggregator<HitCollect
 	}
 
 	@Override
-	public HitCollector<T> nextCollector() {
+	public DocumentReferenceHitCollector nextCollector() {
 		hitCollector.reset();
 		return hitCollector;
 	}
 
 	@Override
-	public List<U> build() {
-		List<U> result = hits;
+	public List<T> build() {
+		List<T> result = hits;
 		hits = null;
 		return result;
 	}
 
-	private class HitCollectorImpl implements HitCollector<T> {
+	private class HitCollectorImpl implements DocumentReferenceHitCollector {
 
 		private boolean currentHitCollected = false;
 
 		@Override
-		public void collect(T hit) {
+		public void collectReference(DocumentReference reference) {
 			checkNotAlreadyCollected();
 			currentHitCollected = true;
-			hits.add( hitTransformer.apply( hit ) );
+			hits.add( documentReferenceTransformer.apply( reference ) );
 		}
 
 		public void reset() {

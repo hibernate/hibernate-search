@@ -12,10 +12,11 @@ package org.hibernate.search.engine.search.query.spi;
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()}.
  *
- * @param <R> The type of references that can be loaded.
- *
  * @see HitCollector
  * @see LoadingHitCollector
  */
-public interface ProjectionHitCollector<R> extends HitCollector<Object>, LoadingHitCollector<R> {
+public interface ProjectionHitCollector extends DocumentReferenceHitCollector, LoadingHitCollector {
+
+	void collectProjection(Object projection);
+
 }

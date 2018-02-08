@@ -8,20 +8,25 @@ package org.hibernate.search.engine.search.query.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.util.AssertionFailure;
 
-public final class ObjectHitAggregator<R, O> implements HitAggregator<LoadingHitCollector<R>, List<O>> {
+public final class ObjectHitAggregator<R, O> implements HitAggregator<LoadingHitCollector, List<O>> {
 
+	private final Function<DocumentReference, R> documentReferenceTransformer;
 	private final ObjectLoader<R, O> objectLoader;
 	private final HitCollectorImpl hitCollector = new HitCollectorImpl();
 
 	private final ArrayList<R> referencesToLoad = new ArrayList<>();
 
-	public ObjectHitAggregator(ObjectLoader<R, O> objectLoader) {
+	public ObjectHitAggregator(Function<DocumentReference, R> documentReferenceTransformer,
+			ObjectLoader<R, O> objectLoader) {
+		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
 	}
 
@@ -32,7 +37,7 @@ public final class ObjectHitAggregator<R, O> implements HitAggregator<LoadingHit
 	}
 
 	@Override
-	public LoadingHitCollector<R> nextCollector() {
+	public LoadingHitCollector nextCollector() {
 		hitCollector.reset();
 		return hitCollector;
 	}
@@ -42,15 +47,15 @@ public final class ObjectHitAggregator<R, O> implements HitAggregator<LoadingHit
 		return objectLoader.load( referencesToLoad );
 	}
 
-	private class HitCollectorImpl implements LoadingHitCollector<R> {
+	private class HitCollectorImpl implements LoadingHitCollector {
 
 		private boolean currentHitCollected = false;
 
 		@Override
-		public void collectForLoading(R reference) {
+		public void collectForLoading(DocumentReference reference) {
 			checkNotAlreadyCollected();
 			currentHitCollected = true;
-			referencesToLoad.add( reference );
+			referencesToLoad.add( documentReferenceTransformer.apply( reference ) );
 		}
 
 		public void reset() {

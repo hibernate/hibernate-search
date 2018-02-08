@@ -9,17 +9,17 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
-class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHitCollector> {
+class DocumentReferenceProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "_id" ).asString();
 
-	private static final DocumentReferenceHitExtractor INSTANCE = new DocumentReferenceHitExtractor();
+	private static final DocumentReferenceProjectionHitExtractor INSTANCE = new DocumentReferenceProjectionHitExtractor();
 
-	public static DocumentReferenceHitExtractor get() {
+	public static DocumentReferenceProjectionHitExtractor get() {
 		return INSTANCE;
 	}
 
@@ -29,11 +29,11 @@ class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHit
 	}
 
 	@Override
-	public void extract(DocumentReferenceHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
 		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).get();
 		String id = HIT_ID_ACCESSOR.get( hit ).get();
 		DocumentReference documentReference = new ElasticsearchDocumentReference( indexName, id );
-		collector.collectReference( documentReference );
+		collector.collectProjection( documentReference );
 	}
 
 }

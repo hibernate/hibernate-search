@@ -7,10 +7,8 @@
 package org.hibernate.search.engine.search.query.spi;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.DocumentReference;
 
 /**
  * A factory for search queries.
@@ -22,16 +20,13 @@ import org.hibernate.search.engine.search.DocumentReference;
  */
 public interface SearchQueryFactory<C> {
 
-	<R, O> SearchQueryBuilder<O, C> asObjects(
-			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
-			HitAggregator<LoadingHitCollector<R>, List<O>> hitAggregator);
+	<O> SearchQueryBuilder<O, C> asObjects(SessionContext sessionContext,
+			HitAggregator<LoadingHitCollector, List<O>> hitAggregator);
 
-	<R, T> SearchQueryBuilder<T, C> asReferences(
-			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
-			HitAggregator<HitCollector<R>, List<T>> hitAggregator);
+	<T> SearchQueryBuilder<T, C> asReferences(SessionContext sessionContext,
+			HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator);
 
-	<R, T> SearchQueryBuilder<T, C> asProjections(
-			SessionContext sessionContext, Function<DocumentReference, R> documentReferenceTransformer,
-			HitAggregator<ProjectionHitCollector<R>, List<T>> hitAggregator, String... projections);
+	<T> SearchQueryBuilder<T, C> asProjections(SessionContext sessionContext,
+			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, String... projections);
 
 }

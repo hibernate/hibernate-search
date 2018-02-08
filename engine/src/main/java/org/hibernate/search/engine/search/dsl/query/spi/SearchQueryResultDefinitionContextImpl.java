@@ -21,13 +21,13 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitio
 import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryWrappingDefinitionResultContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.HitCollector;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ProjectionHitAggregator;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
-import org.hibernate.search.engine.search.query.impl.SimpleHitAggregator;
+import org.hibernate.search.engine.search.query.impl.ReferenceHitAggregator;
 
 public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements SearchQueryResultDefinitionContext<R, O> {
 
@@ -51,19 +51,19 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	@Override
 	public SearchQueryWrappingDefinitionResultContext<SearchQuery<O>> asObjects() {
-		HitAggregator<LoadingHitCollector<R>, List<O>> hitAggregator =
-				new ObjectHitAggregator<>( objectLoader );
+		HitAggregator<LoadingHitCollector, List<O>> hitAggregator =
+				new ObjectHitAggregator<>( documentReferenceTransformer, objectLoader );
 		SearchQueryBuilder<O, C> builder = targetContext.getSearchQueryFactory()
-				.asObjects( sessionContext, documentReferenceTransformer, hitAggregator );
+				.asObjects( sessionContext, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
 	@Override
 	public <T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer) {
-		HitAggregator<HitCollector<R>, List<T>> hitAggregator =
-				new SimpleHitAggregator<>( hitTransformer );
+		HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator =
+				new ReferenceHitAggregator<>( hitTransformer.compose( documentReferenceTransformer ) );
 		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryFactory()
-				.asReferences( sessionContext, documentReferenceTransformer, hitAggregator );
+				.asReferences( sessionContext, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 
@@ -73,11 +73,12 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 		int expectedLoadPerHit = (int) Arrays.stream( projections )
 				.filter( Predicate.isEqual( ProjectionConstants.OBJECT ) )
 				.count();
-		HitAggregator<ProjectionHitCollector<R>, List<T>> hitAggregator =
-				new ProjectionHitAggregator<>( objectLoader, hitTransformer, projections.length, expectedLoadPerHit );
+		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
+				new ProjectionHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
+						projections.length, expectedLoadPerHit );
 
 		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryFactory()
-				.asProjections( sessionContext, documentReferenceTransformer, hitAggregator, projections );
+				.asProjections( sessionContext, hitAggregator, projections );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
 }

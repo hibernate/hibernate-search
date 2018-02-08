@@ -11,14 +11,14 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.engine.search.query.spi.HitCollector;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class SourceHitExtractor implements HitExtractor<HitCollector<Object>> {
+class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -48,9 +48,9 @@ class SourceHitExtractor implements HitExtractor<HitCollector<Object>> {
 	}
 
 	@Override
-	public void extract(HitCollector<Object> collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
-		collector.collect( formatter.parse( fieldValue ) );
+		collector.collectProjection( formatter.parse( fieldValue ) );
 	}
 
 }
