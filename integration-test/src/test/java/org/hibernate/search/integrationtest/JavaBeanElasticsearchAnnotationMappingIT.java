@@ -565,10 +565,7 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 							ProjectionConstants.DOCUMENT_REFERENCE,
 							"customBridgeOnClass.text"
 					)
-					.predicate( root -> root.match()
-							.onField( "myTextField" )
-							.matching( "foo" )
-					)
+					.predicate().all().end()
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -623,11 +620,7 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 				null,
 				"{"
 					+ "'query': {"
-						+ "'match': {"
-							+ "'myTextField': {"
-								+ "'query': 'foo'"
-							+ "}"
-						+ "}"
+						+ "'match_all': {}"
 					+ "},"
 					+ "'_source': ["
 						+ "'myTextField',"

@@ -568,10 +568,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 							ProjectionConstants.OBJECT,
 							"customBridgeOnClass.text"
 					)
-					.predicate( root -> root.match()
-							.onField( "myTextField" )
-							.matching( "foo" )
-					)
+					.predicate().all().end()
 					.build();
 
 			StubElasticsearchClient.pushStubResponse(
@@ -627,11 +624,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 				null,
 				"{"
 					+ "'query': {"
-						+ "'match': {"
-							+ "'myTextField': {"
-								+ "'query': 'foo'"
-							+ "}"
-						+ "}"
+						+ "'match_all': {}"
 					+ "},"
 					+ "'_source': ["
 						+ "'myTextField',"
