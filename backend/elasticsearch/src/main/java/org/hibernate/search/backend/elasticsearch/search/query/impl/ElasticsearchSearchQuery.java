@@ -60,6 +60,11 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + getQueryString() + "]";
+	}
+
+	@Override
 	public SearchResult<T> execute() {
 		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
 				indexNames, routingKeys,

@@ -33,7 +33,6 @@ import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
@@ -46,14 +45,11 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.integrationtest.util.orm.OrmUtils;
 import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
 import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
+import org.hibernate.search.integrationtest.util.orm.OrmUtils;
 import org.hibernate.search.engine.search.ProjectionConstants;
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -312,32 +308,7 @@ public class OrmElasticsearchProgrammaticMappingIT {
 					)
 					.query()
 					.asEntities()
-					.predicate().bool( b -> {
-						b.must().match()
-								.onField( "myTextField" ).boostedTo( 1.5f )
-								.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
-								.matching( "foo" );
-						b.should().range()
-								.onField( "myLocalDateField" )
-								.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
-								.to( LocalDate.of( 2017, 11, 01 ) );
-						/*
-						 * Alternative syntax taking advantage of lambdas,
-						 * allowing to introduce if/else statements in the query building code
-						 * and removing the need to call .end() on nested clause contexts.
-						 */
-						b.should( c -> {
-							if ( /* put some condition here, for example based on user input */ true ) {
-								c.range()
-										.onField( "numeric" )
-										.above( 12 );
-							}
-						} );
-					} )
-					.sort().byField( "numeric" ).desc()
-							.then().byField( "myLocalDateField" )
-							.then().byScore()
-							.end()
+					.predicate().all().end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );
@@ -377,174 +348,8 @@ public class OrmElasticsearchProgrammaticMappingIT {
 				},
 				"{"
 					+ "'query': {"
-						+ "'bool': {"
-							+ "'must': {"
-								+ "'bool': {"
-									+ "'should': ["
-										+ "{"
-											+ "'match': {"
-												+ "'myTextField': {"
-													+ "'query': 'foo',"
-													+ "'boost': 1.5"
-												+ "}"
-											+ "}"
-										+ "},"
-										+ "{"
-											+ "'match': {"
-												+ "'embedded.prefix_myTextField': {"
-													+ "'query': 'foo',"
-													+ "'boost': 0.9"
-												+ "}"
-											+ "}"
-										+ "}"
-									+ "]"
-								+ "}"
-							+ "},"
-							+ "'should': ["
-								+ "{"
-									+ "'range': {"
-										+ "'myLocalDateField': {"
-											+ "'gt': '2017-10-01',"
-											+ "'lte': '2017-11-01'"
-										+ "}"
-									+ "}"
-								+ "},"
-								+ "{"
-									+ "'range': {"
-										+ "'numeric': {"
-											+ "'gte': 12"
-										+ "}"
-									+ "}"
-								+ "}"
-							+ "]"
-						+ "}"
-					+ "},"
-					+ "'sort': ["
-						+ "{"
-							+ "'numeric': {"
-								+ "'order': 'desc'"
-							+ "}"
-						+ "},"
-						+ "'myLocalDateField',"
-						+ "'_score'"
-					+ "]"
-				+ "}" );
-	}
-
-	@Test
-	public void search_separatePredicate() throws JSONException {
-		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextSearchTarget<ParentIndexedEntity> target = ftSession.search(
-					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			);
-
-			SearchPredicate nestedPredicate = target.predicate()
-					.range()
-							.onField( "myLocalDateField" )
-							.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
-							.to( LocalDate.of( 2017, 11, 01 ) );
-			SearchPredicate otherNestedPredicate = target.predicate()
-					.range()
-							.onField( "numeric" )
-							.above( 12 );
-			SearchPredicate predicate = target.predicate()
-					.bool()
-							.must().match()
-									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
-									.matching( "foo" )
-							.should( nestedPredicate )
-							.mustNot().predicate( otherNestedPredicate )
-					.end();
-			SearchSort nestedSort = target.sort().byField( "numeric" ).desc().end();
-			SearchSort otherNestedSort = target.sort().byScore().end();
-			SearchSort sort = target.sort()
-					.by( nestedSort )
-					.then().byField( "myLocalDateField" )
-					.then().by( otherNestedSort )
-					.end();
-			FullTextQuery<ParentIndexedEntity> query = target.query()
-					.asEntities()
-					.predicate( predicate )
-					.sort( sort )
-					.build();
-
-			StubElasticsearchClient.pushStubResponse(
-					"{"
-						+ "'hits': {"
-							+ "'total': 2,"
-							+ "'hits': ["
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
-									+ "'_id': '0'"
-								+ "},"
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
-									+ "'_id': '1'"
-								+ "}"
-							+ "]"
-						+ "}"
+						+ "'match_all': {}"
 					+ "}"
-			);
-			query.list();
-		} );
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "POST", "/_search",
-				null,
-				"{"
-					+ "'query': {"
-						+ "'bool': {"
-							+ "'must': {"
-								+ "'bool': {"
-									+ "'should': ["
-										+ "{"
-											+ "'match': {"
-												+ "'myTextField': {"
-													+ "'query': 'foo',"
-													+ "'boost': 1.5"
-												+ "}"
-											+ "}"
-										+ "},"
-										+ "{"
-											+ "'match': {"
-												+ "'embedded.prefix_myTextField': {"
-													+ "'query': 'foo',"
-													+ "'boost': 0.9"
-												+ "}"
-											+ "}"
-										+ "}"
-									+ "]"
-								+ "}"
-							+ "},"
-							+ "'should': {"
-								+ "'range': {"
-									+ "'myLocalDateField': {"
-										+ "'gt': '2017-10-01',"
-										+ "'lte': '2017-11-01'"
-									+ "}"
-								+ "}"
-							+ "},"
-							+ "'must_not': {"
-								+ "'range': {"
-									+ "'numeric': {"
-										+ "'gte': 12"
-									+ "}"
-								+ "}"
-							+ "}"
-						+ "}"
-					+ "},"
-					+ "'sort': ["
-						+ "{"
-							+ "'numeric': {"
-								+ "'order': 'desc'"
-							+ "}"
-						+ "},"
-						+ "'myLocalDateField',"
-						+ "'_score'"
-					+ "]"
 				+ "}" );
 	}
 

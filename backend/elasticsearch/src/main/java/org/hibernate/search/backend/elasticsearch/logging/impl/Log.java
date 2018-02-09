@@ -49,7 +49,7 @@ public interface Log extends BasicLogger {
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
-	@Message(id = 7, value = "Unknown projection %1$s in indexes %2$s." )
+	@Message(id = 7, value = "Unknown projections %1$s in indexes %2$s." )
 	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<URLEncodedString> indexNames);
 
 	@Message(id = 8, value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."

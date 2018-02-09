@@ -50,6 +50,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
             <scope>test</scope>
         </dependency>
