@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -22,8 +21,6 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -37,7 +34,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
@@ -49,48 +45,36 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
+import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.engine.search.ProjectionConstants;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.fest.assertions.Assertions;
-import org.json.JSONException;
-
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertRequest;
+import static org.hibernate.search.integrationtest.util.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.integrationtest.util.common.stub.backend.StubBackendUtils.reference;
 
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanElasticsearchAnnotationMappingIT {
+public class JavaBeanAnnotationMappingIT {
+
+	@Rule
+	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	private SearchMappingRepository mappingRepository;
-
 	private JavaBeanMapping mapping;
 
-	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
-	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
-
 	@Before
-	public void setup() throws JSONException {
+	public void setup() {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.elasticsearchBackend_1.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
-				.setProperty( "backend.elasticsearchBackend_2.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_2.host", HOST_2 )
-				.setProperty( "index.default.backend", "elasticsearchBackend_1" )
-				.setProperty( "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" );
+				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
@@ -101,143 +85,61 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 		classSet.add( YetAnotherIndexedEntity.class );
 		contributor.annotationMapping().add( classSet );
 
+		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
+				.field( "numeric", Integer.class )
+				.field( "numericAsString", String.class )
+		);
+		backendMock.expectSchema( YetAnotherIndexedEntity.INDEX, b -> b
+				.objectField( "customBridgeOnProperty", b2 -> b2
+						.field( "date", LocalDate.class )
+						.field( "text", String.class )
+				)
+				.field( "myLocalDateField", LocalDate.class )
+				.field( "numeric", Integer.class )
+		);
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "customBridgeOnClass", b2 -> b2
+						.field( "date", LocalDate.class )
+						.field( "text", String.class )
+				)
+				.objectField( "customBridgeOnProperty", b2 -> b2
+						.field( "date", LocalDate.class )
+						.field( "text", String.class )
+				)
+				.objectField( "embedded", b2 -> b2
+						.objectField( "prefix_customBridgeOnClass", b3 -> b3
+								.field( "date", LocalDate.class )
+								.field( "text", String.class )
+						)
+						.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+								.field( "date", LocalDate.class )
+								.field( "text", String.class )
+						)
+						.objectField( "prefix_embedded", b3 -> b3
+								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+										.field( "text", String.class )
+								)
+						)
+						.field( "prefix_myLocalDateField", LocalDate.class )
+						.field( "prefix_myTextField", String.class )
+				)
+				.field( "myLocalDateField", LocalDate.class )
+		);
+
 		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-
-		assertDropAndCreateIndexRequests( requests, OtherIndexedEntity.INDEX, HOST_2,
-				"{"
-					+ "'properties': {"
-						+ "'numeric': {"
-							+ "'type': 'integer'"
-						+ "},"
-						+ "'numericAsString': {"
-							+ "'type': 'keyword'"
-						+ "}"
-					+ "}"
-				+ "}" );
-		assertDropAndCreateIndexRequests( requests, YetAnotherIndexedEntity.INDEX, HOST_1,
-				"{"
-					+ "'properties': {"
-						+ "'customBridgeOnProperty': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'date': {"
-									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-								+ "},"
-								+ "'text': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'myLocalDateField': {"
-							+ "'type': 'date',"
-							+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-						+ "},"
-						+ "'numeric': {"
-							+ "'type': 'integer'"
-						+ "},"
-					+ "}"
-				+ "}" );
-		assertDropAndCreateIndexRequests( requests, IndexedEntity.INDEX, HOST_1,
-				"{"
-					+ "'properties': {"
-						+ "'customBridgeOnClass': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'date': {"
-									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-								+ "},"
-								+ "'text': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'customBridgeOnProperty': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'date': {"
-									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-								+ "},"
-								+ "'text': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'embedded': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'prefix_customBridgeOnClass': {"
-									+ "'type': 'object',"
-									+ "'properties': {"
-										+ "'date': {"
-											+ "'type': 'date',"
-											+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-										+ "},"
-										+ "'text': {"
-											+ "'type': 'keyword'"
-										+ "}"
-									+ "}"
-								+ "},"
-								+ "'prefix_customBridgeOnProperty': {"
-									+ "'type': 'object',"
-									+ "'properties': {"
-										+ "'date': {"
-											+ "'type': 'date',"
-											+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-										+ "},"
-										+ "'text': {"
-											+ "'type': 'keyword'"
-										+ "}"
-									+ "}"
-								+ "},"
-								+ "'prefix_embedded': {"
-									+ "'type': 'object',"
-									+ "'properties': {"
-										+ "'prefix_customBridgeOnClass': {"
-											+ "'type': 'object',"
-											+ "'properties': {"
-												+ "'text': {"
-													+ "'type': 'keyword'"
-												+ "}"
-											+ "}"
-										+ "}"
-									+ "}"
-								+ "},"
-								+ "'prefix_myLocalDateField': {"
-									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-								+ "},"
-								+ "'prefix_myTextField': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'myLocalDateField': {"
-							+ "'type': 'date',"
-							+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
-						+ "},"
-						+ "'myTextField': {"
-							+ "'type': 'keyword'"
-						+ "}"
-					+ "}"
-				+ "}" );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@After
 	public void cleanup() {
-		StubElasticsearchClient.drainRequestsByIndex();
 		if ( mappingRepository != null ) {
 			mappingRepository.close();
 		}
 	}
 
 	@Test
-	public void index() throws JSONException {
+	public void index() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -263,53 +165,52 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 			manager.getMainWorker().add( entity4 );
 			manager.getMainWorker().delete( entity1 );
 			manager.getMainWorker().add( entity3 );
-		}
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		// We expect the first add to be removed due to the delete
-		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "2",
-				"{"
-					+ "'customBridgeOnClass': {"
-						+ "'text': 'some more text (2)',"
-						+ "'date': '2017-11-02'"
-					+ "},"
-					+ "'myLocalDateField': '2017-11-02',"
-					+ "'customBridgeOnProperty': {"
-						+ "'text': 'some more text (3)',"
-						+ "'date': '2017-11-03'"
-					+ "},"
-					+ "'embedded': {"
-						+ "'prefix_customBridgeOnClass': {"
-							+ "'text': 'some more text (3)',"
-							+ "'date': '2017-11-03'"
-						+ "},"
-						+ "'prefix_myLocalDateField': '2017-11-03',"
-						+ "'prefix_myTextField': 'some more text (3)'"
-					+ "},"
-					+ "'myTextField': 'some more text (2)'"
-				+ "}" );
-		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 1, HOST_1, "3",
-				"{"
-					+ "'customBridgeOnClass': {"
-						+ "'text': 'some more text (3)',"
-						+ "'date': '2017-11-03'"
-					+ "},"
-					+ "'myLocalDateField': '2017-11-03',"
-					+ "'myTextField': 'some more text (3)'"
-				+ "}" );
-		assertIndexDocumentRequest( requests, OtherIndexedEntity.INDEX, 0, HOST_2, "4",
-				"{"
-					+ "'numeric': 404,"
-					+ "'numericAsString': '404'"
-				+ "}" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "2", b -> b
+							.field( "myLocalDateField", entity2.getLocalDate() )
+							.field( "myTextField", entity2.getText() )
+							.objectField( "customBridgeOnClass", b2 -> b2
+									.field( "text", entity2.getText() )
+									.field( "date", entity2.getLocalDate() )
+							)
+							.objectField( "customBridgeOnProperty", b2 -> b2
+									.field( "text", entity3.getText() )
+									.field( "date", entity3.getLocalDate() )
+							)
+							.objectField( "embedded", b2 -> b2
+									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+											.field( "text", entity3.getText() )
+											.field( "date", entity3.getLocalDate() )
+									)
+									.field( "prefix_myTextField", entity3.getText() )
+									.field( "prefix_myLocalDateField", entity3.getLocalDate() )
+							)
+					)
+					.add( "3", b -> b
+							.field( "myLocalDateField", entity3.getLocalDate() )
+							.field( "myTextField", entity3.getText() )
+							.objectField( "customBridgeOnClass", b2 -> b2
+									.field( "text", entity3.getText() )
+									.field( "date", entity3.getLocalDate() )
+							)
+					)
+					.preparedThenExecuted();
+			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+					.add( "4", b -> b
+							.field( "numeric", entity4.getNumeric() )
+							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
+					)
+					.preparedThenExecuted();
+		}
 	}
 
 	@Test
-	public void search() throws JSONException {
+	public void search() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search(
-							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-					)
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			)
 					.query()
 					.asReferences()
 					.predicate().all().end()
@@ -317,52 +218,34 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
 
-			StubElasticsearchClient.pushStubResponse(
-					"{"
-						+ "'hits': {"
-							+ "'total': 6,"
-							+ "'hits': ["
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
-									+ "'_id': '0'"
-								+ "},"
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
-									+ "'_id': '1'"
-								+ "}"
-							+ "]"
-						+ "}"
-					+ "}"
+			backendMock.expectSearchReferences(
+					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					b -> b
+							.firstResultIndex( 3L )
+							.maxResultsCount( 2L ),
+					StubSearchWorkBehavior.of(
+							6L,
+							c -> c.collectReference( reference( IndexedEntity.INDEX, "0" ) ),
+							c -> c.collectReference( reference( YetAnotherIndexedEntity.INDEX, "1" ) )
+					)
 			);
-			SearchResult<PojoReference> result = query.execute();
-			Assertions.assertThat( result.getHits() ).hasSize( 2 )
-					.containsExactly(
+
+			assertThat( query )
+					.hasHitsExactOrder(
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
 							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
-					);
-			Assertions.assertThat( result.getHitCount() ).isEqualTo( 6 );
+					)
+					.hasHitCount( 6 );
+			backendMock.verifyExpectationsMet();
 		}
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "POST", "/_search",
-				c -> {
-					c.accept( "from", "3" );
-					c.accept( "size", "2" );
-				},
-				"{"
-					+ "'query': {"
-						+ "'match_all': {}"
-					+ "}"
-				+ "}" );
 	}
 
 	@Test
-	public void search_projection() throws JSONException {
+	public void search_projection() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<List<?>> query = manager.search(
-							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-					)
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			)
 					.query()
 					.asProjections(
 							"myTextField",
@@ -373,73 +256,53 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 					)
 					.predicate().all().end()
 					.build();
+			query.setFirstResult( 3L );
+			query.setMaxResults( 2L );
 
-			StubElasticsearchClient.pushStubResponse(
-					"{"
-						+ "'hits': {"
-							+ "'total': 2,"
-							+ "'hits': ["
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
-									+ "'_id': '0',"
-									+ "_source: {"
-										+ "'myLocalDateField': '2017-11-01',"
-										+ "'myTextField': 'text1',"
-										+ "'customBridgeOnClass.text': 'text2'"
-									+ "}"
-								+ "},"
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ) + "',"
-									+ "'_id': '1',"
-									+ "_source: {"
-										+ "'myLocalDateField': '2017-11-02'"
-									+ "}"
-								+ "}"
-							+ "]"
-						+ "}"
-					+ "}"
+			backendMock.expectSearchProjections(
+					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					b -> b
+							.firstResultIndex( 3L )
+							.maxResultsCount( 2L ),
+					StubSearchWorkBehavior.of(
+							2L,
+							c -> {
+								c.collectProjection( "text1" );
+								c.collectReference( reference( IndexedEntity.INDEX, "0" ) );
+								c.collectProjection( LocalDate.of( 2017, 11, 1 ) );
+								c.collectProjection( reference( IndexedEntity.INDEX, "0" ) );
+								c.collectProjection( "text2" );
+							},
+							c -> {
+								c.collectProjection( null );
+								c.collectReference( reference( YetAnotherIndexedEntity.INDEX, "1" ) );
+								c.collectProjection( LocalDate.of( 2017, 11, 2 ) );
+								c.collectProjection( reference( YetAnotherIndexedEntity.INDEX, "1" ) );
+								c.collectProjection( null );
+							}
+					)
 			);
-			SearchResult<List<?>> result = query.execute();
-			Assertions.assertThat( result.getHits() ).hasSize( 2 )
-					.containsExactly(
+
+			assertThat( query )
+					.hasHitsExactOrder(
 							Arrays.asList(
 									"text1",
 									new PojoReferenceImpl( IndexedEntity.class, 0 ),
 									LocalDate.of( 2017, 11, 1 ),
-									new ElasticsearchDocumentReference(
-											ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ),
-											"0"
-									),
+									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
 									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
 									LocalDate.of( 2017, 11, 2 ),
-									new ElasticsearchDocumentReference(
-											ElasticsearchIndexNameNormalizer.normalize( YetAnotherIndexedEntity.INDEX ),
-											"1"
-									),
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null
 							)
-					);
-			Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+					)
+					.hasHitCount( 2L );
+			backendMock.verifyExpectationsMet();
 		}
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 0,
-				HOST_1, "POST", "/_search",
-				null,
-				"{"
-					+ "'query': {"
-						+ "'match_all': {}"
-					+ "},"
-					+ "'_source': ["
-						+ "'myTextField',"
-						+ "'myLocalDateField',"
-						+ "'customBridgeOnClass.text'"
-					+ "]"
-				+ "}" );
 	}
 
 	public static class ParentIndexedEntity {
@@ -614,7 +477,8 @@ public class JavaBeanElasticsearchAnnotationMappingIT {
 		}
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(
+				IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
 				SearchModel searchModel) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );

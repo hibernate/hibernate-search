@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -19,36 +17,32 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarkerBui
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
+import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.json.JSONException;
 
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
-
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanElasticsearchProgrammaticMappingGeoPointIT {
+public class JavaBeanProgrammaticMappingGeoPointBridgeIT {
+
+	@Rule
+	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	private SearchMappingRepository mappingRepository;
-
 	private JavaBeanMapping mapping;
-
-	private static final String HOST = "http://es1.mycompany.com:9200/";
 
 	@Before
 	public void setup() throws JSONException {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.elasticsearchBackend.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend.host", HOST )
-				.setProperty( "index.default.backend", "elasticsearchBackend" );
+				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
@@ -99,52 +93,31 @@ public class JavaBeanElasticsearchProgrammaticMappingGeoPointIT {
 				.property( "lon" )
 						.marker( new LongitudeMarkerBuilder() );
 
+		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
+				.field( "homeLocation", GeoPoint.class )
+				.field( "workLocation", GeoPoint.class )
+		);
+		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
+				.field( "location", GeoPoint.class )
+		);
+		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
+				.field( "location", GeoPoint.class )
+		);
+
 		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-
-		assertDropAndCreateIndexRequests( requests, GeoPointOnTypeEntity.INDEX, HOST,
-				"{"
-					+ "'properties': {"
-						+ "'homeLocation': {"
-							+ "'type': 'geo_point'"
-						+ "},"
-						+ "'workLocation': {"
-							+ "'type': 'geo_point'"
-						+ "}"
-					+ "}"
-				+ "}" );
-
-		assertDropAndCreateIndexRequests( requests, GeoPointOnCoordinatesPropertyEntity.INDEX, HOST,
-				"{"
-					+ "'properties': {"
-						+ "'location': {"
-							+ "'type': 'geo_point'"
-						+ "}"
-					+ "}"
-				+ "}" );
-
-		assertDropAndCreateIndexRequests( requests, GeoPointOnCustomCoordinatesPropertyEntity.INDEX, HOST,
-				"{"
-					+ "'properties': {"
-						+ "'location': {"
-							+ "'type': 'geo_point'"
-						+ "}"
-					+ "}"
-				+ "}" );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@After
 	public void cleanup() {
-		StubElasticsearchClient.drainRequestsByIndex();
 		if ( mappingRepository != null ) {
 			mappingRepository.close();
 		}
 	}
 
 	@Test
-	public void index() throws JSONException {
+	public void index() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.setId( 1 );
@@ -171,34 +144,30 @@ public class JavaBeanElasticsearchProgrammaticMappingGeoPointIT {
 			manager.getMainWorker().add( entity1 );
 			manager.getMainWorker().add( entity2 );
 			manager.getMainWorker().add( entity3 );
-		}
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertIndexDocumentRequest( requests, GeoPointOnTypeEntity.INDEX, 0, HOST, "1",
-				"{"
-					+ "'homeLocation': {"
-						+ "'lat': 1.1,"
-						+ "'lon': 1.2"
-					+ "},"
-					+ "'workLocation': {"
-						+ "'lat': 1.3,"
-						+ "'lon': 1.4"
-					+ "}"
-				+ "}" );
-		assertIndexDocumentRequest( requests, GeoPointOnCoordinatesPropertyEntity.INDEX, 0, HOST, "2",
-				"{"
-					+ "'location': {"
-						+ "'lat': 2.1,"
-						+ "'lon': 2.2"
-					+ "}"
-				+ "}" );
-		assertIndexDocumentRequest( requests, GeoPointOnCustomCoordinatesPropertyEntity.INDEX, 0, HOST, "3",
-				"{"
-					+ "'location': {"
-						+ "'lat': 3.1,"
-						+ "'lon': 3.2"
-					+ "}"
-				+ "}" );
+			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
+					.add( "1", b -> b
+							.field( "homeLocation", new ImmutableGeoPoint(
+									entity1.getHomeLatitude(), entity1.getHomeLongitude()
+							) )
+							.field( "workLocation", new ImmutableGeoPoint(
+									entity1.getWorkLatitude(), entity1.getWorkLongitude()
+							) )
+					)
+					.preparedThenExecuted();
+			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.INDEX )
+					.add( "2", b -> b
+							.field( "location", entity2.getCoord() )
+					)
+					.preparedThenExecuted();
+			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
+					.add( "3", b -> b
+							.field( "location", new ImmutableGeoPoint(
+									entity3.getCoord().getLat(), entity3.getCoord().getLon()
+							) )
+					)
+					.preparedThenExecuted();
+		}
 	}
 
 	public static final class GeoPointOnTypeEntity {

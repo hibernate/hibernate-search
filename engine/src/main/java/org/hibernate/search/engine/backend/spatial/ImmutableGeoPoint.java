@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.spatial;
 
+import java.util.Objects;
+
 public final class ImmutableGeoPoint implements GeoPoint {
 
 	private final double latitude;
@@ -14,6 +16,32 @@ public final class ImmutableGeoPoint implements GeoPoint {
 	public ImmutableGeoPoint(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
+	}
+
+	@Override
+	public String toString() {
+		return "ImmutableGeoPoint["
+				+ "latitude=" + latitude
+				+ ", longitude=" + longitude
+				+ "]";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		ImmutableGeoPoint that = (ImmutableGeoPoint) o;
+		return that.latitude == latitude &&
+				that.longitude == longitude;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( latitude, longitude );
 	}
 
 	@Override

@@ -7,8 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;
@@ -29,42 +27,33 @@ import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.integrationtest.util.orm.OrmUtils;
-import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import org.json.JSONException;
-
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
 
 /**
  * @author Yoann Rodiere
  */
-public class OrmElasticsearchAccessTypeIT {
+public class OrmAnnotationMappingAccessTypeIT {
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
-	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
-	private static final String HOST_2 = "http://es2.mycompany.com:9200/";
+	@Rule
+	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	private SessionFactory sessionFactory;
 
 	@Before
-	public void setup() throws JSONException {
+	public void setup() {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.host", HOST_1 )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_2.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_2.host", HOST_2 )
-				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
-				.applySetting( PREFIX + "index.OtherIndexedEntity.backend", "elasticsearchBackend_2" )
+				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
 				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
@@ -79,73 +68,38 @@ public class OrmElasticsearchAccessTypeIT {
 		Metadata metadata = ms.buildMetadata();
 
 		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-		this.sessionFactory = sfb.build();
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.field( "fieldWithNonDefaultFieldAccess", String.class )
+				.field( "fieldWithDefaultFieldAccess", String.class )
+				.field( "fieldWithNonDefaultMethodAccess", String.class )
+				.field( "fieldWithDefaultMethodAccess", String.class )
+				.objectField( "embeddedWithDefaultFieldAccess", b2 -> b2
+						.field( "fieldWithDefaultFieldAccess", String.class )
+						.field( "fieldWithNonDefaultMethodAccess", String.class )
+				)
+				.objectField( "embeddedWithDefaultMethodAccess", b2 -> b2
+						.field( "fieldWithNonDefaultFieldAccess", String.class )
+						.field( "fieldWithDefaultMethodAccess", String.class )
+				)
+				.objectField( "nonManaged", b2 -> b2
+						.field( "field", String.class )
+				)
+		);
+		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-
-		assertDropAndCreateIndexRequests( requests, IndexedEntity.INDEX, HOST_1,
-				"{"
-					+ "'properties': {"
-						+ "'fieldWithNonDefaultFieldAccess': {"
-							+ "'type': 'keyword'"
-						+ "},"
-						+ "'fieldWithDefaultFieldAccess': {"
-						+ "'type': 'keyword'"
-						+ "},"
-						+ "'fieldWithNonDefaultMethodAccess': {"
-							+ "'type': 'keyword'"
-						+ "},"
-						+ "'fieldWithDefaultMethodAccess': {"
-							+ "'type': 'keyword'"
-						+ "},"
-						+ "'embeddedWithDefaultFieldAccess': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'fieldWithDefaultFieldAccess': {"
-									+ "'type': 'keyword'"
-								+ "},"
-								+ "'fieldWithNonDefaultMethodAccess': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'embeddedWithDefaultMethodAccess': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'fieldWithNonDefaultFieldAccess': {"
-									+ "'type': 'keyword'"
-								+ "},"
-								+ "'fieldWithDefaultMethodAccess': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "},"
-						+ "'nonManaged': {"
-							+ "'type': 'object',"
-							+ "'properties': {"
-								+ "'field': {"
-									+ "'type': 'keyword'"
-								+ "}"
-							+ "}"
-						+ "}"
-					+ "}"
-				+ "}" );
-
-		assertDropAndCreateIndexRequests( requests, IndexedEntityWithoutIdSetter.INDEX, HOST_1,
-				"{"
-				+ "}" );
+		sessionFactory = sfb.build();
+		backendMock.verifyExpectationsMet();
 	}
 
 	@After
 	public void cleanup() {
-		StubElasticsearchClient.drainRequestsByIndex();
 		if ( sessionFactory != null ) {
 			sessionFactory.close();
 		}
 	}
 
 	@Test
-	public void index() throws JSONException {
+	public void index() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;
@@ -169,28 +123,27 @@ public class OrmElasticsearchAccessTypeIT {
 			nonManaged.setField( "value" );
 
 			session.persist( entity1 );
-		} );
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		// We expect the first add to be removed due to the delete
-		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "1",
-				"{"
-					+ "'fieldWithNonDefaultFieldAccess': 'nonDefaultFieldAccess',"
-					+ "'fieldWithDefaultFieldAccess': 'defaultFieldAccess',"
-					+ "'fieldWithNonDefaultMethodAccess': 'nonDefaultMethodAccess',"
-					+ "'fieldWithDefaultMethodAccess': 'defaultMethodAccess',"
-					+ "'embeddedWithDefaultFieldAccess': {"
-						+ "'fieldWithNonDefaultMethodAccess': 'nonDefaultMethodAccess',"
-						+ "'fieldWithDefaultFieldAccess': 'defaultFieldAccess'"
-					+ "},"
-					+ "'embeddedWithDefaultMethodAccess': {"
-						+ "'fieldWithNonDefaultFieldAccess': 'nonDefaultFieldAccess',"
-						+ "'fieldWithDefaultMethodAccess': 'defaultMethodAccess'"
-					+ "},"
-					+ "'nonManaged': {"
-						+ "'field': 'value'"
-					+ "}"
-				+ "}" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "fieldWithNonDefaultFieldAccess", entity1.fieldWithNonDefaultFieldAccess )
+							.field( "fieldWithDefaultFieldAccess", entity1.fieldWithDefaultFieldAccess )
+							.field( "fieldWithNonDefaultMethodAccess", entity1.getFieldWithNonDefaultMethodAccess() )
+							.field( "fieldWithDefaultMethodAccess", entity1.getFieldWithDefaultMethodAccess() )
+							.objectField( "embeddedWithDefaultFieldAccess", b2 -> b2
+									.field( "fieldWithDefaultFieldAccess", embeddableWithDefaultFieldAccess.fieldWithDefaultFieldAccess )
+									.field( "fieldWithNonDefaultMethodAccess", embeddableWithDefaultFieldAccess.getFieldWithNonDefaultMethodAccess() )
+							)
+							.objectField( "embeddedWithDefaultMethodAccess", b2 -> b2
+									.field( "fieldWithNonDefaultFieldAccess", embeddableWithDefaultMethodAccess.fieldWithNonDefaultFieldAccess )
+									.field( "fieldWithDefaultMethodAccess", embeddableWithDefaultMethodAccess.getFieldWithDefaultMethodAccess() )
+							)
+							.objectField( "nonManaged", b2 -> b2
+									.field( "field", nonManaged.getField() )
+							)
+					)
+					.preparedThenExecuted();
+		} );
 	}
 
 	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {

@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -21,38 +19,33 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.integrationtest.util.common.StubClientElasticsearchBackendFactory;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient;
-import org.hibernate.search.integrationtest.util.common.StubElasticsearchClient.Request;
+import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.integrationtest.util.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.engine.search.SearchQuery;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import org.json.JSONException;
-
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertDropAndCreateIndexRequests;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertIndexDocumentRequest;
-import static org.hibernate.search.integrationtest.util.common.StubAssert.assertRequest;
 
 /**
  * @author Yoann Rodiere
  */
-public class JavaBeanElasticsearchRoutingIT {
+public class JavaBeanProgrammaticMappingRoutingIT {
+
+	@Rule
+	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	private SearchMappingRepository mappingRepository;
-
 	private JavaBeanMapping mapping;
 
-	private static final String HOST_1 = "http://es1.mycompany.com:9200/";
-
 	@Before
-	public void setup() throws JSONException {
+	public void setup() {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.elasticsearchBackend_1.type", StubClientElasticsearchBackendFactory.class.getName() )
-				.setProperty( "backend.elasticsearchBackend_1.host", HOST_1 )
-				.setProperty( "index.default.backend", "elasticsearchBackend_1" );
+				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
 
@@ -64,34 +57,25 @@ public class JavaBeanElasticsearchRoutingIT {
 						.documentId()
 				.property( "value" ).field();
 
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.explicitRouting()
+				.field( "value", String.class )
+		);
+
 		mappingRepository = mappingRepositoryBuilder.build();
 		mapping = contributor.getResult();
-
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-
-		assertDropAndCreateIndexRequests( requests, IndexedEntity.INDEX, HOST_1,
-				"{"
-					+ "'_routing': {"
-						+ "'required': true"
-					+ "},"
-					+ "'properties': {"
-						+ "'value': {"
-							+ "'type': 'keyword'"
-						+ "}"
-					+ "}"
-				+ "}" );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@After
 	public void cleanup() {
-		StubElasticsearchClient.drainRequestsByIndex();
 		if ( mappingRepository != null ) {
 			mappingRepository.close();
 		}
 	}
 
 	@Test
-	public void index() throws JSONException {
+	public void index() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -99,21 +83,22 @@ public class JavaBeanElasticsearchRoutingIT {
 			entity1.setValue( "val1" );
 
 			manager.getMainWorker().add( entity1 );
-		}
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "1",
-				c -> {
-					c.accept( "_routing", "category_2" );
-					c.accept( "refresh", "true" );
-				},
-				"{"
-					+ "'value': 'val1'"
-				+ "}" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( b -> b
+							.identifier( "1" )
+							.routingKey( "category_2" )
+							.document( StubDocumentNode.document()
+									.field( "value", entity1.getValue() )
+									.build()
+							)
+					)
+					.preparedThenExecuted();
+		}
 	}
 
 	@Test
-	public void index_multiTenancy() throws JSONException {
+	public void index_multiTenancy() {
 		try ( PojoSearchManager manager = mapping.createSearchManagerWithOptions()
 				.tenantId( "myTenantId" )
 				.build() ) {
@@ -123,21 +108,23 @@ public class JavaBeanElasticsearchRoutingIT {
 			entity1.setValue( "val1" );
 
 			manager.getMainWorker().add( entity1 );
-		}
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertIndexDocumentRequest( requests, IndexedEntity.INDEX, 0, HOST_1, "myTenantId_1",
-				c -> {
-					c.accept( "_routing", "myTenantId/category_2" );
-					c.accept( "refresh", "true" );
-				},
-				"{"
-						+ "'value': 'val1'"
-						+ "}" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( b -> b
+							.identifier( "1" )
+							.tenantIdentifier( "myTenantId" )
+							.routingKey( "myTenantId/category_2" )
+							.document( StubDocumentNode.document()
+									.field( "value", entity1.getValue() )
+									.build()
+							)
+					)
+					.preparedThenExecuted();
+		}
 	}
 
 	@Test
-	public void search() throws JSONException {
+	public void search() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
@@ -146,40 +133,15 @@ public class JavaBeanElasticsearchRoutingIT {
 					.routing( "category_2" )
 					.build();
 
-			StubElasticsearchClient.pushStubResponse(
-					"{"
-						+ "'hits': {"
-							+ "'hits': ["
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
-									+ "'_id': '0'"
-								+ "},"
-								+ "{"
-									+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( IndexedEntity.INDEX ) + "',"
-									+ "'_id': '1'"
-								+ "}"
-							+ "]"
-						+ "}"
-					+ "}"
+			backendMock.expectSearchReferences(
+					Collections.singletonList( IndexedEntity.INDEX ),
+					b -> b.routingKey( "category_2" ),
+					StubSearchWorkBehavior.empty()
 			);
-			query.execute();
-		}
 
-		Map<String, List<Request>> requests = StubElasticsearchClient.drainRequestsByIndex();
-		assertRequest( requests, IndexedEntity.INDEX, 0,
-				HOST_1, "POST", "/_search",
-				c -> {
-					c.accept( "_routing", "category_2" );
-				},
-				"{"
-					+ "'query': {"
-						+ "'match': {"
-							+ "'value': {"
-								+ "'query': 'val1'"
-							+ "}"
-						+ "}"
-					+ "}"
-				+ "}" );
+			query.execute();
+			backendMock.verifyExpectationsMet();
+		}
 	}
 
 	// TODO implement filters and allow them to use routing predicates, then test this here
