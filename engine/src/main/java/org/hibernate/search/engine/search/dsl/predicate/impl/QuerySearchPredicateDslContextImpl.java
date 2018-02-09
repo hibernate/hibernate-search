@@ -6,24 +6,32 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.spi.LoggerFactory;
 
-public final class QuerySearchPredicateBuildingRootContextImpl<C>
-		implements SearchPredicateDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
+/**
+ * A DSL context used when calling {@link SearchQueryResultContext#predicate()} to build the predicate
+ * in a fluid way (in the same call chain as the query).
+ */
+public final class QuerySearchPredicateDslContextImpl<N, C>
+		implements SearchPredicateDslContext<N, C> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateFactory<C> factory;
+	private final C collector;
+	private final Supplier<N> nextContextSupplier;
 
 	private SearchPredicateContributor<C> singlePredicateContributor;
 
-	public QuerySearchPredicateBuildingRootContextImpl(SearchPredicateFactory<C> factory) {
-		this.factory = factory;
+	public QuerySearchPredicateDslContextImpl(C collector, Supplier<N> nextContextSupplier) {
+		this.collector = collector;
+		this.nextContextSupplier = nextContextSupplier;
 	}
 
 	@Override
@@ -35,12 +43,8 @@ public final class QuerySearchPredicateBuildingRootContextImpl<C>
 	}
 
 	@Override
-	public SearchPredicate getNextContext() {
-		return factory.toSearchPredicate( singlePredicateContributor );
-	}
-
-	@Override
-	public void contribute(C collector) {
+	public N getNextContext() {
 		singlePredicateContributor.contribute( collector );
+		return nextContextSupplier.get();
 	}
 }

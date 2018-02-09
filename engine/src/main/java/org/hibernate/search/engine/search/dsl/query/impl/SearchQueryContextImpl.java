@@ -14,8 +14,10 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.QuerySearchSortBuildingRootContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.impl.BuildingRootSearchSortDslContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.impl.QuerySearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
@@ -64,14 +66,26 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 		return this;
 	}
 
+	@Override
+	public SearchSortContainerContext<SearchQueryContext<Q>> sort() {
+		return toSortContainerContext( targetContext.getSearchSortFactory(),
+				searchQueryBuilder.getQueryElementCollector(), this );
+	}
+
 	private <SC> SearchSortContributor<SC> toContributor(SearchSortFactory<SC> factory,
 			Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
-		QuerySearchSortBuildingRootContextImpl<SC> dslContext =
-				new QuerySearchSortBuildingRootContextImpl<>( factory );
+		BuildingRootSearchSortDslContextImpl<SC> dslContext =
+				new BuildingRootSearchSortDslContextImpl<>( factory );
 		SearchSortContainerContext<SearchSort> containerContext =
 				new SearchSortContainerContextImpl<>( factory, dslContext );
 		sortContributor.accept( containerContext );
 		return dslContext;
+	}
+
+	private <N, PC> SearchSortContainerContext<N> toSortContainerContext(
+			SearchSortFactory<PC> factory, PC collector, N nextContext) {
+		SearchSortDslContext<N, PC> dslContext = new QuerySearchSortDslContextImpl<>( collector, nextContext );
+		return new SearchSortContainerContextImpl<>( factory, dslContext );
 	}
 
 	@Override

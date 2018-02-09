@@ -7,14 +7,14 @@
 package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.impl.QuerySearchPredicateBuildingRootContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.impl.BuildingRootSearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 public final class SearchTargetPredicateRootContext<C> extends SearchPredicateContainerContextImpl<SearchPredicate, C> {
 
 	public SearchTargetPredicateRootContext(SearchPredicateFactory<C> factory) {
-		super( factory, new QuerySearchPredicateBuildingRootContextImpl<>( factory ) );
+		super( factory, new BuildingRootSearchPredicateDslContextImpl<>( factory ) );
 	}
 
 }

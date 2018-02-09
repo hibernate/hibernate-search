@@ -20,4 +20,6 @@ public interface SearchQueryResultContext<Q> {
 
 	SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> predicateContributor);
 
+	SearchPredicateContainerContext<SearchQueryContext<Q>> predicate();
+
 }

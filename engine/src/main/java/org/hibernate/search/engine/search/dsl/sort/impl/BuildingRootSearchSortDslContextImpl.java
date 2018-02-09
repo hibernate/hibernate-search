@@ -14,14 +14,14 @@ import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-public final class QuerySearchSortBuildingRootContextImpl<C>
+public final class BuildingRootSearchSortDslContextImpl<C>
 		implements SearchSortDslContext<SearchSort, C>, SearchSortContributor<C> {
 
 	private final SearchSortFactory<C> factory;
 
 	private List<SearchSortContributor<C>> sortContributors = new ArrayList<>();
 
-	public QuerySearchSortBuildingRootContextImpl(SearchSortFactory<C> factory) {
+	public BuildingRootSearchSortDslContextImpl(SearchSortFactory<C> factory) {
 		this.factory = factory;
 	}
 
