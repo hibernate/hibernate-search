@@ -118,21 +118,21 @@ public class JavaBeanElasticsearchExtensionIT {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()
-					.predicate( root -> root.bool()
-							.should().withExtension( ElasticsearchExtension.get() )
-									.fromJsonString( "{'es1': 'val1'}" )
-							.should().withExtensionOptional(
-									ElasticsearchExtension.get(),
-									// FIXME find some way to forbid using the context twice... ?
-									c -> c.fromJsonString( "{'es2': 'val2'}" )
-							)
-							.must().withExtensionOptional(
-									ElasticsearchExtension.get(),
-									// FIXME find some way to forbid using the context twice... ?
-									c -> c.fromJsonString( "{'es3': 'val3'}" ),
-									c -> c.match().onField( "fallback1" ).matching( "val1" )
-							)
-					)
+					.predicate().bool( b -> {
+						b.should().withExtension( ElasticsearchExtension.get() )
+								.fromJsonString( "{'es1': 'val1'}" );
+						b.should().withExtensionOptional(
+								ElasticsearchExtension.get(),
+								// FIXME find some way to forbid using the context twice... ?
+								c -> c.fromJsonString( "{'es2': 'val2'}" )
+						);
+						b.must().withExtensionOptional(
+								ElasticsearchExtension.get(),
+								// FIXME find some way to forbid using the context twice... ?
+								c -> c.fromJsonString( "{'es3': 'val3'}" ),
+								c -> c.match().onField( "fallback1" ).matching( "val1" )
+						);
+					} )
 					.build();
 
 			query.execute();

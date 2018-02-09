@@ -323,33 +323,32 @@ public class OrmElasticsearchAnnotationMappingIT {
 					)
 					.query()
 					.asEntities()
-					.predicate( root -> root.bool()
-							.must().match()
-									.onField( "myTextField" ).boostedTo( 1.5f )
-									.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
-									.matching( "foo" )
-							.should().range()
-									.onField( "myLocalDateField" )
-									.from( LocalDate.of( 2017, 10, 01 ), RangeBoundInclusion.EXCLUDED )
-									.to( LocalDate.of( 2017, 11, 01 ) )
-							/*
-							 * Alternative syntax taking advantage of lambdas,
-							 * allowing to introduce if/else statements in the query building code
-							 * and removing the need to call .end() on nested clause contexts.
-							 */
-							.should( c -> {
-								if ( /* put some condition here, for example based on user input */ true ) {
-									c.range()
-											.onField( "numeric" )
-											.above( 12 );
-								}
-							} )
-					)
-					.sort( c ->
-							c.byField( "numeric" ).desc()
-									.then().byField( "myLocalDateField" )
-									.then().byScore()
-					)
+					.predicate().bool( b -> {
+						b.must().match()
+								.onField( "myTextField" ).boostedTo( 1.5f )
+								.orField( "embedded.prefix_myTextField" ).boostedTo( 0.9f )
+								.matching( "foo" );
+						b.should().range()
+								.onField( "myLocalDateField" )
+								.from( LocalDate.of( 2017, 10, 1 ), RangeBoundInclusion.EXCLUDED )
+								.to( LocalDate.of( 2017, 11, 1 ) );
+						/*
+						 * Alternative syntax taking advantage of lambdas,
+						 * allowing to introduce if/else statements in the query building code
+						 * and removing the need to call .end() on nested clause contexts.
+						 */
+						b.should( c -> {
+							if ( /* put some condition here, for example based on user input */ true ) {
+								c.range()
+										.onField( "numeric" )
+										.above( 12 );
+							}
+						} );
+					} )
+					.sort().byField( "numeric" ).desc()
+							.then().byField( "myLocalDateField" )
+							.then().byScore()
+							.end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );

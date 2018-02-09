@@ -199,16 +199,14 @@ public class JavaBeanElasticsearchObjectFieldIT {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()
-					.predicate( root ->
-							root.nested().onObjectField( "nestedTexts" )
-									.bool()
-											.must().match()
-													.onField( "nestedTexts.text" )
-													.matching( "value_1")
-											.must().match()
-													.onField( "nestedTexts.text" )
-													.matching( "value_3")
-					)
+					.predicate().nested().onObjectField( "nestedTexts" ).bool( b -> {
+						b.must().match()
+								.onField( "nestedTexts.text" )
+								.matching( "value_1" );
+						b.must().match()
+								.onField( "nestedTexts.text" )
+								.matching( "value_3" );
+					} )
 					.build();
 
 			query.execute();

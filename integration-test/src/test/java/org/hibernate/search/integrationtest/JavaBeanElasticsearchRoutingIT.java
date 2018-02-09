@@ -139,10 +139,7 @@ public class JavaBeanElasticsearchRoutingIT {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()
-					.predicate( root -> root.match()
-							.onField( "value" )
-							.matching( "val1" )
-					)
+					.predicate().match().onField( "value" ).matching( "val1" )
 					.routing( "category_2" )
 					.build();
 
