@@ -21,16 +21,14 @@ public interface AllPredicateContext<N> extends SearchPredicateContext<AllPredic
 	AllPredicateContext<N> except(SearchPredicate searchPredicate);
 
 	/*
-	 * Fully fluid syntax, without lambdas but requiring .end()
-	 * calls from time to time to mark the end of a nested context.
+	 * Fully fluid syntax.
 	 */
 
 	SearchPredicateContainerContext<? extends AllPredicateContext<N>> except();
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
-	 * allowing to introduce if/else statements in the query building code
-	 * and removing the need to call .end() on nested clause contexts.
+	 * allowing to introduce if/else statements in the query building code.
 	 */
 
 	AllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);

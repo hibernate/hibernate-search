@@ -27,8 +27,7 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate);
 
 	/*
-	 * Fully fluid syntax, without lambdas but requiring .end()
-	 * calls from time to time to mark the end of a nested context.
+	 * Fully fluid syntax.
 	 */
 
 	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> must();
@@ -41,8 +40,7 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
-	 * allowing to introduce if/else statements in the query building code
-	 * and removing the need to call .end() on nested clause contexts.
+	 * allowing to introduce if/else statements in the query building code.
 	 */
 
 	BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);

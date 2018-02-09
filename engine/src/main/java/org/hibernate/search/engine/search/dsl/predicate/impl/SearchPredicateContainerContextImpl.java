@@ -47,6 +47,13 @@ public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicat
 	}
 
 	@Override
+	public N bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor) {
+		BooleanJunctionPredicateContext<N> context = bool();
+		clauseContributor.accept( context );
+		return context.end();
+	}
+
+	@Override
 	public MatchPredicateContext<N> match() {
 		MatchPredicateContextImpl<N, C> child = new MatchPredicateContextImpl<>( factory, dslContext::getNextContext );
 		dslContext.addContributor( child );

@@ -22,7 +22,17 @@ public interface SearchPredicateContainerContext<N> {
 
 	AllPredicateContext<N> all();
 
+	/*
+	 * Fully fluid syntax, without lambdas but requiring an .end()
+	 * call to mark the end of a nested context.
+	 */
 	BooleanJunctionPredicateContext<N> bool();
+
+	/*
+	 * Alternative syntax taking advantage of lambdas,
+	 * removing the need to call .end() on the nested context.
+	 */
+	N bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor);
 
 	MatchPredicateContext<N> match();
 

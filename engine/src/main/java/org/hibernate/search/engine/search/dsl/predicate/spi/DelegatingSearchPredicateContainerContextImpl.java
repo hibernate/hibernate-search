@@ -40,6 +40,11 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
+	public N bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor) {
+		return delegate.bool( clauseContributor );
+	}
+
+	@Override
 	public MatchPredicateContext<N> match() {
 		return delegate.match();
 	}
