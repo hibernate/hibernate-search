@@ -312,6 +312,7 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
+                        <argLine>${surefireCoverageArgLine}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -323,7 +324,13 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
+                        <argLine>${failsafeCoverageArgLine}</argLine>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -358,6 +365,60 @@
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>coverage</id>
+            <properties>
+                <!--
+                    Caution, we use @{...} for late property evaluation here:
+                    http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
+                    This is necessary for Jacoco to work as expected.
+                    However, we wrap the @{...} references into two early-evaluated properties
+                    because in certain environments (IntelliJ IDEA), the use of late property evaluation
+                    is not supported and breaks test execution.
+                    This is because IntelliJ tries to parse the POM to retrieve the surefire/failsafe
+                    argLine and pass them to the test execution directly,
+                    but then fails to evaluate "@{...}" references, resulting in errors.
+                    As a result, this profile will not work in IntelliJ,
+                    but we don't need JaCoCo in IntelliJ anyway.
+                 -->
+                <surefireCoverageArgLine>@{surefireJacocoArgLine}</surefireCoverageArgLine>
+                <failsafeCoverageArgLine>@{failsafeJacocoArgLine}</failsafeCoverageArgLine>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/Log_$logger.class</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>surefireJacocoArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-prepare-agent-integration</id>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafeJacocoArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <!-- =============================== -->
