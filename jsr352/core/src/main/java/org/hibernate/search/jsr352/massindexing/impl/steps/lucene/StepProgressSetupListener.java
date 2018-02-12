@@ -87,7 +87,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 					throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
 			}
 
-			try (Session session = PersistenceUtil.openSession( emf, tenantId )) {
+			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
 				for ( Class<?> entityType : jobData.getEntityTypes() ) {
 					Long rowCount = rowCountFunction.apply( session, entityType );
 					log.rowsToIndex( entityType.getName(), rowCount );
