@@ -91,7 +91,7 @@ public class JavaBeanElasticsearchRoutingIT {
 
 	@Test
 	public void index() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
@@ -112,7 +112,7 @@ public class JavaBeanElasticsearchRoutingIT {
 
 	@Test
 	public void index_multiTenancy() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManagerWithOptions()
+		try ( PojoSearchManager manager = mapping.createSearchManagerWithOptions()
 				.tenantId( "myTenantId" )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -135,7 +135,7 @@ public class JavaBeanElasticsearchRoutingIT {
 
 	@Test
 	public void search() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()

@@ -135,7 +135,7 @@
             in 6.16 (still valid in 7.1.1): https://github.com/checkstyle/checkstyle/issues/3048 -->
         <module name="ParenPad">
             <property name="tokens" value="CTOR_CALL, SUPER_CTOR_CALL, LITERAL_FOR, LITERAL_IF,
-                        LITERAL_WHILE, LITERAL_SWITCH, LITERAL_NEW"/>
+                        LITERAL_WHILE, LITERAL_SWITCH, LITERAL_NEW, RESOURCE_SPECIFICATION"/>
             <property name="option" value="space"/>
         </module>
 

@@ -76,7 +76,7 @@ public class JavaBeanElasticsearchMultipleHostsIT {
 						+ "}"
 				+ "}" );
 
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			manager.getMainWorker().add( entity1 );

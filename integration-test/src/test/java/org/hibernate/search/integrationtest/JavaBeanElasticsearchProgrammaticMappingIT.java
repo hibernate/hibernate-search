@@ -263,7 +263,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void index() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -331,7 +331,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
@@ -458,7 +458,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search_separatePredicate() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			PojoSearchTarget<?> target = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
@@ -574,7 +574,7 @@ public class JavaBeanElasticsearchProgrammaticMappingIT {
 
 	@Test
 	public void search_projection() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<List<?>> query = manager.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)

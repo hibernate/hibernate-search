@@ -127,7 +127,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 
 	@Test
 	public void index() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setTexts( Arrays.asList(
@@ -195,7 +195,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 
 	@Test
 	public void search_nestedPredicate() throws JSONException {
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()
@@ -249,7 +249,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedTexts'" );
 		thrown.expectMessage( "is not stored as nested" );
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			manager.search( IndexedEntity.class )
 					.predicate().nested().onObjectField( "flattenedTexts" );
 		}
@@ -260,7 +260,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedTexts.text'" );
 		thrown.expectMessage( "is not an object field" );
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			manager.search( IndexedEntity.class )
 					.predicate().nested().onObjectField( "flattenedTexts.text" );
 		}
@@ -270,7 +270,7 @@ public class JavaBeanElasticsearchObjectFieldIT {
 	public void nestedPredicate_error_missingField() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field 'doesNotExist'" );
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			manager.search( IndexedEntity.class )
 					.predicate().nested().onObjectField( "doesNotExist" );
 		}

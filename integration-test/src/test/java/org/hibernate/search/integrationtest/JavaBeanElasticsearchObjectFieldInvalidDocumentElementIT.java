@@ -89,7 +89,7 @@ public class JavaBeanElasticsearchObjectFieldInvalidDocumentElementIT {
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'customBridgeOnProperty', got 'null'." );
 
-		try (PojoSearchManager manager = mapping.createSearchManager()) {
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "foo" );

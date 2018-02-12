@@ -22,7 +22,7 @@ public final class OrmUtils {
 	}
 
 	public static void withinSession(SessionFactory sessionFactory, Consumer<Session> action) {
-		try (Session session = sessionFactory.openSession()) {
+		try ( Session session = sessionFactory.openSession() ) {
 			action.accept( session );
 		}
 	}
