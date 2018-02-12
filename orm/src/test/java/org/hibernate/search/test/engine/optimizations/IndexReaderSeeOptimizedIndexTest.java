@@ -135,7 +135,7 @@ public class IndexReaderSeeOptimizedIndexTest extends SearchTestBase {
 
 			session.beginTransaction();
 			SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
-			try (IndexReader indexReader = indexReader( searchFactory )) {
+			try ( IndexReader indexReader = indexReader( searchFactory ) ) {
 				assertThat( indexReader.hasDeletions() )
 					.as( "IndexReader should see the deletions before the optimization" )
 					.isTrue();
@@ -144,7 +144,7 @@ public class IndexReaderSeeOptimizedIndexTest extends SearchTestBase {
 				session.getTransaction().commit();
 			}
 
-			try (IndexReader indexReader = indexReader( searchFactory )) {
+			try ( IndexReader indexReader = indexReader( searchFactory ) ) {
 				assertThat( indexReader.hasDeletions() )
 					.as( "IndexReader should see some deletions after optimization" )
 					.isFalse();

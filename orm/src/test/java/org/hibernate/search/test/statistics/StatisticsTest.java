@@ -281,7 +281,7 @@ public class StatisticsTest extends SearchTestBase {
 		assertEquals( (Long) currentSizeForA, indexSizes.get( A.INDEX_NAME ) );
 		assertEquals( (Long) currentSizeForB, indexSizes.get( B.INDEX_NAME ) );
 
-		try (Session s = openSession()) {
+		try ( Session s = openSession() ) {
 			A entity = new A();
 			entity.id = 1L;
 			Transaction tx = s.beginTransaction();
@@ -301,7 +301,7 @@ public class StatisticsTest extends SearchTestBase {
 		assertEquals( (Long) currentSizeForA, indexSizes.get( A.INDEX_NAME ) );
 		assertEquals( (Long) currentSizeForB, indexSizes.get( B.INDEX_NAME ) );
 
-		try (Session s = openSession()) {
+		try ( Session s = openSession() ) {
 			A entity = new A();
 			entity.id = 2L;
 			Transaction tx = s.beginTransaction();

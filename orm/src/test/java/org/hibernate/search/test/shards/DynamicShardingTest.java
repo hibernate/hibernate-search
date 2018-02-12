@@ -179,7 +179,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	private void deleteAnimal(Object entity) {
-		try (Session session = openSession()) {
+		try ( Session session = openSession() ) {
 			Transaction tx = session.beginTransaction();
 			session.delete( entity );
 			tx.commit();

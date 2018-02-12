@@ -32,7 +32,7 @@ public class DeleteByTermEnforcementTest extends BaseConfigurationTest {
 	}
 
 	private void verifyDeleteByTermEnforced(SearchConfigurationForTest cfg) {
-		try (MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg )) {
+		try ( MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg ) ) {
 			assertTrue( extractWorkspace( sf, Document.class ).isDeleteByTermEnforced() );
 
 			// trigger a SearchFactory rebuild:

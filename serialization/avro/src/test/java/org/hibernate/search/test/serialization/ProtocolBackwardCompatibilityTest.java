@@ -230,7 +230,7 @@ public class ProtocolBackwardCompatibilityTest {
 	private void storeSerializedForm(byte[] out, int major, int minor) throws IOException {
 		Path targetDir = getTargetDir();
 		Path outputFilePath = targetDir.resolve( RESOURCE_BASE_NAME + major + "." + minor );
-		try (OutputStream outputStream = new FileOutputStream( outputFilePath.toFile() )) {
+		try ( OutputStream outputStream = new FileOutputStream( outputFilePath.toFile() ) ) {
 			outputStream.write( out );
 			outputStream.flush();
 		}

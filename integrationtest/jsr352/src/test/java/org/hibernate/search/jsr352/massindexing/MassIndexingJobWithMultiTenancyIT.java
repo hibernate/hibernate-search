@@ -70,7 +70,7 @@ public class MassIndexingJobWithMultiTenancyIT extends SearchTestBase {
 	}
 
 	private <T> void persist(String tenantId, List<T> entities) {
-		try (Session session = openSessionWithTenantId( tenantId )) {
+		try ( Session session = openSessionWithTenantId( tenantId ) ) {
 			session.getTransaction().begin();
 			entities.forEach( session::persist );
 			session.getTransaction().commit();

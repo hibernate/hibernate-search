@@ -216,8 +216,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	private boolean determineQueryTranslatorPresent() {
-		try (ServiceReference<LuceneQueryTranslator> translator =
-				getServiceManager().requestReference( LuceneQueryTranslator.class )) {
+		try ( ServiceReference<LuceneQueryTranslator> translator = getServiceManager().requestReference( LuceneQueryTranslator.class ) ) {
 			return true;
 		}
 		catch (Exception e) {
@@ -300,8 +299,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		QueryDescriptor descriptor = null;
 
 		if ( queryTranslatorPresent ) {
-			try (ServiceReference<LuceneQueryTranslator> translator =
-					getServiceManager().requestReference( LuceneQueryTranslator.class )) {
+			try ( ServiceReference<LuceneQueryTranslator> translator = getServiceManager().requestReference( LuceneQueryTranslator.class ) ) {
 				if ( translator.get().conversionRequired( entityTypes ) ) {
 					descriptor = translator.get().convertLuceneQuery( luceneQuery );
 				}

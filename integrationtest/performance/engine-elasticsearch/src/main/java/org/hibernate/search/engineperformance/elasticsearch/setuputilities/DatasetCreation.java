@@ -67,7 +67,7 @@ public class DatasetCreation {
 			return outputPath;
 		}
 
-		try (InputStream input = HIBERNATE_DEV_MAILING_LIST_URI.toURL().openStream();
+		try ( InputStream input = HIBERNATE_DEV_MAILING_LIST_URI.toURL().openStream();
 				ReadableByteChannel inputChannel = Channels.newChannel( input );
 				FileChannel outputChannel = FileChannel.open( outputPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW ) ) {
 			outputChannel.transferFrom( inputChannel, 0, Long.MAX_VALUE );

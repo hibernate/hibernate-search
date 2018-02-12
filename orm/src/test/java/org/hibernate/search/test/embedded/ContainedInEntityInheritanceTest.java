@@ -39,7 +39,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 	public void testContainedInIsInherited() {
 		// Initialize
 		Containing containing;
-		try (Session session = openSession()) {
+		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 
 			containing = new Containing();
@@ -56,7 +56,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 		assertEquals( 1, queryResultSize( 0 ) );
 
 		// Update and test the containedIn
-		try (Session session = openSession()) {
+		try ( Session session = openSession() ) {
 			Transaction transaction = session.beginTransaction();
 
 			containing = session.byId( Containing.class ).load( containing.id );
@@ -70,7 +70,7 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 	}
 
 	private int queryResultSize(int fieldValue) {
-		try (Session session = openSession()) {
+		try ( Session session = openSession() ) {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			QueryBuilder builder = ftSession.getSearchFactory().buildQueryBuilder()
 					.forEntity( Containing.class ).get();

@@ -323,8 +323,8 @@ public class CDIInjectionLifecycleEventsIT {
 		}
 
 		private EventCounts read() throws IOException, ClassNotFoundException {
-			try (InputStream fileIn = Files.newInputStream( EVENT_COUNTS_FILE_PATH );
-					ObjectInputStream objectIn = new ObjectInputStream( fileIn )) {
+			try ( InputStream fileIn = Files.newInputStream( EVENT_COUNTS_FILE_PATH );
+					ObjectInputStream objectIn = new ObjectInputStream( fileIn ) ) {
 				return (EventCounts) objectIn.readObject();
 			}
 		}

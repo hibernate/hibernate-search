@@ -36,7 +36,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 
 	@Test
 	public void canSetIncludeEmbeddedObjectIdProgrammatically() throws Exception {
-		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
+		try ( FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
 				.entity( Address.class )
@@ -70,7 +70,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 
 	@Test
 	public void canSetIndexNullAsProgrammatically() throws Exception {
-		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
+		try ( FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
 				.entity( Address.class )
@@ -104,7 +104,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 
 	@Test
 	public void canSetIncludePathsProgrammatically() throws Exception {
-		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
+		try ( FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
 				.entity( Address.class )

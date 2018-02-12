@@ -178,7 +178,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	}
 
 	private synchronized void cleanup(ExtendedSearchIntegrator extendedIntegrator) {
-		try (Closer<RuntimeException> closer = new Closer<>()) {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			if ( extendedIntegrator != null ) {
 				closer.push( extendedIntegrator::close );
 			}

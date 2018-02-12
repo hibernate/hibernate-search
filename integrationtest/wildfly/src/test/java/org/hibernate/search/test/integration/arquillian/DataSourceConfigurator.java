@@ -71,8 +71,8 @@ public class DataSourceConfigurator {
 
 	private void addPropertiesToModel(ModelNode op, String resourcePath) throws IOException {
 		Properties properties = new Properties();
-		try (InputStream stream = DataSourceConfigurator.class.getResourceAsStream( resourcePath );
-				Reader reader = new InputStreamReader( stream, StandardCharsets.UTF_8 )) {
+		try ( InputStream stream = DataSourceConfigurator.class.getResourceAsStream( resourcePath );
+				Reader reader = new InputStreamReader( stream, StandardCharsets.UTF_8 ) ) {
 			properties.load( reader );
 		}
 		for ( Map.Entry<Object, Object> property : properties.entrySet() ) {
