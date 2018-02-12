@@ -47,7 +47,7 @@ public class ScrollWork extends SimpleElasticsearchWork<SearchResult> {
 					ElasticsearchRequest.post()
 					.pathComponent( Paths._SEARCH )
 					.pathComponent( Paths.SCROLL )
-					.body(JsonBuilder.object()
+					.body( JsonBuilder.object()
 							.addProperty( "scroll_id", scrollId )
 							.addProperty( "scroll", scrollTimeout )
 							.build()

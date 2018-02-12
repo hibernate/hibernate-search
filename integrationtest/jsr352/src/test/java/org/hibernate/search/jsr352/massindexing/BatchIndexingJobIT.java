@@ -128,7 +128,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 			em = emf.createEntityManager();
 			em.getTransaction().begin();
 			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery(Company.class);
+			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class );
 			Root<Company> root = criteria.from( Company.class );
 			Path<Integer> id = root.get( root.getModel().getId( int.class ) );
 			criteria.orderBy( criteriaBuilder.asc( id ) );

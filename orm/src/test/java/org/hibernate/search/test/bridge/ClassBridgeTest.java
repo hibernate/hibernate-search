@@ -58,7 +58,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Departments.class ).get();
 
 		// Check the second ClassBridge annotation
-		Query query = createQuery(queryBuilder, "equiptype", "Cisco" );
+		Query query = createQuery( queryBuilder, "equiptype", "Cisco" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
 		List<Departments> result = hibQuery.list();
 		assertNotNull( result );
@@ -68,14 +68,14 @@ public class ClassBridgeTest extends SearchTestBase {
 		}
 
 		// No data cross-ups.
-		query = createQuery(queryBuilder, "branchnetwork", "Kent Lewin" );
+		query = createQuery( queryBuilder, "branchnetwork", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		query = createQuery(queryBuilder, "branchHead", "Kent Lewin" );
+		query = createQuery( queryBuilder, "branchHead", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -83,7 +83,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertEquals( "incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead() );
 
 		// Check other ClassBridge annotation.
-		query = createQuery(queryBuilder, "branchnetwork", "st. george 1D" );
+		query = createQuery( queryBuilder, "branchnetwork", "st. george 1D" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -127,7 +127,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Departments.class ).get();
 
 		// Check the second ClassBridge annotation
-		Query query = createQuery(queryBuilder, "equiptype", "Cisco" );
+		Query query = createQuery( queryBuilder, "equiptype", "Cisco" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
 
 		hibQuery.setProjection( FullTextQuery.THIS, "equiptype", "branchnetwork" );

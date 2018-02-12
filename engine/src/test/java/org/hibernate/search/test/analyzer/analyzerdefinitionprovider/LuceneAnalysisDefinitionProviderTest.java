@@ -219,7 +219,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 						return analyzerProvider;
 					}
 
-				});
+				} );
 		return integratorResource.create( cfg );
 	}
 

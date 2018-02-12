@@ -78,7 +78,7 @@ public class ElasticsearchScrollingIT {
 		try ( DocumentExtractor extractor = getQuery( query )
 				.queryDocumentExtractor() ) {
 			for ( int i = 0; i < DEFAULT_MAX_RESULT_WINDOW + 10; ++i ) {
-				EntityInfo info = extractor.extract(i);
+				EntityInfo info = extractor.extract( i );
 				assertNotNull( info );
 				assertEquals( i, info.getId() );
 			}

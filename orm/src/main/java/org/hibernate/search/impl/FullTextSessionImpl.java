@@ -110,7 +110,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		}
 		final ExtendedSearchIntegrator searchIntegrator = getSearchIntegrator();
 		final IndexedTypeIdentifier typeIdentifier = searchIntegrator.getIndexBindings().keyFromPojoType( entityType );
-		final IndexedTypeSet targetedClasses = getSearchIntegrator().getIndexedTypesPolymorphic(typeIdentifier.asTypeSet());
+		final IndexedTypeSet targetedClasses = getSearchIntegrator().getIndexedTypesPolymorphic( typeIdentifier.asTypeSet() );
 		if ( targetedClasses.isEmpty() ) {
 			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 			throw new IllegalArgumentException( msg );

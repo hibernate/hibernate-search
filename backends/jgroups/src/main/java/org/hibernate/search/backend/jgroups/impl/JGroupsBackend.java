@@ -139,7 +139,7 @@ public class JGroupsBackend implements Backend {
 	}
 
 	private BackendQueueProcessor createDelegateQueueProcessor(IndexManager indexManager, WorkerBuildContext context) {
-		return BackendFactory.createBackend(delegateBackendName, indexManager, context, properties );
+		return BackendFactory.createBackend( delegateBackendName, indexManager, context, properties );
 	}
 
 	protected NodeSelectorStrategy createNodeSelectorStrategy(IndexManager indexManager) {

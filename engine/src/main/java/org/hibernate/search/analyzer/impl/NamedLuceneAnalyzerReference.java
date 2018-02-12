@@ -58,7 +58,7 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		if ( this.analyzer != null ) {
 			throw new AssertionFailure( "A lucene analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = createAnalyzer(builder);
+		this.analyzer = createAnalyzer( builder );
 	}
 
 	protected Analyzer createAnalyzer(LuceneAnalyzerBuilder builder) {

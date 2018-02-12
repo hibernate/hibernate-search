@@ -100,7 +100,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 )
 						.withStatusMessage( statusMessage )
-						.withBody( responseBody )) );
+						.withBody( responseBody ) ) );
 
 		try ( ElasticsearchClient client = createClient( configuration ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );

@@ -29,11 +29,11 @@ import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
  */
 class AWSSigningRequestInterceptor implements HttpRequestInterceptor {
 
-	private static final Set<String> HEADERS_TO_SIGN = CollectionHelper.asImmutableSet(new String[] {
+	private static final Set<String> HEADERS_TO_SIGN = CollectionHelper.asImmutableSet( new String[] {
 			AWSHeaders.HOST,
 			AWSHeaders.X_AMZ_DATE_HEADER_NAME,
 			AWSHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME
-	});
+	} );
 
 	private final AwsCredentials credentials;
 	private final String region;

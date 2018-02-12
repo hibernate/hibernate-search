@@ -197,7 +197,7 @@ public class SearchIntegratorBuilder {
 		BuildContext buildContext = new BuildContext();
 
 		try {
-			createNewFactoryState( cfg, buildContext);
+			createNewFactoryState( cfg, buildContext );
 		}
 		catch (RuntimeException initializationException) {
 			try {

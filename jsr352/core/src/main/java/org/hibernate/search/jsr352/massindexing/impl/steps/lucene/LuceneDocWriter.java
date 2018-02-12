@@ -128,7 +128,7 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	}
 
 	private void writeItem(Object item) {
-		LuceneWork work = extractWork( item);
+		LuceneWork work = extractWork( item );
 		StreamingOperationExecutor executor = work.acceptIndexWorkVisitor(
 				StreamingOperationExecutorSelector.INSTANCE, null );
 		executor.performStreamOperation(

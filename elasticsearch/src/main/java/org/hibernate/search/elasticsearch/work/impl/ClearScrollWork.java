@@ -43,8 +43,8 @@ public class ClearScrollWork extends SimpleElasticsearchWork<Void> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.delete()
 					.pathComponent( Paths._SEARCH )
-					.pathComponent( Paths.SCROLL)
-					.body(JsonBuilder.object()
+					.pathComponent( Paths.SCROLL )
+					.body( JsonBuilder.object()
 							.add( "scroll_id", JsonBuilder.array().add( new JsonPrimitive( scrollId ) ) )
 							.build()
 					);

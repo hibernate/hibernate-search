@@ -52,7 +52,7 @@ public class AgeBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridg
 
 	@Override
 	public String objectToString(Object object) {
-		Integer age = getAge(object);
+		Integer age = getAge( object );
 		return age == null ? null : age.toString();
 	}
 }

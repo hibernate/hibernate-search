@@ -39,7 +39,7 @@ public class TypeMapping {
 	}
 
 	public void addProperty(String name, PropertyMapping mapping) {
-		getInitializedProperties().put(name, mapping);
+		getInitializedProperties().put( name, mapping );
 	}
 
 	public void removeProperty(String name) {

@@ -56,7 +56,7 @@ public class Elasticsearch2AnalyzerStrategy implements AnalyzerStrategy {
 		 * so that the definition providers can add new definitions between two SearchFactory increments.
 		 * Caching those in a Service, for instance, would prevent that.
 		 */
-		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry(cfg);
+		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry( cfg );
 	}
 
 	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry( SearchConfiguration cfg ) {
@@ -154,7 +154,7 @@ public class Elasticsearch2AnalyzerStrategy implements AnalyzerStrategy {
 			ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
 					createDefinitionRegistry( analyzerReferences, mappingAnalyzerDefinitions,
 							normalizerReferences, mappingNormalizerDefinitions,
-							defaultDefinitionRegistry, translator);
+							defaultDefinitionRegistry, translator );
 
 			// When all definitions are known and translated, actually initialize the references
 			Stream.concat( analyzerReferences.stream(), normalizerReferences.stream() )

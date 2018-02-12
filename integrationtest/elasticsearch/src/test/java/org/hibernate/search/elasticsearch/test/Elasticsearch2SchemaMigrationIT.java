@@ -234,7 +234,7 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 	public void rootMapping_attribute_missing() throws Exception {
 		elasticSearchClient.index( SimpleBooleanEntity.class )
 				.deleteAndCreate()
-				.type(SimpleBooleanEntity.class).putMapping(
+				.type( SimpleBooleanEntity.class ).putMapping(
 				"{"
 					+ "'properties': {"
 							+ "'id': {"

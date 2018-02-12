@@ -106,10 +106,10 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 							)
 							* 1_000 // The configured value is in seconds
 					);
-			String scheme = ConfigurationParseHelper.getString(properties, ElasticsearchEnvironment.DISCOVERY_SCHEME, "http");
+			String scheme = ConfigurationParseHelper.getString( properties, ElasticsearchEnvironment.DISCOVERY_SCHEME, "http" );
 
 			// https discovery support
-			if ( scheme.equals(ElasticsearchHostsSniffer.Scheme.HTTPS.toString()) ) {
+			if ( scheme.equals( ElasticsearchHostsSniffer.Scheme.HTTPS.toString() ) ) {
 				HostsSniffer hostsSniffer = new ElasticsearchHostsSniffer(
 						client,
 						ElasticsearchHostsSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec

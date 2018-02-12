@@ -160,7 +160,7 @@ public class PropertyMapping extends TypeMapping {
 	}
 
 	public void addField(String name, PropertyMapping mapping) {
-		getInitializedFields().put(name, mapping);
+		getInitializedFields().put( name, mapping );
 	}
 
 	public void removeField(String name) {

@@ -202,7 +202,7 @@ public class ChangesetGenerator {
 	private Changeset consume(Changeset target) {
 		consumeIds( target.toAdd, addDeletesPerChangeset, toAdd, consumedToAdd );
 		consumeIds( target.toDelete, addDeletesPerChangeset, toDelete, consumedToDelete );
-		consumeIds( target.toUpdate, updatesPerChangeset, toUpdate, consumedToUpdate);
+		consumeIds( target.toUpdate, updatesPerChangeset, toUpdate, consumedToUpdate );
 		return target;
 	}
 

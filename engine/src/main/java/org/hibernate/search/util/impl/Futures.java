@@ -164,8 +164,8 @@ public final class Futures {
 					}
 					if ( throwable != null ) {
 						return stage.handle( Futures.<Object, T>handler( (ignored, otherThrowable) -> {
-							throw wrap( Throwables.combine( throwable, otherThrowable) );
-						}) );
+							throw wrap( Throwables.combine( throwable, otherThrowable ) );
+						} ) );
 					}
 					else {
 						return stage;

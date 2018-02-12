@@ -535,7 +535,7 @@ public class SortDSLTest {
 	}
 
 	private AssertBuildingHSQueryContext assertQuery(Query query, Sort sort) {
-		return helper.assertThat(query)
+		return helper.assertThat( query )
 				.from( IndexedEntry.class )
 				.sort( sort );
 	}

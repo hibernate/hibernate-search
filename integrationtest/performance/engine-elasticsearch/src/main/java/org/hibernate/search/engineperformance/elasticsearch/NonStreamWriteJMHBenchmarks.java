@@ -66,11 +66,11 @@ public class NonStreamWriteJMHBenchmarks {
 			changeset.toUpdate().forEach( book -> {
 						Work work = new Work( book, book.getId(), WorkType.UPDATE );
 						worker.performWork( work, tc );
-					});
+					} );
 			changeset.toDelete().forEach( id -> {
 						Work work = new Work( typeId, id, WorkType.DELETE );
 						worker.performWork( work, tc );
-					});
+					} );
 			tc.end();
 			++counters.changeset;
 		} );

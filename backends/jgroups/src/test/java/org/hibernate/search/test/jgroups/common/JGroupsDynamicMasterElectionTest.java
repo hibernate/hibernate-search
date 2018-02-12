@@ -183,7 +183,7 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 	private List<DefaultTestResourceManager> determineJGroupsSlaves() {
 		return getResourceManagers().stream()
 				.filter( this::isActive )
-				.filter( (manager) -> !isJGroupsMaster(manager) )
+				.filter( (manager) -> !isJGroupsMaster( manager ) )
 				.collect( Collectors.toList() );
 	}
 }
