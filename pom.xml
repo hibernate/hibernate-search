@@ -32,6 +32,7 @@
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
         <module>integration-test</module>
+        <module>reports</module>
     </modules>
     
     <properties>
@@ -81,6 +82,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-integration-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
