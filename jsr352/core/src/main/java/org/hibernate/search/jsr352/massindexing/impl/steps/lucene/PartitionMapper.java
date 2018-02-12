@@ -133,7 +133,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 		emf = jobData.getEntityManagerFactory();
 
-		try (StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
+		try ( StatelessSession ss = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
 			Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
 					MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
 			);

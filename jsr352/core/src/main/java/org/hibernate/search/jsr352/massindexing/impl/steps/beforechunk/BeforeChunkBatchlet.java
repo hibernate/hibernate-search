@@ -63,7 +63,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			try (Session session = PersistenceUtil.openSession( emf, tenantId )) {
+			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
 				FullTextSession fts = Search.getFullTextSession( session );
 				jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 

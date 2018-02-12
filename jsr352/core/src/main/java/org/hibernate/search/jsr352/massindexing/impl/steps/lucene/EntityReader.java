@@ -480,7 +480,7 @@ public class EntityReader extends AbstractItemReader {
 
 		@Override
 		public void close() {
-			try (Closer<RuntimeException> closer = new Closer<>()) {
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				if ( scroll != null ) {
 					closer.push( scroll::close );
 					scroll = null;
