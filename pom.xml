@@ -338,6 +338,16 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>4.3.0</version>
+                    <configuration>
+                        <relativeReportDirs>
+                            <relativeReportDir>jacoco-aggregate</relativeReportDir>
+                        </relativeReportDirs>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
