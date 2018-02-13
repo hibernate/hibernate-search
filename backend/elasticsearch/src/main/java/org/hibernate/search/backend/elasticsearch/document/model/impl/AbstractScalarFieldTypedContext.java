@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
@@ -28,6 +29,7 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 	private String analyzerName;
 	private String normalizerName;
 	private Store store = Store.DEFAULT;
+	private Sortable sortable = Sortable.DEFAULT;
 
 	public AbstractScalarFieldTypedContext(String relativeName, DataType dataType) {
 		this.relativeName = relativeName;
@@ -53,6 +55,12 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 	}
 
 	@Override
+	public IndexSchemaFieldTypedContext<T> sortable(Sortable sortable) {
+		this.sortable = sortable;
+		return this;
+	}
+
+	@Override
 	protected PropertyMapping contribute(
 			DeferredInitializationIndexFieldAccessor<T> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
@@ -68,8 +76,6 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 			throw log.cannotUseNormalizerOnFieldType( parentNode.getAbsolutePath( relativeName ), dataType );
 		}
 
-		// TODO set docvalues if sortable
-
 		switch ( store ) {
 			case DEFAULT:
 				break;
@@ -80,6 +86,17 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 			case COMPRESS:
 				// TODO what about Store.COMPRESS?
 				mapping.setStore( true );
+				break;
+		}
+
+		switch ( sortable ) {
+			case DEFAULT:
+				break;
+			case NO:
+				mapping.setDocValues( false );
+				break;
+			case YES:
+				mapping.setDocValues( true );
 				break;
 		}
 

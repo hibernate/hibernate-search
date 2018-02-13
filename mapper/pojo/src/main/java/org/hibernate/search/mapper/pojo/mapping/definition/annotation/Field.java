@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 
 /**
@@ -48,6 +49,8 @@ public @interface Field {
 	String normalizer() default "";
 
 	Store store() default Store.DEFAULT;
+
+	Sortable sortable() default Sortable.DEFAULT;
 
 	// TODO index, analyze, norms, termVector
 	// TODO analyzer, normalizer

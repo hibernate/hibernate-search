@@ -8,9 +8,11 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
@@ -29,6 +31,7 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 	private String analyzerName;
 	private String normalizerName;
 	private Store store = Store.DEFAULT;
+	private Sortable sortable = Sortable.DEFAULT;
 
 	public IndexSchemaFieldStringContext(String relativeName) {
 		this.relativeName = relativeName;
@@ -53,6 +56,12 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 	}
 
 	@Override
+	public IndexSchemaFieldTypedContext<String> sortable(Sortable sortable) {
+		this.sortable = sortable;
+		return this;
+	}
+
+	@Override
 	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<String> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
@@ -67,13 +76,31 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 			mapping.setType( DataType.TEXT );
 			mapping.setAnalyzer( analyzerName );
 
-			// TODO set fielddata if sortable
+			switch ( sortable ) {
+				case DEFAULT:
+					break;
+				case NO:
+					mapping.setFieldData( FieldDataType.FALSE );
+					break;
+				case YES:
+					mapping.setFieldData( FieldDataType.TRUE );
+					break;
+			}
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
 			mapping.setNormalizer( normalizerName );
 
-			// TODO set docvalues if sortable
+			switch ( sortable ) {
+				case DEFAULT:
+					break;
+				case NO:
+					mapping.setDocValues( false );
+					break;
+				case YES:
+					mapping.setDocValues( true );
+					break;
+			}
 		}
 
 		switch ( store ) {

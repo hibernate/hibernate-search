@@ -19,4 +19,6 @@ public interface IndexSchemaFieldTypedContext<T> extends IndexSchemaFieldTermina
 
 	IndexSchemaFieldTypedContext<T> store(Store store);
 
+	IndexSchemaFieldTypedContext<T> sortable(Sortable sortable);
+
 }
