@@ -11,7 +11,6 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedC
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
@@ -65,12 +64,12 @@ class IndexSchemaFieldStringContext extends AbstractElasticsearchIndexSchemaFiel
 			case DEFAULT:
 				break;
 			case NO:
-				mapping.setFieldData( FieldDataType.FALSE );
+				mapping.setStore( false );
 				break;
 			case YES:
 			case COMPRESS:
 				// TODO what about Store.COMPRESS?
-				mapping.setFieldData( FieldDataType.TRUE );
+				mapping.setStore( true );
 				break;
 		}
 
