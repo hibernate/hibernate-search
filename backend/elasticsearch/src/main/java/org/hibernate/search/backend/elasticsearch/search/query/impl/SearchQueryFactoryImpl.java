@@ -79,7 +79,7 @@ class SearchQueryFactoryImpl
 			hitExtractor = new IndexSensitiveHitExtractor<>( extractorByIndex );
 		}
 		if ( projectionFound.cardinality() < projections.length ) {
-			projectionFound.flip( 0, projectionFound.length() );
+			projectionFound.flip( 0, projections.length );
 			List<String> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
