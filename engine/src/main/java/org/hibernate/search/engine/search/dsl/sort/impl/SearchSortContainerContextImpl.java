@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
@@ -54,8 +53,9 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 	}
 
 	@Override
-	public ExplicitEndContext<N> byIndexOrder() {
-		return dslContext::getNextContext;
+	public NonEmptySortContext<N> byIndexOrder() {
+		dslContext.addContributor( factory.indexOrder() );
+		return nonEmptyContext();
 	}
 
 	@Override
@@ -73,14 +73,14 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
+	public <T> NonEmptySortContext<N> withExtensionOptional(
 			SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor) {
 		extension.extendOptional( this, factory, dslContext ).ifPresent( clauseContributor );
-		return dslContext.getNextContext();
+		return nonEmptyContext();
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
+	public <T> NonEmptySortContext<N> withExtensionOptional(
 			SearchSortContainerContextExtension<N, T> extension,
 			Consumer<T> clauseContributor,
 			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor) {
@@ -91,7 +91,20 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 		else {
 			fallbackClauseContributor.accept( this );
 		}
-		return dslContext.getNextContext();
+		return nonEmptyContext();
 	}
 
+	private NonEmptySortContext<N> nonEmptyContext() {
+		return new NonEmptySortContext<N>() {
+			@Override
+			public SearchSortContainerContext<N> then() {
+				return SearchSortContainerContextImpl.this;
+			}
+
+			@Override
+			public N end() {
+				return dslContext.getNextContext();
+			}
+		};
+	}
 }

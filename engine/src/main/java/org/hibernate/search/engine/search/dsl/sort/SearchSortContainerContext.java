@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.sort;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContainerContextExtension;
 import org.hibernate.search.util.SearchException;
 
@@ -34,7 +33,7 @@ public interface SearchSortContainerContext<N> {
 	/**
 	 * Order elements by their internal index order.
 	 */
-	ExplicitEndContext<N> byIndexOrder();
+	NonEmptySortContext<N> byIndexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -55,9 +54,9 @@ public interface SearchSortContainerContext<N> {
 
 	<T> T withExtension(SearchSortContainerContextExtension<N, T> extension);
 
-	<T> N withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor);
+	<T> NonEmptySortContext<N> withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor);
 
-	<T> N withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor,
+	<T> NonEmptySortContext<N> withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor,
 			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor);
 
 }

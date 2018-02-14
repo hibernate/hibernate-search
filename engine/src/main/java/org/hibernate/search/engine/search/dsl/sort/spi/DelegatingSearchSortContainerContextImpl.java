@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.sort.spi;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
@@ -34,7 +33,7 @@ public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortCo
 	}
 
 	@Override
-	public ExplicitEndContext<N> byIndexOrder() {
+	public NonEmptySortContext<N> byIndexOrder() {
 		return delegate.byIndexOrder();
 	}
 
@@ -54,14 +53,14 @@ public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortCo
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
+	public <T> NonEmptySortContext<N> withExtensionOptional(
 			SearchSortContainerContextExtension<N, T> extension,
 			Consumer<T> clauseContributor) {
 		return delegate.withExtensionOptional( extension, clauseContributor );
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
+	public <T> NonEmptySortContext<N> withExtensionOptional(
 			SearchSortContainerContextExtension<N, T> extension,
 			Consumer<T> clauseContributor,
 			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor) {
