@@ -181,6 +181,11 @@
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
+        <!-- Maven plugin versions -->
+        <!-- Surefire versions are a minefield of bugs, so depending on context we need to choose a different one -->
+        <maven.plugin.surefire.version>2.20.1</maven.plugin.surefire.version>
+        <maven.plugin.failsafe.version>2.20.1</maven.plugin.failsafe.version>
+
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.5</luceneVersion>
@@ -1232,7 +1237,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.20.1</version>
+                    <version>${maven.plugin.surefire.version}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -1355,7 +1360,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.20.1</version>
+                    <version>${maven.plugin.failsafe.version}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -1825,7 +1830,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         </profile>
 
         <profile>
-            <id>non-jigsaw</id>
+            <id>jdk8</id>
             <activation>
                 <!-- Asciidoctor and Karaf won't work on JDK9 yet  -->
                 <jdk>1.8</jdk>
@@ -1836,7 +1841,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         </profile>
 
         <profile>
-            <id>jigsaw</id>
+            <id>jdk9</id>
             <activation>
                 <!-- Java 9 doesn't identify itself as "1.9" but "9" -->
                 <jdk>9</jdk>
@@ -1844,6 +1849,23 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
                 <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
+            </properties>
+            <modules>
+                <module>integrationtest/jdk9-modules</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>jdk10</id>
+            <activation>
+                <jdk>10</jdk>
+            </activation>
+            <properties>
+                <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
+                <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
+                <!-- For JDK10 we need to override this to: 2.18.1 See https://issues.apache.org/jira/browse/SUREFIRE-1439 -->
+                <maven.plugin.surefire.version>2.18.1</maven.plugin.surefire.version>
+                <maven.plugin.failsafe.version>2.18.1</maven.plugin.failsafe.version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
