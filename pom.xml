@@ -211,7 +211,7 @@
 
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>4.0.0</bytemanVersion>
-        <jbossLoggingVersion>3.3.1.Final</jbossLoggingVersion>
+        <jbossLoggingVersion>3.3.2.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.1.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.5.30.Final</narayanaVersion>
         <avroVersion>1.7.6</avroVersion>
