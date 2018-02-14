@@ -196,7 +196,7 @@
         <jandexVersion>2.0.3.Final</jandexVersion>
         <classMateVersion>1.3.0</classMateVersion>
         <javassistVersion>3.22.0-GA</javassistVersion>
-        <bytebuddyVersion>1.6.14</bytebuddyVersion>
+        <bytebuddyVersion>1.7.9</bytebuddyVersion>
 
         <!-- OSGi ranges for some primary dependencies -->
         <!-- Warning:
