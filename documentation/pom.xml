@@ -210,7 +210,6 @@
                                         <pdf-style>hibernate</pdf-style>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
-                                        <idprefix/>
                                         <idseparator>-</idseparator>
                                     </attributes>
                                 </configuration>

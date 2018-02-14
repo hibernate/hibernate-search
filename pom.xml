@@ -46,6 +46,7 @@
         <module>integrationtest/performance/sandbox</module>
         <module>integrationtest/performance/engine-lucene</module>
         <module>integrationtest/performance/engine-elasticsearch</module>
+        <module>documentation</module>
     </modules>
 
     <issueManagement>
@@ -292,10 +293,10 @@
 
         <!-- Asciidoctor -->
         <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
-        <asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
-        <jruby.version>1.7.26</jruby.version>
-        <asciidoctorj.version>1.5.4.1</asciidoctorj.version>
-        <asciidoctorj-pdf.version>1.5.0-alpha.11</asciidoctorj-pdf.version>
+        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
+        <jruby.version>9.1.15.0</jruby.version>
+        <asciidoctorj.version>1.5.6</asciidoctorj.version>
+        <asciidoctorj-pdf.version>1.5.0-alpha.16</asciidoctorj-pdf.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.9.0.Final</previous.stable>
@@ -1836,7 +1837,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <jdk>1.8</jdk>
             </activation>
             <modules>
-                <module>documentation</module>
+                <!-- Nothing at the moment -->
             </modules>
         </profile>
 
