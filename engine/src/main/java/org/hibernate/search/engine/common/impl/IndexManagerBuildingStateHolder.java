@@ -77,6 +77,10 @@ public class IndexManagerBuildingStateHolder {
 		return createIndexManagerBuildingState( backend, indexName, indexPropertySource, typeOrdering );
 	}
 
+	public Map<String, Backend<?>> getBackendsByName() {
+		return backendsByName;
+	}
+
 	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
 			Backend<D> backend, String indexName, ConfigurationPropertySource indexPropertySource,
 			IndexableTypeOrdering typeOrdering) {

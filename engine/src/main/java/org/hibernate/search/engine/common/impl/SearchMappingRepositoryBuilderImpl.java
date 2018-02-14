@@ -105,7 +105,9 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			mappings.put( mappingKey, mapping );
 		} );
 
-		builtResult = new SearchMappingRepositoryImpl( mappings );
+		builtResult = new SearchMappingRepositoryImpl(
+				mappings, indexManagerBuildingStateProvider.getBackendsByName()
+		);
 		return builtResult;
 	}
 
