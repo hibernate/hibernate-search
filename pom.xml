@@ -292,7 +292,7 @@
         <puppycrawl.checkstyle.version>8.8</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
-        <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
+        <hibernate-asciidoctor-theme.version>1.0.2.Final</hibernate-asciidoctor-theme.version>
         <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
         <jruby.version>9.1.15.0</jruby.version>
         <asciidoctorj.version>1.5.6</asciidoctorj.version>
