@@ -7,7 +7,8 @@
 package org.hibernate.search.mapper.orm.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
@@ -25,7 +26,6 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.util.impl.Maps;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
@@ -46,8 +46,8 @@ public class HibernateSearchContextService implements Service {
 	private static final String SEARCH_MANAGER_KEY =
 			HibernateSearchContextService.class.getName() + "#SEARCH_MANAGER_KEY";
 
-	private final ConcurrentMap<Transaction, ChangesetPojoWorker> workerPerTransaction =
-			Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
+	private static final String WORKER_PER_TRANSACTION_MAP_KEY =
+			HibernateSearchContextService.class.getName() + "#WORKER_PER_TRANSACTION_KEY";
 
 	public void initialize(SearchMappingRepository mappingRepository, HibernateOrmMapping mapping) {
 		this.mappingRepository = mappingRepository;
@@ -98,16 +98,28 @@ public class HibernateSearchContextService implements Service {
 	 *
 	 * @return The {@link PojoWorker} to use for changes to entities in the given session.
 	 */
+	@SuppressWarnings("unchecked")
 	public PojoWorker getCurrentWorker(SessionImplementor sessionImplementor) {
 		PojoSearchManager searchManager = getSearchManager( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
+			TransientReference<Map<Transaction, ChangesetPojoWorker>> reference =
+					(TransientReference<Map<Transaction, ChangesetPojoWorker>>) sessionImplementor.getProperties()
+							.get( WORKER_PER_TRANSACTION_MAP_KEY );
+			Map<Transaction, ChangesetPojoWorker> workerPerTransaction = reference == null ? null : reference.get();
+			if ( workerPerTransaction == null ) {
+				workerPerTransaction = new HashMap<>();
+				reference = new TransientReference<>( workerPerTransaction );
+				sessionImplementor.setProperty( WORKER_PER_TRANSACTION_MAP_KEY, reference );
+			}
 			ChangesetPojoWorker worker = workerPerTransaction.get( transactionIdentifier );
 			if ( worker == null ) {
 				worker = searchManager.createWorker();
 				workerPerTransaction.put( transactionIdentifier, worker );
 				// TODO also create and register a synchronization
-				Synchronization txSync = createTransactionWorkQueueSynchronization( worker, transactionIdentifier );
+				Synchronization txSync = createTransactionWorkQueueSynchronization(
+						worker, workerPerTransaction, transactionIdentifier
+				);
 				registerSynchronization( sessionImplementor, txSync );
 			}
 			return worker;
@@ -118,14 +130,11 @@ public class HibernateSearchContextService implements Service {
 			 * See:
 			 *  - FullTextIndexEventListener (in Search 5 and here)
 			 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
-			 * CAUTION: take into account the fact that the key must not be referenced from the value,
-			 * even indirectly (otherwise it's pointless to use a "WeakKey" map).
-			 * So we cannot use the session itself as a key in particular.
 			 */
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 		else {
-			// TODO add a warning when configuration expects transactions, but none was foundMaps
+			// TODO add a warning when configuration expects transactions, but none was found
 //			if ( transactionExpected ) {
 //				// this is a workaround: isTransactionInProgress should return "true"
 //				// for correct configurations.
@@ -137,7 +146,8 @@ public class HibernateSearchContextService implements Service {
 		}
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(ChangesetPojoWorker worker, Object transactionIdentifier) {
+	private Synchronization createTransactionWorkQueueSynchronization(ChangesetPojoWorker worker,
+			Map<Transaction, ChangesetPojoWorker> workerPerTransaction, Object transactionIdentifier) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
 					worker, workerPerTransaction, transactionIdentifier
