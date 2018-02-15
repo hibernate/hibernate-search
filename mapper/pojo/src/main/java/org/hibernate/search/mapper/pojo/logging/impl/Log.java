@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
@@ -47,4 +49,15 @@ public interface Log extends BasicLogger {
 			+ " or use the method of the same name, but without Class<?> parameters."
 	)
 	SearchException cannotSearchOnEmptyTarget();
+
+	@Message(id = 8, value = "Could not auto-detect the input type for function bridge %1$s"
+			+ "; make sure the bridge uses generics.")
+	SearchException unableToInferFunctionBridgeInputType(FunctionBridge<?, ?> bridge);
+
+	@Message(id = 9, value = "Could not auto-detect the return type for function bridge %1$s"
+			+ "; make sure the bridge uses generics or configure the field explicitly in the bridge's bind() method.")
+	SearchException unableToInferFunctionBridgeIndexFieldType(FunctionBridge<?, ?> bridge);
+
+	@Message(id = 10, value = "Function bridge %1$s cannot be applied to input type %2$s.")
+	SearchException invalidInputTypeForFunctionBridge(FunctionBridge<?, ?> bridge, PojoTypeModel<?> typeModel);
 }

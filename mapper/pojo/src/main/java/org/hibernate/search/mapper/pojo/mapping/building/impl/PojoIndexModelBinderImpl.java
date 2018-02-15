@@ -6,31 +6,33 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
-import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
+import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.BridgeValueProcessor;
-import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeValueProcessor;
-import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BuildContext buildContext;
 	private final BridgeResolver bridgeResolver;
@@ -68,63 +70,53 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public ValueProcessor addBridge(IndexModelBindingContext bindingContext,
+	public Bridge addBridge(IndexModelBindingContext bindingContext,
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends Bridge> builder) {
 		return doAddBridge( bindingContext, pojoModelElement, builder );
 	}
 
 	@Override
-	public ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, PojoTypeModel<?> typeModel,
-			BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
+	public <T> FunctionBridgeProcessor<T, ?> addFunctionBridge(IndexModelBindingContext bindingContext,
+			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor contributor) {
 		BridgeBuilder<? extends FunctionBridge<?, ?>> defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveFunctionBridgeForType( typeModel.getJavaClass() );
 		}
 
-		// TODO check that the bridge is suitable for the given typeModel?
 		FunctionBridge<?, ?> bridge = defaultedBuilder.build( buildContext );
 
-		return doAddFunctionBridge( bindingContext, pojoModelElement, bridge, fieldName, contributor );
+		Class<?> bridgeParameterType = FunctionBridgeUtil.inferInputType( bridge )
+				.orElseThrow( () -> log.unableToInferFunctionBridgeInputType( bridge ) );
+		if ( !typeModel.getSuperType( bridgeParameterType ).isPresent() ) {
+			throw log.invalidInputTypeForFunctionBridge( bridge, typeModel );
+		}
+
+		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
+		FunctionBridge<? super T, ?> typedBridge = (FunctionBridge<? super T, ?>) bridge;
+
+		return doAddFunctionBridge( bindingContext, typedBridge, fieldName, contributor );
 	}
 
-	private ValueProcessor doAddBridge(IndexModelBindingContext bindingContext,
+	private Bridge doAddBridge(IndexModelBindingContext bindingContext,
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends Bridge> builder) {
 		Bridge bridge = builder.build( buildContext );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
 		bridge.bind( bindingContext.getSchemaElement(), pojoModelElement, bindingContext.getSearchModel() );
 
-		return new BridgeValueProcessor( bridge );
+		return bridge;
 	}
 
-	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, FunctionBridge<T, R> bridge,
-			String fieldName, FieldModelContributor contributor) {
-		PojoModelElementAccessor<? extends T> pojoModelElementAccessor = getReferenceForBridge( pojoModelElement, bridge );
-		return doAddFunctionBridge( bindingContext, pojoModelElementAccessor, bridge, fieldName, contributor );
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> PojoModelElementAccessor<? extends T> getReferenceForBridge(PojoModelElement pojoModelElement,
-			FunctionBridge<T, ?> bridge) {
-		return FunctionBridgeUtil.inferParameterType( bridge )
-				.map( c -> pojoModelElement.createAccessor( c ) )
-				.orElse( (PojoModelElementAccessor<T>) pojoModelElement.createAccessor() );
-	}
-
-	private <T, R> ValueProcessor doAddFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElementAccessor<? extends T> pojoModelElementAccessor,
-			FunctionBridge<T, R> bridge, String fieldName, FieldModelContributor contributor) {
+	private <T, R> FunctionBridgeProcessor<T, R> doAddFunctionBridge(IndexModelBindingContext bindingContext,
+			FunctionBridge<? super T, R> bridge, String fieldName, FieldModelContributor contributor) {
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement().field( fieldName );
 
 		// First give the bridge a chance to contribute to the model
 		IndexSchemaFieldTypedContext<R> typedFieldContext = bridge.bind( fieldContext );
 		if ( typedFieldContext == null ) {
 			Class<R> returnType = FunctionBridgeUtil.inferReturnType( bridge )
-					.orElseThrow( () -> new SearchException( "Could not auto-detect the return type for bridge "
-							+ bridge + "; configure encoding explicitly in the bridge." ) );
+					.orElseThrow( () -> log.unableToInferFunctionBridgeIndexFieldType( bridge ) );
 			typedFieldContext = fieldContext.as( returnType );
 		}
 		// Then give the mapping a chance to override some of the model (add storage, ...)
@@ -133,7 +125,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// FIXME if the field is filtered out, we should ignore the processor
 
 		IndexFieldAccessor<R> indexFieldAccessor = typedFieldContext.createAccessor();
-		return new FunctionBridgeValueProcessor<>( bridge, pojoModelElementAccessor, indexFieldAccessor );
+		return new FunctionBridgeProcessor<>( bridge, indexFieldAccessor );
 	}
 
 }

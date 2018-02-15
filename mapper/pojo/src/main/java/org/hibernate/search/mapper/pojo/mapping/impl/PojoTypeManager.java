@@ -28,13 +28,13 @@ public class PojoTypeManager<I, E, D extends DocumentElement> {
 	private final PojoIndexableTypeModel<E> typeModel;
 	private final IdentifierMapping<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
-	private final PojoTypeNodeProcessor processor;
+	private final PojoTypeNodeProcessor<E> processor;
 	private final IndexManager<D> indexManager;
 
 	public PojoTypeManager(PojoIndexableTypeModel<E> typeModel,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
-			PojoTypeNodeProcessor processor, IndexManager<D> indexManager) {
+			PojoTypeNodeProcessor<E> processor, IndexManager<D> indexManager) {
 		this.typeModel = typeModel;
 		this.identifierMapping = identifierMapping;
 		this.routingKeyProvider = routingKeyProvider;

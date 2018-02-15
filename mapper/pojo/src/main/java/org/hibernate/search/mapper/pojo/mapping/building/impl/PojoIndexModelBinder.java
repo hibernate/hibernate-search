@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
 
 /**
  * Provides the ability to contribute the entity model to the index model
@@ -38,12 +38,11 @@ public interface PojoIndexModelBinder {
 	RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends RoutingKeyBridge> bridgeBuilder);
 
-	ValueProcessor addBridge(IndexModelBindingContext bindingContext,
+	Bridge addBridge(IndexModelBindingContext bindingContext,
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends Bridge> bridgeBuilder);
 
-	ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, PojoTypeModel<?> typeModel,
-			BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
+	<T> FunctionBridgeProcessor<T, ?> addFunctionBridge(IndexModelBindingContext bindingContext,
+			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
 			String fieldName, FieldModelContributor contributor);
 
 }

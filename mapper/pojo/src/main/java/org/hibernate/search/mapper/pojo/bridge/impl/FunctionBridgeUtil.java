@@ -22,7 +22,7 @@ public final class FunctionBridgeUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> Optional<Class<T>> inferParameterType(FunctionBridge<T, ?> functionBridge) {
+	public static <T> Optional<Class<T>> inferInputType(FunctionBridge<T, ?> functionBridge) {
 		return getFunctionBridgeTypeArgument( functionBridge, 0 ).map( c -> (Class<T>) c );
 	}
 

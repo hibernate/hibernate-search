@@ -11,40 +11,54 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.spi.Closer;
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoPropertyNodeProcessor {
+class PojoPropertyNodeProcessor<P, T> implements PojoNodeProcessor<P> {
 
 	private final PropertyHandle handle;
-	private final Collection<ValueProcessor> processors;
-	private final Collection<PojoTypeNodeProcessor> indexedEmbeddedProcessors;
+	private final Collection<Bridge> bridges;
+	private final Collection<PojoNodeProcessor<? super T>> nestedProcessors;
 
-	public PojoPropertyNodeProcessor(PropertyHandle handle,
-			Collection<ValueProcessor> processors,
-			Collection<PojoTypeNodeProcessorBuilder> indexedEmbeddedProcessorBuilders) {
+	PojoPropertyNodeProcessor(PropertyHandle handle,
+			Collection<Bridge> bridges,
+			Collection<FunctionBridgeProcessor<? super T, ?>> functionBridgeProcessors,
+			Collection<AbstractPojoNodeProcessorBuilder<? super T>> nestedProcessorBuilders) {
 		this.handle = handle;
-		this.processors = processors.isEmpty() ? Collections.emptyList() : new ArrayList<>( processors );
-		this.indexedEmbeddedProcessors = indexedEmbeddedProcessorBuilders.isEmpty() ?
-				Collections.emptyList() : new ArrayList<>( indexedEmbeddedProcessorBuilders.size() );
-		indexedEmbeddedProcessorBuilders.forEach( builder -> this.indexedEmbeddedProcessors.add( builder.build() ) );
+		this.bridges = bridges.isEmpty() ? Collections.emptyList() : new ArrayList<>( bridges );
+		this.nestedProcessors = functionBridgeProcessors.isEmpty() && nestedProcessorBuilders.isEmpty()
+				? Collections.emptyList()
+				: new ArrayList<>( functionBridgeProcessors.size() + nestedProcessorBuilders.size() );
+		this.nestedProcessors.addAll( functionBridgeProcessors );
+		nestedProcessorBuilders.forEach( builder -> this.nestedProcessors.add( builder.build() ) );
 	}
 
-	public final void process(Object source, DocumentElement destination) {
-		Object nestedValue = handle.get( source );
-		if ( !processors.isEmpty() ) {
-			PojoElement bridgedElement = new PojoElementImpl( nestedValue );
-			for ( ValueProcessor processor : processors ) {
-				processor.process( destination, bridgedElement );
+	@Override
+	public final void process(DocumentElement target, P source) {
+		// TODO add generic type parameters to property handles
+		T propertyValue = (T) handle.get( source );
+		if ( !bridges.isEmpty() ) {
+			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
+			for ( Bridge bridge : bridges ) {
+				bridge.write( target, bridgedElement );
 			}
 		}
-		for ( PojoTypeNodeProcessor processor : indexedEmbeddedProcessors ) {
-			processor.process( nestedValue, destination );
+		for ( PojoNodeProcessor<? super T> processor : nestedProcessors ) {
+			processor.process( target, propertyValue );
 		}
 	}
 
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( Bridge::close, bridges );
+			closer.pushAll( PojoNodeProcessor::close, nestedProcessors );
+		}
+	}
 }

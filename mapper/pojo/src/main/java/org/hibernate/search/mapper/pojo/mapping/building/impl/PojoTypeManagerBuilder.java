@@ -29,7 +29,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
 
 	private final PojoTypeNodeIdentityMappingCollectorImpl identityMappingCollector;
-	private final PojoTypeNodeProcessorBuilder processorBuilder;
+	private final PojoTypeNodeProcessorBuilder<E> processorBuilder;
 
 	PojoTypeManagerBuilder(PojoIndexableTypeModel<E> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
@@ -40,7 +40,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		this.indexManagerBuildingState = indexManagerBuildingState;
 		this.identityMappingCollector = new PojoTypeNodeIdentityMappingCollectorImpl( defaultIdentifierMapping );
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
-		this.processorBuilder = new PojoTypeNodeProcessorBuilder(
+		this.processorBuilder = new PojoTypeNodeProcessorBuilder<>(
 				null, typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
 	}

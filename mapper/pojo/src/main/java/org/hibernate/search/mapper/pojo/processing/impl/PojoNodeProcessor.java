@@ -7,14 +7,10 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
 
-/**
- * @author Yoann Rodiere
- */
-public interface ValueProcessor extends AutoCloseable {
+public interface PojoNodeProcessor<T> extends AutoCloseable {
 
-	void process(DocumentElement target, PojoElement source);
+	void process(DocumentElement target, T source);
 
 	@Override
 	void close();

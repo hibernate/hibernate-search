@@ -14,17 +14,17 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
 
 class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentContributor<D> {
 
-	private final PojoTypeNodeProcessor processor;
+	private final PojoTypeNodeProcessor<E> processor;
 
 	private final Supplier<E> entitySupplier;
 
-	PojoDocumentContributor(PojoTypeNodeProcessor processor, Supplier<E> entitySupplier) {
+	PojoDocumentContributor(PojoTypeNodeProcessor<E> processor, Supplier<E> entitySupplier) {
 		this.processor = processor;
 		this.entitySupplier = entitySupplier;
 	}
 
 	@Override
 	public void contribute(D state) {
-		processor.process( entitySupplier.get(), state );
+		processor.process( state, entitySupplier.get() );
 	}
 }
