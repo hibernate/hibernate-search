@@ -11,7 +11,12 @@ package org.hibernate.search.mapper.pojo.model.spi;
  */
 public interface PojoIntrospector {
 
-	<T> TypeModel<T> getTypeModel(Class<T> type);
+	/**
+	 * @param clazz The Java class representing the raw version of the type
+	 * @param <T> The type
+	 * @return A type model for the given type.
+	 */
+	<T> PojoTypeModel<T> getTypeModel(Class<T> clazz);
 
 	/**
 	 * @param <T> the type of the entity

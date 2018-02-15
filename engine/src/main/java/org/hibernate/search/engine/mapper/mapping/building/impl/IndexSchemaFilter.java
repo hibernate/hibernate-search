@@ -10,8 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -27,7 +26,7 @@ import org.hibernate.search.util.SearchException;
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
  *     <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
- *     {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)} method, which may return a filter
+ *     {@link #composeWithNested(TypeModel, String, Integer, Set)} method, which may return a filter
  *     that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
  *     be ignored</li>
  * </ul>
@@ -57,16 +56,22 @@ import org.hibernate.search.util.SearchException;
  * plus some added restrictions depending on the properties of the nested {@code IndexedEmbedded}.
  * <p>
  * For more information about how filters are composed, see
- * {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)}.
+ * {@link #composeWithNested(TypeModel, String, Integer, Set)}.
  *
  * @author Yoann Rodiere
  */
 class IndexSchemaFilter {
 
-	private final IndexableTypeOrdering typeOrdering;
+	private static final IndexSchemaFilter ROOT = new IndexSchemaFilter(
+			null, null, null, null, Collections.emptySet()
+	);
+
+	public static IndexSchemaFilter root() {
+		return ROOT;
+	}
 
 	private final IndexSchemaFilter parent;
-	private final IndexedTypeIdentifier parentTypeId;
+	private final TypeModel parentTypeModel;
 	private final String relativePrefix;
 
 	/**
@@ -83,16 +88,10 @@ class IndexSchemaFilter {
 	 */
 	private final Set<String> explicitlyIncludedPaths;
 
-	public IndexSchemaFilter(IndexableTypeOrdering typeOrdering) {
-		this( typeOrdering, null, null, null, null, Collections.emptySet() );
-	}
-
-	private IndexSchemaFilter(IndexableTypeOrdering typeOrdering,
-			IndexSchemaFilter parent, IndexedTypeIdentifier parentTypeId, String relativePrefix,
+	private IndexSchemaFilter(IndexSchemaFilter parent, TypeModel parentTypeModel, String relativePrefix,
 			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths) {
-		this.typeOrdering = typeOrdering;
 		this.parent = parent;
-		this.parentTypeId = parentTypeId;
+		this.parentTypeModel = parentTypeModel;
 		this.relativePrefix = relativePrefix;
 		this.remainingCompositionDepth = remainingCompositionDepth;
 		this.explicitlyIncludedPaths = explicitlyIncludedPaths;
@@ -102,7 +101,7 @@ class IndexSchemaFilter {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "parentTypeId=" ).append( parentTypeId )
+				.append( "parentTypeModel=" ).append( parentTypeModel )
 				.append( ",relativePrefix=" ).append( relativePrefix )
 				.append( ",remainingCompositionDepth=" ).append( remainingCompositionDepth )
 				.append( ",explicitlyIncludedPaths=" ).append( explicitlyIncludedPaths )
@@ -118,18 +117,18 @@ class IndexSchemaFilter {
 		return !isEveryPathIncludedByDefault( remainingCompositionDepth ) && !isAnyPathExplicitlyIncluded();
 	}
 
-	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(IndexedTypeIdentifier parentTypeId, String relativePrefix) {
+	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(TypeModel parentTypeModel, String relativePrefix) {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
 		else if ( parent != null ) {
 			if ( this.relativePrefix.equals( relativePrefix )
-					&& typeOrdering.isSubType( parentTypeId, this.parentTypeId ) ) {
+					&& this.parentTypeModel.isSubTypeOf( parentTypeModel ) ) {
 				// Same IndexedEmbedded as the one passed as a parameter
 				return this.relativePrefix;
 			}
 			else {
-				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
+				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
 				return path == null ? null : path + this.relativePrefix;
 			}
 		}
@@ -143,13 +142,13 @@ class IndexSchemaFilter {
 		}
 	}
 
-	public IndexSchemaFilter composeWithNested(IndexedTypeIdentifier parentTypeId, String relativePrefix,
+	public IndexSchemaFilter composeWithNested(TypeModel parentTypeModel, String relativePrefix,
 			Integer maxDepth, Set<String> includePaths) {
-		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
+		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
 		if ( cyclicRecursionPath != null ) {
 			cyclicRecursionPath += relativePrefix;
 			throw new SearchException( "Found an infinite IndexedEmbedded recursion involving path '"
-					+ cyclicRecursionPath + "' on type '" + parentTypeId + "'" );
+					+ cyclicRecursionPath + "' on type '" + parentTypeModel + "'" );
 		}
 
 		Set<String> nullSafeIncludePaths = includePaths == null ? Collections.emptySet() : includePaths;
@@ -218,7 +217,7 @@ class IndexSchemaFilter {
 		}
 
 		return new IndexSchemaFilter(
-				typeOrdering, this, parentTypeId, relativePrefix,
+				this, parentTypeModel, relativePrefix,
 				composedRemainingDepth, composedFilterExplicitlyIncludedPaths
 		);
 	}

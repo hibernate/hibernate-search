@@ -46,8 +46,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Identifier
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetadataContributor {
@@ -55,9 +55,9 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
-	private final TypeModel<?> typeModel;
+	private final PojoTypeModel<?> typeModel;
 
-	AnnotationPojoTypeNodeMetadataContributorImpl(BeanResolver beanResolver, TypeModel<?> typeModel) {
+	AnnotationPojoTypeNodeMetadataContributorImpl(BeanResolver beanResolver, PojoTypeModel<?> typeModel) {
 		this.beanResolver = beanResolver;
 		this.typeModel = typeModel;
 	}
@@ -80,13 +80,13 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 				.forEach( property -> contributePropertyMapping( collector, property ) );
 	}
 
-	private void contributePropertyModel(PojoTypeNodeModelCollector collector, PropertyModel<?> propertyModel) {
+	private void contributePropertyModel(PojoTypeNodeModelCollector collector, PojoPropertyModel<?> propertyModel) {
 		String name = propertyModel.getName();
 		propertyModel.getAnnotationsByMetaAnnotationType( MarkerMapping.class )
 				.forEach( annotation -> addMarker( collector.property( name ), annotation ) );
 	}
 
-	private void contributePropertyMapping(PojoTypeNodeMappingCollector collector, PropertyModel<?> propertyModel) {
+	private void contributePropertyMapping(PojoTypeNodeMappingCollector collector, PojoPropertyModel<?> propertyModel) {
 		PropertyHandle handle = propertyModel.getHandle();
 		propertyModel.getAnnotationsByType( DocumentId.class )
 				.forEach( annotation -> addDocumentId( collector.property( handle ), propertyModel, annotation ) );
@@ -104,7 +104,7 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 		collector.marker( builder );
 	}
 
-	private void addDocumentId(PojoPropertyNodeMappingCollector collector, PropertyModel<?> propertyModel, DocumentId annotation) {
+	private void addDocumentId(PojoPropertyNodeMappingCollector collector, PojoPropertyModel<?> propertyModel, DocumentId annotation) {
 		BridgeBuilder<? extends IdentifierBridge<?>> builder = createIdentifierBridgeBuilder( annotation, propertyModel );
 
 		collector.identifierBridge( builder );
@@ -116,7 +116,7 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 		collector.bridge( builder );
 	}
 
-	private void addField(PojoPropertyNodeMappingCollector collector, PropertyModel<?> propertyModel, Field annotation) {
+	private void addField(PojoPropertyNodeMappingCollector collector, PojoPropertyModel<?> propertyModel, Field annotation) {
 		String cleanedUpFieldName = annotation.name();
 		if ( cleanedUpFieldName.isEmpty() ) {
 			cleanedUpFieldName = null;
@@ -127,7 +127,7 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 		collector.functionBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
 	}
 
-	private void addIndexedEmbedded(PojoPropertyNodeMappingCollector collector, PropertyModel<?> propertyModel,
+	private void addIndexedEmbedded(PojoPropertyNodeMappingCollector collector, PojoPropertyModel<?> propertyModel,
 			IndexedEmbedded annotation) {
 		String cleanedUpPrefix = annotation.prefix();
 		if ( cleanedUpPrefix.isEmpty() ) {
@@ -168,7 +168,7 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 	}
 
 	private BridgeBuilder<? extends IdentifierBridge<?>> createIdentifierBridgeBuilder(
-			DocumentId annotation, PropertyModel<?> propertyModel) {
+			DocumentId annotation, PojoPropertyModel<?> propertyModel) {
 		IdentifierBridgeBeanReference bridgeReferenceAnnotation = annotation.identifierBridge();
 		Optional<BeanReference> bridgeReference = toBeanReference(
 				bridgeReferenceAnnotation.name(),
@@ -218,7 +218,7 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 	}
 
 	private BridgeBuilder<? extends FunctionBridge<?, ?>> createFunctionBridgeBuilder(
-			Field annotation, PropertyModel<?> propertyModel) {
+			Field annotation, PojoPropertyModel<?> propertyModel) {
 		FunctionBridgeBeanReference bridgeReferenceAnnotation = annotation.functionBridge();
 		Optional<BeanReference> bridgeReference = toBeanReference(
 				bridgeReferenceAnnotation.name(),

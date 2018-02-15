@@ -6,33 +6,32 @@
  */
 package org.hibernate.search.mapper.javabean.model.impl;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.SearchException;
 
-class JavaBeanPropertyModel<T> implements PropertyModel<T> {
+class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private final JavaBeanIntrospector introspector;
-	private final TypeModel<?> parentTypeModel;
+	private final PojoTypeModel<?> parentTypeModel;
 
-	private final Class<T> type;
+	private final Class<T> clazz;
 	private final PropertyDescriptor descriptor;
 	private PropertyHandle handle;
 
-	private TypeModel<T> typeModel;
+	private PojoTypeModel<T> typeModel;
 
-	JavaBeanPropertyModel(JavaBeanIntrospector introspector, TypeModel<?> parentTypeModel,
-			Class<T> type, PropertyDescriptor descriptor) {
+	JavaBeanPropertyModel(JavaBeanIntrospector introspector, PojoTypeModel<?> parentTypeModel,
+			Class<T> clazz, PropertyDescriptor descriptor) {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
-		this.type = type;
+		this.clazz = clazz;
 		this.descriptor = descriptor;
 	}
 
@@ -42,8 +41,8 @@ class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 	}
 
 	@Override
-	public Class<T> getJavaType() {
-		return type;
+	public Class<T> getJavaClass() {
+		return clazz;
 	}
 
 	@Override
@@ -57,14 +56,14 @@ class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 	}
 
 	@Override
-	public TypeModel<T> getTypeModel() {
+	public PojoTypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = new JavaBeanTypeModel<>( introspector, type );
+				typeModel = introspector.getTypeModel( clazz );
 			}
-			catch (IntrospectionException | RuntimeException e) {
+			catch (RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property type model for '"
-						+ getName() + "' on '" + parentTypeModel.getJavaType() + "'", e );
+						+ getName() + "' on '" + parentTypeModel + "'", e );
 			}
 		}
 		return typeModel;
@@ -78,7 +77,7 @@ class JavaBeanPropertyModel<T> implements PropertyModel<T> {
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property handle for '"
-						+ getName() + "' on '" + parentTypeModel.getJavaType() + "'", e );
+						+ getName() + "' on '" + parentTypeModel + "'", e );
 			}
 		}
 		return handle;

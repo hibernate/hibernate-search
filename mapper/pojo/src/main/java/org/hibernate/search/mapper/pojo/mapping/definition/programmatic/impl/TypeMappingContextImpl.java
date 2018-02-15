@@ -24,11 +24,10 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelC
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
-import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -36,7 +35,7 @@ import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
-	private final TypeModel<?> typeModel;
+	private final PojoTypeModel<?> typeModel;
 
 	private String indexName;
 	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
@@ -44,19 +43,19 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
 
-	public TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, TypeModel<?> typeModel) {
+	TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, PojoTypeModel<?> typeModel) {
 		this.mapperFactory = mapperFactory;
 		this.typeModel = typeModel;
 	}
 
 	@Override
 	public void contribute(BuildContext buildContext, TypeMetadataCollector collector) {
-		collector.collect( mapperFactory, new PojoIndexedTypeIdentifier( typeModel.getJavaType() ), indexName, this );
+		collector.collect( mapperFactory, typeModel, indexName, this );
 	}
 
 	@Override
 	public void contributeModel(PojoTypeNodeModelCollector collector) {
-		children.stream().forEach( c -> c.contributeModel( collector ) );
+		children.forEach( c -> c.contributeModel( collector ) );
 	}
 
 	@Override
@@ -64,12 +63,12 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 		if ( routingKeyBridgeBuilder != null ) {
 			collector.routingKeyBridge( routingKeyBridgeBuilder );
 		}
-		children.stream().forEach( c -> c.contributeMapping( collector ) );
+		children.forEach( c -> c.contributeMapping( collector ) );
 	}
 
 	@Override
 	public TypeMappingContext indexed() {
-		return indexed( typeModel.getJavaType().getName() );
+		return indexed( typeModel.getJavaClass().getName() );
 	}
 
 	@Override
@@ -130,7 +129,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public PropertyMappingContext property(String propertyName) {
-		PropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
+		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
 		PropertyHandle propertyHandle = propertyModel.getHandle();
 		PropertyMappingContextImpl child = new PropertyMappingContextImpl( this, propertyHandle );
 		children.add( child );

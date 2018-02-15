@@ -22,9 +22,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBind
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -37,7 +36,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 	private final Collection<PojoTypeNodeProcessorBuilder> indexedEmbeddedProcessorBuilders = new ArrayList<>();
 
 	public PojoPropertyNodeProcessorBuilder(
-			PojoTypeNodeProcessorBuilder parent, PropertyHandle propertyHandle, TypeModel<?> propertyTypeModel,
+			PojoTypeNodeProcessorBuilder parent, PropertyHandle propertyHandle, PojoTypeModel<?> propertyTypeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
@@ -55,14 +54,14 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		}
 
 		ValueProcessor processor = indexModelBinder.addFunctionBridge(
-				bindingContext, indexableModel, propertyHandle.getJavaType(), builder, defaultedFieldName, fieldModelContributor );
+				bindingContext, indexableModel, typeModel, builder, defaultedFieldName, fieldModelContributor );
 		processors.add( processor );
 	}
 
 	@Override
+	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
-		IdentifierBridge<?> bridge = indexModelBinder.createIdentifierBridge( propertyHandle.getJavaType(), builder );
-		identityMappingCollector.identifierBridge( propertyHandle, bridge );
+		createAndCollectIdentifierBridge( typeModel, propertyHandle, builder );
 	}
 
 	@Override
@@ -82,23 +81,27 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 			defaultedRelativePrefix = propertyHandle.getName() + ".";
 		}
 
-		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( propertyHandle.getJavaType() );
-
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				typeId, defaultedRelativePrefix, storage, maxDepth, includePaths );
+				parent.typeModel, defaultedRelativePrefix, storage, maxDepth, includePaths );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
 					this, indexableModel.getTypeModel(), contributorProvider, indexModelBinder, nestedBindingContext,
 					PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-					);
+			);
 			indexedEmbeddedProcessorBuilders.add( nestedProcessorBuilder );
-			contributorProvider.get( typeId ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+			contributorProvider.get( typeModel ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 		} );
 	}
 
 	@Override
 	protected void appendSelfPath(StringBuilder builder) {
 		builder.append( "." ).append( propertyHandle.getName() );
+	}
+
+	private <T> void createAndCollectIdentifierBridge(PojoTypeModel<T> typeModel, PropertyHandle propertyHandle,
+			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+		IdentifierBridge<T> bridge = indexModelBinder.createIdentifierBridge( indexableModel, typeModel, builder );
+		identityMappingCollector.identifierBridge( typeModel, propertyHandle, bridge );
 	}
 
 	public PojoPropertyNodeProcessor build() {

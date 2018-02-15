@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBind
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.PojoModelRoot;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelRootElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -27,8 +27,9 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
-	private final AbstractPojoProcessorBuilder parent;
-	protected final PojoModelRoot indexableModel;
+	protected final AbstractPojoProcessorBuilder parent;
+	protected final PojoTypeModel<?> typeModel;
+	protected final PojoModelRootElement indexableModel;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
@@ -37,15 +38,16 @@ abstract class AbstractPojoProcessorBuilder implements PojoNodeMappingCollector 
 	protected final Collection<ValueProcessor> processors = new ArrayList<>();
 
 	public AbstractPojoProcessorBuilder(
-			AbstractPojoProcessorBuilder parent, TypeModel<?> typeModel,
+			AbstractPojoProcessorBuilder parent, PojoTypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
 		this.contributorProvider = contributorProvider;
 
 		this.parent = parent;
+		this.typeModel = typeModel;
 		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
-		this.indexableModel = new PojoModelRoot( typeModel, contributorProvider );
+		this.indexableModel = new PojoModelRootElement( typeModel, contributorProvider );
 		this.indexModelBinder = indexModelBinder;
 		this.bindingContext = bindingContext;
 

@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
@@ -24,17 +25,17 @@ import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
  */
 public class PojoTypeManager<I, E, D extends DocumentElement> {
 
-	private final Class<E> entityType;
+	private final PojoIndexableTypeModel<E> typeModel;
 	private final IdentifierMapping<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoTypeNodeProcessor processor;
 	private final IndexManager<D> indexManager;
 
-	public PojoTypeManager(Class<E> entityType,
+	public PojoTypeManager(PojoIndexableTypeModel<E> typeModel,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoTypeNodeProcessor processor, IndexManager<D> indexManager) {
-		this.entityType = entityType;
+		this.typeModel = typeModel;
 		this.identifierMapping = identifierMapping;
 		this.routingKeyProvider = routingKeyProvider;
 		this.processor = processor;
@@ -45,13 +46,13 @@ public class PojoTypeManager<I, E, D extends DocumentElement> {
 		return identifierMapping;
 	}
 
-	public Class<E> getEntityType() {
-		return entityType;
+	public PojoIndexableTypeModel<E> getTypeModel() {
+		return typeModel;
 	}
 
 	public Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
 		PojoProxyIntrospector proxyIntrospector = sessionContext.getProxyIntrospector();
-		return new CachingCastingEntitySupplier<>( entityType, proxyIntrospector, entity );
+		return new CachingCastingEntitySupplier<>( typeModel, proxyIntrospector, entity );
 	}
 
 	public DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContext sessionContext,

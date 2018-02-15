@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
 
 /**
@@ -31,7 +32,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
  */
 public interface PojoIndexModelBinder {
 
-	<T> IdentifierBridge<T> createIdentifierBridge(Class<T> sourceType,
+	<T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
 	RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
@@ -41,7 +42,7 @@ public interface PojoIndexModelBinder {
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends Bridge> bridgeBuilder);
 
 	ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, Class<?> sourceType,
+			PojoModelElement pojoModelElement, PojoTypeModel<?> typeModel,
 			BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
 			String fieldName, FieldModelContributor contributor);
 

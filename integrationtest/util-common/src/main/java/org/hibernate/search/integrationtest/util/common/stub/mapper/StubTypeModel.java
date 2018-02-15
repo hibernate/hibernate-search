@@ -7,19 +7,35 @@
 package org.hibernate.search.integrationtest.util.common.stub.mapper;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
-class StubTypeIdentifier implements IndexedTypeIdentifier {
+class StubTypeModel implements TypeModel {
 
 	private final String typeIdentifier;
 
-	StubTypeIdentifier(String typeIdentifier) {
+	StubTypeModel(String typeIdentifier) {
 		this.typeIdentifier = typeIdentifier;
 	}
 
 	public String asString() {
 		return typeIdentifier;
+	}
+
+	@Override
+	public boolean isSubTypeOf(TypeModel other) {
+		return false;
+	}
+
+	@Override
+	public Stream<? extends TypeModel> getAscendingSuperTypes() {
+		return Stream.of( this );
+	}
+
+	@Override
+	public Stream<? extends TypeModel> getDescendingSuperTypes() {
+		return Stream.of( this );
 	}
 
 	@Override
@@ -30,7 +46,7 @@ class StubTypeIdentifier implements IndexedTypeIdentifier {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		StubTypeIdentifier that = (StubTypeIdentifier) o;
+		StubTypeModel that = (StubTypeModel) o;
 		return Objects.equals( typeIdentifier, that.typeIdentifier );
 	}
 

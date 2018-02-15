@@ -58,7 +58,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			throw log.cannotSearchOnEmptyTarget();
 		}
 		Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers = targetedTypes.stream()
-				.flatMap( t -> typeManagers.getAllBySuperType( t )
+				.flatMap( t -> typeManagers.getAllBySuperClass( t )
 						.orElseThrow( () -> new SearchException( "Type " + t + " is not indexed and hasn't any indexed supertype." ) )
 						.stream()
 				)
@@ -68,7 +68,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public boolean isIndexable(Class<?> type) {
-		return typeManagers.getByExactType( type ).isPresent();
+		return typeManagers.getByExactClass( type ).isPresent();
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public boolean isSearchable(Class<?> type) {
-		return typeManagers.getAllBySuperType( type ).isPresent();
+		return typeManagers.getAllBySuperClass( type ).isPresent();
 	}
 
 	@Override

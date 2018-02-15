@@ -18,37 +18,68 @@ import java.util.stream.Stream;
 import org.hibernate.PropertyNotFoundException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
-abstract class AbstractHibernateOrmTypeModel<T> implements TypeModel<T> {
+abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeModel<T> {
 
-	protected final HibernateOrmIntrospector introspector;
-	protected final Class<T> type;
-	protected final XClass xClass;
+	final HibernateOrmIntrospector introspector;
+	private final XClass xClass;
+	private final Class<T> clazz;
 
 	/**
 	 * Note: the main purpose of this cache is not to improve performance,
-	 * but to ensure the unicity of {@link PropertyModel}s,
+	 * but to ensure the unicity of {@link PojoPropertyModel}s,
 	 * which lowers the risk of generating duplicate {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle}s.
 	 * <p>
 	 * This is necessary because we cannot easily implement {@link GetterPropertyHandle#hashCode()} properly,
 	 * because of {@link org.hibernate.property.access.spi.Getter} implementations that do not implement equals.
 	 */
-	private final Map<String, PropertyModel<?>> propertyModelCache = new HashMap<>();
+	private final Map<String, PojoPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	private Map<String, XProperty> fieldAccessXPropertiesByName;
 	private Map<String, XProperty> methodAccessXPropertiesByName;
 
-	protected AbstractHibernateOrmTypeModel(HibernateOrmIntrospector introspector, Class<T> type) {
+	AbstractHibernateOrmTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz) {
 		this.introspector = introspector;
-		this.type = type;
-		this.xClass = introspector.toXClass( type );
+		this.xClass = introspector.toXClass( clazz );
+		this.clazz = clazz;
 	}
 
 	@Override
-	public final Class<T> getJavaType() {
-		return type;
+	public String toString() {
+		return getClass().getSimpleName() + "[" + clazz.getName() + "]";
+	}
+
+	@Override
+	public final Class<T> getJavaClass() {
+		return clazz;
+	}
+
+	@Override
+	public boolean isSubTypeOf(TypeModel other) {
+		return other instanceof AbstractHibernateOrmTypeModel
+				&& ((AbstractHibernateOrmTypeModel<?>) other).xClass.isAssignableFrom( xClass );
+	}
+
+	@Override
+	public <U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
+		XClass superClassCandidateXClass = introspector.toXClass( superClassCandidate );
+		return superClassCandidateXClass.isAssignableFrom( xClass )
+				? Optional.of( introspector.getTypeModel( superClassCandidate ) )
+				: Optional.empty();
+	}
+
+	@Override
+	public Stream<PojoTypeModel<? super T>> getAscendingSuperTypes() {
+		return introspector.getAscendingSuperTypes( xClass );
+	}
+
+	@Override
+	public Stream<PojoTypeModel<? super T>> getDescendingSuperTypes() {
+		return introspector.getDescendingSuperTypes( xClass );
 	}
 
 	@Override
@@ -67,12 +98,12 @@ abstract class AbstractHibernateOrmTypeModel<T> implements TypeModel<T> {
 	}
 
 	@Override
-	public final PropertyModel<?> getProperty(String propertyName) {
+	public final PojoPropertyModel<?> getProperty(String propertyName) {
 		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
 	}
 
 	@Override
-	public Stream<PropertyModel<?>> getDeclaredProperties() {
+	public Stream<PojoPropertyModel<?>> getDeclaredProperties() {
 		return Stream.concat(
 						getFieldAccessXPropertiesByName().keySet().stream(),
 						getMethodAccessXPropertiesByName().keySet().stream()
@@ -84,14 +115,10 @@ abstract class AbstractHibernateOrmTypeModel<T> implements TypeModel<T> {
 					}
 					catch (PropertyNotFoundException e) {
 						// Ignore this property
-						return (PropertyModel<?>) null;
+						return (PojoPropertyModel<?>) null;
 					}
 				} )
 				.filter( Objects::nonNull );
-	}
-
-	XClass getXClass() {
-		return xClass;
 	}
 
 	private Map<String, XProperty> getFieldAccessXPropertiesByName() {
@@ -108,7 +135,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements TypeModel<T> {
 		return methodAccessXPropertiesByName;
 	}
 
-	private PropertyModel<?> createPropertyModel(String propertyName) {
+	private PojoPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> xProperties = new ArrayList<>( 2 );
 		XProperty fieldAccessXProperty = getFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
@@ -121,5 +148,12 @@ abstract class AbstractHibernateOrmTypeModel<T> implements TypeModel<T> {
 		return createPropertyModel( propertyName, xProperties );
 	}
 
-	abstract PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties);
+	abstract PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties);
+
+	@Override
+	public T cast(Object instance) {
+		return clazz.cast( instance );
+	}
+
+
 }

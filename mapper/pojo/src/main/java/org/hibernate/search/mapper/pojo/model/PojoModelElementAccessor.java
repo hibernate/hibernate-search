@@ -12,8 +12,6 @@ package org.hibernate.search.mapper.pojo.model;
  */
 public interface PojoModelElementAccessor<T> {
 
-	Class<T> getType();
-
 	T read(PojoElement bridgedElement);
 
 }

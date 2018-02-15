@@ -24,13 +24,12 @@ public class StubMetadataContributor implements MetadataContributor {
 
 	public StubMetadataContributor(SearchMappingRepositoryBuilder searchBuilder) {
 		this.searchBuilder = searchBuilder;
-		StubTypeOrdering typeOrdering = new StubTypeOrdering();
-		this.mapperFactory = new StubMapperFactory( typeOrdering );
+		this.mapperFactory = new StubMapperFactory();
 		searchBuilder.addMapping( this );
 	}
 
 	public void add(String typeIdentifier, String indexName, Consumer<IndexModelBindingContext> mappingContributor) {
-		mappingContributors.add( new StubMappingContributor( new StubTypeIdentifier( typeIdentifier ), indexName, mappingContributor ) );
+		mappingContributors.add( new StubMappingContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
 	}
 
 	@Override

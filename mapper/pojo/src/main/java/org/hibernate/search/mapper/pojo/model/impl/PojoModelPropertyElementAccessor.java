@@ -10,20 +10,14 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-class PojoPropertyAccessor<T> implements PojoModelElementAccessor<T> {
+class PojoModelPropertyElementAccessor<T> implements PojoModelElementAccessor<T> {
 
 	private final PojoModelElementAccessor<?> parent;
 	private final PropertyHandle handle;
 
-	PojoPropertyAccessor(PojoModelElementAccessor<?> parent, PropertyHandle handle) {
+	PojoModelPropertyElementAccessor(PojoModelElementAccessor<?> parent, PropertyHandle handle) {
 		this.parent = parent;
 		this.handle = handle;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Class<T> getType() {
-		return (Class<T>) handle.getJavaType();
 	}
 
 	@Override

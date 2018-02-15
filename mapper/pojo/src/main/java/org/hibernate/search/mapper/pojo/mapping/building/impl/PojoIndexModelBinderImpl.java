@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.BridgeValueProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeValueProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.ValueProcessor;
@@ -34,20 +35,20 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private final BuildContext buildContext;
 	private final BridgeResolver bridgeResolver;
 
-	public PojoIndexModelBinderImpl(BuildContext buildContext, BridgeResolver bridgeResolver) {
+	PojoIndexModelBinderImpl(BuildContext buildContext, BridgeResolver bridgeResolver) {
 		this.buildContext = buildContext;
 		this.bridgeResolver = bridgeResolver;
 	}
 
 	@Override
-	public <T> IdentifierBridge<T> createIdentifierBridge(Class<T> sourceType,
+	public <T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
 		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( sourceType );
+			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel.getJavaClass() );
 		}
 		/*
-		 * TODO check that the bridge is suitable for the given sourceType
+		 * TODO check that the bridge is suitable for the given typeModel
 		 * (use introspection, similarly to what we do to detect the function bridges field type?)
 		 */
 		IdentifierBridge<?> bridge = defaultedBuilder.build( buildContext );
@@ -74,15 +75,15 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public ValueProcessor addFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, Class<?> sourceType,
+			PojoModelElement pojoModelElement, PojoTypeModel<?> typeModel,
 			BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor contributor) {
 		BridgeBuilder<? extends FunctionBridge<?, ?>> defaultedBuilder = builder;
 		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveFunctionBridgeForType( sourceType );
+			defaultedBuilder = bridgeResolver.resolveFunctionBridgeForType( typeModel.getJavaClass() );
 		}
 
-		// TODO check that the bridge is suitable for the given sourceType?
+		// TODO check that the bridge is suitable for the given typeModel?
 		FunctionBridge<?, ?> bridge = defaultedBuilder.build( buildContext );
 
 		return doAddFunctionBridge( bindingContext, pojoModelElement, bridge, fieldName, contributor );

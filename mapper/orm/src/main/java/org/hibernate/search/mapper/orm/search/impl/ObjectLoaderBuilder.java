@@ -12,17 +12,18 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.Session;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 
 public class ObjectLoaderBuilder<O> {
 
 	private final Session session;
-	private final Set<Class<? extends O>> concreteIndexedTypes;
+	private final Set<PojoIndexableTypeModel<? extends O>> concreteIndexedTypeModels;
 
-	public ObjectLoaderBuilder(Session session, Set<Class<? extends O>> concreteIndexedTypes) {
+	ObjectLoaderBuilder(Session session, Set<PojoIndexableTypeModel<? extends O>> concreteIndexedTypeModels) {
 		this.session = session;
-		this.concreteIndexedTypes = concreteIndexedTypes;
+		this.concreteIndexedTypeModels = concreteIndexedTypeModels;
 	}
 
 	public ObjectLoader<PojoReference, O> build(MutableObjectLoadingOptions mutableLoadingOptions) {
@@ -31,8 +32,9 @@ public class ObjectLoaderBuilder<O> {
 
 	public <T> ObjectLoader<PojoReference, T> build(MutableObjectLoadingOptions mutableLoadingOptions,
 			Function<O, T> hitTransformer) {
-		if ( concreteIndexedTypes.size() == 1 ) {
-			return buildForSingleType( mutableLoadingOptions, concreteIndexedTypes.iterator().next(), hitTransformer );
+		if ( concreteIndexedTypeModels.size() == 1 ) {
+			Class<? extends O> concreteIndexedType = concreteIndexedTypeModels.iterator().next().getJavaClass();
+			return buildForSingleType( mutableLoadingOptions, concreteIndexedType, hitTransformer );
 		}
 		else {
 			return buildForMultipleTypes( mutableLoadingOptions, hitTransformer );
@@ -54,11 +56,12 @@ public class ObjectLoaderBuilder<O> {
 		 * (one query per entity hierarchy, and not one query per index).
 		 */
 		Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegateByConcreteType =
-				new HashMap<>( concreteIndexedTypes.size() );
-		for ( Class<? extends O> concreteIndexedType : concreteIndexedTypes ) {
+				new HashMap<>( concreteIndexedTypeModels.size() );
+		for ( PojoIndexableTypeModel<? extends O> concreteIndexedTypeModel : concreteIndexedTypeModels ) {
+			Class<? extends O> concreteIndexedClass = concreteIndexedTypeModel.getJavaClass();
 			ComposableObjectLoader<PojoReference, T> delegate =
-					buildForSingleType( mutableLoadingOptions, concreteIndexedType, hitTransformer );
-			delegateByConcreteType.put( concreteIndexedType, delegate );
+					buildForSingleType( mutableLoadingOptions, concreteIndexedClass, hitTransformer );
+			delegateByConcreteType.put( concreteIndexedClass, delegate );
 		}
 		return new ByTypeObjectLoader<>( delegateByConcreteType );
 	}

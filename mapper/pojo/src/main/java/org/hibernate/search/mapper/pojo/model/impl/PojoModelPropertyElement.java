@@ -21,24 +21,24 @@ import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoModelProperty extends AbstractPojoModelElement
+public class PojoModelPropertyElement extends AbstractPojoModelElement
 		implements PojoModelElement, PojoPropertyNodeModelCollector {
 
 	private final AbstractPojoModelElement parent;
 
-	private final PropertyModel<?> propertyModel;
+	private final PojoPropertyModel<?> propertyModel;
 
 	private final Map<Class<?>, List<?>> markers = new HashMap<>();
 
-	public PojoModelProperty(AbstractPojoModelElement parent, PropertyModel<?> propertyModel,
+	public PojoModelPropertyElement(AbstractPojoModelElement parent, PojoPropertyModel<?> propertyModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.parent = parent;
@@ -50,12 +50,12 @@ public class PojoModelProperty extends AbstractPojoModelElement
 		if ( !isAssignableTo( requestedType ) ) {
 			throw new SearchException( "Requested incompatible type for '" + this.createAccessor() + "': '" + requestedType + "'" );
 		}
-		return new PojoPropertyAccessor<>( parent.createAccessor(), getHandle() );
+		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoPropertyAccessor<>( parent.createAccessor(), getHandle() );
+		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,12 +75,7 @@ public class PojoModelProperty extends AbstractPojoModelElement
 	}
 
 	@Override
-	protected Class<?> getJavaType() {
-		return propertyModel.getJavaType();
-	}
-
-	@Override
-	public TypeModel<?> getTypeModel() {
+	public PojoTypeModel<?> getTypeModel() {
 		return propertyModel.getTypeModel();
 	}
 

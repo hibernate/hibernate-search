@@ -8,20 +8,16 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeOrdering;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -55,21 +51,17 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	public void contribute(BuildContext buildContext, TypeMetadataCollector collector) {
 		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
 		annotatedTypes.stream()
+				.map( introspector::getTypeModel )
 				// Take super types into account
 				// Note: the order of super types (ascending or descending) does not matter here, we just pick one order
-				.flatMap( PojoTypeOrdering.get()::getDescendingSuperTypes )
+				.flatMap( PojoTypeModel::getDescendingSuperTypes )
 				.distinct()
-				// Just for performance, exclude types that we know are not annotated
-				.filter( Predicate.isEqual( Object.class ).negate() )
-				// TODO filter out other types, e.g. standard Java interfaces such as Serializable?
-				.forEach( annotatedType -> {
-					IndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( annotatedType );
-
-					TypeModel<?> typeModel = introspector.getTypeModel( annotatedType );
+				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+				.forEach( typeModel -> {
 					String indexName = typeModel.getAnnotationByType( Indexed.class )
 							.map( Indexed::index ).orElse( null );
 
-					collector.collect( mapperFactory, typeId, indexName,
+					collector.collect( mapperFactory, typeModel, indexName,
 							new AnnotationPojoTypeNodeMetadataContributorImpl( beanResolver, typeModel ) );
 				} );
 	}

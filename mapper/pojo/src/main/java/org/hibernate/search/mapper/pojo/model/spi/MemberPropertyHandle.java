@@ -43,11 +43,6 @@ public final class MemberPropertyHandle implements PropertyHandle {
 	}
 
 	@Override
-	public Class<?> getJavaType() {
-		return getter.type().returnType();
-	}
-
-	@Override
 	public Object get(Object thiz) {
 		try {
 			return getter.invoke( thiz );

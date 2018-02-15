@@ -9,20 +9,21 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public class CachingCastingEntitySupplier<E> implements Supplier<E> {
 
-	private final Class<E> entityType;
+	private final PojoTypeModel<E> typeModel;
 	private final PojoProxyIntrospector proxyIntrospector;
 	private final Object potentiallyProxiedEntity;
 
 	private E unproxiedEntity;
 
 	public CachingCastingEntitySupplier(
-			Class<E> entityType,
+			PojoTypeModel<E> typeModel,
 			PojoProxyIntrospector proxyIntrospector,
 			Object potentiallyProxiedEntity) {
-		this.entityType = entityType;
+		this.typeModel = typeModel;
 		this.proxyIntrospector = proxyIntrospector;
 		this.potentiallyProxiedEntity = potentiallyProxiedEntity;
 	}
@@ -30,7 +31,7 @@ public class CachingCastingEntitySupplier<E> implements Supplier<E> {
 	@Override
 	public E get() {
 		if ( unproxiedEntity == null ) {
-			unproxiedEntity = entityType.cast( proxyIntrospector.unproxy( potentiallyProxiedEntity ) );
+			unproxiedEntity = typeModel.cast( proxyIntrospector.unproxy( potentiallyProxiedEntity ) );
 		}
 		return unproxiedEntity;
 	}

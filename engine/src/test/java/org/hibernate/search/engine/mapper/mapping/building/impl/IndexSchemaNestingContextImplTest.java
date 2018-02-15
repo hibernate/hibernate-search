@@ -18,8 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.junit.Rule;
@@ -35,11 +34,10 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
-	private final IndexableTypeOrdering typeOrderingMock = createMock( "typeOrderingMock", IndexableTypeOrdering.class );
-	private final IndexedTypeIdentifier typeId1Mock = createMock( "typeId1Mock", IndexedTypeIdentifier.class );
-	private final IndexedTypeIdentifier typeId2Mock = createMock( "typeId2Mock", IndexedTypeIdentifier.class );
-	private final IndexedTypeIdentifier typeId3Mock = createMock( "typeId3Mock", IndexedTypeIdentifier.class );
-	private final IndexedTypeIdentifier typeId4Mock = createMock( "typeId4Mock", IndexedTypeIdentifier.class );
+	private final TypeModel typeModel1Mock = createMock( "typeModel1Mock", TypeModel.class );
+	private final TypeModel typeModel2Mock = createMock( "typeModel2Mock", TypeModel.class );
+	private final TypeModel typeModel3Mock = createMock( "typeModel3Mock", TypeModel.class );
+	private final TypeModel typeModel4Mock = createMock( "typeModel4Mock", TypeModel.class );
 	private final StubLeafFactoryFunction leafFactoryIfIncludedMock =
 			createMock( "leafFactoryIfIncludedMock", StubLeafFactoryFunction.class );
 	private final StubLeafFactoryFunction leafFactoryIfExcludedMock =
@@ -53,7 +51,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void noFilter() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		checkFooBarIncluded( "", rootContext );
 
@@ -65,10 +63,10 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.prefix1_",
+				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
@@ -82,7 +80,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition
 
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"prefix1_level2", level1Context, typeId2Mock, "level2.prefix2_",
+				"prefix1_level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null
 		);
 		checkFooBarIncluded( "prefix2_", level2Context );
@@ -90,24 +88,23 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_detectCycle_direct() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.prefix1_",
+				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		resetAll();
-		EasyMock.expect( typeOrderingMock.isSubType( typeId2Mock, typeId1Mock ) )
-				.andReturn( true );
+		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel2Mock ) ).andReturn( true );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
 		thrown.expectMessage( "path 'level1.prefix1_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeId2Mock.toString() + "'" );
+		thrown.expectMessage( "type '" + typeModel2Mock.toString() + "'" );
 		try {
-			level1Context.addIndexedEmbeddedIfIncluded( typeId2Mock, "level1.prefix1_",
+			level1Context.addIndexedEmbeddedIfIncluded( typeModel2Mock, "level1.prefix1_",
 					null, null, nestedContextBuilderMock
 			);
 		}
@@ -119,28 +116,27 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_detectCycle_indirect() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.prefix1_",
+				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
 
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"prefix1_level2", level1Context, typeId1Mock, "level2.prefix2_",
+				"prefix1_level2", level1Context, typeModel1Mock, "level2.prefix2_",
 				null, null
 		);
 
 		resetAll();
-		EasyMock.expect( typeOrderingMock.isSubType( typeId3Mock, typeId1Mock ) )
-				.andReturn( true );
+		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel3Mock ) ).andReturn( true );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
 		thrown.expectMessage( "path 'level1.prefix1_level2.prefix2_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeId3Mock.toString() + "'" );
+		thrown.expectMessage( "type '" + typeModel3Mock.toString() + "'" );
 		try {
-			level2Context.addIndexedEmbeddedIfIncluded( typeId3Mock, "level1.prefix1_",
+			level2Context.addIndexedEmbeddedIfIncluded( typeModel3Mock, "level1.prefix1_",
 					null, null, nestedContextBuilderMock
 			);
 		}
@@ -152,7 +148,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_multiLevelInOneIndexedEmbedded() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		StubNestedContextBuilder nestedContextBuilderMock = createStrictMock( StubNestedContextBuilder.class );
 		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = new Capture<>();
@@ -168,7 +164,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		EasyMock.expect( nestedContextBuilderMock.build( EasyMock.capture( nestedContextCapture ) ) )
 				.andReturn( expectedReturn );
 		replayAll();
-		actualReturn = rootContext.addIndexedEmbeddedIfIncluded( typeId1Mock, "level1.level2.level3.prefix1_",
+		actualReturn = rootContext.addIndexedEmbeddedIfIncluded( typeModel1Mock, "level1.level2.level3.prefix1_",
 				null, null, nestedContextBuilderMock );
 		verifyAll();
 		assertNotNull( actualReturn );
@@ -182,7 +178,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_includePaths() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		Set<String> includePaths = new HashSet<>();
 
@@ -190,11 +186,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		includePaths.add( "level2.prefix2_level3" );
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.",
+				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths
 		);
 		checkFooBarExcluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeId2Mock );
+		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
 		checkLeafExcluded( "level3", level1Context, "level3" );
 		checkCompositeExcluded( "level3", level1Context, "level3" );
 		checkLeafIncluded( "level2", level1Context, "level2" );
@@ -217,11 +213,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition without a prefix
 
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.",
+				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "level3", level2Context, "level3" );
@@ -232,11 +228,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition with a prefix
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.prefix2_",
+				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "level3" );
 		checkLeafExcluded( "prefix2_prefix2_level3", level2Context, "prefix2_level3" );
@@ -250,11 +246,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		includePaths.add( "prefix2_level3" );
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.",
+				"level2", level1Context, typeModel2Mock, "level2.",
 				null, includePaths
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
@@ -266,30 +262,30 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_depth0() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		// Depth == 0 => do not allow IndexedEmbedded composition nor non-IndexedEmbedded nesting
 		// There is little use for this, but we test it as an edge case
 
 		checkSimpleIndexedEmbeddedExcluded(
-				rootContext, typeId1Mock,
+				rootContext, typeModel1Mock,
 				"level1.", 0, null
 		);
 	}
 
 	@Test
 	public void indexedEmbedded_depth1() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		// Depth == 1 => do not allow IndexedEmbedded composition at all,
 		// but allow unlimited non-IndexedEmbedded nesting
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock,
+				"level1", rootContext, typeModel1Mock,
 				"level1.", 1, null
 		);
 		checkFooBarIncluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeId2Mock );
+		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
 
 		// Check non-IndexedEmbedded nesting
 
@@ -304,13 +300,13 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_depth3_overridden() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		// Depth == 3 => allow three levels of IndexedEmbedded composition, including level1,
 		// and allow unlimited non-IndexedEmbedded nesting from any of those three levels
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock,
+				"level1", rootContext, typeModel1Mock,
 				"level1.", 3, null
 		);
 		checkFooBarIncluded( "", level1Context );
@@ -332,7 +328,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition
 
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock,
+				"level2", level1Context, typeModel2Mock,
 				"level2.", null, null
 		);
 		checkFooBarIncluded( "", level2Context );
@@ -344,7 +340,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
 
 		IndexSchemaNestingContextImpl level3Context = checkSimpleIndexedEmbeddedIncluded(
-				"level3", level2Context, typeId3Mock,
+				"level3", level2Context, typeModel3Mock,
 				"level3.", null, null
 		);
 		checkFooBarIncluded( "", level3Context );
@@ -353,27 +349,27 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
 
 		checkSimpleIndexedEmbeddedExcluded(
-				level3Context, typeId4Mock,
+				level3Context, typeModel4Mock,
 				"level4.", null, null
 		);
 
 		// Check IndexedEmbedded composition with a depth override
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock,
+				"level2", level1Context, typeModel2Mock,
 				"level2.", 1, null
 		);
 		checkFooBarIncluded( "", level2Context );
 
 		checkSimpleIndexedEmbeddedExcluded(
-				level2Context, typeId3Mock,
+				level2Context, typeModel3Mock,
 				"level3.", null, null
 		);
 	}
 
 	@Test
 	public void indexedEmbedded_includePaths_depth1() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		Set<String> includePaths = new HashSet<>();
 
@@ -381,11 +377,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		includePaths.add( "level2.prefix2_level3" );
 
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.",
+				"level1", rootContext, typeModel1Mock, "level1.",
 				1, includePaths
 		);
 		checkFooBarIncluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeId2Mock );
+		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
 		checkLeafIncluded( "level2", level1Context, "level2" );
 
 		// Check non-IndexedEmbedded nesting
@@ -397,11 +393,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition without a prefix
 
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.",
+				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "level3", level2Context, "level3" );
@@ -412,11 +408,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition with a prefix
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.prefix2_",
+				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "level3" );
 		checkLeafExcluded( "prefix2_prefix2_level3", level2Context, "prefix2_level3" );
@@ -430,11 +426,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		includePaths.add( "prefix2_level3" );
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.",
+				"level2", level1Context, typeModel2Mock, "level2.",
 				null, includePaths
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
@@ -446,27 +442,27 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
-		IndexSchemaNestingContextImpl rootContext = new IndexSchemaNestingContextImpl( typeOrderingMock );
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
 		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeId1Mock, "level1.",
+				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths
 		);
 		checkFooBarExcluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeId2Mock );
+		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
 		checkLeafIncluded( "level2", level1Context, "level2" );
 
 		includePaths.clear();
 		includePaths.add( "level3-alt.level4" );
 		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeId2Mock, "level2.",
+				"level2", level1Context, typeModel2Mock, "level2.",
 				1, includePaths
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeId3Mock );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafExcluded( "level3-alt", level2Context, "level3-alt" );
 		checkCompositeExcluded( "level3-alt", level2Context, "level3-alt" );
@@ -541,7 +537,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	}
 
 	private IndexSchemaNestingContextImpl checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
-			IndexSchemaNestingContextImpl context, IndexedTypeIdentifier typeId,
+			IndexSchemaNestingContextImpl context, TypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = new Capture<>();
 		resetAll();
@@ -550,7 +546,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		EasyMock.expect( nestedContextBuilderMock.build( EasyMock.capture( nestedContextCapture ) ) )
 				.andReturn( expectedReturn );
 		replayAll();
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeId, relativePrefix,
+		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeModel, relativePrefix,
 				depth, includePaths, nestedContextBuilderMock );
 		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
 		assertTrue( "Expected the indexedEmbedded to be included in " + context, actualReturn.isPresent() );
@@ -559,11 +555,11 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		return nestedContextCapture.getValue();
 	}
 
-	private void checkSimpleIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, IndexedTypeIdentifier typeId,
+	private void checkSimpleIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, TypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		resetAll();
 		replayAll();
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeId, relativePrefix,
+		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeModel, relativePrefix,
 				depth, includePaths, nestedContextBuilderMock );
 		verifyAll();
 		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
@@ -596,24 +592,24 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkCompositeExcluded( expectedPrefix + "foo.bar", context, "foo.bar", recurse );
 	}
 
-	private void checkFooBarIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, IndexedTypeIdentifier typeIdMock) {
+	private void checkFooBarIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, TypeModel typeModel) {
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeIdMock, "foo.", null, null
+				context, typeModel, "foo.", null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeIdMock, "prefix1_", null, null
+				context, typeModel, "prefix1_", null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeIdMock, "foo.prefix1_", null, null
+				context, typeModel, "foo.prefix1_", null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeIdMock, "foo.bar.prefix1_", null, null
+				context, typeModel, "foo.bar.prefix1_", null, null
 		);
 		Set<String> includePaths = new HashSet<>();
 		includePaths.add( "foo" );
 		includePaths.add( "bar" );
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeIdMock, "foo", 3, includePaths
+				context, typeModel, "foo", 3, includePaths
 		);
 	}
 

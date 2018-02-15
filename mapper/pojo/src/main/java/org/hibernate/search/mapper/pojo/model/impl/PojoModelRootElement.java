@@ -6,24 +6,25 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoModelRoot extends AbstractPojoModelElement implements PojoModelElement {
+public class PojoModelRootElement extends AbstractPojoModelElement implements PojoModelElement {
 
-	private final TypeModel<?> typeModel;
+	private final PojoTypeModel<?> typeModel;
 
-	public PojoModelRoot(TypeModel<?> typeModel,
+	public PojoModelRootElement(PojoTypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.typeModel = typeModel;
@@ -31,15 +32,16 @@ public class PojoModelRoot extends AbstractPojoModelElement implements PojoModel
 
 	@Override
 	public <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
-		if ( !isAssignableTo( requestedType ) ) {
+		Optional<PojoTypeModel<T>> superTypeModel = typeModel.getSuperType( requestedType );
+		if ( !superTypeModel.isPresent() ) {
 			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
 		}
-		return new PojoRootAccessor<>( requestedType );
+		return new PojoModelRootElementAccessor<>( superTypeModel.get() );
 	}
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoRootAccessor<>( getJavaType() );
+		return new PojoModelRootElementAccessor<>( typeModel );
 	}
 
 	@Override
@@ -48,12 +50,7 @@ public class PojoModelRoot extends AbstractPojoModelElement implements PojoModel
 	}
 
 	@Override
-	protected Class<?> getJavaType() {
-		return typeModel.getJavaType();
-	}
-
-	@Override
-	public TypeModel<?> getTypeModel() {
+	public PojoTypeModel<?> getTypeModel() {
 		return typeModel;
 	}
 }

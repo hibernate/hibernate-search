@@ -16,15 +16,15 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuild
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.model.impl.PojoIndexedTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.ProvidedStringIdentifierMapping;
+import org.hibernate.search.util.AssertionFailure;
 
 
 /**
@@ -54,17 +54,21 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	}
 
 	@Override
-	public void addIndexed(IndexedTypeIdentifier typeId,
+	public void addIndexed(TypeModel typeModel,
 			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider) {
-		PojoIndexedTypeIdentifier pojoTypeId = (PojoIndexedTypeIdentifier) typeId;
-		Class<?> javaType = pojoTypeId.toJavaType();
-		TypeModel<?> typeModel = introspector.getTypeModel( javaType );
+		if ( !( typeModel instanceof PojoIndexableTypeModel ) ) {
+			throw new AssertionFailure(
+					"Expected the indexed type model to be an instance of " + PojoIndexableTypeModel.class
+					+ ", got " + typeModel + " instead. There is probably a bug in the mapper implementation"
+			);
+		}
+		PojoIndexableTypeModel<?> entityTypeModel = (PojoIndexableTypeModel<?>) typeModel;
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
-				typeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
+				entityTypeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoTypeNodeMappingCollector collector = builder.asCollector();
-		contributorProvider.get( pojoTypeId ).forEach( c -> c.contributeMapping( collector ) );
+		contributorProvider.get( entityTypeModel ).forEach( c -> c.contributeMapping( collector ) );
 		typeManagerBuilders.add( builder );
 	}
 

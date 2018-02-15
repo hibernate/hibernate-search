@@ -34,9 +34,10 @@ import org.hibernate.property.access.spi.Getter;
 import org.hibernate.property.access.spi.PropertyAccess;
 import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
+import org.hibernate.search.mapper.orm.util.impl.XClassOrdering;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 
 /**
@@ -51,13 +52,16 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 
 	/**
 	 * Note: the main purpose of this cache is not to improve performance,
-	 * but to ensure the unicity of the returned {@link TypeModel}s,
-	 * so as to ensure the unicity of {@link PropertyModel}s,
+	 * but to ensure the unicity of the returned {@link PojoTypeModel}s.
+	 * so as to ensure the unicity of {@link PojoPropertyModel}s,
 	 * which lowers the risk of generating duplicate {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle}s.
+	 * <p>
+	 * Also, this cache allows to not care at all about implementing equals and hashcode,
+	 * since type models are presumably instantiated only once per type.
 	 *
 	 * @see AbstractHibernateOrmTypeModel#propertyModelCache
 	 */
-	private final Map<Class<?>, TypeModel<?>> typeModelCache = new HashMap<>();
+	private final Map<Class<?>, PojoTypeModel<?>> typeModelCache = new HashMap<>();
 
 	public HibernateOrmIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
 		ReflectionManager metadataReflectionManager = null;
@@ -82,8 +86,8 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> TypeModel<T> getTypeModel(Class<T> type) {
-		return (TypeModel<T>) typeModelCache.computeIfAbsent( type, this::createTypeModel );
+	public <T> PojoTypeModel<T> getTypeModel(Class<T> clazz) {
+		return (PojoTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -91,6 +95,18 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	@SuppressWarnings("unchecked")
 	public <T> Class<? extends T> getClass(T entity) {
 		return Hibernate.getClass( entity );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	<T> Stream<PojoTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
+		return XClassOrdering.get().getAscendingSuperTypes( xClass )
+				.map( superType -> (PojoTypeModel<? super T>) getTypeModel( superType ) );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	<T> Stream<PojoTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
+		return XClassOrdering.get().getDescendingSuperTypes( xClass )
+				.map( superType -> (PojoTypeModel<? super T>) getTypeModel( superType ) );
 	}
 
 	XClass toXClass(Class<?> type) {
@@ -125,9 +141,9 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
-	PropertyModel<?> createFallbackPropertyModel(TypeModel<?> holderTypeModel, String explicitAccessStrategyName,
+	PojoPropertyModel<?> createFallbackPropertyModel(PojoTypeModel<?> holderTypeModel, String explicitAccessStrategyName,
 			EntityMode entityMode, String propertyName, List<XProperty> xProperties) {
-		Class<?> holderType = holderTypeModel.getJavaType();
+		Class<?> holderType = holderTypeModel.getJavaClass();
 		PropertyAccessStrategy accessStrategy = accessStrategyResolver.resolvePropertyAccessStrategy(
 				holderType, explicitAccessStrategyName, entityMode
 		);
@@ -138,8 +154,13 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		return new HibernateOrmPropertyModel<>( this, holderTypeModel, propertyName, xProperties, getter );
 	}
 
-	private <T> TypeModel<T> createTypeModel(Class<T> type) {
-		TypeModel<T> typeModel = tryCreateEntityTypeModel( type );
+	@SuppressWarnings( "unchecked" )
+	private PojoTypeModel<?> getTypeModel(XClass xClass) {
+		return getTypeModel( reflectionManager.toClass( xClass ) );
+	}
+
+	private <T> PojoTypeModel<T> createTypeModel(Class<T> type) {
+		PojoTypeModel<T> typeModel = tryCreateEntityTypeModel( type );
 		if ( typeModel == null ) {
 			typeModel = tryCreateEmbeddableTypeModel( type );
 		}
@@ -149,10 +170,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		return typeModel;
 	}
 
-	private <T> TypeModel<T> tryCreateEntityTypeModel(Class<T> type) {
+	private <T> PojoTypeModel<T> tryCreateEntityTypeModel(Class<T> type) {
 		try {
 			EntityPersister persister = sessionFactoryImplementor.getMetamodel().entityPersister( type );
-			return new EntityTypeModel<>( this, type, persister );
+			return new HibernateOrmEntityTypeModel<>( this, type, persister );
 		}
 		catch (MappingException ignored) {
 			// The type is not an entity in the current session factory
@@ -160,10 +181,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		}
 	}
 
-	private <T> TypeModel<T> tryCreateEmbeddableTypeModel(Class<T> type) {
+	private <T> PojoTypeModel<T> tryCreateEmbeddableTypeModel(Class<T> type) {
 		try {
 			EmbeddableType<T> embeddableType = sessionFactoryImplementor.getMetamodel().embeddable( type );
-			return new EmbeddableTypeModel<>( this, embeddableType );
+			return new HibernateOrmEmbeddableTypeModel<>( this, embeddableType );
 		}
 		catch (IllegalArgumentException ignored) {
 			// The type is not embeddable in the current session factory
@@ -171,7 +192,7 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		}
 	}
 
-	private <T> TypeModel<T> createNonManagedTypeModel(Class<T> type) {
-		return new NonManagedTypeModel<>( this, type );
+	private <T> PojoTypeModel<T> createNonManagedTypeModel(Class<T> type) {
+		return new HibernateOrmNonManagedTypeModel<>( this, type );
 	}
 }

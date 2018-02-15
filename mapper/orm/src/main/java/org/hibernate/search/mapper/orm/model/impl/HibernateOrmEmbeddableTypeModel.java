@@ -12,15 +12,15 @@ import javax.persistence.metamodel.EmbeddableType;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.metamodel.internal.EmbeddableTypeImpl;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.tuple.component.ComponentTuplizer;
 import org.hibernate.type.ComponentType;
 
-class EmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
+class HibernateOrmEmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
 	private final ComponentType componentType;
 
-	EmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType) {
+	HibernateOrmEmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType) {
 		super( introspector, embeddableType.getJavaType() );
 		// FIXME find a way to avoid depending on Hibernate ORM internal APIs
 		EmbeddableTypeImpl<T> embeddableTypeImpl = (EmbeddableTypeImpl<T>) embeddableType;
@@ -28,7 +28,7 @@ class EmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 	}
 
 	@Override
-	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		Integer index = getPropertyIndexOrNull( componentType, propertyName );
 		if ( index != null ) {
 			ComponentTuplizer tuplizer = componentType.getComponentTuplizer();

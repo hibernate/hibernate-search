@@ -29,8 +29,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.util.SearchException;
 
 
@@ -120,15 +119,15 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new HashMap<>();
 
 		@Override
-		public <C> void collect(MapperFactory<C, ?> mapperFactory, IndexedTypeIdentifier typeId,
+		public <C> void collect(MapperFactory<C, ?> mapperFactory, TypeModel typeModel,
 				String indexName, C contributor) {
 			@SuppressWarnings("unchecked")
 			MapperContribution<C, ?> contribution = (MapperContribution<C, ?>)
 					contributionByMappingKey.computeIfAbsent( mapperFactory, ignored -> new MapperContribution<>( mapperFactory ));
-			contribution.update( typeId, indexName, contributor );
+			contribution.update( typeModel, indexName, contributor );
 		}
 
-		public Map<MappingKey<?>, Mapper<?, ?>> createMappers(
+		Map<MappingKey<?>, Mapper<?, ?>> createMappers(
 				BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			Map<MappingKey<?>, Mapper<?, ?>> mappers = new HashMap<>();
@@ -143,23 +142,22 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private static class MapperContribution<C, M extends MappingImplementor> {
 
 		private final MapperFactory<C, M> mapperFactory;
-		private final Map<IndexedTypeIdentifier, TypeMappingContribution<C>> contributionByType = new HashMap<>();
+		private final Map<TypeModel, TypeMappingContribution<C>> contributionByType = new HashMap<>();
 
-		public MapperContribution(MapperFactory<C, M> mapperFactory) {
+		MapperContribution(MapperFactory<C, M> mapperFactory) {
 			this.mapperFactory = mapperFactory;
 		}
 
-		public void update(IndexedTypeIdentifier typeId, String indexName, C contributor) {
-			contributionByType.computeIfAbsent( typeId, TypeMappingContribution::new )
+		public void update(TypeModel typeModel, String indexName, C contributor) {
+			contributionByType.computeIfAbsent( typeModel, TypeMappingContribution::new )
 					.update( indexName, contributor );
 		}
 
 		public Mapper<C, M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 			Mapper<C, M> mapper = mapperFactory.createMapper( buildContext, propertySource );
-			IndexableTypeOrdering typeOrdering = mapperFactory.getTypeOrdering();
-			for ( IndexedTypeIdentifier mappedType : contributionByType.keySet() ) {
-				Optional<String> indexNameOptional = typeOrdering.getAscendingSuperTypes( mappedType )
+			for ( TypeModel typeModel : contributionByType.keySet() ) {
+				Optional<String> indexNameOptional = typeModel.getAscendingSuperTypes()
 						.map( contributionByType::get )
 						.filter( Objects::nonNull )
 						.map( TypeMappingContribution::getIndexName )
@@ -168,17 +166,17 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				if ( indexNameOptional.isPresent() ) {
 					String indexName = indexNameOptional.get();
 					mapper.addIndexed(
-							mappedType,
-							indexManagerBuildingStateHolder.startBuilding( indexName, typeOrdering ),
-							type2 -> getContributors( typeOrdering, type2 )
-							);
+							typeModel,
+							indexManagerBuildingStateHolder.startBuilding( indexName ),
+							this::getContributors
+					);
 				}
 			}
 			return mapper;
 		}
 
-		private Stream<C> getContributors(IndexableTypeOrdering typeOrdering, IndexedTypeIdentifier typeId) {
-			return typeOrdering.getDescendingSuperTypes( typeId )
+		private Stream<C> getContributors(TypeModel typeModel) {
+			return typeModel.getDescendingSuperTypes()
 					.map( contributionByType::get )
 					.filter( Objects::nonNull )
 					.flatMap( TypeMappingContribution::getContributors );
@@ -186,13 +184,12 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	private static class TypeMappingContribution<C> {
-		private final IndexedTypeIdentifier typeId;
+		private final TypeModel typeModel;
 		private String indexName;
 		private final List<C> contributors = new ArrayList<>();
 
-		public TypeMappingContribution(IndexedTypeIdentifier typeId) {
-			super();
-			this.typeId = typeId;
+		public TypeMappingContribution(TypeModel typeModel) {
+			this.typeModel = typeModel;
 		}
 
 		public String getIndexName() {
@@ -202,7 +199,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		public void update(String indexName, C contributor) {
 			if ( indexName != null && !indexName.isEmpty() ) {
 				if ( this.indexName != null ) {
-					throw new SearchException( "Type '" + typeId + "' mapped to multiple indexes: '"
+					throw new SearchException( "Type '" + typeModel + "' mapped to multiple indexes: '"
 							+ this.indexName + "', '" + indexName + "'." );
 				}
 				this.indexName = indexName;

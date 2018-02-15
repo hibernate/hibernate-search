@@ -10,11 +10,13 @@ import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.SearchException;
 
@@ -29,18 +31,22 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 
 	private final AnnotationHelper annotationHelper;
 
+	/**
+	 * Note: the main purpose of this cache is not to improve performance (though it probably helps),
+	 * but to ensure the unicity of the returned {@link PojoTypeModel}s.
+	 * <p>
+	 * This in turn allows to not care at all about implementing equals and hashcode,
+	 * since type models are presumably instantiated only once per type.
+	 */
+	private final Map<Class<?>, PojoTypeModel<?>> typeModelCache = new HashMap<>();
+
 	public JavaBeanIntrospector(MethodHandles.Lookup lookup) {
 		this.annotationHelper = new AnnotationHelper( lookup );
 	}
 
 	@Override
-	public <T> TypeModel<T> getTypeModel(Class<T> type) {
-		try {
-			return new JavaBeanTypeModel<>( this, type );
-		}
-		catch (IntrospectionException | RuntimeException e) {
-			throw new SearchException( "Exception while retrieving the type model for '" + type + "'", e );
-		}
+	public <T> PojoTypeModel<T> getTypeModel(Class<T> clazz) {
+		return (PojoTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -62,5 +68,14 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(AnnotatedElement annotatedElement,
 			Class<? extends Annotation> metaAnnotationType) {
 		return annotationHelper.getAnnotationsByMetaAnnotationType( annotatedElement, metaAnnotationType );
+	}
+
+	private <T> PojoTypeModel<T> createTypeModel(Class<T> clazz) {
+		try {
+			return new JavaBeanTypeModel<>( this, clazz );
+		}
+		catch (IntrospectionException | RuntimeException e) {
+			throw new SearchException( "Exception while retrieving the type model for '" + clazz + "'", e );
+		}
 	}
 }

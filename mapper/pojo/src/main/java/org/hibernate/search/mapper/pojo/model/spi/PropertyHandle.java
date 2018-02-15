@@ -13,8 +13,6 @@ public interface PropertyHandle {
 
 	String getName();
 
-	Class<?> getJavaType();
-
 	Object get(Object thiz);
 
 	/**

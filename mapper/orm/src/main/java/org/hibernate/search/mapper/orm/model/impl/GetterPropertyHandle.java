@@ -29,22 +29,11 @@ final class GetterPropertyHandle implements PropertyHandle {
 	}
 
 	@Override
-	public Class<?> getJavaType() {
-		return getter.getReturnType();
-	}
-
-	@Override
 	public Object get(Object thiz) {
 		try {
 			return getter.get( thiz );
 		}
-		catch (Error e) {
-			throw e;
-		}
-		catch (Throwable e) {
-			if ( e instanceof InterruptedException ) {
-				Thread.currentThread().interrupt();
-			}
+		catch (RuntimeException e) {
 			throw new SearchException( "Exception while invoking '" + getter + "' on '" + thiz + "'" , e );
 		}
 	}

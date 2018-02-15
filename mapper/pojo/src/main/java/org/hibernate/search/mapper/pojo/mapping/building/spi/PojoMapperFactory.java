@@ -10,7 +10,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -29,11 +28,6 @@ public abstract class PojoMapperFactory<M extends MappingImplementor>
 	protected PojoMapperFactory(PojoIntrospector introspector, boolean implicitProvidedId) {
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
-	}
-
-	@Override
-	public IndexableTypeOrdering getTypeOrdering() {
-		return PojoTypeOrdering.get();
 	}
 
 	@Override

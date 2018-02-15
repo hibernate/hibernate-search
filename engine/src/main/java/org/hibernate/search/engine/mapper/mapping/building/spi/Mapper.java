@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -15,12 +15,12 @@ import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 public interface Mapper<C, M extends MappingImplementor> {
 
 	/**
-	 * @param typeId The identifier of the indexed type to be mapped
+	 * @param typeModel A model of the type to be mapped
 	 * @param indexManagerBuildingState The building state for the index to be mapped
 	 * @param contributorProvider A provider of composite mapping contributors, with contributions
 	 * guaranteed to be ordered from supertype to subtype, allowing the builder to support overrides if necessary.
 	 */
-	void addIndexed(IndexedTypeIdentifier typeId,
+	void addIndexed(TypeModel typeModel,
 			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<C> contributorProvider);
 

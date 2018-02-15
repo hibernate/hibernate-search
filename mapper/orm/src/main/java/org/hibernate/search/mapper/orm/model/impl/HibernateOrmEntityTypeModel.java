@@ -11,21 +11,21 @@ import java.util.List;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.tuple.entity.EntityTuplizer;
 
-class EntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
+class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
 	private final EntityPersister persister;
 
-	EntityTypeModel(HibernateOrmIntrospector introspector, Class<T> type, EntityPersister persister) {
-		super( introspector, type );
+	HibernateOrmEntityTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz, EntityPersister persister) {
+		super( introspector, clazz );
 		this.persister = persister;
 	}
 
 	@Override
-	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		EntityMetamodel metamodel = persister.getEntityMetamodel();
 		Integer index = metamodel.getPropertyIndexOrNull( propertyName );
 

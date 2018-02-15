@@ -63,7 +63,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	}
 
 	protected <E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
-		return typeManagers.getByExactType( clazz )
+		return typeManagers.getByExactClass( clazz )
 				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
 	}
 

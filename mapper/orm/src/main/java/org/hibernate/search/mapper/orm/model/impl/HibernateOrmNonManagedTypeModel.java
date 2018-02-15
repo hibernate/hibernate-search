@@ -10,16 +10,16 @@ import java.util.List;
 
 import org.hibernate.EntityMode;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
-class NonManagedTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
+class HibernateOrmNonManagedTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
-	NonManagedTypeModel(HibernateOrmIntrospector introspector, Class<T> type) {
-		super( introspector, type );
+	HibernateOrmNonManagedTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz) {
+		super( introspector, clazz );
 	}
 
 	@Override
-	PropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
 		return introspector.createFallbackPropertyModel(
 				this,
 				null,

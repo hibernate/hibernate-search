@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdenti
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -30,7 +30,7 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 	private final Map<PropertyHandle, PojoPropertyNodeProcessorBuilder> propertyProcessorBuilders = new HashMap<>();
 
 	public PojoTypeNodeProcessorBuilder(
-			PojoPropertyNodeProcessorBuilder parent, TypeModel<?> typeModel,
+			PojoPropertyNodeProcessorBuilder parent, PojoTypeModel<?> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
@@ -57,7 +57,7 @@ public class PojoTypeNodeProcessorBuilder extends AbstractPojoProcessorBuilder
 
 	@Override
 	protected void appendSelfPath(StringBuilder builder) {
-		builder.append( "type " ).append( indexableModel.getTypeModel().getJavaType().getSimpleName() );
+		builder.append( "type " ).append( indexableModel.getTypeModel().getJavaClass().getSimpleName() );
 	}
 
 	public PojoTypeNodeProcessor build() {

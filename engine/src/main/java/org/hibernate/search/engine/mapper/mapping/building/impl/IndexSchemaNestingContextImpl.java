@@ -12,21 +12,23 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
  */
 class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 
+	private static final IndexSchemaNestingContextImpl ROOT =
+			new IndexSchemaNestingContextImpl( IndexSchemaFilter.root(), "", "" );
+
+	public static IndexSchemaNestingContextImpl root() {
+		return ROOT;
+	}
+
 	private final IndexSchemaFilter filter;
 	private final String prefixFromFilter;
 	private final String unconsumedPrefix;
-
-	public IndexSchemaNestingContextImpl(IndexableTypeOrdering typeOrdering) {
-		this( new IndexSchemaFilter( typeOrdering ), "", "" );
-	}
 
 	private IndexSchemaNestingContextImpl(IndexSchemaFilter filter, String prefixFromFilter,
 			String unconsumedPrefix) {
@@ -76,11 +78,11 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	public <T> Optional<T> addIndexedEmbeddedIfIncluded(
-			IndexedTypeIdentifier parentTypeId, String relativePrefix,
+			TypeModel parentTypeModel, String relativePrefix,
 			Integer nestedMaxDepth, Set<String> nestedPathFilters,
 			NestedContextBuilder<T> contextBuilder) {
 		IndexSchemaFilter composedFilter = filter.composeWithNested(
-				parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters
+				parentTypeModel, relativePrefix, nestedMaxDepth, nestedPathFilters
 		);
 		if ( !composedFilter.isEveryPathExcluded() ) {
 			String prefixToParse = unconsumedPrefix + relativePrefix;

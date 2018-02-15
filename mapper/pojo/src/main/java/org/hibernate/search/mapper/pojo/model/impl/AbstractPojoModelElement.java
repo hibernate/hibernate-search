@@ -15,22 +15,22 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetada
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.TypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNodeModelCollector {
+abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNodeModelCollector {
 
 	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider;
 
-	private final Map<String, PojoModelProperty> propertyModelsByName = new HashMap<>();
+	private final Map<String, PojoModelPropertyElement> propertyModelsByName = new HashMap<>();
 
 	private boolean markersForTypeInitialized = false;
 
-	public AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+	AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
@@ -39,15 +39,15 @@ public abstract class AbstractPojoModelElement implements PojoModelElement, Pojo
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return clazz.isAssignableFrom( getJavaType() );
+		return getTypeModel().getSuperType( clazz ).isPresent();
 	}
 
 	@Override
-	public PojoModelProperty property(String relativeName) {
+	public PojoModelPropertyElement property(String relativeName) {
 		initMarkersForType();
 		return propertyModelsByName.computeIfAbsent( relativeName, name -> {
-			PropertyModel<?> model = getTypeModel().getProperty( name );
-			return new PojoModelProperty( this, model, modelContributorProvider );
+			PojoPropertyModel<?> model = getTypeModel().getProperty( name );
+			return new PojoModelPropertyElement( this, model, modelContributorProvider );
 		} );
 	}
 
@@ -65,16 +65,14 @@ public abstract class AbstractPojoModelElement implements PojoModelElement, Pojo
 	private void initMarkersForType() {
 		if ( !markersForTypeInitialized ) {
 			this.markersForTypeInitialized = true;
-			getModelContributorProvider().get( new PojoIndexedTypeIdentifier( getJavaType() ) )
+			getModelContributorProvider().get( getTypeModel() )
 					.forEach( c -> c.contributeModel( this ) );
 		}
 	}
 
-	protected abstract TypeModel<?> getTypeModel();
+	protected abstract PojoTypeModel<?> getTypeModel();
 
-	protected abstract Class<?> getJavaType();
-
-	protected TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> getModelContributorProvider() {
+	private TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> getModelContributorProvider() {
 		return modelContributorProvider;
 	}
 

@@ -6,15 +6,13 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
+import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 /**
  * @author Yoann Rodiere
  */
 public interface TypeMetadataCollector {
 
-	<C> void collect(MapperFactory<C, ?> mapperFactory,
-			IndexedTypeIdentifier typeId, String indexName,
-			C contributor);
+	<C> void collect(MapperFactory<C, ?> mapperFactory, TypeModel typeModel, String indexName, C contributor);
 
 }

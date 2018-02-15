@@ -8,24 +8,19 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-class PojoRootAccessor<T> implements PojoModelElementAccessor<T> {
+class PojoModelRootElementAccessor<T> implements PojoModelElementAccessor<T> {
 
-	private final Class<T> type;
+	private final PojoTypeModel<T> typeModel;
 
-	PojoRootAccessor(Class<T> type) {
-		super();
-		this.type = type;
-	}
-
-	@Override
-	public Class<T> getType() {
-		return type;
+	PojoModelRootElementAccessor(PojoTypeModel<T> typeModel) {
+		this.typeModel = typeModel;
 	}
 
 	@Override
 	public T read(PojoElement bridgedElement) {
-		return type.cast( ((PojoElementImpl) bridgedElement).get() );
+		return typeModel.cast( ((PojoElementImpl) bridgedElement).get() );
 	}
 
 }
