@@ -71,7 +71,7 @@ public final class StubTreeNodeCompare {
 			}
 		}
 		Set<String> childKeys = new LinkedHashSet<>( expectedNode.getChildren().keySet() );
-		attributeKeys.addAll( actualNode.getChildren().keySet() );
+		childKeys.addAll( actualNode.getChildren().keySet() );
 		for ( String key : childKeys ) {
 			List<N> expectedChildren = expectedNode.getChildren().get( key );
 			List<N> actualChildren = actualNode.getChildren().get( key );

@@ -127,6 +127,7 @@ public class OrmProgrammaticMappingIT {
 						.field( "prefix_myLocalDateField", LocalDate.class )
 						.field( "prefix_myTextField", String.class )
 				)
+				.field( "myTextField", String.class )
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
