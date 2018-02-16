@@ -336,7 +336,7 @@ public class OrmProgrammaticMappingIT {
 							.indexedEmbedded()
 									.prefix( "embedded.prefix_" )
 									.maxDepth( 1 )
-									.includePaths( "embedded.prefix_customBridgeOnClass.text" );
+									.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
 			ProgrammaticMappingDefinition secondMapping = contributor.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )

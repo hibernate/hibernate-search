@@ -31,7 +31,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private Integer maxDepth;
 
-	private final Set<String> pathFilters = new HashSet<>();
+	private final Set<String> includePaths = new HashSet<>();
 
 	public PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
 		super( parent );
@@ -44,7 +44,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.indexedEmbedded( prefix, storage, maxDepth, pathFilters );
+		collector.indexedEmbedded( prefix, storage, maxDepth, includePaths );
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	@Override
 	public PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths) {
-		this.pathFilters.addAll( paths );
+		this.includePaths.addAll( paths );
 		return this;
 	}
 

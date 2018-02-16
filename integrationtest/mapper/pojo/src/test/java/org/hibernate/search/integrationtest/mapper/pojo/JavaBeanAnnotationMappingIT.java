@@ -363,7 +363,7 @@ public class JavaBeanAnnotationMappingIT {
 
 		@Override
 		@IndexedEmbedded(prefix = "embedded.prefix_", maxDepth = 1,
-				includePaths = "embedded.prefix_customBridgeOnClass.text")
+				includePaths = { "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" })
 		public IndexedEntity getEmbedded() {
 			return super.getEmbedded();
 		}

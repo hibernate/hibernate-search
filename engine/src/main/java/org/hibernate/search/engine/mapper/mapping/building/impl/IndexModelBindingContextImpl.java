@@ -82,9 +82,9 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
 	@Override
 	public Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(IndexedTypeIdentifier parentTypeId,
-			String relativePrefix, ObjectFieldStorage storage, Integer nestedMaxDepth, Set<String> nestedPathFilters) {
+			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths) {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
-				parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters,
+				parentTypeId, relativePrefix, maxDepth, includePaths,
 				new Builder( schemaCollector, storage )
 		);
 	}

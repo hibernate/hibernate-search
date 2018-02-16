@@ -74,7 +74,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 
 	@Override
 	public void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage,
-			Integer maxDepth, Set<String> pathFilters) {
+			Integer maxDepth, Set<String> includePaths) {
 		// TODO handle collections
 
 		String defaultedRelativePrefix = relativePrefix;
@@ -85,7 +85,7 @@ public class PojoPropertyNodeProcessorBuilder extends AbstractPojoProcessorBuild
 		PojoIndexedTypeIdentifier typeId = new PojoIndexedTypeIdentifier( propertyHandle.getJavaType() );
 
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				typeId, defaultedRelativePrefix, storage, maxDepth, pathFilters );
+				typeId, defaultedRelativePrefix, storage, maxDepth, includePaths );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoTypeNodeProcessorBuilder nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder(
 					this, indexableModel.getTypeModel(), contributorProvider, indexModelBinder, nestedBindingContext,

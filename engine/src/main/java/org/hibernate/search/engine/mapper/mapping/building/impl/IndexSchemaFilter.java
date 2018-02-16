@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,50 @@ import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.SearchException;
 
 /**
+ * A schema filter, responsible for deciding which parts of a mapping will actually make it to the index schema.
+ * <p>
+ * A schema filter is created at the root of a Pojo mapping (it accepts everything),
+ * and also each time index embedding ({@code @IndexedEmbedded}) is used.
+ *
+ * <h3 id="filter-usage">Filter usage</h3>
+ * <p>
+ * A schema filter is asked to provide advice about whether or not to trim down the schema in two cases:
+ * <ul>
+ *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
+ *     through its {@link #isPathIncluded(String)} method</li>
+ *	   <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
+ *	   {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)} method, which may return a filter
+ *	   that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
+ *	   be ignored</li>
+ * </ul>
+ *
+ * <h3 id="filter-properties">Filter properties</h3>
+ * <p>
+ * A filter decides wether to include a path or not according to its two main properties:
+ * <ul>
+ *     <li>the {@link #remainingCompositionDepth remaining composition depth}</li>
+ *     <li>the {@link #explicitlyIncludedPaths explicitly included paths}</li>
+ * </ul>
+ * <p>
+ * The explicitly included paths, as their name suggest, define which paths
+ * should be accepted by this filter no matter what.
+ * <p>
+ * The composition depth defines
+ * {@link #isEveryPathIncludedByDefault(Integer)} () how paths that do not appear in the explicitly included paths should be treated}:
+ * <ul>
+ *     <li>if {@code <= 0}, paths are excluded by default</li>
+ *     <li>if {@code null} or {@code > 0}, paths are included by default</li>
+ * </ul>
+ *
+ * <h3 id="filter-composition">Filter composition</h3>
+ * <p>
+ * Composed filters are created whenever a nested {@code @IndexedEmbedded} is encountered.
+ * A composed filter will always enforce the restrictions of its parent filter,
+ * plus some added restrictions depending on the properties of the nested {@code IndexedEmbedded}.
+ * <p>
+ * For more information about how filters are composed, see
+ * {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)}.
+ *
  * @author Yoann Rodiere
  */
 class IndexSchemaFilter {
@@ -24,22 +69,33 @@ class IndexSchemaFilter {
 	private final IndexedTypeIdentifier parentTypeId;
 	private final String relativePrefix;
 
-	private final Integer remainingDepth;
-	private final Set<String> pathFilters;
+	/**
+	 * Defines how deep indexed embedded are allowed to be composed.
+	 *
+	 * Note that composition depth only relates to IndexedEmbedded composition;
+	 * bridge-declared fields are only affected by path filtering,
+	 * whose default behavior (include or exclude) is determined by {@link #isEveryPathIncludedByDefault(Integer)}.
+	 */
+	private final Integer remainingCompositionDepth;
+
+	/**
+	 * Defines paths to be included even when the default behavior is to exclude paths.
+	 */
+	private final Set<String> explicitlyIncludedPaths;
 
 	public IndexSchemaFilter(IndexableTypeOrdering typeOrdering) {
-		this( typeOrdering, null, null, null, null, null );
+		this( typeOrdering, null, null, null, null, Collections.emptySet() );
 	}
 
 	private IndexSchemaFilter(IndexableTypeOrdering typeOrdering,
 			IndexSchemaFilter parent, IndexedTypeIdentifier parentTypeId, String relativePrefix,
-			Integer remainingDepth, Set<String> pathFilters) {
+			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths) {
 		this.typeOrdering = typeOrdering;
 		this.parent = parent;
 		this.parentTypeId = parentTypeId;
 		this.relativePrefix = relativePrefix;
-		this.remainingDepth = remainingDepth;
-		this.pathFilters = pathFilters;
+		this.remainingCompositionDepth = remainingCompositionDepth;
+		this.explicitlyIncludedPaths = explicitlyIncludedPaths;
 	}
 
 	@Override
@@ -48,23 +104,22 @@ class IndexSchemaFilter {
 				.append( "[" )
 				.append( "parentTypeId=" ).append( parentTypeId )
 				.append( ",relativePrefix=" ).append( relativePrefix )
-				.append( ",remainingDepth=" ).append( remainingDepth )
-				.append( ",pathFilters=" ).append( pathFilters )
+				.append( ",remainingCompositionDepth=" ).append( remainingCompositionDepth )
+				.append( ",explicitlyIncludedPaths=" ).append( explicitlyIncludedPaths )
 				.append( "]" )
 				.toString();
 	}
 
 	public boolean isPathIncluded(String relativePath) {
-		return remainingDepth == null || remainingDepth > 0
-				|| pathFilters != null && pathFilters.contains( relativePath );
+		return isPathIncluded( remainingCompositionDepth, explicitlyIncludedPaths, relativePath );
 	}
 
-	private boolean hasRecursionLimits() {
-		return remainingDepth != null || pathFilters != null;
+	public boolean isEveryPathExcluded() {
+		return !isEveryPathIncludedByDefault( remainingCompositionDepth ) && !isAnyPathExplicitlyIncluded();
 	}
 
-	private String getPathFromIndexedEmbeddedSinceNoRecursionLimits(IndexedTypeIdentifier parentTypeId, String relativePrefix) {
-		if ( hasRecursionLimits() ) {
+	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(IndexedTypeIdentifier parentTypeId, String relativePrefix) {
+		if ( hasCompositionLimits() ) {
 			return null;
 		}
 		else if ( parent != null ) {
@@ -74,7 +129,7 @@ class IndexSchemaFilter {
 				return this.relativePrefix;
 			}
 			else {
-				String path = parent.getPathFromIndexedEmbeddedSinceNoRecursionLimits( parentTypeId, relativePrefix );
+				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
 				return path == null ? null : path + relativePrefix;
 			}
 		}
@@ -88,69 +143,103 @@ class IndexSchemaFilter {
 		}
 	}
 
-	public boolean isTerminal() {
-		return remainingDepth != null && remainingDepth <= 0 && pathFilters == null
-				|| pathFilters != null && pathFilters.isEmpty();
-	}
-
 	public IndexSchemaFilter composeWithNested(IndexedTypeIdentifier parentTypeId, String relativePrefix,
-			Integer nestedMaxDepth, Set<String> nestedPathFilters) {
-		String cyclicRecursionPath = getPathFromIndexedEmbeddedSinceNoRecursionLimits( parentTypeId, relativePrefix );
+			Integer maxDepth, Set<String> includePaths) {
+		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
 		if ( cyclicRecursionPath != null ) {
 			throw new SearchException( "Found an infinite IndexedEmbedded recursion involving path '"
 					+ cyclicRecursionPath + "' on type '" + parentTypeId + "'" );
 		}
 
-		Integer defaultedNestedMaxDepth = nestedMaxDepth;
-		if ( defaultedNestedMaxDepth == null && nestedPathFilters != null && !nestedPathFilters.isEmpty() ) {
-			// The max depth is implicitly set to 0 when not provided and when there are path filters
-			defaultedNestedMaxDepth = 0;
-		}
+		Set<String> nullSafeIncludePaths = includePaths == null ? Collections.emptySet() : includePaths;
 
-		Integer newRemainingDepth = remainingDepth == null ? null : remainingDepth - 1;
-		if ( defaultedNestedMaxDepth != null && ( remainingDepth == null || remainingDepth > defaultedNestedMaxDepth ) ) {
-			newRemainingDepth = defaultedNestedMaxDepth;
-		}
+		// The remaining composition depth according to "this" only
+		Integer currentRemainingDepth = remainingCompositionDepth == null ? null : remainingCompositionDepth - 1;
 
-		Set<String> newPathFilters = null;
-		if ( nestedPathFilters != null && !nestedPathFilters.isEmpty() ) {
-			/*
-			 * Explicit path filtering on the nested indexedEmbedded:
-			 * compose filters with the current ones and use the result.
-			 */
-			newPathFilters = new HashSet<>();
-			for ( String nestedPathFilter : nestedPathFilters ) {
-				if ( isPathIncluded( relativePrefix + nestedPathFilter ) ) {
-					newPathFilters.add( nestedPathFilter );
-					// Also add paths leading to this path (so that object nodes are not excluded)
-					int afterPreviousDotIndex = 0;
-					int nextDotIndex = nestedPathFilter.indexOf( '.', afterPreviousDotIndex );
-					while ( nextDotIndex >= 0 ) {
-						String subPath = nestedPathFilter.substring( 0, nextDotIndex );
-						newPathFilters.add( subPath );
-						afterPreviousDotIndex = nextDotIndex + 1;
-						nextDotIndex = nestedPathFilter.indexOf( '.', afterPreviousDotIndex );
-					}
-				}
-			}
-		}
-		else if ( pathFilters != null ) {
-			/*
-			 * No explicit path filtering on the nested indexedEmbedded
-			 * (meaning all path are included as far as it's concerned)
-			 * but the parent indexedEmbedded has path filtering.
-			 * Keep only filters matching the nested indexedEmbedded's prefix.
-			 */
-			newPathFilters = new HashSet<>();
-			int relativePrefixLength = relativePrefix.length();
-			for ( String pathFilter : pathFilters ) {
-				if ( pathFilter.startsWith( relativePrefix ) ) {
-					newPathFilters.add( pathFilter.substring( relativePrefixLength ) );
-				}
+		// The remaining composition depth according to the nested IndexedEmbedded only
+		Integer nestedRemainingDepth = maxDepth;
+		if ( maxDepth == null ) {
+			if ( !nullSafeIncludePaths.isEmpty() ) {
+				/*
+				 * If no max depth was provided and "includePaths" was provided,
+				 * the remaining composition depth is implicitly set to 0,
+				 * meaning no composition is allowed and paths are excluded unless
+				 * explicitly listed in "includePaths".
+				 */
+				nestedRemainingDepth = 0;
 			}
 		}
 
-		return new IndexSchemaFilter( typeOrdering, this, parentTypeId, relativePrefix,
-				newRemainingDepth, newPathFilters );
+		/*
+		 * By default, a composed filters' remaining composition depth is its parent's minus one
+		 * (or null if the remaining composition depth was not set in the parent)...
+		 */
+		Integer composedRemainingDepth = currentRemainingDepth;
+		if ( composedRemainingDepth == null
+				|| nestedRemainingDepth != null && composedRemainingDepth > nestedRemainingDepth ) {
+			/*
+			 * ... but the nested filter can override it.
+			 */
+			composedRemainingDepth = nestedRemainingDepth;
+		}
+
+		Set<String> composedFilterExplicitlyIncludedPaths = new HashSet<>();
+		/*
+		 * Add the nested filter's explicitly included paths to the composed filter's "explicitlyIncludedPaths",
+		 * provided they are not filtered out by the current filter.
+		 */
+		for ( String path : nullSafeIncludePaths ) {
+			if ( isPathIncluded( currentRemainingDepth, explicitlyIncludedPaths, relativePrefix + path ) ) {
+				composedFilterExplicitlyIncludedPaths.add( path );
+				// Also add paths leading to this path (so that object nodes are not excluded)
+				int afterPreviousDotIndex = 0;
+				int nextDotIndex = path.indexOf( '.', afterPreviousDotIndex );
+				while ( nextDotIndex >= 0 ) {
+					String subPath = path.substring( 0, nextDotIndex );
+					composedFilterExplicitlyIncludedPaths.add( subPath );
+					afterPreviousDotIndex = nextDotIndex + 1;
+					nextDotIndex = path.indexOf( '.', afterPreviousDotIndex );
+				}
+			}
+		}
+		/*
+		 * Add the current filter's explicitly included paths to the composed filter's "explicitlyIncludedPaths",
+		 * provided they start with the nested filter's prefix and are not filtered out by the nested filter.
+		 */
+		int relativePrefixLength = relativePrefix.length();
+		for ( String path : explicitlyIncludedPaths ) {
+			if ( path.startsWith( relativePrefix ) ) {
+				String pathRelativeToNestedFilter = path.substring( relativePrefixLength );
+				if ( isPathIncluded( nestedRemainingDepth, nullSafeIncludePaths, pathRelativeToNestedFilter ) ) {
+					composedFilterExplicitlyIncludedPaths.add( pathRelativeToNestedFilter );
+				}
+			}
+		}
+
+		return new IndexSchemaFilter(
+				typeOrdering, this, parentTypeId, relativePrefix,
+				composedRemainingDepth, composedFilterExplicitlyIncludedPaths
+		);
+	}
+
+	private static boolean isPathIncluded(Integer remainingDepth, Set<String> explicitlyIncludedPaths, String relativePath) {
+		return isEveryPathIncludedByDefault( remainingDepth )
+				|| explicitlyIncludedPaths.contains( relativePath );
+	}
+
+	private static boolean isEveryPathIncludedByDefault(Integer remainingDepth) {
+		/*
+		 * A remaining composition depth of 0 or below means
+		 * paths should be excluded when filtering unless mentioned in explicitlyIncludedPaths.
+		 */
+		return remainingDepth == null || remainingDepth > 0;
+	}
+
+	private boolean isAnyPathExplicitlyIncluded() {
+		return !explicitlyIncludedPaths.isEmpty();
+	}
+
+	private boolean hasCompositionLimits() {
+		return remainingCompositionDepth != null || !explicitlyIncludedPaths.isEmpty();
 	}
 }

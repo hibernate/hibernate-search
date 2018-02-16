@@ -82,7 +82,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 		IndexSchemaFilter composedFilter = filter.composeWithNested(
 				parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters
 		);
-		if ( !composedFilter.isTerminal() ) {
+		if ( !composedFilter.isEveryPathExcluded() ) {
 			String prefixToParse = unconsumedPrefix + relativePrefix;
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
@@ -95,7 +95,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 			String unconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
 			IndexSchemaNestingContextImpl nestedContext =
-					new IndexSchemaNestingContextImpl( composedFilter, relativePrefix, unconsumedPrefix );
+					new IndexSchemaNestingContextImpl( composedFilter, "", unconsumedPrefix );
 			return Optional.of( contextBuilder.build( nestedContext ) );
 		}
 		else {

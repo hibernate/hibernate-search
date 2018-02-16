@@ -81,7 +81,7 @@ public class JavaBeanProgrammaticMappingIT {
 						.indexedEmbedded()
 								.prefix( "embedded.prefix_" )
 								.maxDepth( 1 )
-								.includePaths( "embedded.prefix_customBridgeOnClass.text" );
+								.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
 		ProgrammaticMappingDefinition secondMappingDefinition = contributor.programmaticMapping();
 		secondMappingDefinition.type( ParentIndexedEntity.class )

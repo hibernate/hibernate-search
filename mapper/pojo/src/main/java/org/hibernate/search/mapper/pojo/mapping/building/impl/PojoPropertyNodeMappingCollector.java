@@ -26,6 +26,6 @@ public interface PojoPropertyNodeMappingCollector extends PojoNodeMappingCollect
 
 	void containedIn();
 
-	void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> pathFilters);
+	void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 
 }

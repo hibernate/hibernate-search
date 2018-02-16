@@ -31,5 +31,5 @@ public interface IndexModelBindingContext {
 	void explicitRouting();
 
 	Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(IndexedTypeIdentifier parentTypeId,
-			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> pathFilters);
+			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 }
