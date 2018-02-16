@@ -196,7 +196,7 @@
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.3.0.Beta1</hibernateVersion>
+        <hibernateVersion>5.3.0.CR1</hibernateVersion>
         <hibernateShortVersion>5.3</hibernateShortVersion>
         <hibernateCommonsAnnotationVersion>5.0.2.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.3.Final</jandexVersion>
