@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +16,8 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.IndexableTypeOrdering;
@@ -35,7 +39,7 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 		this( schemaCollector, Collections.emptyList(), new IndexSchemaNestingContextImpl( typeOrdering ) );
 	}
 
-	IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
+	private IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
 			Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
 			IndexSchemaNestingContextImpl nestingContext) {
 		this.schemaCollector = schemaCollector;
@@ -80,10 +84,35 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 	public Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(IndexedTypeIdentifier parentTypeId,
 			String relativePrefix, ObjectFieldStorage storage, Integer nestedMaxDepth, Set<String> nestedPathFilters) {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
-				relativePrefix, storage,
-				f -> f.composeWithNested( parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters ),
-				schemaCollector
+				parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters,
+				new Builder( schemaCollector, storage )
 		);
+	}
+
+
+	private static class Builder
+			implements IndexSchemaNestingContextImpl.NestedContextBuilder<IndexModelBindingContext> {
+
+		private IndexSchemaCollector currentIndexModelNode;
+		private final ObjectFieldStorage storage;
+		private final List<IndexObjectFieldAccessor> parentObjectAccessors = new ArrayList<>();
+
+		private Builder(IndexSchemaCollector indexModelNode, ObjectFieldStorage storage) {
+			this.currentIndexModelNode = indexModelNode;
+			this.storage = storage;
+		}
+
+		@Override
+		public void appendObject(String objectName) {
+			ObjectFieldIndexSchemaCollector nextNode = currentIndexModelNode.objectField( objectName, storage );
+			parentObjectAccessors.add( nextNode.withContext( IndexSchemaNestingContext.includeAll() ).createAccessor() );
+			currentIndexModelNode = nextNode;
+		}
+
+		@Override
+		public IndexModelBindingContext build(IndexSchemaNestingContextImpl nestingContext) {
+			return new IndexModelBindingContextImpl( currentIndexModelNode, parentObjectAccessors, nestingContext );
+		}
 	}
 
 }
