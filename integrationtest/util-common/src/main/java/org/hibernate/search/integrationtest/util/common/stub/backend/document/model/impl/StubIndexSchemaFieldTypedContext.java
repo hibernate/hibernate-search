@@ -16,12 +16,14 @@ class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContex
 
 	private final String relativeName;
 	private final StubIndexSchemaNode.Builder builder;
+	private final boolean included;
 
-	private StubIndexFieldAccessor<T> accessor;
+	private IndexFieldAccessor<T> accessor;
 
-	StubIndexSchemaFieldTypedContext(String relativeName, StubIndexSchemaNode.Builder builder) {
+	StubIndexSchemaFieldTypedContext(String relativeName, StubIndexSchemaNode.Builder builder, boolean included) {
 		this.relativeName = relativeName;
 		this.builder = builder;
+		this.included = included;
 	}
 
 	@Override
@@ -51,7 +53,12 @@ class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContex
 	@Override
 	public IndexFieldAccessor<T> createAccessor() {
 		if ( accessor == null ) {
-			accessor = new StubIndexFieldAccessor<>( relativeName );
+			if ( included ) {
+				accessor = new StubIncludedIndexFieldAccessor<>( relativeName );
+			}
+			else {
+				accessor = new StubExcludedIndexFieldAccessor<>( relativeName );
+			}
 		}
 		return accessor;
 	}

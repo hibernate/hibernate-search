@@ -38,10 +38,10 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 						// If the field is included, make sure to link it to the parent
 						prefixedName -> {
 							builder.child( prefixedName, childBuilder );
-							return new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder );
+							return new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder, true );
 						},
 						// Otherwise, just make sure the code will work, but ignore any input from the client
-						prefixedName -> new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder )
+						prefixedName -> new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder, false )
 				);
 			}
 
@@ -75,11 +75,11 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 				// If the field is included, make sure to link it to the parent
 				(prefixedName, nestingContext) -> {
 					builder.child( prefixedName, childBuilder );
-					return new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext );
+					return new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext, true );
 				},
 				// Otherwise, just make sure the code will work, but ignore any input from the client
 				(prefixedName, nestingContext) ->
-						new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext )
+						new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext, false )
 		);
 	}
 

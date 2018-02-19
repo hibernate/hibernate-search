@@ -14,18 +14,25 @@ import org.hibernate.search.integrationtest.util.common.stub.backend.document.mo
 class StubIndexSchemaObjectField extends StubIndexSchemaElement implements IndexSchemaObjectField {
 
 	private final String relativeName;
-	private StubIndexObjectFieldAccessor accessor;
+	private final boolean included;
+	private IndexObjectFieldAccessor accessor;
 
 	StubIndexSchemaObjectField(String relativeName, StubIndexSchemaNode.Builder builder,
-			IndexSchemaNestingContext context) {
+			IndexSchemaNestingContext context, boolean included) {
 		super( builder, context );
 		this.relativeName = relativeName;
+		this.included = included;
 	}
 
 	@Override
 	public IndexObjectFieldAccessor createAccessor() {
 		if ( accessor == null ) {
-			accessor = new StubIndexObjectFieldAccessor( relativeName );
+			if ( included ) {
+				accessor = new StubIncludedIndexObjectFieldAccessor( relativeName );
+			}
+			else {
+				accessor = new StubExcludedIndexObjectFieldAccessor( relativeName );
+			}
 		}
 		return accessor;
 	}

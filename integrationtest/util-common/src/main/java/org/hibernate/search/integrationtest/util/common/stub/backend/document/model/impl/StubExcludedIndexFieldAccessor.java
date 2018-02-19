@@ -6,20 +6,26 @@
  */
 package org.hibernate.search.integrationtest.util.common.stub.backend.document.model.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.integrationtest.util.common.stub.backend.document.impl.StubDocumentElement;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.spi.LoggerFactory;
 
-class StubIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+class StubExcludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final String relativeName;
 
-	StubIndexFieldAccessor(String relativeName) {
+	StubExcludedIndexFieldAccessor(String relativeName) {
 		this.relativeName = relativeName;
 	}
 
 	@Override
 	public void write(DocumentElement target, T value) {
-		StubDocumentElement stubTarget = (StubDocumentElement) target;
-		stubTarget.putValue( relativeName, value );
+		log.tracev( "Ignoring write on document element {}, field '{}' with value '{}'" +
+				" because the field was excluded during bootstrap.", target, relativeName, value );
 	}
 }

@@ -23,6 +23,6 @@ class StubObjectFieldIndexSchemaCollector extends StubIndexSchemaCollector
 
 	@Override
 	public IndexSchemaObjectField withContext(IndexSchemaNestingContext context) {
-		return new StubIndexSchemaObjectField( relativeName, builder, context );
+		return new StubIndexSchemaObjectField( relativeName, builder, context, true );
 	}
 }

@@ -10,11 +10,11 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.integrationtest.util.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
+class StubIncludedIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
 
 	private final String relativeName;
 
-	StubIndexObjectFieldAccessor(String relativeName) {
+	StubIncludedIndexObjectFieldAccessor(String relativeName) {
 		this.relativeName = relativeName;
 	}
 
