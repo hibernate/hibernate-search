@@ -7,16 +7,20 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.Hibernate;
 import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.integrationtest.showcase.library.bridge.LibraryServiceBridge;
 
 @Entity
 @Indexed(index = Library.INDEX)
@@ -49,8 +53,26 @@ public class Library {
 	private Double longitude;
 
 	@ElementCollection
-	//@Field // FIXME field unwrapping
+	// TODO add default bridge (and maybe field type?) for enums
+	@Field(functionBridge = @FunctionBridgeBeanReference(type = LibraryServiceBridge.class))
 	private List<LibraryService> services;
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != Hibernate.getClass( o ) ) {
+			return false;
+		}
+		Library library = (Library) o;
+		return Objects.equals( id, library.getId() );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( getClass() );
+	}
 
 	@Override
 	public String toString() {

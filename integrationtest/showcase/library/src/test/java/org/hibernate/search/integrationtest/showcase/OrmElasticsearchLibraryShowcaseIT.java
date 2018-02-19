@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.showcase;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -244,9 +245,6 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Test
 	public void searchAroundMe_nested() {
-		// TODO collection unwrapping for @IndexedEmbedded
-		assumeTrue( "Collection unwrapping for @IndexedEmbedded not implemented yet", false );
-
 		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
 
 		withinTransaction( sessionFactory, this::initData );
@@ -255,46 +253,83 @@ public class OrmElasticsearchLibraryShowcaseIT {
 			List<Document<?>> documents = dao.searchAroundMe(
 					"java", null,
 					null, null,
+					Collections.singletonList( LibraryService.DISABLED_ACCESS ),
+					0, 10
+			);
+			assertThat( documents ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Video.class, JAVA_DANCING_ID ),
+					session.get( Book.class, INDONESIAN_ECONOMY_ID )
+			);
+
+			documents = dao.searchAroundMe(
+					"java", null,
+					null, null,
+					Collections.singletonList( LibraryService.READING_ROOMS ),
+					0, 10
+			);
+			assertThat( documents ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Video.class, JAVA_DANCING_ID ),
+					session.get( Book.class, INDONESIAN_ECONOMY_ID )
+			);
+
+			documents = dao.searchAroundMe(
+					"java", null,
+					null, null,
 					Arrays.asList( LibraryService.DISABLED_ACCESS, LibraryService.READING_ROOMS ),
 					0, 10
 			);
-
 			/*
 			 * In particular, should not match the document "indonesianEconomy",
 			 * which is present in a library with disabled access and in a library with reading rooms,
 			 * but not in a library with both.
 			 */
-			assertThat( documents ).containsExactly(
-					session.get( Video.class, JAVA_DANCING_ID ),
-					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
+			assertThat( documents ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Video.class, JAVA_DANCING_ID )
 			);
 		} );
 	}
 
 	@Test
 	public void searchAroundMe_searchBridge() {
-		// TODO indexedEmbedded unwrapping
-		assumeTrue( "IndexedEmbedded unwrapping not implemented yet", false );
-
 		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
 
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
 			List<Document<?>> documents = dao.searchAroundMe(
-					null, "java,programming",
+					null, "java",
 					null, null,
-					Arrays.asList( LibraryService.DISABLED_ACCESS, LibraryService.READING_ROOMS ),
+					null,
 					0, 10
 			);
-
-			/*
-			 * In particular, should not match the document "indonesianEconomy",
-			 * which is present in a library with disabled access and in a library with reading rooms,
-			 * but not in a library with both.
-			 */
-			assertThat( documents ).containsExactly(
+			assertThat( documents ).containsOnly(
 					session.get( Video.class, JAVA_DANCING_ID ),
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Book.class, INDONESIAN_ECONOMY_ID ),
+					session.get( Video.class, LIVING_ON_ISLAND_ID )
+			);
+
+			documents = dao.searchAroundMe(
+					null, "programming",
+					null, null,
+					null,
+					0, 10
+			);
+			assertThat( documents ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Book.class, ART_OF_COMPUTER_PROG_ID )
+			);
+
+			documents = dao.searchAroundMe(
+					null, "java,programming",
+					null, null,
+					null,
+					0, 10
+			);
+			assertThat( documents ).containsOnly(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
 			);
 		} );

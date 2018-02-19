@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.Hibernate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
@@ -33,6 +35,23 @@ public abstract class DocumentCopy<D extends Document<?>> {
 	@IndexedEmbedded(maxDepth = 1)
 	// TODO facet
 	private Library library;
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != Hibernate.getClass( o ) ) {
+			return false;
+		}
+		DocumentCopy<?> documentCopy = (DocumentCopy<?>) o;
+		return Objects.equals( id, documentCopy.getId() );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( getClass() );
+	}
 
 	@Override
 	public String toString() {

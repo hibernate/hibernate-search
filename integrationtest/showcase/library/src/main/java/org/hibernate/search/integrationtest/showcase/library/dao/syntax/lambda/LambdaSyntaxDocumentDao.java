@@ -88,7 +88,8 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								for ( LibraryService service : libraryServices ) {
 									c2.match()
 											.onField( "copies.library.services" )
-											.matching( service );
+											// Bridged query with function bridge: TODO rely on the bridge to convert to a String
+											.matching( service.name() );
 								}
 							} );
 						}

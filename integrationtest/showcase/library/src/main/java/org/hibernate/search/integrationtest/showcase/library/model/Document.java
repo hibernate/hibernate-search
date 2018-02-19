@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,6 +16,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
+import org.hibernate.Hibernate;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -30,11 +32,11 @@ public abstract class Document<C extends DocumentCopy<?>> {
 	private Integer id;
 
 	@Basic
-	@Field
+	@Field(analyzer = "default")
 	private String title;
 
 	@Basic
-	@Field
+	@Field(analyzer = "default")
 	private String summary;
 
 	/**
@@ -45,8 +47,25 @@ public abstract class Document<C extends DocumentCopy<?>> {
 	private String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
-	@IndexedEmbedded(includePaths = "library.location", storage = ObjectFieldStorage.NESTED) // TODO indexedEmbedded unwrapping
+	@IndexedEmbedded(includePaths = {"library.location", "library.services"}, storage = ObjectFieldStorage.NESTED)
 	private List<C> copies = new ArrayList<>();
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != Hibernate.getClass( o ) ) {
+			return false;
+		}
+		Document<?> document = (Document<?>) o;
+		return Objects.equals( id, document.getId() );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( getClass() );
+	}
 
 	@Override
 	public String toString() {
@@ -96,4 +115,5 @@ public abstract class Document<C extends DocumentCopy<?>> {
 	public void setCopies(List<C> copies) {
 		this.copies = copies;
 	}
+
 }
