@@ -39,7 +39,7 @@ abstract class AbstractElasticsearchIndexSchemaCollector<B extends AbstractIndex
 	@Override
 	public ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage) {
 		IndexSchemaObjectPropertyNodeBuilder nodeBuilder =
-				new IndexSchemaObjectPropertyNodeBuilder( relativeName );
+				new IndexSchemaObjectPropertyNodeBuilder( this.nodeBuilder.getAbsolutePath(), relativeName );
 		nodeBuilder.setStorage( storage );
 		this.nodeBuilder.putProperty( relativeName, nodeBuilder );
 		return new ElasticsearchObjectFieldIndexSchemaCollectorImpl( nodeBuilder );

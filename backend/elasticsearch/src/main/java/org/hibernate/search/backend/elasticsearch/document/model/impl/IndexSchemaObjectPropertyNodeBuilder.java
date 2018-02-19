@@ -21,10 +21,6 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 
 	private ObjectFieldStorage storage = ObjectFieldStorage.DEFAULT;
 
-	IndexSchemaObjectPropertyNodeBuilder(String relativeName) {
-		this( null, relativeName );
-	}
-
 	IndexSchemaObjectPropertyNodeBuilder(String parentPath, String relativeName) {
 		this.absolutePath = parentPath == null ? relativeName : parentPath + "." + relativeName;
 		this.relativeName = relativeName;
