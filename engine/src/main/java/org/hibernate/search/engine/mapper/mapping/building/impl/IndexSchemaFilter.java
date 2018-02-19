@@ -123,8 +123,8 @@ class IndexSchemaFilter {
 			return null;
 		}
 		else if ( parent != null ) {
-			if ( typeOrdering.isSubType( parentTypeId, this.parentTypeId )
-					&& this.relativePrefix.equals( relativePrefix ) ) {
+			if ( this.relativePrefix.equals( relativePrefix )
+					&& typeOrdering.isSubType( parentTypeId, this.parentTypeId ) ) {
 				// Same IndexedEmbedded as the one passed as a parameter
 				return this.relativePrefix;
 			}
