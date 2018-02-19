@@ -130,7 +130,7 @@ class IndexSchemaFilter {
 			}
 			else {
 				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
-				return path == null ? null : path + relativePrefix;
+				return path == null ? null : path + this.relativePrefix;
 			}
 		}
 		else {
@@ -147,6 +147,7 @@ class IndexSchemaFilter {
 			Integer maxDepth, Set<String> includePaths) {
 		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeId, relativePrefix );
 		if ( cyclicRecursionPath != null ) {
+			cyclicRecursionPath += relativePrefix;
 			throw new SearchException( "Found an infinite IndexedEmbedded recursion involving path '"
 					+ cyclicRecursionPath + "' on type '" + parentTypeId + "'" );
 		}
