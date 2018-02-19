@@ -11,9 +11,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -96,6 +100,30 @@ public class JavaBeanAnnotationMappingIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
+				.objectField( "embeddedIterable", b2 -> b2
+						.objectField( "embedded", b3 -> b3
+								.field( "prefix_myTextField", String.class )
+						)
+				)
+				.objectField( "embeddedList", b2 -> b2
+						.objectField( "otherPrefix_embedded", b3 -> b3
+								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+										.field( "text", String.class )
+								)
+						)
+				)
+				.objectField( "embeddedArrayList", b2 -> b2
+						.objectField( "embedded", b3 -> b3
+								.objectField( "prefix_customBridgeOnProperty", b4 -> b4
+										.field( "text", String.class )
+								)
+						)
+				)
+				.objectField( "embeddedMap", b2 -> b2
+						.objectField( "embedded", b3 -> b3
+								.field( "prefix_myLocalDateField", LocalDate.class )
+						)
+				)
 		);
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "customBridgeOnClass", b2 -> b2
@@ -157,15 +185,32 @@ public class JavaBeanAnnotationMappingIT {
 			OtherIndexedEntity entity4 = new OtherIndexedEntity();
 			entity4.setId( 4 );
 			entity4.setNumeric( 404 );
+			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
+			entity5.setId( 5 );
+			entity5.setNumeric( 405 );
+			IndexedEntity entity6 = new IndexedEntity();
+			entity6.setId( 6 );
+			entity6.setText( "some more text (6)" );
+			entity6.setLocalDate( LocalDate.of( 2017, 11, 6 ) );
 
 			entity1.setEmbedded( entity2 );
 			entity2.setEmbedded( entity3 );
+			entity3.setEmbedded( entity2 );
+			entity5.setEmbeddedIterable( new LinkedHashSet<>( Arrays.asList( entity1, entity2 ) ) );
+			entity5.setEmbeddedList( Arrays.asList( entity2, entity3, entity6 ) );
+			entity5.setEmbeddedArrayList( new ArrayList<>( Arrays.asList( entity3, entity1 ) ) );
+			Map<String, IndexedEntity> embeddedMap = new LinkedHashMap<>();
+			embeddedMap.put( "entity3", entity3 );
+			embeddedMap.put( "entity2", entity2 );
+			entity5.setEmbeddedMap( embeddedMap );
 
 			manager.getMainWorker().add( entity1 );
 			manager.getMainWorker().add( entity2 );
 			manager.getMainWorker().add( entity4 );
 			manager.getMainWorker().delete( entity1 );
 			manager.getMainWorker().add( entity3 );
+			manager.getMainWorker().add( entity5 );
+			manager.getMainWorker().add( entity6 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "2", b -> b
@@ -176,16 +221,25 @@ public class JavaBeanAnnotationMappingIT {
 									.field( "date", entity2.getLocalDate() )
 							)
 							.objectField( "customBridgeOnProperty", b2 -> b2
-									.field( "text", entity3.getText() )
-									.field( "date", entity3.getLocalDate() )
+									.field( "text", entity2.getEmbedded().getText() )
+									.field( "date", entity2.getEmbedded().getLocalDate() )
 							)
 							.objectField( "embedded", b2 -> b2
+									.field( "prefix_myTextField", entity2.getEmbedded().getText() )
+									.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
 									.objectField( "prefix_customBridgeOnClass", b3 -> b3
-											.field( "text", entity3.getText() )
-											.field( "date", entity3.getLocalDate() )
+											.field( "text", entity2.getEmbedded().getText() )
+											.field( "date", entity2.getEmbedded().getLocalDate() )
 									)
-									.field( "prefix_myTextField", entity3.getText() )
-									.field( "prefix_myLocalDateField", entity3.getLocalDate() )
+									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+											.field( "text", entity2.getEmbedded().getEmbedded().getText() )
+											.field( "date", entity2.getEmbedded().getEmbedded().getLocalDate() )
+									)
+									.objectField( "prefix_embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+													.field( "text", entity2.getEmbedded().getEmbedded().getText() )
+											)
+									)
 							)
 					)
 					.add( "3", b -> b
@@ -195,12 +249,96 @@ public class JavaBeanAnnotationMappingIT {
 									.field( "text", entity3.getText() )
 									.field( "date", entity3.getLocalDate() )
 							)
+							.objectField( "customBridgeOnProperty", b2 -> b2
+									.field( "text", entity3.getEmbedded().getText() )
+									.field( "date", entity3.getEmbedded().getLocalDate() )
+							)
+							.objectField( "embedded", b2 -> b2
+									.field( "prefix_myTextField", entity3.getEmbedded().getText() )
+									.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+											.field( "text", entity3.getEmbedded().getText() )
+											.field( "date", entity3.getEmbedded().getLocalDate() )
+									)
+									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+											.field( "text", entity3.getEmbedded().getEmbedded().getText() )
+											.field( "date", entity3.getEmbedded().getEmbedded().getLocalDate() )
+									)
+									.objectField( "prefix_embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+													.field( "text", entity3.getEmbedded().getEmbedded().getText() )
+											)
+									)
+							)
+					)
+					.add( "6", b -> b
+							.field( "myLocalDateField", entity6.getLocalDate() )
+							.field( "myTextField", entity6.getText() )
+							.objectField( "customBridgeOnClass", b2 -> b2
+									.field( "text", entity6.getText() )
+									.field( "date", entity6.getLocalDate() )
+							)
 					)
 					.preparedThenExecuted();
 			backendMock.expectWorks( OtherIndexedEntity.INDEX )
 					.add( "4", b -> b
 							.field( "numeric", entity4.getNumeric() )
 							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
+					)
+					.preparedThenExecuted();
+			backendMock.expectWorks( YetAnotherIndexedEntity.INDEX )
+					.add( "5", b -> b
+							.field( "myLocalDateField", entity5.getLocalDate() )
+							.field( "numeric", entity5.getNumeric() )
+							.objectField( "embeddedIterable", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.field( "prefix_myTextField", entity1.getEmbedded().getText() )
+									)
+							)
+							.objectField( "embeddedIterable", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.field( "prefix_myTextField", entity2.getEmbedded().getText() )
+									)
+							)
+							.objectField( "embeddedList", b2 -> b2
+									.objectField( "otherPrefix_embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+													.field( "text", entity2.getEmbedded().getText() )
+											)
+									)
+							)
+							.objectField( "embeddedList", b2 -> b2
+									.objectField( "otherPrefix_embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+													.field( "text", entity3.getEmbedded().getText() )
+											)
+									)
+							)
+							.objectField( "embeddedList", b2 -> { } )
+							.objectField( "embeddedArrayList", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnProperty", b4 -> b4
+													.field( "text", entity3.getEmbedded().getEmbedded().getText() )
+											)
+									)
+							)
+							.objectField( "embeddedArrayList", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.objectField( "prefix_customBridgeOnProperty", b4 -> b4
+													.field( "text", entity1.getEmbedded().getEmbedded().getText() )
+											)
+									)
+							)
+							.objectField( "embeddedMap", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									)
+							)
+							.objectField( "embeddedMap", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									)
+							)
 					)
 					.preparedThenExecuted();
 		}
@@ -329,7 +467,6 @@ public class JavaBeanAnnotationMappingIT {
 		public void setEmbedded(IndexedEntity embedded) {
 			this.embedded = embedded;
 		}
-
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
@@ -409,6 +546,14 @@ public class JavaBeanAnnotationMappingIT {
 
 		private Integer numeric;
 
+		private Iterable<IndexedEntity> embeddedIterable;
+
+		private List<IndexedEntity> embeddedList;
+
+		private ArrayList<IndexedEntity> embeddedArrayList;
+
+		private Map<String, IndexedEntity> embeddedMap;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
@@ -425,6 +570,42 @@ public class JavaBeanAnnotationMappingIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
+		}
+
+		@IndexedEmbedded(includePaths = "embedded.prefix_myTextField")
+		public Iterable<IndexedEntity> getEmbeddedIterable() {
+			return embeddedIterable;
+		}
+
+		public void setEmbeddedIterable(Iterable<IndexedEntity> embeddedIterable) {
+			this.embeddedIterable = embeddedIterable;
+		}
+
+		@IndexedEmbedded(prefix = "embeddedList.otherPrefix_", includePaths = "embedded.prefix_customBridgeOnClass.text")
+		public List<IndexedEntity> getEmbeddedList() {
+			return embeddedList;
+		}
+
+		public void setEmbeddedList(List<IndexedEntity> embeddedList) {
+			this.embeddedList = embeddedList;
+		}
+
+		@IndexedEmbedded(includePaths = "embedded.prefix_customBridgeOnProperty.text")
+		public ArrayList<IndexedEntity> getEmbeddedArrayList() {
+			return embeddedArrayList;
+		}
+
+		public void setEmbeddedArrayList(ArrayList<IndexedEntity> embeddedArrayList) {
+			this.embeddedArrayList = embeddedArrayList;
+		}
+
+		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
+		public Map<String, IndexedEntity> getEmbeddedMap() {
+			return embeddedMap;
+		}
+
+		public void setEmbeddedMap(Map<String, IndexedEntity> embeddedMap) {
+			this.embeddedMap = embeddedMap;
 		}
 	}
 
