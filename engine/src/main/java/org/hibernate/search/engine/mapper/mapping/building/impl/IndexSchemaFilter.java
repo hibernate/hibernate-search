@@ -16,23 +16,23 @@ import org.hibernate.search.util.SearchException;
 /**
  * @author Yoann Rodiere
  */
-class IndexedEmbeddedFilter {
+class IndexSchemaFilter {
 
 	private final IndexableTypeOrdering typeOrdering;
 
-	private final IndexedEmbeddedFilter parent;
+	private final IndexSchemaFilter parent;
 	private final IndexedTypeIdentifier parentTypeId;
 	private final String relativePrefix;
 
 	private final Integer remainingDepth;
 	private final Set<String> pathFilters;
 
-	public IndexedEmbeddedFilter(IndexableTypeOrdering typeOrdering) {
+	public IndexSchemaFilter(IndexableTypeOrdering typeOrdering) {
 		this( typeOrdering, null, null, null, null, null );
 	}
 
-	private IndexedEmbeddedFilter(IndexableTypeOrdering typeOrdering,
-			IndexedEmbeddedFilter parent, IndexedTypeIdentifier parentTypeId, String relativePrefix,
+	private IndexSchemaFilter(IndexableTypeOrdering typeOrdering,
+			IndexSchemaFilter parent, IndexedTypeIdentifier parentTypeId, String relativePrefix,
 			Integer remainingDepth, Set<String> pathFilters) {
 		this.typeOrdering = typeOrdering;
 		this.parent = parent;
@@ -93,7 +93,7 @@ class IndexedEmbeddedFilter {
 				|| pathFilters != null && pathFilters.isEmpty();
 	}
 
-	public IndexedEmbeddedFilter composeWithNested(IndexedTypeIdentifier parentTypeId, String relativePrefix,
+	public IndexSchemaFilter composeWithNested(IndexedTypeIdentifier parentTypeId, String relativePrefix,
 			Integer nestedMaxDepth, Set<String> nestedPathFilters) {
 		String cyclicRecursionPath = getPathFromIndexedEmbeddedSinceNoRecursionLimits( parentTypeId, relativePrefix );
 		if ( cyclicRecursionPath != null ) {
@@ -150,7 +150,7 @@ class IndexedEmbeddedFilter {
 			}
 		}
 
-		return new IndexedEmbeddedFilter( typeOrdering, this, parentTypeId, relativePrefix,
+		return new IndexSchemaFilter( typeOrdering, this, parentTypeId, relativePrefix,
 				newRemainingDepth, newPathFilters );
 	}
 }

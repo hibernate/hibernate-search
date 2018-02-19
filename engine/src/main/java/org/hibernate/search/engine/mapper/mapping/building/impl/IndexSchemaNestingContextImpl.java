@@ -20,15 +20,15 @@ import org.hibernate.search.engine.mapper.model.spi.IndexedTypeIdentifier;
  */
 class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 
-	private final IndexedEmbeddedFilter filter;
+	private final IndexSchemaFilter filter;
 	private final String prefixFromFilter;
 	private final String unconsumedPrefix;
 
 	public IndexSchemaNestingContextImpl(IndexableTypeOrdering typeOrdering) {
-		this( new IndexedEmbeddedFilter( typeOrdering ), "", "" );
+		this( new IndexSchemaFilter( typeOrdering ), "", "" );
 	}
 
-	private IndexSchemaNestingContextImpl(IndexedEmbeddedFilter filter, String prefixFromFilter,
+	private IndexSchemaNestingContextImpl(IndexSchemaFilter filter, String prefixFromFilter,
 			String unconsumedPrefix) {
 		this.filter = filter;
 		this.prefixFromFilter = prefixFromFilter;
@@ -79,7 +79,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 			IndexedTypeIdentifier parentTypeId, String relativePrefix,
 			Integer nestedMaxDepth, Set<String> nestedPathFilters,
 			NestedContextBuilder<T> contextBuilder) {
-		IndexedEmbeddedFilter composedFilter = filter.composeWithNested(
+		IndexSchemaFilter composedFilter = filter.composeWithNested(
 				parentTypeId, relativePrefix, nestedMaxDepth, nestedPathFilters
 		);
 		if ( !composedFilter.isTerminal() ) {
