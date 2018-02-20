@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.document;
 
 
 /**
- * An accessor to an "object" field of a index document,
+ * An accessor to an "object" field of an indexed document,
  * allowing to add new values to this field for a given document.
  *
  * @author Yoann Rodiere
