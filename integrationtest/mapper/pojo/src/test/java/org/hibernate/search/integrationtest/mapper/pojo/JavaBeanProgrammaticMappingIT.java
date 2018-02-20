@@ -107,11 +107,11 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "numeric" )
 						.field();
 
-		backendMock.expectSchema( JavaBeanAnnotationMappingIT.OtherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
 		);
-		backendMock.expectSchema( JavaBeanAnnotationMappingIT.YetAnotherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( YetAnotherIndexedEntity.INDEX, b -> b
 				.objectField( "customBridgeOnProperty", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
@@ -119,7 +119,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
 		);
-		backendMock.expectSchema( JavaBeanAnnotationMappingIT.IndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "customBridgeOnClass", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
