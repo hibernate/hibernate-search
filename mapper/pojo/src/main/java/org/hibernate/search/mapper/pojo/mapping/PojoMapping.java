@@ -17,8 +17,7 @@ public interface PojoMapping {
 
 	/**
 	 * @param type a Java type
-	 * @return {@code true} if this type is indexable (i.e. it can be passed to {@link PojoWorker#delete(Class, Object)}
-	 * for instance), {@code false} if it is not.
+	 * @return {@code true} if this type is indexable, {@code false} if it is not.
 	 */
 	boolean isIndexable(Class<?> type);
 

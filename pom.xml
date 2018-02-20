@@ -249,6 +249,13 @@
                     <configuration>
                         <quiet>true</quiet>
                         <verbose>false</verbose>
+                        <tags>
+                            <tag>
+                                <name>hsearch.experimental</name>
+                                <placement>a</placement>
+                                <head>Experimental</head>
+                            </tag>
+                        </tags>
                     </configuration>
                 </plugin>
                 <plugin>

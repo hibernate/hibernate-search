@@ -11,9 +11,6 @@ package org.hibernate.search.engine.search.query.spi;
  * and to mark references for later loading.
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()}.
- *
- * @see HitCollector
- * @see LoadingHitCollector
  */
 public interface ProjectionHitCollector extends DocumentReferenceHitCollector, LoadingHitCollector {
 

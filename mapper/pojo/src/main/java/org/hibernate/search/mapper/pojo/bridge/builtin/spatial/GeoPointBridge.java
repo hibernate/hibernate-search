@@ -29,11 +29,11 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
  * annotations must mark the properties.
  *
  * <pre><code>
- * &commat;GeoPointBridge(name="home")
+ * &#064;GeoPointBridge(name="home")
  * public class User {
- *     &commat;GeoPointBridge.Latitude
+ *     &#064;GeoPointBridge.Latitude
  *     public Double getHomeLatitude() { ... }
- *     &commat;;GeoPointBridge.Longitude
+ *     &#064;GeoPointBridge.Longitude
  *     public Double getHomeLongitude() { ... }
  * }
  * </code></pre>
@@ -43,7 +43,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
  *
  * <pre><code>
  * public class User {
- *     &commat;GeoPointBridge
+ *     &#064;GeoPointBridge
  *     public Coordinates getHome() { ... }
  * }
  * </code></pre>
@@ -51,11 +51,11 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
  * ... or make the entity itself implement {@link GeoPoint}:
  *
  * <pre><code>
- * &commat;GeoPointBridge(name="location")
+ * &#064;GeoPointBridge(name="location")
  * public class Home implements Coordinates {
- *     &commat;Override
+ *     &#064;Override
  *     public Double getLatitude() { ... }
- *     &commat;Override
+ *     &#064;Override
  *     public Double getLongitude() { ... }
  * }
  * </code></pre>

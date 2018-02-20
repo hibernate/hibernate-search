@@ -8,7 +8,7 @@ package org.hibernate.search.util.spi;
 
 
 /**
- * Log category to be used with {@link LoggerFactory#make(LogCategory)}.
+ * Log category to be used with {@link LoggerFactory#make(Class, LogCategory)}.
  *
  * @author Gunnar Morling
  * @author Yoann Rodiere

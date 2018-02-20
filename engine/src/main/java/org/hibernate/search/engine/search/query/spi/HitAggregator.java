@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.query.spi;
  * Provides one collector per hit, and builds the aggregated result
  * when all hits have been processed.
  *
- * @param <C> The hit collector type. See {@link HitCollector}, {@link LoadingHitCollector}
+ * @param <C> The hit collector type. See {@link DocumentReferenceHitCollector}, {@link LoadingHitCollector}
  * and {@link ProjectionHitCollector} in particular.
  * @param <T> The type of the aggregated result.
  */
