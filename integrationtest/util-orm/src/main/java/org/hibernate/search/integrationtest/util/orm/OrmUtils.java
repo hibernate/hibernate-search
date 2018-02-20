@@ -40,6 +40,7 @@ public final class OrmUtils {
 			catch (RuntimeException e) {
 				t.addSuppressed( e );
 			}
+			throw t;
 		}
 	}
 
