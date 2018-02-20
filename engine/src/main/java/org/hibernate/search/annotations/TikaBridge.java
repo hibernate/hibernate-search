@@ -32,12 +32,21 @@ import java.lang.annotation.Target;
 public @interface TikaBridge {
 
 	/**
-	 * @return Class used for optional Tika metadata pre- and post-processing
+	 * @return Class used for optionally providing a custom Tika parser.
+	 * Must implement {@link org.hibernate.search.bridge.TikaParserProvider}.
+	 * Defaults to using an {@link org.apache.tika.parser.AutoDetectParser}.
+	 */
+	Class<?> parserProvider() default void.class;
+
+	/**
+	 * @return Class used for optional Tika metadata pre- and post-processing.
+	 * Must implement {@link org.hibernate.search.bridge.TikaMetadataProcessor}.
 	 */
 	Class<?> metadataProcessor() default void.class;
 
 	/**
-	 * @return Class used for optionally providing a Tika parsing context
+	 * @return Class used for optionally providing a Tika parsing context.
+	 * Must implement {@link org.hibernate.search.bridge.TikaParseContextProvider}.
 	 */
 	Class<?> parseContextProvider() default void.class;
 }

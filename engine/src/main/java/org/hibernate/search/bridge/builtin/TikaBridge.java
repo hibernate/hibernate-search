@@ -22,11 +22,14 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.WriteOutContentHandler;
+
+import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.MetadataProvidingTikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
+import org.hibernate.search.bridge.TikaParserProvider;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -40,25 +43,49 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
  *
  * @author Hardy Ferentschik
  */
-public class TikaBridge implements MetadataProvidingFieldBridge {
+public class TikaBridge implements MetadataProvidingFieldBridge, AppliedOnTypeAwareBridge {
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
-	// Expensive, so only do it once. The Parser is threadsafe.
-	private final Parser parser = new AutoDetectParser();
+	private TikaParserProvider parserProvider;
+	private Parser parser;
 
 	private TikaMetadataProcessor metadataProcessor;
 	private TikaParseContextProvider parseContextProvider;
 
 	public TikaBridge() {
+		setParserProviderClass( null );
 		setMetadataProcessorClass( null );
 		setParseContextProviderClass( null );
 	}
 
 	@Override
+	public void setAppliedOnType(Class<?> returnType) {
+		// Use this hook to initialize the bridge after the setters have been called.
+		// This is expensive, so we should only do it once.
+		// The Parser is threadsafe.
+		parser = parserProvider.createParser();
+		parserProvider = null;
+	}
+
+	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+
 		if ( metadataProcessor instanceof MetadataProvidingTikaMetadataProcessor ) {
 			( (MetadataProvidingTikaMetadataProcessor) metadataProcessor )
 					.configureFieldMetadata( name, builder );
+		}
+	}
+
+	public void setParserProviderClass(Class<?> parserProviderClass) {
+		if ( parserProviderClass == null ) {
+			parserProvider = new AutoDetectParserProvider();
+		}
+		else {
+			parserProvider = ClassLoaderHelper.instanceFromClass(
+					TikaParserProvider.class,
+					parserProviderClass,
+					"Tika parser provider"
+			);
 		}
 	}
 
@@ -179,6 +206,13 @@ public class TikaBridge implements MetadataProvidingFieldBridge {
 		}
 		catch (FileNotFoundException e) {
 			throw log.fileDoesNotExist( file.toString() );
+		}
+	}
+
+	private static class AutoDetectParserProvider implements TikaParserProvider {
+		@Override
+		public Parser createParser() {
+			return new AutoDetectParser();
 		}
 	}
 

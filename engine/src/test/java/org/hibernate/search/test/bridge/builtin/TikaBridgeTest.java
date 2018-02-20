@@ -10,16 +10,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
+import org.hibernate.search.bridge.TikaParserProvider;
 import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.BackReference;
@@ -27,8 +36,6 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
-import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
-import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,8 +61,8 @@ public class TikaBridgeTest {
 		testDocument = new Document();
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
-						new BackReference<TypeMetadata>(),
-						new BackReference<PropertyMetadata>(), null,
+						new BackReference<>(),
+						new BackReference<>(), null,
 						new DocumentFieldPath( "", "" ), // No field path
 						Store.YES, Field.Index.ANALYZED, Field.TermVector.NO
 				)
@@ -69,6 +76,7 @@ public class TikaBridgeTest {
 
 	@Test
 	public void testPdfToString() throws Exception {
+		bridgeUnderTest.setAppliedOnType( URI.class );
 		URI pdfUri = testDocumentPdf.get().toURI();
 		bridgeUnderTest.set( testFieldName, pdfUri, testDocument, options );
 		assertEquals(
@@ -96,6 +104,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testPrepareMetadata() {
 		bridgeUnderTest.setMetadataProcessorClass( CustomTikaMetadataProcessor.class );
+		bridgeUnderTest.setAppliedOnType( String.class );
 		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 		assertEquals(
 				"The set method of the custom metadata processor should have been called",
@@ -107,6 +116,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testIndexingMetadata() {
 		bridgeUnderTest.setMetadataProcessorClass( CustomTikaMetadataProcessor.class );
+		bridgeUnderTest.setAppliedOnType( String.class );
 		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 
 		assertEquals(
@@ -134,6 +144,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testCustomTikaParseContextProvider() throws Exception {
 		bridgeUnderTest.setParseContextProviderClass( CustomTikaParseContextProvider.class );
+		bridgeUnderTest.setAppliedOnType( String.class );
 		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 
 		assertEquals(
@@ -147,10 +158,54 @@ public class TikaBridgeTest {
 	@Test
 	public void testInvalidPath() throws Exception {
 		try {
+			bridgeUnderTest.setAppliedOnType( String.class );
 			bridgeUnderTest.set( testFieldName, "/foo", testDocument, options );
 		}
 		catch (SearchException e) {
 			assertTrue( "Wrong error type", e.getMessage().startsWith( "HSEARCH000152" ) );
+		}
+	}
+
+	@Test
+	public void testCustomTikaParserProvider() throws Exception {
+		bridgeUnderTest.setParserProviderClass( CustomTikaParserProvider.class );
+		bridgeUnderTest.setAppliedOnType( String.class );
+		assertEquals(
+				"The createParser method of the custom parser provider should have been called",
+				1,
+				CustomTikaParserProvider.invocationCount
+		);
+
+		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
+
+		assertEquals(
+				"The content should have been set to '" + CustomTikaParserProvider.RESULT + "'",
+				CustomTikaParserProvider.RESULT,
+				testDocument.get( testFieldName )
+		);
+	}
+
+	public static class CustomTikaParserProvider implements TikaParserProvider {
+		public static int invocationCount = 0;
+		public static String RESULT = "foo";
+
+		@Override
+		public Parser createParser() {
+			invocationCount++;
+			return new Parser() {
+				@Override
+				public Set<MediaType> getSupportedTypes(ParseContext context) {
+					return Collections.singleton( MediaType.application( "pdf" ) );
+				}
+
+				@Override
+				public void parse(InputStream stream, ContentHandler handler, Metadata metadata, ParseContext context)
+						throws SAXException {
+					handler.startDocument();
+					handler.characters( RESULT.toCharArray(), 0, RESULT.length() );
+					handler.endDocument();
+				}
+			};
 		}
 	}
 

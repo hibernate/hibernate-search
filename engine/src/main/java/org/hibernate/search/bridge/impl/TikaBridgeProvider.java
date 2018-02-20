@@ -28,6 +28,7 @@ class TikaBridgeProvider extends ExtendedBridgeProvider {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String TIKA_BRIDGE_NAME = "org.hibernate.search.bridge.builtin.TikaBridge";
+	private final String TIKA_BRIDGE_PARSER_PROVIDER_SETTER = "setParserProviderClass";
 	private final String TIKA_BRIDGE_METADATA_PROCESSOR_SETTER = "setMetadataProcessorClass";
 	private final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
 
@@ -60,6 +61,16 @@ class TikaBridgeProvider extends ExtendedBridgeProvider {
 	private FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ServiceManager serviceManager) {
 		final Class<?> tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, serviceManager );
 		final FieldBridge tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
+
+		Class<?> tikaParserProviderClass = annotation.parserProvider();
+		if ( tikaParserProviderClass != void.class ) {
+			configureTikaBridgeParameters(
+					tikaBridgeClass,
+					TIKA_BRIDGE_PARSER_PROVIDER_SETTER,
+					tikaBridge,
+					tikaParserProviderClass
+			);
+		}
 
 		Class<?> tikaMetadataProcessorClass = annotation.metadataProcessor();
 		if ( tikaMetadataProcessorClass != void.class ) {
