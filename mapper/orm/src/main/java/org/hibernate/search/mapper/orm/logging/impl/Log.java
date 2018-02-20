@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.logging.impl;
 
 import java.util.Collection;
 
+import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
@@ -26,4 +27,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 3, value = "Unknown indexing mode: %1$s")
 	SearchException unknownIndexingMode(String indexingMode);
+
+	@Message(id = 4, value = "Could not retrieve metadata for type %1$s, property '%2$s' accessed through getter '%3$s'")
+	SearchException unknownPropertyForGetter(Class<?> entityType, String propertyName, Getter getter);
+
 }

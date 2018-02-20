@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +115,26 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		return reflectionManager.toXClass( type );
 	}
 
+	Class<?> toClass(XClass xClass) {
+		return reflectionManager.toClass( xClass );
+	}
+
+	Optional<XProperty> toXProperty(Method method, String propertyName) {
+		return reflectionManager.toXClass( method.getDeclaringClass() )
+				.getDeclaredProperties( XClass.ACCESS_PROPERTY )
+				.stream()
+				.filter( xProperty -> propertyName.equals( xProperty.getName() ) )
+				.findFirst();
+	}
+
+	Optional<XProperty> toXProperty(Member member, String propertyName) {
+		return reflectionManager.toXClass( member.getDeclaringClass() )
+				.getDeclaredProperties( XClass.ACCESS_FIELD )
+				.stream()
+				.filter( xProperty -> propertyName.equals( xProperty.getName() ) )
+				.findFirst();
+	}
+
 	Map<String, XProperty> getFieldAccessPropertiesByName(XClass xClass) {
 		return xClass.getDeclaredProperties( XClass.ACCESS_FIELD ).stream()
 				.collect( Collectors.toMap( XProperty::getName, Function.identity() ) );
@@ -141,8 +163,9 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
-	PojoPropertyModel<?> createFallbackPropertyModel(PojoTypeModel<?> holderTypeModel, String explicitAccessStrategyName,
-			EntityMode entityMode, String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createFallbackPropertyModel(PojoTypeModel<?> holderTypeModel,
+			String explicitAccessStrategyName, EntityMode entityMode, String propertyName,
+			List<XProperty> declaredXProperties) {
 		Class<?> holderType = holderTypeModel.getJavaClass();
 		PropertyAccessStrategy accessStrategy = accessStrategyResolver.resolvePropertyAccessStrategy(
 				holderType, explicitAccessStrategyName, entityMode
@@ -151,11 +174,12 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 				holderType, propertyName
 		);
 		Getter getter = propertyAccess.getGetter();
-		return new HibernateOrmPropertyModel<>( this, holderTypeModel, propertyName, xProperties, getter );
+		return new HibernateOrmPropertyModel<>( this, holderTypeModel, propertyName,
+				declaredXProperties, getter );
 	}
 
 	@SuppressWarnings( "unchecked" )
-	private PojoTypeModel<?> getTypeModel(XClass xClass) {
+	PojoTypeModel<?> getTypeModel(XClass xClass) {
 		return getTypeModel( reflectionManager.toClass( xClass ) );
 	}
 

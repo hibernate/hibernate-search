@@ -25,7 +25,7 @@ class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 	}
 
 	@Override
-	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties) {
 		EntityMetamodel metamodel = persister.getEntityMetamodel();
 		Integer index = metamodel.getPropertyIndexOrNull( propertyName );
 
@@ -33,14 +33,16 @@ class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 			EntityTuplizer tuplizer = persister.getEntityTuplizer();
 			Getter getter = tuplizer.getGetter( index );
 			return new HibernateOrmPropertyModel<>(
-					introspector, this, propertyName, xProperties, getter
+					introspector, this, propertyName,
+					declaredXProperties, getter
 			);
 		}
 		else if ( propertyName.equals( metamodel.getIdentifierProperty().getName() ) ) {
 			EntityTuplizer tuplizer = persister.getEntityTuplizer();
 			Getter getter = tuplizer.getIdentifierGetter();
 			return new HibernateOrmPropertyModel<>(
-					introspector, this, propertyName, xProperties, getter
+					introspector, this, propertyName,
+					declaredXProperties, getter
 			);
 		}
 		else {
@@ -51,7 +53,7 @@ class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 					null,
 					persister.getEntityMode(),
 					propertyName,
-					xProperties
+					declaredXProperties
 			);
 		}
 	}

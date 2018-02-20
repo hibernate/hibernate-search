@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface PojoPropertyModel<T> {
@@ -20,6 +21,8 @@ public interface PojoPropertyModel<T> {
 	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
 
 	PojoTypeModel<T> getTypeModel();
+
+	Optional<PojoContainerTypeModel<?>> getContainerTypeModel();
 
 	PropertyHandle getHandle();
 

@@ -19,13 +19,13 @@ class HibernateOrmNonManagedTypeModel<T> extends AbstractHibernateOrmTypeModel<T
 	}
 
 	@Override
-	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties) {
 		return introspector.createFallbackPropertyModel(
 				this,
 				null,
 				EntityMode.POJO,
 				propertyName,
-				xProperties
+				declaredXProperties
 		);
 	}
 }

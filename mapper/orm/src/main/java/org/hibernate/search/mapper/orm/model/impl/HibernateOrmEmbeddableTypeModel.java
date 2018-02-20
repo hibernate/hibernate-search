@@ -28,13 +28,14 @@ class HibernateOrmEmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T
 	}
 
 	@Override
-	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties) {
+	PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties) {
 		Integer index = getPropertyIndexOrNull( componentType, propertyName );
 		if ( index != null ) {
 			ComponentTuplizer tuplizer = componentType.getComponentTuplizer();
 			Getter getter = tuplizer.getGetter( index );
 			return new HibernateOrmPropertyModel<>(
-					introspector, this, propertyName, xProperties, getter
+					introspector, this, propertyName,
+					declaredXProperties, getter
 			);
 		}
 		else {
@@ -45,7 +46,7 @@ class HibernateOrmEmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T
 					null,
 					componentType.getEntityMode(),
 					propertyName,
-					xProperties
+					declaredXProperties
 			);
 		}
 	}

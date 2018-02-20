@@ -20,8 +20,8 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeModel<T> {
 
@@ -136,19 +136,19 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeMode
 	}
 
 	private PojoPropertyModel<?> createPropertyModel(String propertyName) {
-		List<XProperty> xProperties = new ArrayList<>( 2 );
+		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
 		XProperty fieldAccessXProperty = getFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
-			xProperties.add( fieldAccessXProperty );
+			declaredXProperties.add( fieldAccessXProperty );
 		}
 		XProperty methodAccessXProperty = getMethodAccessXPropertiesByName().get( propertyName );
 		if ( methodAccessXProperty != null ) {
-			xProperties.add( methodAccessXProperty );
+			declaredXProperties.add( methodAccessXProperty );
 		}
-		return createPropertyModel( propertyName, xProperties );
+		return createPropertyModel( propertyName, declaredXProperties );
 	}
 
-	abstract PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> xProperties);
+	abstract PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties);
 
 	@Override
 	public T cast(Object instance) {
