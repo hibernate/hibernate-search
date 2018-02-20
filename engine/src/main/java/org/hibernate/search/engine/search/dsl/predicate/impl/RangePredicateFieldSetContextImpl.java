@@ -79,6 +79,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
+					break;
 				case INCLUDED:
 					break;
 			}
@@ -95,6 +96,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
+					break;
 				case INCLUDED:
 					break;
 			}
@@ -106,6 +108,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeUpperLimit );
+					break;
 				case INCLUDED:
 					break;
 			}
