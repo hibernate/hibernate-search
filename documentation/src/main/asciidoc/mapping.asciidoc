@@ -1666,21 +1666,33 @@ classloader is used when the class is rehydrated
 
 Hibernate Search allows you to extract text from various document types using the built-in
 `TikaBridge` which utilizes link:http://tika.apache.org[Apache Tika] to extract text and metadata
-from the provided documents. The `@TikaBridge` annotation can be used with `String`, `URI`, `byte[]` or
-`java.sql.Blob` properties. In the case of `String` and `URI` the bridge interprets the values are file
-paths and tries to open a file to parse the document. In the case of `byte[]` and `Blob` the values are
-directly passed to Tika for parsing.
+from the provided documents.
 
-Tika uses metadata as in- and output of the parsing process and it also allows to provide additional
-context information. This process is described in
+The `@TikaBridge` annotation can be used with `String`, `URI`, `byte[]` or `java.sql.Blob` properties.
+In the case of `String` and `URI` the bridge interprets the values as file paths and tries to open a file to parse the document.
+In the case of `byte[]` and `Blob` the values are directly passed to Tika for parsing.
+
+When parsing a value, Tika uses:
+
+* the document content as input
+* metadata as input and output
+* a `ParseContext` as input
+
+You can find more information about the parsing process in
 link:http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html[Parser interface].
-The Hibernate Search Tika bridge allows you to make use of these additional
-configuration options by providing two interfaces in conjunction with `TikaBridge`. The first
-interface is the `TikaParseContextProvider`. It allows you to create a custom `ParseContext` for the
-document parsing. The second interface is `TikaMetadataProcessor` which has two methods -
-`prepareMetadata()` and `set(String, Object, Document, LuceneOptions, Metadata metadata)`. The former
-allows to add additional metadata to the parsing process (for example the file name) and the latter
-allows you to index metadata discovered during the parsing process.
+The Hibernate Search Tika bridge allows you to customize the whole process
+by passing implementations of three interfaces to the `TikaBridge`.
+
+The first interface is the `TikaParserProvider`.
+It defines which parser will be used on the document content, i.e. how the document should be interpreted.
+The default behavior should cover most use cases,
+since it uses Tika's `AutoDetectParser` to detect the content type and use an appropriate parser,
+but using a custom provider can still be useful, for example to use a custom Tika configuration file.
+
+The second interface is `TikaMetadataProcessor` which has two methods -
+`prepareMetadata()` and `set(String, Object, Document, LuceneOptions, Metadata metadata)`.
+The former allows to add additional metadata to the parsing process (for example the file name)
+and the latter allows you to index metadata discovered during the parsing process.
 
 [NOTE]
 .Sortable fields with Tika
@@ -1692,8 +1704,11 @@ This is similar to implementing `MetadataProvidingFieldBridge` on a regular fiel
 Like `MetadataProvidingFieldBridge`, the `MetadataProvidingTikaMetadataProcessor` contract is under active development and considered experimental at this time. It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
 ====
 
-`TikaParseContextProvider` as well as `TikaMetadataProcessor` implementation classes can both be
-specified as parameters on the `TikaBridge` annotation.
+The third interface is the `TikaParseContextProvider`.
+It allows you to create a custom `ParseContext` for the document parsing.
+
+Implementations of the interfaces mentioned above are passed to the TikaBridge
+by specifying their class as parameters on the `TikaBridge` annotation.
 
 [[example-tika-mapping]]
 .Example mapping with Apache Tika
