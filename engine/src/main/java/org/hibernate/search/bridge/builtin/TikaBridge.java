@@ -32,6 +32,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
+import java.util.Objects;
 
 import static org.apache.tika.io.IOUtils.closeQuietly;
 
@@ -42,14 +43,18 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
  */
 public class TikaBridge implements MetadataProvidingFieldBridge {
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
-
-	// Expensive, so only do it once. The Parser is threadsafe.
-	private final Parser parser = new AutoDetectParser();
+	
+	private final Parser parser;
 
 	private TikaMetadataProcessor metadataProcessor;
 	private TikaParseContextProvider parseContextProvider;
 
+
 	public TikaBridge() {
+		this(new AutoDetectParser());
+	}
+	public TikaBridge(Parser parser) {
+		this.parser=Objects.requireNonNull(parser, "A parser must be defined!");
 		setMetadataProcessorClass( null );
 		setParseContextProviderClass( null );
 	}
