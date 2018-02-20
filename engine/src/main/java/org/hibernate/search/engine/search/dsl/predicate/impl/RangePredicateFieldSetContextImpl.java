@@ -28,7 +28,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 
 	private final List<RangePredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	public RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
+	RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
@@ -68,13 +68,13 @@ class RangePredicateFieldSetContextImpl<N, C>
 		queryBuilders.forEach( collector );
 	}
 
-	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
+	static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
-		public RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
+		RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
 			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
 			switch ( inclusion ) {
 				case EXCLUDED:
@@ -91,7 +91,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			};
 		}
 
-		public N above(Object value, RangeBoundInclusion inclusion) {
+		N above(Object value, RangeBoundInclusion inclusion) {
 			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
 			switch ( inclusion ) {
 				case EXCLUDED:
@@ -103,7 +103,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			return getNextContextProvider().get();
 		}
 
-		public N below(Object value, RangeBoundInclusion inclusion) {
+		N below(Object value, RangeBoundInclusion inclusion) {
 			getQueryBuilders().forEach( q -> q.upperLimit( value ) );
 			switch ( inclusion ) {
 				case EXCLUDED:

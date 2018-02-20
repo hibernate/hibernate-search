@@ -19,7 +19,7 @@ class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, Searc
 
 	private final RangePredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public RangePredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	RangePredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 

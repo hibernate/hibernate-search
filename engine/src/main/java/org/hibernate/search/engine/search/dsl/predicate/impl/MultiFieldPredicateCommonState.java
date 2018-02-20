@@ -25,7 +25,7 @@ class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonSt
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	public MultiFieldPredicateCommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	MultiFieldPredicateCommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
@@ -42,7 +42,7 @@ class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonSt
 		return nextContextProvider;
 	}
 
-	protected List<F> getFieldSetContexts() {
+	List<F> getFieldSetContexts() {
 		return fieldSetContexts;
 	}
 

@@ -136,7 +136,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 
 		private final SearchPredicateContainerContextImpl<BooleanJunctionPredicateContext<N>, C> containerContext;
 
-		public OccurContext() {
+		OccurContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
 					BooleanJunctionPredicateContextImpl.this.factory, this );
 		}

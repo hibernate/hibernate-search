@@ -26,7 +26,7 @@ class MatchPredicateFieldSetContextImpl<N, C>
 
 	private final List<MatchPredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	public MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
+	MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
@@ -56,9 +56,9 @@ class MatchPredicateFieldSetContextImpl<N, C>
 		queryBuilders.forEach( collector );
 	}
 
-	public static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, MatchPredicateFieldSetContextImpl<N, C>> {
+	static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, MatchPredicateFieldSetContextImpl<N, C>> {
 
-		public CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 

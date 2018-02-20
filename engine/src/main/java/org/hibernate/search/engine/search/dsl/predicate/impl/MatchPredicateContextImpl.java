@@ -19,7 +19,7 @@ class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, Searc
 
 	private final MatchPredicateFieldSetContextImpl.CommonState<N, C> commonState;
 
-	public MatchPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	MatchPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 

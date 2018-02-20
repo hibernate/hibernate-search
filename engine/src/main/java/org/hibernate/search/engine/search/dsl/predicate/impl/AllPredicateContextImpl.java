@@ -92,7 +92,7 @@ class AllPredicateContextImpl<N, C>
 
 		private final SearchPredicateContainerContextImpl<AllPredicateContext<N>, C> containerContext;
 
-		public AllExceptContext() {
+		AllExceptContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
 					AllPredicateContextImpl.this.factory, this );
 		}
