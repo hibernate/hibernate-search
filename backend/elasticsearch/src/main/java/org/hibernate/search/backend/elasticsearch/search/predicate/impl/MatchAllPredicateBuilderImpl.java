@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.engine.search.predicate.spi.AllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-class AllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements AllPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {

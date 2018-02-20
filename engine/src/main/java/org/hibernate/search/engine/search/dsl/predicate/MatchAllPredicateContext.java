@@ -12,25 +12,25 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
- * The context used when defining a boolean junction, allowing in particular to add clauses.
+ * The context used when starting to define a match all predicate.
  *
  * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
  */
-public interface AllPredicateContext<N> extends SearchPredicateContext<AllPredicateContext<N>>, ExplicitEndContext<N> {
+public interface MatchAllPredicateContext<N> extends SearchPredicateContext<MatchAllPredicateContext<N>>, ExplicitEndContext<N> {
 
-	AllPredicateContext<N> except(SearchPredicate searchPredicate);
+	MatchAllPredicateContext<N> except(SearchPredicate searchPredicate);
 
 	/*
 	 * Fully fluid syntax.
 	 */
 
-	SearchPredicateContainerContext<? extends AllPredicateContext<N>> except();
+	SearchPredicateContainerContext<? extends MatchAllPredicateContext<N>> except();
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
 	 * allowing to introduce if/else statements in the query building code.
 	 */
 
-	AllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	MatchAllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
 }

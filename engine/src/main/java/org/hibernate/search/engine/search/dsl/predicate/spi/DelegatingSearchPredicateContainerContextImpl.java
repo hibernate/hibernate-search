@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.AllPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
@@ -30,7 +30,7 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
-	public AllPredicateContext<N> all() {
+	public MatchAllPredicateContext<N> all() {
 		return delegate.all();
 	}
 

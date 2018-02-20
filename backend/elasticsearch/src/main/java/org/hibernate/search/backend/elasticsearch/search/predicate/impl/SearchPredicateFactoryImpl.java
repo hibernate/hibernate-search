@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.spi.AllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -56,8 +56,8 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	}
 
 	@Override
-	public AllPredicateBuilder<ElasticsearchSearchPredicateCollector> all() {
-		return new AllPredicateBuilderImpl();
+	public MatchAllPredicateBuilder<ElasticsearchSearchPredicateCollector> matchAll() {
+		return new MatchAllPredicateBuilderImpl();
 	}
 
 	@Override

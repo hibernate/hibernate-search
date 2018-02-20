@@ -12,50 +12,50 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.AllPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.predicate.spi.AllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class AllPredicateContextImpl<N, C>
-		implements AllPredicateContext<N>, SearchPredicateContributor<C> {
+class MatchAllPredicateContextImpl<N, C>
+		implements MatchAllPredicateContext<N>, SearchPredicateContributor<C> {
 
 	private final SearchPredicateFactory<C> factory;
 	private final Supplier<N> nextContextProvider;
 
-	private final AllPredicateBuilder<C> builder;
-	private AllExceptContext exceptContext;
+	private final MatchAllPredicateBuilder<C> builder;
+	private MatchAllExceptContext exceptContext;
 
-	AllPredicateContextImpl(SearchPredicateFactory<C> factory,
+	MatchAllPredicateContextImpl(SearchPredicateFactory<C> factory,
 			Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
-		this.builder = factory.all();
+		this.builder = factory.matchAll();
 	}
 
 	@Override
-	public AllPredicateContext<N> boostedTo(float boost) {
+	public MatchAllPredicateContext<N> boostedTo(float boost) {
 		this.builder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public AllPredicateContext<N> except(SearchPredicate searchPredicate) {
+	public MatchAllPredicateContext<N> except(SearchPredicate searchPredicate) {
 		except().predicate( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public SearchPredicateContainerContext<? extends AllPredicateContext<N>> except() {
+	public SearchPredicateContainerContext<? extends MatchAllPredicateContext<N>> except() {
 		return getExceptContext().containerContext;
 	}
 
 	@Override
-	public AllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+	public MatchAllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
 		clauseContributor.accept( except() );
 		return this;
 	}
@@ -78,23 +78,23 @@ class AllPredicateContextImpl<N, C>
 		return nextContextProvider.get();
 	}
 
-	private AllExceptContext getExceptContext() {
+	private MatchAllExceptContext getExceptContext() {
 		if ( exceptContext == null ) {
-			exceptContext = new AllExceptContext();
+			exceptContext = new MatchAllExceptContext();
 		}
 		return exceptContext;
 	}
 
-	private class AllExceptContext implements SearchPredicateDslContext<AllPredicateContext<N>, C>,
+	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, C>,
 			SearchPredicateContributor<C> {
 
 		private final List<SearchPredicateContributor<C>> children = new ArrayList<>();
 
-		private final SearchPredicateContainerContextImpl<AllPredicateContext<N>, C> containerContext;
+		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, C> containerContext;
 
-		AllExceptContext() {
+		MatchAllExceptContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
-					AllPredicateContextImpl.this.factory, this );
+					MatchAllPredicateContextImpl.this.factory, this );
 		}
 
 		@Override
@@ -103,8 +103,8 @@ class AllPredicateContextImpl<N, C>
 		}
 
 		@Override
-		public AllPredicateContext<N> getNextContext() {
-			return AllPredicateContextImpl.this;
+		public MatchAllPredicateContext<N> getNextContext() {
+			return MatchAllPredicateContextImpl.this;
 		}
 
 		@Override

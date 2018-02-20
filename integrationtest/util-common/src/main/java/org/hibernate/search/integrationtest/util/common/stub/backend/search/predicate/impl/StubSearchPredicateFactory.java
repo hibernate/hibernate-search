@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.util.common.stub.backend.search.pre
 
 import org.hibernate.search.integrationtest.util.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.spi.AllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -30,7 +30,7 @@ public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQu
 	}
 
 	@Override
-	public AllPredicateBuilder<StubQueryElementCollector> all() {
+	public MatchAllPredicateBuilder<StubQueryElementCollector> matchAll() {
 		return new StubPredicateBuilder();
 	}
 

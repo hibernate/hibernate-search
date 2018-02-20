@@ -23,7 +23,7 @@ public interface SearchPredicateFactory<C> {
 
 	SearchPredicateContributor<C> toContributor(SearchPredicate predicate);
 
-	AllPredicateBuilder<C> all();
+	MatchAllPredicateBuilder<C> matchAll();
 
 	BooleanJunctionPredicateBuilder<C> bool();
 
