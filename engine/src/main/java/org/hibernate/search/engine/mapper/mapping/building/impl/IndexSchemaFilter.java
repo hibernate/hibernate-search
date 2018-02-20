@@ -26,25 +26,25 @@ import org.hibernate.search.util.SearchException;
  * <ul>
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
- *	   <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
- *	   {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)} method, which may return a filter
- *	   that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
- *	   be ignored</li>
+ *     <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
+ *     {@link #composeWithNested(IndexedTypeIdentifier, String, Integer, Set)} method, which may return a filter
+ *     that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
+ *     be ignored</li>
  * </ul>
  *
  * <h3 id="filter-properties">Filter properties</h3>
  * <p>
- * A filter decides wether to include a path or not according to its two main properties:
+ * A filter decides whether to include a path or not according to its two main properties:
  * <ul>
  *     <li>the {@link #remainingCompositionDepth remaining composition depth}</li>
  *     <li>the {@link #explicitlyIncludedPaths explicitly included paths}</li>
  * </ul>
  * <p>
- * The explicitly included paths, as their name suggest, define which paths
+ * The explicitly included paths, as their name suggests, define which paths
  * should be accepted by this filter no matter what.
  * <p>
  * The composition depth defines
- * {@link #isEveryPathIncludedByDefault(Integer)} () how paths that do not appear in the explicitly included paths should be treated}:
+ * {@link #isEveryPathIncludedByDefault(Integer) how paths that do not appear in the explicitly included paths should be treated}:
  * <ul>
  *     <li>if {@code <= 0}, paths are excluded by default</li>
  *     <li>if {@code null} or {@code > 0}, paths are included by default</li>
