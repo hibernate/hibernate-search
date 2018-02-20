@@ -41,7 +41,7 @@ public class ElasticsearchDocumentReference implements DocumentReference {
 			return false;
 		}
 		ElasticsearchDocumentReference other = (ElasticsearchDocumentReference) obj;
-		return indexName.equals( other.indexName ) && Objects.equals( id, other.id );
+		return Objects.equals( indexName, other.indexName ) && Objects.equals( id, other.id );
 	}
 
 	@Override
