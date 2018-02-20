@@ -6,31 +6,39 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 
 class RangePredicateFieldSetContextImpl<N, C>
 		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final CommonState<N, C> commonState;
 
+	private final List<String> fieldNames;
 	private final List<RangePredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
 	RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
 		this.commonState = commonState;
 		this.commonState.add( this );
+		this.fieldNames = fieldNames;
 		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
 		for ( String fieldName : fieldNames ) {
 			queryBuilders.add( predicateFactory.range( fieldName ) );
@@ -70,12 +78,24 @@ class RangePredicateFieldSetContextImpl<N, C>
 
 	static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
 
+		private boolean hasNonNullBound = false;
+
 		CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
+		@Override
+		public void contribute(C collector) {
+			// Just in case from() was called, but not to()
+			checkHasNonNullBound();
+			super.contribute( collector );
+		}
+
 		RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
-			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			if ( value != null ) {
+				hasNonNullBound = true;
+				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			}
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
@@ -92,7 +112,10 @@ class RangePredicateFieldSetContextImpl<N, C>
 		}
 
 		N above(Object value, RangeBoundInclusion inclusion) {
-			getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			if ( value != null ) {
+				hasNonNullBound = true;
+				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			}
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
@@ -100,11 +123,15 @@ class RangePredicateFieldSetContextImpl<N, C>
 				case INCLUDED:
 					break;
 			}
+			checkHasNonNullBound();
 			return getNextContextProvider().get();
 		}
 
 		N below(Object value, RangeBoundInclusion inclusion) {
-			getQueryBuilders().forEach( q -> q.upperLimit( value ) );
+			if ( value != null ) {
+				hasNonNullBound = true;
+				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
+			}
 			switch ( inclusion ) {
 				case EXCLUDED:
 					getQueryBuilders().forEach( RangePredicateBuilder::excludeUpperLimit );
@@ -112,7 +139,19 @@ class RangePredicateFieldSetContextImpl<N, C>
 				case INCLUDED:
 					break;
 			}
+			checkHasNonNullBound();
 			return getNextContextProvider().get();
+		}
+
+		private List<String> collectFieldNames() {
+			return getFieldSetContexts().stream().flatMap( f -> f.fieldNames.stream() )
+					.collect( Collectors.toList() );
+		}
+
+		private void checkHasNonNullBound() {
+			if ( !hasNonNullBound ) {
+				throw log.rangePredicateCannotMatchNullValue( collectFieldNames() );
+			}
 		}
 
 		private Stream<RangePredicateBuilder<C>> getQueryBuilders() {

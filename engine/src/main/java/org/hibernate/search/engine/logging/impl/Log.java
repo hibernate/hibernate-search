@@ -18,6 +18,8 @@ import org.jboss.logging.annotations.MessageLogger;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 
+import java.util.List;
+
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
 
@@ -52,6 +54,14 @@ public interface Log extends BasicLogger {
 	@Message(id = 10, value = "Cannot access the value of containing annotation '%1$s'."
 			+ " Ignoring annotation.")
 	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
+
+	@Message(id = 11, value = "Invalid value: the value to match in match predicates must be non-null." +
+			" Null value was passed to match predicate on fields %1$s")
+	SearchException matchPredicateCannotMatchNullValue(List<String> strings);
+
+	@Message(id = 12, value = "Invalid value: at least one bound in range predicates must be non-null." +
+			" Null bounds were passed tp range predicate on fields %1$s")
+	SearchException rangePredicateCannotMatchNullValue(List<String> strings);
 
 	// Pre-existing message
 	@LogMessage(level = ERROR)
