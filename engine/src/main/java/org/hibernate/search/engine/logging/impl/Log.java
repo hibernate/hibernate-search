@@ -60,7 +60,7 @@ public interface Log extends BasicLogger {
 	SearchException matchPredicateCannotMatchNullValue(List<String> strings);
 
 	@Message(id = 12, value = "Invalid value: at least one bound in range predicates must be non-null." +
-			" Null bounds were passed tp range predicate on fields %1$s")
+			" Null bounds were passed to range predicate on fields %1$s")
 	SearchException rangePredicateCannotMatchNullValue(List<String> strings);
 
 	// Pre-existing message
