@@ -30,4 +30,13 @@ public class FallbackConfigurationPropertySource implements ConfigurationPropert
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "main=" ).append( main )
+				.append( ", fallback=" ).append( fallback )
+				.append( "]" );
+		return sb.toString();
+	}
 }

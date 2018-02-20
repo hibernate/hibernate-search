@@ -36,4 +36,11 @@ public class EmptyConfigurationPropertySource implements ConfigurationPropertySo
 	public ConfigurationPropertySource withFallback(ConfigurationPropertySource fallback) {
 		return fallback;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[]" );
+		return sb.toString();
+	}
 }

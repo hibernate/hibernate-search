@@ -12,12 +12,12 @@ import java.util.Optional;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public class PrefixedConfigurationPropertySource implements ConfigurationPropertySource {
-	private final ConfigurationPropertySource toPrefix;
+	private final ConfigurationPropertySource propertiesToPrefix;
 	private final String radix;
 	private final int radixLength;
 
 	public PrefixedConfigurationPropertySource(ConfigurationPropertySource toPrefix, String mask) {
-		this.toPrefix = Objects.requireNonNull( toPrefix );
+		this.propertiesToPrefix = Objects.requireNonNull( toPrefix );
 		this.radix = Objects.requireNonNull( mask ) + ".";
 		this.radixLength = radix.length();
 	}
@@ -25,7 +25,7 @@ public class PrefixedConfigurationPropertySource implements ConfigurationPropert
 	@Override
 	public Optional<?> get(String key) {
 		if ( key.startsWith( radix ) ) {
-			return toPrefix.get( key.substring( radixLength ) );
+			return propertiesToPrefix.get( key.substring( radixLength ) );
 		}
 		else {
 			return Optional.empty();
@@ -34,6 +34,16 @@ public class PrefixedConfigurationPropertySource implements ConfigurationPropert
 
 	@Override
 	public ConfigurationPropertySource withPrefix(String prefix) {
-		return new PrefixedConfigurationPropertySource( toPrefix, prefix + radix.substring( 0, radix.length() - 1 ) );
+		return new PrefixedConfigurationPropertySource( propertiesToPrefix, prefix + radix.substring( 0, radix.length() - 1 ) );
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "prefix=" ).append( radix )
+				.append( ", propertiesToPrefix=" ).append( propertiesToPrefix )
+				.append( "]" );
+		return sb.toString();
 	}
 }

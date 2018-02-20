@@ -24,4 +24,13 @@ public class PropertiesConfigurationPropertySource implements ConfigurationPrope
 		String value = properties.getProperty( key );
 		return Optional.ofNullable( value );
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "properties=" ).append( properties )
+				.append( "]" );
+		return sb.toString();
+	}
 }

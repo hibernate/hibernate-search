@@ -12,22 +12,32 @@ import java.util.Optional;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public class MaskedConfigurationPropertySource implements ConfigurationPropertySource {
-	private final ConfigurationPropertySource toMask;
+	private final ConfigurationPropertySource propertiesToMask;
 	private final String radix;
 
 	public MaskedConfigurationPropertySource(ConfigurationPropertySource toMask, String mask) {
-		this.toMask = Objects.requireNonNull( toMask );
+		this.propertiesToMask = Objects.requireNonNull( toMask );
 		this.radix = Objects.requireNonNull( mask ) + ".";
 	}
 
 	@Override
 	public Optional<?> get(String key) {
 		String compositeKey = radix + key;
-		return toMask.get( compositeKey );
+		return propertiesToMask.get( compositeKey );
 	}
 
 	@Override
 	public ConfigurationPropertySource withMask(String mask) {
-		return new MaskedConfigurationPropertySource( toMask, radix + mask );
+		return new MaskedConfigurationPropertySource( propertiesToMask, radix + mask );
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "mask=" ).append( radix )
+				.append( ", propertiesToMask=" ).append( propertiesToMask )
+				.append( "]" );
+		return sb.toString();
 	}
 }
