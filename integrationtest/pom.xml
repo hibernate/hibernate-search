@@ -19,6 +19,7 @@
         <module>util-orm</module>
         <module>backend/tck</module>
         <module>backend/elasticsearch</module>
+        <module>backend/lucene</module>
         <module>mapper/pojo</module>
         <module>mapper/orm</module>
         <module>showcase/library</module>

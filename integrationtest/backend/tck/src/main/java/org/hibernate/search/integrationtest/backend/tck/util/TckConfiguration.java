@@ -15,14 +15,12 @@ import java.util.Properties;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 /**
- * Allows to run the tests with different backends depending on the content
- * of the property file at {@value PROPERTIES_PATH} in the classpath.
+ * Allows to run the tests with different backends depending on the content of the property file at
+ * {@value PROPERTIES_PATH} in the classpath.
  */
 public final class TckConfiguration {
 
 	private static final String PROPERTIES_PATH = "/backend-tck.properties";
-
-	private static final String BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY = "backend.lucene.root_directory";
 
 	private static TckConfiguration instance;
 
@@ -33,7 +31,9 @@ public final class TckConfiguration {
 		return instance;
 	}
 
-	private final ConfigurationPropertySource source;
+	private final Properties properties;
+
+	private final String startupTimestamp;
 
 	private TckConfiguration() {
 		Properties properties = new Properties();
@@ -47,24 +47,22 @@ public final class TckConfiguration {
 			throw new IllegalStateException( "Error loading TCK properties file: " + PROPERTIES_PATH );
 		}
 
-		addTimestampToLuceneRootDirectory( properties );
-
-		source = ConfigurationPropertySource.fromProperties( properties );
+		this.properties = properties;
+		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS" ).format( new Date() );
 	}
 
-	public ConfigurationPropertySource getBackendProperties() {
-		return source.withMask( "backend" );
-	}
+	public ConfigurationPropertySource getBackendProperties(String testId) {
+		Properties overriddenProperties = new Properties();
 
-	private void addTimestampToLuceneRootDirectory(Properties properties) {
-		String baseLuceneRootDirectory = properties.getProperty( BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY );
+		properties.forEach( (k, v) -> {
+			if ( v instanceof String ) {
+				overriddenProperties.put( k, ( (String) v ).replace( "#{tck.test.id}", testId ).replace( "#{tck.startup.timestamp}", startupTimestamp ) );
+			}
+			else {
+				overriddenProperties.put( k, v );
+			}
+		} );
 
-		if ( baseLuceneRootDirectory != null ) {
-			StringBuilder timestampedLuceneRootDirectoryBuilder = new StringBuilder( baseLuceneRootDirectory )
-					.append( '/' )
-					.append( new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS" ).format( new Date() ) );
-
-			properties.put( BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY, timestampedLuceneRootDirectoryBuilder.toString() );
-		}
+		return ConfigurationPropertySource.fromProperties( overriddenProperties ).withMask( "backend" );
 	}
 }

@@ -29,7 +29,7 @@ public class SearchSetupHelper implements TestRule {
 
 	private final List<SearchMappingRepository> mappingRepositories = new ArrayList<>();
 
-	private String indexNamePrefix;
+	private String testId;
 
 	@Override
 	public Statement apply(Statement base, Description description) {
@@ -56,25 +56,23 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	protected void before(Description description) {
-		indexNamePrefix = description.getTestClass().getSimpleName() + "-" + description.getMethodName() + "-";
+		testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName() + "-";
 	}
 
 	public SetupContext withDefaultConfiguration() {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties().withPrefix( "backend.testedBackend" );
-		return new SetupContext( indexNamePrefix, propertySource )
+		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId ).withPrefix( "backend.testedBackend" );
+		return new SetupContext( propertySource )
 				.withProperty( "index.default.backend", "testedBackend" );
 	}
 
 	public class SetupContext {
 
-		private final String indexNamePrefix;
 		private final ConfigurationPropertySource propertySource;
 		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 
-		SetupContext(String indexNamePrefix, ConfigurationPropertySource propertySource) {
-			this.indexNamePrefix = indexNamePrefix;
+		SetupContext(ConfigurationPropertySource propertySource) {
 			this.propertySource = propertySource;
 		}
 
@@ -85,7 +83,7 @@ public class SearchSetupHelper implements TestRule {
 
 		public SetupContext withIndex(String typeName, String rawIndexName,
 				Consumer<IndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
-			indexDefinitions.add( new IndexDefinition( typeName, indexNamePrefix + rawIndexName, mappingContributor, listener ) );
+			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );
 			return this;
 		}
 
