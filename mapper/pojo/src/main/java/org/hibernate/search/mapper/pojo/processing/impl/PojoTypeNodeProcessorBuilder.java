@@ -13,8 +13,8 @@ import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
@@ -36,7 +36,7 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 
 	private final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
 
-	private final Collection<Bridge> bridges = new ArrayList<>();
+	private final Collection<TypeBridge> bridges = new ArrayList<>();
 	private final Map<PropertyHandle, PojoPropertyNodeProcessorBuilder<? super T, ?>> propertyProcessorBuilders =
 			new HashMap<>();
 
@@ -55,8 +55,8 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 	}
 
 	@Override
-	public void bridge(BridgeBuilder<? extends Bridge> builder) {
-		bridges.add( indexModelBinder.addBridge( bindingContext, pojoModelRootElement, builder ) );
+	public void bridge(BridgeBuilder<? extends TypeBridge> builder) {
+		bridges.add( indexModelBinder.addTypeBridge( bindingContext, pojoModelRootElement, builder ) );
 	}
 
 	@Override

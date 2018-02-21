@@ -15,8 +15,10 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
-import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMappingBuilderReference;
 
 /**
  * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,
@@ -61,7 +63,10 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
  */
-@BridgeMapping(builder = @BridgeMappingBuilderReference(
+@PropertyBridgeMapping(builder = @PropertyBridgeMappingBuilderReference(
+		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge.Builder.class
+))
+@TypeBridgeMapping(builder = @TypeBridgeMappingBuilderReference(
 		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge.Builder.class
 ))
 @Retention(RetentionPolicy.RUNTIME)

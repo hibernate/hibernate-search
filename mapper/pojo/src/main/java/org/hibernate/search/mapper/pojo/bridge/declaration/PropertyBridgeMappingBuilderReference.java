@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 
 /**
  * @author Yoann Rodiere
@@ -21,16 +21,16 @@ import org.hibernate.search.mapper.pojo.bridge.Bridge;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BridgeMappingBuilderReference {
+public @interface PropertyBridgeMappingBuilderReference {
 
 	String name() default "";
 
-	Class<? extends AnnotationBridgeBuilder<? extends Bridge,?>> type() default UndefinedImplementationType.class;
+	Class<? extends AnnotationBridgeBuilder<? extends PropertyBridge,?>> type() default UndefinedImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedImplementationType implements AnnotationBridgeBuilder<Bridge, Annotation> {
+	abstract class UndefinedImplementationType implements AnnotationBridgeBuilder<PropertyBridge, Annotation> {
 		private UndefinedImplementationType() {
 		}
 	}

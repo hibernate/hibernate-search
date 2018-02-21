@@ -28,8 +28,9 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.engine.mapper.model.SearchModel;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -626,7 +627,7 @@ public class JavaBeanProgrammaticMappingIT {
 		}
 	}
 
-	public static final class MyBridgeBuilder implements BridgeBuilder<Bridge> {
+	public static final class MyBridgeBuilder implements BridgeBuilder<MyBridgeImpl> {
 
 		private String objectName;
 
@@ -636,12 +637,12 @@ public class JavaBeanProgrammaticMappingIT {
 		}
 
 		@Override
-		public Bridge build(BuildContext buildContext) {
+		public MyBridgeImpl build(BuildContext buildContext) {
 			return new MyBridgeImpl( objectName );
 		}
 	}
 
-	private static final class MyBridgeImpl implements Bridge {
+	private static final class MyBridgeImpl implements TypeBridge, PropertyBridge {
 
 		private final String objectName;
 
@@ -674,6 +675,10 @@ public class JavaBeanProgrammaticMappingIT {
 			}
 		}
 
+		@Override
+		public void close() {
+			// Nothing to do
+		}
 	}
 
 }

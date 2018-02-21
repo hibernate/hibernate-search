@@ -13,17 +13,17 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 
-public class MultiKeywordStringBridge implements Bridge {
+public class MultiKeywordStringBridge implements PropertyBridge {
 
 	public static final String SEPARATOR_PATTERN_DEFAULT = ",";
 
-	public static class Builder implements AnnotationBridgeBuilder<Bridge, org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge> {
+	public static class Builder implements AnnotationBridgeBuilder<PropertyBridge, org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge> {
 		private String fieldName;
 		private Pattern separatorPattern = Pattern.compile( SEPARATOR_PATTERN_DEFAULT );
 
@@ -45,7 +45,7 @@ public class MultiKeywordStringBridge implements Bridge {
 		}
 
 		@Override
-		public Bridge build(BuildContext buildContext) {
+		public PropertyBridge build(BuildContext buildContext) {
 			if ( fieldName == null || fieldName.isEmpty() ) {
 				throw new IllegalArgumentException( "fieldName is a mandatory parameter" );
 			}

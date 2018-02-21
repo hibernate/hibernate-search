@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
 
 /**
  * @author Yoann Rodiere
@@ -26,11 +26,11 @@ public interface PropertyMappingContext {
 
 	PropertyMappingContext bridge(String bridgeName);
 
-	PropertyMappingContext bridge(Class<? extends Bridge> bridgeClass);
+	PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass);
 
-	PropertyMappingContext bridge(String bridgeName, Class<? extends Bridge> bridgeClass);
+	PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass);
 
-	PropertyMappingContext bridge(BridgeBuilder<? extends Bridge> builder);
+	PropertyMappingContext bridge(BridgeBuilder<? extends PropertyBridge> builder);
 
 	PropertyMappingContext marker(MarkerBuilder builder);
 

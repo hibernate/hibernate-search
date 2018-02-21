@@ -26,7 +26,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 2, value = "Unable to find a default function bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultFunctionBridgeFromSourceType(Class<?> sourceType);
 
-	@Message(id = 3, value = "Annotation type '%1$s' is annotated with @BridgeMapping,"
+	@Message(id = 3, value = "Annotation type '%1$s' is annotated with @PropertyBridgeMapping,"
 			+ " but the bridge builder reference is empty.")
 	SearchException missingBuilderReferenceInBridgeMapping(Class<? extends Annotation> annotationType);
 

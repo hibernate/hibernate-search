@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -42,17 +42,17 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public PropertyMappingContext bridge(Class<? extends Bridge> bridgeClass) {
+	public PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass) {
 		return delegate.bridge( bridgeClass );
 	}
 
 	@Override
-	public PropertyMappingContext bridge(String bridgeName, Class<? extends Bridge> bridgeClass) {
+	public PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass) {
 		return delegate.bridge( bridgeName, bridgeClass );
 	}
 
 	@Override
-	public PropertyMappingContext bridge(BridgeBuilder<? extends Bridge> builder) {
+	public PropertyMappingContext bridge(BridgeBuilder<? extends PropertyBridge> builder) {
 		return delegate.bridge( builder );
 	}
 

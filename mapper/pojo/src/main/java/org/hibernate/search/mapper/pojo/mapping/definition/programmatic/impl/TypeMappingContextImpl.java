@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
-import org.hibernate.search.mapper.pojo.bridge.Bridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
@@ -108,22 +108,22 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	}
 
 	@Override
-	public TypeMappingContext bridge(Class<? extends Bridge> bridgeClass) {
+	public TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass) {
 		return bridge( new ImmutableBeanReference( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(String bridgeName, Class<? extends Bridge> bridgeClass) {
+	public TypeMappingContext bridge(String bridgeName, Class<? extends TypeBridge> bridgeClass) {
 		return bridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
 	}
 
 	private TypeMappingContext bridge(BeanReference bridgeReference) {
-		return bridge( new BeanResolverBridgeBuilder<>( Bridge.class, bridgeReference ) );
+		return bridge( new BeanResolverBridgeBuilder<>( TypeBridge.class, bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(BridgeBuilder<? extends Bridge> builder) {
-		children.add( new BridgeMappingContributor( builder ) );
+	public TypeMappingContext bridge(BridgeBuilder<? extends TypeBridge> builder) {
+		children.add( new TypeBridgeMappingContributor( builder ) );
 		return this;
 	}
 
