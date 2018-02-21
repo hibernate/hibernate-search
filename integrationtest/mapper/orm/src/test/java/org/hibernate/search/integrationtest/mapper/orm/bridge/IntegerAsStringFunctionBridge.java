@@ -7,10 +7,24 @@
 package org.hibernate.search.integrationtest.mapper.orm.bridge;
 
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
 
 public final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
+
+	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
+	public static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
+
+	public IntegerAsStringFunctionBridge() {
+		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
+	}
+
 	@Override
 	public String toIndexedValue(Integer propertyValue) {
 		return propertyValue == null ? null : propertyValue.toString();
+	}
+
+	@Override
+	public void close() {
+		StaticCounters.get().increment( CLOSE_COUNTER_KEY );
 	}
 }

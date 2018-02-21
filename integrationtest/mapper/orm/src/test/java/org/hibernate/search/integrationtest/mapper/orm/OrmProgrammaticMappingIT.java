@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm;
 
 import static org.hibernate.search.integrationtest.util.common.stub.backend.StubBackendUtils.reference;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -39,8 +40,10 @@ import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBrid
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.integrationtest.util.orm.OrmUtils;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.service.ServiceRegistry;
@@ -61,6 +64,9 @@ public class OrmProgrammaticMappingIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public StaticCounters counters = new StaticCounters();
 
 	private SessionFactory sessionFactory;
 
@@ -146,6 +152,30 @@ public class OrmProgrammaticMappingIT {
 		if ( sessionFactory != null ) {
 			sessionFactory.close();
 		}
+	}
+
+	@Test
+	public void lifecycle() {
+		// More bridges may have been instantiated, but only the below number should be active
+		// (the others should have been dropped because they were completely filtered out)
+		assertEquals( 4, counters.get( CustomTypeBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 3, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		sessionFactory.close();
+		sessionFactory = null;
+		// All instantiated resources should have been closed
+		assertEquals( 0, counters.get( CustomTypeBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
 
 	@Test
