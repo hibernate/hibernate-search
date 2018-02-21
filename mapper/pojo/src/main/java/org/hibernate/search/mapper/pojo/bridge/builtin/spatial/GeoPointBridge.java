@@ -85,7 +85,7 @@ public @interface GeoPointBridge {
 
 	/**
 	 * @return Returns an instance of the {@link Store} enum, indicating whether the value should be stored in the document.
-	 *         Defaults to {@code Store.NO}
+	 *         Defaults to {@code Store.DEFAULT}
 	 */
 	Store store() default Store.DEFAULT;
 
