@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -24,14 +22,9 @@ public class PojoContainerNodeProcessor<C, T> implements PojoNodeProcessor<C> {
 	private final Collection<PojoNodeProcessor<? super T>> nestedProcessors;
 
 	PojoContainerNodeProcessor(ContainerValueExtractor<C, T> extractor,
-			Collection<FunctionBridgeProcessor<? super T, ?>> functionBridgeProcessors,
-			Collection<AbstractPojoNodeProcessorBuilder<? super T>> nestedProcessorBuilders) {
+			Collection<PojoNodeProcessor<? super T>> nestedProcessors) {
 		this.extractor = extractor;
-		this.nestedProcessors = functionBridgeProcessors.isEmpty() && nestedProcessorBuilders.isEmpty()
-				? Collections.emptyList()
-				: new ArrayList<>( functionBridgeProcessors.size() + nestedProcessorBuilders.size() );
-		this.nestedProcessors.addAll( functionBridgeProcessors );
-		nestedProcessorBuilders.forEach( builder -> this.nestedProcessors.add( builder.build() ) );
+		this.nestedProcessors = nestedProcessors;
 	}
 
 	@Override

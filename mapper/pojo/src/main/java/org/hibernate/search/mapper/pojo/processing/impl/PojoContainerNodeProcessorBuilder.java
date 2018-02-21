@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -56,11 +58,11 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 
 	public void functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder, String defaultedFieldName,
 			FieldModelContributor fieldModelContributor) {
-		FunctionBridgeProcessor<T, ?> processor = indexModelBinder.addFunctionBridge(
+		indexModelBinder.addFunctionBridge(
 				bindingContext, elementTypeModel, builder, defaultedFieldName,
 				fieldModelContributor
-		);
-		bridgeProcessors.add( processor );
+		)
+				.ifPresent( bridgeProcessors::add );
 	}
 
 	public void indexedEmbedded(IndexModelBindingContext nestedBindingContext) {
@@ -78,7 +80,29 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 	}
 
 	@Override
-	PojoContainerNodeProcessor<C, T> build() {
-		return new PojoContainerNodeProcessor<>( extractor, bridgeProcessors, elementProcessorBuilders );
+	Optional<PojoContainerNodeProcessor<C, T>> build() {
+		Collection<PojoNodeProcessor<? super T>> immutableNestedProcessors =
+				bridgeProcessors.isEmpty() && elementProcessorBuilders.isEmpty()
+						? Collections.emptyList()
+						: new ArrayList<>( bridgeProcessors.size() + elementProcessorBuilders.size() );
+		immutableNestedProcessors.addAll( bridgeProcessors );
+		elementProcessorBuilders.stream()
+				.map( AbstractPojoNodeProcessorBuilder::build )
+				.filter( Optional::isPresent )
+				.map( Optional::get )
+				.forEach( immutableNestedProcessors::add );
+
+		if ( immutableNestedProcessors.isEmpty() ) {
+			/*
+			 * If this processor doesn't have any bridge, nor any nested processor,
+			 * it is useless and we don't need to build it
+			 */
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( new PojoContainerNodeProcessor<>(
+					extractor, immutableNestedProcessors
+			) );
+		}
 	}
 }

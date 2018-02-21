@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,29 +20,28 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollect
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.ObjectFieldIndexSchemaCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 
 	private final IndexSchemaCollector schemaCollector;
-	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
+	private final Collection<IndexObjectFieldAccessor> parentObjectAccessors;
 	private final IndexSchemaNestingContextImpl nestingContext;
 	private final SearchModel searchModel = new SearchModel() {
 		// TODO provide an actual implementation when the interface defines methods
 	};
-
-	private IndexSchemaElement schemaElementWithNestingContext;
 
 	public IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector) {
 		this( schemaCollector, Collections.emptyList(), IndexSchemaNestingContextImpl.root() );
 	}
 
 	private IndexModelBindingContextImpl(IndexSchemaCollector schemaCollector,
-			Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
+			Collection<IndexObjectFieldAccessor> parentObjectAccessors,
 			IndexSchemaNestingContextImpl nestingContext) {
 		this.schemaCollector = schemaCollector;
-		this.parentObjectAccessors = parentObjectAccessors;
+		this.parentObjectAccessors = Collections.unmodifiableCollection( parentObjectAccessors );
 		this.nestingContext = nestingContext;
 	}
 
@@ -56,16 +56,13 @@ public class IndexModelBindingContextImpl implements IndexModelBindingContext {
 	}
 
 	@Override
-	public Iterable<IndexObjectFieldAccessor> getParentIndexObjectAccessors() {
+	public Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors() {
 		return parentObjectAccessors;
 	}
 
 	@Override
-	public IndexSchemaElement getSchemaElement() {
-		if ( schemaElementWithNestingContext == null ) {
-			schemaElementWithNestingContext = schemaCollector.withContext( nestingContext );
-		}
-		return schemaElementWithNestingContext;
+	public IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener) {
+		return schemaCollector.withContext( new NotifyingNestingContext( nestingContext, listener ) );
 	}
 
 	@Override

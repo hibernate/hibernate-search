@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,9 +18,14 @@ import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 public interface IndexModelBindingContext {
 
-	Iterable<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
+	Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
 
-	IndexSchemaElement getSchemaElement();
+	default IndexSchemaElement getSchemaElement() {
+		// Get a schema element without any listener
+		return getSchemaElement( () -> { } );
+	}
+
+	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
 
 	SearchModel getSearchModel();
 

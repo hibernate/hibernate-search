@@ -13,6 +13,11 @@ public interface PojoNodeProcessor<T> extends AutoCloseable {
 	void process(DocumentElement target, T source);
 
 	@Override
-	void close();
+	default void close() {
+	}
+
+	static <T> PojoNodeProcessor<T> noOp() {
+		return (ignored1, ignored2) -> { };
+	}
 
 }

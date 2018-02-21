@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
 import org.hibernate.search.util.spi.Closer;
 
@@ -29,13 +29,13 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 	private final PojoIndexableTypeModel<E> typeModel;
 	private final IdentifierMapping<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
-	private final PojoTypeNodeProcessor<E> processor;
+	private final PojoNodeProcessor<E> processor;
 	private final IndexManager<D> indexManager;
 
 	public PojoTypeManager(PojoIndexableTypeModel<E> typeModel,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
-			PojoTypeNodeProcessor<E> processor, IndexManager<D> indexManager) {
+			PojoNodeProcessor<E> processor, IndexManager<D> indexManager) {
 		this.typeModel = typeModel;
 		this.identifierMapping = identifierMapping;
 		this.routingKeyProvider = routingKeyProvider;

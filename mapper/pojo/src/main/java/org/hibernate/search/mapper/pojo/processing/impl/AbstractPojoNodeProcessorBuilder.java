@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
@@ -40,7 +42,7 @@ abstract class AbstractPojoNodeProcessorBuilder<T> {
 		return builder.toString();
 	}
 
-	abstract PojoNodeProcessor<T> build();
+	abstract Optional<? extends PojoNodeProcessor<T>> build();
 
 	private void appendPath(StringBuilder builder) {
 		if ( parent == null ) {

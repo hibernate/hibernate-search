@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessorBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeProvider;
@@ -65,7 +66,9 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>(
 				typeModel,
 				identifierMapping, routingKeyProvider,
-				processorBuilder.build(), indexManagerBuildingState.build() );
+				processorBuilder.build().orElseGet( PojoNodeProcessor::noOp ),
+				indexManagerBuildingState.build()
+		);
 		builder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );
 	}
 

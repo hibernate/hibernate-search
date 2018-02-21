@@ -10,15 +10,15 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
 
 class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentContributor<D> {
 
-	private final PojoTypeNodeProcessor<E> processor;
+	private final PojoNodeProcessor<E> processor;
 
 	private final Supplier<E> entitySupplier;
 
-	PojoDocumentContributor(PojoTypeNodeProcessor<E> processor, Supplier<E> entitySupplier) {
+	PojoDocumentContributor(PojoNodeProcessor<E> processor, Supplier<E> entitySupplier) {
 		this.processor = processor;
 		this.entitySupplier = entitySupplier;
 	}

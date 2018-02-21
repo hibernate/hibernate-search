@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
@@ -14,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedC
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -73,29 +75,45 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public TypeBridge addTypeBridge(IndexModelBindingContext bindingContext,
+	public Optional<TypeBridge> addTypeBridge(IndexModelBindingContext bindingContext,
 			PojoModelType pojoModelType, BridgeBuilder<? extends TypeBridge> builder) {
 		TypeBridge bridge = builder.build( buildContext );
 
-		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bindingContext.getSchemaElement(), pojoModelType, bindingContext.getSearchModel() );
+		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
-		return bridge;
+		bridge.bind( bindingContext.getSchemaElement( listener ), pojoModelType, bindingContext.getSearchModel() );
+
+		// If all fields are filtered out, we should ignore the bridge
+		if ( listener.schemaContributed ) {
+			return Optional.of( bridge );
+		}
+		else {
+			bridge.close();
+			return Optional.empty();
+		}
 	}
 
 	@Override
-	public PropertyBridge addPropertyBridge(IndexModelBindingContext bindingContext,
+	public Optional<PropertyBridge> addPropertyBridge(IndexModelBindingContext bindingContext,
 			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> builder) {
 		PropertyBridge bridge = builder.build( buildContext );
 
-		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bindingContext.getSchemaElement(), pojoModelProperty, bindingContext.getSearchModel() );
+		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
-		return bridge;
+		bridge.bind( bindingContext.getSchemaElement( listener ), pojoModelProperty, bindingContext.getSearchModel() );
+
+		// If all fields are filtered out, we should ignore the bridge
+		if ( listener.schemaContributed ) {
+			return Optional.of( bridge );
+		}
+		else {
+			bridge.close();
+			return Optional.empty();
+		}
 	}
 
 	@Override
-	public <T> FunctionBridgeProcessor<T, ?> addFunctionBridge(IndexModelBindingContext bindingContext,
+	public <T> Optional<FunctionBridgeProcessor<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor contributor) {
 		BridgeBuilder<? extends FunctionBridge<?, ?>> defaultedBuilder = builder;
@@ -117,9 +135,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		return doAddFunctionBridge( bindingContext, typedBridge, fieldName, contributor );
 	}
 
-	private <T, R> FunctionBridgeProcessor<T, R> doAddFunctionBridge(IndexModelBindingContext bindingContext,
+	private <T, R> Optional<FunctionBridgeProcessor<T, ?>> doAddFunctionBridge(IndexModelBindingContext bindingContext,
 			FunctionBridge<? super T, R> bridge, String fieldName, FieldModelContributor contributor) {
-		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement().field( fieldName );
+		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
+
+		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( fieldName );
 
 		// First give the bridge a chance to contribute to the model
 		IndexSchemaFieldTypedContext<R> typedFieldContext = bridge.bind( fieldContext );
@@ -131,10 +151,25 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( typedFieldContext );
 
-		// FIXME if the field is filtered out, we should ignore the processor
-
 		IndexFieldAccessor<R> indexFieldAccessor = typedFieldContext.createAccessor();
-		return new FunctionBridgeProcessor<>( bridge, indexFieldAccessor );
+
+
+		// If all fields are filtered out, we should ignore the bridge
+		if ( listener.schemaContributed ) {
+			return Optional.of( new FunctionBridgeProcessor<>( bridge, indexFieldAccessor ) );
+		}
+		else {
+			bridge.close();
+			return Optional.empty();
+		}
 	}
 
+	private class IndexSchemaContributionListenerImpl implements IndexSchemaContributionListener {
+		private boolean schemaContributed = false;
+
+		@Override
+		public void onSchemaContributed() {
+			schemaContributed = true;
+		}
+	}
 }

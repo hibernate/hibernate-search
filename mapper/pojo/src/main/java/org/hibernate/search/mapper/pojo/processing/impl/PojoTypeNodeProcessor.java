@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
@@ -20,7 +18,7 @@ import org.hibernate.search.util.spi.Closer;
 /**
  * @author Yoann Rodiere
  */
-public class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
+class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
 
 	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
 	private final Collection<TypeBridge> bridges;
@@ -28,12 +26,10 @@ public class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
 
 	PojoTypeNodeProcessor(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
 			Collection<TypeBridge> bridges,
-			Collection<PojoPropertyNodeProcessorBuilder<? super T, ?>> propertyProcessorBuilders) {
+			Collection<PojoPropertyNodeProcessor<? super T, ?>> propertyProcessors) {
 		this.parentObjectAccessors = parentObjectAccessors;
-		this.bridges = bridges.isEmpty() ? Collections.emptyList() : new ArrayList<>( bridges );
-		this.propertyProcessors = propertyProcessorBuilders.isEmpty() ?
-				Collections.emptyList() : new ArrayList<>( propertyProcessorBuilders.size() );
-		propertyProcessorBuilders.forEach( builder -> this.propertyProcessors.add( builder.build() ) );
+		this.bridges = bridges;
+		this.propertyProcessors = propertyProcessors;
 	}
 
 	@Override

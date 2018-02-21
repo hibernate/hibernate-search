@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -73,7 +74,8 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 
 	@Override
 	public void bridge(BridgeBuilder<? extends PropertyBridge> builder) {
-		propertyBridges.add( indexModelBinder.addPropertyBridge( bindingContext, pojoModelRootElement, builder ) );
+		indexModelBinder.addPropertyBridge( bindingContext, pojoModelRootElement, builder )
+				.ifPresent( propertyBridges::add );
 	}
 
 	@Override
@@ -89,11 +91,11 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 			containerProcessorBuilder.functionBridge( builder, defaultedFieldName, fieldModelContributor );
 		}
 		else {
-			FunctionBridgeProcessor<? super T, ?> processor = indexModelBinder.addFunctionBridge(
+			indexModelBinder.addFunctionBridge(
 					bindingContext, propertyTypeModel, builder, defaultedFieldName,
 					fieldModelContributor
-			);
-			functionBridgeProcessors.add( processor );
+			)
+					.ifPresent( functionBridgeProcessors::add );
 		}
 	}
 
@@ -178,9 +180,30 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 	}
 
 	@Override
-	PojoPropertyNodeProcessor<P, T> build() {
-		return new PojoPropertyNodeProcessor<>(
-				propertyHandle, propertyBridges, functionBridgeProcessors, nestedProcessorBuilders
-		);
+	Optional<PojoPropertyNodeProcessor<P, T>> build() {
+		Collection<PropertyBridge> immutableBridges = propertyBridges.isEmpty() ? Collections.emptyList() : new ArrayList<>( propertyBridges );
+		Collection<PojoNodeProcessor<? super T>> immutableNestedProcessors =
+				functionBridgeProcessors.isEmpty() && nestedProcessorBuilders.isEmpty()
+				? Collections.emptyList()
+				: new ArrayList<>( functionBridgeProcessors.size() + nestedProcessorBuilders.size() );
+		immutableNestedProcessors.addAll( functionBridgeProcessors );
+		nestedProcessorBuilders.stream()
+				.map( AbstractPojoNodeProcessorBuilder::build )
+				.filter( Optional::isPresent )
+				.map( Optional::get )
+				.forEach( immutableNestedProcessors::add );
+
+		if ( immutableBridges.isEmpty() && immutableNestedProcessors.isEmpty() ) {
+			/*
+			 * If this processor doesn't have any bridge, nor any nested processor,
+			 * it is useless and we don't need to build it
+			 */
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( new PojoPropertyNodeProcessor<>(
+					propertyHandle, immutableBridges, immutableNestedProcessors
+			) );
+		}
 	}
 }
