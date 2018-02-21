@@ -22,7 +22,13 @@ class PojoModelPropertyElementAccessor<T> implements PojoModelElementAccessor<T>
 
 	@Override
 	public T read(PojoElement bridgedElement) {
-		return (T) handle.get( parent.read( bridgedElement ) );
+		Object parentValue = parent.read( bridgedElement );
+		if ( parentValue != null ) {
+			return (T) handle.get( parentValue );
+		}
+		else {
+			return null;
+		}
 	}
 
 }
