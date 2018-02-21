@@ -44,7 +44,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
  * <pre><code>
  * public class User {
  *     &#064;GeoPointBridge
- *     public Coordinates getHome() { ... }
+ *     public GeoPoint getHome() { ... }
  * }
  * </code></pre>
  *
@@ -52,7 +52,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
  *
  * <pre><code>
  * &#064;GeoPointBridge(name="location")
- * public class Home implements Coordinates {
+ * public class Home implements GeoPoint {
  *     &#064;Override
  *     public Double getLatitude() { ... }
  *     &#064;Override
@@ -76,8 +76,8 @@ public @interface GeoPointBridge {
 	/**
 	 * The name of the index field holding spatial information.
 	 *
-	 * If {@code @Spatial} is hosted on a property, defaults to the property name.
-	 * If {@code @Spatial} is hosted on a class, the name must be provided.
+	 * If {@code @GeoPointBridge} is hosted on a property, defaults to the property name.
+	 * If {@code @GeoPointBridge} is hosted on a class, the name must be provided.
 	 *
 	 * @return the field name
 	 */
