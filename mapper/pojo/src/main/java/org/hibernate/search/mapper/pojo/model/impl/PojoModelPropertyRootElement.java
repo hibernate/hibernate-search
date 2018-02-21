@@ -32,6 +32,11 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 	}
 
 	@Override
+	public String toString() {
+		return propertyModel.toString();
+	}
+
+	@Override
 	public <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
 		Optional<PojoTypeModel<T>> superTypeModel = getTypeModel().getSuperType( requestedType );
 		if ( !superTypeModel.isPresent() ) {

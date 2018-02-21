@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -28,11 +30,14 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.StreamHelper;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public class GeoPointBridge implements TypeBridge, PropertyBridge {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static class Builder implements
 			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge> {
@@ -90,22 +95,30 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	@Override
 	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
 			SearchModel searchModel) {
-		bind( indexSchemaElement, bridgedPojoModelType );
+		if ( fieldName == null || fieldName.isEmpty() ) {
+			throw log.missingFieldNameForGeoPointBridgeOnType( bridgedPojoModelType.toString() );
+		}
+
+		bind( fieldName, indexSchemaElement, bridgedPojoModelType );
 	}
 
 	@Override
 	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
 			SearchModel searchModel) {
-		bind( indexSchemaElement, bridgedPojoModelProperty );
-	}
-
-	private void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement) {
-		if ( fieldName == null || fieldName.isEmpty() ) {
-			// TODO retrieve the default name somehow when parameters.name() is empty
-			throw new UnsupportedOperationException( "Default field name not implemented yet" );
+		String defaultedFieldName;
+		if ( fieldName != null && !fieldName.isEmpty() ) {
+			defaultedFieldName = fieldName;
+		}
+		else {
+			defaultedFieldName = bridgedPojoModelProperty.getName();
 		}
 
-		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().store( store ).createAccessor();
+		bind( defaultedFieldName, indexSchemaElement, bridgedPojoModelProperty );
+	}
+
+	private void bind(String defaultedFieldName, IndexSchemaElement indexSchemaElement,
+			PojoModelElement bridgedPojoModelElement) {
+		fieldAccessor = indexSchemaElement.field( defaultedFieldName ).asGeoPoint().store( store ).createAccessor();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
 			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
@@ -115,12 +128,12 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			PojoModelElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LatitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "latitude", fieldName, markerSet ) )
+					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 			PojoModelElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LongitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "longitude", fieldName, markerSet ) )
+					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 
 			coordinatesExtractor = bridgedElement -> {

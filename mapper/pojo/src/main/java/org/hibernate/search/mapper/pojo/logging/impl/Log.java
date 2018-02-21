@@ -60,4 +60,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 10, value = "Function bridge %1$s cannot be applied to input type %2$s.")
 	SearchException invalidInputTypeForFunctionBridge(FunctionBridge<?, ?> bridge, PojoTypeModel<?> typeModel);
+
+	@Message(id = 11, value = "Missing field name for GeoPointBridge on type %1$s."
+			+ " The field name is mandatory when the bridge is applied on an type, optional when applied on a property.")
+	SearchException missingFieldNameForGeoPointBridgeOnType(String typeName);
 }

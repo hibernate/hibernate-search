@@ -59,9 +59,11 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
+				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 				.field( "location", GeoPoint.class, b2 -> b2.store( Store.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
+				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 
@@ -119,11 +121,15 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 					.preparedThenExecuted();
 			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.INDEX )
 					.add( "2", b -> b
+							.field( "coord", entity2.getCoord() )
 							.field( "location", entity2.getCoord() )
 					)
 					.preparedThenExecuted();
 			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
 					.add( "3", b -> b
+							.field( "coord", new ImmutableGeoPoint(
+									entity3.getCoord().getLat(), entity3.getCoord().getLon()
+							) )
 							.field( "location", new ImmutableGeoPoint(
 									entity3.getCoord().getLat(), entity3.getCoord().getLon()
 							) )
@@ -214,6 +220,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
+		@GeoPointBridge
 		@GeoPointBridge(fieldName = "location", store = Store.NO)
 		public GeoPoint getCoord() {
 			return coord;
@@ -243,6 +250,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
+		@GeoPointBridge
 		@GeoPointBridge(fieldName = "location")
 		public CustomCoordinates getCoord() {
 			return coord;
