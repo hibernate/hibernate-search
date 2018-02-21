@@ -26,6 +26,11 @@ public class SimplifyingIndexManager<D extends DocumentElement> implements Index
 	}
 
 	@Override
+	public void close() {
+		delegate.close();
+	}
+
+	@Override
 	public ChangesetIndexWorker<D> createWorker(SessionContext context) {
 		ChangesetIndexWorker<D> delegateWorker = delegate.createWorker( context );
 		return new SimplifyingChangesetIndexWorker<>( delegateWorker );

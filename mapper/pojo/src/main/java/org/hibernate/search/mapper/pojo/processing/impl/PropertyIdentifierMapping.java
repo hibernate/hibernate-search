@@ -30,6 +30,11 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
+	public void close() {
+		bridge.close();
+	}
+
+	@Override
 	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier) {
 		if ( providedId != null ) {
 			return typeModel.cast( providedId );

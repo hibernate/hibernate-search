@@ -11,7 +11,11 @@ import java.util.function.Supplier;
 /**
  * @author Yoann Rodiere
  */
-public interface IdentifierMapping<I, E> {
+public interface IdentifierMapping<I, E> extends AutoCloseable {
+
+	@Override
+	default void close() {
+	}
 
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 

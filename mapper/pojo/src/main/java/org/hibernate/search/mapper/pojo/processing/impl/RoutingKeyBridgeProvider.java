@@ -20,6 +20,11 @@ public class RoutingKeyBridgeProvider<E> implements RoutingKeyProvider<E> {
 	}
 
 	@Override
+	public void close() {
+		bridge.close();
+	}
+
+	@Override
 	public String toRoutingKey(String tenantIdentifier, Object identifier, Supplier<E> entitySupplier) {
 		return bridge.toRoutingKey( tenantIdentifier, identifier, new PojoElementImpl( entitySupplier.get() ) );
 	}

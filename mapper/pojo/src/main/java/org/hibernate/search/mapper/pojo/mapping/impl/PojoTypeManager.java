@@ -19,11 +19,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
+import org.hibernate.search.util.spi.Closer;
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoTypeManager<I, E, D extends DocumentElement> {
+public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable {
 
 	private final PojoIndexableTypeModel<E> typeModel;
 	private final IdentifierMapping<I, E> identifierMapping;
@@ -40,6 +41,16 @@ public class PojoTypeManager<I, E, D extends DocumentElement> {
 		this.routingKeyProvider = routingKeyProvider;
 		this.processor = processor;
 		this.indexManager = indexManager;
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( identifierMapping::close );
+			closer.push( routingKeyProvider::close );
+			closer.push( processor::close );
+			closer.push( indexManager::close );
+		}
 	}
 
 	public IdentifierMapping<I, E> getIdentifierMapping() {
@@ -82,5 +93,4 @@ public class PojoTypeManager<I, E, D extends DocumentElement> {
 	public void addToSearchTarget(IndexSearchTargetBuilder builder) {
 		indexManager.addToSearchTarget( builder );
 	}
-
 }

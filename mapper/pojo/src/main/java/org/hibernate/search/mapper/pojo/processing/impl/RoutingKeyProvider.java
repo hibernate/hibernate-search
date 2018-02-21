@@ -11,7 +11,11 @@ import java.util.function.Supplier;
 /**
  * @author Yoann Rodiere
  */
-public interface RoutingKeyProvider<E> {
+public interface RoutingKeyProvider<E> extends AutoCloseable {
+
+	@Override
+	default void close() {
+	}
 
 	String toRoutingKey(String tenantIdentifier, Object identifier, Supplier<E> entitySupplier);
 

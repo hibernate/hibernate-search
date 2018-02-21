@@ -49,6 +49,11 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 		this.streamOrchestrator = backend.getStreamOrchestrator();
 	}
 
+	@Override
+	public void close() {
+		changesetOrchestrator.close();
+	}
+
 	public String getName() {
 		return name.original;
 	}

@@ -12,7 +12,10 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Yoann Rodiere
  */
-public interface IndexManager<D extends DocumentElement> {
+public interface IndexManager<D extends DocumentElement> extends AutoCloseable {
+
+	@Override
+	void close();
 
 	ChangesetIndexWorker<D> createWorker(SessionContext context);
 
@@ -21,5 +24,4 @@ public interface IndexManager<D extends DocumentElement> {
 	IndexSearchTargetBuilder createSearchTarget();
 
 	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
-
 }
