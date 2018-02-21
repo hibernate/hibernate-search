@@ -6,143 +6,136 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collector;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMappingBuilderReference;
-import org.hibernate.search.mapper.pojo.bridge.declaration.BridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
+import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
+import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.model.SearchModel;
+import org.hibernate.search.mapper.pojo.bridge.Bridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.StreamHelper;
 
 /**
- * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,
- * to an index field representing a point on earth..
- *
- * If your longitude and latitude information are hosted on two different properties,
- * add {@code @GeoPointBridge} on the entity (class-level). The {@link Latitude} and {@link Longitude}
- * annotations must mark the properties.
- *
- * <pre><code>
- * &#064;GeoPointBridge(name="home")
- * public class User {
- *     &#064;GeoPointBridge.Latitude
- *     public Double getHomeLatitude() { ... }
- *     &#064;GeoPointBridge.Longitude
- *     public Double getHomeLongitude() { ... }
- * }
- * </code></pre>
- *
- * Alternatively, you can put the latitude / longitude information in a property of
- * type {@link GeoPoint}.
- *
- * <pre><code>
- * public class User {
- *     &#064;GeoPointBridge
- *     public GeoPoint getHome() { ... }
- * }
- * </code></pre>
- *
- * ... or make the entity itself implement {@link GeoPoint}:
- *
- * <pre><code>
- * &#064;GeoPointBridge(name="location")
- * public class Home implements GeoPoint {
- *     &#064;Override
- *     public Double getLatitude() { ... }
- *     &#064;Override
- *     public Double getLongitude() { ... }
- * }
- * </code></pre>
- *
- * @hsearch.experimental Spatial support is still considered experimental
- * @author Nicolas Helleringer
+ * @author Yoann Rodiere
  */
-@BridgeMapping(builder = @BridgeMappingBuilderReference(type = GeoPointBridgeBuilder.class))
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
-@Documented
-@Repeatable(GeoPointBridge.List.class)
-public @interface GeoPointBridge {
+public class GeoPointBridge implements Bridge {
 
-	int DEFAULT_TOP_SPATIAL_HASH_LEVEL = 0;
-	int DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL = 16;
+	public static class Builder implements
+			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge> {
 
-	/**
-	 * The name of the index field holding spatial information.
-	 *
-	 * If {@code @GeoPointBridge} is hosted on a property, defaults to the property name.
-	 * If {@code @GeoPointBridge} is hosted on a class, the name must be provided.
-	 *
-	 * @return the field name
-	 */
-	String fieldName() default "";
+		private String fieldName;
+		private Store store = Store.DEFAULT;
+		private String markerSet;
 
-	/**
-	 * @return Returns an instance of the {@link Store} enum, indicating whether the value should be stored in the document.
-	 *         Defaults to {@code Store.DEFAULT}
-	 */
-	Store store() default Store.DEFAULT;
+		@Override
+		public void initialize(
+				org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge annotation) {
+			fieldName( annotation.fieldName() );
+			markerSet( annotation.markerSet() );
+			store( annotation.store() );
+		}
 
-	/**
-	 * @return The name of the marker set this spatial should look into
-	 * when looking for the {@link Latitude} and {@link Longitude} markers.
-	 */
-	String markerSet() default "";
+		public Builder fieldName(String fieldName) {
+			this.fieldName = fieldName;
+			return this;
+		}
 
-	/**
-	 * Mark the property hosting the latitude of a specific spatial coordinate.
-	 * The property must be of type {@code Double} or {@code double}.
-	 *
-	 * @author Nicolas Helleringer
-	 */
-	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = LatitudeMarkerBuilder.class))
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.METHOD, ElementType.FIELD } )
-	@Documented
-	@interface Latitude {
+		public Builder store(Store store) {
+			this.store = store;
+			return this;
+		}
 
-		/**
-		 * @return The name of the marker set this marker belongs to.
-		 * Set it to the value of {@link GeoPointBridge#markerSet()}
-		 * so that the bridge detects this marker.
-		 */
-		String markerSet() default "";
+		public Builder markerSet(String markerSet) {
+			this.markerSet = markerSet;
+			return this;
+		}
+
+		@Override
+		public GeoPointBridge build(BuildContext buildContext) {
+			return new GeoPointBridge( fieldName, store, markerSet );
+		}
 
 	}
 
-	/**
-	 * Mark the property hosting the longitude of a specific spatial coordinate.
-	 * The property must be of type {@code Double} or {@code double}.
-	 *
-	 * @author Nicolas Helleringer
+	private final String fieldName;
+	private final Store store;
+	private final String markerSet;
+
+	private IndexFieldAccessor<GeoPoint> fieldAccessor;
+	private Function<PojoElement, GeoPoint> coordinatesExtractor;
+
+	/*
+	 * Private constructor, use the Builder instead.
 	 */
-	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = LongitudeMarkerBuilder.class))
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.METHOD, ElementType.FIELD } )
-	@Documented
-	@interface Longitude {
-
-		/**
-		 * @return The name of the marker set this marker belongs to.
-		 * Set it to the value of {@link GeoPointBridge#markerSet()}
-		 * so that the bridge detects this marker.
-		 */
-		String markerSet() default "";
-
+	private GeoPointBridge(String fieldName, Store store, String markerSet) {
+		this.fieldName = fieldName;
+		this.store = store;
+		this.markerSet = markerSet;
 	}
 
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE } )
-	@Documented
-	@interface List {
+	@Override
+	public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+			SearchModel searchModel) {
+		if ( fieldName == null || fieldName.isEmpty() ) {
+			// TODO retrieve the default name somehow when parameters.name() is empty
+			throw new UnsupportedOperationException( "Default field name not implemented yet" );
+		}
 
-		GeoPointBridge[] value();
+		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().store( store ).createAccessor();
 
+		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
+			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
+			coordinatesExtractor = sourceAccessor::read;
+		}
+		else {
+			PojoModelElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
+					.filter( model -> model.markers( LatitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+					.collect( singleMarkedProperty( "latitude", fieldName, markerSet ) )
+					.createAccessor( Double.class );
+			PojoModelElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
+					.filter( model -> model.markers( LongitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+					.collect( singleMarkedProperty( "longitude", fieldName, markerSet ) )
+					.createAccessor( Double.class );
+
+			coordinatesExtractor = bridgedElement -> {
+				Double latitude = latitudeAccessor.read( bridgedElement );
+				Double longitude = longitudeAccessor.read( bridgedElement );
+
+				if ( latitude == null || longitude == null ) {
+					return null;
+				}
+
+				return new ImmutableGeoPoint( latitude, longitude );
+			};
+		}
+	}
+
+	private static Collector<PojoModelElement, ?, PojoModelElement> singleMarkedProperty(
+			String markerName, String fieldName, String markerSet) {
+		return StreamHelper.singleElement(
+				() -> new SearchException( "Could not find a property with the " + markerName
+						+ " marker for field '" + fieldName + "' (marker set: '" + markerSet + "')" ),
+				() -> new SearchException( "Found multiple properties with the " + markerName
+						+ " marker for field '" + fieldName + "' (marker set: '" + markerSet + "')" )
+				);
+	}
+
+	@Override
+	public void write(DocumentElement target, PojoElement source) {
+		GeoPoint coordinates = coordinatesExtractor.apply( source );
+		fieldAccessor.write( target, coordinates );
 	}
 }

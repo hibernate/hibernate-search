@@ -13,7 +13,9 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -156,7 +158,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
-		@GeoPointBridge.Latitude(markerSet = "home")
+		@Latitude(markerSet = "home")
 		public Double getHomeLatitude() {
 			return homeLatitude;
 		}
@@ -165,7 +167,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.homeLatitude = homeLatitude;
 		}
 
-		@GeoPointBridge.Longitude(markerSet = "home")
+		@Longitude(markerSet = "home")
 		public Double getHomeLongitude() {
 			return homeLongitude;
 		}
@@ -174,7 +176,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.homeLongitude = homeLongitude;
 		}
 
-		@GeoPointBridge.Latitude(markerSet = "work")
+		@Latitude(markerSet = "work")
 		public Double getWorkLatitude() {
 			return workLatitude;
 		}
@@ -183,7 +185,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.workLatitude = workLatitude;
 		}
 
-		@GeoPointBridge.Longitude(markerSet = "work")
+		@Longitude(markerSet = "work")
 		public Double getWorkLongitude() {
 			return workLongitude;
 		}
@@ -264,12 +266,12 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 		}
 
 		// TODO make this work even when the property is of primitive type double
-		@GeoPointBridge.Latitude
+		@Latitude
 		public Double getLat() {
 			return lat;
 		}
 
-		@GeoPointBridge.Longitude
+		@Longitude
 		public Double getLon() {
 			return lon;
 		}
