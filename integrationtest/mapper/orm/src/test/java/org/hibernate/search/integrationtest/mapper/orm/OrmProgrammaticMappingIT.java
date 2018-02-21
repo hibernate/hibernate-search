@@ -26,31 +26,18 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaObjectField;
-import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
@@ -427,7 +414,7 @@ public class OrmProgrammaticMappingIT {
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.bridge(
-							new MyBridgeBuilder()
+							new CustomTypeBridge.Builder()
 							.objectName( "customBridgeOnClass" )
 					)
 					.property( "id" )
@@ -448,7 +435,7 @@ public class OrmProgrammaticMappingIT {
 									.name( "myLocalDateField" )
 					.property( "embedded" )
 							.bridge(
-									new MyBridgeBuilder()
+									new CustomPropertyBridge.Builder()
 									.objectName( "customBridgeOnProperty" )
 							);
 			secondMapping.type( OtherIndexedEntity.class )
@@ -609,74 +596,4 @@ public class OrmProgrammaticMappingIT {
 		}
 	}
 
-	public static final class IntegerAsStringFunctionBridge implements FunctionBridge<Integer, String> {
-		@Override
-		public String toIndexedValue(Integer propertyValue) {
-			return propertyValue == null ? null : propertyValue.toString();
-		}
-	}
-
-	public static final class MyBridgeBuilder implements BridgeBuilder<MyBridgeImpl> {
-
-		private String objectName;
-
-		public MyBridgeBuilder objectName(String value) {
-			this.objectName = value;
-			return this;
-		}
-
-		@Override
-		public MyBridgeImpl build(BuildContext buildContext) {
-			return new MyBridgeImpl( objectName );
-		}
-	}
-
-	private static final class MyBridgeImpl implements TypeBridge, PropertyBridge {
-
-		private final String objectName;
-
-		private PojoModelElementAccessor<IndexedEntity> sourceAccessor;
-		private IndexObjectFieldAccessor objectFieldAccessor;
-		private IndexFieldAccessor<String> textFieldAccessor;
-		private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
-
-		MyBridgeImpl(String objectName) {
-			this.objectName = objectName;
-		}
-
-		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-				SearchModel searchModel) {
-			bind( indexSchemaElement, bridgedPojoModelType );
-		}
-
-		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
-				SearchModel searchModel) {
-			bind( indexSchemaElement, bridgedPojoModelProperty );
-		}
-
-		private void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement) {
-			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
-			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
-			objectFieldAccessor = objectField.createAccessor();
-			textFieldAccessor = objectField.field( "text" ).asString().createAccessor();
-			localDateFieldAccessor = objectField.field( "date" ).asLocalDate().createAccessor();
-		}
-
-		@Override
-		public void write(DocumentElement target, PojoElement source) {
-			IndexedEntity sourceValue = sourceAccessor.read( source );
-			if ( sourceValue != null ) {
-				DocumentElement object = objectFieldAccessor.add( target );
-				textFieldAccessor.write( object, sourceValue.getText() );
-				localDateFieldAccessor.write( object, sourceValue.getLocalDate() );
-			}
-		}
-
-		@Override
-		public void close() {
-			// Nothing to do
-		}
-	}
 }
