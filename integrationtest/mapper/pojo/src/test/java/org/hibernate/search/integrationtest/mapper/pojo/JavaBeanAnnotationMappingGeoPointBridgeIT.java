@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
+import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.common.SearchMappingRepository;
@@ -52,14 +53,14 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 		mappingDefinition.add( CustomCoordinates.class );
 
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
-				.field( "homeLocation", GeoPoint.class )
-				.field( "workLocation", GeoPoint.class )
+				.field( "homeLocation", GeoPoint.class, b2 -> b2.store( Store.YES ) )
+				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "location", GeoPoint.class )
+				.field( "location", GeoPoint.class, b2 -> b2.store( Store.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "location", GeoPoint.class )
+				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 
 		mappingRepository = mappingRepositoryBuilder.build();
@@ -130,7 +131,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 	}
 
 	@Indexed(index = GeoPointOnTypeEntity.INDEX)
-	@GeoPointBridge(fieldName = "homeLocation", markerSet = "home")
+	@GeoPointBridge(fieldName = "homeLocation", markerSet = "home", store = Store.YES)
 	@GeoPointBridge(fieldName = "workLocation", markerSet = "work")
 	public static final class GeoPointOnTypeEntity {
 
@@ -211,7 +212,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
-		@GeoPointBridge(fieldName = "location")
+		@GeoPointBridge(fieldName = "location", store = Store.NO)
 		public GeoPoint getCoord() {
 			return coord;
 		}

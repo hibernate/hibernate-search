@@ -87,7 +87,7 @@ public @interface GeoPointBridge {
 	 * @return Returns an instance of the {@link Store} enum, indicating whether the value should be stored in the document.
 	 *         Defaults to {@code Store.NO}
 	 */
-	Store store() default Store.NO;
+	Store store() default Store.DEFAULT;
 
 	/**
 	 * @return The name of the marker set this spatial should look into

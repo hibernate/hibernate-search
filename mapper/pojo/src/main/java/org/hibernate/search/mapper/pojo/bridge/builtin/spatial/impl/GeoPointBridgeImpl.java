@@ -50,7 +50,7 @@ public class GeoPointBridgeImpl implements Bridge {
 			throw new UnsupportedOperationException( "Default field name not implemented yet" );
 		}
 
-		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().createAccessor();
+		fieldAccessor = indexSchemaElement.field( fieldName ).asGeoPoint().store( store ).createAccessor();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
 			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
