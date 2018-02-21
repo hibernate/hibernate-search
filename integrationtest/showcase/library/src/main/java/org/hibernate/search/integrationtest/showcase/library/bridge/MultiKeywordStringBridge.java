@@ -16,8 +16,8 @@ import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 
 public class MultiKeywordStringBridge implements PropertyBridge {
 
@@ -65,9 +65,9 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
 			SearchModel searchModel) {
-		sourceAccessor = bridgedPojoModelElement.createAccessor( String.class );
+		sourceAccessor = bridgedPojoModelProperty.createAccessor( String.class );
 		valueFieldAccessor = indexSchemaElement.field( fieldName ).asString().createAccessor();
 	}
 

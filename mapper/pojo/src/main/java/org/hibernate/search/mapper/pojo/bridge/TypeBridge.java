@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 
 /**
  * A bridge between a POJO type and an element of the index schema.
@@ -38,11 +38,11 @@ public interface TypeBridge extends AutoCloseable {
 	 * </ul>
 	 *
 	 * @param indexSchemaElement An entry point to declaring expectations and retrieving accessors to the index schema.
-	 * @param bridgedPojoModelElement An entry point to declaring expectations and retrieving accessors to the
-	 * bridged POJO model.
+	 * @param bridgedPojoModelType An entry point to declaring expectations and retrieving accessors to the
+	 * bridged POJO type.
 	 * @param searchModel An entry point to defining how to map POJO properties to fields when searching.
 	 */
-	void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+	void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
 			SearchModel searchModel);
 
 	/**
@@ -51,11 +51,11 @@ public interface TypeBridge extends AutoCloseable {
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
 	 * {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor}s retrieved when the
-	 * {@link #bind(IndexSchemaElement, PojoModelElement, SearchModel)} method was called.
+	 * {@link #bind(IndexSchemaElement, PojoModelType, SearchModel)} method was called.
 	 * <p>
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
-	 * {@link #bind(IndexSchemaElement, PojoModelElement, SearchModel)} method was called.
+	 * {@link #bind(IndexSchemaElement, PojoModelType, SearchModel)} method was called.
 	 *
 	 * @param target The {@link DocumentElement} to write to.
 	 * @param source The {@link PojoElement} to read from.

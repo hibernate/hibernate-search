@@ -18,14 +18,16 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
 
 /**
  * Provides the ability to contribute the entity model to the index model
  * by creating bridges and binding them
- * ({@link TypeBridge#bind(IndexSchemaElement, PojoModelElement, SearchModel)},
- * {@link PropertyBridge#bind(IndexSchemaElement, PojoModelElement, SearchModel)},
+ * ({@link TypeBridge#bind(IndexSchemaElement, PojoModelType, SearchModel)},
+ * {@link PropertyBridge#bind(IndexSchemaElement, PojoModelProperty, SearchModel)},
  * {@link FunctionBridge#bind(IndexSchemaFieldContext)}).
  * <p>
  * Incidentally, this will also generate the index model,
@@ -42,10 +44,10 @@ public interface PojoIndexModelBinder {
 			PojoModelElement pojoModelElement, BridgeBuilder<? extends RoutingKeyBridge> bridgeBuilder);
 
 	TypeBridge addTypeBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeBuilder<? extends TypeBridge> bridgeBuilder);
+			PojoModelType pojoModelType, BridgeBuilder<? extends TypeBridge> bridgeBuilder);
 
 	PropertyBridge addPropertyBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
+			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
 
 	<T> FunctionBridgeProcessor<T, ?> addFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,

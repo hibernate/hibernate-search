@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMa
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.impl.PojoModelRootElement;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
  * @author Yoann Rodiere
@@ -32,7 +32,7 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 		implements PojoTypeNodeMappingCollector {
 
 	private final PojoTypeModel<T> typeModel;
-	private final PojoModelRootElement pojoModelRootElement;
+	private final PojoModelTypeRootElement pojoModelRootElement;
 
 	private final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
 
@@ -48,8 +48,8 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 		super( parent, contributorProvider, indexModelBinder, bindingContext );
 		this.typeModel = typeModel;
 
-		// FIXME do something more with the indexable model, to be able to use it in containedIn processing in particular
-		this.pojoModelRootElement = new PojoModelRootElement( typeModel, contributorProvider );
+		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
+		this.pojoModelRootElement = new PojoModelTypeRootElement( typeModel, contributorProvider );
 
 		this.identityMappingCollector = identityMappingCollector;
 	}

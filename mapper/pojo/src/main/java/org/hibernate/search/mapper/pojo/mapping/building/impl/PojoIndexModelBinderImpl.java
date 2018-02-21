@@ -24,6 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
 import org.hibernate.search.util.spi.LoggerFactory;
@@ -72,22 +74,22 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public TypeBridge addTypeBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeBuilder<? extends TypeBridge> builder) {
+			PojoModelType pojoModelType, BridgeBuilder<? extends TypeBridge> builder) {
 		TypeBridge bridge = builder.build( buildContext );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bindingContext.getSchemaElement(), pojoModelElement, bindingContext.getSearchModel() );
+		bridge.bind( bindingContext.getSchemaElement(), pojoModelType, bindingContext.getSearchModel() );
 
 		return bridge;
 	}
 
 	@Override
 	public PropertyBridge addPropertyBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeBuilder<? extends PropertyBridge> builder) {
+			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> builder) {
 		PropertyBridge bridge = builder.build( buildContext );
 
 		// FIXME if all fields are filtered out, we should ignore the processor
-		bridge.bind( bindingContext.getSchemaElement(), pojoModelElement, bindingContext.getSearchModel() );
+		bridge.bind( bindingContext.getSchemaElement(), pojoModelProperty, bindingContext.getSearchModel() );
 
 		return bridge;
 	}

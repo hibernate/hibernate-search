@@ -24,6 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.StreamHelper;
 
@@ -86,8 +88,18 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
 			SearchModel searchModel) {
+		bind( indexSchemaElement, bridgedPojoModelType );
+	}
+
+	@Override
+	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
+			SearchModel searchModel) {
+		bind( indexSchemaElement, bridgedPojoModelProperty );
+	}
+
+	private void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement) {
 		if ( fieldName == null || fieldName.isEmpty() ) {
 			// TODO retrieve the default name somehow when parameters.name() is empty
 			throw new UnsupportedOperationException( "Default field name not implemented yet" );

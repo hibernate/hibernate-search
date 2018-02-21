@@ -11,17 +11,10 @@ import java.util.stream.Stream;
 /**
  * @author Yoann Rodiere
  */
-public interface PojoModelElement {
+public interface PojoModelProperty extends PojoModelElement {
 
-	// FIXME what if I want a PojoModelElementAccessor<List<MyType>>?
-	<T> PojoModelElementAccessor<T> createAccessor(Class<T> type);
+	String getName();
 
-	PojoModelElementAccessor<?> createAccessor();
-
-	boolean isAssignableTo(Class<?> clazz);
-
-	PojoModelProperty property(String relativeName);
-
-	Stream<PojoModelProperty> properties();
+	<M> Stream<M> markers(Class<M> markerType);
 
 }

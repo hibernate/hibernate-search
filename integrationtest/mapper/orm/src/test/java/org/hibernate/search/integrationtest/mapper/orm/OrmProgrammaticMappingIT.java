@@ -49,6 +49,8 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
@@ -643,8 +645,18 @@ public class OrmProgrammaticMappingIT {
 		}
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement,
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
 				SearchModel searchModel) {
+			bind( indexSchemaElement, bridgedPojoModelType );
+		}
+
+		@Override
+		public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
+				SearchModel searchModel) {
+			bind( indexSchemaElement, bridgedPojoModelProperty );
+		}
+
+		private void bind(IndexSchemaElement indexSchemaElement, PojoModelElement bridgedPojoModelElement) {
 			sourceAccessor = bridgedPojoModelElement.createAccessor( IndexedEntity.class );
 			IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
 			objectFieldAccessor = objectField.createAccessor();
