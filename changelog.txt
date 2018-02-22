@@ -5,6 +5,7 @@ Hibernate Search Changelog
 -------------------------
 
 ** Improvement
+    * HSEARCH-3019 Provide ability to customize parser in TikaBridge
     * HSEARCH-3010 Update JBoss Logging to version 3.3.2.Final
     * HSEARCH-3009 Remove out of date requirement of avoiding Logger invocations with primitives
     * HSEARCH-3008 Update to forbiddenapis to 2.4.1 to get JDK10 compatibility
