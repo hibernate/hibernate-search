@@ -1,6 +1,29 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.0.Beta1 (22-02-2018)
+-------------------------
+
+** Improvement
+    * HSEARCH-3010 Update JBoss Logging to version 3.3.2.Final
+    * HSEARCH-3009 Remove out of date requirement of avoiding Logger invocations with primitives
+    * HSEARCH-3008 Update to forbiddenapis to 2.4.1 to get JDK10 compatibility
+    * HSEARCH-3007 Upgrade to Byte Buddy 1.7.9 to support JDK10
+    * HSEARCH-2979 Use Hibernate ORM 5.3 ManagedBeanRegistry SPI to implement Field Bridge injection
+    * HSEARCH-2978 Upgrade to Hibernate ORM 5.3.0.Beta1
+    * HSEARCH-2430 Update checkstyle ParenPad rule to include RESOURCE_SPECIFICATION
+
+** Task
+    * HSEARCH-3018 Update to Byteman 4.0.1: allows building on JDK10
+    * HSEARCH-3017 Upgrade to Hibernate ORM 5.3.0.CR1
+    * HSEARCH-3012 Update to Hibernate Asciidoctor Theme 1.0.2.Final
+    * HSEARCH-3011 Re-enable building the documentation on all JDKs
+    * HSEARCH-3006 Allow to override version of the Surefire and Failsafe Maven plugins to test on JDK10
+    * HSEARCH-3005 Upgrade to Hibernate Commons Annotations 5.0.2.Final
+    * HSEARCH-3004 Update address of Free Software Foundation
+    * HSEARCH-3002 Upgrade to Checkstyle 8.8 and re-enable checks on method call spaces
+    * HSEARCH-3001 Checkstyle checks were not enabled automatically for the new jsr352 modules
+
 5.9.0.Final (06-02-2018)
 -------------------------
 
