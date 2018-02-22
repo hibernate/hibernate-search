@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
@@ -26,13 +26,13 @@ import org.hibernate.search.util.spi.Closer;
  */
 public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable {
 
-	private final PojoIndexableTypeModel<E> typeModel;
+	private final PojoRawTypeModel<E> typeModel;
 	private final IdentifierMapping<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoNodeProcessor<E> processor;
 	private final IndexManager<D> indexManager;
 
-	public PojoTypeManager(PojoIndexableTypeModel<E> typeModel,
+	public PojoTypeManager(PojoRawTypeModel<E> typeModel,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoNodeProcessor<E> processor, IndexManager<D> indexManager) {
@@ -57,7 +57,7 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 		return identifierMapping;
 	}
 
-	public PojoIndexableTypeModel<E> getTypeModel() {
+	public PojoRawTypeModel<E> getTypeModel() {
 		return typeModel;
 	}
 

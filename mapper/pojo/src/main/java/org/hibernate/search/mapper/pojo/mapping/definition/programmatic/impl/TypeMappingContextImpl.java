@@ -25,9 +25,9 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -35,7 +35,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
-	private final PojoTypeModel<?> typeModel;
+	private final PojoRawTypeModel<?> typeModel;
 
 	private String indexName;
 	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
@@ -43,7 +43,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
 			children = new ArrayList<>();
 
-	TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, PojoTypeModel<?> typeModel) {
+	TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, PojoRawTypeModel<?> typeModel) {
 		this.mapperFactory = mapperFactory;
 		this.typeModel = typeModel;
 	}

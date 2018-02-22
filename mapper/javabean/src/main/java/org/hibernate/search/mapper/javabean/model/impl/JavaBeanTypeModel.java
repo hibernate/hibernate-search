@@ -16,13 +16,13 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.TypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.util.spi.JavaClassOrdering;
 import org.hibernate.search.util.SearchException;
 
-class JavaBeanTypeModel<T> implements PojoIndexableTypeModel<T> {
+class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	private final JavaBeanIntrospector introspector;
 	private final Class<T> clazz;
@@ -42,14 +42,14 @@ class JavaBeanTypeModel<T> implements PojoIndexableTypeModel<T> {
 	}
 
 	@Override
-	public Class<T> getJavaClass() {
-		return clazz;
-	}
-
-	@Override
 	public boolean isSubTypeOf(TypeModel other) {
 		return other instanceof JavaBeanTypeModel
 				&& ( (JavaBeanTypeModel<?>) other ).clazz.isAssignableFrom( clazz );
+	}
+
+	@Override
+	public PojoRawTypeModel<? super T> getRawType() {
+		return this;
 	}
 
 	@Override
@@ -61,14 +61,14 @@ class JavaBeanTypeModel<T> implements PojoIndexableTypeModel<T> {
 
 	@Override
 	@SuppressWarnings( "unchecked" )
-	public Stream<? extends PojoTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes() {
 		return JavaClassOrdering.get().getAscendingSuperTypes( clazz )
 				.map( clazz -> introspector.getTypeModel( (Class<? super T>) clazz ) );
 	}
 
 	@Override
 	@SuppressWarnings( "unchecked" )
-	public Stream<? extends PojoTypeModel<? super T>> getDescendingSuperTypes() {
+	public Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
 		return JavaClassOrdering.get().getDescendingSuperTypes( clazz )
 				.map( clazz -> introspector.getTypeModel( (Class<? super T>) clazz ) );
 	}
@@ -131,5 +131,10 @@ class JavaBeanTypeModel<T> implements PojoIndexableTypeModel<T> {
 	@Override
 	public T cast(Object instance) {
 		return getJavaClass().cast( instance );
+	}
+
+	@Override
+	public Class<T> getJavaClass() {
+		return clazz;
 	}
 }

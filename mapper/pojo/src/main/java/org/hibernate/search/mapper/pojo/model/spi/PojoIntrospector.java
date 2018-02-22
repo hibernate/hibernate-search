@@ -16,7 +16,7 @@ public interface PojoIntrospector {
 	 * @param <T> The type
 	 * @return A type model for the given type.
 	 */
-	<T> PojoTypeModel<T> getTypeModel(Class<T> clazz);
+	<T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz);
 
 	/**
 	 * @param <T> the type of the entity

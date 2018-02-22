@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.util.AssertionFailure;
@@ -57,13 +57,13 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	public void addIndexed(TypeModel typeModel,
 			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider) {
-		if ( !( typeModel instanceof PojoIndexableTypeModel ) ) {
+		if ( !( typeModel instanceof PojoRawTypeModel ) ) {
 			throw new AssertionFailure(
-					"Expected the indexed type model to be an instance of " + PojoIndexableTypeModel.class
+					"Expected the indexed type model to be an instance of " + PojoRawTypeModel.class
 					+ ", got " + typeModel + " instead. There is probably a bug in the mapper implementation"
 			);
 		}
-		PojoIndexableTypeModel<?> entityTypeModel = (PojoIndexableTypeModel<?>) typeModel;
+		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
 				entityTypeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );

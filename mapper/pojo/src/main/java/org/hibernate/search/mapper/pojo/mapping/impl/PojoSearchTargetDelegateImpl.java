@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
@@ -42,7 +42,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	}
 
 	@Override
-	public Set<PojoIndexableTypeModel<? extends T>> getTargetedIndexedTypes() {
+	public Set<PojoRawTypeModel<? extends T>> getTargetedIndexedTypes() {
 		return targetedTypeManagers.stream()
 				.map( PojoTypeManager::getTypeModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );

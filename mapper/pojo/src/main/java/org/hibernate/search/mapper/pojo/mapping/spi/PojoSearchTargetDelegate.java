@@ -9,14 +9,14 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface PojoSearchTargetDelegate<T> extends PojoSearchTarget<PojoReference> {
 
-	Set<PojoIndexableTypeModel<? extends T>> getTargetedIndexedTypes();
+	Set<PojoRawTypeModel<? extends T>> getTargetedIndexedTypes();
 
 	<O> SearchQueryResultDefinitionContext<PojoReference, O> query(ObjectLoader<PojoReference, O> objectLoader);
 

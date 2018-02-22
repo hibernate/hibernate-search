@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
@@ -38,15 +39,15 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	 * This in turn allows to not care at all about implementing equals and hashcode,
 	 * since type models are presumably instantiated only once per type.
 	 */
-	private final Map<Class<?>, PojoTypeModel<?>> typeModelCache = new HashMap<>();
+	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	public JavaBeanIntrospector(MethodHandles.Lookup lookup) {
 		this.annotationHelper = new AnnotationHelper( lookup );
 	}
 
 	@Override
-	public <T> PojoTypeModel<T> getTypeModel(Class<T> clazz) {
-		return (PojoTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
+		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 		return annotationHelper.getAnnotationsByMetaAnnotationType( annotatedElement, metaAnnotationType );
 	}
 
-	private <T> PojoTypeModel<T> createTypeModel(Class<T> clazz) {
+	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {
 		try {
 			return new JavaBeanTypeModel<>( this, clazz );
 		}

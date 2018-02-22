@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -65,11 +64,11 @@ public class PojoTypeManagerContainer {
 		private Builder() {
 		}
 
-		public <E> void add(String indexName, PojoIndexableTypeModel<E> typeModel, PojoTypeManager<?, E, ?> typeManager) {
+		public <E> void add(String indexName, PojoRawTypeModel<E> typeModel, PojoTypeManager<?, E, ?> typeManager) {
 			byIndexName.put( indexName, typeManager );
 			byExactClass.put( typeModel.getJavaClass(), typeManager );
 			typeModel.getAscendingSuperTypes()
-					.map( PojoTypeModel::getJavaClass )
+					.map( PojoRawTypeModel::getJavaClass )
 					.forEach( clazz ->
 							bySuperClass.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 									.add( typeManager )

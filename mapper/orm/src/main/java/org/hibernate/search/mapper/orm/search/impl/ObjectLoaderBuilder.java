@@ -12,16 +12,16 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.Session;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 
 public class ObjectLoaderBuilder<O> {
 
 	private final Session session;
-	private final Set<PojoIndexableTypeModel<? extends O>> concreteIndexedTypeModels;
+	private final Set<PojoRawTypeModel<? extends O>> concreteIndexedTypeModels;
 
-	ObjectLoaderBuilder(Session session, Set<PojoIndexableTypeModel<? extends O>> concreteIndexedTypeModels) {
+	ObjectLoaderBuilder(Session session, Set<PojoRawTypeModel<? extends O>> concreteIndexedTypeModels) {
 		this.session = session;
 		this.concreteIndexedTypeModels = concreteIndexedTypeModels;
 	}
@@ -57,7 +57,7 @@ public class ObjectLoaderBuilder<O> {
 		 */
 		Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedTypeModels.size() );
-		for ( PojoIndexableTypeModel<? extends O> concreteIndexedTypeModel : concreteIndexedTypeModels ) {
+		for ( PojoRawTypeModel<? extends O> concreteIndexedTypeModel : concreteIndexedTypeModels ) {
 			Class<? extends O> concreteIndexedClass = concreteIndexedTypeModel.getJavaClass();
 			ComposableObjectLoader<PojoReference, T> delegate =
 					buildForSingleType( mutableLoadingOptions, concreteIndexedClass, hitTransformer );

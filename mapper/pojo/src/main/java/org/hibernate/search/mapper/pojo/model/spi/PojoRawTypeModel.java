@@ -17,12 +17,11 @@ package org.hibernate.search.mapper.pojo.model.spi;
  *
  * @param <T> The pojo type
  */
-public interface PojoIndexableTypeModel<T> extends PojoTypeModel<T> {
+public interface PojoRawTypeModel<T> extends PojoTypeModel<T> {
 
 	/**
 	 * @return The exact Java {@link Class} for this type.
 	 */
-	@Override
 	Class<T> getJavaClass();
 
 }

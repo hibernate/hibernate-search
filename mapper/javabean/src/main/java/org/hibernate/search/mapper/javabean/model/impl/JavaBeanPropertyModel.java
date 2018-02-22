@@ -8,14 +8,11 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PojoContainerTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -28,10 +25,9 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private final Class<T> clazz;
 	private final PropertyDescriptor descriptor;
-	private PropertyHandle handle;
 
-	private PojoTypeModel<T> typeModel;
-	private Optional<PojoContainerTypeModel<?>> containerTypeModelOptional;
+	private PojoGenericTypeModel<T> typeModel;
+	private PropertyHandle handle;
 
 	JavaBeanPropertyModel(JavaBeanIntrospector introspector, PojoTypeModel<?> parentTypeModel,
 			Class<T> clazz, PropertyDescriptor descriptor) {
@@ -47,11 +43,6 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public Class<T> getJavaClass() {
-		return clazz;
-	}
-
-	@Override
 	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
 		return introspector.getAnnotationsByType( descriptor.getReadMethod(), annotationType );
 	}
@@ -62,10 +53,14 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public PojoTypeModel<T> getTypeModel() {
+	public PojoGenericTypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = introspector.getTypeModel( clazz );
+				typeModel = new ErasingPojoGenericTypeModel<>(
+						introspector,
+						introspector.getTypeModel( clazz ),
+						descriptor.getReadMethod().getGenericReturnType()
+				);
 			}
 			catch (RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property type model for '"
@@ -73,34 +68,6 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 			}
 		}
 		return typeModel;
-	}
-
-	@Override
-	public Optional<PojoContainerTypeModel<?>> getContainerTypeModel() {
-		if ( containerTypeModelOptional == null ) {
-			Type type = descriptor.getReadMethod().getGenericReturnType();
-			if ( type instanceof ParameterizedType ) {
-				ParameterizedType parameterizedType = (ParameterizedType) type;
-				Class<?> rawType = (Class<?>) ( (ParameterizedType) type ).getRawType();
-				Type[] typeArguments = parameterizedType.getActualTypeArguments();
-				PojoTypeModel<?> elementTypeModel = null;
-				// TODO clean this up... maybe use Hibernate Commons Annotations instead of javax.beans?
-				if ( Map.class.isAssignableFrom( rawType ) ) {
-					elementTypeModel = introspector.getTypeModel( (Class<?>) typeArguments[1] );
-				}
-				else if ( Iterable.class.isAssignableFrom( rawType ) ) {
-					elementTypeModel = introspector.getTypeModel( (Class<?>) typeArguments[0] );
-				}
-				if ( elementTypeModel != null ) {
-					containerTypeModelOptional = Optional.of( new JavaBeanContainerTypeModel<>(
-							rawType, elementTypeModel ) );
-				}
-			}
-			if ( containerTypeModelOptional == null ) {
-				containerTypeModelOptional = Optional.empty();
-			}
-		}
-		return containerTypeModelOptional;
 	}
 
 	@Override

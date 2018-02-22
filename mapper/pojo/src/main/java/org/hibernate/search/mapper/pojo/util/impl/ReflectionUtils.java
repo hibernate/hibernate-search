@@ -1,0 +1,52 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.util.impl;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+
+import org.hibernate.search.util.AssertionFailure;
+
+public final class ReflectionUtils {
+
+	private ReflectionUtils() {
+	}
+
+	public static Class<?> getRawType(Type type) {
+		if ( type instanceof TypeVariable ) {
+			Type[] upperBounds = ( (TypeVariable<?>) type ).getBounds();
+			return getRawType( upperBounds[0] );
+		}
+		else if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
+			return getRawType( upperBounds[0] );
+		}
+		else if ( type instanceof ParameterizedType ) {
+			return getRawType( ( (ParameterizedType) type ).getRawType() );
+		}
+		else if ( type instanceof Class ) {
+			return (Class<?>) type;
+		}
+		else if ( type instanceof GenericArrayType ) {
+			Class<?> rawElementType = getRawType( ( (GenericArrayType) type ).getGenericComponentType() );
+			return getArrayClass( rawElementType );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + type.getClass() );
+		}
+	}
+
+	private static Class<?> getArrayClass(Class<?> rawElementType) {
+		// This is ugly, but apparently the only way to get an array type from an element type
+		return Array.newInstance( rawElementType, 0 ).getClass();
+	}
+
+}

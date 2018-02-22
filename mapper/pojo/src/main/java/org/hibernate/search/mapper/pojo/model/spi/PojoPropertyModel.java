@@ -7,22 +7,24 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.annotation.Annotation;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface PojoPropertyModel<T> {
 
 	String getName();
 
-	Class<? super T> getJavaClass();
-
 	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);
 
 	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
 
-	PojoTypeModel<T> getTypeModel();
-
-	Optional<PojoContainerTypeModel<?>> getContainerTypeModel();
+	/**
+	 * @return A model of this property's type. Implementations may decide to return a model of the raw type,
+	 * or to retain at least some generics information, allowing for more precise results
+	 * in {@link PojoGenericTypeModel#getTypeArgument(Class, int)} for example.
+	 *
+	 * @see ErasingPojoGenericTypeModel
+	 */
+	PojoGenericTypeModel<T> getTypeModel();
 
 	PropertyHandle getHandle();
 

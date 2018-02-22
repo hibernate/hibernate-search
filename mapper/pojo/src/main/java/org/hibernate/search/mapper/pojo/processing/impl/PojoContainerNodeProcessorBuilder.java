@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoContainerTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractor;
 
@@ -36,17 +35,6 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 	private final Collection<AbstractPojoNodeProcessorBuilder<? super T>> elementProcessorBuilders = new ArrayList<>();
 
 	PojoContainerNodeProcessorBuilder(
-			PojoPropertyNodeProcessorBuilder<?, ? extends C> parent, PojoContainerTypeModel<T> containerModel,
-			ContainerValueExtractor<C, T> extractor,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
-		this(
-				parent, containerModel.getElementTypeModel(), extractor,
-				contributorProvider, indexModelBinder, bindingContext
-		);
-	}
-
-	private PojoContainerNodeProcessorBuilder(
 			PojoPropertyNodeProcessorBuilder<?, ? extends C> parent,
 			PojoTypeModel<T> elementTypeModel, ContainerValueExtractor<C, T> extractor,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,

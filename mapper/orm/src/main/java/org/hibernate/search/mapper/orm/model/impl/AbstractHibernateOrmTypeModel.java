@@ -19,11 +19,11 @@ import org.hibernate.PropertyNotFoundException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.TypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIndexableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeModel<T> {
+abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 
 	final HibernateOrmIntrospector introspector;
 	private final XClass xClass;
@@ -54,14 +54,14 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeMode
 	}
 
 	@Override
-	public final Class<T> getJavaClass() {
-		return clazz;
-	}
-
-	@Override
 	public boolean isSubTypeOf(TypeModel other) {
 		return other instanceof AbstractHibernateOrmTypeModel
 				&& ((AbstractHibernateOrmTypeModel<?>) other).xClass.isAssignableFrom( xClass );
+	}
+
+	@Override
+	public PojoRawTypeModel<? super T> getRawType() {
+		return this;
 	}
 
 	@Override
@@ -73,12 +73,12 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeMode
 	}
 
 	@Override
-	public Stream<PojoTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<PojoRawTypeModel<? super T>> getAscendingSuperTypes() {
 		return introspector.getAscendingSuperTypes( xClass );
 	}
 
 	@Override
-	public Stream<PojoTypeModel<? super T>> getDescendingSuperTypes() {
+	public Stream<PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
 		return introspector.getDescendingSuperTypes( xClass );
 	}
 
@@ -153,6 +153,11 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoIndexableTypeMode
 	@Override
 	public T cast(Object instance) {
 		return clazz.cast( instance );
+	}
+
+	@Override
+	public final Class<T> getJavaClass() {
+		return clazz;
 	}
 
 

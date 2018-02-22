@@ -83,7 +83,7 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 
 	@Override
 	protected void appendSelfPath(StringBuilder builder) {
-		builder.append( "type " ).append( typeModel.getJavaClass().getSimpleName() );
+		builder.append( "type " ).append( typeModel );
 	}
 
 	@Override

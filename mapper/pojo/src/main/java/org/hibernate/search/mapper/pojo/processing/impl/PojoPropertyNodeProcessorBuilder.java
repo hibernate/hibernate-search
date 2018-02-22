@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMa
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
-import org.hibernate.search.mapper.pojo.model.spi.PojoContainerTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -41,9 +41,8 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 		implements PojoPropertyNodeMappingCollector {
 
 	private final PojoTypeModel<P> parentTypeModel;
-	private final PojoPropertyModel<T> propertyModel;
 	private final PropertyHandle propertyHandle;
-	private final PojoTypeModel<T> propertyTypeModel;
+	private final PojoGenericTypeModel<T> propertyTypeModel;
 	private final PojoModelPropertyRootElement pojoModelRootElement;
 
 	private final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
@@ -63,7 +62,6 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 		super( parent, contributorProvider, indexModelBinder, bindingContext );
 		this.parentTypeModel = parentTypeModel;
 		this.propertyHandle = propertyHandle;
-		this.propertyModel = propertyModel;
 		this.propertyTypeModel = propertyModel.getTypeModel();
 
 		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
@@ -150,30 +148,33 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	private PojoContainerNodeProcessorBuilder<? super T, ?> getContainerProcessorBuilder() {
 		if ( containerProcessorBuilder == null ) {
-			Optional<PojoContainerTypeModel<?>> containerTypeModelOptional = propertyModel.getContainerTypeModel();
-			if ( containerTypeModelOptional.isPresent() ) {
-				PojoContainerTypeModel<?> containerTypeModel = containerTypeModelOptional.get();
-				if ( containerTypeModel.isSubTypeOf( Map.class ) ) {
-					containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-							this, containerTypeModel, MapValueValueExtractor.get(),
-							contributorProvider, indexModelBinder, bindingContext
-					);
-					nestedProcessorBuilders.add( containerProcessorBuilder );
-				}
-				else if ( containerTypeModel.isSubTypeOf( Collection.class ) ) {
-					containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-							this, containerTypeModel, CollectionValueExtractor.get(),
-							contributorProvider, indexModelBinder, bindingContext
-					);
-					nestedProcessorBuilders.add( containerProcessorBuilder );
-				}
-				else if ( containerTypeModel.isSubTypeOf( Iterable.class ) ) {
-					containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-							this, containerTypeModel, IterableValueExtractor.get(),
-							contributorProvider, indexModelBinder, bindingContext
-					);
-					nestedProcessorBuilders.add( containerProcessorBuilder );
-				}
+			Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
+					propertyTypeModel.getTypeArgument( Map.class, 1 );
+			if ( elementTypeModelOptional.isPresent() ) {
+				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
+						this, elementTypeModelOptional.get(), MapValueValueExtractor.get(),
+						contributorProvider, indexModelBinder, bindingContext
+				);
+				nestedProcessorBuilders.add( containerProcessorBuilder );
+				return containerProcessorBuilder;
+			}
+			elementTypeModelOptional = propertyTypeModel.getTypeArgument( Collection.class, 0 );
+			if ( elementTypeModelOptional.isPresent() ) {
+				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
+						this, elementTypeModelOptional.get(), CollectionValueExtractor.get(),
+						contributorProvider, indexModelBinder, bindingContext
+				);
+				nestedProcessorBuilders.add( containerProcessorBuilder );
+				return containerProcessorBuilder;
+			}
+			elementTypeModelOptional = propertyTypeModel.getTypeArgument( Iterable.class, 0 );
+			if ( elementTypeModelOptional.isPresent() ) {
+				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
+						this, elementTypeModelOptional.get(), IterableValueExtractor.get(),
+						contributorProvider, indexModelBinder, bindingContext
+				);
+				nestedProcessorBuilders.add( containerProcessorBuilder );
+				return containerProcessorBuilder;
 			}
 		}
 		return containerProcessorBuilder;

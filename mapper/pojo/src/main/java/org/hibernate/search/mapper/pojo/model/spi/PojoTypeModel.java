@@ -14,20 +14,30 @@ import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 
 public interface PojoTypeModel<T> extends TypeModel {
 
+	/**
+	 * @return The supertypes of the current type, in ascending order.
+	 * If the current type is generic, only raw supertypes are expected.
+	 */
 	@Override
-	Stream<? extends PojoTypeModel<? super T>> getAscendingSuperTypes();
-
-	@Override
-	Stream<? extends PojoTypeModel<? super T>> getDescendingSuperTypes();
+	Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes();
 
 	/**
-	 * @return The Java {@link Class} for this type. The type is {@code Class<? super T>} and not {@code Class<T>}
-	 * on purpose: some type models can refer to parameterized types such as {@code Collection<Integer>},
-	 * in which case this method will return {@code Collection.class} (the raw type),
-	 * because that's the best possible representation of this parameterized type as a {@link Class}.
+	 * @return The supertypes of the current type, in descending order.
+	 * If the current type is generic, only raw supertypes are expected.
 	 */
-	Class<? super T> getJavaClass();
+	@Override
+	Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes();
 
+	/**
+	 * @return A representation of the closest parent Java {@link Class} for this type.
+	 */
+	PojoRawTypeModel<? super T> getRawType();
+
+	/**
+	 * @param superClassCandidate The Java Class representing the candidate supertype
+	 * @return The {@link PojoTypeModel} for this class if it is a supertype of the current type,
+	 * or an empty {@link Optional} if it is not.
+	 */
 	<U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate);
 
 	<A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType);

@@ -11,14 +11,15 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerFunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateFunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringFunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
@@ -42,22 +43,24 @@ public final class BridgeResolver {
 		addDefaultFunctionBridge( LocalDate.class, ignored -> new DefaultLocalDateFunctionBridge() );
 	}
 
-	public <T> BridgeBuilder<? extends IdentifierBridge<T>> resolveIdentifierBridgeForType(Class<T> sourceType) {
+	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoTypeModel<?> sourceType) {
+		// TODO handle non-raw types?
+		Class<?> rawType = sourceType.getRawType().getJavaClass();
 		@SuppressWarnings("unchecked")
-		BridgeBuilder<? extends IdentifierBridge<T>> result =
-				(BridgeBuilder<? extends IdentifierBridge<T>>) defaultIdentifierBridgeBySourceType.get( sourceType );
+		BridgeBuilder<? extends IdentifierBridge<?>> result = defaultIdentifierBridgeBySourceType.get( rawType );
 		if ( result == null ) {
-			throw log.unableToResolveDefaultIdentifierBridgeFromSourceType( sourceType );
+			throw log.unableToResolveDefaultIdentifierBridgeFromSourceType( rawType );
 		}
 		return result;
 	}
 
-	public <T> BridgeBuilder<? extends FunctionBridge<? super T, ?>> resolveFunctionBridgeForType(Class<T> sourceType) {
+	public BridgeBuilder<? extends FunctionBridge<?, ?>> resolveFunctionBridgeForType(PojoTypeModel<?> sourceType) {
+		// TODO handle non-raw types?
+		Class<?> rawType = sourceType.getRawType().getJavaClass();
 		@SuppressWarnings("unchecked")
-		BridgeBuilder<? extends FunctionBridge<? super T, ?>> result =
-				(BridgeBuilder<? extends FunctionBridge<? super T, ?>>) defaultFunctionBridgeBySourceType.get( sourceType );
+		BridgeBuilder<? extends FunctionBridge<?, ?>> result = defaultFunctionBridgeBySourceType.get( rawType );
 		if ( result == null ) {
-			throw log.unableToResolveDefaultFunctionBridgeFromSourceType( sourceType );
+			throw log.unableToResolveDefaultFunctionBridgeFromSourceType( rawType );
 		}
 		return result;
 	}

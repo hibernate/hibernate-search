@@ -52,7 +52,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
 		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel.getJavaClass() );
+			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
 		}
 		/*
 		 * TODO check that the bridge is suitable for the given typeModel
@@ -118,7 +118,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			String fieldName, FieldModelContributor contributor) {
 		BridgeBuilder<? extends FunctionBridge<?, ?>> defaultedBuilder = builder;
 		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveFunctionBridgeForType( typeModel.getJavaClass() );
+			defaultedBuilder = bridgeResolver.resolveFunctionBridgeForType( typeModel );
 		}
 
 		FunctionBridge<?, ?> bridge = defaultedBuilder.build( buildContext );
