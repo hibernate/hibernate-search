@@ -135,12 +135,6 @@
             <artifactId>log4j</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- Avoid warnings during build -->
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

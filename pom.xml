@@ -725,20 +725,12 @@
                 <version>${hibernateVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-spi</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.jboss.jbossts</groupId>
                         <artifactId>jbossjta</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.experlog</groupId>
                         <artifactId>xapool</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-jta_1.1_spec</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1833,7 +1825,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>jdk8</id>
             <activation>
-                <!-- Asciidoctor and Karaf won't work on JDK9 yet  -->
                 <jdk>1.8</jdk>
             </activation>
             <modules>
