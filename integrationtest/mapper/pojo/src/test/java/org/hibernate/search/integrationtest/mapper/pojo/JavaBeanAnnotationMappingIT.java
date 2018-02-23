@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
@@ -92,6 +93,7 @@ public class JavaBeanAnnotationMappingIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
+				.field( "optionalText", String.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myTextField", String.class )
@@ -204,6 +206,7 @@ public class JavaBeanAnnotationMappingIT {
 			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
+			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -306,6 +309,7 @@ public class JavaBeanAnnotationMappingIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
+							.field( "optionalText", entity5.getOptionalText().get() )
 							.objectField( "embeddedIterable", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myTextField", entity1.getEmbedded().getText() )
@@ -562,6 +566,8 @@ public class JavaBeanAnnotationMappingIT {
 
 		private Integer numeric;
 
+		private String optionalText;
+
 		private Iterable<IndexedEntity> embeddedIterable;
 
 		private List<IndexedEntity> embeddedList;
@@ -586,6 +592,15 @@ public class JavaBeanAnnotationMappingIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
+		}
+
+		@Field
+		public Optional<String> getOptionalText() {
+			return Optional.ofNullable( optionalText );
+		}
+
+		public void setOptionalText(Optional<String> text) {
+			this.optionalText = text.orElse( null );
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myTextField")

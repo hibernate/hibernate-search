@@ -39,6 +39,12 @@ public class ContainerValueExtractorResolver {
 					IterableValueExtractor.get(), elementTypeModelOptional.get()
 			) );
 		}
+		elementTypeModelOptional = sourceType.getTypeArgument( Optional.class, 0 );
+		if ( elementTypeModelOptional.isPresent() ) {
+			return Optional.of( new BoundContainerValueExtractor(
+					OptionalValueExtractor.get(), elementTypeModelOptional.get()
+			) );
+		}
 
 		return Optional.empty();
 	}

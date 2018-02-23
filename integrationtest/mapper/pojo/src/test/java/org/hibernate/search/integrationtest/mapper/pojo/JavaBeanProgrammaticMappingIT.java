@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -106,6 +107,8 @@ public class JavaBeanProgrammaticMappingIT {
 						.documentId()
 				.property( "numeric" )
 						.field()
+				.property( "optionalText" )
+						.field()
 				.property( "embeddedIterable" )
 						.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
 				.property( "embeddedList" )
@@ -128,6 +131,7 @@ public class JavaBeanProgrammaticMappingIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
+				.field( "optionalText", String.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myTextField", String.class )
@@ -240,6 +244,7 @@ public class JavaBeanProgrammaticMappingIT {
 			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
+			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -342,6 +347,7 @@ public class JavaBeanProgrammaticMappingIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
+							.field( "optionalText", entity5.getOptionalText().get() )
 							.objectField( "embeddedIterable", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myTextField", entity1.getEmbedded().getText() )
@@ -582,6 +588,8 @@ public class JavaBeanProgrammaticMappingIT {
 
 		private Integer numeric;
 
+		private String optionalText;
+
 		private Iterable<IndexedEntity> embeddedIterable;
 
 		private List<IndexedEntity> embeddedList;
@@ -604,6 +612,14 @@ public class JavaBeanProgrammaticMappingIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
+		}
+
+		public Optional<String> getOptionalText() {
+			return Optional.ofNullable( optionalText );
+		}
+
+		public void setOptionalText(Optional<String> text) {
+			this.optionalText = text.orElse( null );
 		}
 
 		public Iterable<IndexedEntity> getEmbeddedIterable() {

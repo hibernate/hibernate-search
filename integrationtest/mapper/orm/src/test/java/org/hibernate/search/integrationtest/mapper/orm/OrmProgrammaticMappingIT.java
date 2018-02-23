@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
@@ -23,6 +26,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.Type;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
@@ -39,6 +43,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
@@ -100,6 +105,7 @@ public class OrmProgrammaticMappingIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
+				.field( "optionalText", String.class )
 				.objectField( "embeddedList", b2 -> b2
 						.objectField( "otherPrefix_embedded", b3 -> b3
 								.objectField( "prefix_customBridgeOnClass", b4 -> b4
@@ -199,6 +205,7 @@ public class OrmProgrammaticMappingIT {
 			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
+			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -299,6 +306,7 @@ public class OrmProgrammaticMappingIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
+							.field( "optionalText", entity5.getOptionalText().get() )
 							.objectField( "embeddedList", b2 -> b2
 									.objectField( "otherPrefix_embedded", b3 -> b3
 											.objectField( "prefix_customBridgeOnClass", b4 -> b4
@@ -481,6 +489,8 @@ public class OrmProgrammaticMappingIT {
 							.documentId()
 					.property( "numeric" )
 							.field()
+					.property( "optionalText" )
+							.field()
 					.property( "embeddedList" )
 							.indexedEmbedded()
 									.prefix( "embeddedList.otherPrefix_" )
@@ -585,6 +595,8 @@ public class OrmProgrammaticMappingIT {
 
 		private Integer numeric;
 
+		private String optionalText;
+
 		@ManyToMany
 		@JoinTable(name = "yetanother_indexed_list")
 		private List<IndexedEntity> embeddedList;
@@ -607,6 +619,16 @@ public class OrmProgrammaticMappingIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
+		}
+
+		@Access( AccessType.PROPERTY )
+		@Type( type = OptionalStringUserType.NAME )
+		public Optional<String> getOptionalText() {
+			return Optional.ofNullable( optionalText );
+		}
+
+		public void setOptionalText(Optional<String> text) {
+			this.optionalText = text.orElse( null );
 		}
 
 		public List<IndexedEntity> getEmbeddedList() {
