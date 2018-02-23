@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
- * A DSL context allowing to specify the type of a predicate, with some Elasticsearch-specific methods.
+ * A DSL context allowing to specify the sort order, with some Elasticsearch-specific methods.
  *
  * @param <N> The type of the next context (returned by terminal calls such as {@link ScoreSortContext#end()}
  * or {@link FieldSortContext#end()}).

@@ -38,6 +38,7 @@ public final class ElasticsearchExtension<N>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	@SuppressWarnings("rawtypes")
 	private static final ElasticsearchExtension INSTANCE = new ElasticsearchExtension();
 
 	@SuppressWarnings("unchecked")

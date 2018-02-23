@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-// TODO have one version of the factory per dialect, if necessary
+// TODO have one version of the factory per Elasticsearch dialect, if necessary
 public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
