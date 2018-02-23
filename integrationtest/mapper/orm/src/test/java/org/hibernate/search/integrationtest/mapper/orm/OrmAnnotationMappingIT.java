@@ -110,6 +110,7 @@ public class OrmAnnotationMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
 				.field( "optionalText", String.class )
+				.field( "numericArray", Integer.class )
 				.objectField( "embeddedList", b2 -> b2
 						.objectField( "otherPrefix_embedded", b3 -> b3
 								.objectField( "prefix_customBridgeOnClass", b4 -> b4
@@ -210,6 +211,7 @@ public class OrmAnnotationMappingIT {
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
 			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
+			entity5.setNumericArray( new Integer[] { 1, 2, 3 } );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -311,6 +313,9 @@ public class OrmAnnotationMappingIT {
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
 							.field( "optionalText", entity5.getOptionalText().get() )
+							.field( "numericArray", entity5.getNumericArray()[0] )
+							.field( "numericArray", entity5.getNumericArray()[1] )
+							.field( "numericArray", entity5.getNumericArray()[2] )
 							.objectField( "embeddedList", b2 -> b2
 									.objectField( "otherPrefix_embedded", b3 -> b3
 											.objectField( "prefix_customBridgeOnClass", b4 -> b4
@@ -565,6 +570,8 @@ public class OrmAnnotationMappingIT {
 
 		private String optionalText;
 
+		private Integer[] numericArray;
+
 		@ManyToMany
 		@JoinTable(name = "yetanother_indexed_list")
 		private List<IndexedEntity> embeddedList;
@@ -598,6 +605,15 @@ public class OrmAnnotationMappingIT {
 
 		public void setOptionalText(Optional<String> text) {
 			this.optionalText = text.orElse( null );
+		}
+
+		@Field
+		public Integer[] getNumericArray() {
+			return numericArray;
+		}
+
+		public void setNumericArray(Integer[] numericArray) {
+			this.numericArray = numericArray;
 		}
 
 		@IndexedEmbedded(prefix = "embeddedList.otherPrefix_", includePaths = "embedded.prefix_customBridgeOnClass.text")

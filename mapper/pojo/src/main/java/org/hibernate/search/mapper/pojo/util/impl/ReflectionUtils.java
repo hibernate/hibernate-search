@@ -12,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.util.Optional;
 
 import org.hibernate.search.util.AssertionFailure;
 
@@ -38,6 +39,30 @@ public final class ReflectionUtils {
 		else if ( type instanceof GenericArrayType ) {
 			Class<?> rawElementType = getRawType( ( (GenericArrayType) type ).getGenericComponentType() );
 			return getArrayClass( rawElementType );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + type.getClass() );
+		}
+	}
+
+	public static Optional<Type> getArrayElementType(Type type) {
+		if ( type instanceof TypeVariable ) {
+			Type[] upperBounds = ( (TypeVariable<?>) type ).getBounds();
+			return getArrayElementType( upperBounds[0] );
+		}
+		else if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
+			return getArrayElementType( upperBounds[0] );
+		}
+		else if ( type instanceof ParameterizedType ) {
+			return Optional.empty();
+		}
+		else if ( type instanceof Class ) {
+			Class<?> clazz = (Class<?>) type;
+			return Optional.ofNullable( clazz.getComponentType() );
+		}
+		else if ( type instanceof GenericArrayType ) {
+			return Optional.of( ( (GenericArrayType) type ).getGenericComponentType() );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + type.getClass() );

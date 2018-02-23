@@ -117,4 +117,12 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 				.map( rawTypeModel -> new ErasingPojoGenericTypeModel<>( introspector, rawTypeModel ) );
 	}
 
+	@Override
+	public Optional<PojoGenericTypeModel<?>> getArrayElementType() {
+		return ReflectionUtils.getArrayElementType( type )
+				.map( ReflectionUtils::getRawType ) // Type erasure here
+				.map( introspector::getTypeModel )
+				.map( rawTypeModel -> new ErasingPojoGenericTypeModel<>( introspector, rawTypeModel ) );
+	}
+
 }

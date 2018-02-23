@@ -45,6 +45,12 @@ public class ContainerValueExtractorResolver {
 					OptionalValueExtractor.get(), elementTypeModelOptional.get()
 			) );
 		}
+		elementTypeModelOptional = sourceType.getArrayElementType();
+		if ( elementTypeModelOptional.isPresent() ) {
+			return Optional.of( new BoundContainerValueExtractor(
+					ArrayValueExtractor.get(), elementTypeModelOptional.get()
+			) );
+		}
 
 		return Optional.empty();
 	}
