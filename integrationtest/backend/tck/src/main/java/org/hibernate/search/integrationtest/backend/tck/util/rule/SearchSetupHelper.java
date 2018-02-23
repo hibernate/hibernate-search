@@ -21,14 +21,41 @@ import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.util.common.stub.mapper.StubMapping;
 import org.hibernate.search.integrationtest.util.common.stub.mapper.StubMetadataContributor;
 import org.hibernate.search.util.spi.Closer;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
-import org.junit.rules.ExternalResource;
-
-public class SearchSetupHelper extends ExternalResource {
+public class SearchSetupHelper implements TestRule {
 
 	private final List<SearchMappingRepository> mappingRepositories = new ArrayList<>();
 
+	private String indexNamePrefix;
+
 	@Override
+	public Statement apply(Statement base, Description description) {
+		return statement( base, description );
+	}
+
+	private Statement statement(final Statement base, final Description description) {
+		return new Statement() {
+
+			@Override
+			public void evaluate() throws Throwable {
+				before( description );
+				try {
+					base.evaluate();
+				}
+				finally {
+					after();
+				}
+			}
+		};
+	}
+
+	protected void before(Description description) {
+		indexNamePrefix = description.getTestClass().getSimpleName() + "-" + description.getMethodName() + "-";
+	}
+
 	protected void after() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( SearchMappingRepository::close, mappingRepositories );
@@ -39,17 +66,19 @@ public class SearchSetupHelper extends ExternalResource {
 	public SetupContext withDefaultConfiguration() {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
 		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties().withPrefix( "backend.testedBackend" );
-		return new SetupContext( propertySource )
+		return new SetupContext( indexNamePrefix, propertySource )
 				.withProperty( "index.default.backend", "testedBackend" );
 	}
 
 	public class SetupContext {
 
+		private final String indexNamePrefix;
 		private final ConfigurationPropertySource propertySource;
 		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 
-		SetupContext(ConfigurationPropertySource propertySource) {
+		SetupContext(String indexNamePrefix, ConfigurationPropertySource propertySource) {
+			this.indexNamePrefix = indexNamePrefix;
 			this.propertySource = propertySource;
 		}
 
@@ -60,7 +89,7 @@ public class SearchSetupHelper extends ExternalResource {
 
 		public SetupContext withIndex(String typeName, String rawIndexName,
 				Consumer<IndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
-			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );
+			indexDefinitions.add( new IndexDefinition( typeName, indexNamePrefix + rawIndexName, mappingContributor, listener ) );
 			return this;
 		}
 
