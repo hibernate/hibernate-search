@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class IterableValueExtractor<T> implements ContainerValueExtractor<Iterable<T>, T> {
+class IterableValueExtractor<T> implements ContainerValueExtractor<Iterable<T>, T> {
 	private static final IterableValueExtractor<?> INSTANCE = new IterableValueExtractor();
 
 	@SuppressWarnings( "unchecked" ) // INSTANCE works for any T

@@ -23,10 +23,13 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorResolver;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
@@ -41,11 +44,20 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BuildContext buildContext;
+	private final ContainerValueExtractorResolver extractorResolver;
 	private final BridgeResolver bridgeResolver;
 
-	PojoIndexModelBinderImpl(BuildContext buildContext, BridgeResolver bridgeResolver) {
+	PojoIndexModelBinderImpl(BuildContext buildContext, ContainerValueExtractorResolver extractorResolver,
+			BridgeResolver bridgeResolver) {
 		this.buildContext = buildContext;
+		this.extractorResolver = extractorResolver;
 		this.bridgeResolver = bridgeResolver;
+	}
+
+	@Override
+	public <T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractor(
+			PojoGenericTypeModel<T> pojoGenericTypeModel) {
+		return extractorResolver.resolveContainerValueExtractorForType( pojoGenericTypeModel );
 	}
 
 	@Override

@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,9 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.impl.CollectionValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.IterableValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.MapValueValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
@@ -146,39 +143,28 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 		builder.append( "." ).append( propertyHandle.getName() );
 	}
 
-	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	private PojoContainerNodeProcessorBuilder<? super T, ?> getContainerProcessorBuilder() {
 		if ( containerProcessorBuilder == null ) {
-			Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
-					propertyTypeModel.getTypeArgument( Map.class, 1 );
-			if ( elementTypeModelOptional.isPresent() ) {
-				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-						this, elementTypeModelOptional.get(), MapValueValueExtractor.get(),
-						contributorProvider, indexModelBinder, bindingContext
-				);
+			Optional<BoundContainerValueExtractor<? super T, ?>> boundExtractorOptional =
+					indexModelBinder.createDefaultExtractor( propertyTypeModel );
+			if ( boundExtractorOptional.isPresent() ) {
+				/*
+				 * We need to use a generic method here to make it clear to the compiler
+				 * that the extracted type and extractor have compatible generic arguments.
+				 */
+				containerProcessorBuilder = createContainerProcessorBuilder( boundExtractorOptional.get() );
 				nestedProcessorBuilders.add( containerProcessorBuilder );
-				return containerProcessorBuilder;
-			}
-			elementTypeModelOptional = propertyTypeModel.getTypeArgument( Collection.class, 0 );
-			if ( elementTypeModelOptional.isPresent() ) {
-				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-						this, elementTypeModelOptional.get(), CollectionValueExtractor.get(),
-						contributorProvider, indexModelBinder, bindingContext
-				);
-				nestedProcessorBuilders.add( containerProcessorBuilder );
-				return containerProcessorBuilder;
-			}
-			elementTypeModelOptional = propertyTypeModel.getTypeArgument( Iterable.class, 0 );
-			if ( elementTypeModelOptional.isPresent() ) {
-				containerProcessorBuilder = new PojoContainerNodeProcessorBuilder(
-						this, elementTypeModelOptional.get(), IterableValueExtractor.get(),
-						contributorProvider, indexModelBinder, bindingContext
-				);
-				nestedProcessorBuilders.add( containerProcessorBuilder );
-				return containerProcessorBuilder;
 			}
 		}
 		return containerProcessorBuilder;
+	}
+
+	private <V> PojoContainerNodeProcessorBuilder<? super T, V> createContainerProcessorBuilder(
+			BoundContainerValueExtractor<? super T, V> boundExtractor) {
+		return new PojoContainerNodeProcessorBuilder<>(
+				this, boundExtractor.getExtractedType(), boundExtractor.getExtractor(),
+				contributorProvider, indexModelBinder, bindingContext
+		);
 	}
 
 	@Override

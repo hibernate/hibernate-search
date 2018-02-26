@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class MapValueValueExtractor<T> implements ContainerValueExtractor<Map<?, T>, T> {
+class MapValueValueExtractor<T> implements ContainerValueExtractor<Map<?, T>, T> {
 	private static final MapValueValueExtractor<?> INSTANCE = new MapValueValueExtractor();
 
 	@SuppressWarnings( "unchecked" ) // INSTANCE works for any T

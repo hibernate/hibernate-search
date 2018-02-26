@@ -18,6 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorResolver;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -44,8 +45,9 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 			PojoIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory) {
+		ContainerValueExtractorResolver extractorResolver = new ContainerValueExtractorResolver();
 		BridgeResolver bridgeResolver = new BridgeResolver();
-		this.indexModelBinder = new PojoIndexModelBinderImpl( buildContext, bridgeResolver );
+		this.indexModelBinder = new PojoIndexModelBinderImpl( buildContext, extractorResolver, bridgeResolver );
 
 		this.propertySource = propertySource;
 		this.introspector = introspector;
