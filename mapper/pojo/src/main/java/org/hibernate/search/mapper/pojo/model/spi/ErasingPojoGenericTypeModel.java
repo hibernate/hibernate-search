@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 
 /**
  * An implementation of {@link PojoGenericTypeModel} that will erase generics information
- * before returning models of type arguments.
+ * when accessing property types.
  * <p>
  * For instance, given the following model:
  * <pre><code>
@@ -51,7 +51,7 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 	private final Type type;
 	private final GenericTypeContext typeContext;
 
-	private ErasingPojoGenericTypeModel(PojoIntrospector introspector, PojoRawTypeModel<T> rawTypeModel) {
+	public ErasingPojoGenericTypeModel(PojoIntrospector introspector, PojoRawTypeModel<T> rawTypeModel) {
 		this( introspector, rawTypeModel, rawTypeModel.getJavaClass() );
 	}
 
@@ -112,17 +112,17 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 	@Override
 	public Optional<PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType, int typeParameterIndex) {
 		return typeContext.resolveTypeArgument( rawSuperType, typeParameterIndex )
-				.map( ReflectionUtils::getRawType ) // Type erasure here
-				.map( introspector::getTypeModel )
-				.map( rawTypeModel -> new ErasingPojoGenericTypeModel<>( introspector, rawTypeModel ) );
+				.map( type -> new ErasingPojoGenericTypeModel<>(
+						introspector, introspector.getTypeModel( ReflectionUtils.getRawType( type ) ), type
+				) );
 	}
 
 	@Override
 	public Optional<PojoGenericTypeModel<?>> getArrayElementType() {
 		return ReflectionUtils.getArrayElementType( type )
-				.map( ReflectionUtils::getRawType ) // Type erasure here
-				.map( introspector::getTypeModel )
-				.map( rawTypeModel -> new ErasingPojoGenericTypeModel<>( introspector, rawTypeModel ) );
+				.map( type -> new ErasingPojoGenericTypeModel<>(
+						introspector, introspector.getTypeModel( ReflectionUtils.getRawType( type ) ), type
+				) );
 	}
 
 }

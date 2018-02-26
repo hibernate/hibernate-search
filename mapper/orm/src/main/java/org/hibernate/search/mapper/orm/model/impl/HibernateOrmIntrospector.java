@@ -35,6 +35,8 @@ import org.hibernate.property.access.spi.PropertyAccess;
 import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
 import org.hibernate.search.mapper.orm.util.impl.XClassOrdering;
+import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -89,6 +91,11 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	@SuppressWarnings("unchecked")
 	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
 		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+	}
+
+	@Override
+	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
+		return new ErasingPojoGenericTypeModel<>( this, getTypeModel( clazz ) );
 	}
 
 	@Override

@@ -223,9 +223,10 @@ public class JavaBeanAnnotationMappingIT {
 			entity5.setEmbeddedIterable( new LinkedHashSet<>( Arrays.asList( entity1, entity2 ) ) );
 			entity5.setEmbeddedList( Arrays.asList( entity2, entity3, entity6 ) );
 			entity5.setEmbeddedArrayList( new ArrayList<>( Arrays.asList( entity3, entity1 ) ) );
-			Map<String, IndexedEntity> embeddedMap = new LinkedHashMap<>();
-			embeddedMap.put( "entity3", entity3 );
-			embeddedMap.put( "entity2", entity2 );
+			Map<String, List<IndexedEntity>> embeddedMap = new LinkedHashMap<>();
+			embeddedMap.computeIfAbsent( "entity3", ignored -> new ArrayList<>() ).add( entity3 );
+			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity2 );
+			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity3 );
 			entity5.setEmbeddedMap( embeddedMap );
 
 			manager.getMainWorker().add( entity1 );
@@ -366,6 +367,11 @@ public class JavaBeanAnnotationMappingIT {
 							.objectField( "embeddedMap", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									)
+							)
+							.objectField( "embeddedMap", b2 -> b2
+									.objectField( "embedded", b3 -> b3
+											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
 									)
 							)
 					)
@@ -587,7 +593,7 @@ public class JavaBeanAnnotationMappingIT {
 
 		private ArrayList<IndexedEntity> embeddedArrayList;
 
-		private Map<String, IndexedEntity> embeddedMap;
+		private Map<String, List<IndexedEntity>> embeddedMap;
 
 		@DocumentId
 		public Integer getId() {
@@ -662,11 +668,11 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
-		public Map<String, IndexedEntity> getEmbeddedMap() {
+		public Map<String, List<IndexedEntity>> getEmbeddedMap() {
 			return embeddedMap;
 		}
 
-		public void setEmbeddedMap(Map<String, IndexedEntity> embeddedMap) {
+		public void setEmbeddedMap(Map<String, List<IndexedEntity>> embeddedMap) {
 			this.embeddedMap = embeddedMap;
 		}
 	}

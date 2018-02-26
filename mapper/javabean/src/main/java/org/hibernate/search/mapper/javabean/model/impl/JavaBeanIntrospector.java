@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -48,6 +50,11 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	@Override
 	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
 		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+	}
+
+	@Override
+	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
+		return new ErasingPojoGenericTypeModel<>( this, getTypeModel( clazz ) );
 	}
 
 	@Override

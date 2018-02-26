@@ -19,6 +19,12 @@ public interface PojoIntrospector {
 	<T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz);
 
 	/**
+	 * @param clazz The Java class representing the raw version of the type
+	 * @return A type model for the given type.
+	 */
+	<T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz);
+
+	/**
 	 * @param <T> the type of the entity
 	 * @param entity an instance or proxy of T
 	 * @return the class from the instance, or the underlying class as a proxy.

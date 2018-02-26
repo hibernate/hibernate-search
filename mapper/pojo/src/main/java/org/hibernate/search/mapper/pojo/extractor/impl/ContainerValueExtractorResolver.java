@@ -23,54 +23,96 @@ public class ContainerValueExtractorResolver {
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorForType(
 			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
-		Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
-				sourceType.getTypeArgument( Map.class, 1 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					MapValueValueExtractor.get(), elementTypeModelOptional.get()
-			) );
-		}
-		elementTypeModelOptional = sourceType.getTypeArgument( Collection.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					CollectionValueExtractor.get(), elementTypeModelOptional.get()
-			) );
-		}
-		elementTypeModelOptional = sourceType.getTypeArgument( Iterable.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					IterableValueExtractor.get(), elementTypeModelOptional.get()
-			) );
-		}
-		elementTypeModelOptional = sourceType.getTypeArgument( Optional.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					OptionalValueExtractor.get(), elementTypeModelOptional.get()
-			) );
-		}
-		if ( sourceType.getSuperType( OptionalInt.class ).isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					OptionalIntValueExtractor.get(), introspector.getTypeModel( Integer.class )
-			) );
-		}
-		if ( sourceType.getSuperType( OptionalLong.class ).isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					OptionalLongValueExtractor.get(), introspector.getTypeModel( Long.class )
-			) );
-		}
-		if ( sourceType.getSuperType( OptionalDouble.class ).isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					OptionalDoubleValueExtractor.get(), introspector.getTypeModel( Double.class )
-			) );
-		}
-		elementTypeModelOptional = sourceType.getArrayElementType();
-		if ( elementTypeModelOptional.isPresent() ) {
-			return Optional.of( new BoundContainerValueExtractor(
-					ArrayValueExtractor.get(), elementTypeModelOptional.get()
-			) );
-		}
-
-		return Optional.empty();
+		return resolveContainerValueExtractorRecursively(
+				new ExtractorResolutionState<>( introspector, sourceType )
+		);
 	}
 
+	private <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorRecursively(
+			ExtractorResolutionState<C> state) {
+		PojoGenericTypeModel<?> currentType = state.extractedType;
+		Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
+				currentType.getTypeArgument( Map.class, 1 );
+		if ( elementTypeModelOptional.isPresent() ) {
+			state.append( MapValueValueExtractor.get(), elementTypeModelOptional.get() );
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		elementTypeModelOptional = currentType.getTypeArgument( Collection.class, 0 );
+		if ( elementTypeModelOptional.isPresent() ) {
+			state.append( CollectionValueExtractor.get(), elementTypeModelOptional.get() );
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		elementTypeModelOptional = currentType.getTypeArgument( Iterable.class, 0 );
+		if ( elementTypeModelOptional.isPresent() ) {
+			state.append( IterableValueExtractor.get(), elementTypeModelOptional.get() );
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		elementTypeModelOptional = currentType.getTypeArgument( Optional.class, 0 );
+		if ( elementTypeModelOptional.isPresent() ) {
+			state.append( OptionalValueExtractor.get(), elementTypeModelOptional.get() );
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		if ( currentType.getSuperType( OptionalInt.class ).isPresent() ) {
+			state.append(
+					OptionalIntValueExtractor.get(),
+					state.introspector.getGenericTypeModel( Integer.class )
+			);
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		if ( currentType.getSuperType( OptionalLong.class ).isPresent() ) {
+			state.append(
+					OptionalLongValueExtractor.get(),
+					state.introspector.getGenericTypeModel( Long.class )
+			);
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		if ( currentType.getSuperType( OptionalDouble.class ).isPresent() ) {
+			state.append(
+					OptionalDoubleValueExtractor.get(),
+					state.introspector.getGenericTypeModel( Double.class )
+			);
+			return resolveContainerValueExtractorRecursively( state );
+		}
+		elementTypeModelOptional = currentType.getArrayElementType();
+		if ( elementTypeModelOptional.isPresent() ) {
+			state.append( ArrayValueExtractor.get(), elementTypeModelOptional.get() );
+			return resolveContainerValueExtractorRecursively( state );
+		}
+
+		return state.buildOptional();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Checks are implemented using reflection
+	private static class ExtractorResolutionState<C> {
+
+		private final PojoIntrospector introspector;
+		private ContainerValueExtractor<? super C, ?> extractor;
+		private PojoGenericTypeModel<?> extractedType;
+
+		ExtractorResolutionState(PojoIntrospector introspector, PojoGenericTypeModel<?> extractedType) {
+			this.introspector = introspector;
+			this.extractedType = extractedType;
+		}
+
+		<T> void append(ContainerValueExtractor<?, T> extractor, PojoGenericTypeModel<T> extractedType) {
+			this.extractedType = extractedType;
+			if ( this.extractor == null ) {
+				// Initial calls: T == ? super C
+				this.extractor = (ContainerValueExtractor) extractor;
+			}
+			else {
+				this.extractor = new ChainingContainerValueExtractor( this.extractor, extractor );
+			}
+		}
+
+		Optional<BoundContainerValueExtractor<? super C, ?>> buildOptional() {
+			if ( extractor == null ) {
+				return Optional.empty();
+			}
+			else {
+				return Optional.of( new BoundContainerValueExtractor( extractor, extractedType ) );
+			}
+		}
+
+	}
 }
