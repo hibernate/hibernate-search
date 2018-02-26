@@ -17,10 +17,10 @@ import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 public class FunctionBridgeProcessor<T, R> implements PojoNodeProcessor<T> {
 
 	private final FunctionBridge<? super T, R> bridge;
-	private final IndexFieldAccessor<R> indexFieldAccessor;
+	private final IndexFieldAccessor<? super R> indexFieldAccessor;
 
 	public FunctionBridgeProcessor(FunctionBridge<? super T, R> bridge,
-			IndexFieldAccessor<R> indexFieldAccessor) {
+			IndexFieldAccessor<? super R> indexFieldAccessor) {
 		this.bridge = bridge;
 		this.indexFieldAccessor = indexFieldAccessor;
 	}

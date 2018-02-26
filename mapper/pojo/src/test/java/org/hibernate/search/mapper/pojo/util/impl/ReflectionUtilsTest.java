@@ -1,0 +1,250 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.util.impl;
+
+import static org.fest.assertions.Assertions.assertThat;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.search.mapper.pojo.test.util.TypeCapture;
+import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
+import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
+
+import org.junit.Test;
+
+public class ReflectionUtilsTest {
+
+	@Test
+	public void simple() {
+		new AssertWithType<String>() {
+		}
+				.resolveRawTypeTo( String.class );
+		new AssertWithType<Iterable<CustomType>>() {
+		}
+				.resolveRawTypeTo( Iterable.class );
+		new AssertWithType<Collection<CustomType>>() {
+		}
+				.resolveRawTypeTo( Collection.class );
+		new AssertWithType<List<CustomType>>() {
+		}
+				.resolveRawTypeTo( List.class );
+		new AssertWithType<ArrayList<CustomType>>() {
+		}
+				.resolveRawTypeTo( ArrayList.class );
+		new AssertWithType<Map<String, CustomType>>() {
+		}
+				.resolveRawTypeTo( Map.class );
+		new AssertWithType<HashMap<String, CustomType>>() {
+		}
+				.resolveRawTypeTo( HashMap.class );
+		new AssertWithType<String[]>() {
+		}
+				.resolveRawTypeTo( String[].class );
+	}
+
+	@Test
+	public void genericArgument() {
+		new AssertWithType<Iterable<CustomGenericType<String, Integer>>>() {
+		}
+				.resolveRawTypeTo( Iterable.class );
+		new AssertWithType<CustomGenericType<String, Integer>[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericType[].class );
+	}
+
+	@Test
+	@SuppressWarnings("rawtypes")
+	public void rawType() {
+		new AssertWithType<Iterable>() {
+		}
+				.resolveRawTypeTo( Iterable.class );
+		new AssertWithType<CustomGenericType[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericType[].class );
+	}
+
+	@Test
+	public <T> void unboundedTypeVariable() {
+		// Type variable as the tested type
+		new AssertWithType<T>() {
+		}
+				.resolveRawTypeTo( Object.class );
+		new AssertWithType<T[]>() {
+		}
+				.resolveRawTypeTo( Object[].class );
+
+		// Type variable as an argument to the tested type
+		new AssertWithType<CustomGenericInterface<T, String>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithType<CustomGenericInterface<T, String>[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+	}
+
+	@Test
+	public <T extends CustomGenericInterface<Integer, String>> void singleUpperBoundTypeVariable() {
+		// Type variable as the tested type
+		new AssertWithType<T>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithType<T[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+
+		// Type variable as an argument to the tested type
+		new AssertWithType<Map<T, String>>() {
+		}
+				.resolveRawTypeTo( Map.class );
+		new AssertWithType<Map<T, String>[]>() {
+		}
+				.resolveRawTypeTo( Map[].class );
+	}
+
+	@Test
+	public <T extends CustomGenericInterface<Integer, String> & Collection<Double>> void multipleUpperBoundsTypeVariable() {
+		// Type variable as the tested type
+		new AssertWithType<T>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithType<T[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+
+		// Type variable as an argument to the tested type
+		new AssertWithType<Map<T, String>>() {
+		}
+				.resolveRawTypeTo( Map.class );
+		new AssertWithType<Map<T, String>[]>() {
+		}
+				.resolveRawTypeTo( Map[].class );
+	}
+
+	@Test
+	public void unboundedWildcard() {
+		// Wildcard as the tested type
+		new AssertWithWildcardType<Of<?>>() {
+		}
+				.resolveRawTypeTo( Object.class );
+
+		// Wildcard as an argument to the tested type
+		new AssertWithType<CustomGenericInterface<?, String>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithType<CustomGenericInterface<?, String>[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+	}
+
+	@Test
+	public void singleUpperBoundWildcard() {
+		// Wildcard as the tested type
+		new AssertWithWildcardType<Of<? extends CustomGenericInterface<Integer, String>>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithWildcardType<Of<? extends CustomGenericInterface<Integer, String>[]>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+
+		// Wildcard as an argument to the tested type
+		new AssertWithType<Map<? extends CustomGenericInterface<Integer, String>, String>>() {
+		}
+				.resolveRawTypeTo( Map.class );
+		new AssertWithType<Map<? extends CustomGenericInterface<Integer, String>, String>[]>() {
+		}
+				.resolveRawTypeTo( Map[].class );
+	}
+
+	@Test
+	public <T> void unboundedTypeVariableUpperBoundWildcard() {
+		// Wildcard as the tested type
+		new AssertWithWildcardType<Of<? extends T>>() {
+		}
+				.resolveRawTypeTo( Object.class );
+		new AssertWithWildcardType<Of<? extends T[]>>() {
+		}
+				.resolveRawTypeTo( Object[].class );
+
+		// Wildcard as an argument to the tested type
+		new AssertWithType<CustomGenericInterface<? extends T, String>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithType<CustomGenericInterface<? extends T, String>[]>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+	}
+
+	@Test
+	public <T extends CustomGenericInterface<Integer, String>> void boundedTypeVariableUpperBoundWildcard() {
+		// Wildcard as the tested type
+		new AssertWithWildcardType<Of<? extends T>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface.class );
+		new AssertWithWildcardType<Of<? extends T[]>>() {
+		}
+				.resolveRawTypeTo( CustomGenericInterface[].class );
+
+		// Wildcard as an argument to the tested type
+		new AssertWithType<Map<? extends T, String>>() {
+		}
+				.resolveRawTypeTo( Map.class );
+		new AssertWithType<Map<? extends T, String>[]>() {
+		}
+				.resolveRawTypeTo( Map[].class );
+	}
+
+	private abstract static class AbstractReflectionUtilsForTypeAssert {
+		abstract Type getType();
+
+		AbstractReflectionUtilsForTypeAssert resolveRawTypeTo(Class<?> expected) {
+			Class<?> rawType = ReflectionUtils.getRawType( getType() );
+			assertThat( rawType )
+					.as( "Unexpected raw type for " + getType() )
+					.isEqualTo( expected );
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings("unused")
+	private abstract static class AssertWithType<T> extends AbstractReflectionUtilsForTypeAssert {
+		private final Type type;
+
+		AssertWithType() {
+			type = TypeCapture.captureTypeArgument( AssertWithType.class, this );
+		}
+
+		@Override
+		Type getType() {
+			return type;
+		}
+	}
+
+	/**
+	 * Used for wildcard types.
+	 * @see WildcardTypeCapture
+	 */
+	@SuppressWarnings("unused")
+	private abstract static class AssertWithWildcardType<T extends Of<?>> extends AbstractReflectionUtilsForTypeAssert {
+		private final Type type;
+
+		AssertWithWildcardType() {
+			type = WildcardTypeCapture.captureTypeArgument( AssertWithWildcardType.class, this );
+		}
+
+		@Override
+		Type getType() {
+			return type;
+		}
+	}
+
+}

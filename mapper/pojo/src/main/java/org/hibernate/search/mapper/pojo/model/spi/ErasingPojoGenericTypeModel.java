@@ -7,13 +7,13 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.TypeModel;
-
+import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
+import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 
 /**
  * An implementation of {@link PojoGenericTypeModel} that will erase generics information
@@ -50,12 +50,18 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 	private final PojoIntrospector introspector;
 	private final PojoRawTypeModel<? super T> rawTypeModel;
 	private final Type type;
+	private final GenericTypeContext typeContext;
+
+	private ErasingPojoGenericTypeModel(PojoIntrospector introspector, PojoRawTypeModel<T> rawTypeModel) {
+		this( introspector, rawTypeModel, rawTypeModel.getJavaClass() );
+	}
 
 	public ErasingPojoGenericTypeModel(PojoIntrospector introspector, PojoRawTypeModel<? super T> rawTypeModel,
 			Type type) {
 		this.introspector = introspector;
 		this.rawTypeModel = rawTypeModel;
 		this.type = type;
+		this.typeContext = new GenericTypeContext( type );
 	}
 
 	@Override
@@ -122,38 +128,10 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 
 	@Override
 	public Optional<PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType, int typeParameterIndex) {
-		Class<?> rawTypeArgument = null;
-		/*
-		 * FIXME this is wrong, the type may not be parameterized but still implement the raw superclass,
-		 * or it could parameterized but with totally unrelated parameters, for instance:
-		 *
-		 * class A<T> {
-		 * }
-		 * class B<U> extends A<String> {
-		 * }
-		 *
-		 * B definitely implement A, but T is definitely not the same as U.
-		 *
-		 * FIXME also, the type argument may not be a Class<?>, in which case we need to convert it.
-		 */
-		if ( type instanceof ParameterizedType ) {
-			ParameterizedType parameterizedType = (ParameterizedType) type;
-			Class<?> rawType = (Class<?>) parameterizedType.getRawType();
-			if ( rawSuperType.isAssignableFrom( rawType ) ) {
-				Type[] typeArguments = parameterizedType.getActualTypeArguments();
-				rawTypeArgument = (Class<?>) typeArguments[typeParameterIndex];
-			}
-		}
-		if ( rawTypeArgument != null ) {
-			return Optional.of( new ErasingPojoGenericTypeModel<>(
-					introspector,
-					introspector.getTypeModel( rawTypeArgument ),
-					rawTypeArgument
-			) );
-		}
-		else {
-			return Optional.empty();
-		}
+		return typeContext.resolveTypeArgument( rawSuperType, typeParameterIndex )
+				.map( ReflectionUtils::getRawType ) // Type erasure here
+				.map( introspector::getTypeModel )
+				.map( rawTypeModel -> new ErasingPojoGenericTypeModel<>( introspector, rawTypeModel ) );
 	}
 
 }

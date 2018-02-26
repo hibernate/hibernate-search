@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
-import org.hibernate.search.mapper.pojo.bridge.impl.FunctionBridgeUtil;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
@@ -30,6 +29,8 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
+import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
+import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 import org.hibernate.search.util.spi.LoggerFactory;
 
 /**
@@ -123,7 +124,10 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		FunctionBridge<?, ?> bridge = defaultedBuilder.build( buildContext );
 
-		Class<?> bridgeParameterType = FunctionBridgeUtil.inferInputType( bridge )
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
+
+		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( FunctionBridge.class, 0 )
+				.map( ReflectionUtils::getRawType )
 				.orElseThrow( () -> log.unableToInferFunctionBridgeInputType( bridge ) );
 		if ( !typeModel.getSuperType( bridgeParameterType ).isPresent() ) {
 			throw log.invalidInputTypeForFunctionBridge( bridge, typeModel );
@@ -132,27 +136,30 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
 		FunctionBridge<? super T, ?> typedBridge = (FunctionBridge<? super T, ?>) bridge;
 
-		return doAddFunctionBridge( bindingContext, typedBridge, fieldName, contributor );
+		return doAddFunctionBridge( bindingContext, typedBridge, bridgeTypeContext, fieldName, contributor );
 	}
 
 	private <T, R> Optional<FunctionBridgeProcessor<T, ?>> doAddFunctionBridge(IndexModelBindingContext bindingContext,
-			FunctionBridge<? super T, R> bridge, String fieldName, FieldModelContributor contributor) {
+			FunctionBridge<? super T, R> bridge, GenericTypeContext bridgeTypeContext,
+			String fieldName, FieldModelContributor contributor) {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( fieldName );
 
 		// First give the bridge a chance to contribute to the model
-		IndexSchemaFieldTypedContext<R> typedFieldContext = bridge.bind( fieldContext );
+		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind( fieldContext );
 		if ( typedFieldContext == null ) {
-			Class<R> returnType = FunctionBridgeUtil.inferReturnType( bridge )
+			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
+			Class<? super R> returnType =
+					(Class<? super R>) bridgeTypeContext.resolveTypeArgument( FunctionBridge.class, 1 )
+					.map( ReflectionUtils::getRawType )
 					.orElseThrow( () -> log.unableToInferFunctionBridgeIndexFieldType( bridge ) );
 			typedFieldContext = fieldContext.as( returnType );
 		}
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( typedFieldContext );
 
-		IndexFieldAccessor<R> indexFieldAccessor = typedFieldContext.createAccessor();
-
+		IndexFieldAccessor<? super R> indexFieldAccessor = typedFieldContext.createAccessor();
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
