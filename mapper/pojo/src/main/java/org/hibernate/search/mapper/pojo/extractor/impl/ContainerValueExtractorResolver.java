@@ -9,9 +9,12 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
 public class ContainerValueExtractorResolver {
 
@@ -19,7 +22,7 @@ public class ContainerValueExtractorResolver {
 
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorForType(
-			PojoGenericTypeModel<C> sourceType) {
+			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
 		Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
 				sourceType.getTypeArgument( Map.class, 1 );
 		if ( elementTypeModelOptional.isPresent() ) {
@@ -43,6 +46,21 @@ public class ContainerValueExtractorResolver {
 		if ( elementTypeModelOptional.isPresent() ) {
 			return Optional.of( new BoundContainerValueExtractor(
 					OptionalValueExtractor.get(), elementTypeModelOptional.get()
+			) );
+		}
+		if ( sourceType.getSuperType( OptionalInt.class ).isPresent() ) {
+			return Optional.of( new BoundContainerValueExtractor(
+					OptionalIntValueExtractor.get(), introspector.getTypeModel( Integer.class )
+			) );
+		}
+		if ( sourceType.getSuperType( OptionalLong.class ).isPresent() ) {
+			return Optional.of( new BoundContainerValueExtractor(
+					OptionalLongValueExtractor.get(), introspector.getTypeModel( Long.class )
+			) );
+		}
+		if ( sourceType.getSuperType( OptionalDouble.class ).isPresent() ) {
+			return Optional.of( new BoundContainerValueExtractor(
+					OptionalDoubleValueExtractor.get(), introspector.getTypeModel( Double.class )
 			) );
 		}
 		elementTypeModelOptional = sourceType.getArrayElementType();

@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -48,6 +49,7 @@ import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomTypeBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
@@ -110,6 +112,7 @@ public class OrmAnnotationMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
 				.field( "optionalText", String.class )
+				.field( "optionalInt", Integer.class )
 				.field( "numericArray", Integer.class )
 				.objectField( "embeddedList", b2 -> b2
 						.objectField( "otherPrefix_embedded", b3 -> b3
@@ -211,6 +214,7 @@ public class OrmAnnotationMappingIT {
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
 			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
+			entity5.setOptionalInt( OptionalInt.of( 42 ) );
 			entity5.setNumericArray( new Integer[] { 1, 2, 3 } );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
@@ -313,6 +317,7 @@ public class OrmAnnotationMappingIT {
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
 							.field( "optionalText", entity5.getOptionalText().get() )
+							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
 							.field( "numericArray", entity5.getNumericArray()[0] )
 							.field( "numericArray", entity5.getNumericArray()[1] )
 							.field( "numericArray", entity5.getNumericArray()[2] )
@@ -570,6 +575,8 @@ public class OrmAnnotationMappingIT {
 
 		private String optionalText;
 
+		private Integer optionalInt;
+
 		private Integer[] numericArray;
 
 		@ManyToMany
@@ -605,6 +612,17 @@ public class OrmAnnotationMappingIT {
 
 		public void setOptionalText(Optional<String> text) {
 			this.optionalText = text.orElse( null );
+		}
+
+		@Field
+		@Access( AccessType.PROPERTY )
+		@Type( type = OptionalIntUserType.NAME )
+		public OptionalInt getOptionalInt() {
+			return optionalInt == null ? OptionalInt.empty() : OptionalInt.of( optionalInt );
+		}
+
+		public void setOptionalInt(OptionalInt value) {
+			this.optionalInt = value.isPresent() ? value.getAsInt() : null;
 		}
 
 		@Field

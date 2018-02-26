@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -109,6 +110,8 @@ public class JavaBeanProgrammaticMappingIT {
 						.field()
 				.property( "optionalText" )
 						.field()
+				.property( "optionalInt" )
+						.field()
 				.property( "numericArray" )
 						.field()
 				.property( "embeddedIterable" )
@@ -134,6 +137,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
 				.field( "optionalText", String.class )
+				.field( "optionalInt", Integer.class )
 				.field( "numericArray", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
@@ -248,6 +252,7 @@ public class JavaBeanProgrammaticMappingIT {
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
 			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
+			entity5.setOptionalInt( OptionalInt.of( 42 ) );
 			entity5.setNumericArray( new Integer[] { 1, 2, 3 } );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
@@ -352,6 +357,7 @@ public class JavaBeanProgrammaticMappingIT {
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
 							.field( "optionalText", entity5.getOptionalText().get() )
+							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
 							.field( "numericArray", entity5.getNumericArray()[0] )
 							.field( "numericArray", entity5.getNumericArray()[1] )
 							.field( "numericArray", entity5.getNumericArray()[2] )
@@ -597,6 +603,8 @@ public class JavaBeanProgrammaticMappingIT {
 
 		private String optionalText;
 
+		private Integer optionalInt;
+
 		private Integer[] numericArray;
 
 		private Iterable<IndexedEntity> embeddedIterable;
@@ -629,6 +637,14 @@ public class JavaBeanProgrammaticMappingIT {
 
 		public void setOptionalText(Optional<String> text) {
 			this.optionalText = text.orElse( null );
+		}
+
+		public OptionalInt getOptionalInt() {
+			return optionalInt == null ? OptionalInt.empty() : OptionalInt.of( optionalInt );
+		}
+
+		public void setOptionalInt(OptionalInt value) {
+			this.optionalInt = value.isPresent() ? value.getAsInt() : null;
 		}
 
 		public Integer[] getNumericArray() {
