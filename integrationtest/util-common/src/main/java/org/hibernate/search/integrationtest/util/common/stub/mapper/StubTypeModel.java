@@ -9,9 +9,9 @@ package org.hibernate.search.integrationtest.util.common.stub.mapper;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-class StubTypeModel implements TypeModel {
+class StubTypeModel implements MappableTypeModel {
 
 	private final String typeIdentifier;
 
@@ -24,17 +24,17 @@ class StubTypeModel implements TypeModel {
 	}
 
 	@Override
-	public boolean isSubTypeOf(TypeModel other) {
+	public boolean isSubTypeOf(MappableTypeModel other) {
 		return false;
 	}
 
 	@Override
-	public Stream<? extends TypeModel> getAscendingSuperTypes() {
+	public Stream<? extends MappableTypeModel> getAscendingSuperTypes() {
 		return Stream.of( this );
 	}
 
 	@Override
-	public Stream<? extends TypeModel> getDescendingSuperTypes() {
+	public Stream<? extends MappableTypeModel> getDescendingSuperTypes() {
 		return Stream.of( this );
 	}
 

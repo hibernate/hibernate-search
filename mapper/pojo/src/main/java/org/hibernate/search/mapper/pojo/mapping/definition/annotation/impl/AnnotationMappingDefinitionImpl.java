@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -54,7 +54,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 				.map( introspector::getTypeModel )
 				// Take super types into account
 				// Note: the order of super types (ascending or descending) does not matter here, we just pick one order
-				.flatMap( PojoTypeModel::getDescendingSuperTypes )
+				.flatMap( PojoRawTypeModel::getDescendingSuperTypes )
 				.distinct()
 				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
 				.forEach( typeModel -> {

@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import java.util.stream.Stream;
+
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+
 /**
- * An indexable pojo type model, i.e. a type that is fully defined by its {@link Class}.
+ * An {@link PojoTypeModel} representing a raw type, fully defined by its {@link Class}.
  * <p>
  * This excludes in particular parameterized types such as {@code ArrayList<Integer>},
  * because we cannot tell the difference between instances of such types and instances of the same type
@@ -17,7 +21,19 @@ package org.hibernate.search.mapper.pojo.model.spi;
  *
  * @param <T> The pojo type
  */
-public interface PojoRawTypeModel<T> extends PojoTypeModel<T> {
+public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel {
+
+	/**
+	 * @return The supertypes of the current type, in ascending order.
+	 */
+	@Override
+	Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes();
+
+	/**
+	 * @return The supertypes of the current type, in descending order.
+	 */
+	@Override
+	Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes();
 
 	/**
 	 * @return The exact Java {@link Class} for this type.

@@ -62,7 +62,7 @@ abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNod
 	private void initMarkersForType() {
 		if ( !markersForTypeInitialized ) {
 			this.markersForTypeInitialized = true;
-			getModelContributorProvider().get( getTypeModel() )
+			getModelContributorProvider().get( getTypeModel().getRawType() )
 					.forEach( c -> c.contributeModel( this ) );
 		}
 	}

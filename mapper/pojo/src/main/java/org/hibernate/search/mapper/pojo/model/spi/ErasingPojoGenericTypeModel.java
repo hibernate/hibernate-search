@@ -11,7 +11,6 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 
@@ -65,26 +64,10 @@ public final class ErasingPojoGenericTypeModel<T> implements PojoGenericTypeMode
 	}
 
 	@Override
-	public boolean isSubTypeOf(TypeModel other) {
-		return rawTypeModel.isSubTypeOf( other );
-	}
-
-	@Override
-	public Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes() {
-		return rawTypeModel.getAscendingSuperTypes();
-	}
-
-	@Override
-	public Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
-		return rawTypeModel.getDescendingSuperTypes();
-	}
-
-	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + type.getTypeName() + "]";
 	}
 
-	@Override
 	public PojoRawTypeModel<? super T> getRawType() {
 		return rawTypeModel;
 	}

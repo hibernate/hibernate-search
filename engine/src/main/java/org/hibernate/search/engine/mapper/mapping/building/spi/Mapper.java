@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -20,7 +20,7 @@ public interface Mapper<C, M extends MappingImplementor> {
 	 * @param contributorProvider A provider of composite mapping contributors, with contributions
 	 * guaranteed to be ordered from supertype to subtype, allowing the builder to support overrides if necessary.
 	 */
-	void addIndexed(TypeModel typeModel,
+	void addIndexed(MappableTypeModel typeModel,
 			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<C> contributorProvider);
 

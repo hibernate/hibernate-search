@@ -8,13 +8,13 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
  * @author Yoann Rodiere
  */
 public interface TypeMetadataContributorProvider<C> {
 
-	Stream<C> get(TypeModel typeModel);
+	Stream<C> get(MappableTypeModel typeModel);
 
 }

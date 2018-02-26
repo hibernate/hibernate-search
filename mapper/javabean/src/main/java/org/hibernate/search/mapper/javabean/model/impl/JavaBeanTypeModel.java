@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -42,7 +42,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public boolean isSubTypeOf(TypeModel other) {
+	public boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof JavaBeanTypeModel
 				&& ( (JavaBeanTypeModel<?>) other ).clazz.isAssignableFrom( clazz );
 	}

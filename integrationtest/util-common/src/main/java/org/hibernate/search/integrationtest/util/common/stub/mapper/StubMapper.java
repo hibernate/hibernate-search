@@ -14,14 +14,14 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 class StubMapper implements Mapper<StubMappingContributor, StubMapping> {
 
 	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
 
 	@Override
-	public void addIndexed(TypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState,
+	public void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<StubMappingContributor> contributorProvider) {
 		indexManagerBuildingStates.put( (StubTypeModel) typeModel, indexManagerBuildingState );
 		contributorProvider.get( typeModel ).forEach( c -> c.contribute( indexManagerBuildingState ) );

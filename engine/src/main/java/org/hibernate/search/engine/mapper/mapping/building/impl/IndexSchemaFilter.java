@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -26,7 +26,7 @@ import org.hibernate.search.util.SearchException;
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
  *     <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
- *     {@link #composeWithNested(TypeModel, String, Integer, Set)} method, which may return a filter
+ *     {@link #composeWithNested(MappableTypeModel, String, Integer, Set)} method, which may return a filter
  *     that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
  *     be ignored</li>
  * </ul>
@@ -56,7 +56,7 @@ import org.hibernate.search.util.SearchException;
  * plus some added restrictions depending on the properties of the nested {@code IndexedEmbedded}.
  * <p>
  * For more information about how filters are composed, see
- * {@link #composeWithNested(TypeModel, String, Integer, Set)}.
+ * {@link #composeWithNested(MappableTypeModel, String, Integer, Set)}.
  *
  * @author Yoann Rodiere
  */
@@ -71,7 +71,7 @@ class IndexSchemaFilter {
 	}
 
 	private final IndexSchemaFilter parent;
-	private final TypeModel parentTypeModel;
+	private final MappableTypeModel parentTypeModel;
 	private final String relativePrefix;
 
 	/**
@@ -88,7 +88,7 @@ class IndexSchemaFilter {
 	 */
 	private final Set<String> explicitlyIncludedPaths;
 
-	private IndexSchemaFilter(IndexSchemaFilter parent, TypeModel parentTypeModel, String relativePrefix,
+	private IndexSchemaFilter(IndexSchemaFilter parent, MappableTypeModel parentTypeModel, String relativePrefix,
 			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths) {
 		this.parent = parent;
 		this.parentTypeModel = parentTypeModel;
@@ -117,7 +117,7 @@ class IndexSchemaFilter {
 		return !isEveryPathIncludedByDefault( remainingCompositionDepth ) && !isAnyPathExplicitlyIncluded();
 	}
 
-	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(TypeModel parentTypeModel, String relativePrefix) {
+	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(MappableTypeModel parentTypeModel, String relativePrefix) {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
@@ -142,7 +142,7 @@ class IndexSchemaFilter {
 		}
 	}
 
-	public IndexSchemaFilter composeWithNested(TypeModel parentTypeModel, String relativePrefix,
+	public IndexSchemaFilter composeWithNested(MappableTypeModel parentTypeModel, String relativePrefix,
 			Integer maxDepth, Set<String> includePaths) {
 		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
 		if ( cyclicRecursionPath != null ) {

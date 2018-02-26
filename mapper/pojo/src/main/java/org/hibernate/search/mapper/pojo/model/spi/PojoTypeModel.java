@@ -10,23 +10,7 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
-
-public interface PojoTypeModel<T> extends TypeModel {
-
-	/**
-	 * @return The supertypes of the current type, in ascending order.
-	 * If the current type is generic, only raw supertypes are expected.
-	 */
-	@Override
-	Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes();
-
-	/**
-	 * @return The supertypes of the current type, in descending order.
-	 * If the current type is generic, only raw supertypes are expected.
-	 */
-	@Override
-	Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes();
+public interface PojoTypeModel<T> {
 
 	/**
 	 * @return A representation of the closest parent Java {@link Class} for this type.

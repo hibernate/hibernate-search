@@ -29,7 +29,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 
 
@@ -119,7 +119,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new HashMap<>();
 
 		@Override
-		public <C> void collect(MapperFactory<C, ?> mapperFactory, TypeModel typeModel,
+		public <C> void collect(MapperFactory<C, ?> mapperFactory, MappableTypeModel typeModel,
 				String indexName, C contributor) {
 			@SuppressWarnings("unchecked")
 			MapperContribution<C, ?> contribution = (MapperContribution<C, ?>)
@@ -142,13 +142,13 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private static class MapperContribution<C, M extends MappingImplementor> {
 
 		private final MapperFactory<C, M> mapperFactory;
-		private final Map<TypeModel, TypeMappingContribution<C>> contributionByType = new HashMap<>();
+		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new HashMap<>();
 
 		MapperContribution(MapperFactory<C, M> mapperFactory) {
 			this.mapperFactory = mapperFactory;
 		}
 
-		public void update(TypeModel typeModel, String indexName, C contributor) {
+		public void update(MappableTypeModel typeModel, String indexName, C contributor) {
 			contributionByType.computeIfAbsent( typeModel, TypeMappingContribution::new )
 					.update( indexName, contributor );
 		}
@@ -156,7 +156,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		public Mapper<C, M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 			Mapper<C, M> mapper = mapperFactory.createMapper( buildContext, propertySource );
-			for ( TypeModel typeModel : contributionByType.keySet() ) {
+			for ( MappableTypeModel typeModel : contributionByType.keySet() ) {
 				Optional<String> indexNameOptional = typeModel.getAscendingSuperTypes()
 						.map( contributionByType::get )
 						.filter( Objects::nonNull )
@@ -175,7 +175,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			return mapper;
 		}
 
-		private Stream<C> getContributors(TypeModel typeModel) {
+		private Stream<C> getContributors(MappableTypeModel typeModel) {
 			return typeModel.getDescendingSuperTypes()
 					.map( contributionByType::get )
 					.filter( Objects::nonNull )
@@ -184,11 +184,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	private static class TypeMappingContribution<C> {
-		private final TypeModel typeModel;
+		private final MappableTypeModel typeModel;
 		private String indexName;
 		private final List<C> contributors = new ArrayList<>();
 
-		public TypeMappingContribution(TypeModel typeModel) {
+		public TypeMappingContribution(MappableTypeModel typeModel) {
 			this.typeModel = typeModel;
 		}
 

@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -78,7 +78,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	public <T> Optional<T> addIndexedEmbeddedIfIncluded(
-			TypeModel parentTypeModel, String relativePrefix,
+			MappableTypeModel parentTypeModel, String relativePrefix,
 			Integer nestedMaxDepth, Set<String> nestedPathFilters,
 			NestedContextBuilder<T> contextBuilder) {
 		IndexSchemaFilter composedFilter = filter.composeWithNested(

@@ -122,7 +122,7 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 		}
 
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				parentTypeModel, defaultedRelativePrefix, storage, maxDepth, includePaths );
+				parentTypeModel.getRawType(), defaultedRelativePrefix, storage, maxDepth, includePaths );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			PojoContainerNodeProcessorBuilder<? super T, ?> containerProcessorBuilder = getContainerProcessorBuilder();
 
@@ -135,7 +135,8 @@ public class PojoPropertyNodeProcessorBuilder<P, T> extends AbstractPojoNodeProc
 						PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 				);
 				nestedProcessorBuilders.add( nestedProcessorBuilder );
-				contributorProvider.get( propertyTypeModel ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+				contributorProvider.get( propertyTypeModel.getRawType() )
+						.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 			}
 		} );
 	}

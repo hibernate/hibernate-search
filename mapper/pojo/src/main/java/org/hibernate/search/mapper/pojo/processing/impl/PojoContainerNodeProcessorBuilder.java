@@ -59,7 +59,8 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 				PojoTypeNodeIdentityMappingCollector.noOp() // Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 		);
 		elementProcessorBuilders.add( nestedProcessorBuilder );
-		contributorProvider.get( elementTypeModel ).forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+		contributorProvider.get( elementTypeModel.getRawType() )
+				.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 	}
 
 	@Override

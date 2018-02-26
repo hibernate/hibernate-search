@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.junit.Rule;
@@ -34,10 +34,10 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
-	private final TypeModel typeModel1Mock = createMock( "typeModel1Mock", TypeModel.class );
-	private final TypeModel typeModel2Mock = createMock( "typeModel2Mock", TypeModel.class );
-	private final TypeModel typeModel3Mock = createMock( "typeModel3Mock", TypeModel.class );
-	private final TypeModel typeModel4Mock = createMock( "typeModel4Mock", TypeModel.class );
+	private final MappableTypeModel typeModel1Mock = createMock( "typeModel1Mock", MappableTypeModel.class );
+	private final MappableTypeModel typeModel2Mock = createMock( "typeModel2Mock", MappableTypeModel.class );
+	private final MappableTypeModel typeModel3Mock = createMock( "typeModel3Mock", MappableTypeModel.class );
+	private final MappableTypeModel typeModel4Mock = createMock( "typeModel4Mock", MappableTypeModel.class );
 	private final StubLeafFactoryFunction leafFactoryIfIncludedMock =
 			createMock( "leafFactoryIfIncludedMock", StubLeafFactoryFunction.class );
 	private final StubLeafFactoryFunction leafFactoryIfExcludedMock =
@@ -537,7 +537,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	}
 
 	private IndexSchemaNestingContextImpl checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
-			IndexSchemaNestingContextImpl context, TypeModel typeModel,
+			IndexSchemaNestingContextImpl context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = new Capture<>();
 		resetAll();
@@ -555,7 +555,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		return nestedContextCapture.getValue();
 	}
 
-	private void checkSimpleIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, TypeModel typeModel,
+	private void checkSimpleIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		resetAll();
 		replayAll();
@@ -592,7 +592,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkCompositeExcluded( expectedPrefix + "foo.bar", context, "foo.bar", recurse );
 	}
 
-	private void checkFooBarIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, TypeModel typeModel) {
+	private void checkFooBarIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, MappableTypeModel typeModel) {
 		checkSimpleIndexedEmbeddedExcluded(
 				context, typeModel, "foo.", null, null
 		);

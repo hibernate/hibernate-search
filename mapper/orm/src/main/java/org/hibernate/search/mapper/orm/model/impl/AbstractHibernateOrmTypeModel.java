@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import org.hibernate.PropertyNotFoundException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.engine.mapper.model.spi.TypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -54,7 +54,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public boolean isSubTypeOf(TypeModel other) {
+	public boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof AbstractHibernateOrmTypeModel
 				&& ((AbstractHibernateOrmTypeModel<?>) other).xClass.isAssignableFrom( xClass );
 	}
