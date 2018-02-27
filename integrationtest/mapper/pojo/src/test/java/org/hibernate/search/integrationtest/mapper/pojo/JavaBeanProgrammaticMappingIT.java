@@ -25,6 +25,7 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -32,6 +33,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringFunctionBridge;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
@@ -112,6 +114,9 @@ public class JavaBeanProgrammaticMappingIT {
 						.field()
 				.property( "optionalInt" )
 						.field()
+						.field().name( "optionalIntAsString" )
+								.functionBridge( OptionalIntAsStringFunctionBridge.class )
+								.withoutExtractors()
 				.property( "numericArray" )
 						.field()
 				.property( "embeddedIterable" )
@@ -123,6 +128,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "embeddedArrayList" )
 						.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
 				.property( "embeddedMap" )
+						.field().name( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 						.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
@@ -138,6 +144,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.field( "numeric", Integer.class )
 				.field( "optionalText", String.class )
 				.field( "optionalInt", Integer.class )
+				.field( "optionalIntAsString", String.class )
 				.field( "numericArray", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
@@ -158,6 +165,7 @@ public class JavaBeanProgrammaticMappingIT {
 								)
 						)
 				)
+				.field( "embeddedMapKeys", String.class )
 				.objectField( "embeddedMap", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myLocalDateField", LocalDate.class )
@@ -216,6 +224,8 @@ public class JavaBeanProgrammaticMappingIT {
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		mappingRepository.close();
 		mappingRepository = null;
@@ -226,6 +236,8 @@ public class JavaBeanProgrammaticMappingIT {
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -359,6 +371,7 @@ public class JavaBeanProgrammaticMappingIT {
 							.field( "numeric", entity5.getNumeric() )
 							.field( "optionalText", entity5.getOptionalText().get() )
 							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
+							.field( "optionalIntAsString", String.valueOf( entity5.getOptionalInt().getAsInt() ) )
 							.field( "numericArray", entity5.getNumericArray()[0] )
 							.field( "numericArray", entity5.getNumericArray()[1] )
 							.field( "numericArray", entity5.getNumericArray()[2] )
@@ -401,6 +414,7 @@ public class JavaBeanProgrammaticMappingIT {
 											)
 									)
 							)
+							.field( "embeddedMapKeys", "entity3", "entity2" )
 							.objectField( "embeddedMap", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )

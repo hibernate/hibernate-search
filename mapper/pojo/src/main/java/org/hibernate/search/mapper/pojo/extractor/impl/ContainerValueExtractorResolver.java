@@ -9,11 +9,22 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.IterableElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalDoubleValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalIntValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalLongValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
@@ -32,21 +43,24 @@ public class ContainerValueExtractorResolver {
 	private final TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory();
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
+	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
+	private Map<Class<? extends ContainerValueExtractor>, ExtractorContributor> extractorContributorCache =
+			new HashMap<>();
 
 	public ContainerValueExtractorResolver(BuildContext buildContext) {
 		this.beanResolver = buildContext.getServiceManager().getBeanResolver();
-		addDefaultExtractor( MapValueValueExtractor.class );
-		addDefaultExtractor( CollectionValueExtractor.class );
-		addDefaultExtractor( IterableValueExtractor.class );
+		addDefaultExtractor( MapValueExtractor.class );
+		addDefaultExtractor( CollectionElementExtractor.class );
+		addDefaultExtractor( IterableElementExtractor.class );
 		addDefaultExtractor( OptionalValueExtractor.class );
 		addDefaultExtractor( OptionalIntValueExtractor.class );
 		addDefaultExtractor( OptionalLongValueExtractor.class );
 		addDefaultExtractor( OptionalDoubleValueExtractor.class );
-		addDefaultExtractor( ArrayValueExtractor.class );
+		addDefaultExtractor( ArrayElementExtractor.class );
 	}
 
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorForType(
+	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveDefaultContainerValueExtractors(
 			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
 		if ( firstMatchingExtractorContributor.tryAppend( state ) ) {
@@ -57,14 +71,34 @@ public class ContainerValueExtractorResolver {
 		}
 	}
 
+	@SuppressWarnings("unchecked") // Checks are implemented using reflection
+	public <C> BoundContainerValueExtractor<? super C, ?> resolveExplicitContainerValueExtractors(
+			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType,
+			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
+		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
+		for ( Class<? extends ContainerValueExtractor> extractorClass : extractorClasses ) {
+			ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
+			if ( !extractorContributor.tryAppend( state ) ) {
+				throw log.invalidContainerValueExtractorForType( extractorClass, state.extractedType );
+			}
+		}
+		return state.build();
+	}
+
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private void addDefaultExtractor(Class<? extends ContainerValueExtractor> extractorClass) {
-		ExtractorContributor extractorContributor = createExtractorContributorFromClass( extractorClass );
+		ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
 		firstMatchingExtractorContributor.addCandidate( extractorContributor );
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private ExtractorContributor createExtractorContributorFromClass(
+	private ExtractorContributor getExtractorContributorForClass(
+			Class<? extends ContainerValueExtractor> extractorClass) {
+		return extractorContributorCache.computeIfAbsent( extractorClass, this::createExtractorContributorForClass );
+	}
+
+	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	private ExtractorContributor createExtractorContributorForClass(
 			Class<? extends ContainerValueExtractor> extractorClass) {
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typeToMatch = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 0 ).get();

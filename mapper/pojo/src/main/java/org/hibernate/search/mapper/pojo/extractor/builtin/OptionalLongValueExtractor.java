@@ -4,16 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.extractor.impl;
+package org.hibernate.search.mapper.pojo.extractor.builtin;
 
-import java.util.OptionalDouble;
+import java.util.OptionalLong;
 import java.util.stream.Stream;
 
-public class OptionalDoubleValueExtractor implements ContainerValueExtractor<OptionalDouble, Double> {
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+
+public class OptionalLongValueExtractor implements ContainerValueExtractor<OptionalLong, Long> {
 	@Override
-	public Stream<Double> extract(OptionalDouble container) {
+	public Stream<Long> extract(OptionalLong container) {
 		if ( container != null && container.isPresent() ) {
-			return Stream.of( container.getAsDouble() );
+			return Stream.of( container.getAsLong() );
 		}
 		else {
 			return Stream.empty();

@@ -4,10 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.extractor.impl;
+package org.hibernate.search.mapper.pojo.extractor.builtin;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 
 public class OptionalValueExtractor<T> implements ContainerValueExtractor<Optional<T>, T> {
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -23,6 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorResolver;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -58,9 +60,18 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractor(
+	public <T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractors(
 			PojoGenericTypeModel<T> pojoGenericTypeModel) {
-		return extractorResolver.resolveContainerValueExtractorForType( introspector, pojoGenericTypeModel );
+		return extractorResolver.resolveDefaultContainerValueExtractors( introspector, pojoGenericTypeModel );
+	}
+
+	@Override
+	public <T> BoundContainerValueExtractor<? super T, ?> createExplicitExtractors(
+			PojoGenericTypeModel<T> pojoGenericTypeModel,
+			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
+		return extractorResolver.<T>resolveExplicitContainerValueExtractors(
+				introspector, pojoGenericTypeModel, extractorClasses
+		);
 	}
 
 	@Override

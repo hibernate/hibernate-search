@@ -27,7 +27,9 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
@@ -39,6 +41,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringFunctionBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
@@ -96,6 +99,7 @@ public class JavaBeanAnnotationMappingIT {
 				.field( "numeric", Integer.class )
 				.field( "optionalText", String.class )
 				.field( "optionalInt", Integer.class )
+				.field( "optionalIntAsString", String.class )
 				.field( "numericArray", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
@@ -116,6 +120,7 @@ public class JavaBeanAnnotationMappingIT {
 								)
 						)
 				)
+				.field( "embeddedMapKeys", String.class )
 				.objectField( "embeddedMap", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myLocalDateField", LocalDate.class )
@@ -174,6 +179,8 @@ public class JavaBeanAnnotationMappingIT {
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		mappingRepository.close();
 		mappingRepository = null;
@@ -184,6 +191,8 @@ public class JavaBeanAnnotationMappingIT {
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -317,6 +326,7 @@ public class JavaBeanAnnotationMappingIT {
 							.field( "numeric", entity5.getNumeric() )
 							.field( "optionalText", entity5.getOptionalText().get() )
 							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
+							.field( "optionalIntAsString", String.valueOf( entity5.getOptionalInt().getAsInt() ) )
 							.field( "numericArray", entity5.getNumericArray()[0] )
 							.field( "numericArray", entity5.getNumericArray()[1] )
 							.field( "numericArray", entity5.getNumericArray()[2] )
@@ -359,6 +369,7 @@ public class JavaBeanAnnotationMappingIT {
 											)
 									)
 							)
+							.field( "embeddedMapKeys", "entity3", "entity2" )
 							.objectField( "embeddedMap", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
@@ -623,6 +634,11 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@Field
+		@Field(
+				name = "optionalIntAsString",
+				functionBridge = @FunctionBridgeBeanReference(type = OptionalIntAsStringFunctionBridge.class),
+				extractors = {} // Explicitly skip the default extractors
+		)
 		public OptionalInt getOptionalInt() {
 			return optionalInt == null ? OptionalInt.empty() : OptionalInt.of( optionalInt );
 		}
@@ -668,6 +684,10 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
+		@Field(
+				name = "embeddedMapKeys",
+				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+		)
 		public Map<String, List<IndexedEntity>> getEmbeddedMap() {
 			return embeddedMap;
 		}

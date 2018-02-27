@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
@@ -20,7 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
@@ -44,8 +45,12 @@ import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
  */
 public interface PojoIndexModelBinder {
 
-	<T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractor(
+	<T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractors(
 			PojoGenericTypeModel<T> pojoGenericTypeModel);
+
+	<T> BoundContainerValueExtractor<? super T, ?> createExplicitExtractors(
+			PojoGenericTypeModel<T> pojoGenericTypeModel,
+			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
 
 	<T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);

@@ -11,6 +11,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
@@ -92,4 +94,8 @@ public interface Log extends BasicLogger {
 			+ " and setting the second type parameter to the same type variable,"
 			+ " e.g. MyExtractor<T> implements ContainerValueExtractor<MyParameterizedBean<?, T, ?>, T>")
 	SearchException couldNotInferContainerValueExtractorClassTypePattern(Class<?> extractorClass);
+
+	@Message(id = 16, value = "Could not apply the requested container value extractor '%1$s' to type '%2$s'")
+	SearchException invalidContainerValueExtractorForType(Class<? extends ContainerValueExtractor> extractorClass,
+			PojoGenericTypeModel<?> extractedType);
 }

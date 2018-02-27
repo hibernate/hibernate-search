@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.Store;
@@ -17,9 +18,11 @@ import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
@@ -37,6 +40,8 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 
 	private final CompositeFieldModelContributor fieldModelContributor = new CompositeFieldModelContributor();
 
+	private List<Class<? extends ContainerValueExtractor>> extractorClasses = null;
+
 	public PropertyFieldMappingContextImpl(PropertyMappingContext parent) {
 		super( parent );
 	}
@@ -48,7 +53,17 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.functionBridge( bridgeBuilder, fieldName, fieldModelContributor );
+		PojoValueNodeMappingCollector valueNodeMappingCollector;
+		if ( extractorClasses == null ) {
+			valueNodeMappingCollector = collector.valueWithDefaultExtractors();
+		}
+		else if ( extractorClasses.isEmpty() ) {
+			valueNodeMappingCollector = collector.valueWithoutExtractors();
+		}
+		else {
+			valueNodeMappingCollector = collector.valueWithExtractors( extractorClasses );
+		}
+		valueNodeMappingCollector.functionBridge( bridgeBuilder, fieldName, fieldModelContributor );
 	}
 
 	@Override
@@ -90,6 +105,19 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	@Override
 	public PropertyFieldMappingContext store(Store store) {
 		fieldModelContributor.add( c -> c.store( store ) );
+		return this;
+	}
+
+	@Override
+	public PropertyFieldMappingContext withExtractors(
+			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
+		this.extractorClasses = new ArrayList<>( extractorClasses );
+		return this;
+	}
+
+	@Override
+	public PropertyFieldMappingContext withoutExtractors() {
+		this.extractorClasses = Collections.emptyList();
 		return this;
 	}
 

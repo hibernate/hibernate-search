@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
@@ -33,6 +38,8 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private final Set<String> includePaths = new HashSet<>();
 
+	private List<Class<? extends ContainerValueExtractor>> extractorClasses = null;
+
 	public PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
 		super( parent );
 	}
@@ -44,7 +51,17 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.indexedEmbedded( prefix, storage, maxDepth, includePaths );
+		PojoValueNodeMappingCollector valueNodeMappingCollector;
+		if ( extractorClasses == null ) {
+			valueNodeMappingCollector = collector.valueWithDefaultExtractors();
+		}
+		else if ( extractorClasses.isEmpty() ) {
+			valueNodeMappingCollector = collector.valueWithoutExtractors();
+		}
+		else {
+			valueNodeMappingCollector = collector.valueWithExtractors( extractorClasses );
+		}
+		valueNodeMappingCollector.indexedEmbedded( prefix, storage, maxDepth, includePaths );
 	}
 
 	@Override
@@ -71,4 +88,16 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 		return this;
 	}
 
+	@Override
+	public PropertyIndexedEmbeddedMappingContext withExtractors(
+			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
+		this.extractorClasses = new ArrayList<>( extractorClasses );
+		return this;
+	}
+
+	@Override
+	public PropertyIndexedEmbeddedMappingContext withoutExtractors() {
+		this.extractorClasses = Collections.emptyList();
+		return this;
+	}
 }

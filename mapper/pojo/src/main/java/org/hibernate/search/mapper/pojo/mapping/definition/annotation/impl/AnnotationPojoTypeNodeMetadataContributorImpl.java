@@ -8,10 +8,12 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.Sortable;
@@ -40,6 +42,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMo
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
@@ -132,7 +136,8 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 
 		BridgeBuilder<? extends FunctionBridge<?, ?>> builder = createFunctionBridgeBuilder( annotation, propertyModel );
 
-		collector.functionBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
+		getValueNode( collector, annotation.extractors(), Field.DefaultExtractors.class )
+				.functionBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
 	}
 
 	private void addIndexedEmbedded(PojoPropertyNodeMappingCollector collector, PojoPropertyModel<?> propertyModel,
@@ -157,7 +162,25 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 			cleanedUpIncludePaths = Collections.emptySet();
 		}
 
-		collector.indexedEmbedded( cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths );
+		getValueNode( collector, annotation.extractors(), IndexedEmbedded.DefaultExtractors.class )
+				.indexedEmbedded( cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths );
+	}
+
+	private PojoValueNodeMappingCollector getValueNode(PojoPropertyNodeMappingCollector collector,
+			ContainerValueExtractorBeanReference[] extractors, Class<?> defaultExtractorsClass) {
+		if ( extractors.length == 0 ) {
+			return collector.valueWithoutExtractors();
+		}
+		else if ( extractors.length == 1 && defaultExtractorsClass.equals( extractors[0].type() ) ) {
+			return collector.valueWithDefaultExtractors();
+		}
+		else {
+			return collector.valueWithExtractors(
+					Arrays.stream( extractors )
+							.map( ContainerValueExtractorBeanReference::type )
+							.collect( Collectors.toList() )
+			);
+		}
 	}
 
 	private <A extends Annotation> AnnotationMarkerBuilder<A> createMarkerBuilder(A annotation) {

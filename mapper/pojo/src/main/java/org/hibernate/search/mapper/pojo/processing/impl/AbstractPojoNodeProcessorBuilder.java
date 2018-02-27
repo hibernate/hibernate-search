@@ -56,5 +56,4 @@ abstract class AbstractPojoNodeProcessorBuilder<T> {
 	}
 
 	protected abstract void appendSelfPath(StringBuilder builder);
-
 }
