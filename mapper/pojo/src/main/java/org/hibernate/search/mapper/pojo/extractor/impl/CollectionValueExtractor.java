@@ -9,14 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-class CollectionValueExtractor<T> implements ContainerValueExtractor<Collection<T>, T> {
-	private static final CollectionValueExtractor<?> INSTANCE = new CollectionValueExtractor();
-
-	@SuppressWarnings( "unchecked" ) // INSTANCE works for any T
-	public static <T> CollectionValueExtractor<T> get() {
-		return (CollectionValueExtractor<T>) INSTANCE;
-	}
-
+public class CollectionValueExtractor<T> implements ContainerValueExtractor<Collection<T>, T> {
 	@Override
 	public Stream<T> extract(Collection<T> container) {
 		return container == null ? Stream.empty() : container.stream();

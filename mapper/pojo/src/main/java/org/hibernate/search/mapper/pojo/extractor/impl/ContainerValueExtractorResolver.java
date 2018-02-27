@@ -6,80 +6,135 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import java.util.Collection;
-import java.util.Map;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 
+import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
+import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
+import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 public class ContainerValueExtractorResolver {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	// TODO add an extension point to override the builtin extractors, or at least to add defaults for other types
+
+	private final BeanResolver beanResolver;
+	private final TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory();
+	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
+			new FirstMatchingExtractorContributor();
+
+	public ContainerValueExtractorResolver(BuildContext buildContext) {
+		this.beanResolver = buildContext.getServiceManager().getBeanResolver();
+		addDefaultExtractor( MapValueValueExtractor.class );
+		addDefaultExtractor( CollectionValueExtractor.class );
+		addDefaultExtractor( IterableValueExtractor.class );
+		addDefaultExtractor( OptionalValueExtractor.class );
+		addDefaultExtractor( OptionalIntValueExtractor.class );
+		addDefaultExtractor( OptionalLongValueExtractor.class );
+		addDefaultExtractor( OptionalDoubleValueExtractor.class );
+		addDefaultExtractor( ArrayValueExtractor.class );
+	}
 
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorForType(
 			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
-		return resolveContainerValueExtractorRecursively(
-				new ExtractorResolutionState<>( introspector, sourceType )
-		);
+		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
+		if ( firstMatchingExtractorContributor.tryAppend( state ) ) {
+			return Optional.of( state.build() );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
-	private <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveContainerValueExtractorRecursively(
-			ExtractorResolutionState<C> state) {
-		PojoGenericTypeModel<?> currentType = state.extractedType;
-		Optional<? extends PojoGenericTypeModel<?>> elementTypeModelOptional =
-				currentType.getTypeArgument( Map.class, 1 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			state.append( MapValueValueExtractor.get(), elementTypeModelOptional.get() );
-			return resolveContainerValueExtractorRecursively( state );
+	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	private void addDefaultExtractor(Class<? extends ContainerValueExtractor> extractorClass) {
+		ExtractorContributor extractorContributor = createExtractorContributorFromClass( extractorClass );
+		firstMatchingExtractorContributor.addCandidate( extractorContributor );
+	}
+
+	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	private ExtractorContributor createExtractorContributorFromClass(
+			Class<? extends ContainerValueExtractor> extractorClass) {
+		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
+		Type typeToMatch = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 0 ).get();
+		Type resultType = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 1 ).get();
+		TypePatternMatcher typePatternMatcher;
+		try {
+			typePatternMatcher = typePatternMatcherFactory.create( typeToMatch, resultType );
 		}
-		elementTypeModelOptional = currentType.getTypeArgument( Collection.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			state.append( CollectionValueExtractor.get(), elementTypeModelOptional.get() );
-			return resolveContainerValueExtractorRecursively( state );
+		catch (UnsupportedOperationException e) {
+			throw log.couldNotInferContainerValueExtractorClassTypePattern( extractorClass );
 		}
-		elementTypeModelOptional = currentType.getTypeArgument( Iterable.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			state.append( IterableValueExtractor.get(), elementTypeModelOptional.get() );
-			return resolveContainerValueExtractorRecursively( state );
-		}
-		elementTypeModelOptional = currentType.getTypeArgument( Optional.class, 0 );
-		if ( elementTypeModelOptional.isPresent() ) {
-			state.append( OptionalValueExtractor.get(), elementTypeModelOptional.get() );
-			return resolveContainerValueExtractorRecursively( state );
-		}
-		if ( currentType.getSuperType( OptionalInt.class ).isPresent() ) {
-			state.append(
-					OptionalIntValueExtractor.get(),
-					state.introspector.getGenericTypeModel( Integer.class )
-			);
-			return resolveContainerValueExtractorRecursively( state );
-		}
-		if ( currentType.getSuperType( OptionalLong.class ).isPresent() ) {
-			state.append(
-					OptionalLongValueExtractor.get(),
-					state.introspector.getGenericTypeModel( Long.class )
-			);
-			return resolveContainerValueExtractorRecursively( state );
-		}
-		if ( currentType.getSuperType( OptionalDouble.class ).isPresent() ) {
-			state.append(
-					OptionalDoubleValueExtractor.get(),
-					state.introspector.getGenericTypeModel( Double.class )
-			);
-			return resolveContainerValueExtractorRecursively( state );
-		}
-		elementTypeModelOptional = currentType.getArrayElementType();
-		if ( elementTypeModelOptional.isPresent() ) {
-			state.append( ArrayValueExtractor.get(), elementTypeModelOptional.get() );
-			return resolveContainerValueExtractorRecursively( state );
+		return new SingleExtractorContributor( typePatternMatcher, extractorClass );
+	}
+
+	private interface ExtractorContributor {
+
+		/**
+		 * @param state The state to append an extractor to
+		 * @return {@code true} if the current type was accepted by this contributor and an extractor was added,
+		 * {@code false} if the type was rejected and no extractor was added.
+		 */
+		boolean tryAppend(ExtractorResolutionState<?> state);
+
+	}
+
+	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	private class SingleExtractorContributor implements ExtractorContributor {
+		private final TypePatternMatcher typePatternMatcher;
+		private final Class<? extends ContainerValueExtractor> extractorClass;
+
+		SingleExtractorContributor(TypePatternMatcher typePatternMatcher,
+				Class<? extends ContainerValueExtractor> extractorClass) {
+			this.typePatternMatcher = typePatternMatcher;
+			this.extractorClass = extractorClass;
 		}
 
-		return state.buildOptional();
+		@Override
+		public boolean tryAppend(ExtractorResolutionState<?> state) {
+			Optional<? extends PojoGenericTypeModel<?>> resultTypeOptional =
+					typePatternMatcher.match( state.introspector, state.extractedType );
+			if ( resultTypeOptional.isPresent() ) {
+				ContainerValueExtractor<?, ?> extractor =
+						beanResolver.resolve( extractorClass, ContainerValueExtractor.class );
+				state.append( extractor, resultTypeOptional.get() );
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	private static class FirstMatchingExtractorContributor implements ExtractorContributor {
+		private final List<ExtractorContributor> candidates = new ArrayList<>();
+
+		void addCandidate(ExtractorContributor contributor) {
+			candidates.add( contributor );
+		}
+
+		@Override
+		public boolean tryAppend(ExtractorResolutionState<?> state) {
+			for ( ExtractorContributor extractorContributor : candidates ) {
+				if ( extractorContributor.tryAppend( state ) ) {
+					// Recurse as much as possible
+					tryAppend( state );
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Checks are implemented using reflection
@@ -94,7 +149,7 @@ public class ContainerValueExtractorResolver {
 			this.extractedType = extractedType;
 		}
 
-		<T> void append(ContainerValueExtractor<?, T> extractor, PojoGenericTypeModel<T> extractedType) {
+		void append(ContainerValueExtractor<?, ?> extractor, PojoGenericTypeModel<?> extractedType) {
 			this.extractedType = extractedType;
 			if ( this.extractor == null ) {
 				// Initial calls: T == ? super C
@@ -105,13 +160,8 @@ public class ContainerValueExtractorResolver {
 			}
 		}
 
-		Optional<BoundContainerValueExtractor<? super C, ?>> buildOptional() {
-			if ( extractor == null ) {
-				return Optional.empty();
-			}
-			else {
-				return Optional.of( new BoundContainerValueExtractor( extractor, extractedType ) );
-			}
+		BoundContainerValueExtractor<? super C, ?> build() {
+			return new BoundContainerValueExtractor( extractor, extractedType );
 		}
 
 	}

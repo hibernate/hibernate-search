@@ -10,12 +10,6 @@ import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 public class OptionalIntValueExtractor implements ContainerValueExtractor<OptionalInt, Integer> {
-	private static final OptionalIntValueExtractor INSTANCE = new OptionalIntValueExtractor();
-
-	public static OptionalIntValueExtractor get() {
-		return INSTANCE;
-	}
-
 	@Override
 	public Stream<Integer> extract(OptionalInt container) {
 		if ( container != null && container.isPresent() ) {

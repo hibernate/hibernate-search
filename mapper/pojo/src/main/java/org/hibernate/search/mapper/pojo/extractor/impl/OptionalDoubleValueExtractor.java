@@ -10,12 +10,6 @@ import java.util.OptionalDouble;
 import java.util.stream.Stream;
 
 public class OptionalDoubleValueExtractor implements ContainerValueExtractor<OptionalDouble, Double> {
-	private static final OptionalDoubleValueExtractor INSTANCE = new OptionalDoubleValueExtractor();
-
-	public static OptionalDoubleValueExtractor get() {
-		return INSTANCE;
-	}
-
 	@Override
 	public Stream<Double> extract(OptionalDouble container) {
 		if ( container != null && container.isPresent() ) {

@@ -10,12 +10,6 @@ import java.util.OptionalLong;
 import java.util.stream.Stream;
 
 public class OptionalLongValueExtractor implements ContainerValueExtractor<OptionalLong, Long> {
-	private static final OptionalLongValueExtractor INSTANCE = new OptionalLongValueExtractor();
-
-	public static OptionalLongValueExtractor get() {
-		return INSTANCE;
-	}
-
 	@Override
 	public Stream<Long> extract(OptionalLong container) {
 		if ( container != null && container.isPresent() ) {

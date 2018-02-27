@@ -9,14 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-class ArrayValueExtractor<T> implements ContainerValueExtractor<T[], T> {
-	private static final ArrayValueExtractor<?> INSTANCE = new ArrayValueExtractor();
-
-	@SuppressWarnings( "unchecked" ) // INSTANCE works for any T
-	public static <T> ArrayValueExtractor<T> get() {
-		return (ArrayValueExtractor<T>) INSTANCE;
-	}
-
+public class ArrayValueExtractor<T> implements ContainerValueExtractor<T[], T> {
 	@Override
 	public Stream<T> extract(T[] container) {
 		return container == null ? Stream.empty() : Arrays.stream( container );

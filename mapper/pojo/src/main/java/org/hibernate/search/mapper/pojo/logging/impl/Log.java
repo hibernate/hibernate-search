@@ -79,4 +79,17 @@ public interface Log extends BasicLogger {
 	@Message(id = 14, value = "Requested type argument index %3$s to type %2$s"
 			+ " in implementing type %1$s should be 0 or greater")
 	SearchException invalidTypeParameterIndex(Type type, Class<?> rawSuperType, int typeArgumentIndex);
+
+	@Message(id = 15, value = "Could not interpret the type arguments to the ContainerValueExtractor interface in "
+			+ " implementation '%1$s'. Only the following implementations of ContainerValueExtractor are valid: "
+			+ " 1) implementations setting both type parameters to *raw* types,"
+			+ " e.g. class MyExtractor implements ContainerValueExtractor<MyBean, String>;"
+			+ " 2) implementations setting the first type parameter to an array of an unbounded type variable,"
+			+ " and setting the second parameter to the same type variable,"
+			+ " e.g. MyExtractor<T> implements ContainerValueExtractor<T[], T>"
+			+ " 3) implementations setting the first type parameter to a parameterized type"
+			+ " with one argument set to an unbounded type variable and the other to unbounded wildcards,"
+			+ " and setting the second type parameter to the same type variable,"
+			+ " e.g. MyExtractor<T> implements ContainerValueExtractor<MyParameterizedBean<?, T, ?>, T>")
+	SearchException couldNotInferContainerValueExtractorClassTypePattern(Class<?> extractorClass);
 }
