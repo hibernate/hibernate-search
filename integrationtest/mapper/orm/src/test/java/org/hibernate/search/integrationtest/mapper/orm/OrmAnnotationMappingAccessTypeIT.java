@@ -24,9 +24,10 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.integrationtest.util.orm.OrmUtils;
@@ -40,7 +41,7 @@ import org.junit.Test;
 /**
  * @author Yoann Rodiere
  */
-public class OrmProgrammaticMappingAccessTypeIT {
+public class OrmAnnotationMappingAccessTypeIT {
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
@@ -53,8 +54,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 	public void setup() {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
 				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
-				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
+				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 
@@ -146,34 +146,6 @@ public class OrmProgrammaticMappingAccessTypeIT {
 		} );
 	}
 
-	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
-		@Override
-		public void contribute(HibernateOrmMappingContributor contributor) {
-			ProgrammaticMappingDefinition mapping = contributor.programmaticMapping();
-			mapping.type( IndexedEntity.class )
-					.indexed( IndexedEntity.INDEX )
-					.property( "id" ).documentId()
-					.property( "fieldWithNonDefaultFieldAccess" ).field()
-					.property( "fieldWithDefaultFieldAccess" ).field()
-					.property( "fieldWithNonDefaultMethodAccess" ).field()
-					.property( "fieldWithDefaultMethodAccess" ).field()
-					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded()
-					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded()
-					.property( "nonManaged" ).indexedEmbedded();
-			mapping.type( IndexedEntityWithoutIdSetter.class )
-					.indexed( IndexedEntityWithoutIdSetter.INDEX )
-					.property( "id" ).documentId();
-			mapping.type( EmbeddableWithDefaultFieldAccess.class )
-					.property( "fieldWithDefaultFieldAccess" ).field()
-					.property( "fieldWithNonDefaultMethodAccess" ).field();
-			mapping.type( EmbeddableWithDefaultMethodAccess.class )
-					.property( "fieldWithNonDefaultFieldAccess" ).field()
-					.property( "fieldWithDefaultMethodAccess" ).field();
-			mapping.type( NonManaged.class )
-					.property( "field" ).field();
-		}
-	}
-
 	@MappedSuperclass
 	@Access( AccessType.FIELD )
 	public static class ParentIndexedEntity {
@@ -186,6 +158,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 		@Access( AccessType.PROPERTY )
 		@Basic
+		@Field
 		public String getFieldWithNonDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -198,10 +171,12 @@ public class OrmProgrammaticMappingAccessTypeIT {
 	@Entity
 	@Table(name = "indexed")
 	@Access( AccessType.PROPERTY )
+	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
 		@Access( AccessType.FIELD )
@@ -215,9 +190,11 @@ public class OrmProgrammaticMappingAccessTypeIT {
 		private EmbeddableWithDefaultFieldAccess embeddedWithDefaultFieldAccess;
 
 		@Embedded
+		@IndexedEmbedded
 		private EmbeddableWithDefaultMethodAccess embeddedWithDefaultMethodAccess;
 
 		@Basic
+		@IndexedEmbedded
 		private NonManaged nonManaged;
 
 		@Id
@@ -229,6 +206,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 			this.id = id;
 		}
 
+		@Field
 		public String getFieldWithDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -237,6 +215,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 			this.internalFieldWithDifferentName = value;
 		}
 
+		@IndexedEmbedded
 		public EmbeddableWithDefaultFieldAccess getEmbeddedWithDefaultFieldAccess() {
 			return embeddedWithDefaultFieldAccess;
 		}
@@ -264,11 +243,13 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 	@Entity
 	@Table(name = "withoutidsetter")
+	@Indexed(index = IndexedEntityWithoutIdSetter.INDEX)
 	public static class IndexedEntityWithoutIdSetter {
 
 		public static final String INDEX = "IndexedEntityWithoutIdSetter";
 
 		@Id
+		@DocumentId
 		@GeneratedValue
 		private Integer id;
 
@@ -285,6 +266,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 		@Access( AccessType.PROPERTY )
 		@Basic
+		@Field
 		public String getFieldWithNonDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -305,6 +287,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 		private String internalFieldWithDifferentName;
 
 		@Basic
+		@Field
 		public String getFieldWithDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -326,6 +309,7 @@ public class OrmProgrammaticMappingAccessTypeIT {
 			this.internalFieldWithDifferentName = internalFieldWithDifferentName;
 		}
 
+		@Field
 		public String getField() {
 			return internalFieldWithDifferentName;
 		}
