@@ -146,8 +146,8 @@ public class OrmPropertyInheritanceIT {
 			this.parentDeclaredProperty = parentDeclaredProperty;
 		}
 
-		@IndexedEmbedded(maxDepth = 1)
 		@ManyToOne
+		@IndexedEmbedded(maxDepth = 1)
 		public abstract ParentIndexedEntity getEmbedded();
 
 		// Not declaring the setter will make Hibernate Annotation Commons ignore the property, so we need this.

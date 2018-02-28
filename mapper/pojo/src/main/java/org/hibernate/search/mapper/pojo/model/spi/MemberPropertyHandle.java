@@ -7,10 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 
 import org.hibernate.search.util.SearchException;
 
@@ -23,15 +20,7 @@ public final class MemberPropertyHandle implements PropertyHandle {
 	private final Member member;
 	private final MethodHandle getter;
 
-	public MemberPropertyHandle(String name, Field field) throws IllegalAccessException {
-		this( name, field, MethodHandles.lookup().unreflectGetter( field ) );
-	}
-
-	public MemberPropertyHandle(String name, Method method) throws IllegalAccessException {
-		this( name, method, MethodHandles.lookup().unreflect( method ) );
-	}
-
-	private MemberPropertyHandle(String name, Member member, MethodHandle getter) {
+	public MemberPropertyHandle(String name, Member member, MethodHandle getter) {
 		this.name = name;
 		this.member = member;
 		this.getter = getter;

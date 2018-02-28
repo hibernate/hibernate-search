@@ -12,7 +12,6 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -103,7 +102,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	public PropertyHandle getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = new MemberPropertyHandle( getName(), descriptor.getReadMethod() );
+				handle = introspector.createPropertyHandle( getName(), descriptor.getReadMethod() );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property handle for '"
