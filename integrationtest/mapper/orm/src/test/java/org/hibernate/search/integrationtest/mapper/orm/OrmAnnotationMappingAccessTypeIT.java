@@ -37,6 +37,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Yoann Rodiere
@@ -146,6 +147,10 @@ public class OrmAnnotationMappingAccessTypeIT {
 		} );
 	}
 
+	private static AssertionFailedError methodShouldNotBeCalled() {
+		throw new AssertionFailedError( "This method should not be called" );
+	}
+
 	@MappedSuperclass
 	@Access( AccessType.FIELD )
 	public static class ParentIndexedEntity {
@@ -155,6 +160,15 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Transient
 		private String internalFieldWithDifferentName;
+
+		@Field
+		public String getFieldWithDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
 
 		@Access( AccessType.PROPERTY )
 		@Basic
@@ -204,6 +218,15 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		public void setId(Integer id) {
 			this.id = id;
+		}
+
+		@Field
+		public String getFieldWithNonDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
 		}
 
 		@Field
@@ -264,6 +287,15 @@ public class OrmAnnotationMappingAccessTypeIT {
 		@Transient
 		private String internalFieldWithDifferentName;
 
+		@Field
+		public String getFieldWithDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
+
 		@Access( AccessType.PROPERTY )
 		@Basic
 		@Field
@@ -285,6 +317,15 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Transient
 		private String internalFieldWithDifferentName;
+
+		@Field
+		public String getFieldWithNonDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
 
 		@Basic
 		@Field

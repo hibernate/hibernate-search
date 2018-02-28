@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Yoann Rodiere
@@ -146,6 +147,10 @@ public class OrmProgrammaticMappingAccessTypeIT {
 		} );
 	}
 
+	private static AssertionFailedError methodShouldNotBeCalled() {
+		throw new AssertionFailedError( "This method should not be called" );
+	}
+
 	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
 		@Override
 		public void contribute(HibernateOrmMappingContributor contributor) {
@@ -183,6 +188,14 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 		@Transient
 		private String internalFieldWithDifferentName;
+
+		public String getFieldWithDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
 
 		@Access( AccessType.PROPERTY )
 		@Basic
@@ -227,6 +240,14 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 		public void setId(Integer id) {
 			this.id = id;
+		}
+
+		public String getFieldWithNonDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
 		}
 
 		public String getFieldWithDefaultMethodAccess() {
@@ -283,6 +304,14 @@ public class OrmProgrammaticMappingAccessTypeIT {
 		@Transient
 		private String internalFieldWithDifferentName;
 
+		public String getFieldWithDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
+
 		@Access( AccessType.PROPERTY )
 		@Basic
 		public String getFieldWithNonDefaultMethodAccess() {
@@ -303,6 +332,14 @@ public class OrmProgrammaticMappingAccessTypeIT {
 
 		@Transient
 		private String internalFieldWithDifferentName;
+
+		public String getFieldWithNonDefaultFieldAccess() {
+			throw methodShouldNotBeCalled();
+		}
+
+		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
+			throw methodShouldNotBeCalled();
+		}
 
 		@Basic
 		public String getFieldWithDefaultMethodAccess() {
