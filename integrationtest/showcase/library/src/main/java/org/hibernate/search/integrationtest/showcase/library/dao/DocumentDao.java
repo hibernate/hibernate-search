@@ -79,6 +79,8 @@ public abstract class DocumentDao {
 
 	public abstract Optional<Book> getByIsbn(String isbnAsString);
 
+	public abstract List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit);
+
 	public abstract List<Document<?>> searchAroundMe(String terms, String tags,
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryService> libraryServices,

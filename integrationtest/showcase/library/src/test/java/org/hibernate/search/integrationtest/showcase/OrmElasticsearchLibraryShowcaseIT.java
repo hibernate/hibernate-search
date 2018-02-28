@@ -174,6 +174,35 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		} );
 	}
 
+	/*
+	 * This demonstrates generics are resolved properly, since the field "medium" doesn't appear in DocumentCopy
+	 * and could only exist in the index if the "copies" property in class Book
+	 * was successfully resolved to List<BookCopy>.
+	 */
+	@Test
+	public void searchByMedium() {
+		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
+
+		withinTransaction( sessionFactory, this::initData );
+
+		withinSession( sessionFactory, session -> {
+			List<Book> books = dao.searchByMedium(
+					"java", BookMedium.DEMATERIALIZED, 0, 10
+			);
+			assertThat( books ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
+			);
+
+			books = dao.searchByMedium(
+					"java", BookMedium.HARDCOPY, 0, 10
+			);
+			assertThat( books ).containsOnly(
+					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
+					session.get( Book.class, INDONESIAN_ECONOMY_ID )
+			);
+		} );
+	}
+
 	@Test
 	public void searchAroundMe_spatial() {
 		// TODO spatial queries

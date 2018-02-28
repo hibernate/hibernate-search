@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
+import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 
@@ -36,6 +37,33 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
+	}
+
+	@Override
+	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
+		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
+				.asEntities()
+				.predicate().bool( b -> {
+					b.must( ctx -> {
+						if ( terms != null && !terms.isEmpty() ) {
+							ctx.match()
+									.onField( "title" ).boostedTo( 2.0f )
+									.orField( "summary" )
+									.matching( terms );
+						}
+					} );
+					b.must( ctx -> ctx.nested().onObjectField( "copies" )
+							// Bridged query with function bridge: TODO rely on the bridge to convert to a String
+							.match().onField( "copies.medium" ).matching( medium.name() )
+					);
+				} )
+				.sort().byField( "title_sort" ).end()
+				.build();
+
+		query.setFirstResult( offset );
+		query.setMaxResults( limit );
+
+		return query.getResultList();
 	}
 
 	@Override

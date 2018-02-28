@@ -8,9 +8,15 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import javax.persistence.Entity;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
+import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumBridge;
+
 @Entity
 public class VideoCopy extends DocumentCopy<Video> {
 
+	// TODO add default bridge (and maybe field type?) for enums
+	@Field(functionBridge = @FunctionBridgeBeanReference(type = VideoMediumBridge.class))
 	// TODO facet
 	private VideoMedium medium;
 

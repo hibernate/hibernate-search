@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.Hibernate;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -33,6 +34,7 @@ public abstract class Document<C extends DocumentCopy<?>> {
 
 	@Basic
 	@Field(analyzer = "default")
+	@Field(name = "title_sort", sortable = Sortable.YES)
 	private String title;
 
 	@Basic
@@ -47,7 +49,7 @@ public abstract class Document<C extends DocumentCopy<?>> {
 	private String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
-	@IndexedEmbedded(includePaths = {"library.location", "library.services"}, storage = ObjectFieldStorage.NESTED)
+	@IndexedEmbedded(includePaths = {"medium", "library.location", "library.services"}, storage = ObjectFieldStorage.NESTED)
 	private List<C> copies = new ArrayList<>();
 
 	@Override
