@@ -114,8 +114,14 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 						return getProperty( propertyName );
 					}
 					catch (PropertyNotFoundException e) {
+						// Error resolving the property through Hibernate internals
 						// Ignore this property
 						return (PojoPropertyModel<?>) null;
+					}
+					catch (IllegalArgumentException e) {
+						// Error resolving the property through the JPA metamodel
+						// Ignore this property
+						return null;
 					}
 				} )
 				.filter( Objects::nonNull );

@@ -8,6 +8,9 @@ package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +20,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.metamodel.EmbeddableType;
+import javax.persistence.metamodel.ManagedType;
 
+import org.hibernate.AssertionFailure;
 import org.hibernate.EntityMode;
 import org.hibernate.Hibernate;
 import org.hibernate.MappingException;
@@ -31,6 +36,8 @@ import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.property.access.spi.Getter;
+import org.hibernate.property.access.spi.GetterFieldImpl;
+import org.hibernate.property.access.spi.GetterMethodImpl;
 import org.hibernate.property.access.spi.PropertyAccess;
 import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
@@ -149,6 +156,23 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
+	PojoPropertyModel<?> createMemberPropertyModel(AbstractHibernateOrmTypeModel<?> holderTypeModel,
+			String propertyName, Member member, List<XProperty> declaredXProperties) {
+		Class<?> holderType = holderTypeModel.getJavaClass();
+		Getter getter;
+		if ( member instanceof Method ) {
+			getter = new GetterMethodImpl( holderType, propertyName, (Method) member );
+		}
+		else if ( member instanceof Field ) {
+			getter = new GetterFieldImpl( holderType, propertyName, (Field) member );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
+		}
+		return new HibernateOrmPropertyModel<>( this, holderTypeModel, propertyName,
+				declaredXProperties, getter );
+	}
+
 	PojoPropertyModel<?> createFallbackPropertyModel(AbstractHibernateOrmTypeModel<?> holderTypeModel,
 			String explicitAccessStrategyName, EntityMode entityMode, String propertyName,
 			List<XProperty> declaredXProperties) {
@@ -175,6 +199,9 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 			typeModel = tryCreateEmbeddableTypeModel( type );
 		}
 		if ( typeModel == null ) {
+			typeModel = tryCreateMappedSuperclassTypeModel( type );
+		}
+		if ( typeModel == null ) {
 			typeModel = createNonManagedTypeModel( type );
 		}
 		return typeModel;
@@ -198,6 +225,21 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		}
 		catch (IllegalArgumentException ignored) {
 			// The type is not embeddable in the current session factory
+			return null;
+		}
+	}
+
+	private <T> PojoRawTypeModel<T> tryCreateMappedSuperclassTypeModel(Class<T> type) {
+		try {
+			/*
+			 * We try this after having tried to create an entity type model and an embeddable type model,
+			 * so if the type is managed it must be a mapped superclass.
+			 */
+			ManagedType<T> managedType = sessionFactoryImplementor.getMetamodel().managedType( type );
+			return new HibernateOrmMappedSuperclassTypeModel<>( this, managedType );
+		}
+		catch (IllegalArgumentException ignored) {
+			// The type is not managed in the current session factory
 			return null;
 		}
 	}
