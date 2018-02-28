@@ -77,7 +77,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		boolean failedBootScheduling = true;
 		try {
 			SessionFactoryImplementor sessionFactoryImplementor = (SessionFactoryImplementor) factory;
-					listener.initialize( contextFuture );
+			listener.initialize( contextFuture );
 
 			if ( environmentSynchronizer != null ) {
 				environmentSynchronizer.whenEnvironmentReady( () -> boot( sessionFactoryImplementor ) );
