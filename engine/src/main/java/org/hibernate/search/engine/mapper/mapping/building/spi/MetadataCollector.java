@@ -11,8 +11,10 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 /**
  * @author Yoann Rodiere
  */
-public interface TypeMetadataCollector {
+public interface MetadataCollector {
 
-	<C> void collect(MapperFactory<C, ?> mapperFactory, MappableTypeModel typeModel, String indexName, C contributor);
+	<C extends TypeMetadataContributor> void collect(
+			MapperFactory<C, ?> mapperFactory, MappableTypeModel typeModel, String indexName, C contributor
+	);
 
 }

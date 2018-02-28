@@ -72,7 +72,10 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 				entityTypeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoTypeNodeMappingCollector collector = builder.asCollector();
-		contributorProvider.get( entityTypeModel ).forEach( c -> c.contributeMapping( collector ) );
+		contributorProvider.forEach(
+				entityTypeModel,
+				c -> c.contributeMapping( collector )
+		);
 		typeManagerBuilders.add( builder );
 	}
 

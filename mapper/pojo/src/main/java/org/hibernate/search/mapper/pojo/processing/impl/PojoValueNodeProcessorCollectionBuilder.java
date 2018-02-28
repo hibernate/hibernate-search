@@ -95,8 +95,10 @@ public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNode
 					PojoTypeNodeIdentityMappingCollector.noOp()
 			);
 			valueProcessorBuilders.add( nestedProcessorBuilder );
-			contributorProvider.get( valueTypeModel.getRawType() )
-					.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+			contributorProvider.forEach(
+					valueTypeModel.getRawType(),
+					c -> c.contributeMapping( nestedProcessorBuilder )
+			);
 		} );
 	}
 

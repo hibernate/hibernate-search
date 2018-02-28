@@ -10,22 +10,29 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributor;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-class StubMappingContributor {
+class StubTypeMetadataContributor implements TypeMetadataContributor {
 
 	private final StubTypeModel typeIdentifier;
 	private final String indexName;
 	private final Consumer<IndexModelBindingContext> delegate;
 
-	public StubMappingContributor(StubTypeModel typeIdentifier, String indexName, Consumer<IndexModelBindingContext> delegate) {
+	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<IndexModelBindingContext> delegate) {
 		this.typeIdentifier = typeIdentifier;
 		this.indexName = indexName;
 		this.delegate = delegate;
 	}
 
-	final void contribute(StubMapperFactory factory, TypeMetadataCollector collector) {
+	final void contribute(StubMapperFactory factory, MetadataCollector collector) {
 		collector.collect( factory, typeIdentifier, indexName, this );
+	}
+
+	@Override
+	public void beforeNestedContributions(MappableTypeModel typeModel) {
+		// No-op
 	}
 
 	public void contribute(IndexManagerBuildingState<?> indexManagerBuildingState) {

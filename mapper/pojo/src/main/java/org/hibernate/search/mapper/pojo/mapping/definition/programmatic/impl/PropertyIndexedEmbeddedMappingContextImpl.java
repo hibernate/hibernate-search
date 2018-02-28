@@ -61,7 +61,13 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 		else {
 			valueNodeMappingCollector = collector.valueWithExtractors( extractorClasses );
 		}
-		valueNodeMappingCollector.indexedEmbedded( prefix, storage, maxDepth, includePaths );
+		valueNodeMappingCollector.indexedEmbedded(
+				prefix, storage, maxDepth, includePaths
+				/*
+				 * Ignore mapped types, we don't need to discover new mappings automatically
+				 * like in the annotation mappings.
+				 */
+		);
 	}
 
 	@Override

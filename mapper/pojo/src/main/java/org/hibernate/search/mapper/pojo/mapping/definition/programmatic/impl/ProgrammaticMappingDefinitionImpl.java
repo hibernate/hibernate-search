@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -34,7 +34,7 @@ public class ProgrammaticMappingDefinitionImpl implements ProgrammaticMappingDef
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, TypeMetadataCollector collector) {
+	public void contribute(BuildContext buildContext, MetadataCollector collector) {
 		for ( TypeMappingContextImpl contextImpl : entities.values() ) {
 			contextImpl.contribute( buildContext, collector );
 		}

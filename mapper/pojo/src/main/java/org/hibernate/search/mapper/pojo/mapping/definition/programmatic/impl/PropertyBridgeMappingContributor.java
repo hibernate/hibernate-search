@@ -32,7 +32,13 @@ public class PropertyBridgeMappingContributor
 
 	@Override
 	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		collector.bridge( bridgeBuilder );
+		collector.bridge(
+				bridgeBuilder
+				/*
+				 * Ignore mapped types, we don't need to discover new mappings automatically
+				 * like in the annotation mappings.
+				 */
+		);
 	}
 
 }

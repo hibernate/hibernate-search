@@ -163,7 +163,9 @@ class AnnotationPojoTypeNodeMetadataContributorImpl implements PojoTypeNodeMetad
 		}
 
 		getValueNode( collector, annotation.extractors(), IndexedEmbedded.DefaultExtractors.class )
-				.indexedEmbedded( cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths );
+				.indexedEmbedded(
+						cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths
+				);
 	}
 
 	private PojoValueNodeMappingCollector getValueNode(PojoPropertyNodeMappingCollector collector,

@@ -13,6 +13,6 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public interface MetadataContributor {
 
-	void contribute(BuildContext buildContext, TypeMetadataCollector collector);
+	void contribute(BuildContext buildContext, MetadataCollector collector);
 
 }

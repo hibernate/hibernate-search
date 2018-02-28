@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataCollector;
 
 public class StubMetadataContributor implements MetadataContributor {
 
 	private final SearchMappingRepositoryBuilder searchBuilder;
 	private final StubMapperFactory mapperFactory;
-	private final List<StubMappingContributor> mappingContributors = new ArrayList<>();
+	private final List<StubTypeMetadataContributor> mappingContributors = new ArrayList<>();
 
 	public StubMetadataContributor(SearchMappingRepositoryBuilder searchBuilder) {
 		this.searchBuilder = searchBuilder;
@@ -29,12 +29,12 @@ public class StubMetadataContributor implements MetadataContributor {
 	}
 
 	public void add(String typeIdentifier, String indexName, Consumer<IndexModelBindingContext> mappingContributor) {
-		mappingContributors.add( new StubMappingContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
+		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, TypeMetadataCollector collector) {
-		for ( StubMappingContributor mappingContributor : mappingContributors ) {
+	public void contribute(BuildContext buildContext, MetadataCollector collector) {
+		for ( StubTypeMetadataContributor mappingContributor : mappingContributors ) {
 			mappingContributor.contribute( mapperFactory, collector );
 		}
 	}
