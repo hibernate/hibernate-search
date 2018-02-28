@@ -40,7 +40,7 @@ import org.junit.Test;
 /**
  * @author Yoann Rodiere
  */
-public class OrmAnnotationMappingAccessTypeIT {
+public class OrmProgrammaticMappingAccessTypeIT {
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
