@@ -18,8 +18,8 @@
 
     <artifactId>hibernate-search-integrationtest-wildfly</artifactId>
 
-    <name>Hibernate Search Wildfly Integration Tests</name>
-    <description>Hibernate Search integration tests for Wildfly</description>
+    <name>Hibernate Search WildFly Integration Tests</name>
+    <description>Hibernate Search integration tests for WildFly</description>
 
     <properties>
         <!--
@@ -29,8 +29,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>
-        <test.hibernate.search.module.slot>main</test.hibernate.search.module.slot>
-        <test.hibernate.orm.module.slot>${hibernateShortVersion}</test.hibernate.orm.module.slot>
+        <test.module-slot.org.hibernate.search>main</test.module-slot.org.hibernate.search>
+        <test.module-slot.org.hibernate>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</test.module-slot.org.hibernate>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
         <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests}</additionalRuntimeArgLine>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-bom</artifactId>
-                <version>${shrinkwrapResolverVersion}</version>
+                <version>${version.org.jboss.shrinkwrap.resolver}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${arquillianVersion}</version>
+                <version>${version.org.jboss.arquillian}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>${arquillianContainerVersion}</version>
+            <version>${version.org.wildfly.arquillian}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -433,12 +433,12 @@
                                         <artifactItem>
                                            <groupId>org.hibernate.javax.persistence</groupId>
                                            <artifactId>hibernate-jpa-api-2.2-wildflymodules</artifactId>
-                                           <classifier>wildfly-${wildflyVersion}-patch</classifier>
-                                           <version>${jpa22patch.version}</version>
+                                           <classifier>wildfly-${version.wildfly}-patch</classifier>
+                                           <version>${version.jpa22.wildfly-patch}</version>
                                            <type>zip</type>
                                            <outputDirectory>${project.build.directory}</outputDirectory>
                                            <overWrite>true</overWrite>
-                                           <destFileName>${jpa22patch.filename}</destFileName>
+                                           <destFileName>${test.jpa22.wildfly-patch.filename}</destFileName>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -457,7 +457,7 @@
                                 </goals>
                                 <configuration>
                                     <skip>${skipWildFlyPreparation}</skip>
-                                    <url>${cdi20patch.url}</url>
+                                    <url>${test.cdi20.wildfly-patch.url}</url>
                                     <unpack>false</unpack>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </configuration>
@@ -482,7 +482,7 @@
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --override-all --path ${project.build.directory}/${jpa22patch.filename}</command>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
@@ -500,7 +500,7 @@
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --override-all --path ${project.build.directory}/${jpa22patch.filename}</command>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
@@ -518,7 +518,7 @@
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --override-all --path ${project.build.directory}/${cdi20patch.filename}</command>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${test.cdi20.wildfly-patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
@@ -536,7 +536,7 @@
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --override-all --path ${project.build.directory}/${cdi20patch.filename}</command>
+                                        <command>patch apply --override-all --path ${project.build.directory}/${test.cdi20.wildfly-patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
@@ -559,7 +559,7 @@
             </activation>
             <properties>
                 <!-- the slot will be inferred at runtime -->
-                <test.hibernate.search.module.slot/>
+                <test.module-slot.org.hibernate.search/>
             </properties>
             <build>
                 <plugins>
@@ -608,7 +608,7 @@
                 </property>
             </activation>
             <properties>
-                <test.hibernate.orm.module.slot>main</test.hibernate.orm.module.slot>
+                <test.module-slot.org.hibernate>main</test.module-slot.org.hibernate>
             </properties>
         </profile>
     </profiles>
@@ -630,9 +630,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>jboss-public-repository-group</id>
+            <id>${jboss.public.repo.id}</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -656,9 +656,9 @@
             </snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>jboss-public-repository-group</id>
+            <id>${jboss.public.repo.id}</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>

@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>${jmhVersion}</version>
+            <version>${version.org.openjdk.jmh}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -118,7 +118,7 @@
                     <dependency>
                         <groupId>org.openjdk.jmh</groupId>
                         <artifactId>jmh-generator-annprocess</artifactId>
-                        <version>${jmhVersion}</version>
+                        <version>${version.org.openjdk.jmh}</version>
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>

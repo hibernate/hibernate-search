@@ -25,9 +25,6 @@
     <properties>
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
 
-        <karaf.version>4.1.2</karaf.version>
-        <pax.exam.version>4.11.0</pax.exam.version>
-
         <osgi.package.exports>!*</osgi.package.exports>
         <osgi.package.imports>*</osgi.package.imports>
 
@@ -38,7 +35,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-osgi</artifactId>
-            <version>${hibernateVersion}</version>
+            <version>${version.org.hibernate}</version>
             <scope>test</scope>
         </dependency>
 
@@ -78,7 +75,7 @@
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>standard</artifactId>
-            <version>${karaf.version}</version>
+            <version>${version.org.apache.karaf}</version>
             <classifier>features</classifier>
             <type>xml</type>
         </dependency>
@@ -87,7 +84,7 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-karaf</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -101,7 +98,7 @@
         <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
-            <version>${karaf.version}</version>
+            <version>${version.org.apache.karaf}</version>
             <type>tar.gz</type>
             <scope>test</scope>
             <!-- We just need the archive, without downloading its gazillion of dependencies -->
@@ -115,19 +112,19 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>1.6.0</version>
+            <version>${version.org.ops4j.pax.url}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

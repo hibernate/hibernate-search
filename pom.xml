@@ -172,117 +172,172 @@
     </mailingLists>
 
     <prerequisites>
-        <maven>${minMavenVersion}</maven>
+        <maven>${maven.min.version}</maven>
     </prerequisites>
 
     <properties>
-        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
-        <minJdkVersion>1.8</minJdkVersion>
-        <minMavenVersion>3.2.3</minMavenVersion>
-        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
-        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
+        <!-- Version to be used as baseline for API/SPI change reports -->
+        <previous.stable>5.9.0.Final</previous.stable>
 
-        <!-- Maven plugin versions -->
-        <!-- Surefire versions are a minefield of bugs, so depending on context we need to choose a different one -->
-        <maven.plugin.surefire.version>2.20.1</maven.plugin.surefire.version>
-        <maven.plugin.failsafe.version>2.20.1</maven.plugin.failsafe.version>
+        <!-- Dependencies versions -->
 
-        <!-- Dependency versions -->
-        <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>5.5.5</luceneVersion>
-        <lucene.module.slot>5.5</lucene.module.slot>
-        <lucene.feature-pack.version>5.5.5.hibernate05</lucene.feature-pack.version>
-        <infinispanVersion>9.0.1.Final</infinispanVersion>
-        <jgroupsVersion>3.6.12.Final</jgroupsVersion>
+        <version.org.hibernate>5.3.0.CR1</version.org.hibernate>
+        <version.org.hibernate.commons.annotations>5.0.2.Final</version.org.hibernate.commons.annotations>
+        <version.javax.persistence>2.2</version.javax.persistence>
 
-        <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.3.0.CR1</hibernateVersion>
-        <hibernateShortVersion>5.3</hibernateShortVersion>
-        <hibernateCommonsAnnotationVersion>5.0.2.Final</hibernateCommonsAnnotationVersion>
-        <jandexVersion>2.0.3.Final</jandexVersion>
-        <classMateVersion>1.3.0</classMateVersion>
-        <javassistVersion>3.22.0-GA</javassistVersion>
-        <bytebuddyVersion>1.7.9</bytebuddyVersion>
+        <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
+        <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
 
-        <!-- OSGi ranges for some primary dependencies -->
-        <!-- Warning:
-            Ranges are maintained as best effort on our knowledge but only the
-            exact versions in this pom are being tested.
-            Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
-        <luceneOsgiRangeVersion>[5.3.0,5.6.0)</luceneOsgiRangeVersion>
-        <hibernateOrmOsgiRangeVersion>[5.3.0,5.4.0)</hibernateOrmOsgiRangeVersion>
-        <hibernateHcannOsgiRangeVersion>[5,6)</hibernateHcannOsgiRangeVersion>
-        <jGroupsOsgiRangeVersion>[3.6.0,4)</jGroupsOsgiRangeVersion>
-        <jbossLoggingOsgiRangeVersion>[3.3,4.0.0)</jbossLoggingOsgiRangeVersion>
+        <version.org.apache.tika>1.4</version.org.apache.tika>
+        <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
 
-        <tikaVersion>1.4</tikaVersion>
-        <bytemanVersion>4.0.1</bytemanVersion>
-        <jbossLoggingVersion>3.3.2.Final</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>2.1.0.Final</jbossLoggingProcessorVersion>
-        <narayanaVersion>5.5.30.Final</narayanaVersion>
-        <avroVersion>1.7.6</avroVersion>
-        <jacksonAslVersion>1.9.13</jacksonAslVersion>
-        <commonsCompressVersion>1.5</commonsCompressVersion>
-        <commonsIoVersion>2.1</commonsIoVersion>
-        <jbossTransactionApiVersion>1.0.1.Final</jbossTransactionApiVersion>
-        <jbossTransactionSpiVersion>7.6.0.Final</jbossTransactionSpiVersion>
-        <commonsLoggingVersion>1.1.3</commonsLoggingVersion>
-        <activeMQVersion>5.13.3</activeMQVersion>
-        <commonsLangVersion>2.6</commonsLangVersion>
-        <commonsLang3Version>3.5</commonsLang3Version>
-        <httpCoreVersion>4.4.5</httpCoreVersion>
-        <httpClientVersion>4.5.2</httpClientVersion>
-        <commonsCodecVersion>1.10</commonsCodecVersion>
+        <version.org.infinispan>9.0.1.Final</version.org.infinispan>
+
+        <version.net.bytebuddy>1.7.9</version.net.bytebuddy>
+
+        <version.wildfly>11.0.0.Final</version.wildfly>
+
+        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
+        <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
+        <version.org.jgroups>3.6.12.Final</version.org.jgroups>
+
+        <version.org.apache.commons.codec>1.10</version.org.apache.commons.codec>
+        <version.org.apache.commons.compress>1.5</version.org.apache.commons.compress>
+        <version.org.apache.commons.io>2.1</version.org.apache.commons.io>
+        <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
+        <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
+        <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
+        <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
+        <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
+        <version.com.fasterxml.classmate>1.3.3</version.com.fasterxml.classmate>
+        <version.org.apache.avro>1.7.6</version.org.apache.avro>
+        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
+        <version.xml-apis>1.3.03</version.xml-apis>
+
+        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.0.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
+        <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.0.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
+        <version.org.jboss.ejb3.ext-api>2.1.0</version.org.jboss.ejb3.ext-api>
+        <version.javax.inject>1</version.javax.inject>
+        <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.org.jboss.narayana>5.5.30.Final</version.org.jboss.narayana>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
+        <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
 
         <!-- Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
-        <elasticsearchClientVersion>5.6.7</elasticsearchClientVersion>
-        <elasticsearch-client.module.slot>5.6</elasticsearch-client.module.slot>
-        <elasticsearch-client.feature-pack.version>5.6.7.hibernate01</elasticsearch-client.feature-pack.version>
-        <gsonVersion>2.8.2</gsonVersion>
-        <gson.module.slot>2.8</gson.module.slot>
-        <gson.feature-pack.version>2.8.2.hibernate03</gson.feature-pack.version>
-        <awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
-        <aws-v4-signer-java.module.slot>${awsV4SignerJavaVersion}</aws-v4-signer-java.module.slot>
-        <aws-v4-signer-java.feature-pack.version>1.3.0.hibernate03</aws-v4-signer-java.feature-pack.version>
+        <version.org.elasticsearch.client>5.6.7</version.org.elasticsearch.client>
+        <version.feature-pack.org.elasticsearch.client>5.6.7.hibernate01</version.feature-pack.org.elasticsearch.client>
+        <version.com.google.code.gson>2.8.2</version.com.google.code.gson>
+        <version.feature-pack.com.google.code.gson>2.8.2.hibernate03</version.feature-pack.com.google.code.gson>
+        <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
+        <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate03</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
 
-        <!-- Tests -->
+        <!-- JSR 352 -->
+        <version.javax.batch>1.0</version.javax.batch>
+        <!-- in line with the version used in WildFly 11 -->
+        <version.org.jberet>1.2.4.Final</version.org.jberet>
+        <!-- they didn't publish the javadoc for the other 1.2.x -->
+        <version.org.jberet.javadoc>1.2.0.Final</version.org.jberet.javadoc>
+        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
+        <!-- Derby driver used by JBatch -->
+        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
+
+        <version.org.slf4j>1.7.22</version.org.slf4j>
+        <version.log4j>1.2.16</version.log4j>
+        <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
+
+        <!-- Test dependencies -->
+
+        <version.junit>4.12</version.junit>
+        <version.org.easymock>3.5.1</version.org.easymock>
+        <version.org.unitils>3.4.6</version.org.unitils>
+        <version.simple-jndi>0.11.4.1</version.simple-jndi>
+        <version.org.easytesting.fest-assert>1.4</version.org.easytesting.fest-assert>
+        <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
+        <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
         <!-- Fixes dependency convergence within Wiremock, see below -->
-        <jacksonVersion>2.8.6</jacksonVersion>
+        <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
+        <version.org.jboss.byteman>4.0.1</version.org.jboss.byteman>
+        <version.io.takari.junit>1.2.7</version.io.takari.junit>
+        <version.com.h2database>1.4.178</version.com.h2database>
 
         <!-- Integration tests -->
-        <arquillianVersion>1.1.11.Final</arquillianVersion>
-        <arquillianContainerVersion>2.0.0.Final</arquillianContainerVersion>
-        <shrinkwrapResolverVersion>2.2.2</shrinkwrapResolverVersion>
-        <wildflyVersion>11.0.0.Final</wildflyVersion>
-        <jmhVersion>1.20</jmhVersion>
-        <h2Version>1.4.178</h2Version>
-        <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
-        <jpa22patch.version>1.0.0.Beta1</jpa22patch.version>
-        <jpa22patch.filename>hibernate-jpa-api-2.2-wildflymodules-${jpa22patch.version}-wildfly-${wildflyVersion}-patch.zip</jpa22patch.filename>
-        <cdi20patch.version>3.0.2.Final</cdi20patch.version>
-        <cdi20patch.filename>wildfly-${wildflyVersion}-weld-${cdi20patch.version}-patch.zip</cdi20patch.filename>
-        <cdi20patch.url>http://download.jboss.org/weld/${cdi20patch.version}/${cdi20patch.filename}</cdi20patch.url>
 
-        <!-- Elasticsearch -->
+        <version.org.openjdk.jmh>1.20</version.org.openjdk.jmh>
+        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
+        <version.org.jboss.shrinkwrap.resolver>2.2.2</version.org.jboss.shrinkwrap.resolver>
+        <version.org.wildfly.arquillian>2.0.0.Final</version.org.wildfly.arquillian>
+        <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
+        <version.org.apache.karaf>4.1.2</version.org.apache.karaf>
+        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+        <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
+        <version.jpa22.wildfly-patch>1.0.0.Beta1</version.jpa22.wildfly-patch>
+        <test.jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</test.jpa22.wildfly-patch.filename>
+        <version.cdi20.wildfly-patch>3.0.2.Final</version.cdi20.wildfly-patch>
+        <test.cdi20.wildfly-patch.filename>wildfly-${version.wildfly}-weld-${version.cdi20.wildfly-patch}-patch.zip</test.cdi20.wildfly-patch.filename>
+        <test.cdi20.wildfly-patch.url>http://download.jboss.org/weld/${version.cdi20.wildfly-patch}/${test.cdi20.wildfly-patch.filename}</test.cdi20.wildfly-patch.url>
+        <!-- Necessary for OSGi integration tests with Karaf -->
+        <version.org.javassist>3.22.0-GA</version.org.javassist>
+        <version.org.jboss.jandex>2.0.3.Final</version.org.jboss.jandex>
+
+        <!-- OSGi ranges for some primary dependencies -->
+
+        <!-- Warning:
+            Ranges are maintained as best effort on our knowledge but only the
+            exact versions in this pom are being tested.
+            Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
+        <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
+        <osgi.version-range.org.hibernate>[5.3.0,5.4.0)</osgi.version-range.org.hibernate>
+        <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
+        <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
+        <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
+        <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
+
+        <!-- Elasticsearch tests properties -->
+
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.client.http_client_configurer></test.elasticsearch.client.http_client_configurer>
 
-        <!-- JSR 352 -->
-        <!-- in line with the version used in WildFly 11 -->
-        <jberetVersion>1.2.4.Final</jberetVersion>
-        <!-- they didn't publish the javadoc for the other 1.2.x -->
-        <jberetJavadocVersion>1.2.0.Final</jberetJavadocVersion>
+        <!-- Maven plugins versions -->
 
-        <!-- character encoding -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <!-- Eclipse plugin options -->
-        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+        <version.assembly.plugin>3.1.0</version.assembly.plugin>
+        <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
+        <version.bundle.plugin>3.3.0</version.bundle.plugin>
+        <version.checkstyle.plugin>2.17</version.checkstyle.plugin>
+        <version.clean.plugin>3.0.0</version.clean.plugin>
+        <version.copy.plugin>0.0.5</version.copy.plugin>
+        <version.compiler.plugin>3.7.0</version.compiler.plugin>
+        <version.dependency.plugin>3.0.2</version.dependency.plugin>
+        <version.dependencypath.plugin>1.1.1</version.dependencypath.plugin>
+        <version.depends.plugin>1.3.1</version.depends.plugin>
+        <version.download.plugin>1.4.0</version.download.plugin>
+        <version.deploy.plugin>2.8.2</version.deploy.plugin>
+        <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
+        <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
+        <version.forbiddenapis.plugin>2.4.1</version.forbiddenapis.plugin>
+        <version.help.plugin>2.2</version.help.plugin>
+        <version.install.plugin>2.5.2</version.install.plugin>
+        <version.japicmp.plugin>0.9.3</version.japicmp.plugin>
+        <version.jar.plugin>3.0.2</version.jar.plugin>
+        <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
+        <version.jdeps.plugin>0.4.0</version.jdeps.plugin>
+        <version.nexus.plugin>2.1</version.nexus.plugin>
+        <version.processor.plugin>3.2.0</version.processor.plugin>
+        <version.project-info.plugin>2.9</version.project-info.plugin>
+        <version.release.plugin>2.5.3</version.release.plugin>
+        <version.resources.plugin>3.0.2</version.resources.plugin>
+        <version.shade.plugin>3.1.0</version.shade.plugin>
+        <version.site.plugin>3.6</version.site.plugin>
+        <version.source.plugin>3.0.1</version.source.plugin>
+        <!-- Surefire versions are a minefield of bugs, so depending on context we need to choose a different one -->
+        <version.surefire.plugin>2.20.1</version.surefire.plugin>
+        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
+        <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
+        <version.org.wildfly.build-tools>1.2.6.Final</version.org.wildfly.build-tools>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -292,14 +347,53 @@
         <puppycrawl.checkstyle.version>8.8</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
-        <hibernate-asciidoctor-theme.version>1.0.2.Final</hibernate-asciidoctor-theme.version>
-        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
-        <jruby.version>9.1.15.0</jruby.version>
-        <asciidoctorj.version>1.5.6</asciidoctorj.version>
-        <asciidoctorj-pdf.version>1.5.0-alpha.16</asciidoctorj-pdf.version>
 
-        <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.9.0.Final</previous.stable>
+        <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.jruby>9.1.15.0</version.org.jruby>
+        <version.org.asciidoctor.asciidoctorj>1.5.6</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.16</version.org.asciidoctor.asciidoctorj-pdf>
+
+        <!-- JBoss public repository -->
+
+        <jboss.public.repo.id>jboss-public-repository-group</jboss.public.repo.id>
+        <jboss.public.repo.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
+
+        <!-- Repository Deployment URLs -->
+
+        <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
+        <jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+        <jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
+        <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
+
+        <!-- Build settings -->
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
+        <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
+        <!--
+                Options to override the compiler arguments directly on the compiler argument line to separate between what
+                the IDE understands as the source level and what the Maven compiler actually use.
+        -->
+        <maven.compiler.argument.target>${maven.compiler.target}</maven.compiler.argument.target>
+        <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
+        <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
+        <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+
+        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
+        <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
+        <maven.min.version>3.2.3</maven.min.version>
+
+        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
+        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
+
+        <!-- Eclipse plugin options -->
+
+        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     </properties>
 
     <dependencyManagement>
@@ -307,47 +401,67 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>${hibernateVersion}</version>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-envers</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-testing</artifactId>
+                <version>${version.org.hibernate}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.jbossts</groupId>
+                        <artifactId>jbossjta</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.experlog</groupId>
+                        <artifactId>xapool</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
-                <version>${hibernateCommonsAnnotationVersion}</version>
+                <version>${version.org.hibernate.commons.annotations}</version>
             </dependency>
             <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
-                <version>2.2</version>
+                <version>${version.javax.persistence}</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>${bytebuddyVersion}</version>
+                <version>${version.net.bytebuddy}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-backward-codecs</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-misc</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-common</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queryparser</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.lucene</groupId>
@@ -358,27 +472,27 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-phonetic</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-spellchecker</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-facet</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-grouping</artifactId>
-                <version>${luceneVersion}</version>
+                <version>${version.org.apache.lucene}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
-                <version>${tikaVersion}</version>
+                <version>${version.org.apache.tika}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.gagravarr</groupId>
@@ -469,17 +583,17 @@
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
-                <version>${tikaVersion}</version>
+                <version>${version.org.apache.tika}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
-                <version>1.8.1</version>
+                <version>${version.org.apache.pdfbox}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>${avroVersion}</version>
+                <version>${version.org.apache.avro}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.xerial.snappy</groupId>
@@ -495,49 +609,49 @@
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-core-asl</artifactId>
-                <version>${jacksonAslVersion}</version>
+                <version>${version.org.codehaus.jackson}</version>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
-                <version>${jacksonAslVersion}</version>
+                <version>${version.org.codehaus.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>${commonsCompressVersion}</version>
+                <version>${version.org.apache.commons.compress}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>${commonsIoVersion}</version>
+                <version>${version.org.apache.commons.io}</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
-                <version>${commonsLangVersion}</version>
+                <version>${version.org.apache.commons.lang}</version>
             </dependency>
             <dependency>
                 <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency convergence) -->
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>${commonsLang3Version}</version>
+                <version>${version.org.apache.commons.lang3}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>${httpClientVersion}</version>
+                <version>${version.org.apache.httpcomponents.httpclient}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>${httpCoreVersion}</version>
+                <version>${version.org.apache.httpcomponents.httpcore}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}</version>
+                <version>${version.org.apache.commons.codec}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -702,117 +816,97 @@
             <dependency>
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-core</artifactId>
-                <version>${jberetVersion}</version>
+                <version>${version.org.jberet}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>${commonsLoggingVersion}</version>
+                <version>${version.org.apache.commons.logging}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-broker</artifactId>
-                <version>${activeMQVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-envers</artifactId>
-                <version>${hibernateVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-testing</artifactId>
-                <version>${hibernateVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.jbossts</groupId>
-                        <artifactId>jbossjta</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.experlog</groupId>
-                        <artifactId>xapool</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>${version.org.apache.activemq.broker}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.jms</groupId>
                 <artifactId>jboss-jms-api_2.0_spec</artifactId>
-                <version>1.0.0.Final</version>
+                <version>${version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec}</version>
             </dependency>
             <dependency>
                 <groupId>org.jgroups</groupId>
                 <artifactId>jgroups</artifactId>
-                <version>${jgroupsVersion}</version>
+                <version>${version.org.jgroups}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.annotation</groupId>
                 <artifactId>jboss-annotations-api_1.2_spec</artifactId>
-                <version>1.0.0.Final</version>
+                <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec}</version>
             </dependency>
             <dependency>
                 <groupId>javax.batch</groupId>
                 <artifactId>javax.batch-api</artifactId>
-                <version>1.0</version>
+                <version>${version.javax.batch}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
-                <version>1</version>
+                <version>${version.javax.inject}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <version>2.0</version>
+                <version>${version.javax.enterprise}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.ejb</groupId>
                 <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-                <version>1.0.0.Final</version>
+                <version>${version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.ejb3</groupId>
                 <artifactId>jboss-ejb3-ext-api</artifactId>
-                <version>2.1.0</version>
+                <version>${version.org.jboss.ejb3.ext-api}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>${version.junit}</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.5.1</version>
+                <version>${version.org.easymock}</version>
             </dependency>
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
-                <version>3.4.6</version>
+                <version>${version.org.unitils}</version>
             </dependency>
             <dependency>
                 <groupId>simple-jndi</groupId>
                 <artifactId>simple-jndi</artifactId>
-                <version>0.11.4.1</version>
+                <version>${version.simple-jndi}</version>
             </dependency>
             <dependency>
                 <groupId>org.easytesting</groupId>
                 <artifactId>fest-assert</artifactId>
-                <version>1.4</version>
+                <version>${version.org.easytesting.fest-assert}</version>
             </dependency>
             <dependency>
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
-                <version>1.2.3</version>
+                <version>${version.org.skyscreamer.jsonassert}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock</artifactId>
-                <version>2.5.1</version>
+                <version>${version.com.github.tomakehurst.wiremock}</version>
             </dependency>
             <!--
                 Fix dependency convergence within jackson-databind 2.6 (used by wiremock).
@@ -823,17 +917,17 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>${jacksonVersion}</version>
+                <version>${version.com.fasterxml.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${jacksonVersion}</version>
+                <version>${version.com.fasterxml.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jacksonVersion}</version>
+                <version>${version.com.fasterxml.jackson}</version>
             </dependency>
             <!--
             We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
@@ -843,40 +937,40 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${version.org.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${version.org.slf4j}</version>
             </dependency>
             
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.16</version>
+                <version>${version.log4j}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>${jbossLoggingVersion}</version>
+                <version>${version.org.jboss.logging.jboss-logging}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging-annotations</artifactId>
-                <version>${jbossLoggingProcessorVersion}</version>
+                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman</artifactId>
-                <version>${bytemanVersion}</version>
+                <version>${version.org.jboss.byteman}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman-install</artifactId>
-                <version>${bytemanVersion}</version>
+                <version>${version.org.jboss.byteman}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.sun</groupId>
@@ -887,34 +981,34 @@
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman-bmunit</artifactId>
-                <version>${bytemanVersion}</version>
+                <version>${version.org.jboss.byteman}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.narayana.jta</groupId>
                 <artifactId>narayana-jta</artifactId>
-                <version>${narayanaVersion}</version>
+                <version>${version.org.jboss.narayana}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
                 <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-                <version>${jbossTransactionApiVersion}</version>
+                <version>${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss</groupId>
                 <artifactId>jboss-transaction-spi</artifactId>
-                <version>${jbossTransactionSpiVersion}</version>
+                <version>${version.org.jboss.jboss-transaction-spi}</version>
             </dependency>
 
             <!-- Manage version of xml-apis to have dom4j and Tika requirements converge -->
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
-                <version>1.3.03</version>
+                <version>${version.xml-apis}</version>
             </dependency>
             <dependency>
                 <groupId>io.takari.junit</groupId>
                 <artifactId>takari-cpsuite</artifactId>
-                <version>1.2.7</version>
+                <version>${version.io.takari.junit}</version>
             </dependency>
 
             <!-- JDBC drivers -->
@@ -928,7 +1022,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>${h2Version}</version>
+                <version>${version.com.h2database}</version>
             </dependency>
 
             <!-- External WildFly feature packs (to build our own feature packs) -->
@@ -936,7 +1030,7 @@
                 <groupId>org.wildfly</groupId>
                 <artifactId>wildfly-feature-pack</artifactId>
                 <type>zip</type>
-                <version>${wildflyVersion}</version>
+                <version>${version.wildfly}</version>
                 <!-- We just need the ZIP, not the dependencies -->
                 <exclusions>
                     <exclusion>
@@ -949,7 +1043,7 @@
                 <groupId>org.hibernate.lucene-jbossmodules</groupId>
                 <artifactId>lucene-jbossmodules</artifactId>
                 <type>zip</type>
-                <version>${lucene.feature-pack.version}</version>
+                <version>${version.feature-pack.org.apache.lucene}</version>
                 <!-- We just need the ZIP, not the dependencies -->
                 <exclusions>
                     <exclusion>
@@ -962,7 +1056,7 @@
                 <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
                 <artifactId>elasticsearch-client-jbossmodules</artifactId>
                 <type>zip</type>
-                <version>${elasticsearch-client.feature-pack.version}</version>
+                <version>${version.feature-pack.org.elasticsearch.client}</version>
                 <!-- We just need the ZIP, not the dependencies -->
                 <exclusions>
                     <exclusion>
@@ -975,7 +1069,7 @@
                 <groupId>org.hibernate.gson-jbossmodules</groupId>
                 <artifactId>gson-jbossmodules</artifactId>
                 <type>zip</type>
-                <version>${gson.feature-pack.version}</version>
+                <version>${version.feature-pack.com.google.code.gson}</version>
                 <!-- We just need the ZIP, not the dependencies -->
                 <exclusions>
                     <exclusion>
@@ -988,7 +1082,7 @@
                 <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
                 <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
                 <type>zip</type>
-                <version>${aws-v4-signer-java.feature-pack.version}</version>
+                <version>${version.feature-pack.uk.co.lucasweb.aws-v4-signer-java}</version>
                 <!-- We just need the ZIP, not the dependencies -->
                 <exclusions>
                     <exclusion>
@@ -1008,8 +1102,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${maven.compiler.argument.source}</source>
+                    <target>${maven.compiler.argument.target}</target>
+                    <testSource>${maven.compiler.argument.testSource}</testSource>
+                    <testTarget>${maven.compiler.argument.testTarget}</testTarget>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -1036,11 +1132,65 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                    <id>parse-version</id>
-                    <goals>
-                        <goal>parse-version</goal>
-                    </goals>
-                  </execution>
+                        <id>parse-project-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
+                            <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-orm-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate</propertyPrefix>
+                            <versionString>${version.org.hibernate}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-lucene-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.apache.lucene</propertyPrefix>
+                            <versionString>${version.org.apache.lucene}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-elasticsearch-client-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.elasticsearch.client</propertyPrefix>
+                            <versionString>${version.org.elasticsearch.client}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-gson-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.com.google.code.gson</propertyPrefix>
+                            <versionString>${version.com.google.code.gson}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-aws-v4-signer-java-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.uk.co.lucasweb.aws-v4-signer-java</propertyPrefix>
+                            <versionString>${version.uk.co.lucasweb.aws-v4-signer-java}</versionString>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -1101,10 +1251,10 @@
                             <rules>
                                 <requireJavaVersion>
                                     <!-- require JDK 1.8 to run the build -->
-                                    <version>[${minJdkVersion},)</version>
+                                    <version>[${jdk.min.version},)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>${minMavenVersion}</version>
+                                    <version>${maven.min.version}</version>
                                 </requireMavenVersion>
                                 <banDuplicatePomDependencyVersions />
                             </rules>
@@ -1148,53 +1298,58 @@
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
-                    <version>1.2.6.Final</version>
+                    <version>${version.org.wildfly.build-tools}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                    <version>1.2.6.Final</version>
+                    <version>${version.org.wildfly.build-tools}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>${version.wildfly.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
-                    <version>0.4.0</version>
+                    <version>${version.jdeps.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.clean.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>${version.install.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.resources.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.6</version>
+                    <version>${version.site.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.jar.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
-                    <version>3.6.2</version>
+                    <version>${version.compiler.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.bsc.maven</groupId>
                     <artifactId>maven-processor-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>${version.processor.plugin}</version>
                     <executions>
                         <!-- Run annotation processors on src/main/java sources -->
                         <execution>
@@ -1217,7 +1372,7 @@
                         <dependency>
                             <groupId>org.jboss.logging</groupId>
                             <artifactId>jboss-logging-processor</artifactId>
-                            <version>${jbossLoggingProcessorVersion}</version>
+                            <version>${version.org.jboss.logging.jboss-logging-tools}</version>
                             <scope>compile</scope>
                         </dependency>
                     </dependencies>
@@ -1225,12 +1380,12 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-maven-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>${version.nexus.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.plugin.surefire.version}</version>
+                    <version>${version.surefire.plugin}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -1255,44 +1410,44 @@
                 <plugin>
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>${asciidoctor-maven-plugin.version}</version>
+                    <version>${version.asciidoctor.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.jruby</groupId>
                             <artifactId>jruby-complete</artifactId>
-                            <version>${jruby.version}</version>
+                            <version>${version.org.jruby}</version>
                         </dependency>
                          <dependency>
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj</artifactId>
-                            <version>${asciidoctorj.version}</version>
+                            <version>${version.org.asciidoctor.asciidoctorj}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj-pdf</artifactId>
-                            <version>${asciidoctorj-pdf.version}</version>
+                            <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>ch.mfrey.maven.plugin</groupId>
                     <artifactId>copy-maven-plugin</artifactId>
-                    <version>0.0.5</version>
+                    <version>${version.copy.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.assembly.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>${version.release.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>${version.javadoc.plugin}</version>
                     <configuration>
                         <!-- Fail on error alternative -->
                         <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
@@ -1319,7 +1474,7 @@
                             <additionalDependency>
                                 <groupId>org.jboss.logging</groupId>
                                 <artifactId>jboss-logging-annotations</artifactId>
-                                <version>${jbossLoggingProcessorVersion}</version>
+                                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
                             </additionalDependency>
                         </additionalDependencies>
                         <tags>
@@ -1334,7 +1489,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>${version.source.plugin}</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -1348,12 +1503,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>${version.deploy.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven.plugin.failsafe.version}</version>
+                    <version>${version.failsafe.plugin}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -1378,7 +1533,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.dependency.plugin}</version>
                     <executions>
                         <execution>
                             <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
@@ -1401,22 +1556,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${version.help.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>${version.enforcer.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.4.1</version>
+                    <version>${version.forbiddenapis.plugin}</version>
                     <executions>
                         <execution>
                             <id>verify-forbidden-apis</id>
                                 <configuration>
-                                     <targetVersion>1.8</targetVersion>
+                                     <targetVersion>${maven.compiler.argument.target}</targetVersion>
                                      <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                      <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                      <excludes>
@@ -1451,7 +1606,7 @@ org.hibernate.SharedSessionContract#getTransaction()
                          <execution>
                              <id>verify-forbidden-test-apis</id>
                              <configuration>
-                                 <targetVersion>1.8</targetVersion>
+                                 <targetVersion>${maven.compiler.argument.testTarget}</targetVersion>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                  <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                  <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
@@ -1484,7 +1639,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>${version.checkstyle.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.hibernate</groupId>
@@ -1544,13 +1699,13 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <extensions>true</extensions>
-                    <version>3.2.0</version>
+                    <version>${version.bundle.plugin}</version>
                 </plugin>
                 <plugin>
                     <!-- This plugin's configuration is used in m2e only. -->
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
+                    <version>${version.org.eclipse.m2e.lifecycle-mapping}</version>
                     <configuration>
                         <lifecycleMappingMetadata>
                             <pluginExecutions>
@@ -1642,22 +1797,22 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.shade.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.12</version>
+                    <version>${version.buildhelper.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.3.1</version>
+                    <version>${version.depends.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
                     <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>${test.elasticsearch.mavenPlugin.version}</version>
+                    <version>${version.elasticsearch.plugin}</version>
                     <configuration>
                         <clusterName>hsearchEsTestCluster</clusterName>
                         <httpPort>9200</httpPort>
@@ -1666,35 +1821,27 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <plugin>
                     <groupId>org.bitstrings.maven.plugins</groupId>
                     <artifactId>dependencypath-maven-plugin</artifactId>
-                    <version>1.1.1</version>
+                    <version>${version.dependencypath.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
                     <artifactId>download-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+                    <version>${version.download.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
-    <repositories>
-        <!--
-        To build Hibernate Search you have to add the JBoss Maven repository to your settings.xml
-        See also http://community.jboss.org/wiki/ContributingtoHibernateSearch
-        -->
-    </repositories>
-
-
     <distributionManagement>
         <repository>
-            <id>jboss-releases-repository</id>
+            <id>${jboss.releases.repo.id}</id>
             <name>JBoss Releases Repository</name>
-            <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>${jboss.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
-            <id>jboss-snapshots-repository</id>
+            <id>${jboss.snapshots.repo.id}</id>
             <name>JBoss Snapshots Repository</name>
-            <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+            <url>${jboss.snapshots.repo.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -1703,7 +1850,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
+                <version>${version.project-info.plugin}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -1715,7 +1862,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.9.3</version>
+                <version>${version.japicmp.plugin}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -1856,8 +2003,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
                 <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
                 <!-- For JDK10 we need to override this to: 2.18.1 See https://issues.apache.org/jira/browse/SUREFIRE-1439 -->
-                <maven.plugin.surefire.version>2.18.1</maven.plugin.surefire.version>
-                <maven.plugin.failsafe.version>2.18.1</maven.plugin.failsafe.version>
+                <version.surefire.plugin>2.18.1</version.surefire.plugin>
+                <version.failsafe.plugin>2.18.1</version.failsafe.plugin>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -1889,7 +2036,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <dependency>
                     <groupId>org.jboss.logging</groupId>
                     <artifactId>jboss-logging-processor</artifactId>
-                    <version>${jbossLoggingProcessorVersion}</version>
+                    <version>${version.org.jboss.logging.jboss-logging}</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
@@ -1939,7 +2086,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>elasticsearch-2.0</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>2.2</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -1974,7 +2121,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <tcpPort>9300</tcpPort>
@@ -2026,7 +2173,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>elasticsearch-2.2</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>2.2</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>2.4.6</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -2070,7 +2217,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <tcpPort>9300</tcpPort>
@@ -2111,7 +2258,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
         <profile>
             <id>elasticsearch-5.0</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
                 <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
@@ -2121,7 +2268,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
@@ -2163,7 +2310,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.6.7</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -2172,7 +2319,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
@@ -2220,7 +2367,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
-                <jdbc.driver.version>${h2Version}</jdbc.driver.version>
+                <jdbc.driver.version>${version.com.h2database}</jdbc.driver.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>

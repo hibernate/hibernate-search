@@ -26,7 +26,7 @@
         -->
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <scenario></scenario>
-        <serverName>wildfly-${wildflyVersion}</serverName>
+        <serverName>wildfly-${version.wildfly}</serverName>
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
@@ -40,7 +40,7 @@
             <dependency>
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-bom</artifactId>
-                <version>${shrinkwrapResolverVersion}</version>
+                <version>${version.org.jboss.shrinkwrap.resolver}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -48,7 +48,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${arquillianVersion}</version>
+                <version>${version.org.jboss.arquillian}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
-            <version>${hibernateVersion}</version>
+            <version>${version.org.hibernate}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>${arquillianContainerVersion}</version>
+            <version>${version.org.wildfly.arquillian}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -172,7 +172,7 @@
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
             <artifactId>com.ibm.jbatch-runtime</artifactId>
-            <version>1.0</version>
+            <version>${version.com.ibm.jbatch}</version>
             <scope>test</scope>
         </dependency>
         <!--
@@ -183,7 +183,7 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.13.1.1</version>
+            <version>${version.org.apache.derby}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -283,14 +283,14 @@
                             <skip>${skipWildFlyPreparation}</skip>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.hibernate.javax.persistence</groupId>
-                                    <artifactId>hibernate-jpa-api-2.2-wildflymodules</artifactId>
-                                    <classifier>wildfly-${wildflyVersion}-patch</classifier>
-                                    <version>${jpa22patch.version}</version>
-                                    <type>zip</type>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <overWrite>true</overWrite>
-                                    <destFileName>${jpa22patch.filename}</destFileName>
+                                   <groupId>org.hibernate.javax.persistence</groupId>
+                                   <artifactId>hibernate-jpa-api-2.2-wildflymodules</artifactId>
+                                   <classifier>wildfly-${version.wildfly}-patch</classifier>
+                                   <version>${version.jpa22.wildfly-patch}</version>
+                                   <type>zip</type>
+                                   <outputDirectory>${project.build.directory}</outputDirectory>
+                                   <overWrite>true</overWrite>
+                                   <destFileName>${test.jpa22.wildfly-patch.filename}</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -309,7 +309,7 @@
                         </goals>
                         <configuration>
                             <skip>${skipWildFlyPreparation}</skip>
-                            <url>${cdi20patch.url}</url>
+                            <url>${test.cdi20.wildfly-patch.url}</url>
                             <unpack>false</unpack>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
@@ -334,7 +334,7 @@
                             <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --override-all --path ${project.build.directory}/${jpa22patch.filename}</command>
+                                <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
                             </commands>
                         </configuration>
                     </execution>
@@ -352,7 +352,7 @@
                             <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --override-all --path ${project.build.directory}/${cdi20patch.filename}</command>
+                                <command>patch apply --override-all --path ${project.build.directory}/${test.cdi20.wildfly-patch.filename}</command>
                             </commands>
                         </configuration>
                     </execution>

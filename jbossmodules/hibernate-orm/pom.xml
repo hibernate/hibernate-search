@@ -19,8 +19,8 @@
     <description>Temporary repackaging of Hibernate ORM modules as a Wildfly feature pack</description>
 
     <properties>
-        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
-        <template.dir>${featurepack.dir}/modules/</template.dir>
+        <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>
+        <template.dir>${feature-pack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>jipijapa-hibernate5</artifactId>
-            <version>${wildflyVersion}</version>
+            <version>${version.wildfly}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>*</artifactId>
@@ -90,7 +90,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${hibernate.orm.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${module-slot.org.hibernate.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/org/hibernate/core</directory>
@@ -106,7 +106,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${hibernate.orm.slot.simple.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/core</directory>
@@ -122,7 +122,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${hibernate.orm.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${module-slot.org.hibernate.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/org/hibernate/infinispan</directory>
@@ -138,7 +138,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${hibernate.orm.slot.simple.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/infinispan</directory>
@@ -154,7 +154,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${hibernate.orm.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${module-slot.org.hibernate.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/org/hibernate/jipijapa-hibernate5</directory>
@@ -170,7 +170,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${hibernate.orm.slot.simple.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/jipijapa-hibernate5</directory>
@@ -186,7 +186,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <outputDirectory>${feature-pack.dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/feature-pack-def</directory>
@@ -209,7 +209,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <config-file>feature-pack-template.xml</config-file>
-                            <config-dir>${featurepack.dir}</config-dir>
+                            <config-dir>${feature-pack.dir}</config-dir>
                             <resourcesDir>/</resourcesDir>
                         </configuration>
                     </execution>
