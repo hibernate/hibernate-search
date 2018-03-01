@@ -31,12 +31,9 @@ import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
  * class D extends C {
  * }
  * </code></pre>
- * ... an instance of this implementation modeling the type of {@code propertyOfA}
- * would return a model of type {@code B} instead of a model of type {@code B<D>}
- * when calling {@link #getTypeArgument(Class, int) getTypeArgument(List.class, 0)}.
- * As a result, an IndexedEmbedded on {@code propertyOfB} nested in another IndexedEmbedded on {@code propertyOfA}
- * would embed the properties of type {@code C} (the upper bound of type parameter {@code T}),
- * instead of embedding the properties of type {@code D} as one would expect.
+ * ... if an instance of this implementation was used to model the type of {@code A.propertyOfA},
+ * then the property {@code A.propertyOfA.propertyOfB} would appear to have type {@code T extends C}
+ * instead of type {@code D} as one would expect.
  * <p>
  * This behavior is clearly not ideal, but it's by far the easiest way to implement {@link ErasingPojoGenericTypeModel},
  * because it allows to only implement {@link PojoTypeModel} for raw types.
