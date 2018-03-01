@@ -10,12 +10,14 @@ import java.util.List;
 
 import org.hibernate.EntityMode;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class HibernateOrmNonManagedTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
-	HibernateOrmNonManagedTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz) {
-		super( introspector, clazz );
+	HibernateOrmNonManagedTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+		super( introspector, clazz, rawTypeDeclaringContext );
 	}
 
 	@Override

@@ -15,11 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.SearchException;
 
@@ -33,18 +32,17 @@ import org.hibernate.search.util.SearchException;
 public class JavaBeanIntrospector implements PojoIntrospector {
 
 	private final AnnotationHelper annotationHelper;
+	private final JavaBeanGenericContextHelper genericContextHelper;
+	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
-	/**
-	 * Note: the main purpose of this cache is not to improve performance (though it probably helps),
-	 * but to ensure the unicity of the returned {@link PojoTypeModel}s.
-	 * <p>
-	 * This in turn allows to not care at all about implementing equals and hashcode,
-	 * since type models are presumably instantiated only once per type.
-	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	public JavaBeanIntrospector(MethodHandles.Lookup lookup) {
 		this.annotationHelper = new AnnotationHelper( lookup );
+		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
+		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
+				genericContextHelper, Object.class
+		);
 	}
 
 	@Override
@@ -54,7 +52,7 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
-		return new ErasingPojoGenericTypeModel<>( this, getTypeModel( clazz ) );
+		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
 	@Override
@@ -80,7 +78,10 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {
 		try {
-			return new JavaBeanTypeModel<>( this, clazz );
+			return new JavaBeanTypeModel<>(
+					this, clazz,
+					new RawTypeDeclaringContext<>( genericContextHelper, clazz )
+			);
 		}
 		catch (IntrospectionException | RuntimeException e) {
 			throw new SearchException( "Exception while retrieving the type model for '" + clazz + "'", e );

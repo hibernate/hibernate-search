@@ -19,8 +19,9 @@ import org.hibernate.PropertyNotFoundException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
@@ -28,24 +29,51 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	final HibernateOrmIntrospector introspector;
 	private final XClass xClass;
 	private final Class<T> clazz;
+	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
 	/**
 	 * Note: the main purpose of this cache is not to improve performance,
-	 * but to ensure the unicity of {@link PojoPropertyModel}s,
-	 * which lowers the risk of generating duplicate {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle}s.
+	 * but to ensure the unicity of {@link PojoPropertyModel}s for two reasons.
 	 * <p>
-	 * This is necessary because we cannot easily implement {@link GetterPropertyHandle#hashCode()} properly,
-	 * because of {@link org.hibernate.property.access.spi.Getter} implementations that do not implement equals.
+	 * First, having unique {@link PojoPropertyModel} lowers the risk of generating duplicate
+	 * {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle}s,
+	 * which lowers the risk of fetching a property's value multiple times.
+	 * We could also solve this issue by implementing {@link GetterPropertyHandle#hashCode()} properly,
+	 * but this is not possible because of {@link org.hibernate.property.access.spi.Getter} implementations
+	 * that do not implement equals/hashCode.
+	 * <p>
+	 * Second, if property models are unique, they can be used as cache keys in
+	 * {@link HibernateOrmGenericContextHelper#getPropertyCacheKey(PojoPropertyModel)}.
 	 */
 	private final Map<String, PojoPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	private Map<String, XProperty> fieldAccessXPropertiesByName;
 	private Map<String, XProperty> methodAccessXPropertiesByName;
 
-	AbstractHibernateOrmTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz) {
+	AbstractHibernateOrmTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.xClass = introspector.toXClass( clazz );
 		this.clazz = clazz;
+		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		AbstractHibernateOrmTypeModel<?> that = (AbstractHibernateOrmTypeModel<?>) o;
+		return Objects.equals( introspector, that.introspector ) &&
+				Objects.equals( clazz, that.clazz );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( introspector, clazz );
 	}
 
 	@Override
@@ -127,6 +155,22 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 				.filter( Objects::nonNull );
 	}
 
+	@Override
+	public T cast(Object instance) {
+		return clazz.cast( instance );
+	}
+
+	@Override
+	public final Class<T> getJavaClass() {
+		return clazz;
+	}
+
+	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
+		return rawTypeDeclaringContext;
+	}
+
+	abstract PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties);
+
 	private Map<String, XProperty> getFieldAccessXPropertiesByName() {
 		if ( fieldAccessXPropertiesByName == null ) {
 			fieldAccessXPropertiesByName = introspector.getFieldAccessPropertiesByName( xClass );
@@ -152,18 +196,6 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 			declaredXProperties.add( methodAccessXProperty );
 		}
 		return createPropertyModel( propertyName, declaredXProperties );
-	}
-
-	abstract PojoPropertyModel<?> createPropertyModel(String propertyName, List<XProperty> declaredXProperties);
-
-	@Override
-	public T cast(Object instance) {
-		return clazz.cast( instance );
-	}
-
-	@Override
-	public final Class<T> getJavaClass() {
-		return clazz;
 	}
 
 

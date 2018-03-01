@@ -18,11 +18,8 @@ public interface PojoPropertyModel<T> {
 	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
 
 	/**
-	 * @return A model of this property's type. Implementations may decide to return a model of the raw type,
-	 * or to retain at least some generics information, allowing for more precise results
-	 * in {@link PojoGenericTypeModel#getTypeArgument(Class, int)} for example.
-	 *
-	 * @see ErasingPojoGenericTypeModel
+	 * @return A model of this property's type. Implementations may decide to implement their own,
+	 * but could also simply use {@link GenericContextAwarePojoGenericTypeModel}.
 	 */
 	PojoGenericTypeModel<T> getTypeModel();
 

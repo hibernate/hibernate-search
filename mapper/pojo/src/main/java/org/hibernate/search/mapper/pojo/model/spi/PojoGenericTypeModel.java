@@ -12,6 +12,8 @@ import java.util.Optional;
  * A {@link PojoTypeModel} offering additional reflection options,
  * such as the ability to retrieve the type argument for a given generic supertype.
  *
+ * @see GenericContextAwarePojoGenericTypeModel the default implementation
+ *
  * @param <T> The type represented by this model
  */
 public interface PojoGenericTypeModel<T> extends PojoTypeModel<T> {

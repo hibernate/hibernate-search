@@ -11,6 +11,7 @@ import java.util.List;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.property.access.spi.Getter;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.tuple.entity.EntityTuplizer;
@@ -19,8 +20,9 @@ class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
 	private final EntityPersister persister;
 
-	HibernateOrmEntityTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz, EntityPersister persister) {
-		super( introspector, clazz );
+	HibernateOrmEntityTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz, EntityPersister persister,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+		super( introspector, clazz, rawTypeDeclaringContext );
 		this.persister = persister;
 	}
 

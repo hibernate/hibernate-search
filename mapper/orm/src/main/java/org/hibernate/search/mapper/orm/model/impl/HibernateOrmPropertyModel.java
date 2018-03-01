@@ -16,17 +16,15 @@ import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private final HibernateOrmIntrospector introspector;
-	private final PojoTypeModel<?> holderTypeModel;
+	private final AbstractHibernateOrmTypeModel<?> holderTypeModel;
 
 	private final String name;
 	private final Getter getter;
@@ -35,7 +33,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	private PropertyHandle handle;
 	private PojoGenericTypeModel<T> typeModel;
 
-	HibernateOrmPropertyModel(HibernateOrmIntrospector introspector, PojoTypeModel<?> holderTypeModel,
+	HibernateOrmPropertyModel(HibernateOrmIntrospector introspector, AbstractHibernateOrmTypeModel<?> holderTypeModel,
 			String name, List<XProperty> declaredXProperties, Getter getter) {
 		this.introspector = introspector;
 		this.holderTypeModel = holderTypeModel;
@@ -64,16 +62,16 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
+	/*
+	 * The cast is safe as long as both type parameter T and getGetterGenericReturnType
+	 * match the actual type for this property.
+	 */
+	@SuppressWarnings( "unchecked" )
 	public PojoGenericTypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
 			try {
-				@SuppressWarnings("unchecked") // We know the getter has this exact type, see constructor uses
-				Class<T> rawType = (Class<T>) getter.getReturnType();
-				typeModel = new ErasingPojoGenericTypeModel<>(
-						introspector,
-						introspector.getTypeModel( rawType ),
-						getGetterGenericReturnType()
-				);
+				typeModel = (PojoGenericTypeModel<T>) holderTypeModel.getRawTypeDeclaringContext()
+						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property type model for '"
@@ -91,7 +89,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 		return handle;
 	}
 
-	private Type getGetterGenericReturnType() {
+	Type getGetterGenericReturnType() {
 		Method method = getter.getMethod();
 		Member member = getter.getMember();
 		// Try to preserve generics information if possible

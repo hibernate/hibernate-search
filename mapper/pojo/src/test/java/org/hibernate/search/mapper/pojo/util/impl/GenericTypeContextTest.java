@@ -143,8 +143,7 @@ public class GenericTypeContextTest {
 		// Type variable as an argument to the tested type
 		new AssertWithType<Map<T, String>>() {
 		}
-				.resolveTypeArgumentTo( new TypeCapture<T>() {
-				}, Map.class, 0 )
+				.resolveTypeArgumentTo( Object.class, Map.class, 0 )
 				.resolveTypeArgumentTo( String.class, Map.class, 1 )
 				.resolveTypeArgumentToEmpty( Iterable.class, 0 )
 				.resolveTypeArgumentToEmpty( Collection.class, 0 )
@@ -169,7 +168,7 @@ public class GenericTypeContextTest {
 		// Type variable as an argument to the tested type
 		new AssertWithType<Map<T, String>>() {
 		}
-				.resolveTypeArgumentTo( new TypeCapture<T>() {
+				.resolveTypeArgumentTo( new TypeCapture<CustomGenericInterface<Integer, String>>() {
 				}, Map.class, 0 )
 				.resolveTypeArgumentTo( String.class, Map.class, 1 )
 				.resolveTypeArgumentToEmpty( Iterable.class, 0 )
@@ -195,7 +194,7 @@ public class GenericTypeContextTest {
 		// Type variable as an argument to the tested type
 		new AssertWithType<Map<T, String>>() {
 		}
-				.resolveTypeArgumentTo( new TypeCapture<T>() {
+				.resolveTypeArgumentTo( new TypeCapture<CustomGenericInterface<Integer, String>>() {
 				}, Map.class, 0 )
 				.resolveTypeArgumentTo( String.class, Map.class, 1 )
 				.resolveTypeArgumentToEmpty( Iterable.class, 0 )
@@ -323,8 +322,142 @@ public class GenericTypeContextTest {
 				.noTypeParameter( CustomArgumentSettingType.class, 0 );
 	}
 
+	@Test
+	public void declaringContext() throws NoSuchFieldException {
+		class GenericDeclaringClass<T> {
+			public List<T> property;
+		}
+		class TypeSettingClass extends GenericDeclaringClass<String> {
+		}
+
+		Type propertyType = GenericDeclaringClass.class.getField( "property" ).getGenericType();
+		GenericTypeContext typeSettingClassContext = new GenericTypeContext( TypeSettingClass.class );
+
+		GenericTypeContext propertyContext = new GenericTypeContext( typeSettingClassContext, propertyType );
+		GenericTypeContextAssert.assertThat( propertyContext )
+				.resolveTypeArgumentTo( String.class, List.class, 0 );
+	}
+
+	@Test
+	public void declaringContext_array() throws NoSuchFieldException {
+		class GenericDeclaringClass<T> {
+			public T[] arrayProperty;
+			public T nonArrayProperty;
+		}
+		class TypeSettingClass extends GenericDeclaringClass<String> {
+		}
+
+		Type arrayPropertyType = GenericDeclaringClass.class.getField( "arrayProperty" ).getGenericType();
+		Type nonArrayPropertyType = GenericDeclaringClass.class.getField( "nonArrayProperty" ).getGenericType();
+		GenericTypeContext typeSettingClassContext = new GenericTypeContext( TypeSettingClass.class );
+
+		GenericTypeContext arrayPropertyContext = new GenericTypeContext( typeSettingClassContext, arrayPropertyType );
+		GenericTypeContextAssert.assertThat( arrayPropertyContext )
+				.resolveArrayElementTypeTo( String.class );
+
+		GenericTypeContext nonArrayPropertyContext = new GenericTypeContext( typeSettingClassContext, nonArrayPropertyType );
+		GenericTypeContextAssert.assertThat( nonArrayPropertyContext )
+				.resolveArrayElementTypeToEmpty();
+	}
+
+	@Test
+	public void declaringContext_multiNesting() throws NoSuchFieldException {
+		class GenericDeclaringLevel2Class<T> {
+			public T property;
+		}
+		class GenericDeclaringLevel1Class<T> {
+			public GenericDeclaringLevel2Class<List<T>> property;
+		}
+		class TypeSettingClass extends GenericDeclaringLevel1Class<String> {
+		}
+
+		Type level1PropertyType = GenericDeclaringLevel1Class.class.getField( "property" ).getGenericType();
+		Type level2PropertyType = GenericDeclaringLevel2Class.class.getField( "property" ).getGenericType();
+		GenericTypeContext typeSettingClassContext = new GenericTypeContext( TypeSettingClass.class );
+
+		GenericTypeContext property1Context = new GenericTypeContext( typeSettingClassContext, level1PropertyType );
+
+		GenericTypeContext property2Context = new GenericTypeContext( property1Context, level2PropertyType );
+		GenericTypeContextAssert.assertThat( property2Context )
+				.resolveTypeArgumentTo( String.class, List.class, 0 )
+				// Ensure we don't cascade to the declaring context when resolving type arguments
+				.resolveTypeArgumentToEmpty( GenericDeclaringLevel1Class.class, 0 );
+	}
+
+	@Test
+	public void declaringContext_genericMethod() throws NoSuchMethodException {
+		abstract class GenericDeclaringClass<T> {
+			public abstract <U extends T> List<U> property();
+		}
+		abstract class TypeSettingClass extends GenericDeclaringClass<String> {
+		}
+
+		Type propertyType = GenericDeclaringClass.class.getMethod( "property" ).getGenericReturnType();
+		GenericTypeContext declaringContext = new GenericTypeContext( TypeSettingClass.class );
+
+		GenericTypeContext propertyContext = new GenericTypeContext( declaringContext, propertyType );
+		GenericTypeContextAssert.assertThat( propertyContext )
+				.resolveTypeArgumentTo( String.class, List.class, 0 );
+	}
+
+	@Test
+	public void declaringContext_relatedParameters() throws NoSuchMethodException {
+		abstract class GenericDeclaringClass<T, U extends List<T>> {
+			public abstract U property();
+		}
+		abstract class GenericSubClass<V extends List<String>> extends GenericDeclaringClass<String, V> {
+		}
+		abstract class TypeSettingClass extends GenericSubClass<ArrayList<String>> {
+		}
+
+		Type propertyType = GenericDeclaringClass.class.getMethod( "property" ).getGenericReturnType();
+		GenericTypeContext genericSubClassContext = new GenericTypeContext( GenericSubClass.class );
+		GenericTypeContext typeSettingContext = new GenericTypeContext( TypeSettingClass.class );
+
+		GenericTypeContext propertyInGenericSubClassContext =
+				new GenericTypeContext( genericSubClassContext, propertyType );
+		GenericTypeContextAssert.assertThat( propertyInGenericSubClassContext )
+				.resolveTypeTo( GenericSubClass.class.getTypeParameters()[0] )
+				.resolveTypeArgumentTo( String.class, List.class, 0 )
+				.resolveTypeArgumentToEmpty( ArrayList.class, 0 );
+
+		GenericTypeContext propertyInTypeSettingContext = new GenericTypeContext( typeSettingContext, propertyType );
+		GenericTypeContextAssert.assertThat( propertyInTypeSettingContext )
+				.resolveTypeTo( new TypeCapture<ArrayList<String>>() { } )
+				.resolveTypeArgumentTo( String.class, List.class, 0 )
+				.resolveTypeArgumentTo( String.class, ArrayList.class, 0 );
+	}
+
 	private abstract static class AbstractGenericTypeContextAssert {
 		abstract GenericTypeContext getTypeContext();
+
+		AbstractGenericTypeContextAssert resolveTypeTo(TypeCapture<?> expected) {
+			return resolveTypeTo( expected.getType() );
+		}
+
+		AbstractGenericTypeContextAssert resolveTypeTo(Type expected) {
+			assertThat( getTypeContext().getResolvedType() )
+					.isEqualTo( expected );
+			return this;
+		}
+
+		AbstractGenericTypeContextAssert resolveArrayElementTypeTo(Type expected) {
+			Optional<Type> optional = getTypeContext().resolveArrayElementType();
+			assertThat( optional.isPresent() )
+					.as( "Expected " + getTypeContext() + " to be considered an array" )
+					.isTrue();
+			assertThat( optional.get() )
+					.isEqualTo( expected );
+			return this;
+		}
+
+		AbstractGenericTypeContextAssert resolveArrayElementTypeToEmpty() {
+			Optional<Type> optional = getTypeContext().resolveArrayElementType();
+			assertThat( optional.isPresent() )
+					.as( "Expected " + getTypeContext() + " NOT to be considered an array" )
+					.isFalse();
+			return this;
+		}
 
 		AbstractGenericTypeContextAssert resolveTypeArgumentTo(TypeCapture<?> expected, Class<?> rawSuperClass, int typeArgumentIndex) {
 			return resolveTypeArgumentTo( expected.getType(), rawSuperClass, typeArgumentIndex );
@@ -389,6 +522,23 @@ public class GenericTypeContextTest {
 						.contains( " type parameter(s)" );
 			}
 			return this;
+		}
+	}
+
+	private static class GenericTypeContextAssert extends AbstractGenericTypeContextAssert {
+		private final GenericTypeContext typeContext;
+
+		static GenericTypeContextAssert assertThat(GenericTypeContext context) {
+			return new GenericTypeContextAssert( context );
+		}
+
+		private GenericTypeContextAssert(GenericTypeContext typeContext) {
+			this.typeContext = typeContext;
+		}
+
+		@Override
+		GenericTypeContext getTypeContext() {
+			return typeContext;
 		}
 	}
 

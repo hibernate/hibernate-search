@@ -12,6 +12,7 @@ import javax.persistence.metamodel.EmbeddableType;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.metamodel.internal.EmbeddableTypeImpl;
 import org.hibernate.property.access.spi.Getter;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.tuple.component.ComponentTuplizer;
 import org.hibernate.type.ComponentType;
@@ -20,8 +21,9 @@ class HibernateOrmEmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T
 
 	private final ComponentType componentType;
 
-	HibernateOrmEmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType) {
-		super( introspector, embeddableType.getJavaType() );
+	HibernateOrmEmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+		super( introspector, embeddableType.getJavaType(), rawTypeDeclaringContext );
 		// FIXME find a way to avoid depending on Hibernate ORM internal APIs
 		EmbeddableTypeImpl<T> embeddableTypeImpl = (EmbeddableTypeImpl<T>) embeddableType;
 		this.componentType = embeddableTypeImpl.getHibernateType();

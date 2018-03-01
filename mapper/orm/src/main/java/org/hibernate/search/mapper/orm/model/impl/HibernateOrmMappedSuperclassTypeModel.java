@@ -13,14 +13,16 @@ import javax.persistence.metamodel.ManagedType;
 
 import org.hibernate.EntityMode;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class HibernateOrmMappedSuperclassTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
 	private final ManagedType<T> managedType;
 
-	HibernateOrmMappedSuperclassTypeModel(HibernateOrmIntrospector introspector, ManagedType<T> managedType) {
-		super( introspector, managedType.getJavaType() );
+	HibernateOrmMappedSuperclassTypeModel(HibernateOrmIntrospector introspector, ManagedType<T> managedType,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+		super( introspector, managedType.getJavaType(), rawTypeDeclaringContext );
 		this.managedType = managedType;
 	}
 

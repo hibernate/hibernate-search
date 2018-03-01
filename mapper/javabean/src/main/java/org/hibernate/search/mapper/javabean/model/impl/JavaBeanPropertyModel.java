@@ -8,33 +8,60 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
 class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private final JavaBeanIntrospector introspector;
-	private final PojoTypeModel<?> parentTypeModel;
+	private final JavaBeanTypeModel<?> parentTypeModel;
 
-	private final Class<T> clazz;
 	private final PropertyDescriptor descriptor;
 
 	private PojoGenericTypeModel<T> typeModel;
 	private PropertyHandle handle;
 
-	JavaBeanPropertyModel(JavaBeanIntrospector introspector, PojoTypeModel<?> parentTypeModel,
-			Class<T> clazz, PropertyDescriptor descriptor) {
+	JavaBeanPropertyModel(JavaBeanIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel,
+			PropertyDescriptor descriptor) {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
-		this.clazz = clazz;
 		this.descriptor = descriptor;
+	}
+
+	/**
+	 * N.B.: equals and hashCode must be defined properly for
+	 * {@link JavaBeanGenericContextHelper#getPropertyCacheKey(PojoPropertyModel)}
+	 * to work properly.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		JavaBeanPropertyModel<?> that = (JavaBeanPropertyModel<?>) o;
+		return Objects.equals( introspector, that.introspector ) &&
+				Objects.equals( parentTypeModel, that.parentTypeModel ) &&
+				Objects.equals( getHandle(), that.getHandle() );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( introspector, parentTypeModel, handle );
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + getName() + ", " + getGetterGenericReturnType().getTypeName() + "]";
 	}
 
 	@Override
@@ -53,14 +80,16 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
+	/*
+	 * The cast is safe as long as both type parameter T and getGetterGenericReturnType
+	 * match the actual type for this property.
+	 */
+	@SuppressWarnings( "unchecked" )
 	public PojoGenericTypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = new ErasingPojoGenericTypeModel<>(
-						introspector,
-						introspector.getTypeModel( clazz ),
-						descriptor.getReadMethod().getGenericReturnType()
-				);
+				typeModel = (PojoGenericTypeModel<T>) parentTypeModel.getRawTypeDeclaringContext()
+						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
 				throw new SearchException( "Exception while retrieving property type model for '"
@@ -84,4 +113,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 		return handle;
 	}
 
+	Type getGetterGenericReturnType() {
+		return descriptor.getReadMethod().getGenericReturnType();
+	}
 }

@@ -12,10 +12,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -28,12 +30,33 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	private final Class<T> clazz;
 	private final BeanInfo beanInfo;
 	private final BeanInfo declaredBeanInfo;
+	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
-	JavaBeanTypeModel(JavaBeanIntrospector introspector, Class<T> clazz) throws IntrospectionException {
+	JavaBeanTypeModel(JavaBeanIntrospector introspector, Class<T> clazz,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) throws IntrospectionException {
 		this.introspector = introspector;
 		this.clazz = clazz;
 		this.beanInfo = Introspector.getBeanInfo( clazz );
 		this.declaredBeanInfo = Introspector.getBeanInfo( clazz, clazz.getSuperclass() );
+		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		JavaBeanTypeModel<?> that = (JavaBeanTypeModel<?>) o;
+		return Objects.equals( introspector, that.introspector ) &&
+				Objects.equals( clazz, that.clazz );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( introspector, clazz );
 	}
 
 	@Override
@@ -108,6 +131,20 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 				.map( this::createProperty );
 	}
 
+	@Override
+	public T cast(Object instance) {
+		return getJavaClass().cast( instance );
+	}
+
+	@Override
+	public Class<T> getJavaClass() {
+		return clazz;
+	}
+
+	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
+		return rawTypeDeclaringContext;
+	}
+
 	private PropertyDescriptor getPropertyDescriptor(String normalizedName) {
 		PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
 		for ( PropertyDescriptor descriptor : propertyDescriptors ) {
@@ -123,18 +160,6 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 			throw new SearchException( "Property '" + propertyDescriptor.getName() + "' on '"
 					+ this + "' can't be read" );
 		}
-		return new JavaBeanPropertyModel<>(
-				introspector, this, propertyDescriptor.getPropertyType(), propertyDescriptor
-		);
-	}
-
-	@Override
-	public T cast(Object instance) {
-		return getJavaClass().cast( instance );
-	}
-
-	@Override
-	public Class<T> getJavaClass() {
-		return clazz;
+		return new JavaBeanPropertyModel<>( introspector, this, propertyDescriptor );
 	}
 }

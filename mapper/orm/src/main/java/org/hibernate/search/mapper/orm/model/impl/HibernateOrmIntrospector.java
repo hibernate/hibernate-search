@@ -42,7 +42,7 @@ import org.hibernate.property.access.spi.PropertyAccess;
 import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
 import org.hibernate.search.mapper.orm.util.impl.XClassOrdering;
-import org.hibernate.search.mapper.pojo.model.spi.ErasingPojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
@@ -59,6 +59,8 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	private final AnnotationHelper annotationHelper;
 	private final SessionFactoryImplementor sessionFactoryImplementor;
 	private final PropertyAccessStrategyResolver accessStrategyResolver;
+	private final HibernateOrmGenericContextHelper genericContextHelper;
+	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	/**
 	 * Note: the main purpose of this cache is not to improve performance,
@@ -92,6 +94,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 		this.sessionFactoryImplementor = sessionFactoryImplementor;
 		this.accessStrategyResolver = sessionFactoryImplementor.getServiceRegistry()
 				.getService( PropertyAccessStrategyResolver.class );
+		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
+		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
+				genericContextHelper, Object.class
+		);
 	}
 
 	@Override
@@ -102,7 +108,7 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
-		return new ErasingPojoGenericTypeModel<>( this, getTypeModel( clazz ) );
+		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
 	@Override
@@ -210,7 +216,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	private <T> PojoRawTypeModel<T> tryCreateEntityTypeModel(Class<T> type) {
 		try {
 			EntityPersister persister = sessionFactoryImplementor.getMetamodel().entityPersister( type );
-			return new HibernateOrmEntityTypeModel<>( this, type, persister );
+			return new HibernateOrmEntityTypeModel<>(
+					this, type, persister,
+					new RawTypeDeclaringContext<>( genericContextHelper, type )
+			);
 		}
 		catch (MappingException ignored) {
 			// The type is not an entity in the current session factory
@@ -221,7 +230,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	private <T> PojoRawTypeModel<T> tryCreateEmbeddableTypeModel(Class<T> type) {
 		try {
 			EmbeddableType<T> embeddableType = sessionFactoryImplementor.getMetamodel().embeddable( type );
-			return new HibernateOrmEmbeddableTypeModel<>( this, embeddableType );
+			return new HibernateOrmEmbeddableTypeModel<>(
+					this, embeddableType,
+					new RawTypeDeclaringContext<>( genericContextHelper, type )
+			);
 		}
 		catch (IllegalArgumentException ignored) {
 			// The type is not embeddable in the current session factory
@@ -236,7 +248,10 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 			 * so if the type is managed it must be a mapped superclass.
 			 */
 			ManagedType<T> managedType = sessionFactoryImplementor.getMetamodel().managedType( type );
-			return new HibernateOrmMappedSuperclassTypeModel<>( this, managedType );
+			return new HibernateOrmMappedSuperclassTypeModel<>(
+					this, managedType,
+					new RawTypeDeclaringContext<>( genericContextHelper, type )
+			);
 		}
 		catch (IllegalArgumentException ignored) {
 			// The type is not managed in the current session factory
@@ -245,6 +260,9 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	}
 
 	private <T> PojoRawTypeModel<T> createNonManagedTypeModel(Class<T> type) {
-		return new HibernateOrmNonManagedTypeModel<>( this, type );
+		return new HibernateOrmNonManagedTypeModel<>(
+				this, type,
+				new RawTypeDeclaringContext<>( genericContextHelper, type )
+		);
 	}
 }
