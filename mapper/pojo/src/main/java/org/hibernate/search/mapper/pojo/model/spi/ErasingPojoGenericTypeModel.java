@@ -20,20 +20,19 @@ import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
  * <p>
  * For instance, given the following model:
  * <pre><code>
- * class A {
- *   List&lt;B&lt;D&gt;&gt; propertyOfA;
+ * class A&lt;T extends C&gt; {
+ *   List&lt;T&gt; propertyOfA;
  * }
- * class B&lt;T extends C&gt; {
- *   T propertyOfB;
+ * class B extends A&lt;D&gt; {
  * }
  * class C {
  * }
  * class D extends C {
  * }
  * </code></pre>
- * ... if an instance of this implementation was used to model the type of {@code A.propertyOfA},
- * then the property {@code A.propertyOfA.propertyOfB} would appear to have type {@code T extends C}
- * instead of type {@code D} as one would expect.
+ * ... if an instance of this implementation was used to model the type of {@code B.propertyOfA},
+ * then the property {@code B.propertyOfA} would appear to have type {@code List<T>} with {@code T extends C}
+ * instead of type {@code List<D>} as one would expect.
  * <p>
  * This behavior is clearly not ideal, but it's by far the easiest way to implement {@link ErasingPojoGenericTypeModel},
  * because it allows to only implement {@link PojoTypeModel} for raw types.
