@@ -19,8 +19,8 @@
     <description>Hibernate Search Elasticsearch AWS modules to use in JBoss AS / Wildfly</description>
 
     <properties>
-        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
-        <template.dir>${featurepack.dir}/modules/</template.dir>
+        <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>
+        <template.dir>${feature-pack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
@@ -70,7 +70,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/elasticsearch-aws/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/elasticsearch-aws/${module-slot.org.hibernate.search.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/search/elasticsearch-aws</directory>
@@ -86,7 +86,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <outputDirectory>${feature-pack.dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/feature-pack-def</directory>
@@ -109,7 +109,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <config-file>feature-pack-template.xml</config-file>
-                            <config-dir>${featurepack.dir}</config-dir>
+                            <config-dir>${feature-pack.dir}</config-dir>
                             <resourcesDir>/</resourcesDir>
                         </configuration>
                     </execution>

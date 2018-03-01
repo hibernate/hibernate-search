@@ -24,7 +24,7 @@
         <relocation>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-directory-provider</artifactId>
-            <version>${infinispanVersion}</version>
+            <version>${version.org.infinispan}</version>
             <message>This component is now owned and maintained by the Infinispan team</message>
         </relocation>
     </distributionManagement>

@@ -56,7 +56,7 @@
                                 <artifactItem>
                                     <groupId>org.hibernate.infra</groupId>
                                     <artifactId>hibernate-asciidoctor-theme</artifactId>
-                                    <version>${hibernate-asciidoctor-theme.version}</version>
+                                    <version>${version.org.hibernate.infra.hibernate-asciidoctor-theme}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/</outputDirectory>
@@ -170,16 +170,16 @@
                         <tabsize>4</tabsize>
 
                         <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
-                        <hibernateVersion>${hibernateVersion}</hibernateVersion>
-                        <hibernateShortVersion>${hibernateShortVersion}</hibernateShortVersion>
-                        <luceneVersion>${luceneVersion}</luceneVersion>
-                        <infinispanVersion>${infinispanVersion}</infinispanVersion>
+                        <hibernateVersion>${version.org.hibernate}</hibernateVersion>
+                        <hibernateShortVersion>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</hibernateShortVersion>
+                        <luceneVersion>${version.org.apache.lucene}</luceneVersion>
+                        <infinispanVersion>${version.org.infinispan}</infinispanVersion>
                         <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
-                        <tikaModuleVersion>${tikaVersion}</tikaModuleVersion>
-                        <elasticsearchClientVersion>${elasticsearchClientVersion}</elasticsearchClientVersion>
-                        <gsonVersion>${gsonVersion}</gsonVersion>
-                        <awsV4SignerJavaVersion>${awsV4SignerJavaVersion}</awsV4SignerJavaVersion>
-                        <wildflyVersion>${wildflyVersion}</wildflyVersion>
+                        <tikaModuleVersion>${version.org.apache.tika}</tikaModuleVersion>
+                        <elasticsearchClientVersion>${version.org.elasticsearch.client}</elasticsearchClientVersion>
+                        <gsonVersion>${version.com.google.code.gson}</gsonVersion>
+                        <awsV4SignerJavaVersion>${version.uk.co.lucasweb.aws-v4-signer-java}</awsV4SignerJavaVersion>
+                        <wildflyVersion>${version.wildfly}</wildflyVersion>
                     </attributes>
                 </configuration>
             </plugin>

@@ -23,9 +23,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springBootVersion>1.5.3.RELEASE</springBootVersion>
+
         <!-- Override the version of Hibernate ORM in Spring Boot (5.1 or something as I'm writing this) -->
-        <hibernate.version>${hibernateVersion}</hibernate.version>
+        <hibernate.version>${version.org.hibernate}</hibernate.version>
     </properties>
     
     <dependencyManagement>
@@ -34,7 +34,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springBootVersion}</version>
+                <version>${version.org.springframework.boot}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -118,7 +118,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${springBootVersion}</version>
+                <version>${version.org.springframework.boot}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

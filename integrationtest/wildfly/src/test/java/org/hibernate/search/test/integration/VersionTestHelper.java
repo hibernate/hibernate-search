@@ -40,7 +40,7 @@ public class VersionTestHelper {
 	 */
 	public static synchronized String getModuleSlotString() {
 		if ( hibernateSearchModuleSlot == null ) {
-			hibernateSearchModuleSlot = injectVariables( "${test.hibernate.search.module.slot}" );
+			hibernateSearchModuleSlot = injectVariables( "${test.module-slot.org.hibernate.search}" );
 			if ( hibernateSearchModuleSlot == null || hibernateSearchModuleSlot.isEmpty() ) {
 				String versionHibernateSearch = getDependencyVersionHibernateSearch();
 				String[] split = versionHibernateSearch.split( "\\." );
@@ -52,21 +52,21 @@ public class VersionTestHelper {
 
 	public static synchronized String getDependencyVersionHibernateSearch() {
 		if ( hibernateSearchVersion == null ) {
-			hibernateSearchVersion = injectVariables( "${dependency.version.HibernateSearch}" );
+			hibernateSearchVersion = injectVariables( "${dependency.version.org.hibernate.search}" );
 		}
 		return hibernateSearchVersion;
 	}
 
 	public static synchronized String getHibernateORMModuleName() {
 		if ( hibernateOrmModuleName == null ) {
-			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${test.hibernate.orm.module.slot}" );
+			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${test.module-slot.org.hibernate}" );
 		}
 		return hibernateOrmModuleName;
 	}
 
 	public static synchronized String getDependencyVersionHibernateSearchBuiltIn() {
 		if ( hibernateSearchVersionBuiltIn == null ) {
-			hibernateSearchVersionBuiltIn = injectVariables( "${dependency.version.HibernateSearch.builtin}" );
+			hibernateSearchVersionBuiltIn = injectVariables( "${dependency.version.org.hibernate.search.builtin}" );
 			// if no built-in version is specified, default to the version from Maven
 			if ( hibernateSearchVersionBuiltIn == null
 					|| hibernateSearchVersionBuiltIn.isEmpty()
@@ -79,21 +79,21 @@ public class VersionTestHelper {
 
 	public static synchronized String getDependencyVersionLucene() {
 		if ( luceneFullVersion == null ) {
-			luceneFullVersion = injectVariables( "${dependency.version.Lucene}" );
+			luceneFullVersion = injectVariables( "${dependency.version.org.apache.lucene}" );
 		}
 		return luceneFullVersion;
 	}
 
 	public static synchronized String getDependencyVersionHibernateCommonsAnnotations() {
 		if ( hibernateAnnotationsFullVersion == null ) {
-			hibernateAnnotationsFullVersion = injectVariables( "${dependency.version.hcann}" );
+			hibernateAnnotationsFullVersion = injectVariables( "${dependency.version.org.hibernate.commons.annotations}" );
 		}
 		return hibernateAnnotationsFullVersion;
 	}
 
 	public static synchronized String getDependencyVersionTika() {
 		if ( tikaVersion == null ) {
-			tikaVersion = injectVariables( "${dependency.version.tika}" );
+			tikaVersion = injectVariables( "${dependency.version.org.apache.tika}" );
 		}
 		return tikaVersion;
 	}

@@ -173,10 +173,10 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            org.apache.lucene;version="${luceneOsgiRangeVersion}",
-                            org.apache.lucene.document;version="${luceneOsgiRangeVersion}",
+                            org.apache.lucene;version="${osgi.version-range.org.apache.lucene}",
+                            org.apache.lucene.document;version="${osgi.version-range.org.apache.lucene}",
                             org.hibernate.search.*;version="[${project.version},${project.version}]",
-                            org.jgroups.*;version="${jGroupsOsgiRangeVersion}"
+                            org.jgroups.*;version="${osgi.version-range.org.jgroups}"
                         </Import-Package>
                         <Export-Package>
                         </Export-Package>
