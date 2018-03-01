@@ -11,11 +11,11 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
-class ExactTypeMatcher implements TypePatternMatcher {
+class RawSuperTypeMatcher implements TypePatternMatcher {
 	private final Class<?> matchedRawType;
 	private final Class<?> resultRawType;
 
-	ExactTypeMatcher(Class<?> matchedRawType, Class<?> resultRawType) {
+	RawSuperTypeMatcher(Class<?> matchedRawType, Class<?> resultRawType) {
 		this.matchedRawType = matchedRawType;
 		this.resultRawType = resultRawType;
 	}

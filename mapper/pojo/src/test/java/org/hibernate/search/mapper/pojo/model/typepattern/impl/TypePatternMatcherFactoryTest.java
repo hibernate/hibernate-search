@@ -56,13 +56,13 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void exactType() {
+	public void rawSuperType() {
 		PojoGenericTypeModel<?> typeToMatchMock = createMock( PojoGenericTypeModel.class );
 		PojoGenericTypeModel<String> superTypeMock = createMock( PojoGenericTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String.class, Integer.class );
-		assertThat( matcher ).isInstanceOf( ExactTypeMatcher.class );
+		assertThat( matcher ).isInstanceOf( RawSuperTypeMatcher.class );
 		assertThat( matcher.toString() )
 				.isEqualTo( "java.lang.String => java.lang.Integer" );
 
@@ -91,7 +91,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	}
 
 	@Test
-	public <T> void exactType_resultIsTypeVariable() {
+	public <T> void rawSuperType_resultIsTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
 		factory.create(
@@ -101,7 +101,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	}
 
 	@Test
-	public <T> void exactType_resultIsWildcard() {
+	public <T> void rawSuperType_resultIsWildcard() {
 		thrown.expect( UnsupportedOperationException.class );
 
 		factory.create(
@@ -111,7 +111,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void exactType_resultIsParameterized() {
+	public void rawSuperType_resultIsParameterized() {
 		thrown.expect( UnsupportedOperationException.class );
 
 		factory.create(
@@ -127,7 +127,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String[].class, Integer.class );
-		assertThat( matcher ).isInstanceOf( ExactTypeMatcher.class );
+		assertThat( matcher ).isInstanceOf( RawSuperTypeMatcher.class );
 		assertThat( matcher.toString() )
 				.isEqualTo( "[Ljava.lang.String; => java.lang.Integer" );
 

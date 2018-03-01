@@ -94,7 +94,7 @@ public class TypePatternMatcherFactory {
 						"Returning a non-raw result type when matching a raw type is not supported"
 				);
 			}
-			return new ExactTypeMatcher( (Class<?>) typeToMatch, (Class<?>) resultType );
+			return new RawSuperTypeMatcher( (Class<?>) typeToMatch, (Class<?>) resultType );
 		}
 		else if ( typeToMatch instanceof GenericArrayType ) {
 			GenericArrayType arrayTypeToMatch = (GenericArrayType) typeToMatch;
