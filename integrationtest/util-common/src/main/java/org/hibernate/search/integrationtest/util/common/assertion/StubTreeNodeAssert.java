@@ -12,7 +12,7 @@ import org.hibernate.search.integrationtest.util.common.stub.StubTreeNode;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeCompare;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeMismatch;
 
-import junit.framework.AssertionFailedError;
+import org.junit.Assert;
 
 public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 
@@ -38,7 +38,7 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 		if ( !mismatchesByPath.isEmpty() ) {
 			StringBuilder builder = new StringBuilder( messageBase );
 			StubTreeNodeCompare.appendTo( builder, mismatchesByPath, "\n\t", "\t" );
-			throw new AssertionFailedError( builder.toString() );
+			Assert.fail( builder.toString() );
 		}
 		return this;
 	}

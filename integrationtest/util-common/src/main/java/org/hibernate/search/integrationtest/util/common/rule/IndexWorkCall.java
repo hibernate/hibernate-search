@@ -11,9 +11,9 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.StubIndexWork;
 
-import junit.framework.AssertionFailedError;
-
 import static org.hibernate.search.integrationtest.util.common.assertion.StubIndexWorkAssert.assertThat;
+
+import org.junit.Assert;
 
 class IndexWorkCall {
 
@@ -36,7 +36,7 @@ class IndexWorkCall {
 		String whenThisWorkWasExpected = "when a " + operation + " call for a work on index '" + indexName
 				+ "', identifier '" + work.getIdentifier() + "' was expected";
 		if ( !Objects.equals( operation, actualCall.operation ) ) {
-			throw new AssertionFailedError( "Incorrect work operation " + whenThisWorkWasExpected + ".\n\tExpected: "
+			Assert.fail( "Incorrect work operation " + whenThisWorkWasExpected + ".\n\tExpected: "
 					+ operation + ", actual: " + actualCall.operation
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}

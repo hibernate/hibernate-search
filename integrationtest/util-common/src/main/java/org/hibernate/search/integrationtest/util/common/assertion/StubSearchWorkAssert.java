@@ -10,7 +10,7 @@ import java.util.Objects;
 
 import org.hibernate.search.integrationtest.util.common.stub.backend.search.StubSearchWork;
 
-import junit.framework.AssertionFailedError;
+import org.junit.Assert;
 
 public class StubSearchWorkAssert {
 
@@ -49,7 +49,7 @@ public class StubSearchWorkAssert {
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		if ( hasAnyMismatch ) {
-			throw new AssertionFailedError( builder.toString() );
+			Assert.fail( builder.toString() );
 		}
 
 		return this;

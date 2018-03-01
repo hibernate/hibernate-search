@@ -34,10 +34,10 @@ import org.hibernate.search.integrationtest.util.orm.OrmUtils;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import junit.framework.AssertionFailedError;
 
 /**
  * @author Yoann Rodiere
@@ -147,8 +147,9 @@ public class OrmAnnotationMappingAccessTypeIT {
 		} );
 	}
 
-	private static AssertionFailedError methodShouldNotBeCalled() {
-		throw new AssertionFailedError( "This method should not be called" );
+	private static <T> T methodShouldNotBeCalled() {
+		Assert.fail( "This method should not be called" );
+		return null;
 	}
 
 	@MappedSuperclass
@@ -163,11 +164,11 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Field
 		public String getFieldWithDefaultFieldAccess() {
-			throw methodShouldNotBeCalled();
+			return methodShouldNotBeCalled();
 		}
 
 		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
-			throw methodShouldNotBeCalled();
+			methodShouldNotBeCalled();
 		}
 
 		@Access( AccessType.PROPERTY )
@@ -222,11 +223,11 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Field
 		public String getFieldWithNonDefaultFieldAccess() {
-			throw methodShouldNotBeCalled();
+			return methodShouldNotBeCalled();
 		}
 
 		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
-			throw methodShouldNotBeCalled();
+			methodShouldNotBeCalled();
 		}
 
 		@Field
@@ -289,11 +290,11 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Field
 		public String getFieldWithDefaultFieldAccess() {
-			throw methodShouldNotBeCalled();
+			return methodShouldNotBeCalled();
 		}
 
 		public void setFieldWithDefaultFieldAccess(String fieldWithDefaultFieldAccess) {
-			throw methodShouldNotBeCalled();
+			methodShouldNotBeCalled();
 		}
 
 		@Access( AccessType.PROPERTY )
@@ -320,11 +321,11 @@ public class OrmAnnotationMappingAccessTypeIT {
 
 		@Field
 		public String getFieldWithNonDefaultFieldAccess() {
-			throw methodShouldNotBeCalled();
+			return methodShouldNotBeCalled();
 		}
 
 		public void setFieldWithNonDefaultFieldAccess(String fieldWithNonDefaultFieldAccess) {
-			throw methodShouldNotBeCalled();
+			methodShouldNotBeCalled();
 		}
 
 		@Basic

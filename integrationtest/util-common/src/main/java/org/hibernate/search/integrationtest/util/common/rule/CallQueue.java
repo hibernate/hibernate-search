@@ -10,7 +10,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.function.BiFunction;
 
-import junit.framework.AssertionFailedError;
+import org.junit.Assert;
 
 class CallQueue<C> {
 
@@ -30,7 +30,9 @@ class CallQueue<C> {
 		C expectedCall = expectedQueue.poll();
 		try {
 			if ( expectedCall == null ) {
-				throw new AssertionFailedError( "No call expected, but got: " + actualCall );
+				Assert.fail( "No call expected, but got: " + actualCall );
+				// Dead code, we throw an exception above
+				return null;
 			}
 			else {
 				T result = callVerifyFunction.apply( expectedCall, actualCall );
@@ -38,18 +40,20 @@ class CallQueue<C> {
 				return result;
 			}
 		}
-		catch (AssertionFailedError e) {
-			throw new AssertionFailedError(
+		catch (AssertionError e) {
+			Assert.fail(
 					"Unexpected call, see below for details.\n\tLast matching call was "
 					+ lastMatchingCall + "\n\tError for this call was: " + e.getMessage()
 			);
+			// Dead code, we throw an exception above
+			throw e;
 		}
 	}
 
 	void verifyEmpty() {
 		C expectedCall = expectedQueue.peek();
 		if ( expectedCall != null ) {
-			throw new AssertionFailedError( "Expected " + expectedCall );
+			Assert.fail( "Expected " + expectedCall );
 		}
 	}
 
