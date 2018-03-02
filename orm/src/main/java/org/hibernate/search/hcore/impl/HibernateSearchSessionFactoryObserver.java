@@ -124,9 +124,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			failedBoot = false;
 		}
-		catch (RuntimeException e) {
-			extendedSearchIntegratorFuture.completeExceptionally( e );
-			throw e;
+		catch (Throwable t) {
+			extendedSearchIntegratorFuture.completeExceptionally( t );
+			// This will make the SessionFactory abort and close itself
+			throw t;
 		}
 		finally {
 			if ( failedBoot ) {
