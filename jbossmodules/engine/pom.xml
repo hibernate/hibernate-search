@@ -116,7 +116,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/engine/${module-slot.org.hibernate.search}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/engine/${module-slot.org.hibernate.search.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/search/engine</directory>

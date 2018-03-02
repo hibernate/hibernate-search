@@ -290,7 +290,7 @@
                                    <type>zip</type>
                                    <outputDirectory>${project.build.directory}</outputDirectory>
                                    <overWrite>true</overWrite>
-                                   <destFileName>${jpa22.wildfly-patch.filename}</destFileName>
+                                   <destFileName>${test.jpa22.wildfly-patch.filename}</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -309,7 +309,7 @@
                         </goals>
                         <configuration>
                             <skip>${skipWildFlyPreparation}</skip>
-                            <url>${cdi20.wildfly-patch.url}</url>
+                            <url>${test.cdi20.wildfly-patch.url}</url>
                             <unpack>false</unpack>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
@@ -334,7 +334,7 @@
                             <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --override-all --path ${project.build.directory}/${jpa22.wildfly-patch.filename}</command>
+                                <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
                             </commands>
                         </configuration>
                     </execution>
@@ -352,7 +352,7 @@
                             <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --override-all --path ${project.build.directory}/${cdi20.wildfly-patch.filename}</command>
+                                <command>patch apply --override-all --path ${project.build.directory}/${test.cdi20.wildfly-patch.filename}</command>
                             </commands>
                         </configuration>
                     </execution>

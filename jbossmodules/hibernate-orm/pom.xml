@@ -106,7 +106,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${module-slot.org.hibernate}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/core</directory>
@@ -138,7 +138,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${module-slot.org.hibernate}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/infinispan/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/infinispan</directory>
@@ -170,7 +170,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${module-slot.org.hibernate}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/jipijapa-hibernate5/${module-slot.org.hibernate.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/org/hibernate/jipijapa-hibernate5</directory>

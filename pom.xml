@@ -252,7 +252,7 @@
 
         <version.junit>4.12</version.junit>
         <version.org.easymock>3.5.1</version.org.easymock>
-        <version.org.unitls>3.4.6</version.org.unitls>
+        <version.org.unitils>3.4.6</version.org.unitils>
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
         <version.org.easytesting.fest-assert>1.4</version.org.easytesting.fest-assert>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
@@ -274,10 +274,10 @@
         <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
         <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
         <version.jpa22.wildfly-patch>1.0.0.Beta1</version.jpa22.wildfly-patch>
-        <jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</jpa22.wildfly-patch.filename>
+        <test.jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</test.jpa22.wildfly-patch.filename>
         <version.cdi20.wildfly-patch>3.0.2.Final</version.cdi20.wildfly-patch>
-        <cdi20.wildfly-patch.filename>wildfly-${version.wildfly}-weld-${version.cdi20.wildfly-patch}-patch.zip</cdi20.wildfly-patch.filename>
-        <cdi20.wildfly-patch.url>http://download.jboss.org/weld/${version.cdi20.wildfly-patch}/${cdi20.wildfly-patch.filename}</cdi20.wildfly-patch.url>
+        <test.cdi20.wildfly-patch.filename>wildfly-${version.wildfly}-weld-${version.cdi20.wildfly-patch}-patch.zip</test.cdi20.wildfly-patch.filename>
+        <test.cdi20.wildfly-patch.url>http://download.jboss.org/weld/${version.cdi20.wildfly-patch}/${test.cdi20.wildfly-patch.filename}</test.cdi20.wildfly-patch.url>
         <!-- Necessary for OSGi integration tests with Karaf -->
         <version.org.javassist>3.22.0-GA</version.org.javassist>
         <version.org.jboss.jandex>2.0.3.Final</version.org.jboss.jandex>
@@ -886,7 +886,7 @@
             <dependency>
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
-                <version>${version.org.unitls}</version>
+                <version>${version.org.unitils}</version>
             </dependency>
             <dependency>
                 <groupId>simple-jndi</groupId>
@@ -1571,7 +1571,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                                 <configuration>
-                                     <targetVersion>1.8</targetVersion>
+                                     <targetVersion>${maven.compiler.argument.target}</targetVersion>
                                      <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                      <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                      <excludes>
@@ -1606,7 +1606,7 @@ org.hibernate.SharedSessionContract#getTransaction()
                          <execution>
                              <id>verify-forbidden-test-apis</id>
                              <configuration>
-                                 <targetVersion>${maven.compiler.argument.target}</targetVersion>
+                                 <targetVersion>${maven.compiler.argument.testTarget}</targetVersion>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                  <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                  <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>

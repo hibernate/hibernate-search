@@ -20,7 +20,7 @@
         <module name="javax.batch.api" />
         <module name="javax.inject.api" />
         <module name="javax.persistence.api" />
-        <module name="org.hibernate" slot="${module-slot.org.hibernate}" />
+        <module name="org.hibernate" slot="${module-slot.org.hibernate.short-id}" />
         <module name="org.hibernate.search.engine" slot="${module-slot.org.hibernate.search.full-id}" />
         <module name="org.hibernate.search.orm" slot="${module-slot.org.hibernate.search.full-id}" />
         <module name="org.jberet.jberet-core" />
