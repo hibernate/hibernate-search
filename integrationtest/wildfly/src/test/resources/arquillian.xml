@@ -38,6 +38,7 @@
                     -Djava.net.preferIPv4Stack=true
                     -Dremote.maven.repo=${repository.jboss-public.url}
                     -Dmaven.repo.local=${settings.localRepository}
+                    -Dee8.preview.mode=true
                 </property>
                 <!-- To debug the Arquillian managed application server:
                 <property name="javaVmArguments">
@@ -64,6 +65,7 @@
                     -Djava.net.preferIPv4Stack=true
                     -Dremote.maven.repo=${repository.jboss-public.url}
                     -Dmaven.repo.local=${settings.localRepository}
+                    -Dee8.preview.mode=true
                 </property>
                 <property name="managementPort">19990</property>
             </configuration>

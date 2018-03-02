@@ -36,6 +36,7 @@
                 -Djava.net.preferIPv4Stack=true
                 -Dremote.maven.repo=${repository.jboss-public.url}
                 -Dmaven.repo.local=${settings.localRepository}
+                -Dee8.preview.mode=true
             </property>
         </configuration>
     </container>
