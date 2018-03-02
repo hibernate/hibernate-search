@@ -199,7 +199,7 @@
 
         <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
         <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
-        <version.org.jgroups>3.6.12.Final</version.org.jgroups>
+        <version.org.jgroups>3.6.13.Final</version.org.jgroups>
 
         <version.org.apache.commons.codec>1.10</version.org.apache.commons.codec>
         <version.org.apache.commons.compress>1.5</version.org.apache.commons.compress>
