@@ -298,25 +298,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
-                <artifactId>download-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>fetch-cdi20-patch</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <url>${test.cdi20.wildfly-patch.url}</url>
-                            <unpack>false</unpack>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <executions>
@@ -335,24 +316,6 @@
                             <fail-on-error>false</fail-on-error>
                             <commands>
                                 <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
-                            </commands>
-                        </configuration>
-                    </execution>
-                    <!-- Install CDI 2.0 patch -->
-                    <execution>
-                        <id>apply-wildfly-cdi20-patch-file</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>execute-commands</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <offline>true</offline>
-                            <jbossHome>${jbosshome}</jbossHome>
-                            <!-- The CLI script below will fail if the patch was already applied in a previous build -->
-                            <fail-on-error>false</fail-on-error>
-                            <commands>
-                                <command>patch apply --override-all --path ${project.build.directory}/${test.cdi20.wildfly-patch.filename}</command>
                             </commands>
                         </configuration>
                     </execution>

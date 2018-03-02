@@ -196,9 +196,9 @@
 
         <version.net.bytebuddy>1.7.9</version.net.bytebuddy>
 
-        <version.wildfly>11.0.0.Final</version.wildfly>
+        <version.wildfly>12.0.0.Final</version.wildfly>
 
-        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
+        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
         <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
         <version.org.jgroups>4.0.11.Final</version.org.jgroups>
 
@@ -215,13 +215,13 @@
         <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
         <version.xml-apis>1.3.03</version.xml-apis>
 
-        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.0.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
+        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
         <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.0.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
-        <version.org.jboss.ejb3.ext-api>2.1.0</version.org.jboss.ejb3.ext-api>
+        <version.org.jboss.ejb3.ext-api>2.2.0.Final</version.org.jboss.ejb3.ext-api>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.enterprise>2.0</version.javax.enterprise>
-        <version.org.jboss.narayana>5.5.30.Final</version.org.jboss.narayana>
-        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
+        <version.org.jboss.narayana>5.5.31.Final</version.org.jboss.narayana>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
 
         <!-- Elasticsearch -->
@@ -276,9 +276,6 @@
         <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
         <version.jpa22.wildfly-patch>1.0.0.Beta2</version.jpa22.wildfly-patch>
         <test.jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</test.jpa22.wildfly-patch.filename>
-        <version.cdi20.wildfly-patch>3.0.2.Final</version.cdi20.wildfly-patch>
-        <test.cdi20.wildfly-patch.filename>wildfly-${version.wildfly}-weld-${version.cdi20.wildfly-patch}-patch.zip</test.cdi20.wildfly-patch.filename>
-        <test.cdi20.wildfly-patch.url>http://download.jboss.org/weld/${version.cdi20.wildfly-patch}/${test.cdi20.wildfly-patch.filename}</test.cdi20.wildfly-patch.url>
         <!-- Necessary for OSGi integration tests with Karaf -->
         <version.org.javassist>3.22.0-GA</version.org.javassist>
         <version.org.jboss.jandex>2.0.3.Final</version.org.jboss.jandex>
@@ -316,7 +313,6 @@
         <version.dependency-check.plugin>3.1.1</version.dependency-check.plugin>
         <version.dependencypath.plugin>1.1.1</version.dependencypath.plugin>
         <version.depends.plugin>1.3.1</version.depends.plugin>
-        <version.download.plugin>1.4.0</version.download.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
@@ -1846,11 +1842,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>org.bitstrings.maven.plugins</groupId>
                     <artifactId>dependencypath-maven-plugin</artifactId>
                     <version>${version.dependencypath.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.googlecode.maven-download-plugin</groupId>
-                    <artifactId>download-maven-plugin</artifactId>
-                    <version>${version.download.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
