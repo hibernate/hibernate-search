@@ -37,6 +37,7 @@
                 -Djgroups.bind_addr=127.0.0.1
                 -Dremote.maven.repo=${repository.jboss-public.url}
                 -Dmaven.repo.local=${settings.localRepository}
+                -Dee8.preview.mode=true
             </property>
         </configuration>
     </container>
