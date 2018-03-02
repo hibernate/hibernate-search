@@ -22,9 +22,6 @@
         <!-- JMS backend support -->
         <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${module-slot.org.hibernate.search.full-id}" />
 
-        <!-- JGroups backend support -->
-        <module name="org.hibernate.search.backend-jgroups" services="import" optional="true" slot="${module-slot.org.hibernate.search.full-id}" />
-
         <!-- Infinispan extensions - provided by the Infinispan project -->
         <module name="org.infinispan.hibernate-search.directory-provider" slot="${module-slot.org.infinispan.integration}" services="import" optional="true" />
 
