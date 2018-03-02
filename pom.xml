@@ -336,7 +336,7 @@
         <version.surefire.plugin>2.20.1</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
-        <version.org.wildfly.build-tools>1.2.6.Final</version.org.wildfly.build-tools>
+        <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
 
         <!--
             Please don't change the name of this property, it may be used and
