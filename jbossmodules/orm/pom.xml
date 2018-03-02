@@ -19,8 +19,8 @@
     <description>Hibernate Search ORM modules to use in JBoss AS / Wildfly</description>
 
     <properties>
-        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
-        <template.dir>${featurepack.dir}/modules/</template.dir>
+        <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>
+        <template.dir>${feature-pack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
@@ -101,7 +101,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/orm/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/orm/${module-slot.org.hibernate.search.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/search/orm</directory>
@@ -117,7 +117,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/orm/${hibernate.search.slot.simple.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/orm/${module-slot.org.hibernate.search.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/search/orm</directory>
@@ -133,7 +133,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/jsr352/${hibernate.search.slot.full.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/jsr352/${module-slot.org.hibernate.search.full-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/search/jsr352</directory>
@@ -149,7 +149,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/jsr352/${hibernate.search.slot.simple.id}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/jsr352/${module-slot.org.hibernate.search.short-id}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/aliases/search/jsr352</directory>
@@ -165,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <outputDirectory>${feature-pack.dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/feature-pack-def</directory>
@@ -188,7 +188,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <config-file>feature-pack-template.xml</config-file>
-                            <config-dir>${featurepack.dir}</config-dir>
+                            <config-dir>${feature-pack.dir}</config-dir>
                             <resourcesDir>/</resourcesDir>
                         </configuration>
                     </execution>

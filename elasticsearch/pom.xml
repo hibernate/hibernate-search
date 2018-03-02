@@ -32,17 +32,17 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
-            <version>${elasticsearchClientVersion}</version>
+            <version>${version.org.elasticsearch.client}</version>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client-sniffer</artifactId>
-            <version>${elasticsearchClientVersion}</version>
+            <version>${version.org.elasticsearch.client}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${gsonVersion}</version>
+            <version>${version.com.google.code.gson}</version>
         </dependency>
 
         <!-- Test -->
@@ -149,8 +149,8 @@
                     <instructions>
                         <Import-Package>
                             org.hibernate.search.*;version="[${project.version},${project.version}]",
-                            org.apache.lucene.*;version="${luceneOsgiRangeVersion}",
-                            org.hibernate.annotations.common.*;version="${hibernateHcannOsgiRangeVersion}",
+                            org.apache.lucene.*;version="${osgi.version-range.org.apache.lucene}",
+                            org.hibernate.annotations.common.*;version="${osgi.version-range.org.hibernate.commons.annotations}",
                         </Import-Package>
                         <Export-Package>
                         </Export-Package>

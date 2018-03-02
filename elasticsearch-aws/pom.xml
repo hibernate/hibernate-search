@@ -28,7 +28,7 @@
         <dependency>
             <groupId>uk.co.lucasweb</groupId>
             <artifactId>aws-v4-signer-java</artifactId>
-            <version>${awsV4SignerJavaVersion}</version>
+            <version>${version.uk.co.lucasweb.aws-v4-signer-java}</version>
         </dependency>
     </dependencies>
 

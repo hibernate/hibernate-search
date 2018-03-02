@@ -28,12 +28,16 @@
     </modules>
 
     <properties>
-        <hibernate.search.slot.full.id>${project.version}</hibernate.search.slot.full.id>
-        <hibernate.search.slot.simple.id>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.slot.simple.id>
-        <hibernate.orm.slot.full.id>${hibernateVersion}</hibernate.orm.slot.full.id>
-        <hibernate.orm.slot.simple.id>${hibernateShortVersion}</hibernate.orm.slot.simple.id>
-        <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.slot.simple.id}</infinispan.integration.slot>
-        <tika.module.slot>${tikaVersion}</tika.module.slot>
+        <module-slot.org.hibernate.search.full-id>${project.version}</module-slot.org.hibernate.search.full-id>
+        <module-slot.org.hibernate.search.short-id>${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}</module-slot.org.hibernate.search.short-id>
+        <module-slot.org.hibernate.full-id>${version.org.hibernate}</module-slot.org.hibernate.full-id>
+        <module-slot.org.hibernate.short-id>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</module-slot.org.hibernate.short-id>
+        <module-slot.org.infinispan.integration>for-hibernatesearch-${module-slot.org.hibernate.search.short-id}</module-slot.org.infinispan.integration>
+        <module-slot.org.apache.lucene>${parsed-version.org.apache.lucene.majorVersion}.${parsed-version.org.apache.lucene.minorVersion}</module-slot.org.apache.lucene>
+        <module-slot.org.apache.tika>${version.org.apache.tika}</module-slot.org.apache.tika>
+        <module-slot.org.elasticsearch.client>${parsed-version.org.elasticsearch.client.majorVersion}.${parsed-version.org.elasticsearch.client.minorVersion}</module-slot.org.elasticsearch.client>
+        <module-slot.com.google.code.gson>${parsed-version.com.google.code.gson.majorVersion}.${parsed-version.com.google.code.gson.minorVersion}</module-slot.com.google.code.gson>
+        <module-slot.uk.co.lucasweb.aws-v4-signer-java>${parsed-version.uk.co.lucasweb.aws-v4-signer-java.majorVersion}.${parsed-version.uk.co.lucasweb.aws-v4-signer-java.minorVersion}</module-slot.uk.co.lucasweb.aws-v4-signer-java>
 
         <!-- Skip javadoc generation -->
         <maven.javadoc.skip>true</maven.javadoc.skip>

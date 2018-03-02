@@ -19,8 +19,8 @@
     <description>Additional JBoss modules which are meant for internal testing exclusively</description>
 
     <properties>
-        <featurepack.dir>${project.build.directory}/feature-pack/src/main/resources</featurepack.dir>
-        <template.dir>${featurepack.dir}/modules/</template.dir>
+        <feature-pack.dir>${project.build.directory}/feature-pack/src/main/resources</feature-pack.dir>
+        <template.dir>${feature-pack.dir}/modules/</template.dir>
     </properties>
 
     <dependencies>
@@ -76,7 +76,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/apache/tika/${tika.module.slot}/</outputDirectory>
+                            <outputDirectory>${template.dir}/system/layers/base/org/apache/tika/${module-slot.org.apache.tika}/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/tika</directory>
@@ -92,7 +92,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${featurepack.dir}</outputDirectory>
+                            <outputDirectory>${feature-pack.dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/feature-pack-def</directory>
@@ -115,7 +115,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <config-file>feature-pack-template.xml</config-file>
-                            <config-dir>${featurepack.dir}</config-dir>
+                            <config-dir>${feature-pack.dir}</config-dir>
                             <resourcesDir>/</resourcesDir>
                         </configuration>
                     </execution>
