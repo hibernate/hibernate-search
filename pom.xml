@@ -300,7 +300,6 @@
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
-        <test.elasticsearch.client.http_client_configurer></test.elasticsearch.client.http_client_configurer>
 
         <!-- Maven plugins versions -->
 
@@ -2260,7 +2259,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
-                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
