@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
@@ -123,29 +121,8 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 	}
 
 	@Override
-	public <A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType) {
-		return rawTypeModel.getAnnotationByType( annotationType );
-	}
-
-	@Override
-	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return rawTypeModel.getAnnotationsByType( annotationType );
-	}
-
-	@Override
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(
-			Class<? extends Annotation> metaAnnotationType) {
-		return rawTypeModel.getAnnotationsByMetaAnnotationType( metaAnnotationType );
-	}
-
-	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
 		return wrapProperty( rawTypeModel.getProperty( propertyName ) );
-	}
-
-	@Override
-	public Stream<PojoPropertyModel<?>> getDeclaredProperties() {
-		return rawTypeModel.getDeclaredProperties().map( this::wrapProperty );
 	}
 
 	@Override

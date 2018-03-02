@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.lang.annotation.Annotation;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public interface PojoTypeModel<T> {
 
@@ -24,15 +22,7 @@ public interface PojoTypeModel<T> {
 	 */
 	<U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate);
 
-	<A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType);
-
-	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);
-
-	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
-
 	PojoPropertyModel<?> getProperty(String propertyName);
-
-	Stream<PojoPropertyModel<?>> getDeclaredProperties();
 
 	T cast(Object instance);
 }
