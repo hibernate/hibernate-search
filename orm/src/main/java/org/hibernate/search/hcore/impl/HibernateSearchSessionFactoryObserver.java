@@ -143,10 +143,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
 		}
-		catch (RuntimeException e) {
-			extendedSearchIntegratorFuture.completeExceptionally( e );
+		catch (Throwable t) {
+			extendedSearchIntegratorFuture.completeExceptionally( t );
 			// This will make the SessionFactory abort and close itself
-			throw e;
+			throw t;
 		}
 	}
 
