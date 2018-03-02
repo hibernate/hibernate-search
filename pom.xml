@@ -273,7 +273,7 @@
         <version.org.apache.karaf>4.1.2</version.org.apache.karaf>
         <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
         <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
-        <version.jpa22.wildfly-patch>1.0.0.Beta1</version.jpa22.wildfly-patch>
+        <version.jpa22.wildfly-patch>1.0.0.Beta2</version.jpa22.wildfly-patch>
         <test.jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</test.jpa22.wildfly-patch.filename>
         <version.cdi20.wildfly-patch>3.0.2.Final</version.cdi20.wildfly-patch>
         <test.cdi20.wildfly-patch.filename>wildfly-${version.wildfly}-weld-${version.cdi20.wildfly-patch}-patch.zip</test.cdi20.wildfly-patch.filename>

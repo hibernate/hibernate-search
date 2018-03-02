@@ -482,7 +482,7 @@
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --override-all --path ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
+                                        <command>patch apply --override-all ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
                                     </commands>
                                 </configuration>
                             </execution>
