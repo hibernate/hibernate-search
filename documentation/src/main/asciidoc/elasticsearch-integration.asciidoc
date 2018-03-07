@@ -194,6 +194,11 @@ the failure will be blamed on the node and no error will be reported to the appl
 +
 The failover feature will also be enabled when you only have one configured host
 but other hosts have been added thanks to automatic discovery (see below).
+Optional path prefix of the Elasticsearch instance:: `hibernate.search.default.elasticsearch.path_prefix /my/path`
++
+In a typical Elasticsearch setup, it should not be set.
++
+Use the path prefix if your Elasticsearch instance is located at a specific context path i.e. is, for instance, hosted at http://localhost/my/elasticsearch/.
 Username for Elasticsearch connection:: `hibernate.search.default.elasticsearch.username ironman` (default is empty, meaning anonymous access)
 Password for Elasticsearch connection:: `hibernate.search.default.elasticsearch.password j@rV1s` (default is empty)
 +
