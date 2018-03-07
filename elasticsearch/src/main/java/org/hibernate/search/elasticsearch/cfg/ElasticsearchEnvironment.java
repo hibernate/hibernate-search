@@ -12,6 +12,8 @@ import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnaly
  * Configuration properties for Elasticsearch,
  *
  * @author Gunnar Morling
+ * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 public final class ElasticsearchEnvironment {
 
@@ -55,6 +57,21 @@ public final class ElasticsearchEnvironment {
 	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_URI = "elasticsearch.host";
+
+	/**
+	 * Property for specifying the path prefix prepended to the request end point.
+	 * <p>
+	 * A string such as /my/path is expected.
+	 * <p>
+	 * Defaults to null.
+	 * <p>
+	 * The path prefix is defined globally for all the hosts if there are several of them.
+	 * <p>
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.path_prefix}).
+	 * This limitation will be removed in a future version of Hibernate Search.
+	 */
+	public static final String PATH_PREFIX = "elasticsearch.path_prefix";
 
 	/**
 	 * Property for specifying the username to send when connecting to the Elasticsearch servers.

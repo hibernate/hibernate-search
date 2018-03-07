@@ -16,6 +16,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.sniff.ElasticsearchHostsSniffer;
 import org.elasticsearch.client.sniff.HostsSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
@@ -28,6 +29,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.SearchThreadFactory;
 
@@ -36,6 +38,7 @@ import com.google.gson.GsonBuilder;
 /**
  * @author Gunnar Morling
  * @author Yoann Rodiere
+ * @author Guillaume Smet
  */
 public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory, Startable, Stoppable {
 
@@ -77,7 +80,9 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		);
 		ServerUris hosts = ServerUris.fromString( serverUrisString );
 
-		return RestClient.builder( hosts.asHostsArray() )
+		String pathPrefix = ConfigurationParseHelper.getString( properties, ElasticsearchEnvironment.PATH_PREFIX, null );
+
+		RestClientBuilder restClientBuilder = RestClient.builder( hosts.asHostsArray() )
 				/*
 				 * Note: this timeout is currently only used on retries,
 				 * but should we start using the synchronous methods of RestClient,
@@ -86,8 +91,13 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 				 */
 				.setMaxRetryTimeoutMillis( maxRetryTimeoutMillis )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( properties, b ) )
-				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( properties, hosts, b ) )
-				.build();
+				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( properties, hosts, b ) );
+
+		if ( !StringHelper.isEmpty( pathPrefix ) && !"/".equals( pathPrefix ) ) {
+			restClientBuilder.setPathPrefix( pathPrefix );
+		}
+
+		return restClientBuilder.build();
 	}
 
 	private Sniffer createSniffer(RestClient client, Properties properties) {
