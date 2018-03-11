@@ -994,7 +994,7 @@ FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager
 org.hibernate.search.query.dsl.QueryBuilder queryBuilder =
         fullTextEm.getSearchFactory()
         .buildQueryBuilder().forEntity(Book.class).get();
-Query luceneQuery = /* ... use the query builder as explained in tje Querying section ... */;
+Query luceneQuery = /* ... use the query builder as explained in the Querying section ... */;
 FullTextQuery query = fullTextEm.createFullTextQuery( luceneQuery, Book.class );
 Sort sort = queryBuilder.sort()
         .byNative("authors.name", "{'order':'asc', 'mode': 'min'}")
