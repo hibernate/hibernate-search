@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
- * An {@link PojoTypeModel} representing a raw type, fully defined by its {@link Class}.
+ * A {@link PojoTypeModel} representing a raw type, fully defined by its {@link Class}.
  * <p>
  * This excludes in particular parameterized types such as {@code ArrayList<Integer>},
  * because we cannot tell the difference between instances of such types and instances of the same type
