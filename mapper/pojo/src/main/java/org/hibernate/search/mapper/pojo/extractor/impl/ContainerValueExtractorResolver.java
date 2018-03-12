@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalLongValueExtra
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
@@ -61,7 +61,7 @@ public class ContainerValueExtractorResolver {
 
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	public <C> Optional<BoundContainerValueExtractor<? super C, ?>> resolveDefaultContainerValueExtractors(
-			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
+			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
 		if ( firstMatchingExtractorContributor.tryAppend( state ) ) {
 			return Optional.of( state.build() );
@@ -73,7 +73,7 @@ public class ContainerValueExtractorResolver {
 
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
 	public <C> BoundContainerValueExtractor<? super C, ?> resolveExplicitContainerValueExtractors(
-			PojoIntrospector introspector, PojoGenericTypeModel<C> sourceType,
+			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<C> sourceType,
 			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
 		for ( Class<? extends ContainerValueExtractor> extractorClass : extractorClasses ) {
@@ -174,11 +174,11 @@ public class ContainerValueExtractorResolver {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
-		private final PojoIntrospector introspector;
+		private final PojoBootstrapIntrospector introspector;
 		private ContainerValueExtractor<? super C, ?> extractor;
 		private PojoGenericTypeModel<?> extractedType;
 
-		ExtractorResolutionState(PojoIntrospector introspector, PojoGenericTypeModel<?> extractedType) {
+		ExtractorResolutionState(PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> extractedType) {
 			this.introspector = introspector;
 			this.extractedType = extractedType;
 		}

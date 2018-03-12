@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionImpl;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 /**
  * @author Yoann Rodiere
@@ -27,13 +27,13 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	private final PojoMapperFactory<MI> mapperFactory;
 
-	private final PojoIntrospector introspector;
+	private final PojoBootstrapIntrospector introspector;
 
 	private AnnotationMappingDefinitionImpl annotationMappingDefinition;
 
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			PojoMapperFactory<MI> mapperFactory,
-			PojoIntrospector introspector) {
+			PojoBootstrapIntrospector introspector) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mapperFactory = mapperFactory;
 		this.introspector = introspector;

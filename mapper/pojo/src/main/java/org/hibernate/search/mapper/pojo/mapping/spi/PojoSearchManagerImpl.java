@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoSessionContextImpl;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 
 /**
@@ -30,7 +30,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 
 	protected PojoSearchManagerImpl(Builder<? extends PojoSearchManager> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
-		this.sessionContext = new PojoSessionContextImpl( builder.getProxyIntrospector(), builder.getTenantId() );
+		this.sessionContext = new PojoSessionContextImpl( builder.getRuntimeIntrospector(), builder.getTenantId() );
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 			this.mappingDelegate = mappingDelegate;
 		}
 
-		protected abstract PojoProxyIntrospector getProxyIntrospector();
+		protected abstract PojoRuntimeIntrospector getRuntimeIntrospector();
 
 		protected abstract String getTenantId();
 

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 class RawSuperTypeMatcher implements TypePatternMatcher {
 	private final Class<?> matchedRawType;
@@ -26,7 +26,7 @@ class RawSuperTypeMatcher implements TypePatternMatcher {
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> match(PojoIntrospector introspector,
+	public Optional<? extends PojoGenericTypeModel<?>> match(PojoBootstrapIntrospector introspector,
 			PojoGenericTypeModel<?> typeToMatch) {
 		return typeToMatch.getSuperType( matchedRawType )
 				.map( ignored -> introspector.getGenericTypeModel( resultRawType ) );

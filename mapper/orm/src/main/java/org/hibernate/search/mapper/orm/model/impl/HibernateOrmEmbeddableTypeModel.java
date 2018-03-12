@@ -21,7 +21,7 @@ class HibernateOrmEmbeddableTypeModel<T> extends AbstractHibernateOrmTypeModel<T
 
 	private final ComponentType componentType;
 
-	HibernateOrmEmbeddableTypeModel(HibernateOrmIntrospector introspector, EmbeddableType<T> embeddableType,
+	HibernateOrmEmbeddableTypeModel(HibernateOrmBootstrapIntrospector introspector, EmbeddableType<T> embeddableType,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		super( introspector, embeddableType.getJavaType(), rawTypeDeclaringContext );
 		// FIXME find a way to avoid depending on Hibernate ORM internal APIs

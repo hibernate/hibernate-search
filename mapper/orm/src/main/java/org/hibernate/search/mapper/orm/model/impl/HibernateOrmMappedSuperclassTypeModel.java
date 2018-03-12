@@ -20,7 +20,7 @@ class HibernateOrmMappedSuperclassTypeModel<T> extends AbstractHibernateOrmTypeM
 
 	private final ManagedType<T> managedType;
 
-	HibernateOrmMappedSuperclassTypeModel(HibernateOrmIntrospector introspector, ManagedType<T> managedType,
+	HibernateOrmMappedSuperclassTypeModel(HibernateOrmBootstrapIntrospector introspector, ManagedType<T> managedType,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		super( introspector, managedType.getJavaType(), rawTypeDeclaringContext );
 		this.managedType = managedType;

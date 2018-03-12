@@ -20,7 +20,7 @@ class HibernateOrmEntityTypeModel<T> extends AbstractHibernateOrmTypeModel<T> {
 
 	private final EntityPersister persister;
 
-	HibernateOrmEntityTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz, EntityPersister persister,
+	HibernateOrmEntityTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz, EntityPersister persister,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		super( introspector, clazz, rawTypeDeclaringContext );
 		this.persister = persister;

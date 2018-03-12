@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 
 /**
  * @author Yoann Rodiere
@@ -22,9 +21,9 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 	private final Map<Class<?>, StreamPojoTypeWorker<?, ?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
-	public StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
-			PojoIntrospector introspector, PojoSessionContext sessionContext) {
-		super( typeManagers, introspector );
+	StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+			PojoSessionContext sessionContext) {
+		super( typeManagers, sessionContext.getRuntimeIntrospector() );
 		this.sessionContext = sessionContext;
 	}
 

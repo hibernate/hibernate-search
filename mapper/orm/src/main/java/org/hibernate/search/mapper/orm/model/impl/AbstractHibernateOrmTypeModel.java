@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 
-	final HibernateOrmIntrospector introspector;
+	final HibernateOrmBootstrapIntrospector introspector;
 	private final XClass xClass;
 	private final Class<T> clazz;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
@@ -51,7 +51,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	private Map<String, XProperty> fieldAccessXPropertiesByName;
 	private Map<String, XProperty> methodAccessXPropertiesByName;
 
-	AbstractHibernateOrmTypeModel(HibernateOrmIntrospector introspector, Class<T> clazz,
+	AbstractHibernateOrmTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.xClass = introspector.toXClass( clazz );

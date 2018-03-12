@@ -24,7 +24,6 @@ import javax.persistence.metamodel.ManagedType;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.EntityMode;
-import org.hibernate.Hibernate;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -43,17 +42,17 @@ import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.property.access.spi.PropertyAccessStrategyResolver;
 import org.hibernate.search.mapper.orm.util.impl.XClassOrdering;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 
 /**
  * @author Yoann Rodiere
  */
-public class HibernateOrmIntrospector implements PojoIntrospector {
+public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final ReflectionManager reflectionManager;
 	private final AnnotationHelper annotationHelper;
@@ -75,7 +74,7 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	public HibernateOrmIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
+	public HibernateOrmBootstrapIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
 		ReflectionManager metadataReflectionManager = null;
 		if ( metadata instanceof MetadataImplementor ) {
 			metadataReflectionManager = ((MetadataImplementor) metadata).getMetadataBuildingOptions().getReflectionManager();
@@ -109,13 +108,6 @@ public class HibernateOrmIntrospector implements PojoIntrospector {
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
-	}
-
-	@Override
-	// The actual class of a proxy of type T is always a Class<? extends T> (unless T is HibernateProxy, but we don't expect that)
-	@SuppressWarnings("unchecked")
-	public <T> Class<? extends T> getClass(T entity) {
-		return Hibernate.getClass( entity );
 	}
 
 	@SuppressWarnings( "unchecked" )

@@ -27,13 +27,13 @@ import org.hibernate.search.util.SearchException;
 
 class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
-	private final JavaBeanIntrospector introspector;
+	private final JavaBeanBootstrapIntrospector introspector;
 	private final Class<T> clazz;
 	private final BeanInfo beanInfo;
 	private final BeanInfo declaredBeanInfo;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
-	JavaBeanTypeModel(JavaBeanIntrospector introspector, Class<T> clazz,
+	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, Class<T> clazz,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) throws IntrospectionException {
 		this.introspector = introspector;
 		this.clazz = clazz;

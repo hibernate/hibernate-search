@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
@@ -65,7 +65,7 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 	}
 
 	public Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
-		PojoProxyIntrospector proxyIntrospector = sessionContext.getProxyIntrospector();
+		PojoRuntimeIntrospector proxyIntrospector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, proxyIntrospector, entity );
 	}
 

@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.util.AssertionFailure;
 
@@ -35,14 +35,13 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
-	private final PojoIntrospector introspector;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
 	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			PojoIntrospector introspector,
+			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory) {
 		ContainerValueExtractorResolver extractorResolver = new ContainerValueExtractorResolver( buildContext );
@@ -52,7 +51,6 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 		);
 
 		this.propertySource = propertySource;
-		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 	}
@@ -83,7 +81,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	public M build() {
 		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
 		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
-		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build(), introspector );
+		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );
 		return wrapperFactory.apply( propertySource, mappingImplementor );
 	}
 

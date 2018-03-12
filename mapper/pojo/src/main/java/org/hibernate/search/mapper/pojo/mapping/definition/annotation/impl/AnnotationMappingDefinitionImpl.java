@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelC
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
@@ -31,11 +31,11 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 
 	private final PojoMapperFactory<?> mapperFactory;
 
-	private final PojoIntrospector introspector;
+	private final PojoBootstrapIntrospector introspector;
 
 	private final Set<Class<?>> annotatedTypes = new HashSet<>();
 
-	public AnnotationMappingDefinitionImpl(PojoMapperFactory<?> mapperFactory, PojoIntrospector introspector) {
+	public AnnotationMappingDefinitionImpl(PojoMapperFactory<?> mapperFactory, PojoBootstrapIntrospector introspector) {
 		this.mapperFactory = mapperFactory;
 		this.introspector = introspector;
 	}

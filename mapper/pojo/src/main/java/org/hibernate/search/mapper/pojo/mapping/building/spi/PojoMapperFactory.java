@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 
 /**
@@ -22,10 +22,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
 public abstract class PojoMapperFactory<M extends MappingImplementor>
 		implements MapperFactory<PojoTypeNodeMetadataContributor, M> {
 
-	private final PojoIntrospector introspector;
+	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
 
-	protected PojoMapperFactory(PojoIntrospector introspector, boolean implicitProvidedId) {
+	protected PojoMapperFactory(PojoBootstrapIntrospector introspector, boolean implicitProvidedId) {
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
 	}

@@ -9,19 +9,19 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 public class CachingCastingEntitySupplier<E> implements Supplier<E> {
 
 	private final PojoCaster<E> caster;
-	private final PojoProxyIntrospector proxyIntrospector;
+	private final PojoRuntimeIntrospector proxyIntrospector;
 	private final Object potentiallyProxiedEntity;
 
 	private E unproxiedEntity;
 
 	public CachingCastingEntitySupplier(
 			PojoCaster<E> caster,
-			PojoProxyIntrospector proxyIntrospector,
+			PojoRuntimeIntrospector proxyIntrospector,
 			Object potentiallyProxiedEntity) {
 		this.caster = caster;
 		this.proxyIntrospector = proxyIntrospector;

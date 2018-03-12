@@ -20,7 +20,7 @@ import org.hibernate.search.util.SearchException;
 
 class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
-	private final JavaBeanIntrospector introspector;
+	private final JavaBeanBootstrapIntrospector introspector;
 	private final JavaBeanTypeModel<?> parentTypeModel;
 
 	private final PropertyDescriptor descriptor;
@@ -28,7 +28,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	private PojoGenericTypeModel<T> typeModel;
 	private PropertyHandle handle;
 
-	JavaBeanPropertyModel(JavaBeanIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel,
+	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel,
 			PropertyDescriptor descriptor) {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;

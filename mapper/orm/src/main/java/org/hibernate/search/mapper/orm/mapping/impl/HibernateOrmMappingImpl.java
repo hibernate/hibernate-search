@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.Hibernate;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
@@ -34,6 +35,11 @@ public class HibernateOrmMappingImpl extends PojoMappingImpl
 	@Override
 	public HibernateOrmSearchManagerBuilder createSearchManagerWithOptions(EntityManager entityManager) {
 		return createSearchManagerBuilder( entityManager );
+	}
+
+	@Override
+	public boolean isIndexable(Object entity) {
+		return isIndexable( Hibernate.getClass( entity ) );
 	}
 
 	private HibernateOrmSearchManagerBuilder createSearchManagerBuilder(EntityManager entityManager) {

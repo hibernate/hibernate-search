@@ -9,13 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping;
 public interface PojoMapping {
 
 	/**
-	 * @param entity an entity
-	 * @return {@code true} if this entity is indexable (i.e. it can be passed to {@link PojoWorker#add(Object)}
-	 * for instance), {@code false} if it is not.
-	 */
-	boolean isIndexable(Object entity);
-
-	/**
 	 * @param type a Java type
 	 * @return {@code true} if this type is indexable, {@code false} if it is not.
 	 */

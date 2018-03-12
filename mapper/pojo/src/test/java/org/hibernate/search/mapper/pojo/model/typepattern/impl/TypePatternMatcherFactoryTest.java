@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.test.util.TypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
@@ -31,7 +31,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
-	private final PojoIntrospector introspectorMock = createMock( PojoIntrospector.class );
+	private final PojoBootstrapIntrospector introspectorMock = createMock( PojoBootstrapIntrospector.class );
 
 	private final TypePatternMatcherFactory factory = new TypePatternMatcherFactory();
 

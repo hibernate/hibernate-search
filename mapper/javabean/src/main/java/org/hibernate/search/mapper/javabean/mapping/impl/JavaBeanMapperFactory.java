@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.mapper.javabean.model.impl.JavaBeanIntrospector;
+import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
  */
 public final class JavaBeanMapperFactory extends PojoMapperFactory<JavaBeanMappingImpl> {
 
-	public JavaBeanMapperFactory(JavaBeanIntrospector introspector) {
+	public JavaBeanMapperFactory(JavaBeanBootstrapIntrospector introspector) {
 		super( introspector, false );
 	}
 

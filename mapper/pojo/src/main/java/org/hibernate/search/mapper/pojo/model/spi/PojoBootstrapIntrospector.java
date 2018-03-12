@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 /**
- * @author Yoann Rodiere
+ * A Pojo introspector used at bootstrap.
  */
-public interface PojoIntrospector {
+public interface PojoBootstrapIntrospector {
 
 	/**
 	 * @param clazz The Java class representing the raw version of the type
@@ -23,12 +23,5 @@ public interface PojoIntrospector {
 	 * @return A type model for the given type.
 	 */
 	<T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz);
-
-	/**
-	 * @param <T> the type of the entity
-	 * @param entity an instance or proxy of T
-	 * @return the class from the instance, or the underlying class as a proxy.
-	 */
-	<T> Class<? extends T> getClass(T entity);
 
 }

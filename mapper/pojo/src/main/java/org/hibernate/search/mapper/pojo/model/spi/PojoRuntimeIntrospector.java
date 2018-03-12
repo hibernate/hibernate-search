@@ -7,9 +7,16 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 /**
- * @author Yoann Rodiere
+ * A Pojo introspector used at runtime.
  */
-public interface PojoProxyIntrospector {
+public interface PojoRuntimeIntrospector {
+
+	/**
+	 * @param <T> the type of the entity
+	 * @param entity an instance or proxy of T
+	 * @return the class from the instance, or the underlying class as a proxy.
+	 */
+	<T> Class<? extends T> getClass(T entity);
 
 	/**
 	 * @param value the object to unproxy
@@ -39,7 +46,7 @@ public interface PojoProxyIntrospector {
 //	 */
 //	Object[] initializeArray(Object[] value);
 
-	static PojoProxyIntrospector noProxy() {
-		return NoProxyPojoProxyIntrospector.get();
+	static PojoRuntimeIntrospector noProxy() {
+		return NoProxyPojoRuntimeIntrospector.get();
 	}
 }

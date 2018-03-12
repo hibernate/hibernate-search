@@ -13,9 +13,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public class HibernateOrmGenericContextHelper implements GenericContextAwarePojoGenericTypeModel.Helper {
-	private final HibernateOrmIntrospector introspector;
+	private final HibernateOrmBootstrapIntrospector introspector;
 
-	public HibernateOrmGenericContextHelper(HibernateOrmIntrospector introspector) {
+	public HibernateOrmGenericContextHelper(HibernateOrmBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 

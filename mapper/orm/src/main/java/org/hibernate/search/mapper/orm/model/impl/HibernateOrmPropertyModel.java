@@ -23,7 +23,7 @@ import org.hibernate.search.util.SearchException;
 
 class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 
-	private final HibernateOrmIntrospector introspector;
+	private final HibernateOrmBootstrapIntrospector introspector;
 	private final AbstractHibernateOrmTypeModel<?> holderTypeModel;
 
 	private final String name;
@@ -33,7 +33,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	private PropertyHandle handle;
 	private PojoGenericTypeModel<T> typeModel;
 
-	HibernateOrmPropertyModel(HibernateOrmIntrospector introspector, AbstractHibernateOrmTypeModel<?> holderTypeModel,
+	HibernateOrmPropertyModel(HibernateOrmBootstrapIntrospector introspector, AbstractHibernateOrmTypeModel<?> holderTypeModel,
 			String name, List<XProperty> declaredXProperties, Getter getter) {
 		this.introspector = introspector;
 		this.holderTypeModel = holderTypeModel;

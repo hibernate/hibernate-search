@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
@@ -47,11 +47,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BuildContext buildContext;
-	private final PojoIntrospector introspector;
+	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorResolver extractorResolver;
 	private final BridgeResolver bridgeResolver;
 
-	PojoIndexModelBinderImpl(BuildContext buildContext, PojoIntrospector introspector,
+	PojoIndexModelBinderImpl(BuildContext buildContext, PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorResolver extractorResolver, BridgeResolver bridgeResolver) {
 		this.buildContext = buildContext;
 		this.introspector = introspector;

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.SearchException;
 
@@ -29,7 +29,7 @@ import org.hibernate.search.util.SearchException;
  *
  * @author Yoann Rodiere
  */
-public class JavaBeanIntrospector implements PojoIntrospector {
+public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final AnnotationHelper annotationHelper;
 	private final JavaBeanGenericContextHelper genericContextHelper;
@@ -37,7 +37,7 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	public JavaBeanIntrospector(MethodHandles.Lookup lookup) {
+	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
 		this.annotationHelper = new AnnotationHelper( lookup );
 		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
@@ -53,12 +53,6 @@ public class JavaBeanIntrospector implements PojoIntrospector {
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
-	public <T> Class<? extends T> getClass(T entity) {
-		return entity == null ? null : (Class<? extends T>) entity.getClass();
 	}
 
 	<A extends Annotation> Optional<A> getAnnotationByType(AnnotatedElement annotatedElement,

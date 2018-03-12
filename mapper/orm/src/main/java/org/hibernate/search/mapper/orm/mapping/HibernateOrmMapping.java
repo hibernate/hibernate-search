@@ -9,11 +9,19 @@ package org.hibernate.search.mapper.orm.mapping;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 
 public interface HibernateOrmMapping extends PojoMapping {
 
 	HibernateOrmSearchManager createSearchManager(EntityManager entityManager);
 
 	HibernateOrmSearchManagerBuilder createSearchManagerWithOptions(EntityManager entityManager);
+
+	/**
+	 * @param entity an entity
+	 * @return {@code true} if this entity is indexable (i.e. it can be passed to {@link PojoWorker#add(Object)}
+	 * for instance), {@code false} if it is not.
+	 */
+	boolean isIndexable(Object entity);
 
 }

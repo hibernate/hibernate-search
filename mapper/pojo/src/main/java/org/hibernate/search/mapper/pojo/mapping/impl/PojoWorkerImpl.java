@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
-import org.hibernate.search.mapper.pojo.model.spi.PojoIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -18,10 +18,10 @@ import org.hibernate.search.util.SearchException;
 abstract class PojoWorkerImpl implements PojoWorker {
 
 	private final PojoTypeManagerContainer typeManagers;
-	private final PojoIntrospector introspector;
+	private final PojoRuntimeIntrospector introspector;
 
 	public PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
-			PojoIntrospector introspector) {
+			PojoRuntimeIntrospector introspector) {
 		this.typeManagers = typeManagers;
 		this.introspector = introspector;
 	}

@@ -6,22 +6,30 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import org.hibernate.Hibernate;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
-import org.hibernate.search.mapper.pojo.model.spi.PojoProxyIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Yoann Rodiere
  */
-public class HibernateOrmProxyIntrospector implements PojoProxyIntrospector {
+public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	private final SessionImplementor sessionImplementor;
 
-	public HibernateOrmProxyIntrospector(SessionImplementor sessionImplementor) {
+	public HibernateOrmRuntimeIntrospector(SessionImplementor sessionImplementor) {
 		this.sessionImplementor = sessionImplementor;
+	}
+
+	@Override
+	// The actual class of a proxy of type T is always a Class<? extends T> (unless T is HibernateProxy, but we don't expect that)
+	@SuppressWarnings("unchecked")
+	public <T> Class<? extends T> getClass(T entity) {
+		return Hibernate.getClass( entity );
 	}
 
 	@Override
