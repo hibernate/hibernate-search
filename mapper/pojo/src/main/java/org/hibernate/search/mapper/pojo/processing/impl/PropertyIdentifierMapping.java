@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.SearchException;
 
@@ -18,13 +18,13 @@ import org.hibernate.search.util.SearchException;
  */
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
-	private final PojoTypeModel<I> typeModel;
+	private final PojoCaster<I> caster;
 	private final PropertyHandle property;
 	private final IdentifierBridge<I> bridge;
 
 	@SuppressWarnings("unchecked")
-	public PropertyIdentifierMapping(PojoTypeModel<I> typeModel, PropertyHandle property, IdentifierBridge<I> bridge) {
-		this.typeModel = typeModel;
+	public PropertyIdentifierMapping(PojoCaster<I> caster, PropertyHandle property, IdentifierBridge<I> bridge) {
+		this.caster = caster;
 		this.property = property;
 		this.bridge = bridge;
 	}
@@ -37,11 +37,11 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	@Override
 	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier) {
 		if ( providedId != null ) {
-			return typeModel.cast( providedId );
+			return caster.cast( providedId );
 		}
 		else if ( property != null ) {
 			Object id = property.get( entitySupplier.get() );
-			return typeModel.cast( id );
+			return caster.cast( id );
 		}
 		else {
 			throw new SearchException( "No identifier was provided, and this mapping does not define"

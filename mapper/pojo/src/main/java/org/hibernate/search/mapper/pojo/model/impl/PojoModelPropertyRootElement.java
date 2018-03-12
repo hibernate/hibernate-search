@@ -42,12 +42,12 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 		if ( !superTypeModel.isPresent() ) {
 			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
 		}
-		return new PojoModelRootElementAccessor<>( superTypeModel.get() );
+		return new PojoModelRootElementAccessor<>( superTypeModel.get().getCaster() );
 	}
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>( getTypeModel() );
+		return new PojoModelRootElementAccessor<>( getTypeModel().getCaster() );
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -132,8 +133,8 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public T cast(Object instance) {
-		return getJavaClass().cast( instance );
+	public PojoCaster<T> getCaster() {
+		return getJavaClass()::cast;
 	}
 
 	@Override

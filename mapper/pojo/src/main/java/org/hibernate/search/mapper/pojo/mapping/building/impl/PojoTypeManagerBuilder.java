@@ -64,7 +64,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 			routingKeyProvider = new RoutingKeyBridgeProvider<>( routingKeyBridge );
 		}
 		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>(
-				typeModel,
+				typeModel.getJavaClass(), typeModel.getCaster(),
 				identifierMapping, routingKeyProvider,
 				processorBuilder.build().orElseGet( PojoNodeProcessor::noOp ),
 				indexManagerBuildingState.build()
@@ -76,14 +76,14 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		private IdentifierMapping<?, E> identifierMapping;
 		private RoutingKeyBridge routingKeyBridge;
 
-		public PojoTypeNodeIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
+		PojoTypeNodeIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
 			this.identifierMapping = identifierMapping;
 		}
 
 		@Override
 		public <T> void identifierBridge(PojoTypeModel<T> propertyTypeModel, PropertyHandle handle, IdentifierBridge<T> bridge) {
 			// FIXME ensure the bridge is closed upon build failure and when closing the SearchManagerRepository
-			this.identifierMapping = new PropertyIdentifierMapping<>( propertyTypeModel, handle, bridge );
+			this.identifierMapping = new PropertyIdentifierMapping<>( propertyTypeModel.getCaster(), handle, bridge );
 		}
 
 		@Override

@@ -40,12 +40,12 @@ public class PojoModelTypeRootElement extends AbstractPojoModelElement implement
 		if ( !superTypeModel.isPresent() ) {
 			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
 		}
-		return new PojoModelRootElementAccessor<>( superTypeModel.get() );
+		return new PojoModelRootElementAccessor<>( superTypeModel.get().getCaster() );
 	}
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>( typeModel );
+		return new PojoModelRootElementAccessor<>( typeModel.getCaster() );
 	}
 
 	@Override

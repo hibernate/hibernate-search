@@ -127,8 +127,8 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 
 	@Override
 	@SuppressWarnings("unchecked") // We cannot perform runtime checks of generics on an instance
-	public T cast(Object instance) {
-		return (T) rawTypeModel.cast( instance );
+	public PojoCaster<T> getCaster() {
+		return (PojoCaster<T>) rawTypeModel.getCaster();
 	}
 
 	@Override

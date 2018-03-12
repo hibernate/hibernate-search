@@ -24,5 +24,5 @@ public interface PojoTypeModel<T> {
 
 	PojoPropertyModel<?> getProperty(String propertyName);
 
-	T cast(Object instance);
+	PojoCaster<T> getCaster();
 }
