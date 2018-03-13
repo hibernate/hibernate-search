@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+5.9.1.Final (13-03-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3027 Avoid a possible initialization hang on bootstrap failure
+
+** Improvement
+    * HSEARCH-3026 Support the ability to define a pathPrefix for the Elasticsearch REST client
+
 5.9.0.Final (06-02-2018)
 -------------------------
 
