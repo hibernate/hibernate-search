@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
@@ -35,8 +38,16 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 			return this;
 		}
 
-		public Builder field(String relativeName, Object ... values) {
-			attribute( relativeName, values );
+		/*
+		 * The signature is a bit weird, but that's on purpose:
+		 * we want to avoid ambiguity on the call site when passing null
+		 * to the other version of this method.
+		 */
+		public Builder field(String relativeName, Object value, Object ... values) {
+			List<Object> list = new ArrayList<>();
+			list.add( value );
+			Collections.addAll( list, values );
+			attribute( relativeName, list.toArray() );
 			return this;
 		}
 
