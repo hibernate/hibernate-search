@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Session;
+import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.FlushEvent;
 import org.hibernate.event.spi.FlushEventListener;
@@ -182,47 +183,33 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 //		this.flushSynch.put( eventSource, synchronization );
 //	}
 
-	protected void processCollectionEvent(AbstractCollectionEvent event) {
-		if ( eventProcessingEnabled ) {
+	private void processCollectionEvent(AbstractCollectionEvent event) {
+		if ( !eventProcessingEnabled ) {
 			return;
 		}
 
-		// TODO ContainedIn/IndexedEmbedded
-//		Object entity = event.getAffectedOwnerOrNull();
-//		if ( entity == null ) {
-//			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
-//			// or property-ref is used
-//			//Should log really but we don't know if we're interested in this collection for indexing
-//			return;
-//		}
-//		PersistentCollection persistentCollection = event.getCollection();
-//		final String collectionRole;
-//		if ( persistentCollection != null ) {
-//			collectionRole = persistentCollection.getRole();
-//		}
-//		else {
-//			collectionRole = null;
-//		}
-//		AbstractDocumentBuilder documentBuilder = getDocumentBuilder( entity );
-//
-//		if ( documentBuilder != null && documentBuilder.collectionChangeRequiresIndexUpdate( collectionRole ) ) {
-//			Serializable id = getId( entity, event );
-//			if ( id == null ) {
-//				log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
-//				return;
-//			}
-//			processWork( tenantIdentifier( event ), entity, id, WorkType.COLLECTION, event, false );
-//		}
-//	}
-//
-//	private Serializable getId(Object entity, AbstractCollectionEvent event) {
-//		Serializable id = event.getAffectedOwnerIdOrNull();
-//		if ( id == null ) {
-//			// most likely this recovery is unnecessary since Hibernate Core probably try that
-//			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
-//			id = entityEntry == null ? null : entityEntry.getId();
-//		}
-//		return id;
+		HibernateSearchContextService context = state.getHibernateSearchContext();
+		Object entity = event.getAffectedOwnerOrNull();
+		if ( entity == null ) {
+			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
+			// or property-ref is used
+			//Should log really but we don't know if we're interested in this collection for indexing
+			return;
+		}
+		PersistentCollection persistentCollection = event.getCollection();
+		final String collectionRole;
+		if ( persistentCollection != null ) {
+			collectionRole = persistentCollection.getRole();
+		}
+		else {
+			collectionRole = null;
+		}
+
+		if ( isInstanceOfIndexedType( context, entity ) &&
+				( !dirtyCheckingEnabled || true ) ) { // TODO implement dirty checking based on the collection role
+			context.getCurrentWorker( event.getSession() )
+					.update( event.getAffectedOwnerIdOrNull(), entity );
+		}
 	}
 
 	/**
