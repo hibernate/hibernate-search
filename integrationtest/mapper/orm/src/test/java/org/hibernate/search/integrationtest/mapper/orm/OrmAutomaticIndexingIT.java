@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
@@ -88,6 +89,20 @@ public class OrmAutomaticIndexingIT {
 				)
 				.objectField( "containedMapKeys", b2 -> b2
 						.field( "includedInMapKeys", String.class )
+				)
+				.objectField( "child", b3 -> b3
+						.objectField( "containedSingle", b2 -> b2
+								.field( "includedInSingle", String.class )
+						)
+						.objectField( "containedList", b2 -> b2
+								.field( "includedInList", String.class )
+						)
+						.objectField( "containedMapValues", b2 -> b2
+								.field( "includedInMapValues", String.class )
+						)
+						.objectField( "containedMapKeys", b2 -> b2
+								.field( "includedInMapKeys", String.class )
+						)
 				)
 		);
 
@@ -473,20 +488,793 @@ public class OrmAutomaticIndexingIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	public void indirectAssociationUpdate_single() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
 
-	@Entity(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
-	public static class IndexedEntity {
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
 
-		static final String INDEX = "IndexedEntity";
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInSingle( "initialValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInSingle( "updatedValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
+			containingEntity1.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", "updatedValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 6 );
+			containedEntity.setIncludedInSingle( "outOfScopeValue" );
+
+			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			deeplyNestedContainingEntity1.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
+			containingEntity1.setContainedSingle( null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_single() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInSingle( "initialValue" );
+			containingEntity1.setContainedSingle( containedEntity1 );
+			containedEntity1.getContainingAsSingle().add( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.setIncludedInSingle( "initialOutOfScopeValue" );
+			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
+			containedEntity2.getContainingAsSingle().add( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInSingle( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", "updatedValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.setIncludedInSingle( "updatedOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_list() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInList( "firstValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedList().add( containedEntity );
+			containedEntity.getContainingAsList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "firstValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInList( "secondValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedList().add( containedEntity );
+			containedEntity.getContainingAsList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "firstValue" )
+									)
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 6 );
+			containedEntity.setIncludedInList( "outOfScopeValue" );
+
+			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			deeplyNestedContainingEntity1.getContainedList().add( containedEntity );
+			containedEntity.getContainingAsList().add( deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainedEntity containedEntity = containingEntity1.getContainedList().get( 0 );
+			containedEntity.getContainingAsList().clear();
+			containingEntity1.getContainedList().remove( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_list() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInList( "initialValue" );
+			containingEntity1.getContainedList().add( containedEntity1 );
+			containedEntity1.getContainingAsList().add( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.setIncludedInList( "initialOutOfScopeValue" );
+			deeplyNestedContainingEntity.getContainedList().add( containedEntity2 );
+			containedEntity2.getContainingAsList().add( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInList( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "includedInList", "updatedValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.setIncludedInList( "updatedOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_mapValues() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInMapValues( "firstValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "firstValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInMapValues( "secondValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedMapValues().put( "second", containedEntity );
+			containedEntity.getContainingAsMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "firstValue" )
+									)
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 6 );
+			containedEntity.setIncludedInMapValues( "outOfScopeValue" );
+
+			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			deeplyNestedContainingEntity1.getContainedMapValues().put( "outOfScopeKey", containedEntity );
+			containedEntity.getContainingAsMapValues().add( deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainedEntity containedEntity = containingEntity1.getContainedMapValues().get( "first" );
+			containedEntity.getContainingAsMapValues().clear();
+			containingEntity1.getContainedMapValues().values().remove( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_mapValues() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInMapValues( "initialValue" );
+			containingEntity1.getContainedMapValues().put( "someKey", containedEntity1 );
+			containedEntity1.getContainingAsMapValues().add( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.setIncludedInMapValues( "initialOutOfScopeValue" );
+			deeplyNestedContainingEntity.getContainedMapValues().put( "someKey", containedEntity2 );
+			containedEntity2.getContainingAsMapValues().add( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInMapValues( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "includedInMapValues", "updatedValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.setIncludedInMapValues( "updatedOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_mapKeys() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInMapKeys( "firstValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedMapKeys().put( containedEntity, "first" );
+			containedEntity.getContainingAsMapKeys().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "firstValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInMapKeys( "secondValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedMapKeys().put( containedEntity, "second" );
+			containedEntity.getContainingAsMapKeys().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "firstValue" )
+									)
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 6 );
+			containedEntity.setIncludedInMapKeys( "outOfScopeValue" );
+
+			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+			deeplyNestedContainingEntity1.getContainedMapKeys().put( containedEntity, "outOfScopeValue" );
+			containedEntity.getContainingAsMapKeys().add( deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			ContainedEntity containedEntity = containingEntity1.getContainedMapKeys().keySet().iterator().next();
+			containedEntity.getContainingAsMapKeys().clear();
+			containingEntity1.getContainedMapKeys().remove( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_mapKeys() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInMapKeys( "initialValue" );
+			containingEntity1.getContainedMapKeys().put( containedEntity1, "someValue" );
+			containedEntity1.getContainingAsMapKeys().add( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.setIncludedInMapKeys( "initialOutOfScopeValue" );
+			deeplyNestedContainingEntity.getContainedMapKeys().put( containedEntity2, "someValue" );
+			containedEntity2.getContainingAsMapKeys().add( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInMapKeys( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapKeys", b3 -> b3
+											.field( "includedInMapKeys", "updatedValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.setIncludedInMapKeys( "updatedOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Entity(name = "containing")
+	public static class ContainingEntity {
 
 		@Id
 		@DocumentId
 		private Integer id;
 
-		@Basic
-		@Field
-		private String directField;
+		@OneToOne
+		private ContainingEntity parent;
+
+		@OneToOne(mappedBy = "parent")
+		@IndexedEmbedded(includePaths = {
+				"containedSingle.includedInSingle",
+				"containedList.includedInList",
+				"containedMapValues.includedInMapValues",
+				"containedMapKeys.includedInMapKeys",
+		})
+		private ContainingEntity child;
 
 		@ManyToOne
 		@IndexedEmbedded(includePaths = "includedInSingle")
@@ -530,12 +1318,20 @@ public class OrmAutomaticIndexingIT {
 			this.id = id;
 		}
 
-		public String getDirectField() {
-			return directField;
+		public ContainingEntity getParent() {
+			return parent;
 		}
 
-		public void setDirectField(String directField) {
-			this.directField = directField;
+		public void setParent(ContainingEntity parent) {
+			this.parent = parent;
+		}
+
+		public ContainingEntity getChild() {
+			return child;
+		}
+
+		public void setChild(ContainingEntity child) {
+			this.child = child;
 		}
 
 		public ContainedEntity getContainedSingle() {
@@ -559,24 +1355,42 @@ public class OrmAutomaticIndexingIT {
 		}
 	}
 
+	@Entity(name = "indexed")
+	@Indexed(index = IndexedEntity.INDEX)
+	public static class IndexedEntity extends ContainingEntity {
+
+		static final String INDEX = "IndexedEntity";
+
+		@Basic
+		@Field
+		private String directField;
+
+		public String getDirectField() {
+			return directField;
+		}
+
+		public void setDirectField(String directField) {
+			this.directField = directField;
+		}
+	}
+
 	@Entity(name = "contained")
 	public static class ContainedEntity {
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToMany(mappedBy = "containedSingle")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
-		private List<IndexedEntity> containingAsSingle = new ArrayList<>();
+		private List<ContainingEntity> containingAsSingle = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containedList")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
-		private List<IndexedEntity> containingAsList = new ArrayList<>();
+		private List<ContainingEntity> containingAsList = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containedMapValues")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
-		private List<IndexedEntity> containingAsMapValues = new ArrayList<>();
+		private List<ContainingEntity> containingAsMapValues = new ArrayList<>();
 
 		/*
 		 * No mappedBy here. The inverse side of associations modeled by a Map key cannot use mappedBy.
@@ -589,7 +1403,7 @@ public class OrmAutomaticIndexingIT {
 				inverseProperty = "containedMapKeys",
 				inverseExtractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
 		)
-		private List<IndexedEntity> containingAsMapKeys = new ArrayList<>();
+		private List<ContainingEntity> containingAsMapKeys = new ArrayList<>();
 
 		@Basic
 		@Field
@@ -615,19 +1429,19 @@ public class OrmAutomaticIndexingIT {
 			this.id = id;
 		}
 
-		public List<IndexedEntity> getContainingAsSingle() {
+		public List<ContainingEntity> getContainingAsSingle() {
 			return containingAsSingle;
 		}
 
-		public List<IndexedEntity> getContainingAsList() {
+		public List<ContainingEntity> getContainingAsList() {
 			return containingAsList;
 		}
 
-		public List<IndexedEntity> getContainingAsMapValues() {
+		public List<ContainingEntity> getContainingAsMapValues() {
 			return containingAsMapValues;
 		}
 
-		public List<IndexedEntity> getContainingAsMapKeys() {
+		public List<ContainingEntity> getContainingAsMapKeys() {
 			return containingAsMapKeys;
 		}
 
