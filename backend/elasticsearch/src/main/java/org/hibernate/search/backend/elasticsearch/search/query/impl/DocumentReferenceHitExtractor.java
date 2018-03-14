@@ -8,18 +8,26 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
+import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
 import com.google.gson.JsonObject;
 
+/**
+ * A hit extractor used when search results are expected to contain document references, potentially transformed.
+ *
+ * @see SearchQueryFactory#asReferences(SessionContext, HitAggregator)
+ */
 class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHitCollector> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "_id" ).asString();
 
 	private static final DocumentReferenceHitExtractor INSTANCE = new DocumentReferenceHitExtractor();
 
-	public static DocumentReferenceHitExtractor get() {
+	static DocumentReferenceHitExtractor get() {
 		return INSTANCE;
 	}
 

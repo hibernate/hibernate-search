@@ -18,6 +18,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+/**
+ * A hit extractor that will extract a value from the "_source",
+ * and insert it into the projection.
+ */
 class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
@@ -27,7 +31,7 @@ class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 	private final ElasticsearchFieldFormatter formatter;
 
-	public SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldFormatter formatter) {
+	SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldFormatter formatter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.property( absoluteFieldPath );
 		this.formatter = formatter;

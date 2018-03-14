@@ -10,11 +10,16 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 
+/**
+ * A hit extractor used when multiple values must be extracted for each hit.
+ * <p>
+ * Used for projections.
+ */
 class CompositeHitExtractor<C> implements HitExtractor<C> {
 
 	private final List<HitExtractor<? super C>> extractors;
 
-	public CompositeHitExtractor(List<HitExtractor<? super C>> extractors) {
+	CompositeHitExtractor(List<HitExtractor<? super C>> extractors) {
 		this.extractors = extractors;
 	}
 

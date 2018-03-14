@@ -10,11 +10,17 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
+/**
+ * A hit extractor that will insert a null value into a projection.
+ * <p>
+ * Mainly used in conjunction with {@link IndexSensitiveHitExtractor} for multi-index searches,
+ * when a projection makes no sense for a particular index.
+ */
 class NullProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
 	private static final NullProjectionHitExtractor INSTANCE = new NullProjectionHitExtractor();
 
-	public static NullProjectionHitExtractor get() {
+	static NullProjectionHitExtractor get() {
 		return INSTANCE;
 	}
 

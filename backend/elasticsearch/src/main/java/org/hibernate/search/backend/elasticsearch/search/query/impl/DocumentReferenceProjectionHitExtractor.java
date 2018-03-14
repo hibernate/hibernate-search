@@ -8,18 +8,29 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
+import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
 import com.google.gson.JsonObject;
 
+/**
+ * A hit extractor used when projecting on the document reference,
+ * when we don't want the reference to be transformed,
+ * but we just want the raw reference to be inserted into the projection.
+ *
+ * @see org.hibernate.search.engine.search.ProjectionConstants#DOCUMENT_REFERENCE
+ * @see SearchQueryFactory#asProjections(SessionContext, HitAggregator, String...)
+ */
 class DocumentReferenceProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "_id" ).asString();
 
 	private static final DocumentReferenceProjectionHitExtractor INSTANCE = new DocumentReferenceProjectionHitExtractor();
 
-	public static DocumentReferenceProjectionHitExtractor get() {
+	static DocumentReferenceProjectionHitExtractor get() {
 		return INSTANCE;
 	}
 

@@ -12,6 +12,13 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;
 
+/**
+ * A hit extractor that will delegate to a different extractor
+ * depending on the index a given result was extracted from.
+ * <p>
+ * Used in projections, where a given projection can have a different meaning
+ * depending on the index.
+ */
 class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root()
 			.property( "_index" )
@@ -19,7 +26,7 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 
 	private final Map<String, HitExtractor<? super C>> extractorByIndex;
 
-	public IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByIndex) {
+	IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByIndex) {
 		this.extractorByIndex = extractorByIndex;
 	}
 
