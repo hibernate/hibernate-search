@@ -20,15 +20,21 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * The extractor path may be empty, in which case the source type is equal to the extracted type.
  *
  * @param <C> The container type
- * @param <T> The extracted value type
+ * @param <V> The extracted value type
  */
-public class BoundContainerValueExtractorPath<C, T> {
+public class BoundContainerValueExtractorPath<C, V> {
+	public static <V> BoundContainerValueExtractorPath<V, V> noExtractors(PojoGenericTypeModel<V> sourceType) {
+		return new BoundContainerValueExtractorPath<>(
+				sourceType, ContainerValueExtractorPath.noExtractors(), sourceType
+		);
+	}
+
 	private final PojoGenericTypeModel<C> sourceType;
 	private final ContainerValueExtractorPath extractorPath;
-	private final PojoGenericTypeModel<T> extractedType;
+	private final PojoGenericTypeModel<V> extractedType;
 
 	BoundContainerValueExtractorPath(PojoGenericTypeModel<C> sourceType, ContainerValueExtractorPath extractorPath,
-			PojoGenericTypeModel<T> extractedType) {
+			PojoGenericTypeModel<V> extractedType) {
 		this.sourceType = sourceType;
 		this.extractorPath = extractorPath;
 		this.extractedType = extractedType;
@@ -42,7 +48,7 @@ public class BoundContainerValueExtractorPath<C, T> {
 		return extractorPath;
 	}
 
-	public PojoGenericTypeModel<T> getExtractedType() {
+	public PojoGenericTypeModel<V> getExtractedType() {
 		return extractedType;
 	}
 }

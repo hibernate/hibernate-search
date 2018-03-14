@@ -19,16 +19,19 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting the value of a property,
  * and applying nested processor nodes as well as {@link PropertyBridge}s to this value.
+ *
+ * @param <T> The property holder type
+ * @param <P> The property type
  */
-public class PojoIndexingProcessorPropertyNode<P, T> extends PojoIndexingProcessor<P> {
+public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
 
 	private final PropertyHandle handle;
 	private final Collection<PropertyBridge> propertyBridges;
-	private final Collection<PojoIndexingProcessor<? super T>> nestedNodes;
+	private final Collection<PojoIndexingProcessor<? super P>> nestedNodes;
 
 	public PojoIndexingProcessorPropertyNode(PropertyHandle handle,
 			Collection<PropertyBridge> propertyBridges,
-			Collection<PojoIndexingProcessor<? super T>> nestedNodes) {
+			Collection<PojoIndexingProcessor<? super P>> nestedNodes) {
 		this.handle = handle;
 		this.propertyBridges = propertyBridges;
 		this.nestedNodes = nestedNodes;
@@ -52,23 +55,23 @@ public class PojoIndexingProcessorPropertyNode<P, T> extends PojoIndexingProcess
 		}
 		builder.endList();
 		builder.startList( "nestedNodes" );
-		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
 		}
 		builder.endList();
 	}
 
 	@Override
-	public final void process(DocumentElement target, P source) {
+	public final void process(DocumentElement target, T source) {
 		// TODO add generic type parameters to property handles
-		T propertyValue = (T) handle.get( source );
+		P propertyValue = (P) handle.get( source );
 		if ( !propertyBridges.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
 			for ( PropertyBridge bridge : propertyBridges ) {
 				bridge.write( target, bridgedElement );
 			}
 		}
-		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {
 			nestedNode.process( target, propertyValue );
 		}
 	}

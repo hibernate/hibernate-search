@@ -161,13 +161,13 @@ public class ContainerValueExtractorBinder {
 	 *
 	 * @param boundPath The bound path to create the extractor from.
 	 * @param <C> The source type.
-	 * @param <T> The extracted type.
+	 * @param <V> The extracted value type.
 	 * @return The extractor, or an empty optional if the bound path was empty.
 	 */
 	// Checks are performed using reflection when building the resolved path
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
-	public <C, T> Optional<ContainerValueExtractor<? super C, T>> tryCreate(
-			BoundContainerValueExtractorPath<C, T> boundPath) {
+	public <C, V> Optional<ContainerValueExtractor<? super C, V>> tryCreate(
+			BoundContainerValueExtractorPath<C, V> boundPath) {
 		ContainerValueExtractor<? super C, ?> extractor = null;
 		for ( Class<? extends ContainerValueExtractor> extractorClass :
 				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
@@ -185,7 +185,7 @@ public class ContainerValueExtractorBinder {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( (ContainerValueExtractor<C, T>) extractor );
+			return Optional.of( (ContainerValueExtractor<C, V>) extractor );
 		}
 	}
 
@@ -194,12 +194,12 @@ public class ContainerValueExtractorBinder {
 	 *
 	 * @param boundPath The bound path to create the extractor from.
 	 * @param <C> The source type.
-	 * @param <T> The extracted type.
+	 * @param <V> The extracted value type.
 	 * @return The extractor.
 	 * @throws AssertionFailure if the bound path was empty
 	 */
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C, T> ContainerValueExtractor<? super C, T> create(BoundContainerValueExtractorPath<C, T> boundPath) {
+	public <C, V> ContainerValueExtractor<? super C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
 		if ( boundPath.getExtractorPath().isEmpty() ) {
 			throw new AssertionFailure(
 					"Received a request to create extractors, but the extractor path was empty."

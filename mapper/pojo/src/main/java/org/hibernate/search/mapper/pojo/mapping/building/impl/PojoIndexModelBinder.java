@@ -51,11 +51,11 @@ public interface PojoIndexModelBinder {
 	<C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindExtractorPath(
 			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath);
 
-	<C, T> ContainerValueExtractor<? super C, T> createExtractors(
-			BoundContainerValueExtractorPath<C, T> boundExtractorPath);
+	<C, V> ContainerValueExtractor<? super C, V> createExtractors(
+			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
-	<C, T> Optional<? extends ContainerValueExtractor<? super C, T>> tryCreateExtractors(
-			BoundContainerValueExtractorPath<C, T> boundExtractorPath);
+	<C, V> Optional<? extends ContainerValueExtractor<? super C, V>> tryCreateExtractors(
+			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
 	<T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);

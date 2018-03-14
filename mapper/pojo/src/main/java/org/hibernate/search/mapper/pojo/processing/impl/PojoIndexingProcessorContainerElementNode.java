@@ -17,14 +17,17 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting elements from a container
  * and applying nested processor nodes to the elements.
+ *
+ * @param <C> The container type
+ * @param <V> The extracted value type
  */
-public class PojoIndexingProcessorContainerElementNode<C, T> extends PojoIndexingProcessor<C> {
+public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexingProcessor<C> {
 
-	private final ContainerValueExtractor<C, T> extractor;
-	private final Collection<PojoIndexingProcessor<? super T>> nestedNodes;
+	private final ContainerValueExtractor<C, V> extractor;
+	private final Collection<PojoIndexingProcessor<? super V>> nestedNodes;
 
-	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractor<C, T> extractor,
-			Collection<PojoIndexingProcessor<? super T>> nestedNodes) {
+	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractor<C, V> extractor,
+			Collection<PojoIndexingProcessor<? super V>> nestedNodes) {
 		this.extractor = extractor;
 		this.nestedNodes = nestedNodes;
 	}
@@ -41,7 +44,7 @@ public class PojoIndexingProcessorContainerElementNode<C, T> extends PojoIndexin
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "extractor", extractor );
 		builder.startList( "nestedNodes" );
-		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
 		}
 		builder.endList();
@@ -49,13 +52,13 @@ public class PojoIndexingProcessorContainerElementNode<C, T> extends PojoIndexin
 
 	@Override
 	public final void process(DocumentElement target, C source) {
-		try ( Stream<T> stream = extractor.extract( source ) ) {
+		try ( Stream<V> stream = extractor.extract( source ) ) {
 			stream.forEach( sourceItem -> processItem( target, sourceItem ) );
 		}
 	}
 
-	private void processItem(DocumentElement target, T sourceItem) {
-		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+	private void processItem(DocumentElement target, V sourceItem) {
+		for ( PojoIndexingProcessor<? super V> nestedNode : nestedNodes ) {
 			nestedNode.process( target, sourceItem );
 		}
 	}

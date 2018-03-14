@@ -10,23 +10,23 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 
-class ChainingContainerValueExtractor<C, T, U> implements ContainerValueExtractor<C, U> {
+class ChainingContainerValueExtractor<C, U, V> implements ContainerValueExtractor<C, V> {
 
-	private final ContainerValueExtractor<C, T> parent;
-	private final ContainerValueExtractor<? super T, U> chained;
+	private final ContainerValueExtractor<C, U> parent;
+	private final ContainerValueExtractor<? super U, V> chained;
 
-	ChainingContainerValueExtractor(ContainerValueExtractor<C, T> parent,
-			ContainerValueExtractor<? super T, U> chained) {
+	ChainingContainerValueExtractor(ContainerValueExtractor<C, U> parent,
+			ContainerValueExtractor<? super U, V> chained) {
 		this.parent = parent;
 		this.chained = chained;
 	}
 
 	@Override
-	public Stream<U> extract(C container) {
+	public Stream<V> extract(C container) {
 		return parent.extract( container ).flatMap( chained::extract );
 	}
 
-	public ContainerValueExtractor<C, T> getParent() {
+	public ContainerValueExtractor<C, U> getParent() {
 		return parent;
 	}
 

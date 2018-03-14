@@ -13,19 +13,17 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 
 abstract class AbstractPojoProcessorNodeBuilder<T> {
 
 	protected final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
-
-	protected final AbstractPojoProcessorNodeBuilder<?> parent;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
-	AbstractPojoProcessorNodeBuilder(AbstractPojoProcessorNodeBuilder<?> parent,
+	AbstractPojoProcessorNodeBuilder(
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
-		this.parent = parent;
 		this.contributorProvider = contributorProvider;
 		this.indexModelBinder = indexModelBinder;
 		this.bindingContext = bindingContext;
@@ -33,25 +31,10 @@ abstract class AbstractPojoProcessorNodeBuilder<T> {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" );
-		appendPath( builder);
-		builder.append( "]" );
-		return builder.toString();
+		return getClass().getSimpleName() + "[" + getModelPath() + "]";
 	}
+
+	abstract BoundPojoModelPath getModelPath();
 
 	abstract Optional<? extends PojoIndexingProcessor<T>> build();
-
-	private void appendPath(StringBuilder builder) {
-		if ( parent == null ) {
-			appendSelfPath( builder );
-		}
-		else {
-			parent.appendPath( builder );
-			builder.append( " => " );
-			appendSelfPath( builder );
-		}
-	}
-
-	protected abstract void appendSelfPath(StringBuilder builder);
 }

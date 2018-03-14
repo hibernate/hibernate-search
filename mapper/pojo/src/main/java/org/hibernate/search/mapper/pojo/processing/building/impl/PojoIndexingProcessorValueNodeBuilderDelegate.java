@@ -18,48 +18,40 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 
-public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoMappingCollectorValueNode {
+public class PojoIndexingProcessorValueNodeBuilderDelegate<V> implements PojoMappingCollectorValueNode {
 
-	private final AbstractPojoProcessorNodeBuilder<?> parentBuilder;
+	private final BoundPojoModelPathValueNode<?, ?, V> modelPath;
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final IndexModelBindingContext bindingContext;
 
-	private final PojoTypeModel<?> parentTypeModel;
-	private final String defaultName;
-	private final PojoTypeModel<T> valueTypeModel;
+	private final Collection<PojoIndexingProcessorValueBridgeNode<? super V, ?>> bridgeNodes = new ArrayList<>();
 
-	private final Collection<PojoIndexingProcessorValueBridgeNode<? super T, ?>> bridgeNodes = new ArrayList<>();
+	private final Collection<PojoIndexingProcessorTypeNodeBuilder<? super V>> typeNodeBuilders = new ArrayList<>();
 
-	private final Collection<PojoIndexingProcessorTypeNodeBuilder<? super T>> typeNodeBuilders = new ArrayList<>();
-
-	PojoIndexingProcessorValueNodeBuilderDelegate(AbstractPojoProcessorNodeBuilder<?> parentBuilder,
-			PojoTypeModel<?> parentTypeModel, String defaultName,
-			PojoTypeModel<T> valueTypeModel,
+	PojoIndexingProcessorValueNodeBuilderDelegate(
+			BoundPojoModelPathValueNode<?, ?, V> modelPath,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
-		this.parentBuilder = parentBuilder;
+		this.modelPath = modelPath;
 		this.indexModelBinder = indexModelBinder;
 		this.contributorProvider = contributorProvider;
 		this.bindingContext = bindingContext;
-
-		this.parentTypeModel = parentTypeModel;
-		this.defaultName = defaultName;
-		this.valueTypeModel = valueTypeModel;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + parentBuilder.toString() + "]";
+		return getClass().getSimpleName() + "[" + modelPath + "]";
 	}
 
 	@Override
@@ -67,11 +59,11 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoMap
 			FieldModelContributor fieldModelContributor) {
 		String defaultedFieldName = fieldName;
 		if ( defaultedFieldName == null ) {
-			defaultedFieldName = defaultName;
+			defaultedFieldName = modelPath.parent().getPropertyHandle().getName();
 		}
 
 		indexModelBinder.addValueBridge(
-				bindingContext, valueTypeModel, builder, defaultedFieldName,
+				bindingContext, modelPath.type().getTypeModel(), builder, defaultedFieldName,
 				fieldModelContributor
 		)
 				.ifPresent( bridgeNodes::add );
@@ -82,27 +74,32 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoMap
 			Integer maxDepth, Set<String> includePaths) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = defaultName + ".";
+			defaultedRelativePrefix = modelPath.parent().getPropertyHandle().getName() + ".";
 		}
 
+		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.parent().parent();
+
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				parentTypeModel.getRawType(), defaultedRelativePrefix, storage, maxDepth, includePaths );
+				holderTypePath.getTypeModel().getRawType(),
+				defaultedRelativePrefix, storage, maxDepth, includePaths
+		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
-			PojoIndexingProcessorTypeNodeBuilder<T> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
-					parentBuilder, valueTypeModel, contributorProvider, indexModelBinder, nestedBindingContext,
+			BoundPojoModelPathTypeNode<V> embeddedTypeModelPath = modelPath.type();
+			PojoIndexingProcessorTypeNodeBuilder<V> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
+					embeddedTypeModelPath, contributorProvider, indexModelBinder, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					PojoIdentityMappingCollector.noOp()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 			contributorProvider.forEach(
-					valueTypeModel.getRawType(),
+					embeddedTypeModelPath.getTypeModel().getRawType(),
 					c -> c.contributeMapping( nestedProcessorBuilder )
 			);
 		} );
 	}
 
-	Collection<PojoIndexingProcessor<? super T>> build() {
-		Collection<PojoIndexingProcessor<? super T>> immutableNestedNodes =
+	Collection<PojoIndexingProcessor<? super V>> build() {
+		Collection<PojoIndexingProcessor<? super V>> immutableNestedNodes =
 				bridgeNodes.isEmpty() && typeNodeBuilders.isEmpty()
 						? Collections.emptyList()
 						: new ArrayList<>( bridgeNodes.size() + typeNodeBuilders.size() );

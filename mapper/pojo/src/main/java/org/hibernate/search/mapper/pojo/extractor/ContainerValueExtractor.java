@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.extractor;
 
 import java.util.stream.Stream;
 
-public interface ContainerValueExtractor<C, T> {
+public interface ContainerValueExtractor<C, V> {
 
-	Stream<T> extract(C container);
+	Stream<V> extract(C container);
 
 }

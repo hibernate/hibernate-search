@@ -12,6 +12,8 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * A POJO processor responsible for transferring data from the POJO to a document to index.
+ *
+ * @param <T> The processed type
  */
 public abstract class PojoIndexingProcessor<T> implements AutoCloseable, ToStringTreeAppendable {
 

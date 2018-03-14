@@ -72,14 +72,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <C, T> Optional<? extends ContainerValueExtractor<? super C, T>> tryCreateExtractors(
-			BoundContainerValueExtractorPath<C, T> boundExtractorPath) {
+	public <C, V> Optional<? extends ContainerValueExtractor<? super C, V>> tryCreateExtractors(
+			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
 		return extractorBinder.tryCreate( boundExtractorPath );
 	}
 
 	@Override
-	public <C, T> ContainerValueExtractor<? super C, T> createExtractors(
-			BoundContainerValueExtractorPath<C, T> boundExtractorPath) {
+	public <C, V> ContainerValueExtractor<? super C, V> createExtractors(
+			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}
 

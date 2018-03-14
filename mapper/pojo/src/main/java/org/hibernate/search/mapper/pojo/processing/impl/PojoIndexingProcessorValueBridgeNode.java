@@ -13,6 +13,9 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link ValueBridge} to a value.
+ *
+ * @param <T> The processed type
+ * @param <R> The index field type
  */
 public class PojoIndexingProcessorValueBridgeNode<T, R> extends PojoIndexingProcessor<T> {
 
