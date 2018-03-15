@@ -311,6 +311,8 @@
         <version.copy.plugin>0.0.5</version.copy.plugin>
         <version.compiler.plugin>3.7.0</version.compiler.plugin>
         <version.dependency.plugin>3.0.2</version.dependency.plugin>
+        <!-- Check dependencies for security vulnerabilities -->
+        <version.dependency-check.plugin>3.1.1</version.dependency-check.plugin>
         <version.dependencypath.plugin>1.1.1</version.dependencypath.plugin>
         <version.depends.plugin>1.3.1</version.depends.plugin>
         <version.download.plugin>1.4.0</version.download.plugin>
@@ -337,8 +339,6 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
-        <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check-plugin>3.1.1</version.dependency-check-plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -2620,7 +2620,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                   <plugin>
                      <groupId>org.owasp</groupId>
                      <artifactId>dependency-check-maven</artifactId>
-                     <version>${version.dependency-check-plugin}</version>
+                     <version>${version.dependency-check.plugin}</version>
                      <executions>
                         <execution>
                            <goals>
