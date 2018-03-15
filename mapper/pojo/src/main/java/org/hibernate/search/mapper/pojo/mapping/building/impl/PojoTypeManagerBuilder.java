@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierMapping;
-import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeProvider;
+import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
 import org.hibernate.search.util.SearchException;
 
@@ -61,7 +61,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 			routingKeyProvider = RoutingKeyProvider.alwaysNull();
 		}
 		else {
-			routingKeyProvider = new RoutingKeyBridgeProvider<>( routingKeyBridge );
+			routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( routingKeyBridge );
 		}
 		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),
