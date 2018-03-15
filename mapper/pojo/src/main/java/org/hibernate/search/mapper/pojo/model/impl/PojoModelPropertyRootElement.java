@@ -8,24 +8,19 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-
-/**
- * @author Yoann Rodiere
- */
 public class PojoModelPropertyRootElement extends AbstractPojoModelElement implements PojoModelProperty {
 
 	private final PojoPropertyModel<?> propertyModel;
 
 	public PojoModelPropertyRootElement(PojoPropertyModel<?> propertyModel,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
-		super( modelContributorProvider );
+			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
+		super( augmentedTypeModelProvider );
 		this.propertyModel = propertyModel;
 	}
 

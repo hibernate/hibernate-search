@@ -10,30 +10,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
+import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
+abstract class AbstractPojoModelElement implements PojoModelElement {
 
-/**
- * @author Yoann Rodiere
- */
-abstract class AbstractPojoModelElement implements PojoModelElement, PojoModelCollectorTypeNode {
+	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
+	private final Map<String, PojoModelNestedElement> properties = new HashMap<>();
+	private PojoAugmentedTypeModel augmentedTypeModel;
+	private boolean propertiesInitialized = false;
 
-	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
-
-	private final Map<String, PojoModelNestedElement> propertyModelsByName = new HashMap<>();
-
-	private boolean markersForTypeInitialized = false;
-
-	AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
-		this.modelContributorProvider = modelContributorProvider;
+	AbstractPojoModelElement(PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
+		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
 	}
 
 	@Override
@@ -52,38 +48,33 @@ abstract class AbstractPojoModelElement implements PojoModelElement, PojoModelCo
 
 	@Override
 	public PojoModelNestedElement property(String relativeName) {
-		initMarkersForType();
-		return propertyModelsByName.computeIfAbsent( relativeName, name -> {
+		return properties.computeIfAbsent( relativeName, name -> {
 			PojoPropertyModel<?> model = getTypeModel().getProperty( name );
-			return new PojoModelNestedElement( this, model, modelContributorProvider );
+			PojoAugmentedPropertyModel augmentedModel = getAugmentedTypeModel().getProperty( name );
+			return new PojoModelNestedElement( this, model, augmentedModel, augmentedTypeModelProvider );
 		} );
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Stream is covariant in T
 	@Override
-	public Stream<PojoModelProperty> properties() {
-		initMarkersForType();
-		return (Stream<PojoModelProperty>) (Stream) propertyModelsByName.values().stream();
-	}
-
-	/*
-	 * Lazily initialize markers.
-	 * Lazy initialization is necessary to avoid infinite recursion.
-	 */
-	private void initMarkersForType() {
-		if ( !markersForTypeInitialized ) {
-			this.markersForTypeInitialized = true;
-			getModelContributorProvider().forEach(
-					getTypeModel().getRawType(),
-					c -> c.contributeModel( this )
-			);
+	public Stream<? extends PojoModelProperty> properties() {
+		if ( !propertiesInitialized ) {
+			// Populate all the known properties
+			getTypeModel().getRawType().getAscendingSuperTypes()
+					.flatMap( PojoRawTypeModel::getDeclaredProperties )
+					.map( PojoPropertyModel::getName )
+					.forEach( this::property );
+			propertiesInitialized = true;
 		}
+		return properties.values().stream();
 	}
 
 	abstract PojoTypeModel<?> getTypeModel();
 
-	private TypeMetadataContributorProvider<PojoTypeMetadataContributor> getModelContributorProvider() {
-		return modelContributorProvider;
+	private PojoAugmentedTypeModel getAugmentedTypeModel() {
+		if ( augmentedTypeModel == null ) {
+			augmentedTypeModel = augmentedTypeModelProvider.get( getTypeModel().getRawType() );
+		}
+		return augmentedTypeModel;
 	}
-
 }

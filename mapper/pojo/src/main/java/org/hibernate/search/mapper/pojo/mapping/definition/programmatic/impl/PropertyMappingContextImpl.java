@@ -17,10 +17,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -34,7 +34,7 @@ public class PropertyMappingContextImpl
 	private final TypeMappingContext parent;
 	private final PropertyHandle propertyHandle;
 
-	private final List<PojoMetadataContributor<? super PojoModelCollectorPropertyNode, ? super PojoMappingCollectorPropertyNode>>
+	private final List<PojoMetadataContributor<? super PojoAugmentedModelCollectorPropertyNode, ? super PojoMappingCollectorPropertyNode>>
 			children = new ArrayList<>();
 
 	PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
@@ -43,8 +43,8 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoModelCollectorTypeNode collector) {
-		PojoModelCollectorPropertyNode propertyNodeCollector = collector.property( propertyHandle.getName() );
+	public void contributeModel(PojoAugmentedModelCollectorTypeNode collector) {
+		PojoAugmentedModelCollectorPropertyNode propertyNodeCollector = collector.property( propertyHandle.getName() );
 		children.forEach( child -> child.contributeModel( propertyNodeCollector ) );
 	}
 

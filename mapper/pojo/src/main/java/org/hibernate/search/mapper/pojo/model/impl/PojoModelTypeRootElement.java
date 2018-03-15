@@ -6,23 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-
-/**
- * @author Yoann Rodiere
- */
 public class PojoModelTypeRootElement extends AbstractPojoModelElement implements PojoModelType {
 
 	private final PojoTypeModel<?> typeModel;
 
 	public PojoModelTypeRootElement(PojoTypeModel<?> typeModel,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
-		super( modelContributorProvider );
+			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
+		super( augmentedTypeModelProvider );
 		this.typeModel = typeModel;
 	}
 

@@ -22,6 +22,6 @@ public interface PojoModelElement {
 
 	PojoModelProperty property(String relativeName);
 
-	Stream<PojoModelProperty> properties();
+	Stream<? extends PojoModelProperty> properties();
 
 }

@@ -7,16 +7,20 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 
 public class PojoMappingHelper {
 
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
+	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
 	private final PojoIndexModelBinder indexModelBinder;
 
-	public PojoMappingHelper(TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder) {
+	PojoMappingHelper(TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
+			PojoIndexModelBinder indexModelBinder,
+			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		this.contributorProvider = contributorProvider;
 		this.indexModelBinder = indexModelBinder;
+		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
 	}
 
 	public TypeMetadataContributorProvider<PojoTypeMetadataContributor> getContributorProvider() {
@@ -26,4 +30,9 @@ public class PojoMappingHelper {
 	public PojoIndexModelBinder getIndexModelBinder() {
 		return indexModelBinder;
 	}
+
+	public PojoAugmentedTypeModelProvider getAugmentedTypeModelProvider() {
+		return augmentedTypeModelProvider;
+	}
+
 }

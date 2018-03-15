@@ -56,7 +56,7 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 
 		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
 		this.pojoModelRootElement = new PojoModelPropertyRootElement(
-				modelPath.getPropertyModel(), mappingHelper.getContributorProvider()
+				modelPath.getPropertyModel(), mappingHelper.getAugmentedTypeModelProvider()
 		);
 
 		this.identityMappingCollector = identityMappingCollector;

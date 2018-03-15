@@ -6,41 +6,29 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 
-/**
- * @author Yoann Rodiere
- */
-public class PojoModelNestedElement extends AbstractPojoModelElement
-		implements PojoModelProperty, PojoModelCollectorPropertyNode {
+public class PojoModelNestedElement extends AbstractPojoModelElement implements PojoModelProperty {
 
 	private final AbstractPojoModelElement parent;
-
 	private final PojoPropertyModel<?> propertyModel;
-
-	private final Map<Class<?>, List<?>> markers = new HashMap<>();
+	private final PojoAugmentedPropertyModel augmentedPropertyModel;
 
 	PojoModelNestedElement(AbstractPojoModelElement parent, PojoPropertyModel<?> propertyModel,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
-		super( modelContributorProvider );
+			PojoAugmentedPropertyModel augmentedPropertyModel,
+			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
+		super( augmentedTypeModelProvider );
 		this.parent = parent;
+		this.augmentedPropertyModel = augmentedPropertyModel;
 		this.propertyModel = propertyModel;
 	}
 
@@ -49,16 +37,9 @@ public class PojoModelNestedElement extends AbstractPojoModelElement
 		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <M> Stream<M> markers(Class<M> markerType) {
-		return ( (List<M>) this.markers.getOrDefault( markerType, Collections.emptyList() ) )
-				.stream();
-	}
-
-	@Override
-	public final void marker(MarkerBuilder builder) {
-		doAddMarker( builder.build() );
+		return augmentedPropertyModel.getMarkers( markerType );
 	}
 
 	public PropertyHandle getHandle() {
@@ -73,15 +54,5 @@ public class PojoModelNestedElement extends AbstractPojoModelElement
 	@Override
 	public String getName() {
 		return propertyModel.getName();
-	}
-
-	@SuppressWarnings("unchecked")
-	private <M> void doAddMarker(M marker) {
-		Class<M> markerType = (Class<M>) (
-				marker instanceof Annotation ? ((Annotation) marker).annotationType()
-				: marker.getClass()
-		);
-		List<M> list = (List<M>) markers.computeIfAbsent( markerType, ignored -> new ArrayList<M>() );
-		list.add( marker );
 	}
 }
