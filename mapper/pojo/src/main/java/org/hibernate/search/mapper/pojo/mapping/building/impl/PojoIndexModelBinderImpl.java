@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFunctionBridgeNode;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 import org.hibernate.search.util.spi.LoggerFactory;
@@ -140,7 +140,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> Optional<FunctionBridgeProcessor<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
+	public <T> Optional<PojoIndexingProcessorFunctionBridgeNode<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor contributor) {
 		BridgeBuilder<? extends FunctionBridge<?, ?>> defaultedBuilder = builder;
@@ -165,7 +165,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		return doAddFunctionBridge( bindingContext, typedBridge, bridgeTypeContext, fieldName, contributor );
 	}
 
-	private <T, R> Optional<FunctionBridgeProcessor<T, ?>> doAddFunctionBridge(IndexModelBindingContext bindingContext,
+	private <T, R> Optional<PojoIndexingProcessorFunctionBridgeNode<T, ?>> doAddFunctionBridge(IndexModelBindingContext bindingContext,
 			FunctionBridge<? super T, R> bridge, GenericTypeContext bridgeTypeContext,
 			String fieldName, FieldModelContributor contributor) {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
@@ -189,7 +189,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
-			return Optional.of( new FunctionBridgeProcessor<>( bridge, indexFieldAccessor ) );
+			return Optional.of( new PojoIndexingProcessorFunctionBridgeNode<>( bridge, indexFieldAccessor ) );
 		}
 		else {
 			bridge.close();

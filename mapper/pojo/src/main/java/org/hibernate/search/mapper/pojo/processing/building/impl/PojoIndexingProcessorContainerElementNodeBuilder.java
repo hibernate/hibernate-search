@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.processing.impl;
+package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -16,18 +16,17 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBind
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
-/**
- * @author Yoann Rodiere
- */
-public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodeProcessorBuilder<C> {
+public class PojoIndexingProcessorContainerElementNodeBuilder<C, T> extends AbstractPojoProcessorNodeBuilder<C> {
 
 	private final ContainerValueExtractor<C, T> extractor;
 
-	private final PojoValueNodeProcessorCollectionBuilder<T> valueNodeProcessorCollectionBuilder;
+	private final PojoIndexingProcessorValueNodeBuilderDelegate<T> valueNodeProcessorCollectionBuilder;
 
-	PojoContainerNodeProcessorBuilder(
-			PojoPropertyNodeProcessorBuilder<?, ? extends C> parent,
+	PojoIndexingProcessorContainerElementNodeBuilder(
+			PojoIndexingProcessorPropertyNodeBuilder<?, ? extends C> parent,
 			PojoTypeModel<?> parentTypeModel, String propertyName,
 			PojoTypeModel<T> elementTypeModel, ContainerValueExtractor<C, T> extractor,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
@@ -35,7 +34,7 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 		super( parent, contributorProvider, indexModelBinder, bindingContext );
 		this.extractor = extractor;
 
-		valueNodeProcessorCollectionBuilder = new PojoValueNodeProcessorCollectionBuilder<>(
+		valueNodeProcessorCollectionBuilder = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
 				this, parentTypeModel, propertyName, elementTypeModel,
 				contributorProvider, indexModelBinder, bindingContext
 		);
@@ -51,8 +50,8 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 	}
 
 	@Override
-	Optional<PojoContainerNodeProcessor<C, T>> build() {
-		Collection<PojoNodeProcessor<? super T>> immutableNestedProcessors =
+	Optional<PojoIndexingProcessorContainerElementNode<C, T>> build() {
+		Collection<PojoIndexingProcessor<? super T>> immutableNestedProcessors =
 				valueNodeProcessorCollectionBuilder.build();
 
 		if ( immutableNestedProcessors.isEmpty() ) {
@@ -63,7 +62,7 @@ public class PojoContainerNodeProcessorBuilder<C, T> extends AbstractPojoNodePro
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( new PojoContainerNodeProcessor<>(
+			return Optional.of( new PojoIndexingProcessorContainerElementNode<>(
 					extractor, immutableNestedProcessors
 			) );
 		}

@@ -16,20 +16,21 @@ import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.util.spi.Closer;
 
 /**
- * @author Yoann Rodiere
+ * A node inside a {@link PojoIndexingProcessor} responsible for applying processor property nodes
+ * as well as {@link TypeBridge}s to a value.
  */
-class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
+public class PojoIndexingProcessorTypeNode<T> implements PojoIndexingProcessor<T> {
 
 	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
 	private final Collection<TypeBridge> bridges;
-	private final Collection<PojoPropertyNodeProcessor<? super T, ?>> propertyProcessors;
+	private final Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes;
 
-	PojoTypeNodeProcessor(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
+	public PojoIndexingProcessorTypeNode(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
 			Collection<TypeBridge> bridges,
-			Collection<PojoPropertyNodeProcessor<? super T, ?>> propertyProcessors) {
+			Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes) {
 		this.parentObjectAccessors = parentObjectAccessors;
 		this.bridges = bridges;
-		this.propertyProcessors = propertyProcessors;
+		this.propertyNodes = propertyNodes;
 	}
 
 	@Override
@@ -47,9 +48,9 @@ class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
 				bridge.write( parentObject, bridgedElement );
 			}
 		}
-		for ( PojoPropertyNodeProcessor<? super T, ?> processor : propertyProcessors ) {
+		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
 			// Recursion here
-			processor.process( parentObject, source );
+			propertyNode.process( parentObject, source );
 		}
 	}
 
@@ -57,7 +58,7 @@ class PojoTypeNodeProcessor<T> implements PojoNodeProcessor<T> {
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( TypeBridge::close, bridges );
-			closer.pushAll( PojoNodeProcessor::close, propertyProcessors );
+			closer.pushAll( PojoIndexingProcessor::close, propertyNodes );
 		}
 	}
 

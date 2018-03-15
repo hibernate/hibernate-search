@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.FunctionBridgeProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFunctionBridgeNode;
 
 /**
  * Binds a mapping to a given entity model and index model
@@ -64,7 +64,7 @@ public interface PojoIndexModelBinder {
 	Optional<PropertyBridge> addPropertyBridge(IndexModelBindingContext bindingContext,
 			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
 
-	<T> Optional<FunctionBridgeProcessor<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
+	<T> Optional<PojoIndexingProcessorFunctionBridgeNode<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
 			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
 			String fieldName, FieldModelContributor contributor);
 

@@ -10,16 +10,15 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 
-
 /**
- * @author Yoann Rodiere
+ * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link FunctionBridge} to a value.
  */
-public class FunctionBridgeProcessor<T, R> implements PojoNodeProcessor<T> {
+public class PojoIndexingProcessorFunctionBridgeNode<T, R> implements PojoIndexingProcessor<T> {
 
 	private final FunctionBridge<? super T, R> bridge;
 	private final IndexFieldAccessor<? super R> indexFieldAccessor;
 
-	public FunctionBridgeProcessor(FunctionBridge<? super T, R> bridge,
+	public PojoIndexingProcessorFunctionBridgeNode(FunctionBridge<? super T, R> bridge,
 			IndexFieldAccessor<? super R> indexFieldAccessor) {
 		this.bridge = bridge;
 		this.indexFieldAccessor = indexFieldAccessor;

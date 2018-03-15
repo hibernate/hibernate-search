@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.processing.impl;
+package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,13 +23,12 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdenti
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFunctionBridgeNode;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
-/**
- * @author Yoann Rodiere
- */
-public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNodeMappingCollector {
+public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoValueNodeMappingCollector {
 
-	private final AbstractPojoNodeProcessorBuilder<?> parentBuilder;
+	private final AbstractPojoProcessorNodeBuilder<?> parentBuilder;
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
@@ -39,11 +38,11 @@ public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNode
 	private final String defaultName;
 	private final PojoTypeModel<T> valueTypeModel;
 
-	private final Collection<FunctionBridgeProcessor<? super T, ?>> bridgeProcessors = new ArrayList<>();
+	private final Collection<PojoIndexingProcessorFunctionBridgeNode<? super T, ?>> bridgeNodes = new ArrayList<>();
 
-	private final Collection<AbstractPojoNodeProcessorBuilder<? super T>> valueProcessorBuilders = new ArrayList<>();
+	private final Collection<PojoIndexingProcessorTypeNodeBuilder<? super T>> typeNodeBuilders = new ArrayList<>();
 
-	PojoValueNodeProcessorCollectionBuilder(AbstractPojoNodeProcessorBuilder<?> parentBuilder,
+	PojoIndexingProcessorValueNodeBuilderDelegate(AbstractPojoProcessorNodeBuilder<?> parentBuilder,
 			PojoTypeModel<?> parentTypeModel, String defaultName,
 			PojoTypeModel<T> valueTypeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
@@ -75,7 +74,7 @@ public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNode
 				bindingContext, valueTypeModel, builder, defaultedFieldName,
 				fieldModelContributor
 		)
-				.ifPresent( bridgeProcessors::add );
+				.ifPresent( bridgeNodes::add );
 	}
 
 	@Override
@@ -89,12 +88,12 @@ public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNode
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				parentTypeModel.getRawType(), defaultedRelativePrefix, storage, maxDepth, includePaths );
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
-			PojoTypeNodeProcessorBuilder<T> nestedProcessorBuilder = new PojoTypeNodeProcessorBuilder<>(
+			PojoIndexingProcessorTypeNodeBuilder<T> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 					parentBuilder, valueTypeModel, contributorProvider, indexModelBinder, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					PojoTypeNodeIdentityMappingCollector.noOp()
 			);
-			valueProcessorBuilders.add( nestedProcessorBuilder );
+			typeNodeBuilders.add( nestedProcessorBuilder );
 			contributorProvider.forEach(
 					valueTypeModel.getRawType(),
 					c -> c.contributeMapping( nestedProcessorBuilder )
@@ -102,18 +101,18 @@ public class PojoValueNodeProcessorCollectionBuilder<T> implements PojoValueNode
 		} );
 	}
 
-	Collection<PojoNodeProcessor<? super T>> build() {
-		Collection<PojoNodeProcessor<? super T>> immutableNestedProcessors =
-				bridgeProcessors.isEmpty() && valueProcessorBuilders.isEmpty()
+	Collection<PojoIndexingProcessor<? super T>> build() {
+		Collection<PojoIndexingProcessor<? super T>> immutableNestedNodes =
+				bridgeNodes.isEmpty() && typeNodeBuilders.isEmpty()
 						? Collections.emptyList()
-						: new ArrayList<>( bridgeProcessors.size() + valueProcessorBuilders.size() );
-		immutableNestedProcessors.addAll( bridgeProcessors );
-		valueProcessorBuilders.stream()
-				.map( AbstractPojoNodeProcessorBuilder::build )
+						: new ArrayList<>( bridgeNodes.size() + typeNodeBuilders.size() );
+		immutableNestedNodes.addAll( bridgeNodes );
+		typeNodeBuilders.stream()
+				.map( AbstractPojoProcessorNodeBuilder::build )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
-				.forEach( immutableNestedProcessors::add );
+				.forEach( immutableNestedNodes::add );
 
-		return immutableNestedProcessors;
+		return immutableNestedNodes;
 	}
 }

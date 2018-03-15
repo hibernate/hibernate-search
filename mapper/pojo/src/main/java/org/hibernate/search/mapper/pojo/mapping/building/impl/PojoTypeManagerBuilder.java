@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoNodeProcessor;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoTypeNodeProcessorBuilder;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeProvider;
 import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
@@ -30,7 +30,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
 
 	private final PojoTypeNodeIdentityMappingCollectorImpl identityMappingCollector;
-	private final PojoTypeNodeProcessorBuilder<E> processorBuilder;
+	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
 
 	PojoTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
@@ -41,7 +41,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		this.indexManagerBuildingState = indexManagerBuildingState;
 		this.identityMappingCollector = new PojoTypeNodeIdentityMappingCollectorImpl( defaultIdentifierMapping );
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
-		this.processorBuilder = new PojoTypeNodeProcessorBuilder<>(
+		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				null, typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
 	}
@@ -66,7 +66,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		PojoTypeManager<?, E, D> typeManager = new PojoTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),
 				identifierMapping, routingKeyProvider,
-				processorBuilder.build().orElseGet( PojoNodeProcessor::noOp ),
+				processorBuilder.build().orElseGet( PojoIndexingProcessor::noOp ),
 				indexManagerBuildingState.build()
 		);
 		builder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );

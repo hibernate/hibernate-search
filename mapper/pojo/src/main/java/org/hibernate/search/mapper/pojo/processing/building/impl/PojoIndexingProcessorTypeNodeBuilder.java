@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.processing.impl;
+package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,11 +27,11 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetada
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorTypeNode;
 
-/**
- * @author Yoann Rodiere
- */
-public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBuilder<T>
+public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcessorNodeBuilder<T>
 		implements PojoTypeNodeMappingCollector {
 
 	private final PojoTypeModel<T> typeModel;
@@ -40,11 +40,11 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 	private final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
 
 	private final Collection<TypeBridge> bridges = new ArrayList<>();
-	private final Map<PropertyHandle, PojoPropertyNodeProcessorBuilder<? super T, ?>> propertyProcessorBuilders =
+	private final Map<PropertyHandle, PojoIndexingProcessorPropertyNodeBuilder<? super T, ?>> propertyNodeBuilders =
 			new HashMap<>();
 
-	public PojoTypeNodeProcessorBuilder(
-			AbstractPojoNodeProcessorBuilder<?> parent, PojoTypeModel<T> typeModel,
+	public PojoIndexingProcessorTypeNodeBuilder(
+			AbstractPojoProcessorNodeBuilder<?> parent, PojoTypeModel<T> typeModel,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
 			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
@@ -71,11 +71,11 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 
 	@Override
 	public PojoPropertyNodeMappingCollector property(PropertyHandle propertyHandle) {
-		return propertyProcessorBuilders.computeIfAbsent( propertyHandle, this::createPropertyProcessorBuilder );
+		return propertyNodeBuilders.computeIfAbsent( propertyHandle, this::createPropertyNodeBuilder );
 	}
 
-	private PojoPropertyNodeProcessorBuilder<? super T, ?> createPropertyProcessorBuilder(PropertyHandle propertyHandle) {
-		return new PojoPropertyNodeProcessorBuilder<>(
+	private PojoIndexingProcessorPropertyNodeBuilder<? super T, ?> createPropertyNodeBuilder(PropertyHandle propertyHandle) {
+		return new PojoIndexingProcessorPropertyNodeBuilder<>(
 				this, typeModel, typeModel.getProperty( propertyHandle.getName() ), propertyHandle,
 				contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
@@ -87,28 +87,28 @@ public class PojoTypeNodeProcessorBuilder<T> extends AbstractPojoNodeProcessorBu
 	}
 
 	@Override
-	public Optional<PojoNodeProcessor<T>> build() {
+	public Optional<PojoIndexingProcessor<T>> build() {
 		Collection<IndexObjectFieldAccessor> parentIndexObjectAccessors = bindingContext.getParentIndexObjectAccessors();
 		Collection<TypeBridge> immutableBridges = bridges.isEmpty() ? Collections.emptyList() : new ArrayList<>( bridges );
-		Collection<PojoPropertyNodeProcessor<? super T, ?>> immutablePropertyProcessors =
-				propertyProcessorBuilders.isEmpty() ? Collections.emptyList()
-						: new ArrayList<>( propertyProcessorBuilders.size() );
-		propertyProcessorBuilders.values().stream()
-				.map( PojoPropertyNodeProcessorBuilder::build )
+		Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> immutablePropertyNodes =
+				propertyNodeBuilders.isEmpty() ? Collections.emptyList()
+						: new ArrayList<>( propertyNodeBuilders.size() );
+		propertyNodeBuilders.values().stream()
+				.map( PojoIndexingProcessorPropertyNodeBuilder::build )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
-				.forEach( immutablePropertyProcessors::add );
+				.forEach( immutablePropertyNodes::add );
 
-		if ( parentIndexObjectAccessors.isEmpty() && immutableBridges.isEmpty() && immutablePropertyProcessors.isEmpty() ) {
+		if ( parentIndexObjectAccessors.isEmpty() && immutableBridges.isEmpty() && immutablePropertyNodes.isEmpty() ) {
 			/*
-			 * If this processor doesn't create any object in the document, and it doesn't have any bridge,
-			 * nor any property processor, then it is useless and we don't need to build it
+			 * If this node doesn't create any object in the document, and it doesn't have any bridge,
+			 * nor any property node, then it is useless and we don't need to build it.
 			 */
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( new PojoTypeNodeProcessor<>(
-					parentIndexObjectAccessors, immutableBridges, immutablePropertyProcessors
+			return Optional.of( new PojoIndexingProcessorTypeNode<>(
+					parentIndexObjectAccessors, immutableBridges, immutablePropertyNodes
 			) );
 		}
 	}

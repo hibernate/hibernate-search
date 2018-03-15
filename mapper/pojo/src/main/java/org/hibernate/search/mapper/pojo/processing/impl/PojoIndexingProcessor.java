@@ -8,7 +8,10 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 
-public interface PojoNodeProcessor<T> extends AutoCloseable {
+/**
+ * A POJO processor responsible for transferring data from the POJO to a document to index.
+ */
+public interface PojoIndexingProcessor<T> extends AutoCloseable {
 
 	void process(DocumentElement target, T source);
 
@@ -16,7 +19,7 @@ public interface PojoNodeProcessor<T> extends AutoCloseable {
 	default void close() {
 	}
 
-	static <T> PojoNodeProcessor<T> noOp() {
+	static <T> PojoIndexingProcessor<T> noOp() {
 		return (ignored1, ignored2) -> { };
 	}
 

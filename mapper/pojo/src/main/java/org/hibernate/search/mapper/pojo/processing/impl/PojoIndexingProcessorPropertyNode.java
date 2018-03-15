@@ -16,20 +16,21 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.spi.Closer;
 
 /**
- * @author Yoann Rodiere
+ * A node inside a {@link PojoIndexingProcessor} responsible for extracting the value of a property,
+ * and applying nested processor nodes as well as {@link PropertyBridge}s to this value.
  */
-class PojoPropertyNodeProcessor<P, T> implements PojoNodeProcessor<P> {
+public class PojoIndexingProcessorPropertyNode<P, T> implements PojoIndexingProcessor<P> {
 
 	private final PropertyHandle handle;
 	private final Collection<PropertyBridge> propertyBridges;
-	private final Collection<PojoNodeProcessor<? super T>> nestedProcessors;
+	private final Collection<PojoIndexingProcessor<? super T>> nestedNodes;
 
-	PojoPropertyNodeProcessor(PropertyHandle handle,
+	public PojoIndexingProcessorPropertyNode(PropertyHandle handle,
 			Collection<PropertyBridge> propertyBridges,
-			Collection<PojoNodeProcessor<? super T>> nestedProcessors) {
+			Collection<PojoIndexingProcessor<? super T>> nestedNodes) {
 		this.handle = handle;
 		this.propertyBridges = propertyBridges;
-		this.nestedProcessors = nestedProcessors;
+		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
@@ -42,8 +43,8 @@ class PojoPropertyNodeProcessor<P, T> implements PojoNodeProcessor<P> {
 				bridge.write( target, bridgedElement );
 			}
 		}
-		for ( PojoNodeProcessor<? super T> processor : nestedProcessors ) {
-			processor.process( target, propertyValue );
+		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+			nestedNode.process( target, propertyValue );
 		}
 	}
 
@@ -51,7 +52,7 @@ class PojoPropertyNodeProcessor<P, T> implements PojoNodeProcessor<P> {
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( PropertyBridge::close, propertyBridges );
-			closer.pushAll( PojoNodeProcessor::close, nestedProcessors );
+			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
 }

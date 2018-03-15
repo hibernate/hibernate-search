@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.processing.impl;
+package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.Optional;
 
@@ -12,19 +12,17 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
-/**
- * @author Yoann Rodiere
- */
-abstract class AbstractPojoNodeProcessorBuilder<T> {
+abstract class AbstractPojoProcessorNodeBuilder<T> {
 
 	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
 
-	protected final AbstractPojoNodeProcessorBuilder<?> parent;
+	protected final AbstractPojoProcessorNodeBuilder<?> parent;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
-	AbstractPojoNodeProcessorBuilder(AbstractPojoNodeProcessorBuilder<?> parent,
+	AbstractPojoProcessorNodeBuilder(AbstractPojoProcessorNodeBuilder<?> parent,
 			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
 		this.parent = parent;
@@ -42,7 +40,7 @@ abstract class AbstractPojoNodeProcessorBuilder<T> {
 		return builder.toString();
 	}
 
-	abstract Optional<? extends PojoNodeProcessor<T>> build();
+	abstract Optional<? extends PojoIndexingProcessor<T>> build();
 
 	private void appendPath(StringBuilder builder) {
 		if ( parent == null ) {

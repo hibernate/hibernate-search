@@ -14,17 +14,18 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.util.spi.Closer;
 
 /**
- * @author Yoann Rodiere
+ * A node inside a {@link PojoIndexingProcessor} responsible for extracting elements from a container
+ * and applying nested processor nodes to the elements.
  */
-public class PojoContainerNodeProcessor<C, T> implements PojoNodeProcessor<C> {
+public class PojoIndexingProcessorContainerElementNode<C, T> implements PojoIndexingProcessor<C> {
 
 	private final ContainerValueExtractor<C, T> extractor;
-	private final Collection<PojoNodeProcessor<? super T>> nestedProcessors;
+	private final Collection<PojoIndexingProcessor<? super T>> nestedNodes;
 
-	PojoContainerNodeProcessor(ContainerValueExtractor<C, T> extractor,
-			Collection<PojoNodeProcessor<? super T>> nestedProcessors) {
+	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractor<C, T> extractor,
+			Collection<PojoIndexingProcessor<? super T>> nestedNodes) {
 		this.extractor = extractor;
-		this.nestedProcessors = nestedProcessors;
+		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
@@ -37,13 +38,13 @@ public class PojoContainerNodeProcessor<C, T> implements PojoNodeProcessor<C> {
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoNodeProcessor::close, nestedProcessors );
+			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
 
 	private void processItem(DocumentElement target, T sourceItem) {
-		for ( PojoNodeProcessor<? super T> processor : nestedProcessors ) {
-			processor.process( target, sourceItem );
+		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+			nestedNode.process( target, sourceItem );
 		}
 	}
 
