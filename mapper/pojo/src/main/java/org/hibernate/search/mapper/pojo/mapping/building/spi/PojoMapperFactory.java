@@ -11,7 +11,7 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
  * @author Yoann Rodiere
  */
 public abstract class PojoMapperFactory<M extends MappingImplementor>
-		implements MapperFactory<PojoTypeNodeMetadataContributor, M> {
+		implements MapperFactory<PojoTypeMetadataContributor, M> {
 
 	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;

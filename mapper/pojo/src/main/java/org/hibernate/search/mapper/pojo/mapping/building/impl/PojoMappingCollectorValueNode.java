@@ -13,10 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContrib
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
-/**
- * @author Yoann Rodiere
- */
-public interface PojoValueNodeMappingCollector extends PojoNodeMappingCollector {
+public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 
 	void functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor fieldModelContributor);

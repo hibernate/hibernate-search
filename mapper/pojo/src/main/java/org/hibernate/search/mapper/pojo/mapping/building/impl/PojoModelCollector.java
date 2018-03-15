@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-/**
- * @author Yoann Rodiere
- */
-public interface PojoNodeModelCollector {
+public interface PojoModelCollector {
 
 }

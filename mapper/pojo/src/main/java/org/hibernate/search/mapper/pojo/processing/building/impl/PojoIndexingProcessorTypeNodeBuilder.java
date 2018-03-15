@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -32,12 +32,12 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPro
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorTypeNode;
 
 public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcessorNodeBuilder<T>
-		implements PojoTypeNodeMappingCollector {
+		implements PojoMappingCollectorTypeNode {
 
 	private final PojoTypeModel<T> typeModel;
 	private final PojoModelTypeRootElement pojoModelRootElement;
 
-	private final PojoTypeNodeIdentityMappingCollector identityMappingCollector;
+	private final PojoIdentityMappingCollector identityMappingCollector;
 
 	private final Collection<TypeBridge> bridges = new ArrayList<>();
 	private final Map<PropertyHandle, PojoIndexingProcessorPropertyNodeBuilder<? super T, ?>> propertyNodeBuilders =
@@ -45,9 +45,9 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	public PojoIndexingProcessorTypeNodeBuilder(
 			AbstractPojoProcessorNodeBuilder<?> parent, PojoTypeModel<T> typeModel,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
-			PojoTypeNodeIdentityMappingCollector identityMappingCollector) {
+			PojoIdentityMappingCollector identityMappingCollector) {
 		super( parent, contributorProvider, indexModelBinder, bindingContext );
 		this.typeModel = typeModel;
 
@@ -70,7 +70,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	@Override
-	public PojoPropertyNodeMappingCollector property(PropertyHandle propertyHandle) {
+	public PojoMappingCollectorPropertyNode property(PropertyHandle propertyHandle) {
 		return propertyNodeBuilders.computeIfAbsent( propertyHandle, this::createPropertyNodeBuilder );
 	}
 

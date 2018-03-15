@@ -11,9 +11,9 @@ import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  */
 public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyDocumentIdMappingContext,
-				PojoNodeMetadataContributor<PojoPropertyNodeModelCollector, PojoPropertyNodeMappingCollector> {
+		PojoMetadataContributor<PojoModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
 	private BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder;
 
@@ -32,12 +32,12 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 	}
 
 	@Override
-	public void contributeModel(PojoPropertyNodeModelCollector collector) {
+	public void contributeModel(PojoModelCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 
 	@Override
-	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
+	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.identifierBridge( bridgeBuilder );
 	}
 

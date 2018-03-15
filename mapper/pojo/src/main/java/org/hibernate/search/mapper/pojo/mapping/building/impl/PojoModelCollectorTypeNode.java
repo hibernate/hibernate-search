@@ -6,13 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 
-/**
- * @author Yoann Rodiere
- */
-public interface PojoPropertyNodeModelCollector extends PojoNodeModelCollector {
+public interface PojoModelCollectorTypeNode extends PojoModelCollector {
 
-	void marker(MarkerBuilder definition);
+	PojoModelCollectorPropertyNode property(String propertyName);
 
 }

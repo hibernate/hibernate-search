@@ -13,8 +13,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -29,7 +29,7 @@ public class PojoIndexingProcessorContainerElementNodeBuilder<C, T> extends Abst
 			PojoIndexingProcessorPropertyNodeBuilder<?, ? extends C> parent,
 			PojoTypeModel<?> parentTypeModel, String propertyName,
 			PojoTypeModel<T> elementTypeModel, ContainerValueExtractor<C, T> extractor,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
 		super( parent, contributorProvider, indexModelBinder, bindingContext );
 		this.extractor = extractor;
@@ -40,7 +40,7 @@ public class PojoIndexingProcessorContainerElementNodeBuilder<C, T> extends Abst
 		);
 	}
 
-	public PojoValueNodeMappingCollector value() {
+	public PojoMappingCollectorValueNode value() {
 		return valueNodeProcessorCollectionBuilder;
 	}
 

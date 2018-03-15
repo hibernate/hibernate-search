@@ -31,7 +31,7 @@ import org.hibernate.search.util.AssertionFailure;
 /**
  * @author Yoann Rodiere
  */
-public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeNodeMetadataContributor, M> {
+public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeMetadataContributor, M> {
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
@@ -58,7 +58,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	@Override
 	public void addIndexed(MappableTypeModel typeModel,
 			IndexManagerBuildingState<?> indexManagerBuildingState,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider) {
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		if ( !( typeModel instanceof PojoRawTypeModel ) ) {
 			throw new AssertionFailure(
 					"Expected the indexed type model to be an instance of " + PojoRawTypeModel.class
@@ -69,7 +69,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
 				entityTypeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
-		PojoTypeNodeMappingCollector collector = builder.asCollector();
+		PojoMappingCollectorTypeNode collector = builder.asCollector();
 		contributorProvider.forEach(
 				entityTypeModel,
 				c -> c.contributeMapping( collector )

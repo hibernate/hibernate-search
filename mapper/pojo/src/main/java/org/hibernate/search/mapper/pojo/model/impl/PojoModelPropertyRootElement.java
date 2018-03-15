@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -26,7 +26,7 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 	private final PojoPropertyModel<?> propertyModel;
 
 	public PojoModelPropertyRootElement(PojoPropertyModel<?> propertyModel,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.propertyModel = propertyModel;
 	}

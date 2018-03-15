@@ -19,19 +19,19 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFunctionBridgeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
-public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoValueNodeMappingCollector {
+public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoMappingCollectorValueNode {
 
 	private final AbstractPojoProcessorNodeBuilder<?> parentBuilder;
 
 	private final PojoIndexModelBinder indexModelBinder;
-	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
+	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final IndexModelBindingContext bindingContext;
 
 	private final PojoTypeModel<?> parentTypeModel;
@@ -45,7 +45,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoVal
 	PojoIndexingProcessorValueNodeBuilderDelegate(AbstractPojoProcessorNodeBuilder<?> parentBuilder,
 			PojoTypeModel<?> parentTypeModel, String defaultName,
 			PojoTypeModel<T> valueTypeModel,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
 		this.parentBuilder = parentBuilder;
 		this.indexModelBinder = indexModelBinder;
@@ -91,7 +91,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<T> implements PojoVal
 			PojoIndexingProcessorTypeNodeBuilder<T> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 					parentBuilder, valueTypeModel, contributorProvider, indexModelBinder, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-					PojoTypeNodeIdentityMappingCollector.noOp()
+					PojoIdentityMappingCollector.noOp()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 			contributorProvider.forEach(

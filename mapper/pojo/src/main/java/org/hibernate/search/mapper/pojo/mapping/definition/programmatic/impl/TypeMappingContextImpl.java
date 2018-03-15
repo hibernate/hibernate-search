@@ -17,10 +17,10 @@ import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 /**
  * @author Yoann Rodiere
  */
-public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeNodeMetadataContributor {
+public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeMetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
 	private final PojoRawTypeModel<?> typeModel;
@@ -40,7 +40,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private String indexName;
 	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
 
-	private final List<PojoNodeMetadataContributor<? super PojoTypeNodeModelCollector, ? super PojoTypeNodeMappingCollector>>
+	private final List<PojoMetadataContributor<? super PojoModelCollectorTypeNode, ? super PojoMappingCollectorTypeNode>>
 			children = new ArrayList<>();
 
 	TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, PojoRawTypeModel<?> typeModel) {
@@ -54,12 +54,12 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	}
 
 	@Override
-	public void contributeModel(PojoTypeNodeModelCollector collector) {
+	public void contributeModel(PojoModelCollectorTypeNode collector) {
 		children.forEach( c -> c.contributeModel( collector ) );
 	}
 
 	@Override
-	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
+	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
 		if ( routingKeyBridgeBuilder != null ) {
 			collector.routingKeyBridge( routingKeyBridgeBuilder );
 		}

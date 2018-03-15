@@ -15,12 +15,12 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -32,12 +32,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
  * @author Yoann Rodiere
  */
 public class PropertyMappingContextImpl
-		implements PropertyMappingContext, PojoTypeNodeMetadataContributor {
+		implements PropertyMappingContext, PojoTypeMetadataContributor {
 
 	private final TypeMappingContext parent;
 	private final PropertyHandle propertyHandle;
 
-	private final List<PojoNodeMetadataContributor<? super PojoPropertyNodeModelCollector, ? super PojoPropertyNodeMappingCollector>>
+	private final List<PojoMetadataContributor<? super PojoModelCollectorPropertyNode, ? super PojoMappingCollectorPropertyNode>>
 			children = new ArrayList<>();
 
 	public PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
@@ -46,14 +46,14 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoTypeNodeModelCollector collector) {
-		PojoPropertyNodeModelCollector propertyNodeCollector = collector.property( propertyHandle.getName() );
+	public void contributeModel(PojoModelCollectorTypeNode collector) {
+		PojoModelCollectorPropertyNode propertyNodeCollector = collector.property( propertyHandle.getName() );
 		children.forEach( child -> child.contributeModel( propertyNodeCollector ) );
 	}
 
 	@Override
-	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
-		PojoPropertyNodeMappingCollector propertyNodeCollector = collector.property( propertyHandle );
+	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
+		PojoMappingCollectorPropertyNode propertyNodeCollector = collector.property( propertyHandle );
 		children.forEach( child -> child.contributeMapping( propertyNodeCollector ) );
 	}
 

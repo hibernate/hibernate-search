@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -22,15 +22,15 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNodeModelCollector {
+abstract class AbstractPojoModelElement implements PojoModelElement, PojoModelCollectorTypeNode {
 
-	private final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider;
+	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
 
 	private final Map<String, PojoModelNestedElement> propertyModelsByName = new HashMap<>();
 
 	private boolean markersForTypeInitialized = false;
 
-	AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+	AbstractPojoModelElement(TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
@@ -71,7 +71,7 @@ abstract class AbstractPojoModelElement implements PojoModelElement, PojoTypeNod
 
 	abstract PojoTypeModel<?> getTypeModel();
 
-	private TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> getModelContributorProvider() {
+	private TypeMetadataContributorProvider<PojoTypeMetadataContributor> getModelContributorProvider() {
 		return modelContributorProvider;
 	}
 

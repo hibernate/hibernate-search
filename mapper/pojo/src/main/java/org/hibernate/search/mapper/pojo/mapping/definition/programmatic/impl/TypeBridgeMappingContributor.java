@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class TypeBridgeMappingContributor
-		implements PojoNodeMetadataContributor<PojoNodeModelCollector, PojoTypeNodeMappingCollector> {
+		implements PojoMetadataContributor<PojoModelCollector, PojoMappingCollectorTypeNode> {
 
 	private final BridgeBuilder<? extends TypeBridge> bridgeBuilder;
 
@@ -26,12 +26,12 @@ public class TypeBridgeMappingContributor
 	}
 
 	@Override
-	public void contributeModel(PojoNodeModelCollector collector) {
+	public void contributeModel(PojoModelCollector collector) {
 		// Nothing to do
 	}
 
 	@Override
-	public void contributeMapping(PojoTypeNodeMappingCollector collector) {
+	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
 		collector.bridge( bridgeBuilder );
 	}
 

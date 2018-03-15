@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class PropertyBridgeMappingContributor
-		implements PojoNodeMetadataContributor<PojoNodeModelCollector, PojoPropertyNodeMappingCollector> {
+		implements PojoMetadataContributor<PojoModelCollector, PojoMappingCollectorPropertyNode> {
 
 	private final BridgeBuilder<? extends PropertyBridge> bridgeBuilder;
 
@@ -26,12 +26,12 @@ public class PropertyBridgeMappingContributor
 	}
 
 	@Override
-	public void contributeModel(PojoNodeModelCollector collector) {
+	public void contributeModel(PojoModelCollector collector) {
 		// Nothing to do
 	}
 
 	@Override
-	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
+	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.bridge(
 				bridgeBuilder
 				/*

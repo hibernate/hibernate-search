@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -30,7 +30,7 @@ import org.hibernate.search.util.SearchException;
  * @author Yoann Rodiere
  */
 public class PojoModelNestedElement extends AbstractPojoModelElement
-		implements PojoModelProperty, PojoPropertyNodeModelCollector {
+		implements PojoModelProperty, PojoModelCollectorPropertyNode {
 
 	private final AbstractPojoModelElement parent;
 
@@ -39,7 +39,7 @@ public class PojoModelNestedElement extends AbstractPojoModelElement
 	private final Map<Class<?>, List<?>> markers = new HashMap<>();
 
 	PojoModelNestedElement(AbstractPojoModelElement parent, PojoPropertyModel<?> propertyModel,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> modelContributorProvider) {
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
 		super( modelContributorProvider );
 		this.parent = parent;
 		this.propertyModel = propertyModel;

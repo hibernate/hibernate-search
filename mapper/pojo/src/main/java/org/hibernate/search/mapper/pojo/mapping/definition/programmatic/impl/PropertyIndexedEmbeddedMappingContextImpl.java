@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoPropertyNodeModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoValueNodeMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  */
 public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyIndexedEmbeddedMappingContext,
-				PojoNodeMetadataContributor<PojoPropertyNodeModelCollector, PojoPropertyNodeMappingCollector> {
+		PojoMetadataContributor<PojoModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
 	private String prefix;
 
@@ -45,13 +45,13 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public void contributeModel(PojoPropertyNodeModelCollector collector) {
+	public void contributeModel(PojoModelCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 
 	@Override
-	public void contributeMapping(PojoPropertyNodeMappingCollector collector) {
-		PojoValueNodeMappingCollector valueNodeMappingCollector;
+	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+		PojoMappingCollectorValueNode valueNodeMappingCollector;
 		if ( extractorClasses == null ) {
 			valueNodeMappingCollector = collector.valueWithDefaultExtractors();
 		}

@@ -11,9 +11,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-class NoOpPojoTypeNodeIdentityMappingCollector implements PojoTypeNodeIdentityMappingCollector {
+class NoOpPojoIdentityMappingCollector implements PojoIdentityMappingCollector {
 
-	static final NoOpPojoTypeNodeIdentityMappingCollector INSTANCE = new NoOpPojoTypeNodeIdentityMappingCollector();
+	static final NoOpPojoIdentityMappingCollector INSTANCE = new NoOpPojoIdentityMappingCollector();
 
 	@Override
 	public <T> void identifierBridge(PojoTypeModel<T> propertyTypeModel, PropertyHandle handle, IdentifierBridge<T> bridge) {

@@ -11,19 +11,19 @@ import java.util.Optional;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
 abstract class AbstractPojoProcessorNodeBuilder<T> {
 
-	protected final TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider;
+	protected final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 
 	protected final AbstractPojoProcessorNodeBuilder<?> parent;
 	protected final PojoIndexModelBinder indexModelBinder;
 	protected final IndexModelBindingContext bindingContext;
 
 	AbstractPojoProcessorNodeBuilder(AbstractPojoProcessorNodeBuilder<?> parent,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
 		this.parent = parent;
 		this.contributorProvider = contributorProvider;

@@ -14,9 +14,9 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeNodeModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -96,8 +96,8 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 							indexName = null;
 						}
 
-						PojoTypeNodeMetadataContributor contributor =
-								new AnnotationPojoTypeNodeMetadataContributorImpl( beanResolver, typeModel );
+						PojoTypeMetadataContributor contributor =
+								new AnnotationPojoTypeMetadataContributorImpl( beanResolver, typeModel );
 
 						// Make sure to enable automatically discovering types whenever this contributor is called
 						contributor = new LazilyDiscoveringTypeMetadataContributor( contributor );
@@ -118,10 +118,10 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 			}
 		}
 
-		private class LazilyDiscoveringTypeMetadataContributor implements PojoTypeNodeMetadataContributor {
-			private final PojoTypeNodeMetadataContributor delegate;
+		private class LazilyDiscoveringTypeMetadataContributor implements PojoTypeMetadataContributor {
+			private final PojoTypeMetadataContributor delegate;
 
-			private LazilyDiscoveringTypeMetadataContributor(PojoTypeNodeMetadataContributor delegate) {
+			private LazilyDiscoveringTypeMetadataContributor(PojoTypeMetadataContributor delegate) {
 				this.delegate = delegate;
 			}
 
@@ -132,12 +132,12 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 			}
 
 			@Override
-			public void contributeModel(PojoTypeNodeModelCollector collector) {
+			public void contributeModel(PojoModelCollectorTypeNode collector) {
 				delegate.contributeModel( collector );
 			}
 
 			@Override
-			public void contributeMapping(PojoTypeNodeMappingCollector collector) {
+			public void contributeMapping(PojoMappingCollectorTypeNode collector) {
 				delegate.contributeMapping( collector );
 			}
 		}

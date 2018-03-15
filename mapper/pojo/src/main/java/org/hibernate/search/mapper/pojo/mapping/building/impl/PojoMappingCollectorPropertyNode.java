@@ -13,10 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 
-/**
- * @author Yoann Rodiere
- */
-public interface PojoPropertyNodeMappingCollector extends PojoNodeMappingCollector {
+public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
 	void bridge(BridgeBuilder<? extends PropertyBridge> builder);
 
@@ -24,11 +21,11 @@ public interface PojoPropertyNodeMappingCollector extends PojoNodeMappingCollect
 
 	void containedIn();
 
-	PojoValueNodeMappingCollector valueWithoutExtractors();
+	PojoMappingCollectorValueNode valueWithoutExtractors();
 
-	PojoValueNodeMappingCollector valueWithDefaultExtractors();
+	PojoMappingCollectorValueNode valueWithDefaultExtractors();
 
-	PojoValueNodeMappingCollector valueWithExtractors(
+	PojoMappingCollectorValueNode valueWithExtractors(
 			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
 
 }

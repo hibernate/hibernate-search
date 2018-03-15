@@ -29,24 +29,24 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 	private final PojoRawTypeModel<E> typeModel;
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
 
-	private final PojoTypeNodeIdentityMappingCollectorImpl identityMappingCollector;
+	private final PojoIdentityMappingCollectorImpl identityMappingCollector;
 	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
 
 	PojoTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
-			TypeMetadataContributorProvider<PojoTypeNodeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
 			IdentifierMapping<?, E> defaultIdentifierMapping) {
 		this.typeModel = typeModel;
 		this.indexManagerBuildingState = indexManagerBuildingState;
-		this.identityMappingCollector = new PojoTypeNodeIdentityMappingCollectorImpl( defaultIdentifierMapping );
+		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl( defaultIdentifierMapping );
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				null, typeModel, contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
 		);
 	}
 
-	public PojoTypeNodeMappingCollector asCollector() {
+	public PojoMappingCollectorTypeNode asCollector() {
 		return processorBuilder;
 	}
 
@@ -72,11 +72,11 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		builder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );
 	}
 
-	private class PojoTypeNodeIdentityMappingCollectorImpl implements PojoTypeNodeIdentityMappingCollector {
+	private class PojoIdentityMappingCollectorImpl implements PojoIdentityMappingCollector {
 		private IdentifierMapping<?, E> identifierMapping;
 		private RoutingKeyBridge routingKeyBridge;
 
-		PojoTypeNodeIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
+		PojoIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
 			this.identifierMapping = identifierMapping;
 		}
 
