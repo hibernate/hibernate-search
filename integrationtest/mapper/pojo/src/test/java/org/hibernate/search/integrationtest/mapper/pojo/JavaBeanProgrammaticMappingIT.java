@@ -79,8 +79,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "id" )
 						.documentId()
 				.property( "text" )
-						.field()
-								.name( "myTextField" )
+						.field( "myTextField" )
 				.property( "embedded" )
 						.indexedEmbedded()
 								.prefix( "embedded.prefix_" )
@@ -90,8 +89,7 @@ public class JavaBeanProgrammaticMappingIT {
 		ProgrammaticMappingDefinition secondMappingDefinition = contributor.programmaticMapping();
 		secondMappingDefinition.type( ParentIndexedEntity.class )
 				.property( "localDate" )
-						.field()
-								.name( "myLocalDateField" )
+						.field( "myLocalDateField" )
 				.property( "embedded" )
 						.bridge(
 								new CustomPropertyBridge.Builder()
@@ -103,7 +101,7 @@ public class JavaBeanProgrammaticMappingIT {
 						.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 				.property( "numeric" )
 						.field()
-						.field().name( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
+						.field( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
 		secondMappingDefinition.type( YetAnotherIndexedEntity.class )
 				.indexed( YetAnotherIndexedEntity.INDEX )
 				.property( "id" )
@@ -114,7 +112,7 @@ public class JavaBeanProgrammaticMappingIT {
 						.field()
 				.property( "optionalInt" )
 						.field()
-						.field().name( "optionalIntAsString" )
+						.field( "optionalIntAsString" )
 								.functionBridge( OptionalIntAsStringFunctionBridge.class )
 								.withoutExtractors()
 				.property( "numericArray" )
@@ -128,7 +126,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "embeddedArrayList" )
 						.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
 				.property( "embeddedMap" )
-						.field().name( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
+						.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 						.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b

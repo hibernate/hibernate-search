@@ -67,6 +67,11 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
+	public PropertyFieldMappingContext field(String fieldName) {
+		return delegate.field( fieldName );
+	}
+
+	@Override
 	public PropertyIndexedEmbeddedMappingContext indexedEmbedded() {
 		return delegate.indexedEmbedded();
 	}

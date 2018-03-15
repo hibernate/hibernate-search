@@ -36,6 +36,8 @@ public interface PropertyMappingContext {
 
 	PropertyFieldMappingContext field();
 
+	PropertyFieldMappingContext field(String fieldName);
+
 	PropertyIndexedEmbeddedMappingContext indexedEmbedded();
 
 	PropertyMappingContext containedIn();

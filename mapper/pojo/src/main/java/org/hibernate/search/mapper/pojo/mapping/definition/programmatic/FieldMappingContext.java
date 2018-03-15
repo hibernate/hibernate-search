@@ -13,8 +13,6 @@ import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
  */
 public interface FieldMappingContext<R extends FieldMappingContext<R>> {
 
-	R name(String name);
-
 	R bridge(String bridgeName);
 
 	R bridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);

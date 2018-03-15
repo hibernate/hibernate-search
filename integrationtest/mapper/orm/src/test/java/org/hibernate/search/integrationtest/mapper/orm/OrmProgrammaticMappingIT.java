@@ -478,8 +478,7 @@ public class OrmProgrammaticMappingIT {
 					.property( "id" )
 							.documentId()
 					.property( "text" )
-							.field()
-									.name( "myTextField" )
+							.field( "myTextField" )
 					.property( "embedded" )
 							.indexedEmbedded()
 									.prefix( "embedded.prefix_" )
@@ -489,8 +488,7 @@ public class OrmProgrammaticMappingIT {
 			ProgrammaticMappingDefinition secondMapping = contributor.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )
 					.property( "localDate" )
-							.field()
-									.name( "myLocalDateField" )
+							.field( "myLocalDateField" )
 					.property( "embedded" )
 							.bridge(
 									new CustomPropertyBridge.Builder()
@@ -502,7 +500,7 @@ public class OrmProgrammaticMappingIT {
 							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 					.property( "numeric" )
 							.field()
-							.field().name( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
+							.field( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
 			secondMapping.type( YetAnotherIndexedEntity.class )
 					.indexed( YetAnotherIndexedEntity.INDEX )
 					.property( "id" )
@@ -513,7 +511,7 @@ public class OrmProgrammaticMappingIT {
 							.field()
 					.property( "optionalInt" )
 							.field()
-							.field().name( "optionalIntAsString" )
+							.field( "optionalIntAsString" )
 									.functionBridge( OptionalIntAsStringFunctionBridge.class )
 									.withoutExtractors()
 					.property( "numericArray" )
@@ -523,7 +521,7 @@ public class OrmProgrammaticMappingIT {
 									.prefix( "embeddedList.otherPrefix_" )
 									.includePaths( "embedded.prefix_customBridgeOnClass.text" )
 					.property( "embeddedMap" )
-							.field().name( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
+							.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 		}
 	}

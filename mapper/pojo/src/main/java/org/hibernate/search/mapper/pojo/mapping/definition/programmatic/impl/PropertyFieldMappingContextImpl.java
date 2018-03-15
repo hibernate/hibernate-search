@@ -27,23 +27,21 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyFieldMappingContext,
 		PojoMetadataContributor<PojoModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
-	private BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder;
+	private final String fieldName;
 
-	private String fieldName;
+	private BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder;
 
 	private final CompositeFieldModelContributor fieldModelContributor = new CompositeFieldModelContributor();
 
 	private List<Class<? extends ContainerValueExtractor>> extractorClasses = null;
 
-	public PropertyFieldMappingContextImpl(PropertyMappingContext parent) {
+	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String fieldName) {
 		super( parent );
+		this.fieldName = fieldName;
 	}
 
 	@Override
@@ -64,12 +62,6 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 			valueNodeMappingCollector = collector.valueWithExtractors( extractorClasses );
 		}
 		valueNodeMappingCollector.functionBridge( bridgeBuilder, fieldName, fieldModelContributor );
-	}
-
-	@Override
-	public PropertyFieldMappingContext name(String name) {
-		this.fieldName = name;
-		return this;
 	}
 
 	@Override

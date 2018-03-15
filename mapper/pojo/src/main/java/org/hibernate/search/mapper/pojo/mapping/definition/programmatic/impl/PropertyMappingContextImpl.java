@@ -28,9 +28,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-/**
- * @author Yoann Rodiere
- */
 public class PropertyMappingContextImpl
 		implements PropertyMappingContext, PojoTypeMetadataContributor {
 
@@ -40,7 +37,7 @@ public class PropertyMappingContextImpl
 	private final List<PojoMetadataContributor<? super PojoModelCollectorPropertyNode, ? super PojoMappingCollectorPropertyNode>>
 			children = new ArrayList<>();
 
-	public PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
+	PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
 		this.parent = parent;
 		this.propertyHandle = propertyHandle;
 	}
@@ -102,7 +99,12 @@ public class PropertyMappingContextImpl
 
 	@Override
 	public PropertyFieldMappingContext field() {
-		PropertyFieldMappingContextImpl child = new PropertyFieldMappingContextImpl( this );
+		return field( null );
+	}
+
+	@Override
+	public PropertyFieldMappingContext field(String fieldName) {
+		PropertyFieldMappingContextImpl child = new PropertyFieldMappingContextImpl( this, fieldName );
 		children.add( child );
 		return child;
 	}

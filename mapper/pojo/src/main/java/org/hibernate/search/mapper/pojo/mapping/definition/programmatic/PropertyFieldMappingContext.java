@@ -19,8 +19,6 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
  */
 public interface PropertyFieldMappingContext extends PropertyMappingContext {
 
-	PropertyFieldMappingContext name(String name);
-
 	PropertyFieldMappingContext functionBridge(String bridgeName);
 
 	PropertyFieldMappingContext functionBridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);
