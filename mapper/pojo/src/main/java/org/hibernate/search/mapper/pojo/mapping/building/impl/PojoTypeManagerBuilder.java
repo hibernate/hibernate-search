@@ -17,12 +17,12 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
-import org.hibernate.search.mapper.pojo.processing.impl.PropertyIdentifierMapping;
-import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyBridgeRoutingKeyProvider;
-import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
+import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.util.SearchException;
 
 public class PojoTypeManagerBuilder<E, D extends DocumentElement> {

@@ -16,9 +16,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.processing.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
-import org.hibernate.search.mapper.pojo.processing.impl.RoutingKeyProvider;
 import org.hibernate.search.util.spi.Closer;
 
 /**
