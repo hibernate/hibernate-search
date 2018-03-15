@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import java.util.List;
-
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
 
 public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
@@ -21,11 +19,6 @@ public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
 	void containedIn();
 
-	PojoMappingCollectorValueNode valueWithoutExtractors();
-
-	PojoMappingCollectorValueNode valueWithDefaultExtractors();
-
-	PojoMappingCollectorValueNode valueWithExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
+	PojoMappingCollectorValueNode value(ContainerValueExtractorPath extractorPath);
 
 }

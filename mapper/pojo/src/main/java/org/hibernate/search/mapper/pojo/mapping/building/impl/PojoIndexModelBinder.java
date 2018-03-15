@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
@@ -14,14 +13,15 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContex
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
@@ -45,12 +45,17 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorVal
  */
 public interface PojoIndexModelBinder {
 
-	<T> Optional<BoundContainerValueExtractor<? super T, ?>> createDefaultExtractors(
-			PojoGenericTypeModel<T> pojoGenericTypeModel);
+	<C> BoundContainerValueExtractorPath<C, ?> bindExtractorPath(
+			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath);
 
-	<T> BoundContainerValueExtractor<? super T, ?> createExplicitExtractors(
-			PojoGenericTypeModel<T> pojoGenericTypeModel,
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
+	<C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindExtractorPath(
+			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath);
+
+	<C, T> ContainerValueExtractor<? super C, T> createExtractors(
+			BoundContainerValueExtractorPath<C, T> boundExtractorPath);
+
+	<C, T> Optional<? extends ContainerValueExtractor<? super C, T>> tryCreateExtractors(
+			BoundContainerValueExtractorPath<C, T> boundExtractorPath);
 
 	<T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);

@@ -36,13 +36,13 @@ import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -136,7 +136,10 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> builder = createValueBridgeBuilder( annotation, propertyModel );
 
-		getValueNode( collector, annotation.extractors(), Field.DefaultExtractors.class )
+		ContainerValueExtractorPath extractorPath =
+				getExtractorPath( annotation.extractors(), Field.DefaultExtractors.class );
+
+		collector.value( extractorPath )
 				.valueBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
 	}
 
@@ -162,22 +165,25 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 			cleanedUpIncludePaths = Collections.emptySet();
 		}
 
-		getValueNode( collector, annotation.extractors(), IndexedEmbedded.DefaultExtractors.class )
+		ContainerValueExtractorPath extractorPath =
+				getExtractorPath( annotation.extractors(), IndexedEmbedded.DefaultExtractors.class );
+
+		collector.value( extractorPath )
 				.indexedEmbedded(
 						cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths
 				);
 	}
 
-	private PojoMappingCollectorValueNode getValueNode(PojoMappingCollectorPropertyNode collector,
+	private ContainerValueExtractorPath getExtractorPath(
 			ContainerValueExtractorBeanReference[] extractors, Class<?> defaultExtractorsClass) {
 		if ( extractors.length == 0 ) {
-			return collector.valueWithoutExtractors();
+			return ContainerValueExtractorPath.noExtractors();
 		}
 		else if ( extractors.length == 1 && defaultExtractorsClass.equals( extractors[0].type() ) ) {
-			return collector.valueWithDefaultExtractors();
+			return ContainerValueExtractorPath.defaultExtractors();
 		}
 		else {
-			return collector.valueWithExtractors(
+			return ContainerValueExtractorPath.explicitExtractors(
 					Arrays.stream( extractors )
 							.map( ContainerValueExtractorBeanReference::type )
 							.collect( Collectors.toList() )

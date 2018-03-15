@@ -6,26 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyIndexedEmbeddedMappingContext,
 		PojoMetadataContributor<PojoModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
@@ -38,9 +33,9 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private final Set<String> includePaths = new HashSet<>();
 
-	private List<Class<? extends ContainerValueExtractor>> extractorClasses = null;
+	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 
-	public PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
+	PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
 		super( parent );
 	}
 
@@ -51,17 +46,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		PojoMappingCollectorValueNode valueNodeMappingCollector;
-		if ( extractorClasses == null ) {
-			valueNodeMappingCollector = collector.valueWithDefaultExtractors();
-		}
-		else if ( extractorClasses.isEmpty() ) {
-			valueNodeMappingCollector = collector.valueWithoutExtractors();
-		}
-		else {
-			valueNodeMappingCollector = collector.valueWithExtractors( extractorClasses );
-		}
-		valueNodeMappingCollector.indexedEmbedded(
+		collector.value( extractorPath ).indexedEmbedded(
 				prefix, storage, maxDepth, includePaths
 				/*
 				 * Ignore mapped types, we don't need to discover new mappings automatically
@@ -97,13 +82,13 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	@Override
 	public PropertyIndexedEmbeddedMappingContext withExtractors(
 			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
-		this.extractorClasses = new ArrayList<>( extractorClasses );
+		this.extractorPath = ContainerValueExtractorPath.explicitExtractors( extractorClasses );
 		return this;
 	}
 
 	@Override
 	public PropertyIndexedEmbeddedMappingContext withoutExtractors() {
-		this.extractorClasses = Collections.emptyList();
+		this.extractorPath = ContainerValueExtractorPath.noExtractors();
 		return this;
 	}
 }
