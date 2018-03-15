@@ -10,11 +10,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
@@ -28,15 +26,14 @@ public class PojoIndexingProcessorContainerElementNodeBuilder<C, V> extends Abst
 
 	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, ? extends C, V> modelPath,
 			ContainerValueExtractor<C, V> extractor,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
-		super( contributorProvider, indexModelBinder, bindingContext );
+			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
+		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
 		this.extractor = extractor;
 
 		valueNodeProcessorCollectionBuilder = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
 				modelPath,
-				contributorProvider, indexModelBinder, bindingContext
+				mappingHelper, bindingContext
 		);
 	}
 

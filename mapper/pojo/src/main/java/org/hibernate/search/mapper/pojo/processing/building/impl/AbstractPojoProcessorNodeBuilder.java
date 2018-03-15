@@ -9,23 +9,18 @@ package org.hibernate.search.mapper.pojo.processing.building.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 
 abstract class AbstractPojoProcessorNodeBuilder<T> {
 
-	protected final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
-	protected final PojoIndexModelBinder indexModelBinder;
-	protected final IndexModelBindingContext bindingContext;
+	final PojoMappingHelper mappingHelper;
+	final IndexModelBindingContext bindingContext;
 
 	AbstractPojoProcessorNodeBuilder(
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
-		this.contributorProvider = contributorProvider;
-		this.indexModelBinder = indexModelBinder;
+			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
+		this.mappingHelper = mappingHelper;
 		this.bindingContext = bindingContext;
 	}
 

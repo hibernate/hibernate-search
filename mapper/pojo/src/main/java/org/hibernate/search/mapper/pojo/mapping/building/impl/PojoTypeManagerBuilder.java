@@ -11,22 +11,21 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
-import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -40,8 +39,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
 
 	PojoTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder,
+			PojoMappingHelper mappingHelper,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
 			IdentifierMapping<?, E> defaultIdentifierMapping) {
 		this.typeModel = typeModel;
@@ -50,7 +48,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
-				contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
+				mappingHelper, bindingContext, identityMappingCollector
 		);
 	}
 

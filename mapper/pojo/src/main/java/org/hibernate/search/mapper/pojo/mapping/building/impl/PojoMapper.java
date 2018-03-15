@@ -61,9 +61,12 @@ public class PojoMapper<M> implements Mapper<PojoTypeMetadataContributor, M> {
 					+ ", got " + typeModel + " instead. There is probably a bug in the mapper implementation"
 			);
 		}
+
+		PojoMappingHelper mappingHelper = new PojoMappingHelper( contributorProvider, indexModelBinder );
+
 		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
-				entityTypeModel, contributorProvider, indexModelBinder, indexManagerBuildingState,
+				entityTypeModel, mappingHelper, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoMappingCollectorTypeNode collector = builder.asCollector();
 		contributorProvider.forEach(

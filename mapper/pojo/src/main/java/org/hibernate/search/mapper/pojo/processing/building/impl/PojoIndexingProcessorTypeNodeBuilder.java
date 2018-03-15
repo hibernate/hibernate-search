@@ -15,15 +15,13 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -45,28 +43,30 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	public PojoIndexingProcessorTypeNodeBuilder(
 			BoundPojoModelPathTypeNode<T> modelPath,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext,
+			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
 			PojoIdentityMappingCollector identityMappingCollector) {
-		super( contributorProvider, indexModelBinder, bindingContext );
+		super( mappingHelper, bindingContext );
 
 		this.modelPath = modelPath;
 
 		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
-		this.pojoModelRootElement = new PojoModelTypeRootElement( modelPath.getTypeModel(), contributorProvider );
+		this.pojoModelRootElement = new PojoModelTypeRootElement(
+				modelPath.getTypeModel(), mappingHelper.getContributorProvider()
+		);
 
 		this.identityMappingCollector = identityMappingCollector;
 	}
 
 	@Override
 	public void bridge(BridgeBuilder<? extends TypeBridge> builder) {
-		indexModelBinder.addTypeBridge( bindingContext, pojoModelRootElement, builder )
+		mappingHelper.getIndexModelBinder().addTypeBridge( bindingContext, pojoModelRootElement, builder )
 				.ifPresent( bridges::add );
 	}
 
 	@Override
 	public void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		RoutingKeyBridge bridge = indexModelBinder.addRoutingKeyBridge( bindingContext, pojoModelRootElement, builder );
+		RoutingKeyBridge bridge = mappingHelper.getIndexModelBinder()
+				.addRoutingKeyBridge( bindingContext, pojoModelRootElement, builder );
 		identityMappingCollector.routingKeyBridge( bridge );
 	}
 
@@ -78,7 +78,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	private PojoIndexingProcessorPropertyNodeBuilder<? super T, ?> createPropertyNodeBuilder(PropertyHandle propertyHandle) {
 		return new PojoIndexingProcessorPropertyNodeBuilder<>(
 				modelPath.property( propertyHandle ),
-				contributorProvider, indexModelBinder, bindingContext, identityMappingCollector
+				mappingHelper, bindingContext, identityMappingCollector
 		);
 	}
 

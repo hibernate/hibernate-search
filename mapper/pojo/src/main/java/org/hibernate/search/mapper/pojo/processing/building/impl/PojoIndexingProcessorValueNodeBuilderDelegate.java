@@ -15,13 +15,11 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIndexModelBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -31,8 +29,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<V> implements PojoMap
 
 	private final BoundPojoModelPathValueNode<?, ?, V> modelPath;
 
-	private final PojoIndexModelBinder indexModelBinder;
-	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
+	private final PojoMappingHelper mappingHelper;
 	private final IndexModelBindingContext bindingContext;
 
 	private final Collection<PojoIndexingProcessorValueBridgeNode<? super V, ?>> bridgeNodes = new ArrayList<>();
@@ -41,11 +38,9 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<V> implements PojoMap
 
 	PojoIndexingProcessorValueNodeBuilderDelegate(
 			BoundPojoModelPathValueNode<?, ?, V> modelPath,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
-			PojoIndexModelBinder indexModelBinder, IndexModelBindingContext bindingContext) {
+			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
 		this.modelPath = modelPath;
-		this.indexModelBinder = indexModelBinder;
-		this.contributorProvider = contributorProvider;
+		this.mappingHelper = mappingHelper;
 		this.bindingContext = bindingContext;
 	}
 
@@ -62,7 +57,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<V> implements PojoMap
 			defaultedFieldName = modelPath.parent().getPropertyHandle().getName();
 		}
 
-		indexModelBinder.addValueBridge(
+		mappingHelper.getIndexModelBinder().addValueBridge(
 				bindingContext, modelPath.type().getTypeModel(), builder, defaultedFieldName,
 				fieldModelContributor
 		)
@@ -86,12 +81,12 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<V> implements PojoMap
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			BoundPojoModelPathTypeNode<V> embeddedTypeModelPath = modelPath.type();
 			PojoIndexingProcessorTypeNodeBuilder<V> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
-					embeddedTypeModelPath, contributorProvider, indexModelBinder, nestedBindingContext,
+					embeddedTypeModelPath, mappingHelper, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					PojoIdentityMappingCollector.noOp()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
-			contributorProvider.forEach(
+			mappingHelper.getContributorProvider().forEach(
 					embeddedTypeModelPath.getTypeModel().getRawType(),
 					c -> c.contributeMapping( nestedProcessorBuilder )
 			);
