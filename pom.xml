@@ -337,6 +337,8 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
+        <!-- Check dependencies for security vulnerabilities -->
+        <version.dependency-check-plugin>3.1.1</version.dependency-check-plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -2611,5 +2613,24 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
+        <profile>
+         <id>owasp</id>
+            <build>
+               <plugins>
+                  <plugin>
+                     <groupId>org.owasp</groupId>
+                     <artifactId>dependency-check-maven</artifactId>
+                     <version>${version.dependency-check-plugin}</version>
+                     <executions>
+                        <execution>
+                           <goals>
+                              <goal>aggregate</goal>
+                           </goals>
+                        </execution>
+                    </executions>
+                  </plugin>
+               </plugins>
+             </build>
+      </profile>
     </profiles>
 </project>
