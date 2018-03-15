@@ -40,6 +40,6 @@ public interface PropertyMappingContext {
 
 	PropertyIndexedEmbeddedMappingContext indexedEmbedded();
 
-	PropertyMappingContext containedIn();
+	AssociationInverseSideMappingContext associationInverseSide(String inversePropertyName);
 
 }

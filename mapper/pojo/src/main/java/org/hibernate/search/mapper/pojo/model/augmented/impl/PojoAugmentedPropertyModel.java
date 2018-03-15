@@ -11,14 +11,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
+
 public class PojoAugmentedPropertyModel {
 
-	static final PojoAugmentedPropertyModel EMPTY = new PojoAugmentedPropertyModel( Collections.emptyMap() );
+	public static final PojoAugmentedPropertyModel EMPTY = new PojoAugmentedPropertyModel(
+			Collections.emptyMap(), Collections.emptyMap()
+	);
 
+	private final Map<ContainerValueExtractorPath, PojoAugmentedValueModel> values;
 	private final Map<Class<?>, List<?>> markers;
 
-	public PojoAugmentedPropertyModel(Map<Class<?>, List<?>> markers) {
+	public PojoAugmentedPropertyModel(Map<ContainerValueExtractorPath, PojoAugmentedValueModel> values,
+			Map<Class<?>, List<?>> markers) {
+		this.values = values;
 		this.markers = markers;
+	}
+
+	public PojoAugmentedValueModel getValue(ContainerValueExtractorPath extractorPath) {
+		return values.getOrDefault( extractorPath, PojoAugmentedValueModel.EMPTY );
+	}
+
+	public Map<ContainerValueExtractorPath, PojoAugmentedValueModel> getAugmentedValues() {
+		return values;
 	}
 
 	@SuppressWarnings("unchecked")

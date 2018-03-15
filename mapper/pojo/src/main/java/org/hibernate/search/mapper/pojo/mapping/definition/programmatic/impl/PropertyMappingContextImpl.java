@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
@@ -117,9 +118,11 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public PropertyMappingContext containedIn() {
-		children.add( new ContainedInMappingContributor() );
-		return this;
+	public AssociationInverseSideMappingContext associationInverseSide(String inversePropertyName) {
+		AssociationInverseSideMappingContextImpl child = new AssociationInverseSideMappingContextImpl(
+				this, inversePropertyName
+		);
+		children.add( child );
+		return child;
 	}
-
 }

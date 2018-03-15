@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -77,8 +78,8 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public PropertyMappingContext containedIn() {
-		return delegate.containedIn();
+	public AssociationInverseSideMappingContext associationInverseSide(String inversePropertyName) {
+		return delegate.associationInverseSide( inversePropertyName );
 	}
 
 }

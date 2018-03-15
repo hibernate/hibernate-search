@@ -17,8 +17,6 @@ public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
 	void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> reference);
 
-	void containedIn();
-
 	PojoMappingCollectorValueNode value(ContainerValueExtractorPath extractorPath);
 
 }

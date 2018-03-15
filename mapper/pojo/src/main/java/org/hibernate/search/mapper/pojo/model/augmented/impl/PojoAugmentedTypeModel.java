@@ -18,4 +18,8 @@ public class PojoAugmentedTypeModel {
 	public PojoAugmentedPropertyModel getProperty(String name) {
 		return properties.getOrDefault( name, PojoAugmentedPropertyModel.EMPTY );
 	}
+
+	public Map<String, PojoAugmentedPropertyModel> getAugmentedProperties() {
+		return properties;
+	}
 }

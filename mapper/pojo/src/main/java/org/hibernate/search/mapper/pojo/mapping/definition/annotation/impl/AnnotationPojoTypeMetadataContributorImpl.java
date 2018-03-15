@@ -41,6 +41,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -90,6 +91,8 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		String name = propertyModel.getName();
 		propertyModel.getAnnotationsByMetaAnnotationType( MarkerMapping.class )
 				.forEach( annotation -> addMarker( collector.property( name ), annotation ) );
+		propertyModel.getAnnotationsByType( AssociationInverseSide.class )
+				.forEach( annotation -> addAssociationInverseSide( collector.property( name ), annotation ) );
 	}
 
 	private void contributePropertyMapping(PojoMappingCollectorTypeNode collector, PojoPropertyModel<?> propertyModel) {
@@ -108,6 +111,19 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		AnnotationMarkerBuilder<A> builder = createMarkerBuilder( annotation );
 		builder.initialize( annotation );
 		collector.marker( builder );
+	}
+
+	private void addAssociationInverseSide(PojoAugmentedModelCollectorPropertyNode collector,
+			AssociationInverseSide annotation) {
+		ContainerValueExtractorPath extractorPath = getExtractorPath(
+				annotation.extractors(), AssociationInverseSide.DefaultExtractors.class
+		);
+		ContainerValueExtractorPath inverseExtractorPath = getExtractorPath(
+				annotation.inverseExtractors(), AssociationInverseSide.DefaultExtractors.class
+		);
+
+		collector.value( extractorPath )
+				.associationInverseSide( annotation.inverseProperty(), inverseExtractorPath );
 	}
 
 	private void addDocumentId(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel, DocumentId annotation) {

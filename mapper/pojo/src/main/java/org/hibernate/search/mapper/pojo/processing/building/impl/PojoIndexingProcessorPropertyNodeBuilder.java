@@ -88,13 +88,6 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 	}
 
 	@Override
-	public void containedIn() {
-		// FIXME implement ContainedIn
-		// FIXME also contribute containedIns to indexedEmbeddeds using the parent's metadata here, if possible?
-		throw new UnsupportedOperationException( "Not implemented yet" );
-	}
-
-	@Override
 	public PojoMappingCollectorValueNode value(ContainerValueExtractorPath extractorPath) {
 		if ( !extractorPath.isEmpty() ) {
 			PojoIndexingProcessorContainerElementNodeBuilder<? super P, ?> containerElementNodeBuilder =
