@@ -35,9 +35,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * @author Yoann Rodiere
- */
 public class OrmAnnotationMappingDiscoveryIT {
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
@@ -51,7 +48,7 @@ public class OrmAnnotationMappingDiscoveryIT {
 	private SessionFactory sessionFactory;
 
 	@Test
-	public void test() {
+	public void discoveryEnabled() {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
 				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
@@ -60,10 +57,10 @@ public class OrmAnnotationMappingDiscoveryIT {
 					public void contribute(HibernateOrmMappingContributor contributor) {
 						contributor.programmaticMapping()
 								.type( IndexedEntity.class )
-								.property( "nonAnnotationMappedEmbedded" )
-								.indexedEmbedded();
+										.property( "nonAnnotationMappedEmbedded" )
+												.indexedEmbedded();
 					}
-				});
+				} );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 
@@ -87,12 +84,76 @@ public class OrmAnnotationMappingDiscoveryIT {
 						 * b) that the annotation mapping for the type on which the bridge is applied
 						 * has been automatically discovered
 						 */
-						.objectField( CustomMarkerConsumingPropertyBridge.OBJECT_FIELD_NAME, b3 -> {
+						.objectField( "annotatedProperty", b3 -> {
 							// We do not expect any particular property in the object field added by the bridge
 						} )
 				)
+				.objectField( "nonAnnotationMappedEmbedded", b2 -> b2
+						/*
+						 * This field will be discovered automatically even though it is declared in an annotated type
+						 * which has not been registered explicitly.
+						 */
+						.field( "text", String.class )
+				)
+		);
+
+		sessionFactory = sfb.build();
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void discoveryDisabled() {
+		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
+				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
+				.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
+				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new HibernateOrmSearchMappingContributor() {
+					@Override
+					public void contribute(HibernateOrmMappingContributor contributor) {
+						contributor.programmaticMapping()
+								.type( IndexedEntity.class )
+										.property( "nonAnnotationMappedEmbedded" )
+												.indexedEmbedded();
+
+						/*
+						 * Annotations should be completely ignored.
+						 * We add some of the annotation mapping programmatically,
+						 * just to check that discovery is disabled for nested types.
+						 */
+						contributor.programmaticMapping()
+								.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
+										.property( "id" ).documentId()
+										.property( "annotationMappedEmbedded" )
+												.indexedEmbedded();
+					}
+				} );
+
+		ServiceRegistry serviceRegistry = registryBuilder.build();
+
+		// We register NonExplicitlyRegistered* types here, but it's only for Hibernate ORM.
+		// None of those types will be passed to Hibernate Search, since annotation mapping is disabled.
+		MetadataSources ms = new MetadataSources( serviceRegistry )
+				.addAnnotatedClass( IndexedEntity.class )
+				.addAnnotatedClass( NonExplicitlyRegisteredType.class )
+				.addAnnotatedClass( NonExplicitlyRegisteredNonMappedType.class )
+				.addAnnotatedClass( NonExplicitlyRegisteredNonAnnotationMappedType.class );
+
+		Metadata metadata = ms.buildMetadata();
+
+		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
+
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "annotationMappedEmbedded", b2 -> {
+					/*
+					 * This object field should be empty because
+					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 */
+				} )
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> {
-						// Annotations on this type should be ignored
+					/*
+					 * This object field should be empty because
+					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 */
 				} )
 		);
 
@@ -172,26 +233,27 @@ public class OrmAnnotationMappingDiscoveryIT {
 	/**
 	 * A type that is neither registered explicitly, nor mentioned in any mapped property,
 	 * but should be automatically discovered when the {@link CustomMarkerConsumingPropertyBridge} inspects the metamodel;
-	 * if it isn't, the bridge will fail to bind.
+	 * if it isn't, the bridge will not contribute any field.
 	 */
 	@Embeddable
 	public static class NonExplicitlyRegisteredNonMappedType {
 		@CustomMarkerAnnotation
-		private String text;
+		private Integer annotatedProperty;
 
-		public String getText() {
-			return text;
+		public Integer getAnnotatedProperty() {
+			return annotatedProperty;
 		}
 
-		public void setText(String text) {
-			this.text = text;
+		public void setAnnotatedProperty(Integer annotatedProperty) {
+			this.annotatedProperty = annotatedProperty;
 		}
 	}
 
 	/**
 	 * A type that is neither registered explicitly, nor mentioned in any annotation-mapped property,
 	 * nor used by any bridge, but is mentioned in an programmatically mapped property.
-	 * It should *NOT* be automatically discovered, so its annotations should be ignored.
+	 * It should be automatically discovered when contributing the programmatic mapping;
+	 * if it isn't, the field "nonAnnotationMappedEmbedded.text" will be missing.
 	 */
 	@Embeddable
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")

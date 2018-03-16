@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +28,14 @@ import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
@@ -127,21 +128,23 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private boolean frozen = false;
 
 		@Override
-		public <C extends TypeMetadataContributor> void collect(MapperFactory<C, ?> mapperFactory,
-				MappableTypeModel typeModel, String indexName, C contributor) {
-			// Adding new contributors to already known mappings is fine, see MapperContribution
-			if ( frozen && !contributionByMappingKey.containsKey( mapperFactory ) ) {
-				throw new AssertionFailure(
-						"Attempt to add a mapping contribution for a new mapper factory"
-								+ " after Hibernate Search has started to build the mappings."
-								+ " There is a bug in the mapper factory implementation."
-								+ " Mapper factory: " + mapperFactory + ". Type model: " + typeModel + "."
-				);
-			}
-			@SuppressWarnings("unchecked")
-			MapperContribution<C, ?> contribution = (MapperContribution<C, ?>)
-					contributionByMappingKey.computeIfAbsent( mapperFactory, ignored -> new MapperContribution<>( mapperFactory ));
-			contribution.update( typeModel, indexName, contributor );
+		public void mapToIndex(MapperFactory<?, ?> mapperFactory, MappableTypeModel typeModel, String indexName) {
+			checkNotFrozen( mapperFactory, typeModel );
+			getOrCreateContribution( mapperFactory ).mapToIndex( typeModel, indexName );
+		}
+
+		@Override
+		public <C> void collectContributor(MapperFactory<C, ?> mapperFactory,
+				MappableTypeModel typeModel, C contributor) {
+			checkNotFrozen( mapperFactory, typeModel );
+			getOrCreateContribution( mapperFactory ).collectContributor( typeModel, contributor );
+		}
+
+		@Override
+		public <C> void collectDiscoverer(MapperFactory<C, ?> mapperFactory,
+				TypeMetadataDiscoverer<C> metadataDiscoverer) {
+			checkNotFrozen( mapperFactory, null );
+			getOrCreateContribution( mapperFactory ).collectDiscoverer( metadataDiscoverer );
 		}
 
 		Map<MappingKey<?>, Mapper<?, ?>> createMappers(
@@ -155,31 +158,52 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			} );
 			return mappers;
 		}
+
+		@SuppressWarnings("unchecked")
+		private <C> MapperContribution<C, ?> getOrCreateContribution(
+				MapperFactory<C, ?> mapperFactory) {
+			return (MapperContribution<C, ?>) contributionByMappingKey.computeIfAbsent(
+					mapperFactory, ignored -> new MapperContribution<>( mapperFactory )
+			);
+		}
+
+		private void checkNotFrozen(MapperFactory<?, ?> mapperFactory, MappableTypeModel typeModel) {
+			if ( frozen ) {
+				throw new AssertionFailure(
+						"Attempt to add a mapping contribution"
+						+ " after Hibernate Search has started to build the mappings."
+						+ " There is a bug in the mapper factory implementation."
+						+ " Mapper factory: " + mapperFactory + "."
+						+ (
+								typeModel == null ? ""
+								: " Type model for the unexpected contribution: " + typeModel + "."
+						)
+				);
+			}
+		}
 	}
 
-	private static class MapperContribution<C extends TypeMetadataContributor, M extends MappingImplementor> {
+	private static class MapperContribution<C, M extends MappingImplementor> {
 
 		private final MapperFactory<C, M> mapperFactory;
-		private final Set<MappableTypeModel> typesLeftToProcess = new LinkedHashSet<>();
-		private final Set<MappableTypeModel> typesBeingProcessed = new LinkedHashSet<>();
-		private final Set<MappableTypeModel> freezedTypes = new HashSet<>();
-		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new HashMap<>();
+		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
+		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
+		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
 		MapperContribution(MapperFactory<C, M> mapperFactory) {
 			this.mapperFactory = mapperFactory;
 		}
 
-		public void update(MappableTypeModel typeModel, String indexName, C contributor) {
-			if ( freezedTypes.contains( typeModel ) ) {
-				throw new AssertionFailure(
-						"Attempt to add a mapping contribution for a type that has already been mapped"
-								+ " or is being mapped. There is a bug in the mapper implementation."
-								+ " Mapper factory: " + mapperFactory + ". Type model: " + typeModel + "."
-				);
-			}
-			typesLeftToProcess.add( typeModel );
-			contributionByType.computeIfAbsent( typeModel, TypeMappingContribution::new )
-					.update( indexName, contributor );
+		public void mapToIndex(MappableTypeModel typeModel, String indexName) {
+			getOrCreateContribution( typeModel ).mapToIndex( indexName );
+		}
+
+		public void collectContributor(MappableTypeModel typeModel, C contributor) {
+			getOrCreateContribution( typeModel ).collectContributor( contributor );
+		}
+
+		public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
+			metadataDiscoverers.add( metadataDiscoverer );
 		}
 
 		public Mapper<C, M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
@@ -187,64 +211,55 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			ContributorProvider contributorProvider = new ContributorProvider();
 			Mapper<C, M> mapper = mapperFactory.createMapper( buildContext, propertySource );
 
-			/*
-			 * We have to loop, and copy the set of types before starting processing,
-			 * because we allow mappers to add new contributions to new types
-			 * when we call org.hibernate.search.engine.mapper.mapping.building.spi.Mapper.addIndexed.
-			 * This is necessary to allow annotation-based mapping,
-			 * which may discover new embedded types while mapping a type.
-			 *
-			 * We do not, however, allow new contributions to types already encountered in this method
-			 * (the "freezed" types).
-			 */
-			while ( !typesLeftToProcess.isEmpty() ) {
-				typesBeingProcessed.clear();
-				typesBeingProcessed.addAll( typesLeftToProcess );
-				typesLeftToProcess.clear();
-				freezedTypes.addAll( typesBeingProcessed );
-
-				for ( MappableTypeModel typeModel : typesBeingProcessed ) {
-					Optional<String> indexNameOptional = typeModel.getAscendingSuperTypes()
-							.map( contributionByType::get )
-							.filter( Objects::nonNull )
-							.map( TypeMappingContribution::getIndexName )
-							.filter( Objects::nonNull )
-							.findFirst();
-					if ( indexNameOptional.isPresent() ) {
-						String indexName = indexNameOptional.get();
-						mapper.addIndexed(
-								typeModel,
-								indexManagerBuildingStateHolder.startBuilding( indexName ),
-								contributorProvider
-						);
-					}
+			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>( contributionByType.keySet() );
+			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
+				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
+				String indexName = contribution.getIndexName();
+				if ( indexName != null ) {
+					mapper.addIndexed(
+							typeModel,
+							indexManagerBuildingStateHolder.startBuilding( indexName ),
+							contributorProvider
+					);
 				}
 			}
+
 			return mapper;
 		}
 
-		private class ContributorProvider implements TypeMetadataContributorProvider<C> {
-			private C currentContributor = null;
+		private TypeMappingContribution<C> getOrCreateContribution(MappableTypeModel typeModel) {
+			TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
+			if ( contribution == null ) {
+				contribution = new TypeMappingContribution<>( typeModel );
+				contributionByType.put( typeModel, contribution );
+			}
+			return contribution;
+		}
 
+		private TypeMappingContribution<C> getContributionIncludingAutomaticallyDiscovered(
+				MappableTypeModel typeModel) {
+			if ( !typesSubmittedToDiscoverers.contains( typeModel ) ) {
+				// Allow automatic discovery of metadata the first time we encounter each type
+				for ( TypeMetadataDiscoverer<C> metadataDiscoverer : metadataDiscoverers ) {
+					Optional<C> discoveredContributor = metadataDiscoverer.discover( typeModel );
+					if ( discoveredContributor.isPresent() ) {
+						getOrCreateContribution( typeModel )
+								.collectContributor( discoveredContributor.get() );
+					}
+				}
+				typesSubmittedToDiscoverers.add( typeModel );
+			}
+			return contributionByType.get( typeModel );
+		}
+
+		private class ContributorProvider implements TypeMetadataContributorProvider<C> {
 			@Override
 			public void forEach(MappableTypeModel typeModel, Consumer<C> contributorConsumer) {
-				if ( currentContributor != null ) {
-					currentContributor.beforeNestedContributions( typeModel );
-				}
-				C previousContributor = currentContributor;
 				typeModel.getDescendingSuperTypes()
-						.map( contributionByType::get )
+						.map( MapperContribution.this::getContributionIncludingAutomaticallyDiscovered )
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
-						.forEach( contributor -> {
-							currentContributor = contributor;
-							try {
-								contributorConsumer.accept( contributor );
-							}
-							finally {
-								currentContributor = previousContributor;
-							}
-						} );
+						.forEach( contributorConsumer );
 			}
 		}
 	}
@@ -254,7 +269,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private String indexName;
 		private final List<C> contributors = new ArrayList<>();
 
-		public TypeMappingContribution(MappableTypeModel typeModel) {
+		TypeMappingContribution(MappableTypeModel typeModel) {
 			this.typeModel = typeModel;
 		}
 
@@ -262,14 +277,15 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			return indexName;
 		}
 
-		public void update(String indexName, C contributor) {
-			if ( indexName != null && !indexName.isEmpty() ) {
-				if ( this.indexName != null ) {
-					throw new SearchException( "Type '" + typeModel + "' mapped to multiple indexes: '"
-							+ this.indexName + "', '" + indexName + "'." );
-				}
-				this.indexName = indexName;
+		public void mapToIndex(String indexName) {
+			if ( this.indexName != null ) {
+				throw new SearchException( "Type '" + typeModel + "' mapped to multiple indexes: '"
+						+ this.indexName + "', '" + indexName + "'." );
 			}
+			this.indexName = indexName;
+		}
+
+		public void collectContributor(C contributor) {
 			this.contributors.add( contributor );
 		}
 

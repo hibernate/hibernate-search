@@ -50,7 +50,10 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 
 	@Override
 	public void contribute(BuildContext buildContext, MetadataCollector collector) {
-		collector.collect( mapperFactory, typeModel, indexName, this );
+		if ( indexName != null ) {
+			collector.mapToIndex( mapperFactory, typeModel, indexName );
+		}
+		collector.collectContributor( mapperFactory, typeModel, this );
 	}
 
 	@Override

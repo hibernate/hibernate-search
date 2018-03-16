@@ -11,10 +11,8 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributor;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-class StubTypeMetadataContributor implements TypeMetadataContributor {
+class StubTypeMetadataContributor {
 
 	private final StubTypeModel typeIdentifier;
 	private final String indexName;
@@ -27,12 +25,10 @@ class StubTypeMetadataContributor implements TypeMetadataContributor {
 	}
 
 	final void contribute(StubMapperFactory factory, MetadataCollector collector) {
-		collector.collect( factory, typeIdentifier, indexName, this );
-	}
-
-	@Override
-	public void beforeNestedContributions(MappableTypeModel typeModel) {
-		// No-op
+		if ( indexName != null ) {
+			collector.mapToIndex( factory, typeIdentifier, indexName );
+		}
+		collector.collectContributor( factory, typeIdentifier, this );
 	}
 
 	public void contribute(IndexManagerBuildingState<?> indexManagerBuildingState) {

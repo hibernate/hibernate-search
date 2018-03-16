@@ -41,6 +41,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
  */
 public class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 
+	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
+					.asBoolean()
+					.withDefault( true )
+					.build();
+
 	private final ConfigurationPropertySource propertySource;
 	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
@@ -55,7 +61,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	// TODO JMX
 //	private JMXHook jmx;
 
-	public HibernateSearchSessionFactoryObserver(
+	HibernateSearchSessionFactoryObserver(
 			Metadata metadata,
 			ConfigurationPropertySource propertySource,
 			FullTextIndexEventListener listener,
@@ -113,8 +119,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		boolean failedBoot = true;
 		try {
 			SearchMappingRepositoryBuilder builder = SearchMappingRepository.builder( propertySource );
+
+			boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
+
 			HibernateOrmMappingContributor mappingContributor = new HibernateOrmMappingContributor(
-					builder, metadata, sessionFactoryImplementor
+					builder, metadata, sessionFactoryImplementor, enableAnnotationMapping
 			);
 
 			org.hibernate.search.engine.common.spi.BeanResolver searchBeanResolver;
@@ -126,12 +135,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			}
 			builder.setBeanResolver( searchBeanResolver );
 
-			AnnotationMappingDefinition annotationMapping = mappingContributor.annotationMapping();
-			metadata.getEntityBindings().stream()
-					.map( PersistentClass::getMappedClass )
-					// getMappedClass() can return null, which should be ignored
-					.filter( Objects::nonNull )
-					.forEach( annotationMapping::add );
+			if ( enableAnnotationMapping ) {
+				AnnotationMappingDefinition annotationMapping = mappingContributor.annotationMapping();
+				metadata.getEntityBindings().stream()
+						.map( PersistentClass::getMappedClass )
+						// getMappedClass() can return null, which should be ignored
+						.filter( Objects::nonNull )
+						.forEach( annotationMapping::add );
+			}
 
 			ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
 					ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONTRIBUTOR )

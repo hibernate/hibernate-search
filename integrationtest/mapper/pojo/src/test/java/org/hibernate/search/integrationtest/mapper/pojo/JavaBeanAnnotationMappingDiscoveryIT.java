@@ -24,9 +24,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * @author Yoann Rodiere
- */
 public class JavaBeanAnnotationMappingDiscoveryIT {
 
 	@Rule
@@ -38,7 +35,7 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 	private SearchMappingRepository mappingRepository;
 
 	@Test
-	public void test() {
+	public void discoveryEnabled() {
 		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
@@ -61,12 +58,53 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 						 * b) that the annotation mapping for the type on which the bridge is applied
 						 * has been automatically discovered
 						 */
-						.objectField( CustomMarkerConsumingPropertyBridge.OBJECT_FIELD_NAME, b3 -> {
+						.objectField( "annotatedProperty", b3 -> {
 							// We do not expect any particular property in the object field added by the bridge
 						} )
 				)
+				.objectField( "nonAnnotationMappedEmbedded", b2 -> b2
+						/*
+						 * This field will be discovered automatically even though it is declared in an annotated type
+						 * which has not been registered explicitly.
+						 */
+						.field( "text", String.class )
+				)
+		);
+
+		mappingRepository = mappingRepositoryBuilder.build();
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void discoveryDisabled() {
+		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
+				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.setProperty( "index.default.backend", "stubBackend" );
+
+		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor(
+				mappingRepositoryBuilder, false
+		);
+
+		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
+		contributor.annotationMapping().add( IndexedEntity.class );
+
+		contributor.programmaticMapping()
+				.type( IndexedEntity.class )
+						.property( "nonAnnotationMappedEmbedded" )
+								.indexedEmbedded();
+
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "annotationMappedEmbedded", b2 -> {
+					/*
+					 * This object field should be empty because
+					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 */
+				} )
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> {
-						// Annotations on this type should be ignored
+					/*
+					 * This object field should be empty because
+					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 */
 				} )
 		);
 
@@ -141,25 +179,26 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 	/**
 	 * A type that is neither registered explicitly, nor mentioned in any mapped property,
 	 * but should be automatically discovered when the {@link CustomMarkerConsumingPropertyBridge} inspects the metamodel;
-	 * if it isn't, the bridge will fail to bind.
+	 * if it isn't, the bridge will not contribute any field.
 	 */
 	public static class NonExplicitlyRegisteredNonMappedType {
-		private String text;
+		private Integer annotatedProperty;
 
 		@CustomMarkerAnnotation
-		public String getText() {
-			return text;
+		public Integer getAnnotatedProperty() {
+			return annotatedProperty;
 		}
 
-		public void setText(String text) {
-			this.text = text;
+		public void setAnnotatedProperty(Integer annotatedProperty) {
+			this.annotatedProperty = annotatedProperty;
 		}
 	}
 
 	/**
 	 * A type that is neither registered explicitly, nor mentioned in any annotation-mapped property,
 	 * nor used by any bridge, but is mentioned in an programmatically mapped property.
-	 * It should *NOT* be automatically discovered, so its annotations should be ignored.
+	 * It should be automatically discovered when contributing the programmatic mapping;
+	 * if it isn't, the field "nonAnnotationMappedEmbedded.text" will be missing.
 	 */
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
 	public static class NonExplicitlyRegisteredNonAnnotationMappedType {

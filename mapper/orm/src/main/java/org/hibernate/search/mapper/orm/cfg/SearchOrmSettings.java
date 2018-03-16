@@ -34,6 +34,13 @@ public final class SearchOrmSettings {
 	public static final String ENABLE_DIRTY_CHECK = PREFIX + Radicals.ENABLE_DIRTY_CHECK;
 
 	/**
+	 * When enabled, annotations will be automatically processed for entity types,
+	 * as well as nested types in those entity types, for instance embedded types.
+	 * Enabled by default. Disable to only consider {@link #MAPPING_CONTRIBUTOR}.
+	 */
+	public static final String ENABLE_ANNOTATION_MAPPING = PREFIX + Radicals.ENABLE_ANNOTATION_MAPPING;
+
+	/**
 	 * Provide a programmatic mapping model to Hibernate Search configuration
 	 * Accepts a {@link org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor}
 	 * instance or the fully qualified class name of a HibernateOrmSearchMappingContributor subclass.
@@ -45,6 +52,7 @@ public final class SearchOrmSettings {
 		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
 		public static final String INDEXING_STRATEGY = "indexing_strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
+		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONTRIBUTOR = "mapping_contributor";
 
 		private Radicals() {

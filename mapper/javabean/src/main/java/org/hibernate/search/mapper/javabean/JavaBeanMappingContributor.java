@@ -21,16 +21,23 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 public final class JavaBeanMappingContributor extends PojoMappingContributorImpl<JavaBeanMapping, JavaBeanMappingImpl> {
 
 	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder) {
-		this( mappingRepositoryBuilder, MethodHandles.publicLookup() );
+		this( mappingRepositoryBuilder, true );
 	}
 
-	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder, MethodHandles.Lookup lookup) {
-		this( mappingRepositoryBuilder, new JavaBeanBootstrapIntrospector( lookup ) );
+	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			boolean annotatedTypeDiscoveryEnabled) {
+		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled );
+	}
+
+	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			MethodHandles.Lookup lookup, boolean annotatedTypeDiscoveryEnabled) {
+		this( mappingRepositoryBuilder, new JavaBeanBootstrapIntrospector( lookup ), annotatedTypeDiscoveryEnabled );
 	}
 
 	private JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			JavaBeanBootstrapIntrospector introspector) {
-		super( mappingRepositoryBuilder, new JavaBeanMapperFactory( introspector ), introspector );
+			JavaBeanBootstrapIntrospector introspector, boolean annotatedTypeDiscoveryEnabled) {
+		super( mappingRepositoryBuilder, new JavaBeanMapperFactory( introspector ), introspector,
+				annotatedTypeDiscoveryEnabled );
 	}
 
 	@Override

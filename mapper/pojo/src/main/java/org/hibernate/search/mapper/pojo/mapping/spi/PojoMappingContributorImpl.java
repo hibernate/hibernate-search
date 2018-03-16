@@ -33,10 +33,23 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			PojoMapperFactory<MI> mapperFactory,
-			PojoBootstrapIntrospector introspector) {
+			PojoBootstrapIntrospector introspector,
+			boolean annotatedTypeDiscoveryEnabled) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mapperFactory = mapperFactory;
 		this.introspector = introspector;
+
+		/*
+		 * Make sure to create and add the annotation mapping even if the user does not call the
+		 * annotationMapping() method to register annotated types explicitly,
+		 * in case annotated type discovery is enabled.
+		 * Also, make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
+		 * which would lead to duplicate field definitions.
+		 */
+		annotationMappingDefinition = new AnnotationMappingDefinitionImpl(
+				mapperFactory, introspector, annotatedTypeDiscoveryEnabled
+		);
+		mappingRepositoryBuilder.addMapping( annotationMappingDefinition );
 	}
 
 	@Override
@@ -48,17 +61,6 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	@Override
 	public AnnotationMappingDefinition annotationMapping() {
-		/*
-		 * Make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
-		 * which would lead to duplicate field definitions.
-		 */
-		if ( annotationMappingDefinition == null ) {
-			AnnotationMappingDefinitionImpl definition = new AnnotationMappingDefinitionImpl(
-					mapperFactory, introspector
-			);
-			mappingRepositoryBuilder.addMapping( definition );
-			annotationMappingDefinition = definition;
-		}
 		return annotationMappingDefinition;
 	}
 

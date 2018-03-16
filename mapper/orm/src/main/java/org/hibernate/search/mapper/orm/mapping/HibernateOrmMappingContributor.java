@@ -29,14 +29,17 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<HibernateOrmMapping, HibernateOrmMappingImpl> {
 
 	public HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
+			Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor,
+			boolean annotatedTypeDiscoveryEnabled) {
 		this( mappingRepositoryBuilder, new HibernateOrmBootstrapIntrospector( metadata, sessionFactoryImplementor ),
-				sessionFactoryImplementor );
+				sessionFactoryImplementor, annotatedTypeDiscoveryEnabled );
 	}
 
 	private HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			HibernateOrmBootstrapIntrospector introspector, SessionFactoryImplementor sessionFactoryImplementor) {
-		super( mappingRepositoryBuilder, new HibernateOrmMapperFactory( introspector, sessionFactoryImplementor ), introspector );
+			HibernateOrmBootstrapIntrospector introspector, SessionFactoryImplementor sessionFactoryImplementor,
+			boolean annotatedTypeDiscoveryEnabled) {
+		super( mappingRepositoryBuilder, new HibernateOrmMapperFactory( introspector, sessionFactoryImplementor ),
+				introspector, annotatedTypeDiscoveryEnabled );
 	}
 
 	@Override

@@ -8,13 +8,12 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-/**
- * @author Yoann Rodiere
- */
 public interface MetadataCollector {
 
-	<C extends TypeMetadataContributor> void collect(
-			MapperFactory<C, ?> mapperFactory, MappableTypeModel typeModel, String indexName, C contributor
-	);
+	void mapToIndex(MapperFactory<?, ?> mapperFactory, MappableTypeModel typeModel, String indexName);
+
+	<C> void collectContributor(MapperFactory<C, ?> mapperFactory, MappableTypeModel typeModel, C contributor);
+
+	<C> void collectDiscoverer(MapperFactory<C, ?> mapperFactory, TypeMetadataDiscoverer<C> metadataDiscoverer);
 
 }

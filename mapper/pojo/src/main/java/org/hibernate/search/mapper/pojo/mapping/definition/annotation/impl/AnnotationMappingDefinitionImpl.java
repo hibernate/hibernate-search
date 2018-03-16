@@ -7,22 +7,21 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @author Yoann Rodiere
@@ -30,14 +29,15 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinition, MetadataContributor {
 
 	private final PojoMapperFactory<?> mapperFactory;
-
 	private final PojoBootstrapIntrospector introspector;
-
 	private final Set<Class<?>> annotatedTypes = new HashSet<>();
+	private final boolean annotatedTypeDiscoveryEnabled;
 
-	public AnnotationMappingDefinitionImpl(PojoMapperFactory<?> mapperFactory, PojoBootstrapIntrospector introspector) {
+	public AnnotationMappingDefinitionImpl(PojoMapperFactory<?> mapperFactory, PojoBootstrapIntrospector introspector,
+			boolean annotatedTypeDiscoveryEnabled) {
 		this.mapperFactory = mapperFactory;
 		this.introspector = introspector;
+		this.annotatedTypeDiscoveryEnabled = annotatedTypeDiscoveryEnabled;
 	}
 
 	@Override
@@ -54,91 +54,73 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 
 	@Override
 	public void contribute(BuildContext buildContext, MetadataCollector collector) {
-		LazilyDiscoveringMetadataContributor contributor =
-				new LazilyDiscoveringMetadataContributor( mapperFactory, buildContext, collector );
+		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
+
+		/*
+		 * For types that were explicitly requested for annotation scanning and their supertypes,
+		 * map the types to indexes if necessary, and add a metadata contributor.
+		 */
+		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
 		annotatedTypes.stream()
 				.map( introspector::getTypeModel )
-				.forEach( typeModel -> contributor.contributeTypeAndSuperTypes( typeModel, true ) );
+				/*
+				 * Take super types into account
+				 * Note: the order of super types (ascending or descending) does not matter here.
+				 */
+				.flatMap( PojoRawTypeModel::getAscendingSuperTypes )
+				// Ignore types that were already contributed
+				.filter( alreadyContributedTypes::add )
+				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+				.forEach( typeModel -> {
+					Optional<Indexed> indexedAnnotation = typeModel.getAnnotationByType( Indexed.class );
+					if ( indexedAnnotation.isPresent() ) {
+						collector.mapToIndex( mapperFactory, typeModel, indexedAnnotation.get().index() );
+					}
+
+					PojoTypeMetadataContributor contributor =
+							new AnnotationPojoTypeMetadataContributorImpl( beanResolver, typeModel );
+
+					collector.collectContributor( mapperFactory, typeModel, contributor );
+				} );
+
+		/*
+		 * If automatic discovery of annotated types is enabled,
+		 * also add a discoverer for new types (e.g. types encountered in an @IndexedEmbedded).
+		 */
+		if ( annotatedTypeDiscoveryEnabled ) {
+			AnnotationTypeMetadataDiscoverer discoverer =
+					new AnnotationTypeMetadataDiscoverer( beanResolver, alreadyContributedTypes );
+			collector.collectDiscoverer( mapperFactory, discoverer );
+		}
 	}
 
 	/**
-	 * A metadata contributor that will lazily discover nested types and register the annotation mappings accordingly.
+	 * A type metadata discoverer that will provide annotation-based metadata
+	 * for types that were not explicitly requested .
 	 */
-	private static class LazilyDiscoveringMetadataContributor {
-		private final PojoMapperFactory<?> mapperFactory;
+	private static class AnnotationTypeMetadataDiscoverer implements TypeMetadataDiscoverer<PojoTypeMetadataContributor> {
 		private final BeanResolver beanResolver;
-		private final MetadataCollector metadataCollector;
-		private final Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
+		private final Set<PojoRawTypeModel<?>> alreadyContributedTypes;
 
-		LazilyDiscoveringMetadataContributor(PojoMapperFactory<?> mapperFactory,
-				BuildContext buildContext, MetadataCollector metadataCollector) {
-			this.mapperFactory = mapperFactory;
-			this.beanResolver = buildContext.getServiceManager().getBeanResolver();
-			this.metadataCollector = metadataCollector;
+		AnnotationTypeMetadataDiscoverer(BeanResolver beanResolver, Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
+			this.beanResolver = beanResolver;
+			this.alreadyContributedTypes = alreadyContributedTypes;
 		}
 
-		void contributeTypeAndSuperTypes(PojoRawTypeModel<?> subTypeModel, boolean mapToIndex) {
+		@Override
+		public Optional<PojoTypeMetadataContributor> discover(MappableTypeModel typeModel) {
+			PojoRawTypeModel<?> pojoTypeModel = (PojoRawTypeModel<?>) typeModel;
 			/*
-			 * Take super types into account
-			 * Note: the order of super types (ascending or descending) does not matter here.
+			 * Take care of not adding duplicate contributors: this could lead to mapping errors,
+			 * for instance a field being declared twice.
 			 */
-			subTypeModel.getAscendingSuperTypes()
-					// Ignore types that were already contributed
-					.filter( alreadyContributedTypes::add )
-					// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
-					.forEach( typeModel -> {
-						String indexName;
-						if ( mapToIndex ) {
-							indexName = typeModel.getAnnotationByType( Indexed.class )
-									.map( Indexed::index ).orElse( null );
-						}
-						else {
-							indexName = null;
-						}
-
-						PojoTypeMetadataContributor contributor =
-								new AnnotationPojoTypeMetadataContributorImpl( beanResolver, typeModel );
-
-						// Make sure to enable automatically discovering types whenever this contributor is called
-						contributor = new LazilyDiscoveringTypeMetadataContributor( contributor );
-
-						metadataCollector.collect( mapperFactory, typeModel, indexName, contributor );
-					} );
-		}
-
-		private void discoverType(PojoTypeModel<?> typeModel) {
-			PojoRawTypeModel<?> rawTypeModel = typeModel.getRawType();
-			if ( !alreadyContributedTypes.contains( rawTypeModel ) ) {
-				/*
-				 * Do not map lazily discovered types to an index;
-				 * only explicitly registered types should be mapped to an index,
-				 * others should only be used in fields and indexed-embedded.
-				 */
-				contributeTypeAndSuperTypes( rawTypeModel, false );
+			boolean neverContributed = alreadyContributedTypes.add( pojoTypeModel );
+			if ( neverContributed ) {
+				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+				return Optional.of( new AnnotationPojoTypeMetadataContributorImpl( beanResolver, pojoTypeModel ) );
 			}
-		}
-
-		private class LazilyDiscoveringTypeMetadataContributor implements PojoTypeMetadataContributor {
-			private final PojoTypeMetadataContributor delegate;
-
-			private LazilyDiscoveringTypeMetadataContributor(PojoTypeMetadataContributor delegate) {
-				this.delegate = delegate;
-			}
-
-			@Override
-			public void beforeNestedContributions(MappableTypeModel typeModel) {
-				discoverType( (PojoTypeModel<?>) typeModel );
-				delegate.beforeNestedContributions( typeModel );
-			}
-
-			@Override
-			public void contributeModel(PojoModelCollectorTypeNode collector) {
-				delegate.contributeModel( collector );
-			}
-
-			@Override
-			public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-				delegate.contributeMapping( collector );
+			else {
+				return Optional.empty();
 			}
 		}
 	}

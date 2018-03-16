@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bridge;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
@@ -18,8 +22,6 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 
 public final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
-
-	public static final String OBJECT_FIELD_NAME = "customMarkerField";
 
 	public static final class Builder
 			implements AnnotationBridgeBuilder<PropertyBridge, CustomMarkerConsumingPropertyBridgeAnnotation> {
@@ -34,7 +36,7 @@ public final class CustomMarkerConsumingPropertyBridge implements PropertyBridge
 		}
 	}
 
-	private IndexObjectFieldAccessor objectFieldAccessor;
+	private List<IndexObjectFieldAccessor> objectFieldAccessors = new ArrayList<>();
 
 	private CustomMarkerConsumingPropertyBridge() {
 	}
@@ -42,17 +44,18 @@ public final class CustomMarkerConsumingPropertyBridge implements PropertyBridge
 	@Override
 	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
 			SearchModel searchModel) {
-		if ( bridgedPojoModelProperty.properties().flatMap( property -> property.markers( CustomMarker.class ) )
-				.findAny().isPresent() ) {
-			objectFieldAccessor = indexSchemaElement.objectField( OBJECT_FIELD_NAME ).createAccessor();
-		}
-		else {
-			throw new IllegalArgumentException( "Missing CustomMarker marker on the type's properties" );
+		List<PojoModelProperty> markedProperties = bridgedPojoModelProperty.properties()
+				.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
+				.collect( Collectors.toList() );
+		for ( PojoModelProperty property : markedProperties ) {
+			objectFieldAccessors.add( indexSchemaElement.objectField( property.getName() ).createAccessor() );
 		}
 	}
 
 	@Override
 	public void write(DocumentElement target, PojoElement source) {
-		objectFieldAccessor.add( target );
+		for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
+			objectFieldAccessor.add( target );
+		}
 	}
 }
