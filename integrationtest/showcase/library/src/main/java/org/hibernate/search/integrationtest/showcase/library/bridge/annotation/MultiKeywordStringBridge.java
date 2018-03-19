@@ -16,19 +16,24 @@ import java.lang.annotation.Target;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMappingBuilderReference;
 
-@PropertyBridgeMapping( builder = @PropertyBridgeMappingBuilderReference(type = org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.Builder.class))
+@PropertyBridgeMapping(
+		builder = @PropertyBridgeMappingBuilderReference(
+				type = org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.Builder.class
+		)
+)
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Repeatable(MultiKeywordStringBridge.List.class)
 public @interface MultiKeywordStringBridge {
 
 	String fieldName();
 
-	String separatorPattern() default org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.SEPARATOR_PATTERN_DEFAULT;
+	String separatorPattern() default
+			org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.SEPARATOR_PATTERN_DEFAULT;
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target( { ElementType.METHOD, ElementType.FIELD })
+	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Documented
 	@interface List {
 		MultiKeywordStringBridge[] value();
