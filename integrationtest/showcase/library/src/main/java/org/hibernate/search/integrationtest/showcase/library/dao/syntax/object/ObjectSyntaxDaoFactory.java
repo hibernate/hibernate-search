@@ -22,4 +22,9 @@ public class ObjectSyntaxDaoFactory implements DaoFactory {
 	public LibraryDao createLibraryDao(EntityManager entityManager) {
 		return new ObjectSyntaxLibraryDao( entityManager );
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

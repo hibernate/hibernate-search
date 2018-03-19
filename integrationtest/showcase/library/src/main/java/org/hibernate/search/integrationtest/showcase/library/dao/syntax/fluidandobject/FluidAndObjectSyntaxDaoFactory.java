@@ -22,4 +22,9 @@ public class FluidAndObjectSyntaxDaoFactory implements DaoFactory {
 	public LibraryDao createLibraryDao(EntityManager entityManager) {
 		return new FluidAndObjectSyntaxLibraryDao( entityManager );
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }
