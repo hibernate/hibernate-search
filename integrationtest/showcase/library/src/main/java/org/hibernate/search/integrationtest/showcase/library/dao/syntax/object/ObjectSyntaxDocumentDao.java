@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluid;
+package org.hibernate.search.integrationtest.showcase.library.dao.syntax.object;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +22,8 @@ import org.hibernate.search.integrationtest.showcase.library.model.LibraryServic
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 
-class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
-	FluidAndObjectSyntaxDocumentDao(EntityManager entityManager) {
+class ObjectSyntaxDocumentDao extends DocumentDao {
+	ObjectSyntaxDocumentDao(EntityManager entityManager) {
 		super( entityManager );
 	}
 
@@ -32,11 +32,18 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 		if ( isbnAsString == null ) {
 			return Optional.empty();
 		}
+
 		// Must use Hibernate ORM types (as opposed to JPA types) to benefit from query.uniqueResult()
-		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
-				entityManager.unwrap( FullTextSession.class ).search( Book.class ).query()
+		FullTextSession fullTextSession = entityManager.unwrap( FullTextSession.class );
+
+		org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget<Book> target =
+				fullTextSession.search( Book.class );
+
+		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query = target.query()
 				.asEntities()
-				.predicate().match().onField( "isbn" ).matching( isbnAsString )
+				.predicate(
+						target.predicate().match().onField( "isbn" ).matching( isbnAsString )
+				)
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -48,20 +55,24 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 		BooleanJunctionPredicateContext<SearchPredicate> booleanBuilder = target.predicate().bool();
 
 		if ( terms != null && !terms.isEmpty() ) {
-			booleanBuilder.must().match()
+			booleanBuilder.must(
+					target.predicate().match()
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
-					.matching( terms );
+					.matching( terms )
+			);
 		}
 
-		booleanBuilder.must().nested().onObjectField( "copies" )
+		booleanBuilder.must(
+				target.predicate().nested().onObjectField( "copies" )
 				// Bridged query with function bridge: TODO rely on the bridge to convert to a String
-				.match().onField( "copies.medium" ).matching( medium.name() );
+				.match().onField( "copies.medium" ).matching( medium.name() )
+		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
 				.predicate( booleanBuilder.end() )
-				.sort().byField( "title_sort" ).end()
+				.sort( target.sort().byField( "title_sort" ).end() )
 				.build();
 
 		query.setFirstResult( offset );
@@ -80,19 +91,23 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 
 		// Match query
 		if ( terms != null && !terms.isEmpty() ) {
-			booleanBuilder.must().match()
+			booleanBuilder.must(
+					target.predicate().match()
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
-					.matching( terms );
+					.matching( terms )
+			);
 		}
 
 		// Bridged query with complex bridge: TODO rely on the bridge to split the String
 		String[] splitTags = tags == null ? null : tags.split( "," );
 		if ( splitTags != null && splitTags.length > 0 ) {
 			for ( String tag : splitTags ) {
-				booleanBuilder.must().match()
+				booleanBuilder.must(
+						target.predicate().match()
 						.onField( "tags" )
-						.matching( tag );
+						.matching( tag )
+				);
 			}
 		}
 
@@ -101,30 +116,35 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 
 		/*
 		if ( myLocation != null && maxDistanceInKilometers != null ) {
-			booleanBuilder.must().spatial()
+			booleanBuilder.must(
+					target.predicate().spatial()
 					.onField( "copies.library.location" )
 					.within( maxDistanceInKilometers, DistanceUnit.KM )
-					.of( myLocation );
+					.of( myLocation )
+			);
 		}
 		*/
 
 		// Nested query + must loop
 		if ( libraryServices != null && !libraryServices.isEmpty() ) {
-			BooleanJunctionPredicateContext<?> nestedBoolean =
-					booleanBuilder.must().nested().onObjectField( "copies" ).bool();
+			BooleanJunctionPredicateContext<SearchPredicate> nestedBoolean =
+					target.predicate().nested().onObjectField( "copies" ).bool();
 			for ( LibraryService service : libraryServices ) {
-				nestedBoolean.must().match()
+				nestedBoolean.must(
+						target.predicate().match()
 						.onField( "copies.library.services" )
 						// Bridged query with function bridge: TODO rely on the bridge to convert to a String
-						.matching( service.name() );
+						.matching( service.name() )
+				);
 			}
+			booleanBuilder.must( nestedBoolean.end() );
 		}
 
 		FullTextQuery<Document<?>> query = target.query()
 				.asEntities()
 				.predicate( booleanBuilder.end() )
 				// TODO facets (tag, medium, library in particular)
-				.sort().byScore().end()
+				.sort( target.sort().byScore().end() )
 				.build();
 
 		query.setFirstResult( offset );

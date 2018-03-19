@@ -23,9 +23,11 @@ import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
-import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluid.FluidAndObjectSyntaxDaoFactory;
+import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandlambda.FluidAndLambdaSyntaxDaoFactory;
+import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandobject.FluidAndObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
+import org.hibernate.search.integrationtest.showcase.library.dao.syntax.object.ObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
@@ -58,7 +60,10 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<DaoFactory> daoFactories() {
-		return Arrays.asList( new FluidAndObjectSyntaxDaoFactory(), new LambdaSyntaxDaoFactory() );
+		return Arrays.asList(
+				new FluidAndLambdaSyntaxDaoFactory(), new FluidAndObjectSyntaxDaoFactory(),
+				new LambdaSyntaxDaoFactory(), new ObjectSyntaxDaoFactory()
+		);
 	}
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;

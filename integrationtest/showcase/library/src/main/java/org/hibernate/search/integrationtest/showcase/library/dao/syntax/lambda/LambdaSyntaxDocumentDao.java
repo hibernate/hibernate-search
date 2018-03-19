@@ -29,9 +29,12 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 		if ( isbnAsString == null ) {
 			return Optional.empty();
 		}
+
 		// Must use Hibernate ORM types (as opposed to JPA types) to benefit from query.uniqueResult()
+		FullTextSession fullTextSession = entityManager.unwrap( FullTextSession.class );
+
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
-				entityManager.unwrap( FullTextSession.class ).search( Book.class ).query()
+				fullTextSession.search( Book.class ).query()
 				.asEntities()
 				.predicate( c -> c.match().onField( "isbn" ).matching( isbnAsString ) )
 				.build();
@@ -57,7 +60,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 							.match().onField( "copies.medium" ).matching( medium.name() )
 					);
 				} )
-				.sort().byField( "title_sort" ).end()
+				.sort( b -> b.byField( "title_sort" ) )
 				.build();
 
 		query.setFirstResult( offset );
@@ -124,7 +127,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 					} );
 				} )
 				// TODO facets (tag, medium, library in particular)
-				.sort().byScore().end()
+				.sort( b -> b.byScore() )
 				.build();
 
 		query.setFirstResult( offset );
