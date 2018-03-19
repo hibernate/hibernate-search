@@ -15,7 +15,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.Hibernate;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
@@ -29,7 +28,6 @@ public abstract class DocumentCopy<D extends Document<?>> {
 
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Integer id;
 
 	@ManyToOne(targetEntity = Document.class)
