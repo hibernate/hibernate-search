@@ -24,6 +24,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBr
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.showcase.library.bridge.LibraryServiceBridge;
 
+/**
+ * A place where documents are available.
+ */
 @Entity
 @Indexed(index = Library.INDEX)
 @GeoPointBridge(fieldName = "location")

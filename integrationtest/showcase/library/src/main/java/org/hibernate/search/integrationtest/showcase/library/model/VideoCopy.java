@@ -12,6 +12,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
 import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumBridge;
 
+/**
+ * A concrete copy of a video document.
+ *
+ * @see DocumentCopy
+ */
 @Entity
 public class VideoCopy extends DocumentCopy<Video> {
 

@@ -10,6 +10,11 @@ import javax.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
+/**
+ * A video document.
+ *
+ * @see Document
+ */
 @Entity
 @Indexed(index = Video.INDEX)
 public class Video extends Document<VideoCopy> {

@@ -24,6 +24,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge;
 
+/**
+ * Information about a document (book, video, ...) that can be available in a library catalog.
+ *
+ * @param <C> The type of document copies.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Document<C extends DocumentCopy<?>> {

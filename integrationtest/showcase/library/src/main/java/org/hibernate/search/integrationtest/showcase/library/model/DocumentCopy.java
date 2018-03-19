@@ -18,6 +18,11 @@ import org.hibernate.Hibernate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
+/**
+ * A concrete copy of a document, be it physical or dematerialized, that can be borrowed.
+ *
+ * @param <D> The type of document.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class DocumentCopy<D extends Document<?>> {
