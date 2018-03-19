@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
@@ -95,8 +96,26 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	}
 
 	@Override
+	public PropertyFieldMappingContext analyzer(String analyzerName) {
+		fieldModelContributor.add( c -> c.analyzer( analyzerName ) );
+		return this;
+	}
+
+	@Override
+	public PropertyFieldMappingContext normalizer(String normalizerName) {
+		fieldModelContributor.add( c -> c.normalizer( normalizerName ) );
+		return this;
+	}
+
+	@Override
 	public PropertyFieldMappingContext store(Store store) {
 		fieldModelContributor.add( c -> c.store( store ) );
+		return this;
+	}
+
+	@Override
+	public PropertyFieldMappingContext sortable(Sortable sortable) {
+		fieldModelContributor.add( c -> c.sortable( sortable ) );
 		return this;
 	}
 

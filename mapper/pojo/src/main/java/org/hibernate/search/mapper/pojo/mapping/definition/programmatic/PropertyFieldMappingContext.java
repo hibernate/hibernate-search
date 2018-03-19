@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
@@ -27,7 +28,13 @@ public interface PropertyFieldMappingContext extends PropertyMappingContext {
 
 	PropertyFieldMappingContext functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder);
 
+	PropertyFieldMappingContext analyzer(String analyzerName);
+
+	PropertyFieldMappingContext normalizer(String normalizerName);
+
 	PropertyFieldMappingContext store(Store store);
+
+	PropertyFieldMappingContext sortable(Sortable sortable);
 
 	default PropertyFieldMappingContext withExtractor(Class<? extends ContainerValueExtractor> extractorClass) {
 		return withExtractors( Collections.singletonList( extractorClass ) );
