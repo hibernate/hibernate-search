@@ -54,10 +54,9 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 					.matching( terms );
 		}
 
-		booleanBuilder.must( ctx -> ctx.nested().onObjectField( "copies" )
+		booleanBuilder.must().nested().onObjectField( "copies" )
 				// Bridged query with function bridge: TODO rely on the bridge to convert to a String
-				.match().onField( "copies.medium" ).matching( medium.name() )
-		);
+				.match().onField( "copies.medium" ).matching( medium.name() );
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
