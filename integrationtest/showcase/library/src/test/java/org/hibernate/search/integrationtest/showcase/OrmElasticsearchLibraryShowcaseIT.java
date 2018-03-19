@@ -6,6 +6,13 @@
  */
 package org.hibernate.search.integrationtest.showcase;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinSession;
+import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinTransaction;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +30,10 @@ import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
+import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandlambda.FluidAndLambdaSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandobject.FluidAndObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
-import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.object.ObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
@@ -36,6 +43,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.DocumentCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
+import org.hibernate.search.integrationtest.showcase.library.model.ProgrammaticMappingContributor;
 import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
@@ -48,22 +56,37 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinSession;
-import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinTransaction;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
-
 @RunWith(Parameterized.class)
 public class OrmElasticsearchLibraryShowcaseIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<DaoFactory> daoFactories() {
-		return Arrays.asList(
-				new FluidAndLambdaSyntaxDaoFactory(), new FluidAndObjectSyntaxDaoFactory(),
-				new LambdaSyntaxDaoFactory(), new ObjectSyntaxDaoFactory()
-		);
+	private enum MappingMode {
+		ANNOTATION_MAPPING,
+		PROGRAMMATIC_MAPPING;
+	}
+
+	@Parameterized.Parameters(name = "{0} - {1}")
+	public static Object[][] parameters() {
+		MappingMode[] mappingModes = new MappingMode[] {
+				MappingMode.ANNOTATION_MAPPING,
+				MappingMode.PROGRAMMATIC_MAPPING
+		};
+		DaoFactory[] daoFactories = new DaoFactory[] {
+				new FluidAndLambdaSyntaxDaoFactory(),
+				new FluidAndObjectSyntaxDaoFactory(),
+				new LambdaSyntaxDaoFactory(),
+				new ObjectSyntaxDaoFactory()
+		};
+		// Compute the cross product
+		Object[][] parameters = new Object[mappingModes.length * daoFactories.length][2];
+		int i = 0;
+		for ( MappingMode mappingMode : mappingModes ) {
+			for ( DaoFactory daoFactory : daoFactories ) {
+				parameters[i][0] = mappingMode;
+				parameters[i][1] = daoFactory;
+				++i;
+			}
+		}
+		return parameters;
 	}
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
@@ -83,11 +106,13 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	private static final int SUBURBAN_2_ID = 3;
 	private static final int UNIVERSITY_ID = 4;
 
+	private final MappingMode mappingMode;
+	private final DaoFactory daoFactory;
+
 	private SessionFactory sessionFactory;
 
-	private DaoFactory daoFactory;
-
-	public OrmElasticsearchLibraryShowcaseIT(DaoFactory daoFactory) {
+	public OrmElasticsearchLibraryShowcaseIT(MappingMode mappingMode, DaoFactory daoFactory) {
+		this.mappingMode = mappingMode;
 		this.daoFactory = daoFactory;
 	}
 
@@ -97,6 +122,12 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
+
+		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
+			registryBuilder.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" );
+			registryBuilder.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR,
+					new ProgrammaticMappingContributor() );
+		}
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 

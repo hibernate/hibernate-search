@@ -36,12 +36,14 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 			separatorPattern( Pattern.compile( annotation.separatorPattern() ) );
 		}
 
-		public void fieldName(String fieldName) {
+		public Builder fieldName(String fieldName) {
 			this.fieldName = fieldName;
+			return this;
 		}
 
-		public void separatorPattern(Pattern separatorPattern) {
+		public Builder separatorPattern(Pattern separatorPattern) {
 			this.separatorPattern = separatorPattern;
+			return this;
 		}
 
 		@Override
