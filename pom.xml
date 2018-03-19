@@ -419,6 +419,33 @@
     </build>
 
     <profiles>
+        <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
+            as one can't trigger the profile activation on either/or property -->
+        <profile>
+            <id>skippingAllTests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
+                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+            </properties>
+        </profile>
+        <profile>
+            <id>skippingIntegrationTests</id>
+            <activation>
+                <property>
+                    <name>skipITs</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
+                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+            </properties>
+        </profile>
+
         <profile>
             <id>IDEA</id>
             <!--
