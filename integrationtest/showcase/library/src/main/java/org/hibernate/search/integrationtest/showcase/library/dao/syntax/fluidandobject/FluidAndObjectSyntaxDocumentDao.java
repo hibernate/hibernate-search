@@ -58,7 +58,7 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 		}
 
 		booleanBuilder.must().nested().onObjectField( "copies" )
-				// Bridged query with function bridge: TODO rely on the bridge to convert to a String
+				// Bridged query with value bridge: TODO rely on the bridge to convert to a String
 				.match().onField( "copies.medium" ).matching( medium.name() );
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
@@ -118,7 +118,7 @@ class FluidAndObjectSyntaxDocumentDao extends DocumentDao {
 			for ( LibraryService service : libraryServices ) {
 				nestedBoolean.must().match()
 						.onField( "copies.library.services" )
-						// Bridged query with function bridge: TODO rely on the bridge to convert to a String
+						// Bridged query with value bridge: TODO rely on the bridge to convert to a String
 						.matching( service.name() );
 			}
 		}

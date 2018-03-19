@@ -42,7 +42,7 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 				.property( "latitude" ).marker( new LatitudeMarker.Builder() )
 				.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 				.property( "services" )
-						.field().functionBridge( LibraryServiceBridge.class );
+						.field().valueBridge( LibraryServiceBridge.class );
 
 		mapping.type( Document.class )
 				.property( "id" ).documentId()
@@ -62,7 +62,7 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 								.storage( ObjectFieldStorage.NESTED );
 		mapping.type( Book.class ).indexed( Book.INDEX )
 				.property( "isbn" )
-						.field().functionBridge( ISBNBridge.class );
+						.field().valueBridge( ISBNBridge.class );
 		mapping.type( Video.class ).indexed( Video.INDEX );
 
 		mapping.type( DocumentCopy.class )
@@ -72,9 +72,9 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 						.indexedEmbedded().maxDepth( 1 );
 		mapping.type( BookCopy.class )
 				.property( "medium" )
-						.field().functionBridge( BookMediumBridge.class );
+						.field().valueBridge( BookMediumBridge.class );
 		mapping.type( VideoCopy.class )
 				.property( "medium" )
-						.field().functionBridge( VideoMediumBridge.class );
+						.field().valueBridge( VideoMediumBridge.class );
 	}
 }

@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
 
-public class VideoMediumBridge implements FunctionBridge<VideoMedium, String> {
+public class VideoMediumBridge implements ValueBridge<VideoMedium, String> {
 	@Override
-	public String toIndexedValue(VideoMedium propertyValue) {
-		return propertyValue == null ? null : propertyValue.name();
+	public String toIndexedValue(VideoMedium value) {
+		return value == null ? null : value.name();
 	}
 
 	@Override
-	public Object fromIndexedValue(String fieldValue) {
-		return fieldValue == null ? null : BookMedium.valueOf( fieldValue );
+	public Object fromIndexedValue(String indexedValue) {
+		return indexedValue == null ? null : BookMedium.valueOf( indexedValue );
 	}
 }

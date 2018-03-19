@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -40,8 +40,8 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringFunctionBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
@@ -177,10 +177,10 @@ public class JavaBeanAnnotationMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 4, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		mappingRepository.close();
 		mappingRepository = null;
@@ -189,10 +189,10 @@ public class JavaBeanAnnotationMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -572,7 +572,7 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@Field
-		@Field(name = "numericAsString", functionBridge = @FunctionBridgeBeanReference(type = IntegerAsStringFunctionBridge.class))
+		@Field(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -636,7 +636,7 @@ public class JavaBeanAnnotationMappingIT {
 		@Field
 		@Field(
 				name = "optionalIntAsString",
-				functionBridge = @FunctionBridgeBeanReference(type = OptionalIntAsStringFunctionBridge.class),
+				valueBridge = @ValueBridgeBeanReference(type = OptionalIntAsStringValueBridge.class),
 				extractors = {} // Explicitly skip the default extractors
 		)
 		public OptionalInt getOptionalInt() {

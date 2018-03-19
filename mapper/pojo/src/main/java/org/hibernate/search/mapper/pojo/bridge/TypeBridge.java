@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 /**
  * A bridge between a POJO type and an element of the index schema.
  * <p>
- * The {@code TypeBridge} interface is a more powerful version of {@link FunctionBridge}
+ * The {@code TypeBridge} interface is a more powerful version of {@link ValueBridge}
  * that applies to a whole type instead of a single property,
  * and can contribute more than one index field, in particular.
  *

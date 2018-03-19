@@ -11,12 +11,12 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerFunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateFunctionBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringFunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -30,7 +30,7 @@ public final class BridgeResolver {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<Class<?>, BridgeBuilder<? extends IdentifierBridge<?>>> defaultIdentifierBridgeBySourceType = new HashMap<>();
-	private final Map<Class<?>, BridgeBuilder<? extends FunctionBridge<?, ?>>> defaultFunctionBridgeBySourceType = new HashMap<>();
+	private final Map<Class<?>, BridgeBuilder<? extends ValueBridge<?, ?>>> defaultValueBridgeBySourceType = new HashMap<>();
 
 	public BridgeResolver() {
 		// TODO add an extension point to override these maps, or at least to add defaults for other types
@@ -38,9 +38,9 @@ public final class BridgeResolver {
 
 		addDefaultIdentifierBridge( Integer.class, ignored -> new DefaultIntegerIdentifierBridge() );
 
-		addDefaultFunctionBridge( Integer.class, ignored -> new DefaultIntegerFunctionBridge() );
-		addDefaultFunctionBridge( String.class, ignored -> new DefaultStringFunctionBridge() );
-		addDefaultFunctionBridge( LocalDate.class, ignored -> new DefaultLocalDateFunctionBridge() );
+		addDefaultValueBridge( Integer.class, ignored -> new DefaultIntegerValueBridge() );
+		addDefaultValueBridge( String.class, ignored -> new DefaultStringValueBridge() );
+		addDefaultValueBridge( LocalDate.class, ignored -> new DefaultLocalDateValueBridge() );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoTypeModel<?> sourceType) {
@@ -54,13 +54,13 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	public BridgeBuilder<? extends FunctionBridge<?, ?>> resolveFunctionBridgeForType(PojoTypeModel<?> sourceType) {
+	public BridgeBuilder<? extends ValueBridge<?, ?>> resolveValueBridgeForType(PojoTypeModel<?> sourceType) {
 		// TODO handle non-raw types?
 		Class<?> rawType = sourceType.getRawType().getJavaClass();
 		@SuppressWarnings("unchecked")
-		BridgeBuilder<? extends FunctionBridge<?, ?>> result = defaultFunctionBridgeBySourceType.get( rawType );
+		BridgeBuilder<? extends ValueBridge<?, ?>> result = defaultValueBridgeBySourceType.get( rawType );
 		if ( result == null ) {
-			throw log.unableToResolveDefaultFunctionBridgeFromSourceType( rawType );
+			throw log.unableToResolveDefaultValueBridgeFromSourceType( rawType );
 		}
 		return result;
 	}
@@ -69,8 +69,8 @@ public final class BridgeResolver {
 		defaultIdentifierBridgeBySourceType.put( type, builder );
 	}
 
-	private <T> void addDefaultFunctionBridge(Class<T> type, BridgeBuilder<? extends FunctionBridge<? super T, ?>> builder) {
-		defaultFunctionBridgeBySourceType.put( type, builder );
+	private <T> void addDefaultValueBridge(Class<T> type, BridgeBuilder<? extends ValueBridge<? super T, ?>> builder) {
+		defaultValueBridgeBySourceType.put( type, builder );
 	}
 
 }

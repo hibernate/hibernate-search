@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
-public final class DefaultStringFunctionBridge implements FunctionBridge<String, String> {
+public final class DefaultStringValueBridge implements ValueBridge<String, String> {
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> bind(IndexSchemaFieldContext context) {
@@ -18,8 +18,8 @@ public final class DefaultStringFunctionBridge implements FunctionBridge<String,
 	}
 
 	@Override
-	public String toIndexedValue(String propertyValue) {
-		return propertyValue;
+	public String toIndexedValue(String value) {
+		return value;
 	}
 
 }

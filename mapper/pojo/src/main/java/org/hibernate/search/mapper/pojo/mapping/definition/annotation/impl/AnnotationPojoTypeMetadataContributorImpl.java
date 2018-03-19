@@ -22,7 +22,7 @@ import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -46,8 +46,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollect
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBuilderBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -134,10 +134,10 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 			cleanedUpFieldName = null;
 		}
 
-		BridgeBuilder<? extends FunctionBridge<?, ?>> builder = createFunctionBridgeBuilder( annotation, propertyModel );
+		BridgeBuilder<? extends ValueBridge<?, ?>> builder = createValueBridgeBuilder( annotation, propertyModel );
 
 		getValueNode( collector, annotation.extractors(), Field.DefaultExtractors.class )
-				.functionBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
+				.valueBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
 	}
 
 	private void addIndexedEmbedded(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel,
@@ -196,7 +196,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
 
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in FunctionBridgeUtil
+		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		return beanResolver.resolve( markerBuilderReference, AnnotationMarkerBuilder.class );
 	}
 
@@ -219,14 +219,14 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference( propertyModel.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			// The builder will return an object of some class T where T extends FunctionBridge<?, ?>, so this is safe
+			// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
 			@SuppressWarnings( "unchecked" )
 			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
 					new BeanResolverBridgeBuilder( IdentifierBridge.class, bridgeReference.get() );
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in FunctionBridgeUtil
+			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 			return beanResolver.resolve( bridgeBuilderReference.get(), BridgeBuilder.class );
 		}
 		else {
@@ -247,7 +247,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
 
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in FunctionBridgeUtil
+		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		return beanResolver.resolve( builderReference, AnnotationBridgeBuilder.class );
 	}
 
@@ -263,37 +263,37 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
 
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in FunctionBridgeUtil
+		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		return beanResolver.resolve( builderReference, AnnotationBridgeBuilder.class );
 	}
 
-	private BridgeBuilder<? extends FunctionBridge<?, ?>> createFunctionBridgeBuilder(
+	private BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
 			Field annotation, PojoPropertyModel<?> propertyModel) {
-		FunctionBridgeBeanReference bridgeReferenceAnnotation = annotation.functionBridge();
+		ValueBridgeBeanReference bridgeReferenceAnnotation = annotation.valueBridge();
 		Optional<BeanReference> bridgeReference = toBeanReference(
 				bridgeReferenceAnnotation.name(),
 				bridgeReferenceAnnotation.type(),
-				FunctionBridgeBeanReference.UndefinedImplementationType.class
+				ValueBridgeBeanReference.UndefinedImplementationType.class
 		);
-		FunctionBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation = annotation.functionBridgeBuilder();
+		ValueBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation = annotation.valueBridgeBuilder();
 		Optional<BeanReference> bridgeBuilderReference = toBeanReference(
 				bridgeBuilderReferenceAnnotation.name(),
 				bridgeBuilderReferenceAnnotation.type(),
-				FunctionBridgeBuilderBeanReference.UndefinedImplementationType.class
+				ValueBridgeBuilderBeanReference.UndefinedImplementationType.class
 		);
 
 		if ( bridgeReference.isPresent() && bridgeBuilderReference.isPresent() ) {
 			throw log.invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference( propertyModel.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			// The builder will return an object of some class T where T extends FunctionBridge<?, ?>, so this is safe
+			// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
 			@SuppressWarnings( "unchecked" )
-			BridgeBuilder<? extends FunctionBridge<?, ?>> castedBuilder =
-					new BeanResolverBridgeBuilder( FunctionBridge.class, bridgeReference.get() );
+			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
+					new BeanResolverBridgeBuilder( ValueBridge.class, bridgeReference.get() );
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in FunctionBridgeUtil
+			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 			return beanResolver.resolve( bridgeBuilderReference.get(), BridgeBuilder.class );
 		}
 		else {

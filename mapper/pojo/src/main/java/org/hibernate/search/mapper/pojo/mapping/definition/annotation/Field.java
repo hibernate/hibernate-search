@@ -32,18 +32,18 @@ public @interface Field {
 	String name() default "";
 
 	/**
-	 * @return A reference to the function bridge to use for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #functionBridgeBuilder()}:
+	 * @return A reference to the value bridge to use for this field.
+	 * Cannot be used in the same {@code @Field} annotation as {@link #valueBridgeBuilder()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	FunctionBridgeBeanReference functionBridge() default @FunctionBridgeBeanReference;
+	ValueBridgeBeanReference valueBridge() default @ValueBridgeBeanReference;
 
 	/**
-	 * @return A reference to the builder to use to build a function bridge for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #functionBridge()}:
+	 * @return A reference to the builder to use to build a value bridge for this field.
+	 * Cannot be used in the same {@code @Field} annotation as {@link #valueBridge()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	FunctionBridgeBuilderBeanReference functionBridgeBuilder() default @FunctionBridgeBuilderBeanReference;
+	ValueBridgeBuilderBeanReference valueBridgeBuilder() default @ValueBridgeBuilderBeanReference;
 
 	String analyzer() default "";
 

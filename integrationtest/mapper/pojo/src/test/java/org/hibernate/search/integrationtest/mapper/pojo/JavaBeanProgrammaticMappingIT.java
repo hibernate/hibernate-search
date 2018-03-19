@@ -32,8 +32,8 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringFunctionBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
 import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
@@ -101,7 +101,7 @@ public class JavaBeanProgrammaticMappingIT {
 						.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 				.property( "numeric" )
 						.field()
-						.field( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
+						.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 		secondMappingDefinition.type( YetAnotherIndexedEntity.class )
 				.indexed( YetAnotherIndexedEntity.INDEX )
 				.property( "id" )
@@ -113,7 +113,7 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "optionalInt" )
 						.field()
 						.field( "optionalIntAsString" )
-								.functionBridge( OptionalIntAsStringFunctionBridge.class )
+								.valueBridge( OptionalIntAsStringValueBridge.class )
 								.withoutExtractors()
 				.property( "numericArray" )
 						.field()
@@ -220,10 +220,10 @@ public class JavaBeanProgrammaticMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 4, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		mappingRepository.close();
 		mappingRepository = null;
@@ -232,10 +232,10 @@ public class JavaBeanProgrammaticMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}

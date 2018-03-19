@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 import javax.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.integrationtest.showcase.library.bridge.BookMediumBridge;
 
 /**
@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.showcase.library.bridge.BookMediumBr
 public class BookCopy extends DocumentCopy<Book> {
 
 	// TODO add default bridge (and maybe field type?) for enums
-	@Field(functionBridge = @FunctionBridgeBeanReference(type = BookMediumBridge.class))
+	@Field(valueBridge = @ValueBridgeBeanReference(type = BookMediumBridge.class))
 	// TODO facet
 	private BookMedium medium;
 

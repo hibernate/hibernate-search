@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 
-public class LibraryServiceBridge implements FunctionBridge<LibraryService, String> {
+public class LibraryServiceBridge implements ValueBridge<LibraryService, String> {
 	@Override
-	public String toIndexedValue(LibraryService propertyValue) {
-		return propertyValue == null ? null : propertyValue.name();
+	public String toIndexedValue(LibraryService value) {
+		return value == null ? null : value.name();
 	}
 
 	@Override
-	public Object fromIndexedValue(String fieldValue) {
-		return fieldValue == null ? null : LibraryService.valueOf( fieldValue );
+	public Object fromIndexedValue(String indexedValue) {
+		return indexedValue == null ? null : LibraryService.valueOf( indexedValue );
 	}
 }

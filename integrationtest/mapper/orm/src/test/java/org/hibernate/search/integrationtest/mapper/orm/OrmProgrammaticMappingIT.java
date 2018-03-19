@@ -44,8 +44,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
 import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
@@ -176,10 +176,10 @@ public class OrmProgrammaticMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		sessionFactory.close();
 		sessionFactory = null;
@@ -188,10 +188,10 @@ public class OrmProgrammaticMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -500,7 +500,7 @@ public class OrmProgrammaticMappingIT {
 							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 					.property( "numeric" )
 							.field()
-							.field( "numericAsString" ).functionBridge( IntegerAsStringFunctionBridge.class );
+							.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 			secondMapping.type( YetAnotherIndexedEntity.class )
 					.indexed( YetAnotherIndexedEntity.INDEX )
 					.property( "id" )
@@ -512,7 +512,7 @@ public class OrmProgrammaticMappingIT {
 					.property( "optionalInt" )
 							.field()
 							.field( "optionalIntAsString" )
-									.functionBridge( OptionalIntAsStringFunctionBridge.class )
+									.valueBridge( OptionalIntAsStringValueBridge.class )
 									.withoutExtractors()
 					.property( "numericArray" )
 							.field()

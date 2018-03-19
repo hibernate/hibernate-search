@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContrib
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFunctionBridgeNode;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 
 /**
  * Binds a mapping to a given entity model and index model
@@ -36,7 +36,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorFun
  * Also binds the bridges where appropriate:
  * {@link TypeBridge#bind(IndexSchemaElement, PojoModelType, SearchModel)},
  * {@link PropertyBridge#bind(IndexSchemaElement, PojoModelProperty, SearchModel)},
- * {@link FunctionBridge#bind(IndexSchemaFieldContext)}.
+ * {@link ValueBridge#bind(IndexSchemaFieldContext)}.
  * <p>
  * Incidentally, this will also generate the index model,
  * due to bridges contributing to the index model as we bind them.
@@ -64,8 +64,8 @@ public interface PojoIndexModelBinder {
 	Optional<PropertyBridge> addPropertyBridge(IndexModelBindingContext bindingContext,
 			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
 
-	<T> Optional<PojoIndexingProcessorFunctionBridgeNode<T, ?>> addFunctionBridge(IndexModelBindingContext bindingContext,
-			PojoTypeModel<T> typeModel, BridgeBuilder<? extends FunctionBridge<?, ?>> bridgeBuilder,
+	<T> Optional<PojoIndexingProcessorValueBridgeNode<T, ?>> addValueBridge(IndexModelBindingContext bindingContext,
+			PojoTypeModel<T> typeModel, BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder,
 			String fieldName, FieldModelContributor contributor);
 
 }

@@ -10,7 +10,7 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -26,8 +26,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 1, value = "Unable to find a default identifier bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(Class<?> sourceType);
 
-	@Message(id = 2, value = "Unable to find a default function bridge implementation for type '%1$s'")
-	SearchException unableToResolveDefaultFunctionBridgeFromSourceType(Class<?> sourceType);
+	@Message(id = 2, value = "Unable to find a default value bridge implementation for type '%1$s'")
+	SearchException unableToResolveDefaultValueBridgeFromSourceType(Class<?> sourceType);
 
 	@Message(id = 3, value = "Annotation type '%1$s' is annotated with @PropertyBridgeMapping,"
 			+ " but the bridge builder reference is empty.")
@@ -37,7 +37,7 @@ public interface Log extends BasicLogger {
 			+ " but the marker builder reference is empty.")
 	SearchException missingBuilderReferenceInMarkerMapping(Class<? extends Annotation> annotationType);
 
-	@Message(id = 5, value = "Annotation @Field on property '%1$s' defines both functionBridge and functionBridgeBuilder."
+	@Message(id = 5, value = "Annotation @Field on property '%1$s' defines both valueBridge and valueBridgeBuilder."
 			+ " Only one of those can be defined, not both."
 	)
 	SearchException invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
@@ -53,16 +53,16 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotSearchOnEmptyTarget();
 
-	@Message(id = 8, value = "Could not auto-detect the input type for function bridge %1$s"
+	@Message(id = 8, value = "Could not auto-detect the input type for value bridge %1$s"
 			+ "; make sure the bridge uses generics.")
-	SearchException unableToInferFunctionBridgeInputType(FunctionBridge<?, ?> bridge);
+	SearchException unableToInferValueBridgeInputType(ValueBridge<?, ?> bridge);
 
-	@Message(id = 9, value = "Could not auto-detect the return type for function bridge %1$s"
+	@Message(id = 9, value = "Could not auto-detect the return type for value bridge %1$s"
 			+ "; make sure the bridge uses generics or configure the field explicitly in the bridge's bind() method.")
-	SearchException unableToInferFunctionBridgeIndexFieldType(FunctionBridge<?, ?> bridge);
+	SearchException unableToInferValueBridgeIndexFieldType(ValueBridge<?, ?> bridge);
 
-	@Message(id = 10, value = "Function bridge %1$s cannot be applied to input type %2$s.")
-	SearchException invalidInputTypeForFunctionBridge(FunctionBridge<?, ?> bridge, PojoTypeModel<?> typeModel);
+	@Message(id = 10, value = "Value bridge %1$s cannot be applied to input type %2$s.")
+	SearchException invalidInputTypeForValueBridge(ValueBridge<?, ?> bridge, PojoTypeModel<?> typeModel);
 
 	@Message(id = 11, value = "Missing field name for GeoPointBridge on type %1$s."
 			+ " The field name is mandatory when the bridge is applied on an type, optional when applied on a property.")

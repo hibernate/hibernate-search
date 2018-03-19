@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 /**
  * A bridge between a POJO property and an element of the index schema.
  * <p>
- * The {@code PropertyBridge} interface is a more powerful version of {@link FunctionBridge}
+ * The {@code PropertyBridge} interface is a more powerful version of {@link ValueBridge}
  * that can use reflection to get information about the property being bridged,
  * and can contribute more than one index field, in particular.
  *

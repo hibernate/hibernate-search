@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 
 /**
@@ -20,13 +20,13 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
  */
 public interface PropertyFieldMappingContext extends PropertyMappingContext {
 
-	PropertyFieldMappingContext functionBridge(String bridgeName);
+	PropertyFieldMappingContext valueBridge(String bridgeName);
 
-	PropertyFieldMappingContext functionBridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	PropertyFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	PropertyFieldMappingContext functionBridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	PropertyFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	PropertyFieldMappingContext functionBridge(BridgeBuilder<? extends FunctionBridge<?, ?>> builder);
+	PropertyFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
 	PropertyFieldMappingContext analyzer(String analyzerName);
 

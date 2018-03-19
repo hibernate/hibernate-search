@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 
-public class ISBNBridge implements FunctionBridge<ISBN, String> {
+public class ISBNBridge implements ValueBridge<ISBN, String> {
 
 	// TODO use a default normalizer that removes hyphens
 
 	@Override
-	public String toIndexedValue(ISBN propertyValue) {
-		return propertyValue == null ? null : propertyValue.getStringValue();
+	public String toIndexedValue(ISBN value) {
+		return value == null ? null : value.getStringValue();
 	}
 
 	@Override
-	public Object fromIndexedValue(String fieldValue) {
-		return fieldValue == null ? null : new ISBN( fieldValue );
+	public Object fromIndexedValue(String indexedValue) {
+		return indexedValue == null ? null : new ISBN( indexedValue );
 	}
 }

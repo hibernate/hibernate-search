@@ -41,15 +41,15 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FunctionBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringFunctionBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringFunctionBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
@@ -181,10 +181,10 @@ public class OrmAnnotationMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 1, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 		sessionFactory.close();
 		sessionFactory = null;
@@ -193,10 +193,10 @@ public class OrmAnnotationMappingIT {
 				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
 				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( IntegerAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( OptionalIntAsStringFunctionBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringFunctionBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
+				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -547,7 +547,7 @@ public class OrmAnnotationMappingIT {
 		@Id
 		private Integer id;
 
-		@Field(name = "numericAsString", functionBridge = @FunctionBridgeBeanReference(type = IntegerAsStringFunctionBridge.class))
+		@Field(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
 		private Integer numeric;
 
 		@DocumentId(identifierBridge = @IdentifierBridgeBeanReference(type = DefaultIntegerIdentifierBridge.class))
@@ -628,7 +628,7 @@ public class OrmAnnotationMappingIT {
 		@Field
 		@Field(
 				name = "optionalIntAsString",
-				functionBridge = @FunctionBridgeBeanReference(type = OptionalIntAsStringFunctionBridge.class),
+				valueBridge = @ValueBridgeBeanReference(type = OptionalIntAsStringValueBridge.class),
 				extractors = {} // Explicitly skip the default extractors
 		)
 		@Access( AccessType.PROPERTY )

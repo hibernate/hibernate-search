@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.bridge.FunctionBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 /**
  * @author Yoann Rodiere
@@ -15,8 +15,8 @@ public interface FieldMappingContext<R extends FieldMappingContext<R>> {
 
 	R bridge(String bridgeName);
 
-	R bridge(Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	R bridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	R bridge(String bridgeName, Class<? extends FunctionBridge<?, ?>> bridgeClass);
+	R bridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass);
 
 }
