@@ -10,6 +10,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
+import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 class StubMapperFactory
@@ -21,9 +22,9 @@ class StubMapperFactory
 	}
 
 	@Override
-	public Mapper<StubTypeMetadataContributor, StubMapping> createMapper(
-			BuildContext buildContext, ConfigurationPropertySource propertySource) {
-		return new StubMapper();
+	public Mapper<StubMapping> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
+		return new StubMapper( contributorProvider );
 	}
 
 }

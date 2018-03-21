@@ -98,7 +98,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
 		contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
 
-		Map<MappingKey<?>, Mapper<?, ?>> mappers =
+		Map<MappingKey<?>, Mapper<?>> mappers =
 				metadataCollector.createMappers( buildContext, propertySource, indexManagerBuildingStateProvider );
 
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
@@ -143,13 +143,13 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			getOrCreateContribution( mapperFactory ).collectDiscoverer( metadataDiscoverer );
 		}
 
-		Map<MappingKey<?>, Mapper<?, ?>> createMappers(
+		Map<MappingKey<?>, Mapper<?>> createMappers(
 				BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			frozen = true;
-			Map<MappingKey<?>, Mapper<?, ?>> mappers = new HashMap<>();
+			Map<MappingKey<?>, Mapper<?>> mappers = new HashMap<>();
 			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
-				Mapper<?, ?> mapper = contribution.preBuild( buildContext, propertySource, indexManagerBuildingStateProvider );
+				Mapper<?> mapper = contribution.preBuild( buildContext, propertySource, indexManagerBuildingStateProvider );
 				mappers.put( mappingKey, mapper );
 			} );
 			return mappers;
@@ -202,10 +202,10 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			metadataDiscoverers.add( metadataDiscoverer );
 		}
 
-		public Mapper<C, M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
+		public Mapper<M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 			ContributorProvider contributorProvider = new ContributorProvider();
-			Mapper<C, M> mapper = mapperFactory.createMapper( buildContext, propertySource );
+			Mapper<M> mapper = mapperFactory.createMapper( buildContext, propertySource, contributorProvider );
 
 			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>( contributionByType.keySet() );
 			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
@@ -214,8 +214,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				if ( indexName != null ) {
 					mapper.addIndexed(
 							typeModel,
-							indexManagerBuildingStateHolder.startBuilding( indexName ),
-							contributorProvider
+							indexManagerBuildingStateHolder.startBuilding( indexName )
 					);
 				}
 			}

@@ -28,16 +28,18 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.util.AssertionFailure;
 
-public class PojoMapper<M> implements Mapper<PojoTypeMetadataContributor, M> {
+class PojoMapper<M> implements Mapper<M> {
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
+	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
-	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+	PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
@@ -48,14 +50,13 @@ public class PojoMapper<M> implements Mapper<PojoTypeMetadataContributor, M> {
 		);
 
 		this.propertySource = propertySource;
+		this.contributorProvider = contributorProvider;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 	}
 
 	@Override
-	public void addIndexed(MappableTypeModel typeModel,
-			IndexManagerBuildingState<?> indexManagerBuildingState,
-			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
+	public void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState) {
 		if ( !( typeModel instanceof PojoRawTypeModel ) ) {
 			throw new AssertionFailure(
 					"Expected the indexed type model to be an instance of " + PojoRawTypeModel.class

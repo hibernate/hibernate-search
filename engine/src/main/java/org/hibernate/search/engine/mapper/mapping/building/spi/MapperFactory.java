@@ -14,6 +14,7 @@ public interface MapperFactory<C, M> {
 
 	MappingKey<M> getMappingKey();
 
-	Mapper<C, M> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource);
+	Mapper<M> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			TypeMetadataContributorProvider<C> contributorProvider);
 
 }
