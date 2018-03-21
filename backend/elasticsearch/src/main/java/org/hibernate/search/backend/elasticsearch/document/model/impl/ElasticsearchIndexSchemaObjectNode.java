@@ -33,6 +33,11 @@ public class ElasticsearchIndexSchemaObjectNode {
 		this.storage = storage;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + "]";
+	}
+
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
 	}

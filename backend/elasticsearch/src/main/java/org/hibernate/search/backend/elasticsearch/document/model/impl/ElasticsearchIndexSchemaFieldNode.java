@@ -20,6 +20,11 @@ public class ElasticsearchIndexSchemaFieldNode {
 		this.formatter = formatter;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[parent=" + parent + "]";
+	}
+
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
 	}
@@ -27,5 +32,4 @@ public class ElasticsearchIndexSchemaFieldNode {
 	public ElasticsearchFieldFormatter getFormatter() {
 		return formatter;
 	}
-
 }

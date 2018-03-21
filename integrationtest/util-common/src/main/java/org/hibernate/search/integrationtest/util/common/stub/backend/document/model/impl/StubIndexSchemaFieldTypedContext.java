@@ -14,14 +14,12 @@ import org.hibernate.search.integrationtest.util.common.stub.backend.document.mo
 
 class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContext<T> {
 
-	private final String relativeName;
 	private final StubIndexSchemaNode.Builder builder;
 	private final boolean included;
 
 	private IndexFieldAccessor<T> accessor;
 
-	StubIndexSchemaFieldTypedContext(String relativeName, StubIndexSchemaNode.Builder builder, boolean included) {
-		this.relativeName = relativeName;
+	StubIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, boolean included) {
 		this.builder = builder;
 		this.included = included;
 	}
@@ -54,10 +52,10 @@ class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContex
 	public IndexFieldAccessor<T> createAccessor() {
 		if ( accessor == null ) {
 			if ( included ) {
-				accessor = new StubIncludedIndexFieldAccessor<>( relativeName );
+				accessor = new StubIncludedIndexFieldAccessor<>( builder.getAbsolutePath(), builder.getRelativeName() );
 			}
 			else {
-				accessor = new StubExcludedIndexFieldAccessor<>( relativeName );
+				accessor = new StubExcludedIndexFieldAccessor<>( builder.getAbsolutePath(), builder.getRelativeName() );
 			}
 		}
 		return accessor;

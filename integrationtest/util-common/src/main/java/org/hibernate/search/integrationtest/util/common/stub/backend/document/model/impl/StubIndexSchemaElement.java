@@ -32,16 +32,21 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 		return new IndexSchemaFieldContext() {
 			@Override
 			public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
-				StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( inputType );
 				return context.nest(
 						relativeName,
 						// If the field is included, make sure to link it to the parent
 						prefixedName -> {
-							builder.child( prefixedName, childBuilder );
-							return new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder, true );
+							StubIndexSchemaNode.Builder childBuilder =
+									StubIndexSchemaNode.field( builder, prefixedName, inputType );
+							builder.child( childBuilder );
+							return new StubIndexSchemaFieldTypedContext<>( childBuilder, true );
 						},
 						// Otherwise, just make sure the code will work, but ignore any input from the client
-						prefixedName -> new StubIndexSchemaFieldTypedContext<>( prefixedName, childBuilder, false )
+						prefixedName -> {
+							StubIndexSchemaNode.Builder childBuilder =
+									StubIndexSchemaNode.field( builder, prefixedName, inputType );
+							return new StubIndexSchemaFieldTypedContext<>( childBuilder, false );
+						}
 				);
 			}
 
@@ -69,17 +74,21 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 
 	@Override
 	public IndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage) {
-		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.objectField( storage );
 		return context.nest(
 				relativeName,
 				// If the field is included, make sure to link it to the parent
 				(prefixedName, nestingContext) -> {
-					builder.child( prefixedName, childBuilder );
-					return new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext, true );
+					StubIndexSchemaNode.Builder childBuilder =
+							StubIndexSchemaNode.objectField( builder, prefixedName, storage );
+					builder.child( childBuilder );
+					return new StubIndexSchemaObjectField( childBuilder, nestingContext, true );
 				},
 				// Otherwise, just make sure the code will work, but ignore any input from the client
-				(prefixedName, nestingContext) ->
-						new StubIndexSchemaObjectField( prefixedName, childBuilder, nestingContext, false )
+				(prefixedName, nestingContext) -> {
+					StubIndexSchemaNode.Builder childBuilder =
+							StubIndexSchemaNode.objectField( builder, prefixedName, storage );
+					return new StubIndexSchemaObjectField( childBuilder, nestingContext, false );
+				}
 		);
 	}
 

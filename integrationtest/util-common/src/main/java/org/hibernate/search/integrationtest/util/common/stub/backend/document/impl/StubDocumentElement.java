@@ -22,8 +22,8 @@ public class StubDocumentElement implements DocumentElement {
 	}
 
 	public StubDocumentElement putChild(String relativeName) {
-		StubDocumentNode.Builder childBuilder = StubDocumentNode.object();
-		builder.child( relativeName, childBuilder );
+		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, relativeName );
+		builder.child( childBuilder );
 		return new StubDocumentElement( childBuilder );
 	}
 

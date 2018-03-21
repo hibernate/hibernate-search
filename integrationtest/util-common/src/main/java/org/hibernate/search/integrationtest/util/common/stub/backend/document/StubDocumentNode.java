@@ -13,11 +13,11 @@ import org.hibernate.search.integrationtest.util.common.stub.StubTreeNode;
 public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 
 	public static Builder document() {
-		return new Builder();
+		return new Builder( null, null );
 	}
 
-	public static Builder object() {
-		return new Builder();
+	public static Builder object(Builder parent, String relativeName) {
+		return new Builder( parent, relativeName );
 	}
 
 	private StubDocumentNode(Builder builder) {
@@ -25,6 +25,10 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 	}
 
 	public static class Builder extends StubTreeNode.Builder<StubDocumentNode> {
+
+		private Builder(Builder parent, String relativeName) {
+			super( parent, relativeName );
+		}
 
 		public Builder field(String relativeName, Object value) {
 			attribute( relativeName, value );
@@ -37,20 +41,20 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		}
 
 		public Builder objectField(String relativeName, Consumer<Builder> contributor) {
-			Builder childBuilder = StubDocumentNode.object();
+			Builder childBuilder = StubDocumentNode.object( this, relativeName );
 			contributor.accept( childBuilder );
-			child( relativeName, childBuilder );
+			child( childBuilder );
 			return this;
 		}
 
 		public Builder missingObjectField(String relativeName) {
-			child( relativeName, null );
+			missingChild( relativeName );
 			return this;
 		}
 
 		@Override
-		public void child(String relativeName, StubTreeNode.Builder<StubDocumentNode> nodeBuilder) {
-			super.child( relativeName, nodeBuilder );
+		public void child(StubTreeNode.Builder<StubDocumentNode> nodeBuilder) {
+			super.child( nodeBuilder );
 		}
 
 		@Override

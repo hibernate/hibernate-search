@@ -17,10 +17,17 @@ class StubExcludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String absolutePath;
 	private final String relativeName;
 
-	StubExcludedIndexFieldAccessor(String relativeName) {
+	StubExcludedIndexFieldAccessor(String absolutePath, String relativeName) {
+		this.absolutePath = absolutePath;
 		this.relativeName = relativeName;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
 	@Override

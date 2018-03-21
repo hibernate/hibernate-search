@@ -22,16 +22,16 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	}
 
 	public static Builder schema() {
-		return new Builder( Type.ROOT );
+		return new Builder( null, null, Type.ROOT );
 	}
 
-	public static Builder objectField(ObjectFieldStorage storage) {
-		return new Builder( Type.OBJECT_FIELD )
+	public static Builder objectField(Builder parent, String relativeName, ObjectFieldStorage storage) {
+		return new Builder( parent, relativeName, Type.OBJECT_FIELD )
 				.objectFieldStorage( storage );
 	}
 
-	public static Builder field(Class<?> inputType) {
-		return new Builder( Type.NON_OBJECT_FIELD )
+	public static Builder field(Builder parent, String relativeName, Class<?> inputType) {
+		return new Builder( parent, relativeName, Type.NON_OBJECT_FIELD )
 				.inputType( inputType );
 	}
 
@@ -41,7 +41,8 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static class Builder extends StubTreeNode.Builder<StubIndexSchemaNode> {
 
-		private Builder(Type type) {
+		private Builder(Builder parent, String relativeName, Type type) {
+			super( parent, relativeName );
 			attribute( "type", type );
 		}
 
@@ -51,9 +52,9 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder field(String relativeName, Class<?> inputType, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.field( inputType );
+			Builder builder = StubIndexSchemaNode.field( this, relativeName, inputType );
 			contributor.accept( builder );
-			child( relativeName, builder );
+			child( builder );
 			return this;
 		}
 
@@ -63,15 +64,15 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder objectField(String relativeName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectField( storage );
+			Builder builder = StubIndexSchemaNode.objectField( this, relativeName, storage );
 			contributor.accept( builder );
-			child( relativeName, builder );
+			child( builder );
 			return this;
 		}
 
 		@Override
-		public void child(String relativeName, StubTreeNode.Builder<StubIndexSchemaNode> nodeBuilder) {
-			super.child( relativeName, nodeBuilder );
+		public void child(StubTreeNode.Builder<StubIndexSchemaNode> nodeBuilder) {
+			super.child( nodeBuilder );
 		}
 
 		public Builder explicitRouting() {

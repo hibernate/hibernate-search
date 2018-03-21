@@ -19,17 +19,24 @@ class StubExcludedIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String absolutePath;
 	private final String relativeName;
 
-	StubExcludedIndexObjectFieldAccessor(String relativeName) {
+	StubExcludedIndexObjectFieldAccessor(String absolutePath, String relativeName) {
+		this.absolutePath = absolutePath;
 		this.relativeName = relativeName;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
 	@Override
 	public DocumentElement add(DocumentElement target) {
 		log.tracev( "Ignoring add on document element {}, object field '{}'" +
 				" because the field was excluded during bootstrap.", target, relativeName );
-		return new StubDocumentElement( StubDocumentNode.object() );
+		return new StubDocumentElement( StubDocumentNode.object( null, relativeName ) );
 	}
 
 	@Override

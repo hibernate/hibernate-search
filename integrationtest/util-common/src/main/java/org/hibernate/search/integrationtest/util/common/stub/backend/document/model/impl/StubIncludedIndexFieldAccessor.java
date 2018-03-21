@@ -11,10 +11,17 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.integrationtest.util.common.stub.backend.document.impl.StubDocumentElement;
 
 class StubIncludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+	private final String absolutePath;
 	private final String relativeName;
 
-	StubIncludedIndexFieldAccessor(String relativeName) {
+	StubIncludedIndexFieldAccessor(String absolutePath, String relativeName) {
+		this.absolutePath = absolutePath;
 		this.relativeName = relativeName;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
 	@Override

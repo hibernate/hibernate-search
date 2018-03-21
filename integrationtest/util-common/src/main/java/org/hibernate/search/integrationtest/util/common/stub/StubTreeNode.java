@@ -115,16 +115,47 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> {
 
 	public abstract static class Builder<N> {
 
+		private final Builder<?> parent;
+		private final String relativeName;
+		private final String absolutePath;
+
 		private final Map<String, List<Object>> attributes = new LinkedHashMap<>();
 		private final Map<String, List<Builder<N>>> children = new LinkedHashMap<>();
+
+		protected Builder(Builder<?> parent, String relativeName) {
+			this.parent = parent;
+			this.relativeName = relativeName;
+			if ( parent == null ) {
+				this.absolutePath = "<ROOT>";
+			}
+			else if ( parent.parent == null ) {
+				this.absolutePath = relativeName;
+			}
+			else {
+				this.absolutePath = parent.getAbsolutePath() + "." + relativeName;
+			}
+		}
+
+		public String getRelativeName() {
+			return relativeName;
+		}
+
+		public String getAbsolutePath() {
+			return absolutePath;
+		}
 
 		protected void attribute(String name, Object... values) {
 			List<Object> attributeValues = attributes.computeIfAbsent( name, ignored -> new ArrayList<>() );
 			Collections.addAll( attributeValues, values );
 		}
 
-		protected void child(String relativeName, Builder<N> nodeBuilder) {
+		protected void missingChild(String relativeName) {
 			children.computeIfAbsent( relativeName, ignored -> new ArrayList<>() )
+					.add( null );
+		}
+
+		protected void child(Builder<N> nodeBuilder) {
+			children.computeIfAbsent( nodeBuilder.relativeName, ignored -> new ArrayList<>() )
 					.add( nodeBuilder );
 		}
 
