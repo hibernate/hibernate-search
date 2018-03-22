@@ -39,6 +39,7 @@
                     -Djgroups.bind_addr=127.0.0.1
                     -Dremote.maven.repo=${repository.jboss-public.url}
                     -Dmaven.repo.local=${settings.localRepository}
+                    ${container.jacoco.args}
                 </property>
                 <!-- To debug the Arquillian managed application server:
                 <property name="javaVmArguments">
@@ -50,6 +51,7 @@
                     -Djgroups.bind_addr=127.0.0.1
                     -Dremote.maven.repo=${repository.jboss-public.url}
                     -Dmaven.repo.local=${settings.localRepository}
+                    ${container.jacoco.args}
                 </property>
                  -->
             </configuration>

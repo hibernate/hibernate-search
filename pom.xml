@@ -1411,6 +1411,12 @@
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
+                            <!--
+                                Must be a separate property which is not set in Maven,
+                                so that it will be retrieved by the code launching the container (Arquillian, ...)
+                                at runtime, and will not be replaced at build time by Maven filtering in configuration files.
+                             -->
+                            <container.jacoco.args>${surefire.container.jacoco.args}</container.jacoco.args>
                         </systemPropertyVariables>
                         <argLine>${surefire.system.args}</argLine>
                         <additionalClasspathElements>
@@ -1534,6 +1540,12 @@
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
+                            <!--
+                                Must be a separate property which is not set in Maven,
+                                so that it will be retrieved by the code launching the container (Arquillian, ...)
+                                at runtime, and will not be replaced at build time by Maven filtering in configuration files.
+                             -->
+                            <container.jacoco.args>${failsafe.container.jacoco.args}</container.jacoco.args>
                         </systemPropertyVariables>
                         <argLine>${failsafe.system.args}</argLine>
                         <additionalClasspathElements>
@@ -2395,6 +2407,13 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                  -->
                 <surefire.jacoco.args>@{surefire.jacoco.args.lateEval}</surefire.jacoco.args>
                 <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
+                <!--
+                    We don't use @{...} for late property evaluation here,
+                    because these properties are evaluated by surefire/failsafe itself,
+                    which doesn't understand the @{...} syntax but somehow manages to always use late evaluation.
+                 -->
+                <surefire.container.jacoco.args>${surefire.jacoco.args.lateEval}</surefire.container.jacoco.args>
+                <failsafe.container.jacoco.args>${failsafe.jacoco.args.lateEval}</failsafe.container.jacoco.args>
             </properties>
             <build>
                 <plugins>

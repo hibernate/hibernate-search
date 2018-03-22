@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
@@ -129,10 +130,14 @@ public class HibernateSearchWithKarafIT {
 			mavenProperties.load( inputStream );
 		}
 
+		String jacocoVMArgs = System.getProperty( "container.jacoco.args" );
+
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
 				DEBUG ? debugConfiguration( "5005", true ) : null,
+				jacocoVMArgs != null && !jacocoVMArgs.isEmpty()
+						? CoreOptions.vmOptions( jacocoVMArgs.split( " " ) ) : null,
 				logLevel( LogLevelOption.LogLevel.WARN ),
 				karafDistributionConfiguration()
 						.frameworkUrl( karafUrl )
