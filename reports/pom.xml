@@ -102,7 +102,20 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
-        <!-- TODO add JaCoCo reports to OSGi and WildFly integration tests? This will probably require some hacking. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-integrationtest-wildfly</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-integrationtest-osgi</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
