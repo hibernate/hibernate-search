@@ -47,6 +47,7 @@
         <module>integrationtest/performance/engine-lucene</module>
         <module>integrationtest/performance/engine-elasticsearch</module>
         <module>documentation</module>
+        <module>reports</module>
     </modules>
 
     <issueManagement>
