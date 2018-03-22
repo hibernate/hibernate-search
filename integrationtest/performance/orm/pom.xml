@@ -30,7 +30,7 @@
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
-        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests}</additionalRuntimeArgLine>
+        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests}</additionalRuntimeArgLine>
     </properties>
 
     <dependencyManagement>
