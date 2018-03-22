@@ -27,13 +27,13 @@ import org.hibernate.search.util.AssertionFailure;
 
 public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
 
-	private final PojoTypeManagerContainer typeManagers;
-	private final Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers;
+	private final PojoIndexedTypeManagerContainer typeManagers;
+	private final Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers;
 	private final SessionContext sessionContext;
 	private IndexSearchTarget indexSearchTarget;
 
-	public PojoSearchTargetDelegateImpl(PojoTypeManagerContainer typeManagers,
-			Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers,
+	public PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
+			Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers,
 			SessionContext sessionContext) {
 		this.typeManagers = typeManagers;
 		this.targetedTypeManagers = targetedTypeManagers;
@@ -43,7 +43,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	@Override
 	public Set<Class<? extends T>> getTargetedIndexedTypes() {
 		return targetedTypeManagers.stream()
-				.map( PojoTypeManager::getIndexedJavaClass )
+				.map( PojoIndexedTypeManager::getIndexedJavaClass )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
@@ -69,7 +69,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 
 	private IndexSearchTarget getIndexSearchTarget() {
 		if ( indexSearchTarget == null ) {
-			Iterator<PojoTypeManager<?, ? extends T, ?>> iterator = targetedTypeManagers.iterator();
+			Iterator<PojoIndexedTypeManager<?, ? extends T, ?>> iterator = targetedTypeManagers.iterator();
 			IndexSearchTargetBuilder builder = iterator.next().createSearchTarget();
 			while ( iterator.hasNext() ) {
 				iterator.next().addToSearchTarget( builder );
@@ -80,7 +80,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	}
 
 	private PojoReference toPojoReference(DocumentReference documentReference) {
-		PojoTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
+		PojoIndexedTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
 				.orElseThrow( () -> new AssertionFailure(
 						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
 		// TODO error handling if typeManager is null

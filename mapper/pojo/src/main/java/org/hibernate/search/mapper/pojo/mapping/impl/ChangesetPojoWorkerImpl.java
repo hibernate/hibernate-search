@@ -19,16 +19,16 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 
 	private final PojoSessionContext sessionContext;
 	// Use a LinkedHashMap for stable ordering across JVMs
-	private final Map<Class<?>, ChangesetPojoTypeWorker<?, ?, ?>> delegates = new LinkedHashMap<>();
+	private final Map<Class<?>, ChangesetPojoIndexedTypeWorker<?, ?, ?>> delegates = new LinkedHashMap<>();
 
-	ChangesetPojoWorkerImpl(PojoTypeManagerContainer typeManagers, PojoSessionContext sessionContext) {
-		super( typeManagers, sessionContext.getRuntimeIntrospector() );
+	ChangesetPojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers, PojoSessionContext sessionContext) {
+		super( indexedTypeManagers, sessionContext.getRuntimeIntrospector() );
 		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public void prepare() {
-		for ( ChangesetPojoTypeWorker<?, ?, ?> delegate : delegates.values() ) {
+		for ( ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate : delegates.values() ) {
 			delegate.prepare();
 		}
 	}
@@ -38,7 +38,7 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 		try {
 			prepare();
 			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( ChangesetPojoTypeWorker<?, ?, ?> delegate : delegates.values() ) {
+			for ( ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate : delegates.values() ) {
 				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture[futures.size()] ) );
@@ -49,10 +49,10 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	}
 
 	@Override
-	ChangesetPojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
+	ChangesetPojoIndexedTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
 		return delegates.computeIfAbsent(
 				clazz,
-				c -> getTypeManager( c ).createWorker( sessionContext )
+				c -> getIndexedTypeManager( c ).createWorker( sessionContext )
 		);
 	}
 

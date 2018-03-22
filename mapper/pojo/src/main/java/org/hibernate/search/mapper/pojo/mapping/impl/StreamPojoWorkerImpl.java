@@ -15,18 +15,18 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	private final PojoSessionContext sessionContext;
-	private final Map<Class<?>, StreamPojoTypeWorker<?, ?, ?>> delegates = new ConcurrentHashMap<>();
+	private final Map<Class<?>, StreamPojoIndexedTypeWorker<?, ?, ?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
-	StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+	StreamPojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoSessionContext sessionContext) {
-		super( typeManagers, sessionContext.getRuntimeIntrospector() );
+		super( indexedTypeManagers, sessionContext.getRuntimeIntrospector() );
 		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public void flush() {
-		for ( StreamPojoTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
+		for ( StreamPojoIndexedTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
 			delegate.flush();
 		}
 	}
@@ -38,7 +38,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	public void optimize() {
-		for ( StreamPojoTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
+		for ( StreamPojoIndexedTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
 			delegate.optimize();
 		}
 	}
@@ -49,13 +49,13 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 	}
 
 	@Override
-	StreamPojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( sessionContext ) );
+	StreamPojoIndexedTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
+		return delegates.computeIfAbsent( clazz, c -> getIndexedTypeManager( clazz ).createStreamWorker( sessionContext ) );
 	}
 
-	private Iterable<StreamPojoTypeWorker<?, ?, ?>> getAllDelegates() {
+	private Iterable<StreamPojoIndexedTypeWorker<?, ?, ?>> getAllDelegates() {
 		if ( !addedAll ) {
-			getAllTypeManagers().forEach( manager -> getDelegate( manager.getClass() ) );
+			getAllIndexedTypeManagers().forEach( manager -> getDelegate( manager.getClass() ) );
 			addedAll = true;
 		}
 		return delegates.values();

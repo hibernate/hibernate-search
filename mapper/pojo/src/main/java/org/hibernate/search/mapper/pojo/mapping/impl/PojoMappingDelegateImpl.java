@@ -31,27 +31,27 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoTypeManagerContainer typeManagers;
+	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 
-	public PojoMappingDelegateImpl(PojoTypeManagerContainer typeManagers) {
-		this.typeManagers = typeManagers;
+	public PojoMappingDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers) {
+		this.indexedTypeManagers = indexedTypeManagers;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoTypeManager::close, typeManagers.getAll() );
+			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
 		}
 	}
 
 	@Override
 	public ChangesetPojoWorker createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoWorkerImpl( typeManagers, sessionContext );
+		return new ChangesetPojoWorkerImpl( indexedTypeManagers, sessionContext );
 	}
 
 	@Override
 	public StreamPojoWorker createStreamWorker(PojoSessionContext sessionContext) {
-		return new StreamPojoWorkerImpl( typeManagers, sessionContext );
+		return new StreamPojoWorkerImpl( indexedTypeManagers, sessionContext );
 	}
 
 	@Override
@@ -60,22 +60,22 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();
 		}
-		Set<PojoTypeManager<?, ? extends T, ?>> targetedTypeManagers = targetedTypes.stream()
-				.flatMap( t -> typeManagers.getAllBySuperClass( t )
+		Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers = targetedTypes.stream()
+				.flatMap( t -> indexedTypeManagers.getAllBySuperClass( t )
 						.orElseThrow( () -> new SearchException( "Type " + t + " is not indexed and hasn't any indexed supertype." ) )
 						.stream()
 				)
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-		return new PojoSearchTargetDelegateImpl<>( typeManagers, targetedTypeManagers, sessionContext );
+		return new PojoSearchTargetDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
 	}
 
 	@Override
 	public boolean isIndexable(Class<?> type) {
-		return typeManagers.getByExactClass( type ).isPresent();
+		return indexedTypeManagers.getByExactClass( type ).isPresent();
 	}
 
 	@Override
 	public boolean isSearchable(Class<?> type) {
-		return typeManagers.getAllBySuperClass( type ).isPresent();
+		return indexedTypeManagers.getAllBySuperClass( type ).isPresent();
 	}
 }

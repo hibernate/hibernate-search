@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
-public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable, ToStringTreeAppendable {
+public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements AutoCloseable, ToStringTreeAppendable {
 
 	private final Class<E> indexedJavaClass;
 	private final PojoCaster<E> caster;
@@ -29,7 +29,7 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 	private final PojoIndexingProcessor<E> processor;
 	private final IndexManager<D> indexManager;
 
-	public PojoTypeManager(Class<E> indexedJavaClass,
+	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
 			PojoCaster<E> caster,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
@@ -90,14 +90,14 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 		return new PojoDocumentContributor<>( processor, entitySupplier );
 	}
 
-	public ChangesetPojoTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoTypeWorker<>(
+	public ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
+		return new ChangesetPojoIndexedTypeWorker<>(
 				this, sessionContext, indexManager.createWorker( sessionContext )
 		);
 	}
 
-	public StreamPojoTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
-		return new StreamPojoTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
+	public StreamPojoIndexedTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
+		return new StreamPojoIndexedTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
 	}
 
 	public IndexSearchTargetBuilder createSearchTarget() {

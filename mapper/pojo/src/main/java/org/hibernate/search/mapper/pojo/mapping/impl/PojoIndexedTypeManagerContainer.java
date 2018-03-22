@@ -15,21 +15,18 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-/**
- * @author Yoann Rodiere
- */
-public class PojoTypeManagerContainer {
+public class PojoIndexedTypeManagerContainer {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 
-	private final Map<String, PojoTypeManager<?, ?, ?>> byIndexName;
-	private final Map<Class<?>, PojoTypeManager<?, ?, ?>> byExactClass;
-	private final Map<Class<?>, Set<? extends PojoTypeManager<?, ?, ?>>> bySuperClass;
-	private final Set<PojoTypeManager<?, ?, ?>> all;
+	private final Map<String, PojoIndexedTypeManager<?, ?, ?>> byIndexName;
+	private final Map<Class<?>, PojoIndexedTypeManager<?, ?, ?>> byExactClass;
+	private final Map<Class<?>, Set<? extends PojoIndexedTypeManager<?, ?, ?>>> bySuperClass;
+	private final Set<PojoIndexedTypeManager<?, ?, ?>> all;
 
-	private PojoTypeManagerContainer(Builder builder) {
+	private PojoIndexedTypeManagerContainer(Builder builder) {
 		this.byIndexName = new HashMap<>( builder.byIndexName );
 		this.byExactClass = new HashMap<>( builder.byExactClass );
 		this.bySuperClass = new HashMap<>( builder.bySuperClass );
@@ -37,34 +34,34 @@ public class PojoTypeManagerContainer {
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
 	}
 
-	public Optional<PojoTypeManager<?, ?, ?>> getByIndexName(String indexName) {
+	public Optional<PojoIndexedTypeManager<?, ?, ?>> getByIndexName(String indexName) {
 		return Optional.ofNullable( byIndexName.get( indexName ) );
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E> Optional<PojoTypeManager<?, E, ?>> getByExactClass(Class<E> clazz) {
-		return Optional.ofNullable( (PojoTypeManager<?, E, ?>) byExactClass.get( clazz ) );
+	public <E> Optional<PojoIndexedTypeManager<?, E, ?>> getByExactClass(Class<E> clazz) {
+		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactClass.get( clazz ) );
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E> Optional<Set<PojoTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
-		return Optional.ofNullable( (Set<PojoTypeManager<?, ? extends E, ?>>) bySuperClass.get( clazz ) );
+	public <E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
+		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperClass.get( clazz ) );
 	}
 
-	public Set<PojoTypeManager<?, ?, ?>> getAll() {
+	public Set<PojoIndexedTypeManager<?, ?, ?>> getAll() {
 		return all;
 	}
 
 	public static class Builder {
 
-		private final Map<String, PojoTypeManager<?, ?, ?>> byIndexName = new HashMap<>();
-		private final Map<Class<?>, PojoTypeManager<?, ?, ?>> byExactClass = new HashMap<>();
-		private final Map<Class<?>, Set<PojoTypeManager<?, ?, ?>>> bySuperClass = new HashMap<>();
+		private final Map<String, PojoIndexedTypeManager<?, ?, ?>> byIndexName = new HashMap<>();
+		private final Map<Class<?>, PojoIndexedTypeManager<?, ?, ?>> byExactClass = new HashMap<>();
+		private final Map<Class<?>, Set<PojoIndexedTypeManager<?, ?, ?>>> bySuperClass = new HashMap<>();
 
 		private Builder() {
 		}
 
-		public <E> void add(String indexName, PojoRawTypeModel<E> typeModel, PojoTypeManager<?, E, ?> typeManager) {
+		public <E> void add(String indexName, PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E, ?> typeManager) {
 			byIndexName.put( indexName, typeManager );
 			byExactClass.put( typeModel.getJavaClass(), typeManager );
 			typeModel.getAscendingSuperTypes()
@@ -75,8 +72,8 @@ public class PojoTypeManagerContainer {
 					);
 		}
 
-		public PojoTypeManagerContainer build() {
-			return new PojoTypeManagerContainer( this );
+		public PojoIndexedTypeManagerContainer build() {
+			return new PojoIndexedTypeManagerContainer( this );
 		}
 	}
 

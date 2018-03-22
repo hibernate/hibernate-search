@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-class StreamPojoTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
+class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoIndexedTypeWorker {
 
-	private final PojoTypeManager<I, E, D> typeManager;
+	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final StreamIndexWorker<D> delegate;
 
-	StreamPojoTypeWorker(PojoTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
+	StreamPojoIndexedTypeWorker(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
 			StreamIndexWorker<D> delegate) {
 		super( sessionContext );
 		this.typeManager = typeManager;

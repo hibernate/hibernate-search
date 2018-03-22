@@ -20,7 +20,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -36,7 +36,7 @@ class PojoMapper<M> implements Mapper<M> {
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoMappingHelper mappingHelper;
 
-	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
+	private final List<PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders = new ArrayList<>();
 
 	PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
@@ -72,7 +72,7 @@ class PojoMapper<M> implements Mapper<M> {
 		}
 
 		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
-		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
+		PojoIndexedTypeManagerBuilder<?, ?> builder = new PojoIndexedTypeManagerBuilder<>(
 				entityTypeModel, mappingHelper, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
 		PojoMappingCollectorTypeNode collector = builder.asCollector();
@@ -80,14 +80,17 @@ class PojoMapper<M> implements Mapper<M> {
 				entityTypeModel,
 				c -> c.contributeMapping( collector )
 		);
-		typeManagerBuilders.add( builder );
+		indexedTypeManagerBuilders.add( builder );
 	}
 
 	@Override
 	public MappingImplementor<M> build() {
-		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
-		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
-		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );
+		PojoIndexedTypeManagerContainer.Builder indexedTypeManagerContainerBuilder =
+				PojoIndexedTypeManagerContainer.builder();
+		indexedTypeManagerBuilders.forEach( b -> b.addTo( indexedTypeManagerContainerBuilder ) );
+		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl(
+				indexedTypeManagerContainerBuilder.build()
+		);
 		return wrapperFactory.apply( propertySource, mappingImplementor );
 	}
 

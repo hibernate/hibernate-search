@@ -16,15 +16,15 @@ import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-class ChangesetPojoTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
+class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoIndexedTypeWorker {
 
-	private final PojoTypeManager<I, E, D> typeManager;
+	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final ChangesetIndexWorker<D> delegate;
 
 	// Use a LinkedHashMap for stable ordering across JVMs
 	private final Map<I, WorkPlanPerDocument> workPlansPerId = new LinkedHashMap<>();
 
-	ChangesetPojoTypeWorker(PojoTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
+	ChangesetPojoIndexedTypeWorker(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
 			ChangesetIndexWorker<D> delegate) {
 		super( sessionContext );
 		this.typeManager = typeManager;

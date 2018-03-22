@@ -14,12 +14,12 @@ import org.hibernate.search.util.SearchException;
 
 abstract class PojoWorkerImpl implements PojoWorker {
 
-	private final PojoTypeManagerContainer typeManagers;
+	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoRuntimeIntrospector introspector;
 
-	PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+	PojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoRuntimeIntrospector introspector) {
-		this.typeManagers = typeManagers;
+		this.indexedTypeManagers = indexedTypeManagers;
 		this.introspector = introspector;
 	}
 
@@ -31,7 +31,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker delegate = getDelegate( clazz );
+		PojoIndexedTypeWorker delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -43,7 +43,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker delegate = getDelegate( clazz );
+		PojoIndexedTypeWorker delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
@@ -55,7 +55,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void delete(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker delegate = getDelegate( clazz );
+		PojoIndexedTypeWorker delegate = getDelegate( clazz );
 		delegate.delete( id, entity );
 	}
 
@@ -63,14 +63,14 @@ abstract class PojoWorkerImpl implements PojoWorker {
 		return introspector;
 	}
 
-	<E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
-		return typeManagers.getByExactClass( clazz )
+	<E> PojoIndexedTypeManager<?, E, ?> getIndexedTypeManager(Class<E> clazz) {
+		return indexedTypeManagers.getByExactClass( clazz )
 				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
 	}
 
-	Set<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
-		return typeManagers.getAll();
+	Set<PojoIndexedTypeManager<?, ?, ?>> getAllIndexedTypeManagers() {
+		return indexedTypeManagers.getAll();
 	}
 
-	abstract PojoTypeWorker getDelegate(Class<?> clazz);
+	abstract PojoIndexedTypeWorker getDelegate(Class<?> clazz);
 }
