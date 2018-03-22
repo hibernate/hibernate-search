@@ -341,6 +341,7 @@
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
         <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
+        <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -1843,6 +1844,16 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${version.jacoco.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>${version.coveralls.plugin}</version>
+                    <configuration>
+                        <relativeReportDirs>
+                            <relativeReportDir>jacoco-aggregate</relativeReportDir>
+                        </relativeReportDirs>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

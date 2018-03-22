@@ -35,7 +35,7 @@ env:
 before_install:
   # Build options must be set before install, so that
   # we properly retrieve *all* the necessary dependencies
-  - BUILD_OPTIONS='-Pdist'
+  - BUILD_OPTIONS='-Pdist -Pcoverage'
   - case $DB in
     "h2") ;;
     "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
@@ -64,6 +64,8 @@ script:
   # then we run the actual build
   - ./mvnw $BUILD_OPTIONS checkstyle:check
     && ./mvnw $BUILD_OPTIONS clean install -Dcheckstyle.skip
+after_success:
+  - ./mvnw coveralls:report
 before_cache:
   # Do not put Hibernate Search artifacts into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/hibernate-search*
