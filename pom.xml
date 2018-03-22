@@ -339,6 +339,7 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
+        <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -384,6 +385,14 @@
         <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+
+        <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <additionalRuntimeArgLine></additionalRuntimeArgLine>
+        <additionalRuntimeArgLineForWildFlyTests></additionalRuntimeArgLineForWildFlyTests>
+        <surefire.jacoco.args></surefire.jacoco.args>
+        <failsafe.jacoco.args></failsafe.jacoco.args>
+        <surefire.system.args>${additionalRuntimeArgLine} ${surefire.jacoco.args}</surefire.system.args>
+        <failsafe.system.args>${additionalRuntimeArgLine} ${failsafe.jacoco.args}</failsafe.system.args>
 
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
@@ -1401,7 +1410,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${surefire.system.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1524,7 +1533,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${failsafe.system.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1828,6 +1837,11 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                     <groupId>com.googlecode.maven-download-plugin</groupId>
                     <artifactId>download-maven-plugin</artifactId>
                     <version>${version.download.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${version.jacoco.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -2348,6 +2362,61 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>coverage</id>
+            <properties>
+                <!--
+                    Caution, we use @{...} for late property evaluation here:
+                    http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
+                    This is necessary for Jacoco to work as expected.
+                    However, we wrap the @{...} references into two early-evaluated properties
+                    because in certain environments (IntelliJ IDEA), the use of late property evaluation
+                    is not supported and breaks test execution.
+                    This is because IntelliJ tries to parse the POM to retrieve the surefire/failsafe
+                    argLine and pass them to the test execution directly,
+                    but then fails to evaluate "@{...}" references, resulting in errors.
+                    As a result, this profile will not work in IntelliJ,
+                    but we don't need JaCoCo in IntelliJ anyway.
+                 -->
+                <surefire.jacoco.args>@{surefire.jacoco.args.lateEval}</surefire.jacoco.args>
+                <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*_$logger.class</exclude>
+                                <exclude>**/*_$bundle.class</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>surefire.jacoco.args.lateEval</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-prepare-agent-integration</id>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jacoco.args.lateEval</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
 
