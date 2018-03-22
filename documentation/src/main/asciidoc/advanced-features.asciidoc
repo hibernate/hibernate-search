@@ -411,6 +411,7 @@ extend the base class `org.hibernate.search.cfg.spi.SearchConfigurationBase`: th
 compatibility by not breaking your code when we need to add new methods to this interface.
 ====
 
+[[section-custom-similarity]]
 === Customizing Lucene's scoring formula
 
 Lucene allows the user to customize its scoring formula by extending
