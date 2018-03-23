@@ -71,7 +71,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isInstanceOfIndexedType( context, entity ) ) {
+		if ( isWorkable( context, entity ) ) {
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			context.getCurrentWorker( event.getSession() )
@@ -87,7 +87,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isInstanceOfIndexedType( context, entity ) ) {
+		if ( isWorkable( context, entity ) ) {
 			context.getCurrentWorker( event.getSession() )
 					.add( event.getId(), entity );
 		}
@@ -101,7 +101,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isInstanceOfIndexedType( context, entity ) &&
+		if ( isWorkable( context, entity ) &&
 				( !dirtyCheckingEnabled || true ) ) { // TODO implement dirty checking
 			context.getCurrentWorker( event.getSession() )
 					.update( event.getId(), entity );
@@ -163,8 +163,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		return context;
 	}
 
-	private boolean isInstanceOfIndexedType(HibernateSearchContextService context, Object entity) {
-		return context.getMapping().isIndexable( entity );
+	private boolean isWorkable(HibernateSearchContextService context, Object entity) {
+		return context.getMapping().isWorkable( entity );
 	}
 
 	// TODO handle the "simulated" transaction when a Flush listener is registered
@@ -205,7 +205,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			collectionRole = null;
 		}
 
-		if ( isInstanceOfIndexedType( context, entity ) &&
+		if ( isWorkable( context, entity ) &&
 				( !dirtyCheckingEnabled || true ) ) { // TODO implement dirty checking based on the collection role
 			context.getCurrentWorker( event.getSession() )
 					.update( event.getAffectedOwnerIdOrNull(), entity );

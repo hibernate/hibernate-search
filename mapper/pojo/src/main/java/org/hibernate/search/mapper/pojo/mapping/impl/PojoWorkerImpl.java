@@ -10,11 +10,10 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.SearchException;
 
 abstract class PojoWorkerImpl implements PojoWorker {
 
-	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
+	final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoRuntimeIntrospector introspector;
 
 	PojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
@@ -31,7 +30,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoIndexedTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -43,7 +42,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoIndexedTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
@@ -55,7 +54,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void delete(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoIndexedTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.delete( id, entity );
 	}
 
@@ -63,14 +62,9 @@ abstract class PojoWorkerImpl implements PojoWorker {
 		return introspector;
 	}
 
-	<E> PojoIndexedTypeManager<?, E, ?> getIndexedTypeManager(Class<E> clazz) {
-		return indexedTypeManagers.getByExactClass( clazz )
-				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
-	}
-
 	Set<PojoIndexedTypeManager<?, ?, ?>> getAllIndexedTypeManagers() {
 		return indexedTypeManagers.getAll();
 	}
 
-	abstract PojoIndexedTypeWorker getDelegate(Class<?> clazz);
+	abstract PojoTypeWorker getDelegate(Class<?> clazz);
 }

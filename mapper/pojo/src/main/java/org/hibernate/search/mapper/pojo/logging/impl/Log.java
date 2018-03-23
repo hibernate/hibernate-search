@@ -13,7 +13,9 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
+import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -22,6 +24,7 @@ import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
@@ -115,4 +118,25 @@ public interface Log extends BasicLogger {
 	@Message(id = 18, value = "Detected entity types: %1$s")
 	void detectedEntityTypes(Set<PojoRawTypeModel<?>> entityTypes);
 
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = 19, value = "Created POJO contained type manager: %1$s")
+	void createdPojoContainedTypeManager(
+			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoContainedTypeManager<?> typeManager);
+
+	@Message(id = 20, value = "Could not find the inverse side of the association '%3$s' from type '%2$s' on type '%1$s'")
+	SearchException cannotInvertAssociation(PojoRawTypeModel<?> inverseSideTypeModel, PojoRawTypeModel<?> typeModel,
+			PojoAssociationPath associationPath);
+
+	@Message(id = 21, value = "Could not apply the path of the inverse association '%2$s' to type '%1$s'."
+			+ " Association on the original side (which was inverted) was '%4$s' on type '%3$s'."
+			+ " Error was: '%5$s'")
+	SearchException cannotApplyInvertAssociationPath(
+			PojoRawTypeModel<?> inverseSideTypeModel, PojoAssociationPath inverseSideAssociationPath,
+			PojoRawTypeModel<?> originalSideTypeModel, PojoAssociationPath originalSideAssociationPath,
+			String errorMessage,
+			@Cause Exception cause);
+
+	@Message(id = 22, value = "The inverse association targets type '%1$s', but a supertype of '%2$s' was expected.")
+	SearchException incorrectTargetTypeForInverseAssociation(PojoRawTypeModel<?> inverseAssociationTargetType,
+			PojoRawTypeModel<?> entityType);
 }

@@ -43,8 +43,8 @@ public class HibernateOrmMappingImpl extends PojoMappingImpl<HibernateOrmMapping
 	}
 
 	@Override
-	public boolean isIndexable(Object entity) {
-		return isIndexable( Hibernate.getClass( entity ) );
+	public boolean isWorkable(Object entity) {
+		return isWorkable( Hibernate.getClass( entity ) );
 	}
 
 	private HibernateOrmSearchManagerBuilder createSearchManagerBuilder(EntityManager entityManager) {

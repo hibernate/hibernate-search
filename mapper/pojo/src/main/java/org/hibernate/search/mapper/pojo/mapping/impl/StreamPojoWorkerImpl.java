@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.util.SearchException;
 
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
@@ -51,6 +52,11 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 	@Override
 	StreamPojoIndexedTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
 		return delegates.computeIfAbsent( clazz, c -> getIndexedTypeManager( clazz ).createStreamWorker( sessionContext ) );
+	}
+
+	private <E> PojoIndexedTypeManager<?, E, ?> getIndexedTypeManager(Class<E> clazz) {
+		return indexedTypeManagers.getByExactClass( clazz )
+				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
 	}
 
 	private Iterable<StreamPojoIndexedTypeWorker<?, ?, ?>> getAllDelegates() {

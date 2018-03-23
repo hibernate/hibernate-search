@@ -1,0 +1,57 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.mapping.impl;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+
+public class PojoContainedTypeManagerContainer {
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass;
+	private final Set<PojoContainedTypeManager<?>> all;
+
+	private PojoContainedTypeManagerContainer(Builder builder) {
+		this.byExactClass = new HashMap<>( builder.byExactClass );
+		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	public <E> Optional<PojoContainedTypeManager<E>> getByExactClass(Class<E> clazz) {
+		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactClass.get( clazz ) );
+	}
+
+	public Set<PojoContainedTypeManager<?>> getAll() {
+		return all;
+	}
+
+	public static class Builder {
+
+		private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass = new HashMap<>();
+
+		private Builder() {
+		}
+
+		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<E> typeManager) {
+			byExactClass.put( typeModel.getJavaClass(), typeManager );
+		}
+
+		public PojoContainedTypeManagerContainer build() {
+			return new PojoContainedTypeManagerContainer( this );
+		}
+	}
+
+}

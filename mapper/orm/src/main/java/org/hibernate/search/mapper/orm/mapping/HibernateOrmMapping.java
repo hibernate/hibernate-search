@@ -19,9 +19,9 @@ public interface HibernateOrmMapping extends PojoMapping {
 
 	/**
 	 * @param entity an entity
-	 * @return {@code true} if this entity is indexable (i.e. it can be passed to {@link PojoWorker#add(Object)}
-	 * for instance), {@code false} if it is not.
+	 * @return {@code true} if this entity can be the subject of a work (i.e. it can be passed to
+	 * {@link PojoWorker#add(Object)} for instance), {@code false} if it cannot.
 	 */
-	boolean isIndexable(Object entity);
+	boolean isWorkable(Object entity);
 
 }

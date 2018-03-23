@@ -10,6 +10,14 @@ public interface PojoMapping {
 
 	/**
 	 * @param type a Java type
+	 * @return {@code true} if this type can be the subject of a work (i.e. it can be passed to
+	 * {@link PojoWorker#add(Object)} for instance), {@code false} if it cannot.
+	 * Workable types include both indexable types and contained entity types.
+	 */
+	boolean isWorkable(Class<?> type);
+
+	/**
+	 * @param type a Java type
 	 * @return {@code true} if this type is indexable, {@code false} if it is not.
 	 */
 	boolean isIndexable(Class<?> type);

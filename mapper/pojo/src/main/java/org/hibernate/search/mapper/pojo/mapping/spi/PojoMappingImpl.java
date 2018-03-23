@@ -27,6 +27,11 @@ public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapp
 	}
 
 	@Override
+	public boolean isWorkable(Class<?> type) {
+		return delegate.isWorkable( type );
+	}
+
+	@Override
 	public boolean isIndexable(Class<?> type) {
 		return delegate.isIndexable( type );
 	}

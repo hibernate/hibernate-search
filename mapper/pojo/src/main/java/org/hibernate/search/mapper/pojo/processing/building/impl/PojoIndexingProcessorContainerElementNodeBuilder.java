@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -17,14 +18,14 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
 
-public class PojoIndexingProcessorContainerElementNodeBuilder<C, V> extends AbstractPojoProcessorNodeBuilder<C> {
+public class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extends AbstractPojoProcessorNodeBuilder<C> {
 
-	private final BoundPojoModelPathValueNode<?, ? extends C, V> modelPath;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
 	private final ContainerValueExtractor<C, V> extractor;
 
-	private final PojoIndexingProcessorValueNodeBuilderDelegate<V> valueNodeProcessorCollectionBuilder;
+	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, V> valueNodeProcessorCollectionBuilder;
 
-	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, ? extends C, V> modelPath,
+	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, P, V> modelPath,
 			ContainerValueExtractor<C, V> extractor,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
 		super( mappingHelper, bindingContext );
@@ -46,10 +47,10 @@ public class PojoIndexingProcessorContainerElementNodeBuilder<C, V> extends Abst
 		return modelPath;
 	}
 
-	@Override
-	Optional<PojoIndexingProcessorContainerElementNode<C, V>> build() {
+	Optional<PojoIndexingProcessorContainerElementNode<C, V>> build(
+			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		Collection<PojoIndexingProcessor<? super V>> immutableNestedProcessors =
-				valueNodeProcessorCollectionBuilder.build();
+				valueNodeProcessorCollectionBuilder.build( parentDependencyCollector );
 
 		if ( immutableNestedProcessors.isEmpty() ) {
 			/*

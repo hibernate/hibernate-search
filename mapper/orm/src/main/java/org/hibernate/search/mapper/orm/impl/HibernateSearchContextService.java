@@ -139,9 +139,10 @@ public class HibernateSearchContextService implements Service {
 //				// for correct configurations.
 //				log.pushedChangesOutOfTransaction();
 //			}
-			// Ensure changes will be applied without waiting for a call to worker.execute()
+			// TODO Create a ChangesetWorker (to handle automatic reindexing of containing types),
+			// but ensure changes will be applied without waiting for a call to worker.execute()
 			// TODO also ensure synchronicity if necessary (getStreamWorker(Synchronization.SYNCHRONOUS)? Something else?)
-			return searchManager.getStreamWorker();
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 

@@ -32,9 +32,12 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
+	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
-	public PojoMappingDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers) {
+	public PojoMappingDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+			PojoContainedTypeManagerContainer containedTypeManagers) {
 		this.indexedTypeManagers = indexedTypeManagers;
+		this.containedTypeManagers = containedTypeManagers;
 	}
 
 	@Override
@@ -46,7 +49,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public ChangesetPojoWorker createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoWorkerImpl( indexedTypeManagers, sessionContext );
+		return new ChangesetPojoWorkerImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
 	}
 
 	@Override
@@ -67,6 +70,12 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 				)
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		return new PojoSearchTargetDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
+	}
+
+	@Override
+	public boolean isWorkable(Class<?> type) {
+		return indexedTypeManagers.getByExactClass( type ).isPresent()
+				|| containedTypeManagers.getByExactClass( type ).isPresent();
 	}
 
 	@Override

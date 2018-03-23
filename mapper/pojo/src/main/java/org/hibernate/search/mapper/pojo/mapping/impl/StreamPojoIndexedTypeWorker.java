@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoIndexedTypeWorker {
+class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final StreamIndexWorker<D> delegate;
