@@ -194,7 +194,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 						markerBuilderReferenceAnnotation.type(),
 						MarkerMappingBuilderReference.UndefinedImplementationType.class
 				)
-						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
+						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping( annotation.annotationType() ) );
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		return beanResolver.resolve( markerBuilderReference, AnnotationMarkerBuilder.class );
