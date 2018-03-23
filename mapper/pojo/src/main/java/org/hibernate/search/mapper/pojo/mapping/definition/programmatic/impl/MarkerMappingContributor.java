@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
 
 
 /**

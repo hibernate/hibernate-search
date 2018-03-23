@@ -13,7 +13,7 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;

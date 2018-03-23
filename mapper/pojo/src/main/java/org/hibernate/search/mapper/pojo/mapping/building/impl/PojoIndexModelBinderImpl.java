@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;

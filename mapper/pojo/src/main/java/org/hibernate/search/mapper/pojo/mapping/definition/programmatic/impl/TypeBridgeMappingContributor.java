@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 
 
 /**

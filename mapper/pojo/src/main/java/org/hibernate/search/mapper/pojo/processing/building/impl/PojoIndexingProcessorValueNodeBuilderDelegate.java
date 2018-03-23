@@ -18,7 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;

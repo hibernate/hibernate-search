@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;

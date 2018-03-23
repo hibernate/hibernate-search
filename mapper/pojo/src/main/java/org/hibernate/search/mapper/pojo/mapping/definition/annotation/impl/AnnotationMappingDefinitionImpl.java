@@ -17,7 +17,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;

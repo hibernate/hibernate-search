@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.pojo.model.augmented.building.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
 

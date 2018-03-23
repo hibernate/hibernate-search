@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalDoubleValueExt
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalIntValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalLongValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;

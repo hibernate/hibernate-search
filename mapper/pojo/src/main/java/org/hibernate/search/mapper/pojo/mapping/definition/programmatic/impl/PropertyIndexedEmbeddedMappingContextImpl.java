@@ -13,12 +13,12 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
 
 
 public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext

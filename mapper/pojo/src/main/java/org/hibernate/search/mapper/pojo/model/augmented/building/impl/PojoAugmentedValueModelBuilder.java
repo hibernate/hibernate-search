@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.augmented.building.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedValueModel;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
 

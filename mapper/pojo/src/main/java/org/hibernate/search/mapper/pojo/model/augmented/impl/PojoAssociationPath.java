@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.augmented.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
 
 public class PojoAssociationPath {
 	private final String propertyName;

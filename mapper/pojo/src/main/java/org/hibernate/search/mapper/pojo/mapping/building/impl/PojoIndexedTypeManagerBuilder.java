@@ -14,6 +14,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;

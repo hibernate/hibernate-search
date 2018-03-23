@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
 
 /**
  * @param <T> The property holder type of this node, i.e. the type from which the property is retrieved.

@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
 
 
 /**

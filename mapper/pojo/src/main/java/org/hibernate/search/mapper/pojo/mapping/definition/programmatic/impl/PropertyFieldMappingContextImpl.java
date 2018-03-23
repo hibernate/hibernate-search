@@ -19,12 +19,12 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
 
 
 public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingContext

@@ -19,6 +19,8 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
