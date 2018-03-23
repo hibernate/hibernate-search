@@ -30,11 +30,11 @@ import org.hibernate.search.util.AssertionFailure;
 
 class PojoMapper<M> implements Mapper<M> {
 
-	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
+	private final PojoMappingHelper mappingHelper;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
@@ -43,16 +43,23 @@ class PojoMapper<M> implements Mapper<M> {
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
-		ContainerValueExtractorBinder extractorBinder = new ContainerValueExtractorBinder( buildContext );
-		BridgeResolver bridgeResolver = new BridgeResolver();
-		this.indexModelBinder = new PojoIndexModelBinderImpl(
-				buildContext, introspector, extractorBinder, bridgeResolver
-		);
-
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
+
+		PojoAugmentedTypeModelProvider augmentedTypeModelProvider =
+				new PojoAugmentedTypeModelProvider( contributorProvider );
+
+		ContainerValueExtractorBinder extractorBinder = new ContainerValueExtractorBinder( buildContext );
+		BridgeResolver bridgeResolver = new BridgeResolver();
+		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
+				buildContext, introspector, extractorBinder, bridgeResolver
+		);
+
+		mappingHelper = new PojoMappingHelper(
+				contributorProvider, indexModelBinder, augmentedTypeModelProvider
+		);
 	}
 
 	@Override
@@ -63,12 +70,6 @@ class PojoMapper<M> implements Mapper<M> {
 					+ ", got " + typeModel + " instead. There is probably a bug in the mapper implementation"
 			);
 		}
-
-		PojoAugmentedTypeModelProvider augmentedTypeModelProvider =
-				new PojoAugmentedTypeModelProvider( contributorProvider );
-		PojoMappingHelper mappingHelper = new PojoMappingHelper(
-				contributorProvider, indexModelBinder, augmentedTypeModelProvider
-		);
 
 		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
 		PojoTypeManagerBuilder<?, ?> builder = new PojoTypeManagerBuilder<>(
