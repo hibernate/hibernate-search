@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -255,6 +256,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
 						.forEach( contributorConsumer );
+			}
+
+			@Override
+			public Set<? extends MappableTypeModel> getTypesContributedTo() {
+				return Collections.unmodifiableSet( new HashSet<>( contributionByType.keySet() ) );
 			}
 		}
 	}

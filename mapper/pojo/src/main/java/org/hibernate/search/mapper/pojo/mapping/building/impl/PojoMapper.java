@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -19,23 +24,28 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
+import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class PojoMapper<M> implements Mapper<M> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
+	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
 	private final PojoMappingHelper mappingHelper;
 
 	private final List<PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders = new ArrayList<>();
@@ -50,8 +60,7 @@ class PojoMapper<M> implements Mapper<M> {
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 
-		PojoAugmentedTypeModelProvider augmentedTypeModelProvider =
-				new PojoAugmentedTypeModelProvider( contributorProvider );
+		augmentedTypeModelProvider = new PojoAugmentedTypeModelProvider( contributorProvider );
 
 		ContainerValueExtractorBinder extractorBinder = new ContainerValueExtractorBinder( buildContext );
 		BridgeResolver bridgeResolver = new BridgeResolver();
@@ -87,13 +96,30 @@ class PojoMapper<M> implements Mapper<M> {
 
 	@Override
 	public MappingImplementor<M> build() {
+		Set<PojoRawTypeModel<?>> entityTypes = computeEntityTypes();
+		log.detectedEntityTypes( entityTypes );
+		// TODO use the entity types for the automatic reindexing feature
+
 		PojoIndexedTypeManagerContainer.Builder indexedTypeManagerContainerBuilder =
 				PojoIndexedTypeManagerContainer.builder();
+
 		indexedTypeManagerBuilders.forEach( b -> b.addTo( indexedTypeManagerContainerBuilder ) );
 		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl(
 				indexedTypeManagerContainerBuilder.build()
 		);
 		return wrapperFactory.apply( propertySource, mappingImplementor );
+	}
+
+	private Set<PojoRawTypeModel<?>> computeEntityTypes() {
+		Set<PojoRawTypeModel<?>> entityTypes = new HashSet<>();
+		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.getTypesContributedTo();
+		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
+			PojoRawTypeModel<?> pojoRawTypeModel = (PojoRawTypeModel<?>) mappableTypeModel;
+			if ( augmentedTypeModelProvider.get( pojoRawTypeModel ).isEntity() ) {
+				entityTypes.add( pojoRawTypeModel );
+			}
+		}
+		return Collections.unmodifiableSet( entityTypes );
 	}
 
 }

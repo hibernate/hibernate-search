@@ -122,7 +122,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
 
-			HibernateOrmMappingContributor mappingContributor = new HibernateOrmMappingContributor(
+			HibernateOrmMappingContributor mappingContributor = HibernateOrmMappingContributor.create(
 					builder, metadata, sessionFactoryImplementor, enableAnnotationMapping
 			);
 

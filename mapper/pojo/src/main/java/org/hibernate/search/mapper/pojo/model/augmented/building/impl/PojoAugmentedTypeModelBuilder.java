@@ -15,7 +15,13 @@ import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedProper
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
 
 class PojoAugmentedTypeModelBuilder implements PojoAugmentedModelCollectorTypeNode {
+	private boolean entity;
 	private final Map<String, PojoAugmentedPropertyModelBuilder> propertyBuilders = new HashMap<>();
+
+	@Override
+	public void markAsEntity() {
+		this.entity = true;
+	}
 
 	@Override
 	public PojoAugmentedModelCollectorPropertyNode property(String propertyName) {
@@ -28,6 +34,6 @@ class PojoAugmentedTypeModelBuilder implements PojoAugmentedModelCollectorTypeNo
 			properties.put( entry.getKey(), entry.getValue().build() );
 
 		}
-		return new PojoAugmentedTypeModel( properties );
+		return new PojoAugmentedTypeModel( entity, properties );
 	}
 }
