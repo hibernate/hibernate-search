@@ -22,6 +22,8 @@ public class ToStringTreeBuilderTest {
 						"foo=value, children={"
 						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ] }, emptyChild={ },"
 						+ " appendable={ attr=val, nested={ attr=val2 } },"
+						+ " appendableAsObject={ attr=val, nested={ attr=val2 } },"
+						+ " nullAppendable=null,"
 						+ " list=[ { name=foo }, { name=bar } ]"
 						+ " }, bar=value"
 				);
@@ -52,6 +54,13 @@ public class ToStringTreeBuilderTest {
 						+ "\t\t\tattr=val2\n"
 						+ "\t\t}\n"
 						+ "\t}\n"
+						+ "\tappendableAsObject={\n"
+						+ "\t\tattr=val\n"
+						+ "\t\tnested={\n"
+						+ "\t\t\tattr=val2\n"
+						+ "\t\t}\n"
+						+ "\t}\n"
+						+ "\tnullAppendable=null\n"
 						+ "\tlist=[\n"
 						+ "\t\t{\n"
 						+ "\t\t\tname=foo\n"
@@ -85,6 +94,8 @@ public class ToStringTreeBuilderTest {
 					.startObject( "emptyChild" )
 						.endObject()
 					.attribute( "appendable", new Appendable() )
+					.attribute( "appendableAsObject", (Object) new Appendable() )
+					.attribute( "nullAppendable", (Appendable) null )
 					.startList( "list" )
 						.startObject()
 							.attribute( "name", "foo" )

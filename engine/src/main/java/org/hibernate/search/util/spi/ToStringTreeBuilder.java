@@ -42,9 +42,14 @@ public class ToStringTreeBuilder {
 	}
 
 	public ToStringTreeBuilder attribute(String name, ToStringTreeAppendable value) {
-		startObject( name );
-		value.appendTo( this );
-		endObject();
+		if ( value != null ) {
+			startObject( name );
+			value.appendTo( this );
+			endObject();
+		}
+		else {
+			attribute( name, (Object) null );
+		}
 		return this;
 	}
 
