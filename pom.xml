@@ -1365,7 +1365,7 @@
                                 </processors>
                                 <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
                                 <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
-                                <compilerArguments>-source 1.8 -target 1.8 -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
+                                <compilerArguments>-source ${maven.compiler.argument.source} -target ${maven.compiler.argument.target} -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
