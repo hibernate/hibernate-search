@@ -12,12 +12,13 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting elements from a container
  * and applying nested processor nodes to the elements.
  */
-public class PojoIndexingProcessorContainerElementNode<C, T> implements PojoIndexingProcessor<C> {
+public class PojoIndexingProcessorContainerElementNode<C, T> extends PojoIndexingProcessor<C> {
 
 	private final ContainerValueExtractor<C, T> extractor;
 	private final Collection<PojoIndexingProcessor<? super T>> nestedNodes;
@@ -29,16 +30,27 @@ public class PojoIndexingProcessorContainerElementNode<C, T> implements PojoInde
 	}
 
 	@Override
-	public final void process(DocumentElement target, C source) {
-		try ( Stream<T> stream = extractor.extract( source ) ) {
-			stream.forEach( sourceItem -> processItem( target, sourceItem ) );
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
 
 	@Override
-	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "extractor", extractor );
+		builder.startList( "nestedNodes" );
+		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+			builder.value( nestedNode );
+		}
+		builder.endList();
+	}
+
+	@Override
+	public final void process(DocumentElement target, C source) {
+		try ( Stream<T> stream = extractor.extract( source ) ) {
+			stream.forEach( sourceItem -> processItem( target, sourceItem ) );
 		}
 	}
 

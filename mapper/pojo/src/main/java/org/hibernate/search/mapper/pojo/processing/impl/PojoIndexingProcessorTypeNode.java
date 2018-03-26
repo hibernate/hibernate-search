@@ -14,12 +14,13 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying processor property nodes
  * as well as {@link TypeBridge}s to a value.
  */
-public class PojoIndexingProcessorTypeNode<T> implements PojoIndexingProcessor<T> {
+public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
 	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
 	private final Collection<TypeBridge> bridges;
@@ -31,6 +32,30 @@ public class PojoIndexingProcessorTypeNode<T> implements PojoIndexingProcessor<T
 		this.parentObjectAccessors = parentObjectAccessors;
 		this.bridges = bridges;
 		this.propertyNodes = propertyNodes;
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( TypeBridge::close, bridges );
+			closer.pushAll( PojoIndexingProcessor::close, propertyNodes );
+		}
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "objectAccessors", parentObjectAccessors );
+		builder.startList( "bridges" );
+		for ( TypeBridge bridge : bridges ) {
+			builder.value( bridge );
+		}
+		builder.endList();
+		builder.startList( "propertyNodes" );
+		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
+			builder.value( propertyNode );
+		}
+		builder.endList();
 	}
 
 	@Override
@@ -51,14 +76,6 @@ public class PojoIndexingProcessorTypeNode<T> implements PojoIndexingProcessor<T
 		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
 			// Recursion here
 			propertyNode.process( parentObject, source );
-		}
-	}
-
-	@Override
-	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( TypeBridge::close, bridges );
-			closer.pushAll( PojoIndexingProcessor::close, propertyNodes );
 		}
 	}
 

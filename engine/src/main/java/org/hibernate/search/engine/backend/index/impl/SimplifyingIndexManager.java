@@ -26,6 +26,11 @@ public class SimplifyingIndexManager<D extends DocumentElement> implements Index
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + delegate + "]";
+	}
+
+	@Override
 	public void close() {
 		delegate.close();
 	}

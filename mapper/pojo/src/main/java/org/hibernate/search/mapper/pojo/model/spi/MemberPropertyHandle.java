@@ -38,6 +38,11 @@ public final class MemberPropertyHandle implements PropertyHandle {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + member + "]";
+	}
+
+	@Override
 	public String getName() {
 		return name;
 	}

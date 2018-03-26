@@ -18,11 +18,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable {
+public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable, ToStringTreeAppendable {
 
 	private final Class<E> indexedJavaClass;
 	private final PojoCaster<E> caster;
@@ -45,6 +47,11 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 	}
 
 	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( identifierMapping::close );
@@ -52,6 +59,15 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 			closer.push( processor::close );
 			closer.push( indexManager::close );
 		}
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "indexedJavaClass", indexedJavaClass )
+				.attribute( "indexManager", indexManager )
+				.attribute( "identifierMapping", identifierMapping )
+				.attribute( "routingKeyProvider", routingKeyProvider )
+				.attribute( "processor", processor );
 	}
 
 	public IdentifierMapping<I, E> getIdentifierMapping() {

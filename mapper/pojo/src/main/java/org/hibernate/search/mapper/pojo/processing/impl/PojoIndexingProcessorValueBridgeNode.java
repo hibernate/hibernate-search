@@ -9,11 +9,12 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link ValueBridge} to a value.
  */
-public class PojoIndexingProcessorValueBridgeNode<T, R> implements PojoIndexingProcessor<T> {
+public class PojoIndexingProcessorValueBridgeNode<T, R> extends PojoIndexingProcessor<T> {
 
 	private final ValueBridge<? super T, R> bridge;
 	private final IndexFieldAccessor<? super R> indexFieldAccessor;
@@ -25,14 +26,21 @@ public class PojoIndexingProcessorValueBridgeNode<T, R> implements PojoIndexingP
 	}
 
 	@Override
-	public void process(DocumentElement target, T source) {
-		R indexFieldValue = bridge.toIndexedValue( source );
-		indexFieldAccessor.write( target, indexFieldValue );
+	public void close() {
+		bridge.close();
 	}
 
 	@Override
-	public void close() {
-		bridge.close();
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "bridge", bridge );
+		builder.attribute( "indexFieldAccessor", indexFieldAccessor );
+	}
+
+	@Override
+	public void process(DocumentElement target, T source) {
+		R indexFieldValue = bridge.toIndexedValue( source );
+		indexFieldAccessor.write( target, indexFieldValue );
 	}
 
 }

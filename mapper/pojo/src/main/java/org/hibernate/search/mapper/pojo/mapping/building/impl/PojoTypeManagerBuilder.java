@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -24,8 +27,11 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.spi.LoggerFactory;
 
 public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
+	private static Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final PojoRawTypeModel<E> typeModel;
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
 
@@ -69,6 +75,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 				processorBuilder.build().orElseGet( PojoIndexingProcessor::noOp ),
 				indexManagerBuildingState.build()
 		);
+		log.createdPojoTypeManager( typeManager );
 		builder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );
 	}
 

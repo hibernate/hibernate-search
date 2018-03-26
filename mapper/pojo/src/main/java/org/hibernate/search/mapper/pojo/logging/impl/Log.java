@@ -12,11 +12,16 @@ import java.lang.reflect.Type;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.engine.logging.impl.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.FormatWith;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -98,4 +103,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 16, value = "Could not apply the requested container value extractor '%1$s' to type '%2$s'")
 	SearchException invalidContainerValueExtractorForType(Class<? extends ContainerValueExtractor> extractorClass,
 			PojoGenericTypeModel<?> extractedType);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = 17, value = "Created POJO type manager: %1$s")
+	void createdPojoTypeManager(
+			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoTypeManager<?, ?, ?> typeManager);
 }

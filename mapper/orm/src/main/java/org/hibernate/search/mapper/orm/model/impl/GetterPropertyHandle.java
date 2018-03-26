@@ -24,6 +24,11 @@ final class GetterPropertyHandle implements PropertyHandle {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + propertyName + "]";
+	}
+
+	@Override
 	public String getName() {
 		return propertyName;
 	}

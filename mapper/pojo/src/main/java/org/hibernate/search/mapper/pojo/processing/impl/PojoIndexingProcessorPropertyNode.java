@@ -14,12 +14,13 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting the value of a property,
  * and applying nested processor nodes as well as {@link PropertyBridge}s to this value.
  */
-public class PojoIndexingProcessorPropertyNode<P, T> implements PojoIndexingProcessor<P> {
+public class PojoIndexingProcessorPropertyNode<P, T> extends PojoIndexingProcessor<P> {
 
 	private final PropertyHandle handle;
 	private final Collection<PropertyBridge> propertyBridges;
@@ -34,6 +35,30 @@ public class PojoIndexingProcessorPropertyNode<P, T> implements PojoIndexingProc
 	}
 
 	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( PropertyBridge::close, propertyBridges );
+			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
+		}
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "handle", handle );
+		builder.startList( "bridges" );
+		for ( PropertyBridge bridge : propertyBridges ) {
+			builder.value( bridge );
+		}
+		builder.endList();
+		builder.startList( "nestedNodes" );
+		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
+			builder.value( nestedNode );
+		}
+		builder.endList();
+	}
+
+	@Override
 	public final void process(DocumentElement target, P source) {
 		// TODO add generic type parameters to property handles
 		T propertyValue = (T) handle.get( source );
@@ -45,14 +70,6 @@ public class PojoIndexingProcessorPropertyNode<P, T> implements PojoIndexingProc
 		}
 		for ( PojoIndexingProcessor<? super T> nestedNode : nestedNodes ) {
 			nestedNode.process( target, propertyValue );
-		}
-	}
-
-	@Override
-	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PropertyBridge::close, propertyBridges );
-			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
 }

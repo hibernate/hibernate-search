@@ -7,20 +7,27 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.util.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 /**
  * A POJO processor responsible for transferring data from the POJO to a document to index.
  */
-public interface PojoIndexingProcessor<T> extends AutoCloseable {
-
-	void process(DocumentElement target, T source);
+public abstract class PojoIndexingProcessor<T> implements AutoCloseable, ToStringTreeAppendable {
 
 	@Override
-	default void close() {
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
 	}
 
-	static <T> PojoIndexingProcessor<T> noOp() {
-		return (ignored1, ignored2) -> { };
+	@Override
+	public void close() {
+	}
+
+	public abstract void process(DocumentElement target, T source);
+
+	public static <T> PojoIndexingProcessor<T> noOp() {
+		return NoOpPojoIndexingProcessor.get();
 	}
 
 }
