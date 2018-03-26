@@ -2037,7 +2037,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <dependency>
                     <groupId>org.jboss.logging</groupId>
                     <artifactId>jboss-logging-processor</artifactId>
-                    <version>${version.org.jboss.logging.jboss-logging}</version>
+                    <version>${version.org.jboss.logging.jboss-logging-tools}</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
