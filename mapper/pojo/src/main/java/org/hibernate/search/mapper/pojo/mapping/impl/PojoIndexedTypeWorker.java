@@ -16,10 +16,10 @@ abstract class PojoIndexedTypeWorker {
 		this.sessionContext = sessionContext;
 	}
 
-	public abstract void add(Object id, Object entity);
+	abstract void add(Object id, Object entity);
 
-	public abstract void update(Object id, Object entity);
+	abstract void update(Object id, Object entity);
 
-	public abstract void delete(Object id, Object entity);
+	abstract void delete(Object id, Object entity);
 
 }

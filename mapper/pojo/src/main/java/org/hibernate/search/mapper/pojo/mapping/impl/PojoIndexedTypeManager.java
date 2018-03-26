@@ -66,45 +66,45 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 				.attribute( "processor", processor );
 	}
 
-	public IdentifierMapping<I, E> getIdentifierMapping() {
+	IdentifierMapping<I, E> getIdentifierMapping() {
 		return identifierMapping;
 	}
 
-	public Class<E> getIndexedJavaClass() {
+	Class<E> getIndexedJavaClass() {
 		return indexedJavaClass;
 	}
 
-	public Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
+	Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
 		PojoRuntimeIntrospector proxyIntrospector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, proxyIntrospector, entity );
 	}
 
-	public DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContext sessionContext,
+	DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContext sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
 		String tenantId = sessionContext.getTenantIdentifier();
 		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
 		return new PojoDocumentReferenceProvider<>( routingKeyProvider, tenantId, identifier, documentIdentifier, entitySupplier );
 	}
 
-	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier) {
+	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier) {
 		return new PojoDocumentContributor<>( processor, entitySupplier );
 	}
 
-	public ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
+	ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
 		return new ChangesetPojoIndexedTypeWorker<>(
 				this, sessionContext, indexManager.createWorker( sessionContext )
 		);
 	}
 
-	public StreamPojoIndexedTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
+	StreamPojoIndexedTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
 		return new StreamPojoIndexedTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
 	}
 
-	public IndexSearchTargetBuilder createSearchTarget() {
+	IndexSearchTargetBuilder createSearchTarget() {
 		return indexManager.createSearchTarget();
 	}
 
-	public void addToSearchTarget(IndexSearchTargetBuilder builder) {
+	void addToSearchTarget(IndexSearchTargetBuilder builder) {
 		indexManager.addToSearchTarget( builder );
 	}
 }

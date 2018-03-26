@@ -32,21 +32,21 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 	}
 
 	@Override
-	public void add(Object providedId, Object entity) {
+	void add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).add( entitySupplier );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity) {
+	void update(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).update( entitySupplier );
 	}
 
 	@Override
-	public void delete(Object providedId, Object entity) {
+	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).delete( entitySupplier );

@@ -25,7 +25,7 @@ class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoI
 	}
 
 	@Override
-	public void add(Object providedId, Object entity) {
+	void add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getDelegate().add(
@@ -35,7 +35,7 @@ class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoI
 	}
 
 	@Override
-	public void update(Object providedId, Object entity) {
+	void update(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getDelegate().update(
@@ -45,21 +45,21 @@ class StreamPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoI
 	}
 
 	@Override
-	public void delete(Object providedId, Object entity) {
+	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getDelegate().delete( typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ) );
 	}
 
-	public void flush() {
+	void flush() {
 		getDelegate().flush();
 	}
 
-	public void optimize() {
+	void optimize() {
 		getDelegate().optimize();
 	}
 
-	protected StreamIndexWorker<D> getDelegate() {
+	private StreamIndexWorker<D> getDelegate() {
 		return delegate;
 	}
 }
