@@ -6,63 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.function.Supplier;
-
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.index.spi.IndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
+abstract class PojoTypeWorker {
 
-/**
- * @author Yoann Rodiere
- */
-class PojoTypeWorker<D extends DocumentElement, E, C extends IndexWorker<D>> {
+	final PojoSessionContext sessionContext;
 
-	private final PojoTypeManager<?, E, D> typeManager;
-	private final PojoSessionContext sessionContext;
-	private final C delegate;
-
-	public PojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext, C delegate) {
-		this.typeManager = typeManager;
+	PojoTypeWorker(PojoSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
-		this.delegate = delegate;
 	}
 
-	protected C getDelegate() {
-		return delegate;
-	}
+	public abstract void add(Object id, Object entity);
 
-	public void add(Object entity) {
-		add( null, entity );
-	}
+	public abstract void update(Object id, Object entity);
 
-	public void add(Object id, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		getDelegate().add(
-				typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ),
-				typeManager.toDocumentContributor( entitySupplier )
-		);
-	}
-
-	public void update(Object entity) {
-		update( null, entity );
-	}
-
-	public void update(Object id, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		getDelegate().update(
-				typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ),
-				typeManager.toDocumentContributor( entitySupplier )
-		);
-	}
-
-	public void delete(Object entity) {
-		delete( null, entity );
-	}
-
-	public void delete(Object id, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		getDelegate().delete( typeManager.toDocumentReferenceProvider( sessionContext, id, entitySupplier ) );
-	}
+	public abstract void delete(Object id, Object entity);
 
 }

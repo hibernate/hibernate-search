@@ -12,15 +12,12 @@ import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.SearchException;
 
-/**
- * @author Yoann Rodiere
- */
 abstract class PojoWorkerImpl implements PojoWorker {
 
 	private final PojoTypeManagerContainer typeManagers;
 	private final PojoRuntimeIntrospector introspector;
 
-	public PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
+	PojoWorkerImpl(PojoTypeManagerContainer typeManagers,
 			PojoRuntimeIntrospector introspector) {
 		this.typeManagers = typeManagers;
 		this.introspector = introspector;
@@ -34,7 +31,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -46,7 +43,7 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
@@ -58,18 +55,22 @@ abstract class PojoWorkerImpl implements PojoWorker {
 	@Override
 	public void delete(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorker<?, ?, ?> delegate = getDelegate( clazz );
+		PojoTypeWorker delegate = getDelegate( clazz );
 		delegate.delete( id, entity );
 	}
 
-	protected <E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
+	PojoRuntimeIntrospector getIntrospector() {
+		return introspector;
+	}
+
+	<E> PojoTypeManager<?, E, ?> getTypeManager(Class<E> clazz) {
 		return typeManagers.getByExactClass( clazz )
 				.orElseThrow( () -> new SearchException( "Cannot work on type " + clazz + ", because it is not indexed." ) );
 	}
 
-	protected Set<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
+	Set<PojoTypeManager<?, ?, ?>> getAllTypeManagers() {
 		return typeManagers.getAll();
 	}
 
-	protected abstract PojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz);
+	abstract PojoTypeWorker getDelegate(Class<?> clazz);
 }

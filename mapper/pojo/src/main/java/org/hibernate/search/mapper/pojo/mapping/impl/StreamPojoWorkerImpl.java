@@ -12,13 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-/**
- * @author Yoann Rodiere
- */
 class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	private final PojoSessionContext sessionContext;
-	private final Map<Class<?>, StreamPojoTypeWorker<?, ?>> delegates = new ConcurrentHashMap<>();
+	private final Map<Class<?>, StreamPojoTypeWorker<?, ?, ?>> delegates = new ConcurrentHashMap<>();
 	private volatile boolean addedAll = false;
 
 	StreamPojoWorkerImpl(PojoTypeManagerContainer typeManagers,
@@ -29,7 +26,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	public void flush() {
-		for ( StreamPojoTypeWorker<?, ?> delegate : getAllDelegates() ) {
+		for ( StreamPojoTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
 			delegate.flush();
 		}
 	}
@@ -41,7 +38,7 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 
 	@Override
 	public void optimize() {
-		for ( StreamPojoTypeWorker<?, ?> delegate : getAllDelegates() ) {
+		for ( StreamPojoTypeWorker<?, ?, ?> delegate : getAllDelegates() ) {
 			delegate.optimize();
 		}
 	}
@@ -52,11 +49,11 @@ class StreamPojoWorkerImpl extends PojoWorkerImpl implements StreamPojoWorker {
 	}
 
 	@Override
-	protected StreamPojoTypeWorker<?, ?> getDelegate(Class<?> clazz) {
+	StreamPojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
 		return delegates.computeIfAbsent( clazz, c -> getTypeManager( clazz ).createStreamWorker( sessionContext ) );
 	}
 
-	private Iterable<StreamPojoTypeWorker<?, ?>> getAllDelegates() {
+	private Iterable<StreamPojoTypeWorker<?, ?, ?>> getAllDelegates() {
 		if ( !addedAll ) {
 			getAllTypeManagers().forEach( manager -> getDelegate( manager.getClass() ) );
 			addedAll = true;

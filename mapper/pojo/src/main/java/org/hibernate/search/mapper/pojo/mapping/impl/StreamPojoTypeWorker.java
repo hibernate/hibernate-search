@@ -6,18 +6,49 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-/**
- * @author Yoann Rodiere
- */
-class StreamPojoTypeWorker<D extends DocumentElement, E> extends PojoTypeWorker<D, E, StreamIndexWorker<D>> {
+class StreamPojoTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
 
-	public StreamPojoTypeWorker(PojoTypeManager<?, E, D> typeManager, PojoSessionContext sessionContext,
+	private final PojoTypeManager<I, E, D> typeManager;
+	private final StreamIndexWorker<D> delegate;
+
+	StreamPojoTypeWorker(PojoTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
 			StreamIndexWorker<D> delegate) {
-		super( typeManager, sessionContext, delegate );
+		super( sessionContext );
+		this.typeManager = typeManager;
+		this.delegate = delegate;
+	}
+
+	@Override
+	public void add(Object providedId, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		getDelegate().add(
+				typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
+				typeManager.toDocumentContributor( entitySupplier )
+		);
+	}
+
+	@Override
+	public void update(Object providedId, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		getDelegate().update(
+				typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
+				typeManager.toDocumentContributor( entitySupplier )
+		);
+	}
+
+	@Override
+	public void delete(Object providedId, Object entity) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		getDelegate().delete( typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ) );
 	}
 
 	public void flush() {
@@ -28,4 +59,7 @@ class StreamPojoTypeWorker<D extends DocumentElement, E> extends PojoTypeWorker<
 		getDelegate().optimize();
 	}
 
+	protected StreamIndexWorker<D> getDelegate() {
+		return delegate;
+	}
 }

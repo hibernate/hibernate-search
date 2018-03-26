@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
-import org.hibernate.search.engine.backend.index.impl.SimplifyingIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.Backend;
@@ -116,10 +115,7 @@ class IndexManagerBuildingStateHolder {
 
 		@Override
 		public IndexManager<D> build() {
-			IndexManager<D> result = builder.build();
-			// Optimize changeset execution in the resulting index manager
-			result = new SimplifyingIndexManager<>( result );
-			return result;
+			return builder.build();
 		}
 	}
 

@@ -86,14 +86,15 @@ public class ObjectFieldStorageIT {
 	@Test
 	public void index_error_invalidDocumentElement_root() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( "willNotWork" ), document -> {
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.string.write( flattenedObject, "willNotWork" );
-		} );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'null', got 'flattenedObject'." );
+
+		worker.add( referenceProvider( "willNotWork" ), document -> {
+			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
+			indexAccessors.string.write( flattenedObject, "willNotWork" );
+		} );
 
 		worker.execute().join();
 	}
@@ -101,13 +102,14 @@ public class ObjectFieldStorageIT {
 	@Test
 	public void index_error_invalidDocumentElement_flattened() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( "willNotWork" ), document -> {
-			indexAccessors.flattenedObject.string.write( document, "willNotWork" );
-		} );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'flattenedObject', got 'null'." );
+
+		worker.add( referenceProvider( "willNotWork" ), document -> {
+			indexAccessors.flattenedObject.string.write( document, "willNotWork" );
+		} );
 
 		worker.execute().join();
 	}
@@ -115,13 +117,14 @@ public class ObjectFieldStorageIT {
 	@Test
 	public void index_error_invalidDocumentElement_nested() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( "willNotWork" ), document -> {
-			indexAccessors.nestedObject.string.write( document, "willNotWork" );
-		} );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'nestedObject', got 'null'." );
+
+		worker.add( referenceProvider( "willNotWork" ), document -> {
+			indexAccessors.nestedObject.string.write( document, "willNotWork" );
+		} );
 
 		worker.execute().join();
 	}

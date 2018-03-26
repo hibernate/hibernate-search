@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -21,9 +20,6 @@ import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
-/**
- * @author Yoann Rodiere
- */
 public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoCloseable, ToStringTreeAppendable {
 
 	private final Class<E> indexedJavaClass;
@@ -84,22 +80,23 @@ public class PojoTypeManager<I, E, D extends DocumentElement> implements AutoClo
 	}
 
 	public DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContext sessionContext,
-			Object providedId, Supplier<E> entitySupplier) {
+			I identifier, Supplier<E> entitySupplier) {
 		String tenantId = sessionContext.getTenantIdentifier();
-		I identifier = identifierMapping.getIdentifier( providedId, entitySupplier );
 		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
 		return new PojoDocumentReferenceProvider<>( routingKeyProvider, tenantId, identifier, documentIdentifier, entitySupplier );
 	}
 
-	public DocumentContributor<D> toDocumentContributor(Supplier<E> entitySupplier) {
+	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier) {
 		return new PojoDocumentContributor<>( processor, entitySupplier );
 	}
 
-	public ChangesetPojoTypeWorker<D, E> createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoTypeWorker<>( this, sessionContext, indexManager.createWorker( sessionContext ) );
+	public ChangesetPojoTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
+		return new ChangesetPojoTypeWorker<>(
+				this, sessionContext, indexManager.createWorker( sessionContext )
+		);
 	}
 
-	public StreamPojoTypeWorker<D, E> createStreamWorker(PojoSessionContext sessionContext) {
+	public StreamPojoTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
 		return new StreamPojoTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
 	}
 

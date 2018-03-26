@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -15,13 +15,11 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-/**
- * @author Yoann Rodiere
- */
 class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
 
 	private final PojoSessionContext sessionContext;
-	private final Map<Class<?>, ChangesetPojoTypeWorker<?, ?>> delegates = new HashMap<>();
+	// Use a LinkedHashMap for stable ordering across JVMs
+	private final Map<Class<?>, ChangesetPojoTypeWorker<?, ?, ?>> delegates = new LinkedHashMap<>();
 
 	ChangesetPojoWorkerImpl(PojoTypeManagerContainer typeManagers, PojoSessionContext sessionContext) {
 		super( typeManagers, sessionContext.getRuntimeIntrospector() );
@@ -29,13 +27,8 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	}
 
 	@Override
-	protected ChangesetPojoTypeWorker<?, ?> getDelegate(Class<?> clazz) {
-		return delegates.computeIfAbsent( clazz, c -> getTypeManager( c ).createWorker( sessionContext ) );
-	}
-
-	@Override
 	public void prepare() {
-		for ( ChangesetPojoTypeWorker<?, ?> delegate : delegates.values() ) {
+		for ( ChangesetPojoTypeWorker<?, ?, ?> delegate : delegates.values() ) {
 			delegate.prepare();
 		}
 	}
@@ -43,12 +36,9 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			/*
-			 * No need to call prepare() here: we don't do anything special ourselves when preparing,
-			 * and delegates are supposed to handle execute() even without a prior call to prepare().
-			 */
+			prepare();
 			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( ChangesetPojoTypeWorker<?, ?> delegate : delegates.values() ) {
+			for ( ChangesetPojoTypeWorker<?, ?, ?> delegate : delegates.values() ) {
 				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture[futures.size()] ) );
@@ -56,6 +46,14 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 		finally {
 			delegates.clear();
 		}
+	}
+
+	@Override
+	ChangesetPojoTypeWorker<?, ?, ?> getDelegate(Class<?> clazz) {
+		return delegates.computeIfAbsent(
+				clazz,
+				c -> getTypeManager( c ).createWorker( sessionContext )
+		);
 	}
 
 }
