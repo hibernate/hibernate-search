@@ -559,6 +559,38 @@
             </build>
         </profile>
 
+        <profile>
+            <id>jqassistant</id>
+            <!--
+            To run the analysis on the engine module and launch a Neo4j server accessible at http://localhost:7474/, run:
+                mvn -pl engine jqassistant:scan jqassistant:server -Pjqassistant
+            To run the analysis on the engine module:
+                mvn clean install -pl engine -Pjqassistant -DskipTests=true
+            Our rules are in jqassistant/rules.xml.
+            -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.buschmais.jqassistant</groupId>
+                        <artifactId>jqassistant-maven-plugin</artifactId>
+                        <version>1.3.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>scan</goal>
+                                    <goal>analyze</goal>
+                                </goals>
+                                <configuration>
+                                    <warnOnSeverity>INFO</warnOnSeverity>
+                                    <failOnSeverity>MAJOR</failOnSeverity>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- =============================== -->
         <!-- Elasticsearch IT profiles       -->
         <!-- =============================== -->

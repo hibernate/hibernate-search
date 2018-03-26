@@ -20,7 +20,7 @@ install:
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
 script:
-  - ./mvnw -Pcoverage clean install javadoc:javadoc
+  - ./mvnw -Pcoverage -Pjqassistant clean install javadoc:javadoc
 after_success:
   - ./mvnw coveralls:report
 before_cache:
