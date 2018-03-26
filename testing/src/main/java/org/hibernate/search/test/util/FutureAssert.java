@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.util;
 
-import static org.assertj.core.util.Strings.formatIfArgs;
-
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -15,10 +13,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+import org.junit.Assert;
+
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
 
 /**
  * @author Yoann Rodiere
@@ -42,10 +41,10 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			// All's good
 		}
 		catch (CancellationException e) {
-			failWithMessage( "future <%s> should be pending, but instead it's been cancelled", actual );
+			failWithCauseAndMessage( e, "future <%s> should be pending, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			failWithMessage( "future <%s> should be pending, but instead it failed with exception: %s", actual, e );
+			failWithCauseAndMessage( e, "future <%s> should be pending, but instead it failed with exception: %s", actual, e );
 		}
 		return this;
 	}
@@ -66,17 +65,17 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 				valueAssertion.accept( result );
 			}
 			catch (AssertionError e2) {
-				failWithMessage( formatIfArgs( "future <%s> succeeded as expected, but the result is wrong: %s", actual, e2 ) );
+				failWithCauseAndMessage( e2, "future <%s> succeeded as expected, but the result is wrong: %s", actual, e2 );
 			}
 		}
 		catch (TimeoutException e) {
 			failWithMessage( "future <%s> should have succeeded, but instead it's still pending", actual );
 		}
 		catch (CancellationException e) {
-			failWithMessage( "future <%s> should have succeeded, but instead it's been cancelled", actual );
+			failWithCauseAndMessage( e, "future <%s> should have succeeded, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			failWithMessage( "future <%s> should have succeeded, but instead it failed with exception: %s", actual, e );
+			failWithCauseAndMessage( e, "future <%s> should have succeeded, but instead it failed with exception: %s", actual, e );
 		}
 		return this;
 	}
@@ -103,14 +102,14 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			failWithMessage( "future <%s> should have failed, but instead it's still pending", actual );
 		}
 		catch (CancellationException e) {
-			failWithMessage( "future <%s> should have failed, but instead it's been cancelled", actual );
+			failWithCauseAndMessage( e, "future <%s> should have failed, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
 			try {
 				exceptionAssertion.accept( e.getCause() );
 			}
 			catch (AssertionError e2) {
-				failWithMessage( "future <%s> failed as expected, but the exception is wrong: %s", actual, e2 );
+				failWithCauseAndMessage( e2, "future <%s> failed as expected, but the exception is wrong: %s", actual, e2 );
 			}
 		}
 		return this;
@@ -131,11 +130,22 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			Throwable t = e;
 			while ( t != null ) {
 				if ( t instanceof AssertionError ) {
-					failWithMessage( "future <%s> failed because of a failing assertion: %s", actual, e.getCause() );
+					Throwable cause = e.getCause();
+					failWithCauseAndMessage( cause, "future <%s> failed because of a failing assertion: %s", actual, cause );
 				}
 				t = t.getCause();
 			}
 			throw e;
+		}
+	}
+
+	protected void failWithCauseAndMessage(Throwable cause, String errorMessage, Object... arguments) {
+		try {
+			failWithMessage( errorMessage, arguments );
+		}
+		catch (AssertionError assertionError) {
+			assertionError.initCause( cause );
+			throw assertionError;
 		}
 	}
 }
