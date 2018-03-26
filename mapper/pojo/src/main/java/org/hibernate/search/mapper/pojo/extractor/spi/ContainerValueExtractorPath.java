@@ -46,6 +46,14 @@ public class ContainerValueExtractorPath {
 		return NONE;
 	}
 
+	public static ContainerValueExtractorPath explicitExtractor(
+			Class<? extends ContainerValueExtractor> extractorClass) {
+		return new ContainerValueExtractorPath(
+				false,
+				Collections.singletonList( extractorClass )
+		);
+	}
+
 	public static ContainerValueExtractorPath explicitExtractors(
 			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
 		if ( extractorClasses.isEmpty() ) {

@@ -17,6 +17,10 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 /**
  * Given an association on a entity type A to entity type B, defines the inverse side of an association,
  * i.e. the path from B to A.
+ * <p>
+ * This annotation is generally not needed, as inverse sides of associations should generally be inferred by the mapper.
+ * For example, Hibernate ORM defines inverse sides using {@code @OneToMany#mappedBy}, {@code @OneToOne#mappedBy}, etc.,
+ * and the Hibernate ORM mapper will register these inverse sides automatically.
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
