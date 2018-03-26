@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -19,6 +21,8 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 public final class TckConfiguration {
 
 	private static final String PROPERTIES_PATH = "/backend-tck.properties";
+
+	private static final String BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY = "backend.lucene.root_directory";
 
 	private static TckConfiguration instance;
 
@@ -42,6 +46,9 @@ public final class TckConfiguration {
 		catch (IOException e) {
 			throw new IllegalStateException( "Error loading TCK properties file: " + PROPERTIES_PATH );
 		}
+
+		addTimestampToLuceneRootDirectory( properties );
+
 		source = ConfigurationPropertySource.fromProperties( properties );
 	}
 
@@ -49,4 +56,15 @@ public final class TckConfiguration {
 		return source.withMask( "backend" );
 	}
 
+	private void addTimestampToLuceneRootDirectory(Properties properties) {
+		String baseLuceneRootDirectory = properties.getProperty( BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY );
+
+		if ( baseLuceneRootDirectory != null ) {
+			StringBuilder timestampedLuceneRootDirectoryBuilder = new StringBuilder( baseLuceneRootDirectory )
+					.append( '/' )
+					.append( new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS" ).format( new Date() ) );
+
+			properties.put( BACKEND_LUCENE_ROOT_DIRECTORY_PROPERTY, timestampedLuceneRootDirectoryBuilder.toString() );
+		}
+	}
 }
