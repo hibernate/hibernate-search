@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 
 public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 		extends AbstractSearchResultAssert<DocumentReferencesSearchResultAssert<T>, T> {
@@ -87,8 +87,8 @@ public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 			return this;
 		}
 
-		private Object[] getExpectedHits() {
-			return expectedHits.toArray();
+		private DocumentReference[] getExpectedHits() {
+			return expectedHits.toArray( new DocumentReference[expectedHits.size()] );
 		}
 	}
 

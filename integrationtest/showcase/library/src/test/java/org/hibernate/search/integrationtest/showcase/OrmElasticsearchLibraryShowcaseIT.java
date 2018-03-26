@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinSession;
 import static org.hibernate.search.integrationtest.util.orm.OrmUtils.withinTransaction;
 import static org.junit.Assert.assertFalse;

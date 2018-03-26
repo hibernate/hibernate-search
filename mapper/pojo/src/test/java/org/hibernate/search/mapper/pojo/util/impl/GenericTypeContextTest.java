@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.util.impl;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;

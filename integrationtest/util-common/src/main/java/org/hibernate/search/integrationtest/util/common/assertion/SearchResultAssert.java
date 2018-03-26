@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 
 public class SearchResultAssert<T> extends AbstractSearchResultAssert<SearchResultAssert<T>, T> {
 
@@ -39,7 +39,7 @@ public class SearchResultAssert<T> extends AbstractSearchResultAssert<SearchResu
 	public final SearchResultAssert<T> hasHitsExactOrder(T... hits) {
 		Assertions.assertThat( actual.getHits() )
 				.as( "Hits of " + actual )
-				.containsExactly( (Object[]) hits );
+				.containsExactly( hits );
 		return thisAsSelfType();
 	}
 
@@ -47,7 +47,7 @@ public class SearchResultAssert<T> extends AbstractSearchResultAssert<SearchResu
 	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
 		Assertions.assertThat( actual.getHits() )
 				.as( "Hits of " + actual )
-				.containsOnly( (Object[]) hits );
+				.containsOnly( hits );
 		return thisAsSelfType();
 	}
 

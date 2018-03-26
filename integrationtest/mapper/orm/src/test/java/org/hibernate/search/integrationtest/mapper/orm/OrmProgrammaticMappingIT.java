@@ -62,7 +62,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 
 /**
  * @author Yoann Rodiere

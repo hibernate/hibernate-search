@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.util.common.NormalizationUtils;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 
 public class ProjectionsSearchResultAssert<T extends List<?>>
 		extends AbstractSearchResultAssert<ProjectionsSearchResultAssert<T>, T> {
@@ -68,8 +68,9 @@ public class ProjectionsSearchResultAssert<T extends List<?>>
 			return this;
 		}
 
-		private Object[] getExpectedHits() {
-			return expectedHits.toArray();
+		@SuppressWarnings("rawtypes")
+		private List[] getExpectedHits() {
+			return expectedHits.toArray( new List[expectedHits.size()] );
 		}
 	}
 
