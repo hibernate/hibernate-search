@@ -60,6 +60,7 @@ public abstract class DocumentDao {
 	public BookCopy createCopy(Library library, Book document, BookMedium medium) {
 		BookCopy copy = new BookCopy();
 		copy.setLibrary( library );
+		library.getCopies().add( copy );
 		copy.setDocument( document );
 		document.getCopies().add( copy );
 		copy.setMedium( medium );
@@ -70,6 +71,7 @@ public abstract class DocumentDao {
 	public VideoCopy createCopy(Library library, Video document, VideoMedium medium) {
 		VideoCopy copy = new VideoCopy();
 		copy.setLibrary( library );
+		library.getCopies().add( copy );
 		copy.setDocument( document );
 		document.getCopies().add( copy );
 		copy.setMedium( medium );

@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Type;
@@ -98,6 +101,7 @@ public class OrmGenericPropertyIT {
 			genericEntity.setArrayContent( new String[] { "entry1", "entry2" } );
 
 			entity1.setGenericProperty( genericEntity );
+			genericEntity.getContainingEntities().add( entity1 );
 
 			session.persist( genericEntity );
 			session.persist( entity1 );
@@ -162,6 +166,9 @@ public class OrmGenericPropertyIT {
 		@Field
 		private T[] arrayContent;
 
+		@OneToMany(mappedBy = "genericProperty")
+		private List<IndexedEntity> containingEntities = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -184,6 +191,10 @@ public class OrmGenericPropertyIT {
 
 		public void setArrayContent(T[] arrayContent) {
 			this.arrayContent = arrayContent;
+		}
+
+		public List<IndexedEntity> getContainingEntities() {
+			return containingEntities;
 		}
 	}
 

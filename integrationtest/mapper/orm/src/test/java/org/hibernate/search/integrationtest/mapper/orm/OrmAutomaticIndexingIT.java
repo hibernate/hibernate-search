@@ -31,6 +31,7 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -584,6 +585,10 @@ public class OrmAutomaticIndexingIT {
 		 */
 		@ManyToMany
 		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inverseProperty = "containedMapKeys",
+				inverseExtractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+		)
 		private List<IndexedEntity> containingAsMapKeys = new ArrayList<>();
 
 		@Basic

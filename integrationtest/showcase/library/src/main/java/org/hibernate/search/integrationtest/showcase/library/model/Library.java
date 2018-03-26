@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.Hibernate;
 import org.hibernate.search.engine.backend.document.model.Sortable;
@@ -61,6 +63,9 @@ public class Library {
 	// TODO add default bridge (and maybe field type?) for enums
 	@Field(valueBridge = @ValueBridgeBeanReference(type = LibraryServiceBridge.class))
 	private List<LibraryService> services;
+
+	@OneToMany(mappedBy = "library")
+	private List<DocumentCopy<?>> copies = new ArrayList<>();
 
 	@Override
 	public boolean equals(Object o) {
@@ -134,5 +139,9 @@ public class Library {
 
 	public void setServices(List<LibraryService> services) {
 		this.services = services;
+	}
+
+	public List<DocumentCopy<?>> getCopies() {
+		return copies;
 	}
 }

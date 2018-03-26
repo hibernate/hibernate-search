@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -124,6 +127,8 @@ public class OrmPropertyInheritanceIT {
 
 		private String parentDeclaredProperty;
 
+		private List<ParentIndexedEntity> embedding = new ArrayList<>();
+
 		@Id
 		@DocumentId
 		public Integer getId() {
@@ -149,6 +154,15 @@ public class OrmPropertyInheritanceIT {
 
 		// Not declaring the setter will make Hibernate Annotation Commons ignore the property, so we need this.
 		public abstract void setEmbedded(ParentIndexedEntity parentIndexedEntity);
+
+		@OneToMany(mappedBy = "embedded")
+		public List<ParentIndexedEntity> getEmbedding() {
+			return embedding;
+		}
+
+		public void setEmbedding(List<ParentIndexedEntity> embedding) {
+			this.embedding = embedding;
+		}
 	}
 
 	@Entity(name = "indexedEntity")

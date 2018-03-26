@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
@@ -231,13 +233,21 @@ public class OrmAnnotationMappingIT {
 			entity6.setLocalDate( LocalDate.of( 2017, 11, 6 ) );
 
 			entity1.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingleFromIndexed().add( entity1 );
 			entity2.setEmbedded( entity3 );
+			entity3.getEmbeddingAsSingleFromIndexed().add( entity2 );
 			entity3.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingleFromIndexed().add( entity3 );
 			entity5.setEmbeddedList( Arrays.asList( entity2, entity3, entity6 ) );
+			entity2.getEmbeddingAsListFromYetAnotherIndexed().add( entity5 );
+			entity3.getEmbeddingAsListFromYetAnotherIndexed().add( entity5 );
+			entity6.getEmbeddingAsListFromYetAnotherIndexed().add( entity5 );
 			Map<String, IndexedEntity> embeddedMap = new LinkedHashMap<>();
 			embeddedMap.put( "entity3", entity3 );
 			embeddedMap.put( "entity2", entity2 );
 			entity5.setEmbeddedMap( embeddedMap );
+			entity3.getEmbeddingAsMapFromYetAnotherIndexed().add( entity5 );
+			entity2.getEmbeddingAsMapFromYetAnotherIndexed().add( entity5 );
 
 			session.persist( entity1 );
 			session.persist( entity2 );
@@ -495,7 +505,6 @@ public class OrmAnnotationMappingIT {
 		public void setEmbedded(IndexedEntity embedded) {
 			this.embedded = embedded;
 		}
-
 	}
 
 	@Entity
@@ -512,6 +521,18 @@ public class OrmAnnotationMappingIT {
 
 		@Field(name = "myTextField")
 		private String text;
+
+		@OneToMany(mappedBy = "embedded")
+		private List<IndexedEntity> embeddingAsSingleFromIndexed = new ArrayList<>();
+
+		@OneToMany(mappedBy = "embedded")
+		private List<YetAnotherIndexedEntity> embeddingAsSingleFromYetAnotherIndexed = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "embeddedList")
+		private List<YetAnotherIndexedEntity> embeddingAsListFromYetAnotherIndexed = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "embeddedMap")
+		private List<YetAnotherIndexedEntity> embeddingAsMapFromYetAnotherIndexed = new ArrayList<>();
 
 		public Integer getId() {
 			return id;
@@ -534,6 +555,22 @@ public class OrmAnnotationMappingIT {
 				includePaths = { "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" })
 		public IndexedEntity getEmbedded() {
 			return super.getEmbedded();
+		}
+
+		public List<IndexedEntity> getEmbeddingAsSingleFromIndexed() {
+			return embeddingAsSingleFromIndexed;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsSingleFromYetAnotherIndexed() {
+			return embeddingAsSingleFromYetAnotherIndexed;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsListFromYetAnotherIndexed() {
+			return embeddingAsListFromYetAnotherIndexed;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsMapFromYetAnotherIndexed() {
+			return embeddingAsMapFromYetAnotherIndexed;
 		}
 	}
 
