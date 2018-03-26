@@ -41,7 +41,7 @@ class IndexWorkCall {
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}
 		assertThat( actualCall.work )
-				.as( "Incorrect work " + whenThisWorkWasExpected + ": " )
+				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return CompletableFuture.completedFuture( null );
 	}

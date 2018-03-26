@@ -11,6 +11,8 @@ import java.util.Map;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNode;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeCompare;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeMismatch;
+import org.hibernate.search.util.spi.ToStringStyle;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 import org.junit.Assert;
 
@@ -36,9 +38,11 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 	public StubTreeNodeAssert<T> matches(T expected) {
 		Map<String, StubTreeNodeMismatch> mismatchesByPath = StubTreeNodeCompare.compare( expected, actual );
 		if ( !mismatchesByPath.isEmpty() ) {
-			StringBuilder builder = new StringBuilder( messageBase );
-			StubTreeNodeCompare.appendTo( builder, mismatchesByPath, "\n\t", "\t" );
-			Assert.fail( builder.toString() );
+			ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.MULTILINE );
+			builder.startObject();
+			StubTreeNodeCompare.appendTo( builder, mismatchesByPath );
+			builder.endObject();
+			Assert.fail( messageBase + builder.toString() );
 		}
 		return this;
 	}

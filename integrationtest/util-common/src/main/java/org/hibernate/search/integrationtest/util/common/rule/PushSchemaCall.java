@@ -22,7 +22,7 @@ class PushSchemaCall {
 
 	public Void verify(PushSchemaCall actualCall) {
 		assertThat( actualCall.schemaNode )
-				.as( "Schema for index '" + indexName + "' did not match:" )
+				.as( "Schema for index '" + indexName + "' did not match:\n" )
 				.matches( schemaNode );
 		return null;
 	}

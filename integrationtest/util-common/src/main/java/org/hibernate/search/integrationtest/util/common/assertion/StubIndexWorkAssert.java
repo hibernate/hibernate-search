@@ -12,6 +12,8 @@ import java.util.Objects;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeCompare;
 import org.hibernate.search.integrationtest.util.common.stub.StubTreeNodeMismatch;
 import org.hibernate.search.integrationtest.util.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.spi.ToStringStyle;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
 
 import org.junit.Assert;
 
@@ -38,7 +40,9 @@ public class StubIndexWorkAssert {
 	}
 
 	public StubIndexWorkAssert matches(StubIndexWork expected) {
-		StringBuilder builder = new StringBuilder( messageBase );
+		ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.MULTILINE );
+
+		builder.startObject();
 
 		boolean hasAnyMismatch;
 		boolean mismatch = checkForMismatch( builder, "type", expected.getType(), actual.getType() );
@@ -56,22 +60,26 @@ public class StubIndexWorkAssert {
 				StubTreeNodeCompare.compare( expected.getDocument(), actual.getDocument() );
 		if ( !documentMismatches.isEmpty() ) {
 			hasAnyMismatch = true;
-			builder.append( NEWLINE ).append( "document:" );
-			StubTreeNodeCompare.appendTo( builder, documentMismatches, NEWLINE + INDENT, INDENT );
+			builder.startObject( "document" );
+			StubTreeNodeCompare.appendTo( builder, documentMismatches );
+			builder.endObject();
 		}
 
+		builder.endObject();
+
 		if ( hasAnyMismatch ) {
-			Assert.fail( builder.toString() );
+			Assert.fail( messageBase + builder.toString() );
 		}
 
 		return this;
 	}
 
-	private static boolean checkForMismatch(StringBuilder builder, String name, Object expected, Object actual) {
+	private static boolean checkForMismatch(ToStringTreeBuilder builder, String name, Object expected, Object actual) {
 		if ( !Objects.equals( expected, actual ) ) {
-			builder.append( NEWLINE ).append( name ).append( ": " )
-					.append( "expected: " ).append( expected )
-					.append( ", " ).append( "actual: " ).append( actual );
+			builder.startObject( name );
+			builder.attribute( "expected", expected );
+			builder.attribute( "actual", actual );
+			builder.endObject();
 			return true;
 		}
 		else {

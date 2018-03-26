@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
+
 public final class StubTreeNodeCompare {
 
 	private static final Object NO_VALUE = new Object() {
@@ -31,21 +33,14 @@ public final class StubTreeNodeCompare {
 		return mismatchesByPath;
 	}
 
-	public static void appendTo(
-			StringBuilder builder, Map<String, StubTreeNodeMismatch> mismatchesByPath,
-			String newline, String indent) {
-		String secondLevelNewline = newline + indent;
-		String thirdLevelNewline = secondLevelNewline + indent;
+	public static void appendTo(ToStringTreeBuilder treeBuilder, Map<String, StubTreeNodeMismatch> mismatchesByPath) {
 		for ( Map.Entry<String, StubTreeNodeMismatch> entry : mismatchesByPath.entrySet() ) {
 			String path = entry.getKey();
-			if ( path != null ) {
-				builder.append( newline ).append( path ).append( ":" );
-			}
+			treeBuilder.startObject( path );
 			StubTreeNodeMismatch mismatch = entry.getValue();
-			builder.append( secondLevelNewline ).append( "expected: " );
-			appendTo( builder, mismatch.expected, thirdLevelNewline, indent );
-			builder.append( secondLevelNewline ).append( "actual: " );
-			appendTo( builder, mismatch.actual, thirdLevelNewline, indent );
+			treeBuilder.attribute( "expected" , mismatch.expected );
+			treeBuilder.attribute( "actual" , mismatch.actual );
+			treeBuilder.endObject();
 		}
 	}
 
@@ -123,15 +118,6 @@ public final class StubTreeNodeCompare {
 			builder.append( "[" ).append( i ).append( "]" );
 		}
 		return builder.toString();
-	}
-
-	private static void appendTo(StringBuilder builder, Object value, String newline, String indent) {
-		if ( value instanceof StubTreeNode ) {
-			((StubTreeNode<?>)value).appendTo( builder, newline, indent, "" );
-		}
-		else {
-			builder.append( value );
-		}
 	}
 
 }

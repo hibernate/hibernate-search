@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class StubTreeNode<N extends StubTreeNode<N>> {
+import org.hibernate.search.util.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.spi.ToStringTreeBuilder;
+
+public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStringTreeAppendable {
 
 	private final Map<String, List<Object>> attributes;
 	private final Map<String, List<N>> children;
@@ -49,60 +52,31 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		appendTo( builder, "", "", ", " );
-		return builder.toString();
+		return new ToStringTreeBuilder().value( this ).toString();
 	}
 
-	public void appendTo(StringBuilder builder, String newline, String indent, String separator) {
-		boolean first = true;
-		builder.append( "<" );
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
 		for ( Map.Entry<String, List<Object>> entry : attributes.entrySet() ) {
-			builder.append( newline );
-			if ( first ) {
-				first = false;
-			}
-			else {
-				builder.append( separator );
-			}
-			builder.append( entry.getKey() );
-			builder.append( "=" );
-			builder.append( entry.getValue() );
+			builder.attribute( entry.getKey(), entry.getValue() );
 		}
-		builder.append( newline );
-		if ( !first ) {
-			builder.append( separator );
-		}
-		builder.append( "children={" );
-		String childrenNewline = newline + indent;
-		String childrenItemNewline = childrenNewline + indent;
-		first = true;
 		for ( Map.Entry<String, List<N>> entry : children.entrySet() ) {
-			builder.append( childrenNewline );
-			if ( first ) {
-				first = false;
+			List<N> list = entry.getValue();
+			if ( list.size() == 1 ) {
+				builder.startObject( entry.getKey() );
+				list.get( 0 ).appendTo( builder );
+				builder.endObject();
 			}
 			else {
-				builder.append( separator );
-			}
-			builder.append( entry.getKey() );
-			builder.append( "=" );
-			boolean firstItem = true;
-			for ( N child : entry.getValue() ) {
-				if ( firstItem ) {
-					firstItem = false;
+				builder.startList( entry.getKey() );
+				for ( N child : entry.getValue() ) {
+					builder.startObject();
+					child.appendTo( builder );
+					builder.endObject();
 				}
-				else {
-					builder.append( separator );
-				}
-				child.appendTo( builder, childrenItemNewline, indent, separator );
+				builder.endList();
 			}
 		}
-		if ( !first ) {
-			builder.append( newline );
-		}
-		builder.append( "}" );
-		builder.append( newline ).append( ">" );
 	}
 
 	public Map<String, List<Object>> getAttributes() {
