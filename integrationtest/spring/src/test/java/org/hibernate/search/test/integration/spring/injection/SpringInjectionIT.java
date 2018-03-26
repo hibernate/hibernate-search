@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.integration.spring.injection;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.function.Function;
@@ -42,75 +42,75 @@ public class SpringInjectionIT {
 	public void injectedFieldBridge() {
 		Function<String, List<EntityWithSpringAwareBridges>> search = dao::searchFieldBridge;
 
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity2 = new EntityWithSpringAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 
 		dao.delete( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 	}
 
 	@Test
 	public void injectedClassBridge() {
 		Function<String, List<EntityWithSpringAwareBridges>> search = dao::searchClassBridge;
 
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity2 = new EntityWithSpringAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 
 		dao.delete( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 	}
 
 	@Test
 	public void nonSpringFieldBridge() {
 		Function<String, List<EntityWithSpringAwareBridges>> search = dao::searchNonSpringBridge;
 
-		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).onProperty( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).extracting( "id" ).containsOnly( entity.getId() );
 	}
 }

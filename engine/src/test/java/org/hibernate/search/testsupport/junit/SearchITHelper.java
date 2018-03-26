@@ -23,9 +23,9 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-import org.fest.assertions.Assertions;
-import org.fest.assertions.IntAssert;
-import org.fest.assertions.ListAssert;
+import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ListAssert;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -36,7 +36,6 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.StringHelper;
-
 import org.junit.Assert;
 
 /**
@@ -293,7 +292,7 @@ public class SearchITHelper {
 					.as( "Results of query " + toString( hsQuery ) );
 		}
 
-		public IntAssert asResultSize() {
+		public AbstractIntegerAssert<?> asResultSize() {
 			HSQuery hsQuery = getHSQuery();
 			int actualSize = hsQuery.queryResultSize();
 			return Assertions.assertThat( actualSize )

@@ -34,8 +34,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -368,7 +368,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 		assertThat( partitionProgress )
 				.as( "Entities processed per partition" )
 				.hasSize( 3 * 2 )
-				.includes(
+				.contains(
 						// First entity type
 						entry( 0, INSTANCE_PER_ENTITY_TYPE - 1L ), // Partition 1 for first entity type
 						entry( 1, 1L ), // Partition 2 for first entity type

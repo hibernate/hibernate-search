@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.analyzer.analyzerdefinitionprovider;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;

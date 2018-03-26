@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.filters;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -105,9 +105,9 @@ public class FreshReadersProvidedTest {
 		expectedTermsForQuery( secondRecordingWrapper, "thorin", "oakenshield", "balin" );
 	}
 
-	private void expectedTermsForQuery(RecordingQueryWrapper recordingWrapper, String... term) {
-		Assert.assertEquals( term.length, recordingWrapper.seenTerms.size() );
-		assertThat( recordingWrapper.seenTerms ).as( "seen terms" ).contains( (Object[]) term );
+	private void expectedTermsForQuery(RecordingQueryWrapper recordingWrapper, String... terms) {
+		Assert.assertEquals( terms.length, recordingWrapper.seenTerms.size() );
+		assertThat( recordingWrapper.seenTerms ).as( "seen terms" ).contains( terms );
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class FreshReadersProvidedTest {
 		try {
 			List<IndexReader> allSubReaders = getSubIndexReaders( (MultiReader) currentIndexReader );
 			assertThat( recordingWrapper.visitedReaders ).as( "visited readers" )
-					.contains( allSubReaders.toArray() );
+					.contains( allSubReaders.toArray( new IndexReader[allSubReaders.size()] ) );
 		}
 		finally {
 			searchFactory.getIndexReaderAccessor().close( currentIndexReader );

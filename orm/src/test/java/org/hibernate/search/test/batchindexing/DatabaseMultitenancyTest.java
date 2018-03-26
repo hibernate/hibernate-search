@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
-import org.fest.util.Collections;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.Dialect;
@@ -21,12 +22,11 @@ import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.testing.RequiresDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * This is a test class to check that search can be used with ORM in multi-tenancy.
@@ -61,17 +61,17 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	 */
 	private static final String GEOCHRON_TID = "geochron";
 
-	private static Object[] METAMEC_MODELS = {
+	private static Clock[] METAMEC_MODELS = {
 			new Clock( 1, "Metamec - Model A850" ),
 			new Clock( 2, "Metamec - Model 4562" ),
 			new Clock( 5, "Metamec - Model 792" )
-		};
+	};
 
-	private static Object[] GEOCHRON_MODELS = {
+	private static Clock[] GEOCHRON_MODELS = {
 			new Clock( 1, "Geochron - Model The Original Kilburg" ),
 			new Clock( 2, "Geochron - Model The Boardroom" ),
 			new Clock( 9, "Geochron - Model Designer Series" )
-		};
+	};
 
 	@Override
 	@Before
@@ -265,7 +265,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 
 	@Override
 	public Set<String> multiTenantIds() {
-		return Collections.set( METAMEC_TID, GEOCHRON_TID );
+		return CollectionHelper.asSet( METAMEC_TID, GEOCHRON_TID );
 	}
 
 }

@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.test.query.initandlookup;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.fest.assertions.Condition;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -27,8 +28,6 @@ import org.hibernate.search.testsupport.backend.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Test second level cache and persistence context lookup methods
@@ -234,14 +233,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID );
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
-		for ( Object o : list ) {
-			assertThat( o ).satisfies( new Condition<Object>() {
-				@Override
-				public boolean matches(Object value) {
-					return Hibernate.isInitialized( value );
-				}
-			} );
-		}
+		assertThat( list ).allSatisfy( o -> assertThat( Hibernate.isInitialized( o ) ).isTrue() );
 
 		for ( Object o : list ) {
 			o.toString(); //check true initialization

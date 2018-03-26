@@ -23,7 +23,7 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;

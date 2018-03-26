@@ -24,7 +24,7 @@ import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test second level cache and persistence context lookup methods

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded.sorting;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 

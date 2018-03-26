@@ -15,7 +15,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Locale;
 
@@ -93,7 +93,7 @@ public class EmbeddedFieldBoostTest extends SearchTestBase {
 		// Then
 		assertThat( fullTextSession.createFullTextQuery( query, Magazine.class ).list() )
 				.describedAs( "Query results are not in the order expected as per configured field boosts" )
-				.onProperty( "id" )
+				.extracting( "id" )
 				.containsExactly( 2L, 4L, 3L, 1L );
 
 		tx.commit();

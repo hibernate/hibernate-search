@@ -26,7 +26,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;

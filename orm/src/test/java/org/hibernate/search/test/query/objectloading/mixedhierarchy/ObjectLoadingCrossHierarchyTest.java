@@ -22,7 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for using object loading with queries spanning across multiple id spaces
@@ -97,7 +97,7 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 		List<College> results = fullTextSession.createFullTextQuery( query, EducationalInstitution.class ).list();
 
 		assertThat( results )
-				.onProperty( "name" )
+				.extracting( "name" )
 				.describedAs( "Can load results originating from different id spaces, using different id types and names" )
 				.containsOnly(
 				"Southern Florida College of Golf",

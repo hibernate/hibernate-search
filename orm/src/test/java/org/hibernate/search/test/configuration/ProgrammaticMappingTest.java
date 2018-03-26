@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -176,14 +176,14 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		query.setSort( new Sort( new SortField( "price", SortField.Type.INT ) ) );
 
 		List<?> results = query.list();
-		assertThat( results ).onProperty( "price" )
+		assertThat( results ).extracting( "price" )
 			.describedAs( "Sortable field via programmatic config" )
 			.containsExactly( (short) 3354, (short) 3454, (short) 3554 );
 
 		query.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		results = query.list();
-		assertThat( results ).onProperty( "id" )
+		assertThat( results ).extracting( "id" )
 			.describedAs( "Sortable field via programmatic config" )
 			.containsExactly( 1, 2, 3 );
 
@@ -241,10 +241,10 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		List<Facet> results = query.list();
 
 		List<Facet> facets = query.getFacetManager().getFacets( "myFacet" );
-		assertThat( facets ).onProperty( "value" )
+		assertThat( facets ).extracting( "value" )
 				.describedAs( "Retrieved facets - values" )
 				.containsExactly( "[, 50.0)", "[50.0, 1000.0)", "[1000.0, ]" );
-		assertThat( facets ).onProperty( "count" )
+		assertThat( facets ).extracting( "count" )
 				.describedAs( "Retrieved facets - counts" )
 				.containsExactly( 2, 1, 1 );
 

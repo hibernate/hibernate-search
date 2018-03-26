@@ -12,8 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.fest.assertions.Assertions;
-import org.fest.assertions.ListAssert;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ListAssert;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.junit.Assert;

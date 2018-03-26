@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
@@ -47,7 +47,7 @@ public class IndexNameOverrideTest {
 				integrator.getIndexBindings().get( NoAnnotationIndexNameOverrideEntity.class )
 						.getIndexManagerSelector().all()
 				)
-				.onProperty( "indexName" )
+				.extracting( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
 				.containsOnly( NoAnnotationIndexNameOverrideEntity.class.getName() );
 
@@ -67,7 +67,7 @@ public class IndexNameOverrideTest {
 				integrator.getIndexBindings().get( IndexedAnnotationIndexNameOverriddeEntity.class )
 						.getIndexManagerSelector().all()
 				)
-				.onProperty( "indexName" )
+				.extracting( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )
 				.containsOnly( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
 
@@ -96,7 +96,7 @@ public class IndexNameOverrideTest {
 				integrator.getIndexBindings().get( NoAnnotationIndexNameOverrideEntity.class )
 						.getIndexManagerSelector().all()
 				)
-				.onProperty( "indexName" )
+				.extracting( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
 				.containsOnly( NoAnnotationIndexNameOverrideEntity.class.getName() );
 
@@ -125,7 +125,7 @@ public class IndexNameOverrideTest {
 				integrator.getIndexBindings().get( IndexedAnnotationIndexNameOverriddeEntity.class )
 						.getIndexManagerSelector().all()
 				)
-				.onProperty( "indexName" )
+				.extracting( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )
 				.containsOnly( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
 

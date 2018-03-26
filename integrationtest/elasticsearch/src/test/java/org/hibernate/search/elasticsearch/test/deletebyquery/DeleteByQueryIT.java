@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test.deletebyquery;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -102,7 +102,7 @@ public class DeleteByQueryIT extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<HockeyPlayer> result = session.createFullTextQuery( query, HockeyPlayer.class ).list();
 
-		assertThat( result ).onProperty( "name" ).containsOnly( "Hergesheimer", "Brand" );
+		assertThat( result ).extracting( "name" ).containsOnly( "Hergesheimer", "Brand" );
 
 		tx.commit();
 		s.close();

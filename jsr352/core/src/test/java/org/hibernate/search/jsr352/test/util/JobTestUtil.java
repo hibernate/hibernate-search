@@ -31,7 +31,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.Query;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Yoann Rodiere

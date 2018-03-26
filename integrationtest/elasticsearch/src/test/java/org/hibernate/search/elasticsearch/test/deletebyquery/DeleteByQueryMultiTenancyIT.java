@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test.deletebyquery;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -156,7 +156,7 @@ public class DeleteByQueryMultiTenancyIT extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<HockeyPlayer> result = session.createFullTextQuery( query, HockeyPlayer.class ).list();
 
-		assertThat( result ).onProperty( "name" ).containsOnly( "Hergesheimer", "Brand" );
+		assertThat( result ).extracting( "name" ).containsOnly( "Hergesheimer", "Brand" );
 
 		tx.commit();
 
@@ -178,7 +178,7 @@ public class DeleteByQueryMultiTenancyIT extends SearchTestBase {
 
 		assertThat( result )
 			.describedAs( "Running delete-by-query for other tenant should not affect entities of this entity" )
-			.onProperty( "name" )
+			.extracting( "name" )
 			.containsOnly( "Metz", "Plenty" );
 
 		tx.commit();

@@ -25,8 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.Fail.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
 
 /**
@@ -62,14 +62,14 @@ public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 				ResearchPaper.class
 		).list();
 
-		assertThat( result ).onProperty( "title" ).containsExactly( "important research" );
+		assertThat( result ).extracting( "title" ).containsExactly( "important research" );
 
 		result = session.createFullTextQuery(
 				queryParser.parse( "title:tales" ),
 				ComicBook.class
 		).list();
 
-		assertThat( result ).onProperty( "title" ).containsExactly( "The tales of Bob" );
+		assertThat( result ).extracting( "title" ).containsExactly( "The tales of Bob" );
 
 		tx.commit();
 		s.close();

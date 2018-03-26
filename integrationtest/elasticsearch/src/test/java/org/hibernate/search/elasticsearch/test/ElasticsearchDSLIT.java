@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.test.util.JsonHelper.assertJsonEquals;
 
 import java.util.Calendar;
@@ -328,7 +328,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 			Sort sort = queryBuilder.sort().byNative( "idSort", "\"desc\"" ).createSort();
 			fullTextQuery.setSort( sort );
 			List<?> list = fullTextQuery.list();
-			assertThat( list ).onProperty( "id" )
+			assertThat( list ).extracting( "id" )
 					.containsExactly( letter2.getId(), letter1.getId() );
 
 			// Make sure the assertion above didn't just pass by chance
@@ -336,7 +336,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 			sort = queryBuilder.sort().byNative( "idSort", "\"asc\"" ).createSort();
 			fullTextQuery.setSort( sort );
 			list = fullTextQuery.list();
-			assertThat( list ).onProperty( "id" )
+			assertThat( list ).extracting( "id" )
 					.containsExactly( letter1.getId(), letter2.getId() );
 		}
 	}
@@ -360,7 +360,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 			Sort sort = queryBuilder.sort().byNative( "idSort", "{\"order\":\"desc\"}" ).createSort();
 			fullTextQuery.setSort( sort );
 			List<?> list = fullTextQuery.list();
-			assertThat( list ).onProperty( "id" )
+			assertThat( list ).extracting( "id" )
 					.containsExactly( letter2.getId(), letter1.getId() );
 
 			// Make sure the first assertion above didn't just pass by chance
@@ -368,7 +368,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 			sort = queryBuilder.sort().byNative( "idSort", "{\"order\":\"asc\"}" ).createSort();
 			fullTextQuery.setSort( sort );
 			list = fullTextQuery.list();
-			assertThat( list ).onProperty( "id" )
+			assertThat( list ).extracting( "id" )
 					.containsExactly( letter1.getId(), letter2.getId() );
 		}
 	}

@@ -30,7 +30,7 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -70,10 +70,10 @@ public class TypeMetadataTest {
 		TypeMetadata metadata = metadataProvider.getTypeMetadataFor( Bar.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 
 		Set<SortableFieldMetadata> fieldMetadata = metadata.getPropertyMetadataForProperty( "name" ).getSortableFieldMetadata();
-		assertThat( fieldMetadata ).onProperty( "absoluteName" ).containsOnly( "name" );
+		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsOnly( "name" );
 
 		fieldMetadata = metadata.getPropertyMetadataForProperty( "age" ).getSortableFieldMetadata();
-		assertThat( fieldMetadata ).onProperty( "absoluteName" ).containsOnly( "ageForStringSorting", "ageForIntSorting" );
+		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsOnly( "ageForStringSorting", "ageForIntSorting" );
 	}
 
 	@Indexed

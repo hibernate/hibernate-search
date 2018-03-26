@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.jsr352.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResultsInTenant;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
@@ -24,16 +28,11 @@ import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.testing.RequiresDialect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import org.fest.util.Collections;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResultsInTenant;
 
 /**
  * @author Mincong Huang
@@ -120,7 +119,7 @@ public class MassIndexingJobWithMultiTenancyIT extends SearchTestBase {
 
 	@Override
 	public Set<String> multiTenantIds() {
-		return Collections.set( TARGET_TENANT_ID, UNUSED_TENANT_ID );
+		return CollectionHelper.asSet( TARGET_TENANT_ID, UNUSED_TENANT_ID );
 	}
 
 	@Override

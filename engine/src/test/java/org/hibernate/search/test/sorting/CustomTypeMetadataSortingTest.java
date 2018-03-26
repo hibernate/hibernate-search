@@ -16,7 +16,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -84,11 +84,11 @@ public class CustomTypeMetadataSortingTest {
 		HSQuery query = factoryHolder.getSearchFactory().createHSQuery( luceneQuery, PropertySet.class, Person.class )
 				.sort( FIRST_NAME_SORT );
 
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 0, 1, 2 );
 
 		query.sort( FIRST_NAME_SORT_REVERSED );
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 2, 1, 0 );
 	}
 
@@ -122,11 +122,11 @@ public class CustomTypeMetadataSortingTest {
 		HSQuery query = factoryHolder.getSearchFactory().createHSQuery( luceneQuery, metadata )
 				.sort( FIRST_NAME_SORT );
 
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 0, 1, 2 );
 
 		query.sort( FIRST_NAME_SORT_REVERSED );
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 2, 1, 0 );
 	}
 
@@ -155,11 +155,11 @@ public class CustomTypeMetadataSortingTest {
 		HSQuery query = factoryHolder.getSearchFactory().createHSQuery( luceneQuery, metadata )
 				.sort( FIRST_NAME_SORT );
 
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 0, 1, 2 );
 
 		query.sort( FIRST_NAME_SORT_REVERSED );
-		Assertions.assertThat( query.queryEntityInfos() ).onProperty( "id" ).as( "Sorted IDs" )
+		Assertions.assertThat( query.queryEntityInfos() ).extracting( "id" ).as( "Sorted IDs" )
 				.containsExactly( 2, 1, 0 );
 	}
 

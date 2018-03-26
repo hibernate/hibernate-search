@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.filter;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -47,11 +47,11 @@ public class OrmFilterTest extends SearchTestBase {
 			criteria.orderBy( cb.asc( root.get( "id" ) ) );
 			org.hibernate.query.Query<FilterableEntity> query = session.createQuery( criteria );
 			query.setMaxResults( 3 );
-			assertThat( query.getResultList() ).onProperty( "id" )
+			assertThat( query.getResultList() ).extracting( "id" )
 					.containsExactly( 0, 2, 3 );
 
 			session.enableFilter( "filter1" ).setParameter( "excludedNumericValue", 3 );
-			assertThat( query.getResultList() ).onProperty( "id" )
+			assertThat( query.getResultList() ).extracting( "id" )
 					.containsExactly( 0, 2, 4 );
 		}
 	}
@@ -66,7 +66,7 @@ public class OrmFilterTest extends SearchTestBase {
 			ftQuery.setSort( qb.sort().byField( "idSort" ).createSort() );
 			ftQuery.setMaxResults( 3 );
 			assertThat( ftQuery.getResultSize() ).isEqualTo( 4 ); // Ignores max results, that's expected
-			assertThat( ftQuery.getResultList() ).onProperty( "id" )
+			assertThat( ftQuery.getResultList() ).extracting( "id" )
 					.containsExactly( 0, 2, 3 );
 
 			// TODO we'll need to change the following assertions when fixing HSEARCH-2848.
@@ -79,7 +79,7 @@ public class OrmFilterTest extends SearchTestBase {
 			 * but the filter will be applied after the result limit.
 			 * Thus the result 4 is missing here, while we would expect it to be included.
 			 */
-			assertThat( ftQuery.getResultList() ).onProperty( "id" )
+			assertThat( ftQuery.getResultList() ).extracting( "id" )
 					.containsExactly( 0, 2 );
 		}
 	}

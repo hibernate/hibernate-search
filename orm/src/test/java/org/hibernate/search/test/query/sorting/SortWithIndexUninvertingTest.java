@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -80,7 +80,7 @@ public class SortWithIndexUninvertingTest extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "name" )
+		assertThat( result ).extracting( "name" )
 			.describedAs( "Expecting results from index with sort field and uninverted index in the correct sort order" )
 			.containsExactly( "Bill the brick layer", "Bill the plumber" );
 

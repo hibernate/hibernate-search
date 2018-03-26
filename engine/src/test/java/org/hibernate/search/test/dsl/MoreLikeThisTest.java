@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.test.dsl;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +22,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.fest.assertions.Condition;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -32,7 +31,6 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,20 +74,8 @@ public class MoreLikeThisTest {
 
 		assertThat( terms )
 				.describedAs( "internalDescription should be ignored" )
-				.doesNotSatisfy(
-						new Condition<Collection<?>>() {
-							@SuppressWarnings("unchecked")
-							@Override
-							public boolean matches(Collection<?> value) {
-								for ( Term term : (Collection<Term>) value ) {
-									if ( "internalDescription".equals( term.field() ) ) {
-										return true;
-									}
-								}
-								return false;
-							}
-						}
-				);
+				.extracting( t -> t.field() )
+				.doesNotContain( "internalDescription" );
 		outputQueryAndResults( decaffInstance, mltQuery, results );
 
 		//custom fields
@@ -105,7 +91,7 @@ public class MoreLikeThisTest {
 		assertThat( mltQuery instanceof BooleanQuery );
 		BooleanQuery topMltQuery = (BooleanQuery) mltQuery;
 		// FIXME: I'd prefer a test that uses data instead of how the query is actually built
-		assertThat( topMltQuery.clauses() ).onProperty( "query.boost" ).contains( 1f, 10f );
+		assertThat( topMltQuery.clauses() ).extracting( "query.boost" ).contains( 1f, 10f );
 
 		outputQueryAndResults( decaffInstance, mltQuery, results );
 

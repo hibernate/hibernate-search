@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.test.util.JsonHelper.assertJsonEquals;
 
 import java.util.Calendar;
@@ -82,7 +82,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).hasSize( 1 );
-			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+			assertThat( letters ).extracting( "message" ).containsExactly( "Important letter" );
 		}
 	}
 
@@ -104,7 +104,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).hasSize( 1 );
-			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+			assertThat( letters ).extracting( "message" ).containsExactly( "Important letter" );
 		}
 	}
 
@@ -127,7 +127,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).hasSize( 1 );
-			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+			assertThat( letters ).extracting( "message" ).containsExactly( "Important letter" );
 		}
 	}
 
@@ -150,7 +150,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).hasSize( 1 );
-			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+			assertThat( letters ).extracting( "message" ).containsExactly( "Important letter" );
 		}
 	}
 

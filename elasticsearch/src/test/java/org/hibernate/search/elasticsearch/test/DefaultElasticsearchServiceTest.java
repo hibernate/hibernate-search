@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.easymock.EasyMock.replay;
-import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Properties;
 
+import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockRunner;
 import org.easymock.Mock;
 import org.easymock.MockType;
-import org.fest.assertions.StringAssert;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImplementor;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
@@ -106,7 +106,7 @@ public class DefaultElasticsearchServiceTest {
 		assertProperty( maskedProperties, "default.elasticsearch.4" ).isEqualTo( "4" );
 	}
 
-	private StringAssert assertProperty(Properties maskedProperties, String name) {
+	private AbstractCharSequenceAssert<?, String> assertProperty(Properties maskedProperties, String name) {
 		return assertThat( maskedProperties.getProperty( name ) ).as( "Property from masked properties '" + name + "'" );
 	}
 

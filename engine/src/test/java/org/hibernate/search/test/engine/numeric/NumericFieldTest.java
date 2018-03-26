@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -176,7 +176,7 @@ public class NumericFieldTest {
 				.getProperty( "rating" )
 				.getIndexedFields();
 
-		assertThat( fields ).onProperty( "name" )
+		assertThat( fields ).extracting( "name" )
 				.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2" );
 
 		for ( FieldDescriptor field : fields ) {

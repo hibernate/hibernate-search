@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -105,7 +105,7 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 			TermQuery query = new TermQuery( new Term( "englishTweet", "fox" ) );
 			@SuppressWarnings("unchecked")
 			List<Tweet> list = fullTextSession.createFullTextQuery( query ).list();
-			assertThat( list ).onProperty( "englishTweet" ).containsExactly( tweet.getEnglishTweet() );
+			assertThat( list ).extracting( "englishTweet" ).containsExactly( tweet.getEnglishTweet() );
 		}
 	}
 
@@ -120,7 +120,7 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 			TermQuery query = new TermQuery( new Term( "whitespaceTweet", "fox" ) );
 			@SuppressWarnings("unchecked")
 			List<Tweet> list = fullTextSession.createFullTextQuery( query, Tweet.class ).list();
-			assertThat( list ).onProperty( "whitespaceTweet" ).containsExactly( tweet.getWhitespaceTweet() );
+			assertThat( list ).extracting( "whitespaceTweet" ).containsExactly( tweet.getWhitespaceTweet() );
 		}
 	}
 
@@ -134,7 +134,7 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 
 			@SuppressWarnings("unchecked")
 			List<Tweet> expectedResult = fullTextSession.createFullTextQuery( termQuery( "customTweet", "open" ), Tweet.class ).list();
-			assertThat( expectedResult ).onProperty( "customTweet" ).containsExactly( tweet.getCustomTweet() );
+			assertThat( expectedResult ).extracting( "customTweet" ).containsExactly( tweet.getCustomTweet() );
 
 			@SuppressWarnings("unchecked")
 			List<Tweet> expectedEmpty = fullTextSession.createFullTextQuery( termQuery( "customTweet", "CLOSE" ), Tweet.class ).list();
@@ -152,7 +152,7 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 
 			@SuppressWarnings("unchecked")
 			List<Tweet> expectedResult = fullTextSession.createFullTextQuery( termQuery( "tweetWithCustom", "open" ), Tweet.class ).list();
-			assertThat( expectedResult ).onProperty( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
+			assertThat( expectedResult ).extracting( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
 
 			@SuppressWarnings("unchecked")
 			List<Tweet> expectedEmpty = fullTextSession.createFullTextQuery( termQuery( "tweetWithCustom", "CLOSE" ), Tweet.class ).list();
@@ -170,7 +170,7 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 
 			@SuppressWarnings("unchecked")
 			List<Tweet> expectedResult = fullTextSession.createFullTextQuery( termQuery( "tweetNotAnalyzed", "close OPEN SOURCE test1" ), Tweet.class ).list();
-			assertThat( expectedResult ).onProperty( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
+			assertThat( expectedResult ).extracting( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
 		}
 	}
 

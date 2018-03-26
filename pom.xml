@@ -254,7 +254,7 @@
         <version.org.easymock>3.5.1</version.org.easymock>
         <version.org.unitils>3.4.6</version.org.unitils>
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
-        <version.org.easytesting.fest-assert>1.4</version.org.easytesting.fest-assert>
+        <version.org.assertj.assertj-core>3.9.1</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -895,9 +895,9 @@
                 <version>${version.simple-jndi}</version>
             </dependency>
             <dependency>
-                <groupId>org.easytesting</groupId>
-                <artifactId>fest-assert</artifactId>
-                <version>${version.org.easytesting.fest-assert}</version>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${version.org.assertj.assertj-core}</version>
             </dependency>
             <dependency>
                 <groupId>org.skyscreamer</groupId>

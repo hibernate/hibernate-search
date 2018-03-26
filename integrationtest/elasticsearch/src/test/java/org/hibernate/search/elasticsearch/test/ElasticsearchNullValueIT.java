@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.List;
@@ -85,19 +85,19 @@ public class ElasticsearchNullValueIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "active:false" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "driveWidth:\\-1" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
 
 		tx.commit();
 		s.close();

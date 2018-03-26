@@ -44,7 +44,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 

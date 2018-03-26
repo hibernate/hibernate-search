@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ public class ElasticsearchSpatialIT extends SearchTestBase {
 		List<?> result = session.createFullTextQuery( query, POI.class )
 				.setSort( new Sort( new DistanceSortField( 24, 32, "location" ) ) )
 				.list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Geo distance query" ).containsOnly( 1, 2, 3 );
+		assertThat( result ).extracting( "id" ).describedAs( "Geo distance query" ).containsOnly( 1, 2, 3 );
 
 		tx.commit();
 		s.close();
@@ -136,7 +136,7 @@ public class ElasticsearchSpatialIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( boundingBoxQuery );
 		List<?> result = session.createFullTextQuery( query, POI.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Geo distance query" ).containsOnly( 1, 2, 3, 4 );
+		assertThat( result ).extracting( "id" ).describedAs( "Geo distance query" ).containsOnly( 1, 2, 3, 4 );
 
 		tx.commit();
 		s.close();

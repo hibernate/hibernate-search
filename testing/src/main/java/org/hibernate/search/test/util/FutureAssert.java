@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.util;
 
-import static org.fest.assertions.Formatting.format;
+import static org.assertj.core.util.Strings.formatIfArgs;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -15,41 +15,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import org.fest.assertions.Assertions;
-import org.fest.assertions.GenericAssert;
+import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 /**
  * @author Yoann Rodiere
  */
-public class FutureAssert<T> extends GenericAssert<FutureAssert<T>, Future<T>> {
+public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
 
 	public static <T> FutureAssert<T> assertThat(Future<T> future) {
 		return new FutureAssert<>( future );
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected FutureAssert(Future<T> actual) {
-		super( (Class) FutureAssert.class, actual );
+		super( actual, FutureAssert.class );
 	}
 
 	public FutureAssert<T> isPending() {
 		try {
 			Object result = getNow();
-			failIfCustomMessageIsSet();
-			fail( format( "future <%s> should be pending, but instead it succeeded with result <%s>", actual, result ) );
+			failWithMessage( "future <%s> should be pending, but instead it succeeded with result <%s>", actual, result );
 		}
 		catch (TimeoutException e) {
 			// All's good
 		}
 		catch (CancellationException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should be pending, but instead it's been cancelled", actual ), e );
+			failWithMessage( "future <%s> should be pending, but instead it's been cancelled", actual );
 		}
 		catch (ExecutionException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should be pending, but instead it failed with exception: %s", actual, e ), e );
+			failWithMessage( "future <%s> should be pending, but instead it failed with exception: %s", actual, e );
 		}
 		return this;
 	}
@@ -70,21 +66,17 @@ public class FutureAssert<T> extends GenericAssert<FutureAssert<T>, Future<T>> {
 				valueAssertion.accept( result );
 			}
 			catch (AssertionError e2) {
-				failIfCustomMessageIsSet( e2 );
-				fail( format( "future <%s> succeeded as expected, but the result is wrong: %s", actual, e2 ), e2 );
+				failWithMessage( formatIfArgs( "future <%s> succeeded as expected, but the result is wrong: %s", actual, e2 ) );
 			}
 		}
 		catch (TimeoutException e) {
-			failIfCustomMessageIsSet();
-			fail( format( "future <%s> should have succeeded, but instead it's still pending", actual ) );
+			failWithMessage( "future <%s> should have succeeded, but instead it's still pending", actual );
 		}
 		catch (CancellationException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should have succeeded, but instead it's been cancelled", actual ), e );
+			failWithMessage( "future <%s> should have succeeded, but instead it's been cancelled", actual );
 		}
 		catch (ExecutionException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should have succeeded, but instead it failed with exception: %s", actual, e ), e );
+			failWithMessage( "future <%s> should have succeeded, but instead it failed with exception: %s", actual, e );
 		}
 		return this;
 	}
@@ -105,24 +97,20 @@ public class FutureAssert<T> extends GenericAssert<FutureAssert<T>, Future<T>> {
 		Object result;
 		try {
 			result = getNow();
-			failIfCustomMessageIsSet();
-			fail( format( "future <%s> should have failed, but instead it succeeded with result <%s>", actual, result ) );
+			failWithMessage( "future <%s> should have failed, but instead it succeeded with result <%s>", actual, result );
 		}
 		catch (TimeoutException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should have failed, but instead it's still pending", actual ), e );
+			failWithMessage( "future <%s> should have failed, but instead it's still pending", actual );
 		}
 		catch (CancellationException e) {
-			failIfCustomMessageIsSet( e );
-			fail( format( "future <%s> should have failed, but instead it's been cancelled", actual ), e );
+			failWithMessage( "future <%s> should have failed, but instead it's been cancelled", actual );
 		}
 		catch (ExecutionException e) {
 			try {
 				exceptionAssertion.accept( e.getCause() );
 			}
 			catch (AssertionError e2) {
-				failIfCustomMessageIsSet( e2 );
-				fail( format( "future <%s> failed as expected, but the exception is wrong: %s", actual, e2 ), e2 );
+				failWithMessage( "future <%s> failed as expected, but the exception is wrong: %s", actual, e2 );
 			}
 		}
 		return this;
@@ -143,12 +131,11 @@ public class FutureAssert<T> extends GenericAssert<FutureAssert<T>, Future<T>> {
 			Throwable t = e;
 			while ( t != null ) {
 				if ( t instanceof AssertionError ) {
-					fail( format( "future <%s> failed because of a failing assertion: %s", actual, e.getCause() ), e.getCause() );
+					failWithMessage( "future <%s> failed because of a failing assertion: %s", actual, e.getCause() );
 				}
 				t = t.getCause();
 			}
 			throw e;
 		}
 	}
-
 }

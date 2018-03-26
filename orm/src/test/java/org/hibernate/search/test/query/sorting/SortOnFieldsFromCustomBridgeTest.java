@@ -21,7 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -86,7 +86,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 			.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 3, 1, 2 );
+		assertThat( result ).extracting( "id" ).containsExactly( 3, 1, 2 );
 
 		tx.commit();
 		fullTextSession.close();
@@ -103,7 +103,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 			.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 3, 1, 2 );
+		assertThat( result ).extracting( "id" ).containsExactly( 3, 1, 2 );
 
 		tx.commit();
 		fullTextSession.close();
@@ -125,7 +125,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 			.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 3, 2, 1 );
+		assertThat( result ).extracting( "id" ).containsExactly( 3, 2, 1 );
 
 		tx.commit();
 		fullTextSession.close();
@@ -147,7 +147,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 			.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3 );
 
 		tx.commit();
 		fullTextSession.close();
@@ -164,7 +164,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 			.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 2, 1, 3 );
+		assertThat( result ).extracting( "id" ).containsExactly( 2, 1, 3 );
 
 		tx.commit();
 		fullTextSession.close();

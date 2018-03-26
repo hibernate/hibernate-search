@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -105,9 +105,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		TokenizerDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry( "max_token_length", new JsonPrimitive( "5" ) ) );
+				.containsEntry( "max_token_length", new JsonPrimitive( "5" ) );
 		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
-				.excludes( "maxTokenLength" );
+				.doesNotContain( "maxTokenLength" );
 	}
 
 	@Test
@@ -137,10 +137,10 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		CharFilterDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"escaped_tags",
 						JsonBuilder.array().add( new JsonPrimitive( "foo" ) ).add( new JsonPrimitive( "bar" ) ).build()
-				) );
+				);
 	}
 
 	@Test
@@ -154,10 +154,10 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		TokenFilterDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"tokenizer",
 						new JsonPrimitive( "whitespace" )
-				) );
+				);
 	}
 
 	@Test
@@ -187,10 +187,10 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		TokenFilterDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"patterns",
 						JsonBuilder.array().add( new JsonPrimitive( "foo" ) ).build()
-				) );
+				);
 	}
 
 	@Test
@@ -204,9 +204,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "stemmer" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"name", new JsonPrimitive( "light_norwegian" )
-				) );
+				);
 	}
 
 	@Test
@@ -221,9 +221,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "stemmer" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"name", new JsonPrimitive( "light_norwegian" )
-				) );
+				);
 	}
 
 	@Test
@@ -238,9 +238,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "stemmer" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"name", new JsonPrimitive( "light_nynorsk" )
-				) );
+				);
 	}
 
 	@Test
@@ -271,9 +271,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		TokenFilterDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"all", new JsonPrimitive( "false" )
-				) );
+				);
 	}
 
 	@Test
@@ -291,28 +291,24 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		TokenFilterDefinition definition = translator.translate( annotation );
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes(
-						entry(
-								"output_unigrams",
-								new JsonPrimitive( "true" )
-						)
+				.containsEntry(
+						"output_unigrams",
+						new JsonPrimitive( "true" )
 				);
 
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes(
-						entry(
-								"ignored_scripts",
-								JsonBuilder.array()
-										.add( new JsonPrimitive( "han" ) )
-										.add( new JsonPrimitive( "hiragana" ) )
-										.add( new JsonPrimitive( "katakana" ) )
-										.add( new JsonPrimitive( "hangul" ) )
-								.build()
-						)
+				.containsEntry(
+						"ignored_scripts",
+						JsonBuilder.array()
+								.add( new JsonPrimitive( "han" ) )
+								.add( new JsonPrimitive( "hiragana" ) )
+								.add( new JsonPrimitive( "katakana" ) )
+								.add( new JsonPrimitive( "hangul" ) )
+						.build()
 				);
 
 		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
-				.excludes( "han", "hiragana", "katakana", "hangul", "outputUnigrams" );
+				.doesNotContain( "han", "hiragana", "katakana", "hangul", "outputUnigrams" );
 	}
 
 	@Test
@@ -366,13 +362,13 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "keep_types" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry(
+				.containsEntry(
 						"types",
 						JsonBuilder.array()
 								.add( new JsonPrimitive( "<FOO>" ) )
 								.add( new JsonPrimitive( "<BAR>" ) )
 						.build()
-				) );
+				);
 		// No other parameter is expected, particularly not "useWhitelist"
 		assertThat( definition.getParameters() ).as( "parameters" ).hasSize( 1 );
 	}
@@ -395,7 +391,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "foo" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes(
+				.contains(
 						entry( "string", new JsonPrimitive( "foo" ) ),
 						entry( "boolean", new JsonPrimitive( true ) ),
 						entry( "integer", new JsonPrimitive( 42 ) ),
@@ -421,7 +417,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 						)
 				);
 		assertThat( definition.getParameters().keySet() ).as( "parameters" )
-				.excludes( "type" );
+				.doesNotContain( "type" );
 	}
 
 	@Test
@@ -437,9 +433,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getType() ).as( "type" ).isEqualTo( "stringWithoutQuotes" );
 		assertThat( definition.getParameters() ).as( "parameters" )
-				.includes( entry( "param", new JsonPrimitive( "stringWithoutQuotes" ) ) );
+				.containsEntry( "param", new JsonPrimitive( "stringWithoutQuotes" ) );
 		assertThat( definition.getParameters().keySet() ).as( "parameters" )
-				.excludes( "type" );
+				.doesNotContain( "type" );
 	}
 
 	@Test

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.bridge.provider;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.exception.SearchException;

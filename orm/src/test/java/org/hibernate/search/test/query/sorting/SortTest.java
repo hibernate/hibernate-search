@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.sorting;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -105,7 +105,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
 		tx.commit();
 	}
@@ -121,7 +121,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		tx.commit();
 	}
@@ -137,15 +137,15 @@ public class SortTest extends SearchTestBase {
 
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 		List<Book> result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
 		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
 		result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 		result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
 		tx.commit();
 	}
@@ -198,7 +198,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 4, 10, 3, 2, 1 );
+		assertThat( result ).extracting( "id" ).containsExactly( 4, 10, 3, 2, 1 );
 		assertEquals( "Groovy in Action", result.get( 0 ).getSummary() );
 
 		tx.commit();
@@ -262,7 +262,7 @@ public class SortTest extends SearchTestBase {
 		List<Book> result = hibQuery.list();
 
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsOnly( 1, 2, 3, 10 );
+		assertThat( result ).extracting( "id" ).containsOnly( 1, 2, 3, 10 );
 
 		tx.commit();
 	}
@@ -279,7 +279,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "id" ).containsExactly( 2, 1, 3, 4, 10 );
+		assertThat( result ).extracting( "id" ).containsExactly( 2, 1, 3, 4, 10 );
 
 		tx.commit();
 	}
@@ -297,10 +297,10 @@ public class SortTest extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertThat( result ).onProperty( "lastName" )
+		assertThat( result ).extracting( "lastName" )
 			.containsExactly( "Higgins", "Higgins", "Johnson", "Johnson" );
 
-		assertThat( result ).onProperty( "name" )
+		assertThat( result ).extracting( "name" )
 			.containsExactly( "Barny the brick layer", "Bart the brick layer", "Barny the brick layer", "Bill the brick layer" );
 
 		tx.commit();
@@ -317,11 +317,11 @@ public class SortTest extends SearchTestBase {
 
 		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
 		List<Book> result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, true ) ) );
 		result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 10, 3, 2, 1 );
+		assertThat( result ).extracting( "id" ).containsExactly( 10, 3, 2, 1 );
 
 		tx.commit();
 	}

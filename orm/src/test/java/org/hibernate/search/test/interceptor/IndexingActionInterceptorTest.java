@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.interceptor;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -69,8 +69,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		List<Blog> blogEntries = getBlogEntries();
-		assertThat( blogEntries ).as( "Blog is explicitly intercepted" ).excludes( blog );
-		assertThat( blogEntries ).as( "Article is inherently intercepted" ).excludes( article );
+		assertThat( blogEntries ).as( "Blog is explicitly intercepted" ).doesNotContain( blog );
+		assertThat( blogEntries ).as( "Article is inherently intercepted" ).doesNotContain( article );
 
 		tx.commit();
 	}
@@ -104,8 +104,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		List<Blog> blogEntries = getBlogEntries();
-		assertThat( blogEntries ).excludes( blog );
-		assertThat( blogEntries ).as( "Article is inherently intercepted" ).excludes( article );
+		assertThat( blogEntries ).doesNotContain( blog );
+		assertThat( blogEntries ).as( "Article is inherently intercepted" ).doesNotContain( article );
 
 		tx.commit();
 	}

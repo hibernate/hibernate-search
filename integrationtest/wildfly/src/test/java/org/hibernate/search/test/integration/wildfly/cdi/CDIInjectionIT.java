@@ -35,7 +35,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
@@ -91,63 +91,63 @@ public class CDIInjectionIT {
 	public void injectedFieldBridge() throws InterruptedException {
 		Function<String, List<EntityWithCDIAwareBridges>> search = dao::searchFieldBridge;
 
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithCDIAwareBridges entity = new EntityWithCDIAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithCDIAwareBridges entity2 = new EntityWithCDIAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 
 		dao.delete( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 	}
 
 	@Test
 	public void injectedClassBridge() throws InterruptedException {
 		Function<String, List<EntityWithCDIAwareBridges>> search = dao::searchClassBridge;
 
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithCDIAwareBridges entity = new EntityWithCDIAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).isEmpty();
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithCDIAwareBridges entity2 = new EntityWithCDIAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 
 		dao.delete( entity );
-		assertThat( search.apply( "bonjour" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
 	}
 }
