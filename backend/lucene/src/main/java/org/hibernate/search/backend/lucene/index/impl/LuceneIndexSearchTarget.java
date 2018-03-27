@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.impl.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
@@ -18,14 +18,8 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchTargetC
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchTargetPredicateRootContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.SearchTargetSortRootContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 
@@ -33,7 +27,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class LuceneIndexSearchTarget implements IndexSearchTarget {
+class LuceneIndexSearchTarget extends IndexSearchTargetBase {
 
 	private final LuceneSearchTargetModel searchTargetModel;
 	private final SearchTargetContext<?> searchTargetContext;
@@ -53,13 +47,8 @@ class LuceneIndexSearchTarget implements IndexSearchTarget {
 	}
 
 	@Override
-	public SearchPredicateContainerContext<SearchPredicate> predicate() {
-		return new SearchTargetPredicateRootContext<>( searchTargetContext.getSearchPredicateFactory() );
-	}
-
-	@Override
-	public SearchSortContainerContext<SearchSort> sort() {
-		return new SearchTargetSortRootContext<>( searchTargetContext.getSearchSortFactory() );
+	protected SearchTargetContext<?> getSearchTargetContext() {
+		return searchTargetContext;
 	}
 
 	@Override

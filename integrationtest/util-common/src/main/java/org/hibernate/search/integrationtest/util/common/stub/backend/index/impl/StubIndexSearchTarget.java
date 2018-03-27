@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.util.common.stub.backend.search.StubQueryElementCollector;
@@ -19,20 +20,14 @@ import org.hibernate.search.integrationtest.util.common.stub.backend.search.pred
 import org.hibernate.search.integrationtest.util.common.stub.backend.search.sort.StubSearchSortFactory;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchTargetPredicateRootContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.SearchTargetSortRootContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-class StubIndexSearchTarget implements IndexSearchTarget, SearchTargetContext<StubQueryElementCollector> {
+class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTargetContext<StubQueryElementCollector> {
 	private final StubSearchPredicateFactory predicateFactory;
 	private final StubSearchSortFactory sortFactory;
 	private final StubSearchQueryFactory queryFactory;
@@ -52,16 +47,6 @@ class StubIndexSearchTarget implements IndexSearchTarget, SearchTargetContext<St
 	}
 
 	@Override
-	public SearchPredicateContainerContext<SearchPredicate> predicate() {
-		return new SearchTargetPredicateRootContext<>( predicateFactory );
-	}
-
-	@Override
-	public SearchSortContainerContext<SearchSort> sort() {
-		return new SearchTargetSortRootContext<>( sortFactory );
-	}
-
-	@Override
 	public SearchPredicateFactory<? super StubQueryElementCollector> getSearchPredicateFactory() {
 		return predicateFactory;
 	}
@@ -74,6 +59,11 @@ class StubIndexSearchTarget implements IndexSearchTarget, SearchTargetContext<St
 	@Override
 	public SearchQueryFactory<StubQueryElementCollector> getSearchQueryFactory() {
 		return queryFactory;
+	}
+
+	@Override
+	protected SearchTargetContext<?> getSearchTargetContext() {
+		return this;
 	}
 
 	static class Builder implements IndexSearchTargetBuilder {
