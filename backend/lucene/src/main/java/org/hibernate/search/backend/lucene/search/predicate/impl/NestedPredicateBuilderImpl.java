@@ -46,6 +46,8 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		childQueryBuilder.add( LuceneQueries.nestedDocumentPathQuery( absoluteFieldPath ), Occur.FILTER );
 		childQueryBuilder.add( nestedQuery, Occur.MUST );
 
+		// TODO we should probably also filter the parent documents on the tenantId but we don't have the SessionContext at hand for now
+
 		// TODO at some point we should have a parameter for the score mode
 		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( LuceneQueries.mainDocumentQuery() ), ScoreMode.Avg );
 	}

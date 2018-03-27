@@ -23,12 +23,15 @@ public class AddEntryLuceneWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String tenantId;
+
 	private final String id;
 
 	private final LuceneIndexEntry indexEntry;
 
-	public AddEntryLuceneWork(String indexName, String id, LuceneIndexEntry indexEntry) {
+	public AddEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
 		super( "addEntry", indexName );
+		this.tenantId = tenantId;
 		this.id = id;
 		this.indexEntry = indexEntry;
 	}
@@ -43,7 +46,7 @@ public class AddEntryLuceneWork extends AbstractLuceneWork<Long> {
 			return CompletableFuture.completedFuture( indexWriter.addDocuments( indexEntry ) );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( indexName, id, e );
+			throw log.unableToIndexEntry( indexName, tenantId, id, e );
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.apache.lucene.index.Term;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.util.spi.Futures;
 import org.hibernate.search.util.spi.LoggerFactory;
 
@@ -25,27 +26,39 @@ public class UpdateEntryLuceneWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String tenantId;
+
 	private final String id;
 
 	private final LuceneIndexEntry indexEntry;
 
-	public UpdateEntryLuceneWork(String indexName, String id, LuceneIndexEntry indexEntry) {
+	public UpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
 		super( "updateEntry", indexName );
+		this.tenantId = tenantId;
 		this.id = id;
 		this.indexEntry = indexEntry;
 	}
 
 	@Override
 	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
-		return Futures.create( () -> updateEntry( context.getIndexWriter() ) );
+		return Futures.create( () -> CompletableFuture.completedFuture( updateEntry( context.getIndexWriter() ) ) );
 	}
 
-	private CompletableFuture<Long> updateEntry(IndexWriter indexWriter) {
+	private long updateEntry(IndexWriter indexWriter) {
 		try {
-			return CompletableFuture.completedFuture( indexWriter.updateDocuments( new Term( LuceneFields.idFieldName(), id ), indexEntry ) );
+			if ( tenantId == null ) {
+				// if the tenantId is null, we can do an atomic update
+				// we don't expose the query construction in LuceneQueries as it is not considered safe and should be
+				// used with care
+				return indexWriter.updateDocuments( new Term( LuceneFields.idFieldName(), id ), indexEntry );
+			}
+			else {
+				indexWriter.deleteDocuments( LuceneQueries.documentIdQuery( tenantId, id ) );
+				return indexWriter.addDocuments( indexEntry );
+			}
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( indexName, id, e );
+			throw log.unableToIndexEntry( indexName, tenantId, id, e );
 		}
 	}
 

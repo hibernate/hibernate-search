@@ -84,11 +84,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 22, value = "Unable to create the IndexWriter for backend '%1$s', index '%2$s' and path '%3$s'." )
 	SearchException unableToCreateIndexWriter(String backendName, String indexName, Path directoryPath, @Cause Exception e);
 
-	@Message(id = 23, value = "Unable to index entry '%2$s' for index '%1$s'." )
-	SearchException unableToIndexEntry(String indexName, String id, @Cause Exception e);
+	@Message(id = 23, value = "Unable to index entry '%3$s' for index '%1$s' and tenantId '%2$s'." )
+	SearchException unableToIndexEntry(String indexName, String tenantId, String id, @Cause Exception e);
 
-	@Message(id = 24, value = "Unable to delete entry '%2$s' from index '%1$s'." )
-	SearchException unableToDeleteEntryFromIndex(String indexName, String id, @Cause Exception e);
+	@Message(id = 24, value = "Unable to delete entry '%3$s' from index '%1$s' and tenantId '%2$s'." )
+	SearchException unableToDeleteEntryFromIndex(String indexName, String tenantId, String id, @Cause Exception e);
 
 	@Message(id = 25, value = "Unable to flush index '%1$s'." )
 	SearchException unableToFlushIndex(String indexName, @Cause Exception e);

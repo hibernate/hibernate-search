@@ -33,11 +33,11 @@ class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder
 	}
 
 	@Override
-	void contribute(String rootIndexName, String rootId, Document currentDocument, List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, String tenantId, String rootId, Document currentDocument, List<Document> nestedDocuments) {
 		for ( IndexableField field : fields ) {
 			currentDocument.add( field );
 		}
 
-		super.contribute( rootIndexName, rootId, currentDocument, nestedDocuments );
+		super.contribute( rootIndexName, tenantId, rootId, currentDocument, nestedDocuments );
 	}
 }

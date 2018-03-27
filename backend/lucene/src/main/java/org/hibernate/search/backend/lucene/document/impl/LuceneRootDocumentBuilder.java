@@ -34,17 +34,20 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentBuilder {
 		rootDocument.add( field );
 	}
 
-	public LuceneIndexEntry build(String indexName, String id) {
-		return new LuceneIndexEntry( indexName, id, assembleDocuments( indexName, id ) );
+	public LuceneIndexEntry build(String indexName, String tenantId, String id) {
+		return new LuceneIndexEntry( indexName, id, assembleDocuments( indexName, tenantId, id ) );
 	}
 
-	private List<Document> assembleDocuments(String indexName, String id) {
+	private List<Document> assembleDocuments(String indexName, String tenantId, String id) {
 		rootDocument.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT, Store.YES ) );
 		rootDocument.add( new StringField( LuceneFields.indexFieldName(), indexName, Store.YES ) );
+		if ( tenantId != null ) {
+			rootDocument.add( new StringField( LuceneFields.tenantIdFieldName(), tenantId, Store.YES ) );
+		}
 		rootDocument.add( new StringField( LuceneFields.idFieldName(), id, Store.YES ) );
 
 		List<Document> documents = new ArrayList<>();
-		contribute( indexName, id, rootDocument, documents );
+		contribute( indexName, tenantId, id, rootDocument, documents );
 		documents.add( rootDocument );
 
 		return documents;

@@ -34,14 +34,17 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 	}
 
 	@Override
-	void contribute(String rootIndexName, String rootId, Document currentDocument, List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, String tenantId, String rootId, Document currentDocument, List<Document> nestedDocuments) {
 		nestedDocument.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT, Store.YES ) );
 		nestedDocument.add( new StringField( LuceneFields.rootIndexFieldName(), rootIndexName, Store.YES ) );
+		if ( tenantId != null ) {
+			nestedDocument.add( new StringField( LuceneFields.tenantIdFieldName(), tenantId, Store.YES ) );
+		}
 		nestedDocument.add( new StringField( LuceneFields.rootIdFieldName(), rootId, Store.YES ) );
 		nestedDocument.add( new StringField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath(), Store.YES ) );
 
 		nestedDocuments.add( nestedDocument );
 
-		super.contribute( rootIndexName, rootId, nestedDocument, nestedDocuments );
+		super.contribute( rootIndexName, tenantId, rootId, nestedDocument, nestedDocuments );
 	}
 }

@@ -24,6 +24,8 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 class SearchQueryBuilderImpl<C, T>
 		implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
+	private final String tenantId;
+
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchTargetModel searchTargetModel;
@@ -38,12 +40,10 @@ class SearchQueryBuilderImpl<C, T>
 			SessionContext context,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
+		this.tenantId = context.getTenantIdentifier();
+
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
-		String tenantId = context.getTenantIdentifier();
-		if ( tenantId != null ) {
-			// TODO handle tenant ID filtering
-		}
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchTargetModel = searchTargetModel;
@@ -67,6 +67,9 @@ class SearchQueryBuilderImpl<C, T>
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
+		if ( tenantId != null ) {
+			luceneQueryBuilder.add( LuceneQueries.tenantIdQuery( tenantId ), Occur.FILTER );
+		}
 
 		return new LuceneSearchQuery<T>( queryOrchestrator, workFactory,
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),

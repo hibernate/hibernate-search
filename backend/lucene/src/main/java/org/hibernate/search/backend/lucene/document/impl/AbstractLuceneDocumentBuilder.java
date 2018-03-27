@@ -61,16 +61,16 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 		}
 	}
 
-	void contribute(String rootIndexName, String rootId, Document currentDocument, List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, String tenantId, String rootId, Document currentDocument, List<Document> nestedDocuments) {
 		if ( flattenedObjectDocumentBuilders != null ) {
 			for ( LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder : flattenedObjectDocumentBuilders ) {
-				flattenedObjectDocumentBuilder.contribute( rootIndexName, rootId, currentDocument, nestedDocuments );
+				flattenedObjectDocumentBuilder.contribute( rootIndexName, tenantId, rootId, currentDocument, nestedDocuments );
 			}
 		}
 
 		if ( nestedObjectDocumentBuilders != null ) {
 			for ( LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder : nestedObjectDocumentBuilders ) {
-				nestedObjectDocumentBuilder.contribute( rootIndexName, rootId, currentDocument, nestedDocuments );
+				nestedObjectDocumentBuilder.contribute( rootIndexName, tenantId, rootId, currentDocument, nestedDocuments );
 			}
 		}
 	}

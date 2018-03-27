@@ -14,11 +14,11 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
  */
 public interface LuceneWorkFactory {
 
-	LuceneIndexWork<?> add(String indexName, String id, String routingKey, LuceneIndexEntry indexEntry);
+	LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
 
-	LuceneIndexWork<?> update(String indexName, String id, String routingKey, LuceneIndexEntry indexEntry);
+	LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
 
-	LuceneIndexWork<?> delete(String indexName, String id, String routingKey);
+	LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey);
 
 	LuceneIndexWork<?> commit(String indexName);
 

@@ -16,18 +16,18 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
 public class StubLuceneWorkFactory implements LuceneWorkFactory {
 
 	@Override
-	public LuceneIndexWork<?> add(String indexName, String id, String routingKey, LuceneIndexEntry indexEntry) {
-		return new AddEntryLuceneWork( indexName, id, indexEntry );
+	public LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
+		return new AddEntryLuceneWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneIndexWork<?> update(String indexName, String id, String routingKey, LuceneIndexEntry indexEntry) {
-		return new UpdateEntryLuceneWork( indexName, id, indexEntry );
+	public LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
+		return new UpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneIndexWork<?> delete(String indexName, String id, String routingKey) {
-		return new DeleteEntryLuceneWork( indexName, id );
+	public LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey) {
+		return new DeleteEntryLuceneWork( indexName, tenantId, id );
 	}
 
 	@Override

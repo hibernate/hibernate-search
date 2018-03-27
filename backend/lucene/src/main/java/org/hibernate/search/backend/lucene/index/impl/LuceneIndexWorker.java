@@ -33,11 +33,11 @@ public abstract class LuceneIndexWorker implements IndexWorker<LuceneRootDocumen
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
-		String id = toActualId( referenceProvider.getIdentifier() );
+		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
-		collect( factory.add( indexName, id, routingKey, builder.build( indexName, id ) ) );
+		collect( factory.add( indexName, tenantId, id, routingKey, builder.build( indexName, tenantId, id ) ) );
 		// FIXME remove this explicit commit
 		collect( factory.commit( indexName ) );
 	}
@@ -45,26 +45,22 @@ public abstract class LuceneIndexWorker implements IndexWorker<LuceneRootDocumen
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
-		String id = toActualId( referenceProvider.getIdentifier() );
+		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
-		collect( factory.update( indexName, id, routingKey, builder.build( indexName, id ) ) );
+		collect( factory.update( indexName, tenantId, id, routingKey, builder.build( indexName, tenantId, id ) ) );
 		// FIXME remove this explicit commit
 		collect( factory.commit( indexName ) );
 	}
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
-		String id = toActualId( referenceProvider.getIdentifier() );
+		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
-		collect( factory.delete( indexName, id, routingKey ) );
+		collect( factory.delete( indexName, tenantId, id, routingKey ) );
 		// FIXME remove this explicit commit
 		collect( factory.commit( indexName ) );
-	}
-
-	protected final String toActualId(String id) {
-		return tenantId == null ? id : tenantId + "_" + id;
 	}
 
 	protected abstract void collect(LuceneIndexWork<?> work);
