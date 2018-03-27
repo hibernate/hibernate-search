@@ -94,6 +94,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
                 <version>${project.version}</version>
             </dependency>
