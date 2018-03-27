@@ -53,12 +53,10 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	}
 
 	public SearchResult<T> execute() throws IOException {
-		int maxDocs = getMaxDocs();
-
 		// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
 
-		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder();
-		hitExtractor.contributeCollectors( luceneCollectorsBuilder, luceneSort, maxDocs );
+		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs() );
+		hitExtractor.contributeCollectors( luceneCollectorsBuilder );
 		LuceneCollectors luceneCollectors = luceneCollectorsBuilder.build();
 
 		indexSearcher.search( luceneQuery, luceneCollectors.getCompositeCollector() );

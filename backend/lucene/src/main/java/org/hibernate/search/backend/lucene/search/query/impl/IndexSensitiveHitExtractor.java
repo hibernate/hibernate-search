@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.util.impl.CollectionHelper;
 
@@ -29,9 +28,9 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder, Sort luceneSort, int maxDocs) {
+	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
 		for ( HitExtractor<?> extractor : extractorByIndex.values() ) {
-			extractor.contributeCollectors( luceneCollectorBuilder, luceneSort, maxDocs );
+			extractor.contributeCollectors( luceneCollectorBuilder );
 		}
 	}
 

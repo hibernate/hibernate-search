@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -34,8 +33,8 @@ class DocumentReferenceProjectionDocumentExtractor implements ProjectionDocument
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder, Sort luceneSort, int maxDocs) {
-		luceneCollectorBuilder.requireTopDocsCollector( luceneSort, maxDocs );
+	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+		luceneCollectorBuilder.requireTopDocsCollector();
 	}
 
 	@Override

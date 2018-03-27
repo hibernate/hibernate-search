@@ -19,13 +19,22 @@ import org.apache.lucene.search.TotalHitCountCollector;
 
 class LuceneCollectorsBuilder {
 
+	private Sort sort;
+
+	private int maxDocs;
+
 	private TopDocsCollector<?> topDocsCollector;
 
 	private TotalHitCountCollector totalHitCountCollector;
 
 	private List<Collector> luceneCollectors = new ArrayList<>();
 
-	void requireTopDocsCollector(Sort sort, int maxDocs) {
+	LuceneCollectorsBuilder(Sort sort, int maxDocs) {
+		this.sort = sort;
+		this.maxDocs = maxDocs;
+	}
+
+	void requireTopDocsCollector() {
 		if ( maxDocs == 0 ) {
 			if ( totalHitCountCollector == null ) {
 				totalHitCountCollector = new TotalHitCountCollector();

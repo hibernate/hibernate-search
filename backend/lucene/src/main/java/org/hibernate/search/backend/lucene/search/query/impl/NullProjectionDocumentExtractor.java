@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 class NullProjectionDocumentExtractor implements ProjectionDocumentExtractor {
@@ -26,7 +25,7 @@ class NullProjectionDocumentExtractor implements ProjectionDocumentExtractor {
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder, Sort luceneSort, int maxDocs) {
+	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
 	}
 
 	@Override

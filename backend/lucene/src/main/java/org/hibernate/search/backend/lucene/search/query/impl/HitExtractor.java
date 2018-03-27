@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 
 public interface HitExtractor<C> {
 
@@ -18,10 +17,8 @@ public interface HitExtractor<C> {
 	 * Contribute to the Lucene collectors, making sure that the information required by this extractor are collected.
 	 *
 	 * @param luceneCollectorBuilder the Lucene collector builder.
-	 * @param luceneSort the Lucene sort.
-	 * @param maxDocs the maximum number of documents the collector should collect.
 	 */
-	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder, Sort luceneSort, int maxDocs);
+	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder);
 
 	/**
 	 * Perform hit extraction.

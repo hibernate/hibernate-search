@@ -10,12 +10,11 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 interface ProjectionDocumentExtractor {
 
-	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder, Sort luceneSort, int maxDocs);
+	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder);
 
 	void contributeFields(Set<String> absoluteFieldPaths);
 
