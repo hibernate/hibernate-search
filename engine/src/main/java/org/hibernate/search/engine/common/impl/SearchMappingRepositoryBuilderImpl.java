@@ -40,10 +40,6 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 
-
-/**
- * @author Yoann Rodiere
- */
 public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
 
 	private final ConfigurationPropertySource mainPropertySource;
@@ -105,10 +101,10 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		Map<MappingKey<?>, Mapper<?, ?>> mappers =
 				metadataCollector.createMappers( buildContext, propertySource, indexManagerBuildingStateProvider );
 
-		Map<MappingKey<?>, MappingImplementor> mappings = new HashMap<>();
+		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
 		// TODO close the mappings created so far if anything fails after this
 		mappers.forEach( (mappingKey, mapper) -> {
-			MappingImplementor mapping = mapper.build();
+			MappingImplementor<?> mapping = mapper.build();
 			mappings.put( mappingKey, mapping );
 		} );
 
@@ -163,7 +159,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private <C> MapperContribution<C, ?> getOrCreateContribution(
 				MapperFactory<C, ?> mapperFactory) {
 			return (MapperContribution<C, ?>) contributionByMappingKey.computeIfAbsent(
-					mapperFactory, ignored -> new MapperContribution<>( mapperFactory )
+					mapperFactory.getMappingKey(), ignored -> new MapperContribution<>( mapperFactory )
 			);
 		}
 
@@ -183,7 +179,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 	}
 
-	private static class MapperContribution<C, M extends MappingImplementor> {
+	private static class MapperContribution<C, M> {
 
 		private final MapperFactory<C, M> mapperFactory;
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();

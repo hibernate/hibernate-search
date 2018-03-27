@@ -7,36 +7,33 @@
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoMappingContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapperFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-/**
- * @author Yoann Rodiere
- */
-public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI extends MappingImplementor>
+public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 		implements PojoMappingContributor<M> {
 
 	private final SearchMappingRepositoryBuilder mappingRepositoryBuilder;
-
-	private final PojoMapperFactory<MI> mapperFactory;
-
+	private final PojoMapperFactory<M> mapperFactory;
 	private final PojoBootstrapIntrospector introspector;
 
 	private AnnotationMappingDefinitionImpl annotationMappingDefinition;
 
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			PojoMapperFactory<MI> mapperFactory,
+			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
 			PojoBootstrapIntrospector introspector,
 			boolean annotatedTypeDiscoveryEnabled) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
-		this.mapperFactory = mapperFactory;
+		this.mapperFactory = new PojoMapperFactory<>(
+				mappingKey, mappingFactory, introspector, annotatedTypeDiscoveryEnabled
+		);
 		this.introspector = introspector;
 
 		/*
@@ -54,7 +51,8 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	@Override
 	public ProgrammaticMappingDefinition programmaticMapping() {
-		ProgrammaticMappingDefinitionImpl definition = new ProgrammaticMappingDefinitionImpl( mapperFactory, introspector );
+		ProgrammaticMappingDefinitionImpl definition =
+				new ProgrammaticMappingDefinitionImpl( mapperFactory, introspector );
 		mappingRepositoryBuilder.addMapping( definition );
 		return definition;
 	}
@@ -66,8 +64,6 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping, MI exten
 
 	@Override
 	public M getResult() {
-		return toReturnType( mappingRepositoryBuilder.getBuiltResult().getMapping( mapperFactory ) );
+		return mappingRepositoryBuilder.getBuiltResult().getMapping( mapperFactory.getMappingKey() );
 	}
-
-	protected abstract M toReturnType(MI mapping);
 }

@@ -27,23 +27,19 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.util.AssertionFailure;
 
-
-/**
- * @author Yoann Rodiere
- */
-public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoTypeMetadataContributor, M> {
+public class PojoMapper<M> implements Mapper<PojoTypeMetadataContributor, M> {
 
 	private final PojoIndexModelBinder indexModelBinder;
 	private final ConfigurationPropertySource propertySource;
 	private final boolean implicitProvidedId;
-	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory;
+	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 
 	private final List<PojoTypeManagerBuilder<?, ?>> typeManagerBuilders = new ArrayList<>();
 
 	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
-			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, M> wrapperFactory) {
+			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
 		ContainerValueExtractorResolver extractorResolver = new ContainerValueExtractorResolver( buildContext );
 		BridgeResolver bridgeResolver = new BridgeResolver();
 		this.indexModelBinder = new PojoIndexModelBinderImpl(
@@ -78,7 +74,7 @@ public class PojoMapper<M extends MappingImplementor> implements Mapper<PojoType
 	}
 
 	@Override
-	public M build() {
+	public MappingImplementor<M> build() {
 		PojoTypeManagerContainer.Builder typeManagersBuilder = PojoTypeManagerContainer.builder();
 		typeManagerBuilders.forEach( b -> b.addTo( typeManagersBuilder ) );
 		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl( typeManagersBuilder.build() );

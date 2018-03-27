@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 
-public class PojoMappingImpl implements PojoMapping, MappingImplementor {
+public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapping, MappingImplementor<M> {
 
 	private final PojoMappingDelegate delegate;
 

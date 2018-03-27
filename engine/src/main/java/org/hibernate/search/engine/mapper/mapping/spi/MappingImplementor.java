@@ -12,9 +12,11 @@ package org.hibernate.search.engine.mapper.mapping.spi;
  * Publicly exposed mapping interfaces do not have to extend this interface;
  * only the implementations have to implement it.
  *
- * @author Yoann Rodiere
+ * @param <M> The API type for this implementor.
  */
-public interface MappingImplementor extends AutoCloseable {
+public interface MappingImplementor<M> extends AutoCloseable {
+
+	M toAPI();
 
 	@Override
 	void close();

@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImpl;
 
-public class HibernateOrmMappingImpl extends PojoMappingImpl
+public class HibernateOrmMappingImpl extends PojoMappingImpl<HibernateOrmMapping>
 		implements HibernateOrmMapping {
 
 	private final SessionFactoryImplementor sessionFactoryImplementor;
@@ -25,6 +25,11 @@ public class HibernateOrmMappingImpl extends PojoMappingImpl
 	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor) {
 		super( mappingDelegate );
 		this.sessionFactoryImplementor = sessionFactoryImplementor;
+	}
+
+	@Override
+	public HibernateOrmMapping toAPI() {
+		return this;
 	}
 
 	@Override

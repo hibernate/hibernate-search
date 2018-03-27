@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.util.spi.Closer;
 
-public class StubMapping implements MappingImplementor {
+public class StubMapping implements MappingImplementor<StubMapping> {
 
 	private final Map<String, String> normalizedIndexNamesByTypeIdentifier;
 	private final Map<String, IndexManager<?>> indexManagersByTypeIdentifier;
@@ -21,6 +21,11 @@ public class StubMapping implements MappingImplementor {
 			Map<String, IndexManager<?>> indexManagersByTypeIdentifier) {
 		this.normalizedIndexNamesByTypeIdentifier = normalizedIndexNamesByTypeIdentifier;
 		this.indexManagersByTypeIdentifier = indexManagersByTypeIdentifier;
+	}
+
+	@Override
+	public StubMapping toAPI() {
+		return this;
 	}
 
 	public String getNormalizedIndexNameByTypeIdentifier(String typeId) {

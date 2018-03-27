@@ -8,14 +8,11 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
-/**
- * @author Yoann Rodiere
- */
-public interface MapperFactory<C, M extends MappingImplementor>
-		extends MappingKey<M> {
+public interface MapperFactory<C, M> {
+
+	MappingKey<M> getMappingKey();
 
 	Mapper<C, M> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource);
 

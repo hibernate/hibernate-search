@@ -9,10 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-/**
- * @author Yoann Rodiere
- */
-public interface Mapper<C, M extends MappingImplementor> {
+public interface Mapper<C, M> {
 
 	/**
 	 * @param typeModel A model of the type to be mapped
@@ -24,6 +21,6 @@ public interface Mapper<C, M extends MappingImplementor> {
 			IndexManagerBuildingState<?> indexManagerBuildingState,
 			TypeMetadataContributorProvider<C> contributorProvider);
 
-	M build();
+	MappingImplementor<M> build();
 
 }

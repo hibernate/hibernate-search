@@ -9,14 +9,11 @@ package org.hibernate.search.mapper.orm.mapping;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapperFactory;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingImpl;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingFactory;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
 
-/**
- * @author Yoann Rodiere
- */
 /*
  * TODO create a Hibernate ORM specific mapper, with the following additions:
  *  1. During mapping creation, use the Hibernate ORM identifier as a fallback when no document ID was found
@@ -26,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
  *  5. And more?
  */
-public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<HibernateOrmMapping, HibernateOrmMappingImpl> {
+public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<HibernateOrmMapping> {
 
 	public HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor,
@@ -38,12 +35,11 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 	private HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			HibernateOrmBootstrapIntrospector introspector, SessionFactoryImplementor sessionFactoryImplementor,
 			boolean annotatedTypeDiscoveryEnabled) {
-		super( mappingRepositoryBuilder, new HibernateOrmMapperFactory( introspector, sessionFactoryImplementor ),
-				introspector, annotatedTypeDiscoveryEnabled );
+		super(
+				mappingRepositoryBuilder, new HibernateOrmMappingKey(),
+				new HibernateOrmMappingFactory( sessionFactoryImplementor ),
+				introspector, annotatedTypeDiscoveryEnabled
+		);
 	}
 
-	@Override
-	protected HibernateOrmMapping toReturnType(HibernateOrmMappingImpl mapping) {
-		return mapping;
-	}
 }

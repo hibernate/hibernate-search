@@ -9,32 +9,29 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.engine.common.spi.BeanReference;
-import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperFactory;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
-/**
- * @author Yoann Rodiere
- */
 public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeMetadataContributor {
 
-	private final PojoMapperFactory<?> mapperFactory;
+	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
 	private final PojoRawTypeModel<?> typeModel;
 
 	private String indexName;
@@ -43,7 +40,7 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final List<PojoMetadataContributor<? super PojoModelCollectorTypeNode, ? super PojoMappingCollectorTypeNode>>
 			children = new ArrayList<>();
 
-	TypeMappingContextImpl(PojoMapperFactory<?> mapperFactory, PojoRawTypeModel<?> typeModel) {
+	TypeMappingContextImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory, PojoRawTypeModel<?> typeModel) {
 		this.mapperFactory = mapperFactory;
 		this.typeModel = typeModel;
 	}
