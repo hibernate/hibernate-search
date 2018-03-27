@@ -14,11 +14,11 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 /**
  * @author Guillaume Smet
  */
-// TODO the ReaderProvider will need some work as we will probably need all the complexity
-// of the current ReaderProvider hierarchy but for now having it here will do
-public interface LuceneIndexManager extends IndexManager<LuceneRootDocumentBuilder>, ReaderProvider {
+public interface LuceneIndexManager extends IndexManager<LuceneRootDocumentBuilder> {
 
 	String getName();
 
 	LuceneIndexModel getModel();
+
+	ReaderProvider getReaderProvider();
 }

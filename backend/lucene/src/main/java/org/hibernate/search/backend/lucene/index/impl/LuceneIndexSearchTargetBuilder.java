@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
@@ -53,7 +52,7 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		// TODO obviously, this will have to be changed once we have the full storage complexity from Search 5
-		Set<ReaderProvider> readerProviders = indexManagers.stream().map( Function.identity() )
+		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManager::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new LuceneIndexSearchTarget( backend, indexModels, readerProviders );

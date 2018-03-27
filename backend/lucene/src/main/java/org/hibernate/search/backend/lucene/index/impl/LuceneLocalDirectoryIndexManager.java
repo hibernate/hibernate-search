@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.impl.LuceneBackend;
+import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
@@ -31,7 +32,8 @@ import org.hibernate.search.util.spi.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager {
+// TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
+public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -107,6 +109,11 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager {
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Lucene index manager", e );
 		}
+	}
+
+	@Override
+	public ReaderProvider getReaderProvider() {
+		return this;
 	}
 
 	@Override
