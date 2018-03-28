@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 /**
  * Represents an arbitrarily long access path bound to a specific POJO model.
  * <p>
- * For instance the path could be:
+ * This class and its various subclasses are similar to {@link PojoModelPath},
+ * except they provide information about the types they are bound to.
+ * As a result, they include type node. For instance the path could be:
  * <code>
  * Type A =&gt; property "propertyOfA" =&gt; extractor "MapValueExtractor" =&gt; Type B =&gt; property "propertyOfB"
  * </code>

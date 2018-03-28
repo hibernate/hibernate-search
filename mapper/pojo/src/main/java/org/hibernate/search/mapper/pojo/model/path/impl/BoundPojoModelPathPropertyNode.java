@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
@@ -42,6 +44,17 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	public PojoPropertyModel<P> getPropertyModel() {
 		return propertyModel;
+	}
+
+	public PojoModelPathPropertyNode toUnboundPath() {
+		String propertyName = propertyHandle.getName();
+		BoundPojoModelPathValueNode<?, ?, ?> parentParent = parent.parent();
+		if ( parentParent == null ) {
+			return PojoModelPath.fromRoot( propertyName );
+		}
+		else {
+			return parentParent.toUnboundPath().property( propertyName );
+		}
 	}
 
 	@Override
