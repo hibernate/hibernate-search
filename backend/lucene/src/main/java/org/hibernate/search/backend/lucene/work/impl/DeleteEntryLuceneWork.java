@@ -37,6 +37,7 @@ public class DeleteEntryLuceneWork extends AbstractLuceneWork<Long> {
 
 	@Override
 	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
+		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
 	}
 
