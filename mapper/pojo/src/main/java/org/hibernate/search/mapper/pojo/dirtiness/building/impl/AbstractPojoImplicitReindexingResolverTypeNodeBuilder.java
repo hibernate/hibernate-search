@@ -15,67 +15,67 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-class PojoImplicitReindexingResolverTypeNodeBuilder<T>
+abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder {
 
-	private final BoundPojoModelPathTypeNode<T> modelPath;
-	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
+	private final BoundPojoModelPathTypeNode<U> modelPath;
+	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
 			new HashMap<>();
 
-	PojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<T> modelPath,
+	private boolean markForReindexing = false;
+
+	AbstractPojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.modelPath = modelPath;
 	}
 
-	PojoTypeModel<?> getType() {
-		return modelPath.getTypeModel();
-	}
-
-	PojoImplicitReindexingResolverPropertyNodeBuilder<T, ?> property(String propertyName) {
-		return getOrCreatePropertyBuilder( propertyName );
-	}
-
 	@Override
-	BoundPojoModelPathTypeNode<T> getModelPath() {
+	BoundPojoModelPathTypeNode<U> getModelPath() {
 		return modelPath;
 	}
 
-	public Optional<PojoImplicitReindexingResolver<T>> build() {
-		Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> immutablePropertyNodes =
+	PojoTypeModel<U> getTypeModel() {
+		return modelPath.getTypeModel();
+	}
+
+	PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> property(String propertyName) {
+		return getOrCreatePropertyBuilder( propertyName );
+	}
+
+	void markForReindexing() {
+		markForReindexing = true;
+	}
+
+	abstract Optional<PojoImplicitReindexingResolver<T>> build();
+
+	final boolean isMarkForReindexing() {
+		return markForReindexing;
+	}
+
+	final Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> buildPropertyNodes() {
+		Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> immutablePropertyNodes =
 				propertyNodeBuilders.isEmpty() ? Collections.emptyList() : new ArrayList<>( propertyNodeBuilders.size() );
 		propertyNodeBuilders.values().stream()
 				.map( PojoImplicitReindexingResolverPropertyNodeBuilder::build )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutablePropertyNodes::add );
-
-		if ( immutablePropertyNodes.isEmpty() ) {
-			/*
-			 * If this resolver doesn't resolve to anything,
-			 * then it is useless and we don't need to build it
-			 */
-			return Optional.empty();
-		}
-		else {
-			return Optional.of( new PojoImplicitReindexingResolverTypeNode<>( immutablePropertyNodes ) );
-		}
+		return immutablePropertyNodes;
 	}
 
-	private PojoImplicitReindexingResolverPropertyNodeBuilder<T, ?> getOrCreatePropertyBuilder(String propertyName) {
+	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );
 	}
 
-	private PojoImplicitReindexingResolverPropertyNodeBuilder<T, ?> createPropertyBuilder(String propertyName) {
-		PropertyHandle handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
+	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> createPropertyBuilder(String propertyName) {
+				PropertyHandle handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
 		return new PojoImplicitReindexingResolverPropertyNodeBuilder<>(
 				modelPath.property( handle ), buildingHelper
 		);
 	}
-
 }

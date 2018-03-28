@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 /**
  * @param <T> The property holder type of this node, i.e. the type from which the property is retrieved.
@@ -18,7 +19,7 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 
 	private final BoundPojoModelPathPropertyNode<T, P> parent;
 	private final BoundContainerValueExtractorPath<P, V> boundExtractorPath;
-	private BoundPojoModelPathTypeNode<V> elementTypePathNode;
+	private BoundPojoModelPathOriginalTypeNode<V> elementTypePathNode;
 
 	BoundPojoModelPathValueNode(BoundPojoModelPathPropertyNode<T, P> parent,
 			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
@@ -37,13 +38,20 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	/**
 	 * @return A child path node representing the type of values represented by this node.
 	 */
-	public BoundPojoModelPathTypeNode<V> type() {
+	public BoundPojoModelPathOriginalTypeNode<V> type() {
 		if ( elementTypePathNode == null ) {
-			elementTypePathNode = new BoundPojoModelPathTypeNode<>(
+			elementTypePathNode = new BoundPojoModelPathOriginalTypeNode<>(
 					this, boundExtractorPath.getExtractedType()
 			);
 		}
 		return elementTypePathNode;
+	}
+
+	/**
+	 * @return A child path node representing values represented by this node, casted to the given type.
+	 */
+	public <U> BoundPojoModelPathCastedTypeNode<V, U> castedType(PojoRawTypeModel<U> typeModel) {
+		return new BoundPojoModelPathCastedTypeNode<>( this, typeModel );
 	}
 
 	/**

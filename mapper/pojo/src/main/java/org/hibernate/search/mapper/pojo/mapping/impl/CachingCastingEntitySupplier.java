@@ -31,6 +31,7 @@ public class CachingCastingEntitySupplier<E> implements Supplier<E> {
 	@Override
 	public E get() {
 		if ( unproxiedEntity == null ) {
+			// TODO avoid unnecessary unproxying by asking the introspector if the entity has the target type first
 			unproxiedEntity = caster.cast( proxyIntrospector.unproxy( potentiallyProxiedEntity ) );
 		}
 		return unproxiedEntity;

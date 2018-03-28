@@ -46,8 +46,9 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 		return new CachingCastingEntitySupplier<>( caster, proxyIntrospector, entity );
 	}
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, Supplier<E> entitySupplier) {
-		reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get() );
+	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+			Supplier<E> entitySupplier) {
+		reindexingResolver.resolveEntitiesToReindex( collector, runtimeIntrospector, entitySupplier.get() );
 	}
 
 	ChangesetPojoContainedTypeWorker<E> createWorker(PojoSessionContext sessionContext) {

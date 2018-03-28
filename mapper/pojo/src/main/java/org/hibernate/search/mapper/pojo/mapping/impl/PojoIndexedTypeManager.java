@@ -96,10 +96,11 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return new PojoDocumentContributor<>( processor, entitySupplier );
 	}
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, Supplier<E> entitySupplier) {
+	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+			Supplier<E> entitySupplier) {
 		// TODO take into account dirty properties to only contribute containing entities
 		// that are affected by the changes in the contained entity
-		reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get() );
+		reindexingResolver.resolveEntitiesToReindex( collector, runtimeIntrospector, entitySupplier.get() );
 	}
 
 	ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {

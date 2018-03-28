@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
  */
 public abstract class BoundPojoModelPath {
 
-	public static <T> BoundPojoModelPathTypeNode<T> root(PojoRawTypeModel<T> typeModel) {
-		return new BoundPojoModelPathTypeNode<>( null, typeModel );
+	public static <T> BoundPojoModelPathOriginalTypeNode<T> root(PojoRawTypeModel<T> typeModel) {
+		return new BoundPojoModelPathOriginalTypeNode<>( null, typeModel );
 	}
 
 	BoundPojoModelPath() {

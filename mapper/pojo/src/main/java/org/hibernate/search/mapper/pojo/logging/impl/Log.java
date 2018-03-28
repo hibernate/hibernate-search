@@ -136,7 +136,8 @@ public interface Log extends BasicLogger {
 			String errorMessage,
 			@Cause Exception cause);
 
-	@Message(id = 22, value = "The inverse association targets type '%1$s', but a supertype of '%2$s' was expected.")
+	@Message(id = 22, value = "The inverse association targets type '%1$s',"
+			+ " but a supertype or subtype of '%2$s' was expected.")
 	SearchException incorrectTargetTypeForInverseAssociation(PojoRawTypeModel<?> inverseAssociationTargetType,
 			PojoRawTypeModel<?> entityType);
 }

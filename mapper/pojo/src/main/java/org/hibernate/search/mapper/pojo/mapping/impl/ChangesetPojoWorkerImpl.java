@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 
 class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
@@ -101,31 +102,30 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 
 	private ChangesetPojoIndexedTypeWorker<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
 		ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
-		if ( delegate == null ) {
-			Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
-					indexedTypeManagers.getByExactClass( clazz );
-			if ( indexedTypeManagerOptional.isPresent() ) {
-				delegate = indexedTypeManagerOptional.get().createWorker( sessionContext );
-				indexedTypeDelegates.put( clazz, delegate );
-			}
+		if ( delegate != null ) {
+			return delegate;
 		}
-		return delegate;
+
+		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
+				indexedTypeManagers.getByExactClass( clazz );
+		if ( indexedTypeManagerOptional.isPresent() ) {
+			delegate = indexedTypeManagerOptional.get().createWorker( sessionContext );
+			indexedTypeDelegates.put( clazz, delegate );
+			return delegate;
+		}
+
+		throw new AssertionFailure(
+				"Attempt to reindex an entity of type " + clazz + " because a contained entity was modified,"
+				+ " but " + clazz + " is not indexed directly."
+				+ " This is proa"
+		);
 	}
 
 	private void updateBecauseOfContained(Object containingEntity) {
 		// TODO ignore the event when containingEntity has provided IDs
 		Class<?> clazz = getIntrospector().getClass( containingEntity );
 		ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
-		/*
-		 * There may be false positives. For instance, when an indexed entity extends another entity
-		 * and adds an @IndexedEmbedded on an association of the parent entity, then the inverse side of the association
-		 * will target the parent entity, and at runtime the inverse side value may be an instance of the indexed type,
-		 * but it may equally well be an instance of its parent type.
-		 * In such cases, just ignore the event.
-		 */
-		if ( delegate != null ) {
-			delegate.updateBecauseOfContained( containingEntity );
-		}
+		delegate.updateBecauseOfContained( containingEntity );
 	}
 
 }

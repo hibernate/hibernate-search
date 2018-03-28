@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
@@ -48,7 +49,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 			PojoRawTypeModel<? super T> rawType = modelPath.getTypeModel().getRawType();
 			for ( PojoRawTypeModel<?> concreteEntityType :
 					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
-				PojoImplicitReindexingResolverTypeNodeBuilder<?> builder =
+				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType );
 				parent.markForReindexing( builder );
 			}
@@ -57,6 +58,10 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 
 	PojoIndexingDependencyCollectorValueNode<?, T> getParent() {
 		return parent;
+	}
+
+	PojoTypeModel<T> getTypeModel() {
+		return modelPath.getTypeModel();
 	}
 
 }

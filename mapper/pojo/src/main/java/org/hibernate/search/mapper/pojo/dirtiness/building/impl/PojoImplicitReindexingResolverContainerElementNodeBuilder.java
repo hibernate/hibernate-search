@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
@@ -40,20 +41,18 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 	}
 
 	Optional<PojoImplicitReindexingResolverContainerElementNode<C, V>> build() {
-		boolean markForReindexing = valueBuilderDelegate.isMarkForReindexing();
-		Optional<PojoImplicitReindexingResolver<V>> valueTypeNode =
-				valueBuilderDelegate.buildTypeNode();
+		Collection<PojoImplicitReindexingResolver<V>> valueTypeNodes =
+				valueBuilderDelegate.buildTypeNodes();
 
-		if ( !markForReindexing && !valueTypeNode.isPresent() ) {
+		if ( valueTypeNodes.isEmpty() ) {
 			/*
-			 * If this resolver doesn't mark the value for reindexing and doesn't have any nested node,
-			 * it is useless and we don't need to build it.
+			 * If this resolver doesn't have any nested node, it is useless and we don't need to build it.
 			 */
 			return Optional.empty();
 		}
 		else {
 			return Optional.of( new PojoImplicitReindexingResolverContainerElementNode<>(
-					extractor, markForReindexing, valueTypeNode.orElse( null )
+					extractor, valueTypeNodes
 			) );
 		}
 	}

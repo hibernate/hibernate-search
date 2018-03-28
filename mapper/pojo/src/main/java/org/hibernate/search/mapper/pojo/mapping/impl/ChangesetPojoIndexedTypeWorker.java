@@ -171,7 +171,8 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveDirty ) {
 				shouldResolveDirty = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex( containingEntityCollector, entitySupplier );
+				typeManager.resolveEntitiesToReindex( containingEntityCollector,
+						sessionContext.getRuntimeIntrospector(), entitySupplier );
 			}
 		}
 

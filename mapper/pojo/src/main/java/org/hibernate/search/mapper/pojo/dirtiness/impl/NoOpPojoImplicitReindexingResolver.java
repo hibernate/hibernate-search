@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<Object> {
@@ -18,7 +19,8 @@ class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<
 	}
 
 	@Override
-	public void resolveEntitiesToReindex(PojoReindexingCollector collector, Object dirty) {
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
+			PojoRuntimeIntrospector runtimeIntrospector, Object dirty) {
 		// No-op
 	}
 

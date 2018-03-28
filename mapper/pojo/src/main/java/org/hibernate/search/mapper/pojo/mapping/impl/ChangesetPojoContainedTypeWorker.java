@@ -106,7 +106,8 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveDirty ) {
 				shouldResolveDirty = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex( containingEntityCollector, entitySupplier );
+				typeManager.resolveEntitiesToReindex( containingEntityCollector,
+						sessionContext.getRuntimeIntrospector(), entitySupplier );
 			}
 		}
 	}

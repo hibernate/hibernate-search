@@ -20,6 +20,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -30,6 +31,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	private final XClass xClass;
 	private final Class<T> clazz;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
+	private final PojoCaster<T> caster;
 
 	/**
 	 * Note: the main purpose of this cache is not to improve performance,
@@ -56,6 +58,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 		this.xClass = introspector.toXClass( clazz );
 		this.clazz = clazz;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
+		this.caster = new JavaClassPojoCaster<>( clazz );
 	}
 
 	@Override
@@ -160,7 +163,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public PojoCaster<T> getCaster() {
-		return clazz::cast;
+		return caster;
 	}
 
 	@Override
