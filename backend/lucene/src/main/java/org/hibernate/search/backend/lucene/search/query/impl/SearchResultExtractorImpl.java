@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -18,12 +19,17 @@ import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
 
+	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
+
 	private final HitExtractor<? super C> hitExtractor;
+
 	private final HitAggregator<C, List<T>> hitAggregator;
 
 	public SearchResultExtractorImpl(
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
+		this.storedFieldVisitor = storedFieldVisitor;
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
 	}
@@ -33,8 +39,11 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 		hitAggregator.init( topDocs.scoreDocs.length );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
+			indexSearcher.doc( hit.doc, storedFieldVisitor );
+			Document document = storedFieldVisitor.getDocumentAndReset();
+
 			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, indexSearcher, hit );
+			hitExtractor.extract( hitCollector, document );
 		}
 
 		long totalHits = topDocs.totalHits;

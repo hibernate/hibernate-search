@@ -29,6 +29,7 @@ class SearchQueryBuilderImpl<C, T>
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchTargetModel searchTargetModel;
+	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
 	private final LuceneSearchQueryElementCollector elementCollector;
@@ -38,10 +39,12 @@ class SearchQueryBuilderImpl<C, T>
 			LuceneWorkFactory workFactory,
 			LuceneSearchTargetModel searchTargetModel,
 			SessionContext context,
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
 		this.tenantId = context.getTenantIdentifier();
 
+		this.storedFieldVisitor = storedFieldVisitor;
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
 		this.queryOrchestrator = queryOrchestrator;
@@ -62,7 +65,7 @@ class SearchQueryBuilderImpl<C, T>
 	}
 
 	private SearchQuery<T> build() {
-		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );
+		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>( storedFieldVisitor, hitExtractor, hitAggregator );
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );

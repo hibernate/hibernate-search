@@ -6,20 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.io.IOException;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.util.impl.CollectionHelper;
 
 abstract class AbstractDocumentReferenceHitExtractor<T> implements HitExtractor<T> {
-
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor = new ReusableDocumentStoredFieldVisitor(
-			CollectionHelper.asSet( LuceneFields.idFieldName(), LuceneFields.indexFieldName() )
-	);
 
 	protected AbstractDocumentReferenceHitExtractor() {
 	}
@@ -29,9 +23,13 @@ abstract class AbstractDocumentReferenceHitExtractor<T> implements HitExtractor<
 		luceneCollectorBuilder.requireTopDocsCollector();
 	}
 
-	protected DocumentReference extractDocumentReference(IndexSearcher indexSearcher, int documentId) throws IOException {
-		indexSearcher.doc( documentId, storedFieldVisitor );
-		Document document = storedFieldVisitor.getDocumentAndReset();
+	@Override
+	public void contributeFields(Set<String> absoluteFieldPaths) {
+		absoluteFieldPaths.add( LuceneFields.indexFieldName() );
+		absoluteFieldPaths.add( LuceneFields.idFieldName() );
+	}
+
+	protected DocumentReference extractDocumentReference(Document document) {
 		DocumentReference documentReference = new LuceneDocumentReference(
 				document.get( LuceneFields.indexFieldName() ),
 				document.get( LuceneFields.idFieldName() )

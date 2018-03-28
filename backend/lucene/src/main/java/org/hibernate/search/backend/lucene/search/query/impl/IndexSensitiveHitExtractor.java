@@ -6,25 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
-import org.hibernate.search.util.impl.CollectionHelper;
 
 class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
-
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor = new ReusableDocumentStoredFieldVisitor(
-			CollectionHelper.asSet( LuceneFields.indexFieldName() )
-	);
 
 	private final Map<String, HitExtractor<? super C>> extractorByIndex;
 
 	IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByIndex) {
 		this.extractorByIndex = extractorByIndex;
+	}
+
+	@Override
+	public void contributeFields(Set<String> absoluteFieldPaths) {
+		absoluteFieldPaths.add( LuceneFields.indexFieldName() );
+
+		for ( HitExtractor<?> extractor : extractorByIndex.values() ) {
+			extractor.contributeFields( absoluteFieldPaths );
+		}
 	}
 
 	@Override
@@ -35,11 +37,9 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void extract(C collector, IndexSearcher indexSearcher, ScoreDoc scoreDoc) throws IOException {
-		indexSearcher.doc( scoreDoc.doc, storedFieldVisitor );
-		Document document = storedFieldVisitor.getDocumentAndReset();
+	public void extract(C collector, Document document) {
 		String indexName = document.get( LuceneFields.indexFieldName() );
 		HitExtractor<? super C> delegate = extractorByIndex.get( indexName );
-		delegate.extract( collector, indexSearcher, scoreDoc );
+		delegate.extract( collector, document );
 	}
 }

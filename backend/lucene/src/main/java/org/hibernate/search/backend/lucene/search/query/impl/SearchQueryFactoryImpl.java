@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,46 +93,51 @@ class SearchQueryFactoryImpl
 
 	private HitExtractor<? super ProjectionHitCollector> createProjectionHitExtractor(
 			LuceneIndexModel indexModel, String[] projections, BitSet projectionFound) {
-		List<ProjectionDocumentExtractor> documentExtractors = new ArrayList<>( projections.length );
+		List<HitExtractor<? super ProjectionHitCollector>> extractors = new ArrayList<>( projections.length );
 		for ( int i = 0; i < projections.length; ++i ) {
 			String projection = projections[i];
 			switch ( projection ) {
 				case ProjectionConstants.OBJECT:
 					projectionFound.set( i );
-					documentExtractors.add( ObjectProjectionDocumentExtractor.get() );
+					extractors.add( ObjectHitExtractor.get() );
 					break;
 				case ProjectionConstants.REFERENCE:
 					projectionFound.set( i );
-					documentExtractors.add( ReferenceProjectionDocumentExtractor.get() );
+					extractors.add( DocumentReferenceHitExtractor.get() );
 					break;
 				case ProjectionConstants.DOCUMENT_REFERENCE:
 					projectionFound.set( i );
-					documentExtractors.add( DocumentReferenceProjectionDocumentExtractor.get() );
+					extractors.add( DocumentReferenceProjectionHitExtractor.get() );
 					break;
 				default:
 					LuceneIndexSchemaFieldNode<?> node = indexModel.getFieldNode( projection );
 					if ( node != null ) {
 						projectionFound.set( i );
-						documentExtractors.add( new FieldProjectionDocumentExtractor( projection, node.getFormatter() ) );
+						extractors.add( new FieldProjectionHitExtractor( projection, node.getFormatter() ) );
 					}
 					else {
 						// Make sure that the result list will have the correct indices and size
-						documentExtractors.add( NullProjectionDocumentExtractor.get() );
+						extractors.add( NullProjectionHitExtractor.get() );
 					}
 					break;
 			}
 		}
-		return new ProjectionHitExtractor( documentExtractors );
+		return new CompositeHitExtractor<>( extractors );
 	}
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+		Set<String> storedFields = new HashSet<>();
+		hitExtractor.contributeFields( storedFields );
+
 		return new SearchQueryBuilderImpl<>(
 				backend.getQueryOrchestrator(),
 				backend.getWorkFactory(),
 				searchTargetModel,
 				sessionContext,
-				hitExtractor, hitAggregator
+				new ReusableDocumentStoredFieldVisitor( storedFields ),
+				hitExtractor,
+				hitAggregator
 		);
 	}
 }

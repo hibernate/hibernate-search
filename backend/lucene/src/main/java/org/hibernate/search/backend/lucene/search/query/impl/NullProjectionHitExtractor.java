@@ -9,18 +9,23 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.ScoreDoc;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-class NullProjectionDocumentExtractor implements ProjectionDocumentExtractor {
+/**
+ * A hit extractor that will insert a null value into a projection.
+ * <p>
+ * Mainly used in conjunction with {@link IndexSensitiveHitExtractor} for multi-index searches, when a projection makes
+ * no sense for a particular index.
+ */
+class NullProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
-	private static final NullProjectionDocumentExtractor INSTANCE = new NullProjectionDocumentExtractor();
+	private static final NullProjectionHitExtractor INSTANCE = new NullProjectionHitExtractor();
 
-	public static NullProjectionDocumentExtractor get() {
+	static NullProjectionHitExtractor get() {
 		return INSTANCE;
 	}
 
-	private NullProjectionDocumentExtractor() {
+	private NullProjectionHitExtractor() {
 		// Private constructor, use get() instead
 	}
 
@@ -33,7 +38,7 @@ class NullProjectionDocumentExtractor implements ProjectionDocumentExtractor {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, ScoreDoc scoreDoc, Document document) {
+	public void extract(ProjectionHitCollector collector, Document document) {
 		collector.collectProjection( null );
 	}
 }

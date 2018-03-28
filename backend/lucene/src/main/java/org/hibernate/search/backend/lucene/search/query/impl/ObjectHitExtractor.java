@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.io.IOException;
-
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.document.Document;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 
 class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<LoadingHitCollector> {
@@ -24,7 +21,7 @@ class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<LoadingHi
 	}
 
 	@Override
-	public void extract(LoadingHitCollector collector, IndexSearcher indexSearcher, ScoreDoc scoreDoc) throws IOException {
-		collector.collectForLoading( extractDocumentReference( indexSearcher, scoreDoc.doc ) );
+	public void extract(LoadingHitCollector collector, Document document) {
+		collector.collectForLoading( extractDocumentReference( document ) );
 	}
 }

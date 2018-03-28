@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.io.IOException;
+import java.util.Set;
 
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.document.Document;
 
 public interface HitExtractor<C> {
 
@@ -21,12 +20,18 @@ public interface HitExtractor<C> {
 	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder);
 
 	/**
+	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
+	 * other fields e.g. if the stored fields have different names.
+	 *
+	 * @param absoluteFieldPaths
+	 */
+	void contributeFields(Set<String> absoluteFieldPaths);
+
+	/**
 	 * Perform hit extraction.
 	 *
 	 * @param collector The hit collector, which will receive the result of the extraction.
-	 * @param indexSearcher The Lucene index searcher.
-	 * @param scoreDoc The document id and score of the hit.
-	 * @throws IOException if Lucene threw an IOException when extracting the information.
+	 * @param document The Lucene document extracted from the index.
 	 */
-	void extract(C collector, IndexSearcher indexSearcher, ScoreDoc scoreDoc) throws IOException;
+	void extract(C collector, Document document);
 }
