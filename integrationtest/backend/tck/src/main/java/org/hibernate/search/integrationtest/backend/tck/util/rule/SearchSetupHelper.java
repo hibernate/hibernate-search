@@ -42,11 +42,14 @@ public class SearchSetupHelper implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 				before( description );
-				try {
-					base.evaluate();
-				}
-				finally {
-					after();
+				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+					try {
+						base.evaluate();
+					}
+					finally {
+						closer.pushAll( SearchMappingRepository::close, mappingRepositories );
+						mappingRepositories.clear();
+					}
 				}
 			}
 		};
@@ -54,13 +57,6 @@ public class SearchSetupHelper implements TestRule {
 
 	protected void before(Description description) {
 		indexNamePrefix = description.getTestClass().getSimpleName() + "-" + description.getMethodName() + "-";
-	}
-
-	protected void after() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( SearchMappingRepository::close, mappingRepositories );
-			mappingRepositories.clear();
-		}
 	}
 
 	public SetupContext withDefaultConfiguration() {
