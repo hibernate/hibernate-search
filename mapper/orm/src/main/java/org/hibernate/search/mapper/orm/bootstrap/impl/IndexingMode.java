@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * Modes for triggering indexing of entities.

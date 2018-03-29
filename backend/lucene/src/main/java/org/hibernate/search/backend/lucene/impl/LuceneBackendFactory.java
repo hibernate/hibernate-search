@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**

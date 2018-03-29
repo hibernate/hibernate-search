@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.spi;
+package org.hibernate.search.util.impl.common;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,8 +14,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.impl.SearchThreadFactory;
+import org.hibernate.search.util.impl.common.logging.Log;
 
 /**
  * Helper class to create threads;

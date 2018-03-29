@@ -16,7 +16,7 @@ import java.util.Map;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> {
 

@@ -19,8 +19,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWor
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet

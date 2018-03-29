@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class NestedPredicateContextImpl<N, C>

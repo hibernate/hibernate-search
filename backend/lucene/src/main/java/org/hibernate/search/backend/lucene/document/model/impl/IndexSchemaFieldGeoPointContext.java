@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
-import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 
 /**
  * @author Guillaume Smet

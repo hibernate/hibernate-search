@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.util.spi.ToStringTreeAppendable;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStringTreeAppendable {
 

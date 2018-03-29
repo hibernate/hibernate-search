@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManager;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.engine.logging.impl.ToStringTreeAppendableMultilineFormatter;
+import org.hibernate.search.util.impl.common.logging.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;

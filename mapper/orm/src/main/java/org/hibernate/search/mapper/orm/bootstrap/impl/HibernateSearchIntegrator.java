@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.spi.BeanResolver;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 

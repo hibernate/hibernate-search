@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting elements from a container

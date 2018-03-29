@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringValueBr
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Yoann Rodiere

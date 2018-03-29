@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.impl.common.Closer;
 
 
 /**

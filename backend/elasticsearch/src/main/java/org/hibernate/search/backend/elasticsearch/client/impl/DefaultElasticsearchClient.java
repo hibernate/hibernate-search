@@ -23,10 +23,10 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.Executors;
-import org.hibernate.search.util.spi.Futures;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.Executors;
+import org.hibernate.search.util.impl.common.Futures;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

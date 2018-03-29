@@ -7,6 +7,8 @@
 
 package org.hibernate.search.engine.logging.impl;
 
+import java.util.List;
+
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
@@ -15,10 +17,6 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import static org.jboss.logging.Logger.Level.ERROR;
-
-import java.util.List;
 
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
@@ -62,9 +60,4 @@ public interface Log extends BasicLogger {
 	@Message(id = 12, value = "Invalid value: at least one bound in range predicates must be non-null." +
 			" Null bounds were passed to range predicate on fields %1$s")
 	SearchException rangePredicateCannotMatchNullValue(List<String> strings);
-
-	// Pre-existing message
-	@LogMessage(level = ERROR)
-	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
-	void interruptedWorkError(Runnable r);
 }

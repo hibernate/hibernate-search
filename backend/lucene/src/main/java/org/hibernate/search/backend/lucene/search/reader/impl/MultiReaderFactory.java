@@ -13,7 +13,7 @@ import java.util.Set;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * Creates and closes the IndexReaders encompassing multiple indexes.

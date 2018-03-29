@@ -13,8 +13,8 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying processor property nodes

@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ContainerValueExtractorResolver {
 

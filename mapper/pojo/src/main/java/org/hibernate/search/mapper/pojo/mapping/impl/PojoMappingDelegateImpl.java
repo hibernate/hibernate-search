@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**

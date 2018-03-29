@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.util.spi.ToStringTreeAppendable;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * A POJO processor responsible for transferring data from the POJO to a document to index.

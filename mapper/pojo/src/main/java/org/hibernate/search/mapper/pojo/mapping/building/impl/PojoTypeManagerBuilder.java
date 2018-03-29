@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 	private static Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

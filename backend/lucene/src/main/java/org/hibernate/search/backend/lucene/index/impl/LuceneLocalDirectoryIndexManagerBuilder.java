@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.impl.LuceneLocalDirectoryBackend;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.impl.common.Closer;
 
 public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 

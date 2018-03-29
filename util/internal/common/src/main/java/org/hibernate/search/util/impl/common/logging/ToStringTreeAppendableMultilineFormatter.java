@@ -4,15 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.logging.impl;
+package org.hibernate.search.util.impl.common.logging;
 
-import org.hibernate.search.util.spi.ToStringStyle;
-import org.hibernate.search.util.spi.ToStringTreeAppendable;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.ToStringStyle;
+import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to display
- * {@link org.hibernate.search.util.spi.ToStringTreeAppendable} objects in log messages.
+ * {@link ToStringTreeAppendable} objects in log messages.
  */
 public class ToStringTreeAppendableMultilineFormatter {
 

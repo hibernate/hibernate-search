@@ -20,7 +20,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMetadataContributor;
-import org.hibernate.search.util.spi.Closer;
+import org.hibernate.search.util.impl.common.Closer;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;

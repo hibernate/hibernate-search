@@ -25,8 +25,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWor
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**

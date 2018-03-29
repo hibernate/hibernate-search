@@ -22,6 +22,10 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-util-internal-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>

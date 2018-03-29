@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 

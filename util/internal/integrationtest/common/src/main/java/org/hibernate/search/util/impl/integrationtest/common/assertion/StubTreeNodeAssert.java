@@ -11,8 +11,8 @@ import java.util.Map;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeCompare;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
-import org.hibernate.search.util.spi.ToStringStyle;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.ToStringStyle;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 import org.junit.Assert;
 

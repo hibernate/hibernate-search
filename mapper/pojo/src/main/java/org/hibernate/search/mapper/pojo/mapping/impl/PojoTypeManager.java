@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
-import org.hibernate.search.util.spi.Closer;
-import org.hibernate.search.util.spi.ToStringTreeAppendable;
-import org.hibernate.search.util.spi.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
+import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * @author Yoann Rodiere

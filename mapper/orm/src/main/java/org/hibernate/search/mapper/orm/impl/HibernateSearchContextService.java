@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
-import org.hibernate.search.util.spi.LoggerFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.Service;
 
 public class HibernateSearchContextService implements Service {

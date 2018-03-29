@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
-import org.hibernate.search.util.spi.Futures;
+import org.hibernate.search.util.impl.common.Futures;
 
 
 /**
