@@ -19,16 +19,16 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldQueryFactory queryBuilder;
+	private final LuceneFieldQueryFactory queryFactory;
 
 	private Object lowerLimit;
 	private Object upperLimit;
 
 	private final RangeQueryOptions queryOptions = new RangeQueryOptions();
 
-	public RangePredicateBuilderImpl(String absoluteFieldPath, LuceneFieldQueryFactory queryBuilder) {
+	public RangePredicateBuilderImpl(String absoluteFieldPath, LuceneFieldQueryFactory queryFactory) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.queryBuilder = queryBuilder;
+		this.queryFactory = queryFactory;
 	}
 
 	@Override
@@ -53,6 +53,6 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	@Override
 	protected Query buildQuery() {
-		return queryBuilder.createRangeQuery( absoluteFieldPath, lowerLimit, upperLimit, queryOptions );
+		return queryFactory.createRangeQuery( absoluteFieldPath, lowerLimit, upperLimit, queryOptions );
 	}
 }

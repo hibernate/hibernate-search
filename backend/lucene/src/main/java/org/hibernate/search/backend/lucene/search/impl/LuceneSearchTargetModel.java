@@ -49,8 +49,8 @@ public class LuceneSearchTargetModel {
 		return readerProviders;
 	}
 
-	public LuceneFieldQueryFactory getFieldQueryBuilder(String absoluteFieldPath) {
-		return getFieldElement( LuceneIndexSchemaFieldNode::getQueryBuilder, absoluteFieldPath );
+	public LuceneFieldQueryFactory getFieldQueryFactory(String absoluteFieldPath) {
+		return getFieldElement( LuceneIndexSchemaFieldNode::getQueryFactory, absoluteFieldPath );
 	}
 
 	public LuceneFieldFormatter<?> getFieldFormatter(String absoluteFieldPath) {

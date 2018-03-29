@@ -41,7 +41,7 @@ class IndexSchemaFieldGeoPointContext extends AbstractLuceneIndexSchemaFieldType
 				parentNode,
 				getFieldName(),
 				new LuceneGeoPointFieldFormatter( parentNode.getAbsolutePath( getFieldName() ), getStore() ),
-				null // for now we don't have a query builder for GeoPoint
+				null // for now we don't have a query factory for GeoPoint
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

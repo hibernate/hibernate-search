@@ -46,7 +46,7 @@ class IndexSchemaFieldIntegerContext extends AbstractLuceneIndexSchemaFieldTyped
 				parentNode,
 				getFieldName(),
 				new IntegerFieldFormatter( getStore(), sortable ),
-				IntegerFieldQueryBuilder.INSTANCE
+				IntegerFieldQueryFactory.INSTANCE
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -144,11 +144,11 @@ class IndexSchemaFieldIntegerContext extends AbstractLuceneIndexSchemaFieldTyped
 		}
 	}
 
-	private static final class IntegerFieldQueryBuilder implements LuceneFieldQueryFactory {
+	private static final class IntegerFieldQueryFactory implements LuceneFieldQueryFactory {
 
-		private static final IntegerFieldQueryBuilder INSTANCE = new IntegerFieldQueryBuilder();
+		private static final IntegerFieldQueryFactory INSTANCE = new IntegerFieldQueryFactory();
 
-		private IntegerFieldQueryBuilder() {
+		private IntegerFieldQueryFactory() {
 		}
 
 		@Override

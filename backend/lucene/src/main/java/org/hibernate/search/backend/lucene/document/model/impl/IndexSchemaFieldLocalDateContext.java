@@ -58,7 +58,7 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 				parentNode,
 				getFieldName(),
 				localDateFieldFormatter,
-				new LocalDateFieldQueryBuilder( localDateFieldFormatter )
+				new LocalDateFieldQueryFactory( localDateFieldFormatter )
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -173,11 +173,11 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 		}
 	}
 
-	private static final class LocalDateFieldQueryBuilder implements LuceneFieldQueryFactory {
+	private static final class LocalDateFieldQueryFactory implements LuceneFieldQueryFactory {
 
 		private final LocalDateFieldFormatter localDateFieldFormatter;
 
-		private LocalDateFieldQueryBuilder(LocalDateFieldFormatter localDateFieldFormatter) {
+		private LocalDateFieldQueryFactory(LocalDateFieldFormatter localDateFieldFormatter) {
 			this.localDateFieldFormatter = localDateFieldFormatter;
 		}
 

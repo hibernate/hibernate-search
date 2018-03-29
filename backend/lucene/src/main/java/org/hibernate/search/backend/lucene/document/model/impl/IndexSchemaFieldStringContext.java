@@ -74,7 +74,7 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 						getFieldType( getStore(), analyzer != null ),
 						analyzerOrNormalizer
 				),
-				new StringFieldQueryBuilder( analyzerOrNormalizer, analyzer != null, queryBuilder )
+				new StringFieldQueryFactory( analyzerOrNormalizer, analyzer != null, queryBuilder )
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -220,7 +220,7 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 		}
 	}
 
-	private static class StringFieldQueryBuilder implements LuceneFieldQueryFactory {
+	private static class StringFieldQueryFactory implements LuceneFieldQueryFactory {
 
 		private final Analyzer analyzerOrNormalizer;
 
@@ -230,7 +230,7 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 
 		private final int hashCode;
 
-		private StringFieldQueryBuilder(Analyzer analyzerOrNormalizer, boolean tokenized, QueryBuilder queryBuilder) {
+		private StringFieldQueryFactory(Analyzer analyzerOrNormalizer, boolean tokenized, QueryBuilder queryBuilder) {
 			this.analyzerOrNormalizer = analyzerOrNormalizer;
 			this.tokenized = tokenized;
 			this.queryBuilder = queryBuilder;
@@ -281,7 +281,7 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 				return false;
 			}
 
-			StringFieldQueryBuilder other = (StringFieldQueryBuilder) obj;
+			StringFieldQueryFactory other = (StringFieldQueryFactory) obj;
 
 			return Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer ) &&
 					tokenized == other.tokenized &&

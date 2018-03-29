@@ -20,15 +20,15 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldQueryFactory queryBuilder;
+	private final LuceneFieldQueryFactory queryFactory;
 
 	private final MatchQueryOptions queryOptions = new MatchQueryOptions();
 
 	private Object value;
 
-	public MatchPredicateBuilderImpl(String absoluteFieldPath, LuceneFieldQueryFactory queryBuilder) {
+	public MatchPredicateBuilderImpl(String absoluteFieldPath, LuceneFieldQueryFactory queryFactory) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.queryBuilder = queryBuilder;
+		this.queryFactory = queryFactory;
 	}
 
 	@Override
@@ -41,6 +41,6 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		// TODO GSM MatchQueryOptions will be populated once we have more options in the match predicate
 		queryOptions.setOperator( Occur.SHOULD );
 
-		return queryBuilder.createMatchQuery( absoluteFieldPath, value, queryOptions );
+		return queryFactory.createMatchQuery( absoluteFieldPath, value, queryOptions );
 	}
 }
