@@ -18,6 +18,7 @@
     <modules>
         <module>common</module>
         <module>orm</module>
+        <module>sharedresources</module>
     </modules>
 
 </project>

@@ -31,7 +31,6 @@
         <module>mapper/javabean</module>
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
-        <module>sharedtestresources</module>
         <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
         <module>reports</module>
@@ -428,7 +427,11 @@
                     <executions>
                         <execution>
                             <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
-                            <!-- This will only be effective if hibernate-search-sharedtestresources is actually a project dependency -->
+                            <!--
+                                 This will only be effective if
+                                 hibernate-search-util-internal-integrationtest-sharedresources
+                                 is actually a project dependency
+                              -->
                             <id>unpack-shared-test-build-resources</id>
                             <goals>
                                 <goal>unpack-dependencies</goal>
@@ -437,7 +440,7 @@
                             <configuration>
                                 <outputDirectory>${project.build.directory}/</outputDirectory>
                                 <includeGroupIds>${project.groupId}</includeGroupIds>
-                                <includeArtifacIds>hibernate-search-sharedtestresources</includeArtifacIds>
+                                <includeArtifacIds>hibernate-search-util-internal-integrationtest-sharedresources</includeArtifacIds>
                                 <includeTypes>zip</includeTypes>
                                 <excludeTransitive>true</excludeTransitive>
                             </configuration>

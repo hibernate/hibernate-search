@@ -43,7 +43,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-search-sharedtestresources</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
                 <classifier>build-resources</classifier>
                 <type>zip</type>
                 <version>${project.version}</version>
