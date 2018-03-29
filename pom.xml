@@ -32,6 +32,7 @@
         <module>mapper/protobuf</module>
         <module>mapper/orm</module>
         <module>sharedtestresources</module>
+        <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
         <module>reports</module>
     </modules>

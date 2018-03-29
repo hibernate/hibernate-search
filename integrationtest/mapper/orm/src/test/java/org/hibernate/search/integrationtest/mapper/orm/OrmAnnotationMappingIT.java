@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm;
 
-import static org.hibernate.search.integrationtest.util.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -54,12 +54,12 @@ import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomP
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
-import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
-import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubIndexManager;
-import org.hibernate.search.integrationtest.util.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.service.ServiceRegistry;
 

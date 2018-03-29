@@ -16,7 +16,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-integrationtest-util-common</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
         </dependency>
     </dependencies>
 

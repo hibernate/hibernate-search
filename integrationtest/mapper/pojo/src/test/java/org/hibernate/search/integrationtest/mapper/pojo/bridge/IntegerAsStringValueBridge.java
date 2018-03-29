@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.bridge;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
 
 public final class IntegerAsStringValueBridge implements ValueBridge<Integer, String> {
 

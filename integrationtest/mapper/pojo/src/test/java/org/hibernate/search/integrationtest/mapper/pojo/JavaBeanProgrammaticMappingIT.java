@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import static org.hibernate.search.integrationtest.util.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.integrationtest.util.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -34,11 +34,11 @@ import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBri
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringValueBridge;
-import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
-import org.hibernate.search.integrationtest.util.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 

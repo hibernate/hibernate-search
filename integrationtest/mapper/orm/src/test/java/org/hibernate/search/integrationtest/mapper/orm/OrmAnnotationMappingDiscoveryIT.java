@@ -26,9 +26,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsumingPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
-import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.util.common.rule.StaticCounters;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;

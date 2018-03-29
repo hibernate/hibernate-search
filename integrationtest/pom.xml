@@ -16,8 +16,6 @@
     </properties>
 
     <modules>
-        <module>util-common</module>
-        <module>util-orm</module>
         <module>backend/tck</module>
         <module>backend/elasticsearch</module>
         <module>backend/lucene</module>
@@ -30,12 +28,12 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-search-integrationtest-util-common</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-search-integrationtest-util-orm</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

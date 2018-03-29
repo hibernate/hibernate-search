@@ -27,9 +27,9 @@ import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-import org.hibernate.search.integrationtest.util.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.util.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.integrationtest.util.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;

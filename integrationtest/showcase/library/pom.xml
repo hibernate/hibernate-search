@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-integrationtest-util-orm</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
             <scope>test</scope>
         </dependency>
 
