@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataCo
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
@@ -38,7 +39,7 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 
 	@Override
 	public <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
-		Optional<PojoTypeModel<T>> superTypeModel = getTypeModel().getSuperType( requestedType );
+		Optional<PojoRawTypeModel<T>> superTypeModel = getTypeModel().getSuperType( requestedType );
 		if ( !superTypeModel.isPresent() ) {
 			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
 		}
@@ -47,7 +48,7 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>( getTypeModel().getCaster() );
+		return new PojoModelRootElementAccessor<>( getTypeModel().getRawType().getCaster() );
 	}
 
 	@Override

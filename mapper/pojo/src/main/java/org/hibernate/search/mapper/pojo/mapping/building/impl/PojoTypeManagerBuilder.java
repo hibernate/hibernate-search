@@ -90,7 +90,7 @@ public class PojoTypeManagerBuilder<E, D extends DocumentElement> {
 		@Override
 		public <T> void identifierBridge(PojoTypeModel<T> propertyTypeModel, PropertyHandle handle, IdentifierBridge<T> bridge) {
 			// FIXME ensure the bridge is closed upon build failure and when closing the SearchManagerRepository
-			this.identifierMapping = new PropertyIdentifierMapping<>( propertyTypeModel.getCaster(), handle, bridge );
+			this.identifierMapping = new PropertyIdentifierMapping<>( propertyTypeModel.getRawType().getCaster(), handle, bridge );
 		}
 
 		@Override

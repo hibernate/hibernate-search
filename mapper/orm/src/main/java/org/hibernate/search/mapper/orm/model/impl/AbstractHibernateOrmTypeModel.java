@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGeneric
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 
@@ -94,7 +93,7 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public <U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
+	public <U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
 		XClass superClassCandidateXClass = introspector.toXClass( superClassCandidate );
 		return superClassCandidateXClass.isAssignableFrom( xClass )
 				? Optional.of( introspector.getTypeModel( superClassCandidate ) )

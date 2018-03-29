@@ -116,19 +116,13 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 	}
 
 	@Override
-	public <U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
+	public <U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
 		return rawTypeModel.getSuperType( superClassCandidate );
 	}
 
 	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
 		return wrapProperty( rawTypeModel.getProperty( propertyName ) );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked") // We cannot perform runtime checks of generics on an instance
-	public PojoCaster<T> getCaster() {
-		return (PojoCaster<T>) rawTypeModel.getCaster();
 	}
 
 	@Override

@@ -18,12 +18,12 @@ import org.hibernate.search.util.SearchException;
  */
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
-	private final PojoCaster<I> caster;
+	private final PojoCaster<? super I> caster;
 	private final PropertyHandle property;
 	private final IdentifierBridge<I> bridge;
 
 	@SuppressWarnings("unchecked")
-	public PropertyIdentifierMapping(PojoCaster<I> caster, PropertyHandle property, IdentifierBridge<I> bridge) {
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle property, IdentifierBridge<I> bridge) {
 		this.caster = caster;
 		this.property = property;
 		this.bridge = bridge;
@@ -35,13 +35,15 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
+	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if I is generic we need an unchecked cast
 	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier) {
 		if ( providedId != null ) {
-			return caster.cast( providedId );
+			return (I) caster.cast( providedId );
 		}
 		else if ( property != null ) {
 			Object id = property.get( entitySupplier.get() );
-			return caster.cast( id );
+			// TODO avoid this cast? By construction, the property handle should always return type I
+			return (I) caster.cast( id );
 		}
 		else {
 			throw new SearchException( "No identifier was provided, and this mapping does not define"

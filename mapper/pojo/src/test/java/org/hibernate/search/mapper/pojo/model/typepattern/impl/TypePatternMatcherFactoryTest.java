@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.test.util.TypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
@@ -58,7 +59,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	@Test
 	public void rawSuperType() {
 		PojoGenericTypeModel<?> typeToMatchMock = createMock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<String> superTypeMock = createMock( PojoGenericTypeModel.class );
+		PojoRawTypeModel<String> superTypeMock = createMock( PojoRawTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String.class, Integer.class );
@@ -123,7 +124,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	@Test
 	public void nonGenericArrayElement() {
 		PojoGenericTypeModel<?> typeToMatchMock = createMock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<String[]> superTypeMock = createMock( PojoGenericTypeModel.class );
+		PojoRawTypeModel<String[]> superTypeMock = createMock( PojoRawTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String[].class, Integer.class );

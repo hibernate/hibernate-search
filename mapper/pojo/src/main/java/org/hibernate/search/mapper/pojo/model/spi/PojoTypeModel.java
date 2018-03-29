@@ -20,9 +20,7 @@ public interface PojoTypeModel<T> {
 	 * @return The {@link PojoTypeModel} for this class if it is a supertype of the current type,
 	 * or an empty {@link Optional} if it is not.
 	 */
-	<U> Optional<PojoTypeModel<U>> getSuperType(Class<U> superClassCandidate);
+	<U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate);
 
 	PojoPropertyModel<?> getProperty(String propertyName);
-
-	PojoCaster<T> getCaster();
 }
