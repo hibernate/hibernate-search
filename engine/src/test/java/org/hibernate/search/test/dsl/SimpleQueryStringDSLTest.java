@@ -221,6 +221,20 @@ public class SimpleQueryStringDSLTest {
 				.matchesNone();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3039")
+	public void testSearchOnDocumentId() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "id" )
+				.matching( "Caramelito" )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.matchesExactlyIds( "Caramelito" );
+	}
+
 	private QueryBuilder getCoffeeQueryBuilder() {
 		return helper.queryBuilder( Coffee.class );
 	}
