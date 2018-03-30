@@ -385,6 +385,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
+		if ( !parseContext.skipAnalyzers() ) {
+			// Register a pass through analyzer for the document id
+			typeMetadataBuilder.addToScopedAnalyzerReference( fieldPath, null, Field.Index.NOT_ANALYZED );
+		}
+
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder(
 				typeMetadataBuilder.getResultReference(), member,
 				reflectionManager.toClass( member.getType() ) );

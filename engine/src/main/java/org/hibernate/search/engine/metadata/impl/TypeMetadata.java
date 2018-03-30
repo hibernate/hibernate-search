@@ -603,13 +603,13 @@ public class TypeMetadata {
 
 		@SuppressWarnings( "deprecation" )
 		public AnalyzerReference addToScopedAnalyzerReference(DocumentFieldPath fieldPath, AnalyzerReference analyzerReference, Field.Index index) {
-			if ( analyzerReference == null ) {
-				analyzerReference = scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
-			}
-
 			if ( !index.isAnalyzed() ) {
 				// no analyzer is used, add a pass-through (i.e. no-op) analyzer for queries
 				analyzerReference = analyzerRegistry.getPassThroughAnalyzerReference();
+			}
+			else if ( analyzerReference == null ) {
+				// no analyzer set, we use the default analyzer
+				analyzerReference = scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 			}
 
 			scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldPath.getAbsoluteName(), analyzerReference );
