@@ -18,7 +18,6 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.util.BytesRef;
@@ -29,7 +28,9 @@ import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 /**
  * @author Guillaume Smet
@@ -74,7 +75,8 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 						getFieldType( getStore(), analyzer != null ),
 						analyzerOrNormalizer
 				),
-				new StringFieldQueryFactory( analyzerOrNormalizer, analyzer != null, queryBuilder )
+				new StringFieldQueryFactory( analyzerOrNormalizer, analyzer != null, queryBuilder ),
+				StringFieldSortContributor.INSTANCE
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -140,14 +142,10 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 
 		private final Analyzer normalizer;
 
-		private final int hashCode;
-
 		private StringFieldFormatter(Sortable sortable, FieldType fieldType, Analyzer normalizer) {
 			this.sortable = sortable;
 			this.fieldType = fieldType;
 			this.normalizer = normalizer;
-
-			this.hashCode = buildHashCode();
 		}
 
 		@Override
@@ -169,21 +167,6 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 		@Override
 		public Object format(Object value) {
 			return value;
-		}
-
-		@Override
-		public Type getDefaultSortFieldType() {
-			return SortField.Type.STRING;
-		}
-
-		@Override
-		public Object getSortMissingFirst() {
-			return SortField.STRING_FIRST;
-		}
-
-		@Override
-		public Object getSortMissingLast() {
-			return SortField.STRING_LAST;
 		}
 
 		@Override
@@ -212,10 +195,6 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 
 		@Override
 		public int hashCode() {
-			return hashCode;
-		}
-
-		private int buildHashCode() {
 			return Objects.hash( sortable, fieldType, normalizer );
 		}
 	}
@@ -228,14 +207,10 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 
 		private final QueryBuilder queryBuilder;
 
-		private final int hashCode;
-
 		private StringFieldQueryFactory(Analyzer analyzerOrNormalizer, boolean tokenized, QueryBuilder queryBuilder) {
 			this.analyzerOrNormalizer = analyzerOrNormalizer;
 			this.tokenized = tokenized;
 			this.queryBuilder = queryBuilder;
-
-			this.hashCode = buildHashCode();
 		}
 
 		@Override
@@ -290,10 +265,6 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 
 		@Override
 		public int hashCode() {
-			return hashCode;
-		}
-
-		private int buildHashCode() {
 			return Objects.hash( analyzerOrNormalizer, tokenized, queryBuilder );
 		}
 
@@ -303,6 +274,23 @@ class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedC
 			}
 
 			return AnalyzerUtils.analyzeSortableValue( analyzerOrNormalizer, fieldName, stringValue );
+		}
+	}
+
+	private static class StringFieldSortContributor extends AbstractScalarLuceneFieldSortContributor {
+
+		private static final StringFieldSortContributor INSTANCE = new StringFieldSortContributor();
+
+		private StringFieldSortContributor() {
+			super( SortField.STRING_FIRST, SortField.STRING_LAST );
+		}
+
+		@Override
+		public void contribute(LuceneSearchSortCollector collector, String absoluteFieldPath, SortOrder order, Object missingValue) {
+			SortField sortField = new SortField( absoluteFieldPath, SortField.Type.STRING, order == SortOrder.DESC ? true : false );
+			setEffectiveMissingValue( sortField, missingValue, order );
+
+			collector.collectSortField( sortField );
 		}
 	}
 }

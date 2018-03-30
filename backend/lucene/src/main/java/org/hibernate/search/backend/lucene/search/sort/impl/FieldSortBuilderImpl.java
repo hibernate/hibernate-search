@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldSortContributor;
+import org.hibernate.search.backend.lucene.document.model.impl.SortMissingValue;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortBuilderImpl extends AbstractSearchSortBuilder
@@ -18,21 +18,24 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private final LuceneFieldFormatter<?> fieldFormatter;
 
+	private final LuceneFieldSortContributor fieldSortContributor;
+
 	private Object missingValue;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldFormatter<?> fieldFormatter) {
+	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldFormatter<?> fieldFormatter, LuceneFieldSortContributor fieldSortContributor) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.fieldFormatter = fieldFormatter;
+		this.fieldSortContributor = fieldSortContributor;
 	}
 
 	@Override
 	public void missingFirst() {
-		missingValue = Missing.FIRST;
+		missingValue = SortMissingValue.MISSING_FIRST;
 	}
 
 	@Override
 	public void missingLast() {
-		missingValue = Missing.LAST;
+		missingValue = SortMissingValue.MISSING_LAST;
 	}
 
 	@Override
@@ -42,24 +45,6 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	@Override
 	public void contribute(LuceneSearchSortCollector collector) {
-		// X so this is to mimic the Elasticsearch behavior, I'm not totally convinced it's the good choice though
-		if ( missingValue == Missing.FIRST ) {
-			missingValue = order == SortOrder.DESC ? fieldFormatter.getSortMissingLast() : fieldFormatter.getSortMissingFirst();
-		}
-		else if ( missingValue == Missing.LAST ) {
-			missingValue = order == SortOrder.DESC ? fieldFormatter.getSortMissingFirst() : fieldFormatter.getSortMissingLast();
-		}
-
-		SortField sortField = new SortField( absoluteFieldPath, fieldFormatter.getDefaultSortFieldType(), order == SortOrder.DESC ? true : false );
-		if ( missingValue != null ) {
-			sortField.setMissingValue( missingValue );
-		}
-
-		collector.collectSortField( sortField );
-	}
-
-	private enum Missing {
-		FIRST,
-		LAST;
+		fieldSortContributor.contribute( collector, absoluteFieldPath, order, missingValue );
 	}
 }

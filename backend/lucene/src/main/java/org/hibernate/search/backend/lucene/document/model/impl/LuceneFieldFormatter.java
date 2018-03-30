@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 /**
@@ -27,10 +26,4 @@ public interface LuceneFieldFormatter<T> {
 	T parse(Document document, String fieldName);
 
 	Object format(Object value);
-
-	SortField.Type getDefaultSortFieldType();
-
-	Object getSortMissingLast();
-
-	Object getSortMissingFirst();
 }

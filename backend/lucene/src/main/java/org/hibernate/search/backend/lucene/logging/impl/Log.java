@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManager;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
@@ -68,8 +69,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 18, value = "Multiple conflicting types for field '%1$s': '%2$s' in index '%3$s', but '%4$s' in index '%5$s'." )
 	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
-			Object typeElement1, String indexName1,
-			Object typeElement2, String indexName2);
+			LuceneIndexSchemaFieldNode<?> schemaNode1, String indexName1,
+			LuceneIndexSchemaFieldNode<?> schemaNode2, String indexName2);
 
 	@Message(id = 19, value = "Field '%2$s' is not an object field in index '%1$s'." )
 	SearchException nonObjectFieldForNestedQuery(String indexName, String absoluteFieldPath);

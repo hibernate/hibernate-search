@@ -25,12 +25,13 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortField.Type;
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 /**
  * @author Guillaume Smet
@@ -58,7 +59,8 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 				parentNode,
 				getFieldName(),
 				localDateFieldFormatter,
-				new LocalDateFieldQueryFactory( localDateFieldFormatter )
+				new LocalDateFieldQueryFactory( localDateFieldFormatter ),
+				LocalDateFieldSortContributor.INSTANCE
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -81,13 +83,9 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 
 		private final Sortable sortable;
 
-		private final int hashCode;
-
 		private LocalDateFieldFormatter(Store store, Sortable sortable) {
 			this.store = store;
 			this.sortable = sortable;
-
-			this.hashCode = buildHashCode();
 		}
 
 		@Override
@@ -132,21 +130,6 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 		}
 
 		@Override
-		public Type getDefaultSortFieldType() {
-			return SortField.Type.LONG;
-		}
-
-		@Override
-		public Object getSortMissingFirst() {
-			return Long.MIN_VALUE;
-		}
-
-		@Override
-		public Object getSortMissingLast() {
-			return Long.MAX_VALUE;
-		}
-
-		@Override
 		public boolean equals(Object obj) {
 			if ( this == obj ) {
 				return true;
@@ -160,16 +143,12 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 
 			LocalDateFieldFormatter other = (LocalDateFieldFormatter) obj;
 
-			return Objects.equals( store, other.store );
+			return Objects.equals( store, other.store ) && Objects.equals( sortable, other.sortable );
 		}
 
 		@Override
 		public int hashCode() {
-			return hashCode;
-		}
-
-		private int buildHashCode() {
-			return Objects.hashCode( store );
+			return Objects.hash( store, sortable );
 		}
 	}
 
@@ -213,6 +192,45 @@ class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTyp
 				long upperLimitAsLong = (long) localDateFieldFormatter.format( upperLimit );
 				return excludeUpperLimit ? Math.addExact( upperLimitAsLong, -1 ) : upperLimitAsLong;
 			}
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( LocalDateFieldQueryFactory.class != obj.getClass() ) {
+				return false;
+			}
+
+			LocalDateFieldQueryFactory other = (LocalDateFieldQueryFactory) obj;
+
+			return Objects.equals( localDateFieldFormatter, other.localDateFieldFormatter );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( localDateFieldFormatter );
+		}
+	}
+
+	private static class LocalDateFieldSortContributor extends AbstractScalarLuceneFieldSortContributor {
+
+		private static final LocalDateFieldSortContributor INSTANCE = new LocalDateFieldSortContributor();
+
+		private LocalDateFieldSortContributor() {
+			super( Long.MIN_VALUE, Long.MAX_VALUE );
+		}
+
+		@Override
+		public void contribute(LuceneSearchSortCollector collector, String absoluteFieldPath, SortOrder order, Object missingValue) {
+			SortField sortField = new SortField( absoluteFieldPath, SortField.Type.LONG, order == SortOrder.DESC ? true : false );
+			setEffectiveMissingValue( sortField, missingValue, order );
+
+			collector.collectSortField( sortField );
 		}
 	}
 }

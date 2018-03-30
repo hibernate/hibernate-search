@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
@@ -53,7 +54,13 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortCollector> field(String absoluteFieldPath) {
-		return new FieldSortBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldFormatter( absoluteFieldPath ) );
+		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		return new FieldSortBuilderImpl(
+				absoluteFieldPath,
+				schemaNode.getFormatter(),
+				schemaNode.getSortContributor()
+		);
 	}
 
 	@Override

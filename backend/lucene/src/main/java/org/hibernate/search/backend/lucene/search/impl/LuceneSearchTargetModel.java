@@ -8,12 +8,9 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -49,38 +46,29 @@ public class LuceneSearchTargetModel {
 		return readerProviders;
 	}
 
-	public LuceneFieldQueryFactory getFieldQueryFactory(String absoluteFieldPath) {
-		return getFieldElement( LuceneIndexSchemaFieldNode::getQueryFactory, absoluteFieldPath );
-	}
+	public LuceneIndexSchemaFieldNode<?> getSchemaNode(String absoluteFieldPath) {
+		LuceneIndexModel indexModelForSelectedSchemaNode = null;
+		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 
-	public LuceneFieldFormatter<?> getFieldFormatter(String absoluteFieldPath) {
-		return getFieldElement( LuceneIndexSchemaFieldNode::getFormatter, absoluteFieldPath );
-	}
-
-	private <R> R getFieldElement(Function<LuceneIndexSchemaFieldNode<?>, R> getElementFunction, String absoluteFieldPath) {
-		LuceneIndexModel indexModelForSelectedFormatter = null;
-		R selectedElement = null;
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 			if ( schemaNode != null ) {
-				R element = getElementFunction.apply( schemaNode );
-				if ( selectedElement == null ) {
-					selectedElement = element;
-					indexModelForSelectedFormatter = indexModel;
+				if ( selectedSchemaNode == null ) {
+					selectedSchemaNode = schemaNode;
+					indexModelForSelectedSchemaNode = indexModel;
 				}
-				else if ( !selectedElement.equals( element ) ) {
+				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
 					throw log.conflictingFieldTypesForSearch(
 							absoluteFieldPath,
-							selectedElement, indexModelForSelectedFormatter.getIndexName(),
-							element, indexModel.getIndexName()
-					);
+							selectedSchemaNode, indexModelForSelectedSchemaNode.getIndexName(),
+							schemaNode, indexModel.getIndexName() );
 				}
 			}
 		}
-		if ( selectedElement == null ) {
+		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
 		}
-		return selectedElement;
+		return selectedSchemaNode;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {
