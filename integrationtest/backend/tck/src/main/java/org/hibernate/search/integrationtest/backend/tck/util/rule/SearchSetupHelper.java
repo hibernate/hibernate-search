@@ -66,6 +66,13 @@ public class SearchSetupHelper implements TestRule {
 				.withProperty( "index.default.backend", "testedBackend" );
 	}
 
+	public SetupContext withMultiTenancyConfiguration() {
+		TckConfiguration tckConfiguration = TckConfiguration.get();
+		ConfigurationPropertySource propertySource = tckConfiguration.getMultiTenancyBackendProperties( testId ).withPrefix( "backend.testedBackend" );
+		return new SetupContext( propertySource )
+				.withProperty( "index.default.backend", "testedBackend" );
+	}
+
 	public class SetupContext {
 
 		private final ConfigurationPropertySource propertySource;

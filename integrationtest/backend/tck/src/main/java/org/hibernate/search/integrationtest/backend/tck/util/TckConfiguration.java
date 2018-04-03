@@ -22,6 +22,8 @@ public final class TckConfiguration {
 
 	private static final String PROPERTIES_PATH = "/backend-tck.properties";
 
+	private static final String MULTI_TENANCY_PROPERTIES_PATH = "/backend-tck-multi-tenancy.properties";
+
 	private static TckConfiguration instance;
 
 	public static TckConfiguration get() {
@@ -31,27 +33,32 @@ public final class TckConfiguration {
 		return instance;
 	}
 
-	private final Properties properties;
-
 	private final String startupTimestamp;
 
 	private TckConfiguration() {
-		Properties properties = new Properties();
-		try ( InputStream propertiesInputStream = getClass().getResourceAsStream( PROPERTIES_PATH ) ) {
-			if ( propertiesInputStream == null ) {
-				throw new IllegalStateException( "Missing TCK properties file in the classpath: " + PROPERTIES_PATH );
-			}
-			properties.load( propertiesInputStream );
-		}
-		catch (IOException e) {
-			throw new IllegalStateException( "Error loading TCK properties file: " + PROPERTIES_PATH );
-		}
-
-		this.properties = properties;
 		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS" ).format( new Date() );
 	}
 
 	public ConfigurationPropertySource getBackendProperties(String testId) {
+		return getPropertySourceFromFile( PROPERTIES_PATH, testId );
+	}
+
+	public ConfigurationPropertySource getMultiTenancyBackendProperties(String testId) {
+		return getPropertySourceFromFile( MULTI_TENANCY_PROPERTIES_PATH, testId );
+	}
+
+	private ConfigurationPropertySource getPropertySourceFromFile(String propertyFilePath, String testId) {
+		Properties properties = new Properties();
+		try ( InputStream propertiesInputStream = getClass().getResourceAsStream( propertyFilePath ) ) {
+			if ( propertiesInputStream == null ) {
+				throw new IllegalStateException( "Missing TCK properties file in the classpath: " + propertyFilePath );
+			}
+			properties.load( propertiesInputStream );
+		}
+		catch (IOException e) {
+			throw new IllegalStateException( "Error loading TCK properties file: " + propertyFilePath );
+		}
+
 		Properties overriddenProperties = new Properties();
 
 		properties.forEach( (k, v) -> {
