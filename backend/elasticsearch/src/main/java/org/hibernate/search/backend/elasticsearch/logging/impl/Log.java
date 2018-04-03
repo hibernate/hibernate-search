@@ -15,10 +15,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.backend.spi.Backend;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -107,4 +107,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 513, value = "A normalizer was set on field '%1$s' of type '%2$s', but fields of this type cannot be analyzed." )
 	SearchException cannotUseNormalizerOnFieldType(String fieldName, DataType fieldType);
+
+	@Message(id = 514, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
+	SearchException multiTenancyRequiredButNotSupportedByBackend(String backendName, String indexName);
+
+	@Message(id = 515, value = "Unknown multi-tenancy strategy '%1$s'.")
+	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
+
+	@Message(id = 516, value = "Tenant identifier '%2$s' is provided, but multi-tenancy is disabled for the backend '%1$s'.")
+	SearchException tenantIdProvidedButMultiTenancyDisabled(Backend<?> backend, String tenantId);
+
+	@Message(id = 517, value = "Backend '%1$s' has multi-tenancy enabled, but no tenant identifier is provided.")
+	SearchException multiTenancyEnabledButNoTenantIdProvided(Backend<?> backend);
 }

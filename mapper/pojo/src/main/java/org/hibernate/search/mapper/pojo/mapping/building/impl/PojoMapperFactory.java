@@ -23,13 +23,15 @@ public class PojoMapperFactory<M extends PojoMapping>
 	private final PojoMappingFactory<M> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
+	private final boolean multiTenancyEnabled;
 
 	public PojoMapperFactory(MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
-			PojoBootstrapIntrospector introspector, boolean implicitProvidedId) {
+			PojoBootstrapIntrospector introspector, boolean implicitProvidedId, boolean multiTenancyEnabled) {
 		this.mappingKey = mappingKey;
 		this.mappingFactory = mappingFactory;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
+		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class PojoMapperFactory<M extends PojoMapping>
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
 				buildContext, propertySource, contributorProvider,
-				introspector, implicitProvidedId, mappingFactory::createMapping
+				introspector, implicitProvidedId, multiTenancyEnabled, mappingFactory::createMapping
 		);
 	}
 

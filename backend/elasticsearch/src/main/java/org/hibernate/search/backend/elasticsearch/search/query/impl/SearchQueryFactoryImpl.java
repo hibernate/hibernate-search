@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
@@ -40,21 +41,32 @@ class SearchQueryFactoryImpl
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
+	private final DocumentReferenceHitExtractor documentReferenceHitExtractor;
+
+	private final ObjectHitExtractor objectHitExtractor;
+
+	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
+
 	SearchQueryFactoryImpl(ElasticsearchBackend backend, ElasticsearchSearchTargetModel searchTargetModel) {
 		this.backend = backend;
 		this.searchTargetModel = searchTargetModel;
+
+		MultiTenancyStrategy multiTenancyStrategy = backend.getMultiTenancyStrategy();
+		this.documentReferenceHitExtractor = new DocumentReferenceHitExtractor( multiTenancyStrategy );
+		this.objectHitExtractor = new ObjectHitExtractor( multiTenancyStrategy );
+		this.documentReferenceProjectionHitExtractor = new DocumentReferenceProjectionHitExtractor( multiTenancyStrategy );
 	}
 
 	@Override
 	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObjects(
 			SessionContext sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
-		return createSearchQueryBuilder( sessionContext, ObjectHitExtractor.get(), hitAggregator );
+		return createSearchQueryBuilder( sessionContext, objectHitExtractor, hitAggregator );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
 			SessionContext sessionContext, HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator) {
-		return createSearchQueryBuilder( sessionContext, DocumentReferenceHitExtractor.get(), hitAggregator );
+		return createSearchQueryBuilder( sessionContext, documentReferenceHitExtractor, hitAggregator );
 	}
 
 	@Override
@@ -98,15 +110,15 @@ class SearchQueryFactoryImpl
 			switch ( projection ) {
 				case ProjectionConstants.OBJECT:
 					projectionFound.set( i );
-					extractors.add( ObjectHitExtractor.get() );
+					extractors.add( objectHitExtractor );
 					break;
 				case ProjectionConstants.REFERENCE:
 					projectionFound.set( i );
-					extractors.add( DocumentReferenceHitExtractor.get() );
+					extractors.add( documentReferenceHitExtractor );
 					break;
 				case ProjectionConstants.DOCUMENT_REFERENCE:
 					projectionFound.set( i );
-					extractors.add( DocumentReferenceProjectionHitExtractor.get() );
+					extractors.add( documentReferenceProjectionHitExtractor );
 					break;
 				default:
 					ElasticsearchIndexSchemaFieldNode node = indexModel.getFieldNode( projection );
@@ -126,10 +138,13 @@ class SearchQueryFactoryImpl
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
 		return new SearchQueryBuilderImpl<>(
 				backend.getQueryOrchestrator(),
 				backend.getWorkFactory(),
 				searchTargetModel.getIndexNames(),
+				backend.getMultiTenancyStrategy(),
 				sessionContext,
 				hitExtractor, hitAggregator
 		);

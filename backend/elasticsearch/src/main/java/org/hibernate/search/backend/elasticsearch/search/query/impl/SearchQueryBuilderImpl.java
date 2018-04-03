@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -33,25 +34,26 @@ class SearchQueryBuilderImpl<C, T>
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
+	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final String tenantId;
 
 	public SearchQueryBuilderImpl(
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			ElasticsearchWorkFactory workFactory,
 			Set<URLEncodedString> indexNames,
-			SessionContext context,
+			MultiTenancyStrategy multiTenancyStrategy,
+			SessionContext sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
-		String tenantId = context.getTenantIdentifier();
-		if ( tenantId != null ) {
-			// TODO handle tenant ID filtering
-		}
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
 		this.routingKeys = new HashSet<>();
 		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
+		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
@@ -66,20 +68,29 @@ class SearchQueryBuilderImpl<C, T>
 
 	private SearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
-		JsonObject jsonPredicate = elementCollector.toJsonPredicate();
-		if ( jsonPredicate != null ) {
-			payload.add( "query", jsonPredicate );
+
+		JsonObject jsonQuery = getJsonQuery();
+		if ( jsonQuery != null ) {
+			payload.add( "query", jsonQuery );
 		}
+
 		JsonArray jsonSort = elementCollector.toJsonSort();
 		if ( jsonSort != null ) {
 			payload.add( "sort", jsonSort );
 		}
+
 		hitExtractor.contributeRequest( payload );
+
 		SearchResultExtractor<T> searchResultExtractor =
 				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );
+
 		return new ElasticsearchSearchQuery<>( queryOrchestrator, workFactory,
 				indexNames, routingKeys,
 				payload, searchResultExtractor );
+	}
+
+	private JsonObject getJsonQuery() {
+		return multiTenancyStrategy.decorateJsonQuery( elementCollector.toJsonPredicate(), tenantId );
 	}
 
 	@Override

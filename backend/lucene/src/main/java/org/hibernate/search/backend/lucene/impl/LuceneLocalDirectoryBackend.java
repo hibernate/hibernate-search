@@ -55,7 +55,7 @@ public class LuceneLocalDirectoryBackend implements LuceneBackend {
 
 	@Override
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
-			String indexName, BuildContext context, ConfigurationPropertySource propertySource) {
+			String indexName, boolean multiTenancyEnabled, BuildContext context, ConfigurationPropertySource propertySource) {
 		return new LuceneLocalDirectoryIndexManagerBuilder( this, normalizeIndexName( indexName ), context, propertySource );
 	}
 

@@ -29,7 +29,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final BuildContext context;
 	private final ConfigurationPropertySource propertySource;
 
-	private final ElasticsearchRootIndexSchemaCollectorImpl collector = new ElasticsearchRootIndexSchemaCollectorImpl();
+	private final ElasticsearchRootIndexSchemaCollectorImpl collector;
 
 	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
 			BuildContext context, ConfigurationPropertySource propertySource) {
@@ -37,6 +37,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.indexName = indexName;
 		this.context = context;
 		this.propertySource = propertySource;
+		this.collector = new ElasticsearchRootIndexSchemaCollectorImpl( backend.getMultiTenancyStrategy() );
 	}
 
 	@Override

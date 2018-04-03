@@ -22,21 +22,26 @@ public final class JavaBeanMappingContributor extends PojoMappingContributorImpl
 
 	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			boolean annotatedTypeDiscoveryEnabled) {
-		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled );
+		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled, false );
 	}
 
 	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			MethodHandles.Lookup lookup, boolean annotatedTypeDiscoveryEnabled) {
-		this( mappingRepositoryBuilder, new JavaBeanBootstrapIntrospector( lookup ), annotatedTypeDiscoveryEnabled );
+			boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
+		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled, multiTenancyEnabled );
+	}
+
+	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+			MethodHandles.Lookup lookup, boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
+		this( mappingRepositoryBuilder, new JavaBeanBootstrapIntrospector( lookup ), annotatedTypeDiscoveryEnabled, multiTenancyEnabled );
 	}
 
 	private JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			JavaBeanBootstrapIntrospector introspector, boolean annotatedTypeDiscoveryEnabled) {
+			JavaBeanBootstrapIntrospector introspector, boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
 		super(
 				mappingRepositoryBuilder, new JavaBeanMappingKey(),
 				new JavaBeanMappingFactory(),
 				introspector, false,
-				annotatedTypeDiscoveryEnabled
+				annotatedTypeDiscoveryEnabled, multiTenancyEnabled
 		);
 	}
 }

@@ -90,6 +90,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 				.pathComponent( indexName )
 				.pathComponent( typeName )
 				.pathComponent( URLEncodedString.fromString( id ) );
+		builder.param( "refresh", true );
 		if ( routingKey != null ) {
 			builder.param( "_routing", routingKey );
 		}

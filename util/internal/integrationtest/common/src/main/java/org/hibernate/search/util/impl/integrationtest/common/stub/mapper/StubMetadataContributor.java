@@ -22,9 +22,9 @@ public class StubMetadataContributor implements MetadataContributor {
 	private final StubMapperFactory mapperFactory;
 	private final List<StubTypeMetadataContributor> mappingContributors = new ArrayList<>();
 
-	public StubMetadataContributor(SearchMappingRepositoryBuilder searchBuilder) {
+	public StubMetadataContributor(SearchMappingRepositoryBuilder searchBuilder, boolean multiTenancyEnabled) {
 		this.searchBuilder = searchBuilder;
-		this.mapperFactory = new StubMapperFactory();
+		this.mapperFactory = new StubMapperFactory( multiTenancyEnabled );
 		searchBuilder.addMapping( this );
 	}
 

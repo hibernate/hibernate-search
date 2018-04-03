@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -34,7 +33,6 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	private final URLEncodedString name;
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
-	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
@@ -44,7 +42,6 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 		this.name = name;
 		this.typeName = typeName;
 		this.model = model;
-		this.workFactory = backend.getWorkFactory();
 		this.changesetOrchestrator = backend.createChangesetOrchestrator();
 		this.streamOrchestrator = backend.getStreamOrchestrator();
 	}
@@ -63,13 +60,19 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	}
 
 	@Override
-	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext context) {
-		return new ElasticsearchChangesetIndexWorker( workFactory, changesetOrchestrator, name, typeName, context );
+	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
+		return new ElasticsearchChangesetIndexWorker( backend.getWorkFactory(), changesetOrchestrator, name, typeName, backend.getMultiTenancyStrategy(),
+				sessionContext );
 	}
 
 	@Override
-	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext context) {
-		return new ElasticsearchStreamIndexWorker( workFactory, streamOrchestrator, name, typeName, context );
+	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext sessionContext) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
+		return new ElasticsearchStreamIndexWorker( backend.getWorkFactory(), streamOrchestrator, name, typeName, backend.getMultiTenancyStrategy(),
+				sessionContext );
 	}
 
 	@Override
@@ -95,6 +98,5 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 				.append( "]")
 				.toString();
 	}
-
 
 }

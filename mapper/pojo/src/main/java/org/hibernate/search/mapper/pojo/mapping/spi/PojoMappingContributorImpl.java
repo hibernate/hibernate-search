@@ -26,16 +26,17 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 	private final PojoMapperFactory<M> mapperFactory;
 	private final PojoBootstrapIntrospector introspector;
 
-	private AnnotationMappingDefinitionImpl annotationMappingDefinition;
+	private final AnnotationMappingDefinitionImpl annotationMappingDefinition;
 
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
-			boolean annotatedTypeDiscoveryEnabled) {
+			boolean annotatedTypeDiscoveryEnabled,
+			boolean multiTenancyEnabled) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mapperFactory = new PojoMapperFactory<>(
-				mappingKey, mappingFactory, introspector, implicitProvidedId
+				mappingKey, mappingFactory, introspector, implicitProvidedId, multiTenancyEnabled
 		);
 		this.introspector = introspector;
 

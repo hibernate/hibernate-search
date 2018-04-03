@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -43,7 +44,9 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		relativeAccessor.add( content, value );
 	}
 
-	public JsonObject build() {
+	public JsonObject build(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
+		multiTenancyStrategy.contributeToIndexedDocument( content, tenantId, id );
+
 		return content;
 	}
 

@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
+import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -31,8 +32,9 @@ public class ElasticsearchChangesetIndexWorker extends ElasticsearchIndexWorker
 	public ElasticsearchChangesetIndexWorker(ElasticsearchWorkFactory factory,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
-			SessionContext context) {
-		super( factory, indexName, typeName, context );
+			MultiTenancyStrategy multiTenancyStrategy,
+			SessionContext sessionContext) {
+		super( factory, indexName, typeName, multiTenancyStrategy, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

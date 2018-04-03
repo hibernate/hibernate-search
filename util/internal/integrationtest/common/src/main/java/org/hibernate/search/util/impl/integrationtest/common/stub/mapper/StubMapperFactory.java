@@ -16,6 +16,12 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 class StubMapperFactory
 		implements MapperFactory<StubTypeMetadataContributor, StubMapping>, MappingKey<StubMapping> {
 
+	private final boolean multiTenancyEnabled;
+
+	public StubMapperFactory(boolean multiTenancyEnabled) {
+		this.multiTenancyEnabled = multiTenancyEnabled;
+	}
+
 	@Override
 	public MappingKey<StubMapping> getMappingKey() {
 		return this;
@@ -24,7 +30,7 @@ class StubMapperFactory
 	@Override
 	public Mapper<StubMapping> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
-		return new StubMapper( contributorProvider );
+		return new StubMapper( contributorProvider, multiTenancyEnabled );
 	}
 
 }

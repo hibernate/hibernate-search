@@ -51,7 +51,7 @@ class IndexManagerBuildingStateHolder {
 		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
 	}
 
-	public IndexManagerBuildingState<?> startBuilding(String rawIndexName) {
+	public IndexManagerBuildingState<?> startBuilding(String rawIndexName, boolean multiTenancyEnabled) {
 		ConfigurationPropertySource indexPropertySource = propertySource.withMask("index." + rawIndexName )
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
@@ -61,7 +61,7 @@ class IndexManagerBuildingStateHolder {
 
 		IndexManagerBuildingState<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
 		if ( state == null ) {
-			state = createIndexManagerBuildingState( backend, normalizedIndexName, indexPropertySource );
+			state = createIndexManagerBuildingState( backend, normalizedIndexName, multiTenancyEnabled, indexPropertySource );
 			indexManagerBuildingStateByName.put( normalizedIndexName, state );
 		}
 		return state;
@@ -72,8 +72,8 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	private <D extends DocumentElement> IndexManagerBuildingState<D> createIndexManagerBuildingState(
-			Backend<D> backend, String normalizedIndexName, ConfigurationPropertySource indexPropertySource) {
-		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, buildContext, indexPropertySource );
+			Backend<D> backend, String normalizedIndexName, boolean multiTenancyEnabled, ConfigurationPropertySource indexPropertySource) {
+		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, multiTenancyEnabled, buildContext, indexPropertySource );
 		IndexSchemaCollector schemaCollector = builder.getSchemaCollector();
 		IndexModelBindingContext bindingContext = new IndexModelBindingContextImpl( schemaCollector );
 		return new IndexMappingBuildingStateImpl<>( normalizedIndexName, builder, bindingContext );

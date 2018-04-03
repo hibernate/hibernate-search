@@ -23,12 +23,14 @@ class CompositeHitExtractor<C> implements HitExtractor<C> {
 		this.extractors = extractors;
 	}
 
+	@Override
 	public void contributeRequest(JsonObject requestBody) {
 		for ( HitExtractor<?> extractor : extractors ) {
 			extractor.contributeRequest( requestBody );
 		}
 	}
 
+	@Override
 	public void extract(C collector, JsonObject responseBody, JsonObject hit) {
 		for ( HitExtractor<? super C> extractor : extractors ) {
 			extractor.extract( collector, responseBody, hit );

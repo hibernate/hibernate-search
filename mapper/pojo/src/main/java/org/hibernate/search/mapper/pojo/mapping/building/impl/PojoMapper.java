@@ -24,6 +24,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
@@ -37,7 +38,6 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
-import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.AssertionFailure;
@@ -51,6 +51,7 @@ class PojoMapper<M> implements Mapper<M> {
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
+	private final boolean multiTenancyEnabled;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerValueExtractorBinder extractorBinder;
@@ -62,12 +63,13 @@ class PojoMapper<M> implements Mapper<M> {
 	PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
-			boolean implicitProvidedId,
+			boolean implicitProvidedId, boolean multiTenancyEnabled,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
+		this.multiTenancyEnabled = multiTenancyEnabled;
 		this.wrapperFactory = wrapperFactory;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider( contributorProvider );
@@ -81,6 +83,11 @@ class PojoMapper<M> implements Mapper<M> {
 		mappingHelper = new PojoMappingHelper(
 				contributorProvider, indexModelBinder
 		);
+	}
+
+	@Override
+	public boolean isMultiTenancyEnabled() {
+		return multiTenancyEnabled;
 	}
 
 	@Override

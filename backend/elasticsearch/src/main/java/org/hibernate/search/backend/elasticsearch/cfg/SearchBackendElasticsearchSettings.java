@@ -43,6 +43,8 @@ public final class SearchBackendElasticsearchSettings {
 
 	public static final String LOG_JSON_PRETTY_PRINTING = "log.json_pretty_printing";
 
+	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy_strategy";
+
 	/**
 	 * Default values for the different settings if no values are given.
 	 */
@@ -61,5 +63,6 @@ public final class SearchBackendElasticsearchSettings {
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final String DISCOVERY_SCHEME = "http";
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
+		public static final MultiTenancyStrategyConfiguration MULTI_TENANCY_STRATEGY = MultiTenancyStrategyConfiguration.NONE;
 	}
 }

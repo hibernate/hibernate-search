@@ -71,6 +71,7 @@ public class SearchSetupHelper implements TestRule {
 		private final ConfigurationPropertySource propertySource;
 		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
+		private boolean multiTenancyEnabled = false;
 
 		SetupContext(ConfigurationPropertySource propertySource) {
 			this.propertySource = propertySource;
@@ -87,6 +88,11 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
+		public SetupContext withMultiTenancy() {
+			multiTenancyEnabled = true;
+			return this;
+		}
+
 		public void setup() {
 			SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder( propertySource );
 
@@ -94,7 +100,7 @@ public class SearchSetupHelper implements TestRule {
 				mappingRepositoryBuilder = mappingRepositoryBuilder.setProperty( entry.getKey(), entry.getValue() );
 			}
 
-			StubMetadataContributor contributor = new StubMetadataContributor( mappingRepositoryBuilder );
+			StubMetadataContributor contributor = new StubMetadataContributor( mappingRepositoryBuilder, multiTenancyEnabled );
 			indexDefinitions.forEach( d -> d.beforeBuild( contributor ) );
 
 			SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();

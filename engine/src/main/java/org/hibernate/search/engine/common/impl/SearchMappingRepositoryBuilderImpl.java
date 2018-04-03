@@ -223,7 +223,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				if ( indexName != null ) {
 					mapper.addIndexed(
 							typeModel,
-							indexManagerBuildingStateHolder.startBuilding( indexName )
+							indexManagerBuildingStateHolder.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
 					);
 				}
 			}

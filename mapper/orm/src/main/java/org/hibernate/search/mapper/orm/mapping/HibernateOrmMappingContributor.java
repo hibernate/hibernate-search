@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
@@ -49,7 +50,8 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 				mappingRepositoryBuilder, new HibernateOrmMappingKey(),
 				new HibernateOrmMappingFactory( sessionFactoryImplementor ),
 				introspector, false,
-				annotatedTypeDiscoveryEnabled
+				annotatedTypeDiscoveryEnabled,
+				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
 		);
 		mappingRepositoryBuilder.addMapping(
 				new HibernateOrmMetatadaContributor( getMapperFactory(), introspector, metadata )

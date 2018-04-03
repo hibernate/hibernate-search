@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactory;
@@ -25,6 +26,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.util.AssertionFailure;
 
 import com.google.gson.GsonBuilder;
 
@@ -33,6 +35,12 @@ import com.google.gson.GsonBuilder;
  * @author Yoann Rodiere
  */
 public class ElasticsearchBackendFactory implements BackendFactory {
+
+	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
+			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.MULTI_TENANCY_STRATEGY )
+					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
+					.withDefault( SearchBackendElasticsearchSettings.Defaults.MULTI_TENANCY_STRATEGY )
+					.build();
 
 	private static final ConfigurationProperty<Boolean> LOG_JSON_PRETTY_PRINTING =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.LOG_JSON_PRETTY_PRINTING )
@@ -57,7 +65,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory( dialectSpecificGsonProvider );
 
-		return new ElasticsearchBackend( client, name, workFactory );
+		return new ElasticsearchBackend( client, name, workFactory, getMultiTenancyStrategy( name, propertySource ) );
 	}
 
 	private GsonBuilder createES5GsonBuilderBase() {
@@ -67,4 +75,17 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				.registerTypeAdapter( NormsType.class, new ES5NormsTypeJsonAdapter().nullSafe() );
 	}
 
+	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
+		MultiTenancyStrategyConfiguration multiTenancyStrategyConfiguration = MULTI_TENANCY_STRATEGY.get( propertySource );
+
+		switch ( multiTenancyStrategyConfiguration ) {
+			case NONE:
+				return new NoMultiTenancyStrategyImpl();
+			case DISCRIMINATOR:
+				return new DiscriminatorMultiTenancyStrategyImpl();
+			default:
+				throw new AssertionFailure( String.format( "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'", backendName,
+						multiTenancyStrategyConfiguration ) );
+		}
+	}
 }

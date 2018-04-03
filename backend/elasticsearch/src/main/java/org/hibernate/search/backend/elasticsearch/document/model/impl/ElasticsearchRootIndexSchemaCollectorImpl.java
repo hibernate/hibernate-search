@@ -10,12 +10,13 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNesting
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
+import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 
 public class ElasticsearchRootIndexSchemaCollectorImpl
 		extends AbstractElasticsearchIndexSchemaCollector<IndexSchemaRootTypeNodeBuilder> {
 
-	public ElasticsearchRootIndexSchemaCollectorImpl() {
-		super( new IndexSchemaRootTypeNodeBuilder() );
+	public ElasticsearchRootIndexSchemaCollectorImpl(MultiTenancyStrategy multiTenancyStrategy) {
+		super( new IndexSchemaRootTypeNodeBuilder( multiTenancyStrategy ) );
 	}
 
 	@Override

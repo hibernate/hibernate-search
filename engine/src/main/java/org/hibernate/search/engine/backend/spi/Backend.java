@@ -27,6 +27,7 @@ public interface Backend<D extends DocumentElement> extends AutoCloseable {
 
 	/**
 	 * @param normalizedIndexName The (already {@link #normalizeIndexName(String) normalized}) name of the index
+	 * @param multiTenancyEnabled {@code true} if multi-tenancy is enabled for this index, {@code false} otherwise.
 	 * @param context The build context
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
@@ -34,7 +35,7 @@ public interface Backend<D extends DocumentElement> extends AutoCloseable {
 	 * <strong>CAUTION:</strong> the property key {@code backend} is reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
-	IndexManagerBuilder<D> createIndexManagerBuilder(String normalizedIndexName, BuildContext context,
+	IndexManagerBuilder<D> createIndexManagerBuilder(String normalizedIndexName, boolean multiTenancyEnabled, BuildContext context,
 			ConfigurationPropertySource propertySource);
 
 	@Override

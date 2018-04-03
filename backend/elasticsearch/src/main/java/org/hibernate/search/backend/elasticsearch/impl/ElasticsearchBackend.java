@@ -7,10 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
@@ -20,6 +22,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
@@ -27,20 +30,25 @@ import org.hibernate.search.util.impl.common.Closer;
  */
 public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObjectBuilder> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final ElasticsearchClient client;
 
 	private final String name;
 
 	private final ElasticsearchWorkFactory workFactory;
 
+	private final MultiTenancyStrategy multiTenancyStrategy;
+
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
-	public ElasticsearchBackend(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory) {
+	public ElasticsearchBackend(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
 		this.workFactory = workFactory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 	}
@@ -52,12 +60,20 @@ public class ElasticsearchBackend implements Backend<ElasticsearchDocumentObject
 
 	@Override
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
-			String name, BuildContext context, ConfigurationPropertySource propertySource) {
-		return new ElasticsearchIndexManagerBuilder( this, name, context, propertySource );
+			String normalizedIndexName, boolean multiTenancyEnabled, BuildContext context, ConfigurationPropertySource propertySource) {
+		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
+			throw log.multiTenancyRequiredButNotSupportedByBackend( name, normalizedIndexName );
+		}
+
+		return new ElasticsearchIndexManagerBuilder( this, normalizedIndexName, context, propertySource );
 	}
 
 	public ElasticsearchWorkFactory getWorkFactory() {
 		return workFactory;
+	}
+
+	public MultiTenancyStrategy getMultiTenancyStrategy() {
+		return multiTenancyStrategy;
 	}
 
 	public ElasticsearchWorkOrchestrator createChangesetOrchestrator() {

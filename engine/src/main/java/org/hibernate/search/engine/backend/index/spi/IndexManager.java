@@ -17,9 +17,9 @@ public interface IndexManager<D extends DocumentElement> extends AutoCloseable {
 	@Override
 	void close();
 
-	ChangesetIndexWorker<D> createWorker(SessionContext context);
+	ChangesetIndexWorker<D> createWorker(SessionContext sessionContext);
 
-	StreamIndexWorker<D> createStreamWorker(SessionContext context);
+	StreamIndexWorker<D> createStreamWorker(SessionContext sessionContext);
 
 	IndexSearchTargetBuilder createSearchTarget();
 

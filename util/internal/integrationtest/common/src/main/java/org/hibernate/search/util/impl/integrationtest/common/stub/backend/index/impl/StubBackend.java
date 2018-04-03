@@ -37,7 +37,7 @@ public class StubBackend implements Backend<StubDocumentElement> {
 	}
 
 	@Override
-	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String name, BuildContext context,
+	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String name, boolean isMultiTenancyEnabled, BuildContext context,
 			ConfigurationPropertySource propertySource) {
 		return new StubIndexManagerBuilder( this, name );
 	}
