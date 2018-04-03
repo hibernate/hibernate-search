@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl.esnative;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * An enum for Elasticsearch "fielddata" attribute values.
  * <p>
@@ -20,9 +18,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public enum FieldDataType {
 
-	@SerializedName( "true" )
 	TRUE,
-	@SerializedName( "false" )
 	FALSE
 	;
 }

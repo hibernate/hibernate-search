@@ -12,13 +12,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.util.impl.common.SearchThreadFactory;
 
-import com.google.gson.GsonBuilder;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
@@ -101,12 +99,6 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.DISCOVERY_SCHEME )
 					.build();
 
-	private static final ConfigurationProperty<Boolean> LOG_JSON_PRETTY_PRINTING =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.LOG_JSON_PRETTY_PRINTING )
-					.asBoolean()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
-					.build();
-
 	/* TODO ElasticsearchHttpClientConfigurer
 	private ServiceManager serviceManager;
 
@@ -122,14 +114,12 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 	*/
 
 	@Override
-	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource) {
+	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
+			GsonProvider initialGsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		RestClient restClient = createClient( propertySource, requestTimeoutMs );
 		Sniffer sniffer = createSniffer( restClient, propertySource );
-
-		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
-		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
 		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS, initialGsonProvider );
 	}
