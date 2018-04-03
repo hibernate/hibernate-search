@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 
 public final class ProjectionConstants {
 
-	private static final String PREFIX = "__HibernateSearch_";
+	private static final String PREFIX = "__HSEARCH_PROJECTION_";
 
 	private ProjectionConstants() {
 		// Private constructor, this is a utility class
