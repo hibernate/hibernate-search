@@ -55,16 +55,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-backend-jgroups</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.lucene-jbossmodules</groupId>
             <artifactId>lucene-jbossmodules</artifactId>
             <type>zip</type>
@@ -152,22 +142,6 @@
                             <resources>
                                 <resource>
                                     <directory>src/main/modules/search/backend-jms</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>gen-module-backend-jgroups</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${template.dir}/system/layers/base/org/hibernate/search/backend-jgroups/${module-slot.org.hibernate.search.full-id}/</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/modules/search/backend-jgroups</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
