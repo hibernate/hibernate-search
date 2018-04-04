@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 
 public class PojoAugmentedPropertyModel {
 

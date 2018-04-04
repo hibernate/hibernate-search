@@ -8,12 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -80,15 +78,9 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext withExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
-		this.extractorPath = ContainerValueExtractorPath.explicitExtractors( extractorClasses );
+	public PropertyIndexedEmbeddedMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+		this.extractorPath = extractorPath;
 		return this;
 	}
 
-	@Override
-	public PropertyIndexedEmbeddedMappingContext withoutExtractors() {
-		this.extractorPath = ContainerValueExtractorPath.noExtractors();
-		return this;
-	}
 }

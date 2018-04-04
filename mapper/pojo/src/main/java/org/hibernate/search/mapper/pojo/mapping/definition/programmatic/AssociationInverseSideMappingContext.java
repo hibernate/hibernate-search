@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 
 /**
  * @author Yoann Rodiere
@@ -18,21 +16,23 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 
 	default AssociationInverseSideMappingContext withExtractor(
 			Class<? extends ContainerValueExtractor> extractorClass) {
-		return withExtractors( Collections.singletonList( extractorClass ) );
+		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
-	AssociationInverseSideMappingContext withExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
+	default AssociationInverseSideMappingContext withoutExtractors() {
+		return withExtractors( ContainerValueExtractorPath.noExtractors() );
+	}
 
-	AssociationInverseSideMappingContext withoutExtractors();
-
-	AssociationInverseSideMappingContext withoutInverseExtractors();
+	AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
 
 	default AssociationInverseSideMappingContext withInverseExtractor(
 			Class<? extends ContainerValueExtractor> inverseExtractorClass) {
-		return withInverseExtractors( Collections.singletonList( inverseExtractorClass ) );
+		return withInverseExtractors( ContainerValueExtractorPath.explicitExtractor( inverseExtractorClass ) );
 	}
 
-	AssociationInverseSideMappingContext withInverseExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> inverseExtractorClasses);
+	default AssociationInverseSideMappingContext withoutInverseExtractors() {
+		return withInverseExtractors( ContainerValueExtractorPath.noExtractors() );
+	}
+
+	AssociationInverseSideMappingContext withInverseExtractors(ContainerValueExtractorPath inverseExtractorPath);
 }

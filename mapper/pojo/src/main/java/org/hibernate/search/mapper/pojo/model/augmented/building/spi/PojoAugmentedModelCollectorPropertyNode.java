@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.augmented.building.spi;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 
 public interface PojoAugmentedModelCollectorPropertyNode extends PojoAugmentedModelCollector {
 

@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.List;
-
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
@@ -45,28 +42,15 @@ public class AssociationInverseSideMappingContextImpl
 	}
 
 	@Override
-	public AssociationInverseSideMappingContext withExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
-		this.extractorPath = ContainerValueExtractorPath.explicitExtractors( extractorClasses );
-		return this;
-	}
-
-	@Override
-	public AssociationInverseSideMappingContext withoutExtractors() {
-		this.extractorPath = ContainerValueExtractorPath.noExtractors();
-		return this;
-	}
-
-	@Override
-	public AssociationInverseSideMappingContext withoutInverseExtractors() {
-		this.inverseExtractorPath = ContainerValueExtractorPath.noExtractors();
+	public AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+		this.extractorPath = extractorPath;
 		return this;
 	}
 
 	@Override
 	public AssociationInverseSideMappingContext withInverseExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> inverseExtractorClasses) {
-		this.inverseExtractorPath = ContainerValueExtractorPath.explicitExtractors( inverseExtractorClasses );
+			ContainerValueExtractorPath inverseExtractorPath) {
+		this.inverseExtractorPath = inverseExtractorPath;
 		return this;
 	}
 }

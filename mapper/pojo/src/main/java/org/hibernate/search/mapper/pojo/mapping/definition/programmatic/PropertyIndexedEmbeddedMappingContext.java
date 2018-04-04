@@ -8,11 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 
 /**
  * @author Yoann Rodiere
@@ -31,13 +30,15 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 
 	PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths);
 
-	default PropertyIndexedEmbeddedMappingContext withExtractor(Class<? extends ContainerValueExtractor> extractorClass) {
-		return withExtractors( Collections.singletonList( extractorClass ) );
+	default PropertyIndexedEmbeddedMappingContext withExtractor(
+			Class<? extends ContainerValueExtractor> extractorClass) {
+		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
-	PropertyIndexedEmbeddedMappingContext withExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses);
+	default PropertyIndexedEmbeddedMappingContext withoutExtractors() {
+		return withExtractors( ContainerValueExtractorPath.noExtractors() );
+	}
 
-	PropertyIndexedEmbeddedMappingContext withoutExtractors();
+	PropertyIndexedEmbeddedMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
 
 }

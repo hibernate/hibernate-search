@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;

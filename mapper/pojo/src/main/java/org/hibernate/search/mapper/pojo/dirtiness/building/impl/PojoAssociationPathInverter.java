@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;

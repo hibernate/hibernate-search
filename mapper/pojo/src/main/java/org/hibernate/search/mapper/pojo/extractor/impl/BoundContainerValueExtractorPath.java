@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
 /**

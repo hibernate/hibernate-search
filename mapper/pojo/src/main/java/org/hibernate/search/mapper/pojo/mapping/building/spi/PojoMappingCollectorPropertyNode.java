@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 
 public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
