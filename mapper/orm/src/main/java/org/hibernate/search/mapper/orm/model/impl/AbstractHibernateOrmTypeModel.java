@@ -82,6 +82,11 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
+	public boolean isAbstract() {
+		return xClass.isAbstract();
+	}
+
+	@Override
 	public boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof AbstractHibernateOrmTypeModel
 				&& ((AbstractHibernateOrmTypeModel<?>) other).xClass.isAssignableFrom( xClass );

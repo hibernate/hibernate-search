@@ -11,6 +11,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,6 +63,11 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + clazz.getName() + "]";
+	}
+
+	@Override
+	public boolean isAbstract() {
+		return Modifier.isAbstract( clazz.getModifiers() );
 	}
 
 	@Override

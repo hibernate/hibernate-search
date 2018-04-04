@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,10 +39,14 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDisco
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ConfigurationPropertySource mainPropertySource;
 	private final Properties overriddenProperties = new Properties();
@@ -192,6 +197,9 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 
 		public void mapToIndex(MappableTypeModel typeModel, String indexName) {
+			if ( typeModel.isAbstract() ) {
+				throw log.cannotMapAbstractTypeToIndex( typeModel, indexName );
+			}
 			getOrCreateContribution( typeModel ).mapToIndex( indexName );
 		}
 

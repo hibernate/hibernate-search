@@ -9,6 +9,7 @@ package org.hibernate.search.engine.logging.impl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
@@ -60,4 +61,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 12, value = "Invalid value: at least one bound in range predicates must be non-null." +
 			" Null bounds were passed to range predicate on fields %1$s")
 	SearchException rangePredicateCannotMatchNullValue(List<String> strings);
+
+	@Message(id = 13, value = "Cannot map type '%1$s' to index '%2$s', because this type is abstract."
+			+ " Index mappings are not inherited: they apply to exact instances of a given type."
+			+ " As a result, mapping an abstract type to an index does not make sense,"
+			+ " since the index would always be empty.")
+	SearchException cannotMapAbstractTypeToIndex(MappableTypeModel typeModel, String indexName);
 }

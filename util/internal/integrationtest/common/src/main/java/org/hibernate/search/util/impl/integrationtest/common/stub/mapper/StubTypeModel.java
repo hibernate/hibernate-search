@@ -24,6 +24,11 @@ class StubTypeModel implements MappableTypeModel {
 	}
 
 	@Override
+	public boolean isAbstract() {
+		return false;
+	}
+
+	@Override
 	public boolean isSubTypeOf(MappableTypeModel other) {
 		return false;
 	}
