@@ -18,26 +18,28 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
  */
 public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractPojoIndexingDependencyCollectorNode {
 
-	private final PojoIndexingDependencyCollectorTypeNode<T> parent;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
+	private final PojoIndexingDependencyCollectorTypeNode<?> entityAncestor;
+	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromEntity;
 
-	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parent,
-			BoundPojoModelPathPropertyNode<T, P> modelPath,
+	PojoIndexingDependencyCollectorPropertyNode(BoundPojoModelPathPropertyNode<T, P> modelPath,
+			PojoIndexingDependencyCollectorTypeNode<?> entityAncestor,
+			BoundPojoModelPathPropertyNode<T, P> modelPathFromEntity,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.parent = parent;
 		this.modelPath = modelPath;
+		this.entityAncestor = entityAncestor;
+		this.modelPathFromEntity = modelPathFromEntity;
 	}
 
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
 			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
 		return new PojoIndexingDependencyCollectorValueNode<>(
-				this, modelPath.value( boundExtractorPath ), buildingHelper
+				modelPath.value( boundExtractorPath ),
+				entityAncestor,
+				modelPathFromEntity.value( boundExtractorPath ),
+				buildingHelper
 		);
-	}
-
-	PojoIndexingDependencyCollectorTypeNode<T> getParent() {
-		return parent;
 	}
 
 }

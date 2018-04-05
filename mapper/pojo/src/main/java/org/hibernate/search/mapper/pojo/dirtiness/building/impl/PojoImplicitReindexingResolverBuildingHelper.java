@@ -28,6 +28,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final PojoAssociationPathInverter pathInverter;
+	private final Set<PojoRawTypeModel<?>> entityTypes;
 	private final Map<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> concreteEntitySubTypesByEntitySuperType =
 			new HashMap<>();
 	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?>> builderByType =
@@ -41,6 +42,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.pathInverter = pathInverter;
+		this.entityTypes = entityTypes;
 
 		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 			if ( !entityType.isAbstract() ) {
@@ -76,6 +78,10 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	PojoAssociationPathInverter getPathInverter() {
 		return pathInverter;
+	}
+
+	boolean isEntity(PojoRawTypeModel<?> typeModel) {
+		return entityTypes.contains( typeModel );
 	}
 
 	/**

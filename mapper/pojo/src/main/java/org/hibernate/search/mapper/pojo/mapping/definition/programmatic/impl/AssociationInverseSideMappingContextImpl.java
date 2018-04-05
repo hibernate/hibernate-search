@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContrib
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
 /**
@@ -22,18 +23,17 @@ public class AssociationInverseSideMappingContextImpl
 		implements AssociationInverseSideMappingContext,
 		PojoMetadataContributor<PojoAugmentedModelCollectorPropertyNode, PojoMappingCollector> {
 
-	private final String inversePropertyName;
+	private final PojoModelPathValueNode inversePath;
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
-	private ContainerValueExtractorPath inverseExtractorPath = ContainerValueExtractorPath.defaultExtractors();
 
-	AssociationInverseSideMappingContextImpl(PropertyMappingContext delegate, String inversePropertyName) {
+	AssociationInverseSideMappingContextImpl(PropertyMappingContext delegate, PojoModelPathValueNode inversePath) {
 		super( delegate );
-		this.inversePropertyName = inversePropertyName;
+		this.inversePath = inversePath;
 	}
 
 	@Override
 	public void contributeModel(PojoAugmentedModelCollectorPropertyNode collector) {
-		collector.value( extractorPath ).associationInverseSide( inversePropertyName, inverseExtractorPath );
+		collector.value( extractorPath ).associationInverseSide( inversePath );
 	}
 
 	@Override
@@ -44,13 +44,6 @@ public class AssociationInverseSideMappingContextImpl
 	@Override
 	public AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
-		return this;
-	}
-
-	@Override
-	public AssociationInverseSideMappingContext withInverseExtractors(
-			ContainerValueExtractorPath inverseExtractorPath) {
-		this.inverseExtractorPath = inverseExtractorPath;
 		return this;
 	}
 }

@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * Represents an arbitrarily long access path bound to a specific POJO model.
@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
  */
 public abstract class BoundPojoModelPath {
 
-	public static <T> BoundPojoModelPathOriginalTypeNode<T> root(PojoRawTypeModel<T> typeModel) {
+	public static <T> BoundPojoModelPathOriginalTypeNode<T> root(PojoTypeModel<T> typeModel) {
 		return new BoundPojoModelPathOriginalTypeNode<>( null, typeModel );
 	}
 
@@ -39,6 +39,8 @@ public abstract class BoundPojoModelPath {
 	}
 
 	public abstract BoundPojoModelPath parent();
+
+	public abstract PojoTypeModel<?> rootType();
 
 	abstract void appendSelfPath(StringBuilder builder);
 

@@ -17,6 +17,17 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 	BoundPojoModelPathTypeNode() {
 	}
 
+	@Override
+	public PojoTypeModel<?> rootType() {
+		BoundPojoModelPathValueNode<?, ?, ?> parent = parent();
+		if ( parent == null ) {
+			return getTypeModel();
+		}
+		else {
+			return parent.rootType();
+		}
+	}
+
 	public BoundPojoModelPathPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
 		return new BoundPojoModelPathPropertyNode<>(
 				this, propertyHandle, getTypeModel().getProperty( propertyHandle.getName() )

@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
 /**
@@ -78,8 +79,8 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public AssociationInverseSideMappingContext associationInverseSide(String inversePropertyName) {
-		return delegate.associationInverseSide( inversePropertyName );
+	public AssociationInverseSideMappingContext associationInverseSide(PojoModelPathValueNode inversePath) {
+		return delegate.associationInverseSide( inversePath );
 	}
 
 }

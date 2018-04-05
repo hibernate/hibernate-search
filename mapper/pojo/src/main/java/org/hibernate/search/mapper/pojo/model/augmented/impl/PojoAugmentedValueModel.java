@@ -8,17 +8,19 @@ package org.hibernate.search.mapper.pojo.model.augmented.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+
 public class PojoAugmentedValueModel {
 
 	public static final PojoAugmentedValueModel EMPTY = new PojoAugmentedValueModel( null );
 
-	private final PojoAssociationPath inverseSidePath;
+	private final PojoModelPathValueNode inverseSidePath;
 
-	public PojoAugmentedValueModel(PojoAssociationPath inverseSidePath) {
+	public PojoAugmentedValueModel(PojoModelPathValueNode inverseSidePath) {
 		this.inverseSidePath = inverseSidePath;
 	}
 
-	public Optional<PojoAssociationPath> getInverseSidePath() {
+	public Optional<PojoModelPathValueNode> getInverseSidePath() {
 		return Optional.ofNullable( inverseSidePath );
 	}
 

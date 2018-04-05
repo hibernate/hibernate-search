@@ -12,13 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.AssertionFailure;
@@ -50,30 +52,33 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexingDependencyCollectorPropertyNode<?, P> parent;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
+	private final PojoIndexingDependencyCollectorTypeNode<?> entityAncestor;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromEntity;
 
 	// First key: inverse side entity type, second key: original side concrete entity type
-	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoAssociationPath>> inverseAssociationPathCache =
+	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
-	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parent,
-			BoundPojoModelPathValueNode<?, P, V> modelPath,
+	PojoIndexingDependencyCollectorValueNode(BoundPojoModelPathValueNode<?, P, V> modelPath,
+			PojoIndexingDependencyCollectorTypeNode<?> entityAncestor,
+			BoundPojoModelPathValueNode<?, P, V> modelPathFromEntity,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.parent = parent;
 		this.modelPath = modelPath;
+		this.entityAncestor = entityAncestor;
+		this.modelPathFromEntity = modelPathFromEntity;
 	}
 
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
-				this, modelPath.type(), buildingHelper
+				this, modelPath.type(), entityAncestor, modelPathFromEntity.type(), buildingHelper
 		);
 	}
 
 	public void collectDependency() {
 		// TODO pass the path to the value somehow, so as to support fine-grained dirty checking
-		parent.getParent().collectDependency();
+		entityAncestor.collectDependency();
 	}
 
 	PojoTypeModel<V> getTypeModel() {
@@ -99,44 +104,37 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			);
 		}
 
-		Map<PojoRawTypeModel<?>, PojoAssociationPath> inverseAssociationsPaths =
+		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inverseAssociationsPaths =
 				getInverseAssociationPathByConcreteEntityType( typeNodeBuilder.getTypeModel() );
-		for ( Map.Entry<PojoRawTypeModel<?>, PojoAssociationPath> entry : inverseAssociationsPaths.entrySet() ) {
+		for ( Map.Entry<PojoRawTypeModel<?>, PojoModelPathValueNode> entry : inverseAssociationsPaths.entrySet() ) {
 			markForReindexingWithOriginalSideConcreteType( entry.getKey(), typeNodeBuilder, entry.getValue() );
 		}
 	}
 
-	private Map<PojoRawTypeModel<?>, PojoAssociationPath> getInverseAssociationPathByConcreteEntityType(
+	private Map<PojoRawTypeModel<?>, PojoModelPathValueNode> getInverseAssociationPathByConcreteEntityType(
 			PojoTypeModel<?> inverseSideEntityType) {
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
 
 		// Cache the inverse association path, as we may compute it many times, which may be costly
-		Map<PojoRawTypeModel<?>, PojoAssociationPath> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
+		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
-				BoundPojoModelPathPropertyNode<?, ? extends P> originalSidePropertyPath = modelPath.parent();
-				PojoTypeModel<?> originalSideEntityType = originalSidePropertyPath.parent().getTypeModel();
+				PojoTypeModel<?> originalSideEntityType = entityAncestor.getTypeModel();
 				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.getRawType();
-				PojoPropertyModel<?> originalSideProperty = originalSidePropertyPath.getPropertyModel();
-				BoundContainerValueExtractorPath<?, ?> originalSideExtractorPath = modelPath.getBoundExtractorPath();
 
 				result = new HashMap<>();
 
 				for ( PojoRawTypeModel<?> concreteEntityType :
 						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {
-					PojoAssociationPath inverseAssociationPath = buildingHelper.getPathInverter()
-							.invertPropertyAndExtractors(
-									inverseSideEntityType, concreteEntityType,
-									originalSideProperty, originalSideExtractorPath
-							)
+					BoundPojoModelPathValueNode<?, ?, ?> modelPathFromConcreteEntitySubType =
+							applyProcessingPathToSubType( concreteEntityType, modelPathFromEntity );
+					PojoModelPathValueNode inverseAssociationPath = buildingHelper.getPathInverter()
+							.invertPath( inverseSideEntityType, modelPathFromConcreteEntitySubType )
 							.orElse( null );
 					if ( inverseAssociationPath == null ) {
-						PojoAssociationPath associationPath = new PojoAssociationPath(
-								originalSideProperty.getName(), originalSideExtractorPath.getExtractorPath()
-						);
-						inverseAssociationPathCache.put( inverseSideRawEntityType, null );
 						throw log.cannotInvertAssociation(
-								inverseSideRawEntityType, concreteEntityType, associationPath
+								inverseSideRawEntityType, concreteEntityType,
+								modelPathFromEntity.toUnboundPath()
 						);
 					}
 
@@ -156,7 +154,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 
 	private void markForReindexingWithOriginalSideConcreteType(PojoTypeModel<?> originalSideConcreteEntityType,
 			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNodeBuilder,
-			PojoAssociationPath inverseAssociationPath) {
+			PojoModelPathValueNode inverseAssociationPath) {
 		PojoTypeModel<?> inverseSideEntityType = typeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
 
@@ -166,9 +164,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNodeBuilderDelegate;
 		Set<? extends PojoRawTypeModel<?>> valueNodeTypeConcreteEntitySubTypes;
 		try {
-			String inversePropertyName = inverseAssociationPath.getPropertyName();
-			ContainerValueExtractorPath inverseExtractorPath = inverseAssociationPath.getExtractorPath();
-			valueNodeBuilderDelegate = typeNodeBuilder.property( inversePropertyName ).value( inverseExtractorPath );
+			valueNodeBuilderDelegate = applyPath( typeNodeBuilder, inverseAssociationPath );
 
 			/*
 			 * The entities to reindex will always be instances of both the entity type on the original side
@@ -192,19 +188,15 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		}
 		// Note: this should catch errors related to properties not found, among others.
 		catch (RuntimeException e) {
-			BoundContainerValueExtractorPath<?, ?> originalSideExtractorPath = modelPath.getBoundExtractorPath();
-			PojoAssociationPath associationPath = new PojoAssociationPath(
-					modelPath.parent().getPropertyModel().getName(), originalSideExtractorPath.getExtractorPath()
-			);
 			throw log.cannotApplyInvertAssociationPath(
 					inverseSideRawEntityType, inverseAssociationPath,
-					originalSideRawConcreteEntityType, associationPath,
+					originalSideRawConcreteEntityType, modelPathFromEntity.toUnboundPath(),
 					e.getMessage(), e
 			);
 		}
 
 		// Recurse if necessary
-		PojoIndexingDependencyCollectorValueNode<?, ?> entityNodeParentValueNode = parent.getParent().getParent();
+		PojoIndexingDependencyCollectorValueNode<?, ?> entityNodeParentValueNode = entityAncestor.getParent();
 		if ( entityNodeParentValueNode != null ) {
 			/*
 			 * We did not reach the indexed type yet.
@@ -228,6 +220,60 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				inverseValueTypeBuilder.markForReindexing();
 			}
 		}
+	}
+
+	private PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> applyPath(
+			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
+			PojoModelPathValueNode unboundPath) {
+		PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNodeBuilder =
+				applyPath( builder, unboundPath.parent() );
+		ContainerValueExtractorPath inverseExtractorPath = unboundPath.getExtractorPath();
+		return propertyNodeBuilder.value( inverseExtractorPath );
+	}
+
+	private PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> applyPath(
+			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
+			PojoModelPathPropertyNode unboundPath) {
+		PojoModelPathValueNode parent = unboundPath.parent();
+		AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> parentBuilder;
+		if ( parent != null ) {
+			parentBuilder = applyPath( builder, parent ).type();
+		}
+		else {
+			parentBuilder = builder;
+		}
+		String inversePropertyName = unboundPath.getPropertyName();
+		return parentBuilder.property( inversePropertyName );
+	}
+
+	private BoundPojoModelPathValueNode<?, ?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
+			BoundPojoModelPathValueNode<?, ?, ?> source) {
+		BoundPojoModelPathPropertyNode<?, ?> targetParent = applyProcessingPathToSubType( rootSubType, source.parent() );
+		return bindAndApplyExtractorPath( targetParent, source.getExtractorPath() );
+	}
+
+	private BoundPojoModelPathPropertyNode<?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
+			BoundPojoModelPathPropertyNode<?, ?> source) {
+		BoundPojoModelPathTypeNode<?> targetParent = applyProcessingPathToSubType( rootSubType, source.parent() );
+		return targetParent.property( source.getPropertyHandle() );
+	}
+
+	private BoundPojoModelPathTypeNode<?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
+			BoundPojoModelPathTypeNode<?> source) {
+		BoundPojoModelPathValueNode<?, ?, ?> sourceParent = source.parent();
+		if ( sourceParent != null ) {
+			return applyProcessingPathToSubType( rootSubType, sourceParent ).type();
+		}
+		else {
+			return BoundPojoModelPath.root( rootSubType );
+		}
+	}
+
+	private <T, P> BoundPojoModelPathValueNode<T, P, ?> bindAndApplyExtractorPath(
+			BoundPojoModelPathPropertyNode<T, P> propertyNode, ContainerValueExtractorPath extractorPath) {
+		BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+				buildingHelper.bindExtractorPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
+		return propertyNode.value( boundExtractorPath );
 	}
 
 }

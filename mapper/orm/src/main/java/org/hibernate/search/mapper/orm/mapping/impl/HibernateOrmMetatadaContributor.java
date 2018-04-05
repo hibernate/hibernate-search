@@ -9,8 +9,10 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.hibernate.boot.Metadata;
+import org.hibernate.mapping.Component;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -27,6 +29,9 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public final class HibernateOrmMetatadaContributor implements MetadataContributor {
@@ -90,9 +95,9 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			if ( referencedEntityName != null ) {
 				String mappedByPath = collectionValue.getMappedByProperty();
 				if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
-					collector.add( createInverseSideMetadataContributor(
+					collector.add( new HibernateOrmAssociationInverseSideMetadataContributor(
 							property.getName(), getExtractorPath( collectionValue ),
-							referencedEntityName, mappedByPath
+							resolveMappedByPath( referencedEntityName, mappedByPath )
 					) );
 				}
 			}
@@ -103,24 +108,39 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			// For *ToOne, the "mappedBy" information is apparently stored in the ReferencedPropertyName
 			String mappedByPath = toOneValue.getReferencedPropertyName();
 			if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
-				collector.add( createInverseSideMetadataContributor(
+				collector.add( new HibernateOrmAssociationInverseSideMetadataContributor(
 						property.getName(), getExtractorPath( toOneValue ),
-						referencedEntityName, mappedByPath
+						resolveMappedByPath( referencedEntityName, mappedByPath )
 				) );
 			}
 		}
 	}
 
-	private PojoTypeMetadataContributor createInverseSideMetadataContributor(
-			String propertyName, ContainerValueExtractorPath extractorPath,
-			String inverseSideEntity, String mappedByPath) {
-		Property inverseProperty = metadata.getEntityBinding( inverseSideEntity ).getProperty( mappedByPath );
-		Value value = inverseProperty.getValue();
-		ContainerValueExtractorPath inverseExtractorPath = getExtractorPath( value );
-		return new HibernateOrmAssociationInverseSideMetadataContributor(
-				propertyName, extractorPath,
-				inverseProperty.getName(), inverseExtractorPath
-		);
+	private PojoModelPathValueNode resolveMappedByPath(String inverseSideEntity, String mappedByPath) {
+		StringTokenizer tokenizer = new StringTokenizer( mappedByPath, ".", false );
+
+		String rootPropertyName = tokenizer.nextToken();
+		PojoModelPathPropertyNode inverseSidePropertyPath = PojoModelPath.fromRoot( rootPropertyName );
+		PojoModelPathValueNode inverseSideValuePath;
+		Property property = metadata.getEntityBinding( inverseSideEntity ).getProperty( rootPropertyName );
+
+		do {
+			Value value = property.getValue();
+			inverseSideValuePath = inverseSidePropertyPath.value( getExtractorPath( value ) );
+
+			if ( tokenizer.hasMoreTokens() ) {
+				Component component = (Component) value;
+				String propertyName = tokenizer.nextToken();
+				property = component.getProperty( propertyName );
+				inverseSidePropertyPath = inverseSideValuePath.property( propertyName );
+			}
+			else {
+				property = null;
+			}
+		}
+		while ( property != null );
+
+		return inverseSideValuePath;
 	}
 
 	private ContainerValueExtractorPath getExtractorPath(Value value) {

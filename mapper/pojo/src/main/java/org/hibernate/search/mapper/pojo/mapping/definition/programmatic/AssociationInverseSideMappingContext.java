@@ -25,14 +25,4 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 
 	AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
 
-	default AssociationInverseSideMappingContext withInverseExtractor(
-			Class<? extends ContainerValueExtractor> inverseExtractorClass) {
-		return withInverseExtractors( ContainerValueExtractorPath.explicitExtractor( inverseExtractorClass ) );
-	}
-
-	default AssociationInverseSideMappingContext withoutInverseExtractors() {
-		return withInverseExtractors( ContainerValueExtractorPath.noExtractors() );
-	}
-
-	AssociationInverseSideMappingContext withInverseExtractors(ContainerValueExtractorPath inverseExtractorPath);
 }

@@ -7,10 +7,12 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.AssertionFailure;
 
 /**
  * A node representing a type in a dependency collector.
@@ -23,29 +25,56 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 
 	private final PojoIndexingDependencyCollectorValueNode<?, T> parent;
 	private final BoundPojoModelPathTypeNode<T> modelPath;
+	private final PojoIndexingDependencyCollectorTypeNode<?> entityAncestor;
+	private final BoundPojoModelPathTypeNode<T> modelPathFromEntity;
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
-		this( null, BoundPojoModelPath.root( typeModel ), buildingHelper );
+		super( buildingHelper );
+		this.parent = null;
+		this.modelPath = BoundPojoModelPath.root( typeModel );
+		this.entityAncestor = this;
+		this.modelPathFromEntity = modelPath;
 	}
 
 	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parent,
 			BoundPojoModelPathTypeNode<T> modelPath,
+			PojoIndexingDependencyCollectorTypeNode<?> entityAncestor,
+			BoundPojoModelPathTypeNode<T> modelPathFromEntity,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parent = parent;
 		this.modelPath = modelPath;
+		if ( buildingHelper.isEntity( modelPath.getTypeModel().getRawType() ) ) {
+			this.entityAncestor = this;
+			this.modelPathFromEntity = BoundPojoModelPath.root( modelPath.getTypeModel() );
+		}
+		else {
+			this.entityAncestor = entityAncestor;
+			this.modelPathFromEntity = modelPathFromEntity;
+		}
 	}
 
+	/*
+	 * modelPath and modelPathFromEntity represent the same type,
+	 * so applying the same property handle results in the same property type.
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
-				this, modelPath.property( propertyHandle ), buildingHelper
+				modelPath.property( propertyHandle ),
+				entityAncestor,
+				(BoundPojoModelPathPropertyNode) modelPathFromEntity.property( propertyHandle ),
+				buildingHelper
 		);
 	}
 
 	void collectDependency() {
+		if ( entityAncestor != this ) {
+			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
+		}
 		if ( parent != null ) {
-			// FIXME handle the case when this type is not an entity type (the Set below will be empty)
+			// This node has an entity type: mark the root for reindexing whenever this node is changed.
 			PojoRawTypeModel<? super T> rawType = modelPath.getTypeModel().getRawType();
 			for ( PojoRawTypeModel<?> concreteEntityType :
 					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {

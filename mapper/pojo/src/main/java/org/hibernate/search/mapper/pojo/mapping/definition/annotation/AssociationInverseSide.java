@@ -43,23 +43,12 @@ public @interface AssociationInverseSide {
 			default @ContainerValueExtractorBeanReference( type = DefaultExtractors.class );
 
 	/**
-	 * @return The name of the inverse property on the inverse side of the association
+	 * @return The path to the targeted entity on the inverse side of the association.
 	 */
-	String inverseProperty();
+	PropertyValue[] inversePath();
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes,
-	 * which will be applied to the inverse property when getting the value of the inverse side of the association.
-	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
-	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
-	 */
-	ContainerValueExtractorBeanReference[] inverseExtractors()
-			default @ContainerValueExtractorBeanReference( type = DefaultExtractors.class );
-
-	/**
-	 * Class used as a marker for the default value of the {@link #extractors()} and {@link #inverseExtractors()}
-	 * attributes.
+	 * Class used as a marker for the default value of the {@link #extractors()} attribute.
 	 */
 	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
 		private DefaultExtractors() {

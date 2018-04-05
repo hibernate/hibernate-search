@@ -38,6 +38,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -1400,8 +1401,10 @@ public class OrmAutomaticIndexingIT {
 		@ManyToMany
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
-				inverseProperty = "containedMapKeys",
-				inverseExtractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				inversePath = @PropertyValue(
+						propertyName = "containedMapKeys",
+						extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				)
 		)
 		private List<ContainingEntity> containingAsMapKeys = new ArrayList<>();
 

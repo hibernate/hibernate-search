@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.model.augmented.building.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedValueModel;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 class PojoAugmentedValueModelBuilder implements PojoAugmentedModelCollectorValueNode {
-	private PojoAssociationPath inverseSidePath;
+	private PojoModelPathValueNode inverseSidePath;
 
 	@Override
-	public void associationInverseSide(String inversePropertyName, ContainerValueExtractorPath inverseExtractorPath) {
-		this.inverseSidePath = new PojoAssociationPath( inversePropertyName, inverseExtractorPath );
+	public void associationInverseSide(PojoModelPathValueNode inverseSidePath) {
+		this.inverseSidePath = inverseSidePath;
 	}
 
 	PojoAugmentedValueModel build() {

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAssociationPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -125,14 +125,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 20, value = "Could not find the inverse side of the association '%3$s' from type '%2$s' on type '%1$s'")
 	SearchException cannotInvertAssociation(PojoRawTypeModel<?> inverseSideTypeModel, PojoRawTypeModel<?> typeModel,
-			PojoAssociationPath associationPath);
+			PojoModelPathValueNode associationPath);
 
 	@Message(id = 21, value = "Could not apply the path of the inverse association '%2$s' to type '%1$s'."
 			+ " Association on the original side (which was inverted) was '%4$s' on type '%3$s'."
 			+ " Error was: '%5$s'")
 	SearchException cannotApplyInvertAssociationPath(
-			PojoRawTypeModel<?> inverseSideTypeModel, PojoAssociationPath inverseSideAssociationPath,
-			PojoRawTypeModel<?> originalSideTypeModel, PojoAssociationPath originalSideAssociationPath,
+			PojoRawTypeModel<?> inverseSideTypeModel, PojoModelPathValueNode inverseSideAssociationPath,
+			PojoRawTypeModel<?> originalSideTypeModel, PojoModelPathValueNode originalSideAssociationPath,
 			String errorMessage,
 			@Cause Exception cause);
 
@@ -140,4 +140,8 @@ public interface Log extends BasicLogger {
 			+ " but a supertype or subtype of '%2$s' was expected.")
 	SearchException incorrectTargetTypeForInverseAssociation(PojoRawTypeModel<?> inverseAssociationTargetType,
 			PojoRawTypeModel<?> entityType);
+
+	@Message(id = 23, value = "Property '%2$s' from type '%1$s' is annotated with @AnnotationInverseSide,"
+			+ " but the inverse path is empty.")
+	SearchException missingInversePathInAssociationInverseSideMapping(PojoRawTypeModel<?> typeModel, String propertyName);
 }

@@ -10,6 +10,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtrac
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @param <T> The property holder type of this node, i.e. the type from which the property is retrieved.
@@ -34,6 +35,11 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	@Override
 	public BoundPojoModelPathPropertyNode<T, P> parent() {
 		return parent;
+	}
+
+	@Override
+	public PojoTypeModel<?> rootType() {
+		return parent.rootType();
 	}
 
 	/**

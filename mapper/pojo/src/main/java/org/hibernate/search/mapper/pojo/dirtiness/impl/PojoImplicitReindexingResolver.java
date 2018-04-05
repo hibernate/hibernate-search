@@ -15,7 +15,7 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  *
  * @param <T> The type of "dirty" objects for which this class is able to
  * {@link #resolveEntitiesToReindex(PojoReindexingCollector, PojoRuntimeIntrospector, Object)} resolve entities to reindex}.
- * This type may be an entity type, a collection type, ...
+ * This type may be an entity type, an embeddable type, a collection type, ...
  */
 public abstract class PojoImplicitReindexingResolver<T> implements ToStringTreeAppendable {
 
