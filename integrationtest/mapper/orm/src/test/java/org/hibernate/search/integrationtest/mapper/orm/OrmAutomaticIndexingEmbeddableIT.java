@@ -93,6 +93,14 @@ public class OrmAutomaticIndexingEmbeddableIT {
 										.field( "includedInElementCollection", String.class )
 								)
 						)
+						.objectField( "containedBidirectionalEmbedded", b2 -> b2
+								.objectField( "containedSingle", b3 -> b3
+										.field( "includedInBidirectionalEmbedded", String.class )
+								)
+						)
+						.objectField( "containedSingleWithInverseSideEmbedded", b2 -> b2
+								.field( "includedInContainedSingleWithInverseSideEmbedded", String.class )
+						)
 				)
 		);
 
@@ -126,6 +134,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -153,6 +162,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -181,6 +191,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -197,6 +208,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -234,6 +246,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -262,6 +275,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -279,6 +293,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -316,6 +331,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -336,6 +352,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 											)
 									)
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -362,6 +379,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -389,6 +407,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "initialValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -417,6 +436,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "updatedValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -433,6 +453,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -459,6 +480,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -486,6 +508,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "firstValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -516,6 +539,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "secondValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -538,6 +562,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "secondValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -575,6 +600,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "initialValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -595,6 +621,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInEmbeddedList", "updatedValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -621,6 +648,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> b2
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -649,6 +677,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInElementCollection", "firstValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -682,6 +711,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInElementCollection", "secondValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -705,6 +735,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInElementCollection", "secondValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -739,6 +770,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedElementCollection", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -767,6 +799,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInElementCollection", "initialValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -797,6 +830,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 												.field( "includedInElementCollection", "updatedValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -816,6 +850,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedSingle", b3 -> { } )
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedElementCollection", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -854,6 +889,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 													.field( "includedInElementCollection", "initialValue" )
 											)
 									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
 					)
 					.preparedThenExecuted();
@@ -873,6 +909,398 @@ public class OrmAutomaticIndexingEmbeddableIT {
 									.objectField( "containedElementCollection", b3 -> b3
 											.objectField( "containedSingle", b4 -> b4
 													.field( "includedInElementCollection", "updatedValue" )
+											)
+									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_inverseSideEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "initialValue" );
+			containingEntity1.setContainedSingleWithInverseSideEmbedded( containedEntity );
+			containedEntity.setContainingAsSingleWithInverseSideEmbedded( new InverseSideEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedSingleWithInverseSideEmbedded", b3 -> b3
+											.field( "includedInContainedSingleWithInverseSideEmbedded", "initialValue" )
+									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedSingleWithInverseSideEmbedded()
+					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
+			containingEntity1.setContainedSingleWithInverseSideEmbedded( containedEntity );
+			containedEntity.setContainingAsSingleWithInverseSideEmbedded( new InverseSideEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedSingleWithInverseSideEmbedded", b3 -> b3
+											.field( "includedInContainedSingleWithInverseSideEmbedded", "updatedValue" )
+									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedSingleWithInverseSideEmbedded()
+					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
+			containingEntity1.setContainedSingleWithInverseSideEmbedded( null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_inverseSideEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInContainedSingleWithInverseSideEmbedded( "initialValue" );
+			containingEntity1.setContainedSingleWithInverseSideEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsSingleWithInverseSideEmbedded( new InverseSideEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedSingleWithInverseSideEmbedded", b3 -> b3
+											.field( "includedInContainedSingleWithInverseSideEmbedded", "initialValue" )
+									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedSingleWithInverseSideEmbedded", b3 -> b3
+											.field( "includedInContainedSingleWithInverseSideEmbedded", "updatedValue" )
+									)
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectEmbeddedUpdate_bidirectionalEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInBidirectionalEmbedded( "initialValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity ) );
+			containedEntity.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "initialValue" )
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
+					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
+			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity ) );
+			containedEntity.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "updatedValue" )
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
+					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
+			containingEntity1.setContainedBidirectionalEmbedded( null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_bidirectionalEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIncludedInBidirectionalEmbedded( "initialValue" );
+			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity ) );
+			containedEntity.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "initialValue" )
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
+
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
+					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
+			containingEntity1.getContainedBidirectionalEmbedded().setContainedSingle( containedEntity );
+			containedEntity.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "updatedValue" )
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
+					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
+			containingEntity1.getContainedBidirectionalEmbedded().setContainedSingle( null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_bidirectionalEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.setIncludedInBidirectionalEmbedded( "initialValue" );
+			containingEntity1.setContainedBidirectionalEmbedded( new BidirectionalEmbeddable( containedEntity1 ) );
+			containedEntity1.setContainingAsBidirectionalEmbedded( new InverseSideBidirectionalEmbeddable( containingEntity1 ) );
+
+			session.persist( containedEntity1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "initialValue" )
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedEmbeddedSingle", b3 -> { } )
+									.objectField( "containedEmbeddedList", b3 -> { } )
+									.objectField( "containedBidirectionalEmbedded", b3 -> b3
+											.objectField( "containedSingle", b4 -> b4
+													.field( "includedInBidirectionalEmbedded", "updatedValue" )
 											)
 									)
 							)
@@ -917,6 +1345,14 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		@IndexedEmbedded(includePaths = "containedSingle.includedInElementCollection")
 		private List<SingleContainingEmbeddable> containedElementCollection = new ArrayList<>();
 
+		@OneToOne
+		@IndexedEmbedded(includePaths = "includedInContainedSingleWithInverseSideEmbedded")
+		private ContainedEntity containedSingleWithInverseSideEmbedded;
+
+		@Embedded
+		@IndexedEmbedded(includePaths = "containedSingle.includedInBidirectionalEmbedded")
+		private BidirectionalEmbeddable containedBidirectionalEmbedded = new BidirectionalEmbeddable();
+
 		public Integer getId() {
 			return id;
 		}
@@ -952,6 +1388,22 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		public List<SingleContainingEmbeddable> getContainedElementCollection() {
 			return containedElementCollection;
 		}
+
+		public ContainedEntity getContainedSingleWithInverseSideEmbedded() {
+			return containedSingleWithInverseSideEmbedded;
+		}
+
+		public void setContainedSingleWithInverseSideEmbedded(ContainedEntity containedSingleWithInverseSideEmbedded) {
+			this.containedSingleWithInverseSideEmbedded = containedSingleWithInverseSideEmbedded;
+		}
+
+		public BidirectionalEmbeddable getContainedBidirectionalEmbedded() {
+			return containedBidirectionalEmbedded;
+		}
+
+		public void setContainedBidirectionalEmbedded(BidirectionalEmbeddable containedBidirectionalEmbedded) {
+			this.containedBidirectionalEmbedded = containedBidirectionalEmbedded;
+		}
 	}
 
 	@Entity(name = "indexed")
@@ -968,7 +1420,9 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		@IndexedEmbedded(includePaths = {
 				"containedEmbeddedSingle.containedSingle.includedInEmbeddedSingle",
 				"containedEmbeddedList.containedList.includedInEmbeddedList",
-				"containedElementCollection.containedSingle.includedInElementCollection"
+				"containedElementCollection.containedSingle.includedInElementCollection",
+				"containedBidirectionalEmbedded.containedSingle.includedInBidirectionalEmbedded",
+				"containedSingleWithInverseSideEmbedded.includedInContainedSingleWithInverseSideEmbedded"
 		})
 		private ContainingEntity child;
 
@@ -1020,6 +1474,12 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		)
 		private List<ContainingEntity> containingAsElementCollection = new ArrayList<>();
 
+		@Embedded
+		private InverseSideEmbeddable containingAsSingleWithInverseSideEmbedded = new InverseSideEmbeddable();
+
+		@Embedded
+		private InverseSideBidirectionalEmbeddable containingAsBidirectionalEmbedded = new InverseSideBidirectionalEmbeddable();
+
 		@Basic
 		@Field
 		private String includedInEmbeddedSingle;
@@ -1031,6 +1491,14 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		@Basic
 		@Field
 		private String includedInElementCollection;
+
+		@Basic
+		@Field
+		private String includedInContainedSingleWithInverseSideEmbedded;
+
+		@Basic
+		@Field
+		private String includedInBidirectionalEmbedded;
 
 		public Integer getId() {
 			return id;
@@ -1050,6 +1518,23 @@ public class OrmAutomaticIndexingEmbeddableIT {
 
 		public List<ContainingEntity> getContainingAsElementCollection() {
 			return containingAsElementCollection;
+		}
+
+		public InverseSideEmbeddable getContainingAsSingleWithInverseSideEmbedded() {
+			return containingAsSingleWithInverseSideEmbedded;
+		}
+
+		public void setContainingAsSingleWithInverseSideEmbedded(
+				InverseSideEmbeddable containingAsSingleWithInverseSideEmbedded) {
+			this.containingAsSingleWithInverseSideEmbedded = containingAsSingleWithInverseSideEmbedded;
+		}
+
+		public InverseSideBidirectionalEmbeddable getContainingAsBidirectionalEmbedded() {
+			return containingAsBidirectionalEmbedded;
+		}
+
+		public void setContainingAsBidirectionalEmbedded(InverseSideBidirectionalEmbeddable containingAsBidirectionalEmbedded) {
+			this.containingAsBidirectionalEmbedded = containingAsBidirectionalEmbedded;
 		}
 
 		public String getIncludedInEmbeddedSingle() {
@@ -1074,6 +1559,23 @@ public class OrmAutomaticIndexingEmbeddableIT {
 
 		public void setIncludedInElementCollection(String includedInElementCollection) {
 			this.includedInElementCollection = includedInElementCollection;
+		}
+
+		public String getIncludedInContainedSingleWithInverseSideEmbedded() {
+			return includedInContainedSingleWithInverseSideEmbedded;
+		}
+
+		public void setIncludedInContainedSingleWithInverseSideEmbedded(
+				String includedInContainedSingleWithInverseSideEmbedded) {
+			this.includedInContainedSingleWithInverseSideEmbedded = includedInContainedSingleWithInverseSideEmbedded;
+		}
+
+		public String getIncludedInBidirectionalEmbedded() {
+			return includedInBidirectionalEmbedded;
+		}
+
+		public void setIncludedInBidirectionalEmbedded(String includedInBidirectionalEmbedded) {
+			this.includedInBidirectionalEmbedded = includedInBidirectionalEmbedded;
 		}
 	}
 
@@ -1117,6 +1619,85 @@ public class OrmAutomaticIndexingEmbeddableIT {
 
 		public List<ContainedEntity> getContainedList() {
 			return containedList;
+		}
+	}
+
+	@Embeddable
+	public static class InverseSideEmbeddable {
+		/*
+		 * This association must not use "mappedBy".
+		 * This is because we want to test defining the "association mapping" in an embeddable on the inverse side
+		 * without relying on Hibernate ORM.
+		 * This has specific implications internally, as the embeddable type
+		 * will not have been discovered when we start building reindexing resolvers,
+		 * and we used to expect all types to have been discovered at that point in order
+		 * to know the full list of entity types.
+		 * Now we allow new types to be discovered while building reindexing resolvers
+		 * (though we still expect all entity types to have been discovered),
+		 * so there should be no problem, but this test should prevent any regression.
+		 */
+		@OneToOne
+		@AssociationInverseSide(inversePath = @PropertyValue(propertyName = "containedSingleWithInverseSideEmbedded"))
+		private ContainingEntity containingAsSingle;
+
+		public InverseSideEmbeddable() {
+		}
+
+		public InverseSideEmbeddable(ContainingEntity containingAsSingle) {
+			this.containingAsSingle = containingAsSingle;
+		}
+
+		public ContainingEntity getContainingAsSingle() {
+			return containingAsSingle;
+		}
+
+		public void setContainingAsSingle(ContainingEntity containingAsSingle) {
+			this.containingAsSingle = containingAsSingle;
+		}
+	}
+
+	@Embeddable
+	public static class BidirectionalEmbeddable {
+
+		@OneToOne
+		@IndexedEmbedded
+		private ContainedEntity containedSingle;
+
+		public BidirectionalEmbeddable() {
+		}
+
+		public BidirectionalEmbeddable(ContainedEntity containedSingle) {
+			this.containedSingle = containedSingle;
+		}
+
+		public ContainedEntity getContainedSingle() {
+			return containedSingle;
+		}
+
+		public void setContainedSingle(ContainedEntity containedSingle) {
+			this.containedSingle = containedSingle;
+		}
+	}
+
+	@Embeddable
+	public static class InverseSideBidirectionalEmbeddable {
+
+		@OneToOne(mappedBy = "containedBidirectionalEmbedded.containedSingle")
+		private ContainingEntity containingAsSingle;
+
+		public InverseSideBidirectionalEmbeddable() {
+		}
+
+		public InverseSideBidirectionalEmbeddable(ContainingEntity containingAsSingle) {
+			this.containingAsSingle = containingAsSingle;
+		}
+
+		public ContainingEntity getContainingAsSingle() {
+			return containingAsSingle;
+		}
+
+		public void setContainingAsSingle(ContainingEntity containingAsSingle) {
+			this.containingAsSingle = containingAsSingle;
 		}
 	}
 
