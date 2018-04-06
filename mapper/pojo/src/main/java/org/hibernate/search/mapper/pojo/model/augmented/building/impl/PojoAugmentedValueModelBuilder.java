@@ -12,13 +12,19 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 class PojoAugmentedValueModelBuilder implements PojoAugmentedModelCollectorValueNode {
 	private PojoModelPathValueNode inverseSidePath;
+	private boolean associationEmbedded = false;
 
 	@Override
 	public void associationInverseSide(PojoModelPathValueNode inverseSidePath) {
 		this.inverseSidePath = inverseSidePath;
 	}
 
+	@Override
+	public void associationEmbedded() {
+		this.associationEmbedded = true;
+	}
+
 	PojoAugmentedValueModel build() {
-		return new PojoAugmentedValueModel( inverseSidePath );
+		return new PojoAugmentedValueModel( inverseSidePath, associationEmbedded );
 	}
 }

@@ -12,4 +12,6 @@ public interface PojoAugmentedModelCollectorValueNode extends PojoAugmentedModel
 
 	void associationInverseSide(PojoModelPathValueNode inverseSidePath);
 
+	void associationEmbedded();
+
 }

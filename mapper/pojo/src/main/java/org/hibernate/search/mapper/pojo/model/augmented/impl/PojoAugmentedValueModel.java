@@ -12,16 +12,22 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 public class PojoAugmentedValueModel {
 
-	public static final PojoAugmentedValueModel EMPTY = new PojoAugmentedValueModel( null );
+	public static final PojoAugmentedValueModel EMPTY = new PojoAugmentedValueModel( null, false );
 
 	private final PojoModelPathValueNode inverseSidePath;
+	private final boolean associationEmbedded;
 
-	public PojoAugmentedValueModel(PojoModelPathValueNode inverseSidePath) {
+	public PojoAugmentedValueModel(PojoModelPathValueNode inverseSidePath, boolean associationEmbedded) {
 		this.inverseSidePath = inverseSidePath;
+		this.associationEmbedded = associationEmbedded;
 	}
 
 	public Optional<PojoModelPathValueNode> getInverseSidePath() {
 		return Optional.ofNullable( inverseSidePath );
+	}
+
+	public boolean isAssociationEmbedded() {
+		return associationEmbedded;
 	}
 
 }
