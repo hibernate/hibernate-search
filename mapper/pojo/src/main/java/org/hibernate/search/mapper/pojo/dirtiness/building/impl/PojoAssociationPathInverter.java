@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 /**
  * An object responsible for inverting an association path,
@@ -168,6 +169,17 @@ public final class PojoAssociationPathInverter {
 			PojoTypeModel<?> inverseSideTypeModel,
 			PojoRawTypeModel<?> originalSideEntityType,
 			List<PojoModelPathValueNode> associationPathsToMatch) {
+		BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode = BoundPojoModelPathTypeNode.root( inverseSideTypeModel );
+		return findInverseSidePathFromInverseSideRecursive(
+				inverseSidePathTypeNode, originalSideEntityType, associationPathsToMatch
+		);
+	}
+
+	private Optional<PojoModelPathValueNode> findInverseSidePathFromInverseSideRecursive(
+			BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode,
+			PojoRawTypeModel<?> originalSideEntityType,
+			List<PojoModelPathValueNode> associationPathsToMatch) {
+		PojoTypeModel<?> inverseSideTypeModel = inverseSidePathTypeNode.getTypeModel();
 		PojoAugmentedTypeModel augmentedInverseSideTypeModel =
 				augmentedTypeModelProvider.get( inverseSideTypeModel.getRawType() );
 
@@ -175,13 +187,16 @@ public final class PojoAssociationPathInverter {
 				augmentedInverseSideTypeModel.getAugmentedProperties().entrySet() ) {
 			String inverseSidePropertyName = propertyEntry.getKey();
 			PojoPropertyModel<?> inverseSidePropertyModel = inverseSideTypeModel.getProperty( inverseSidePropertyName );
+			PropertyHandle propertyHandle = inverseSidePropertyModel.getHandle();
+			BoundPojoModelPathPropertyNode<?, ?> inverseSidePathPropertyNode =
+					inverseSidePathTypeNode.property( propertyHandle );
 			PojoAugmentedPropertyModel augmentedInverseSidePropertyModel = propertyEntry.getValue();
-
-			// TODO support embeddables on the inverse side
 
 			for ( Map.Entry<ContainerValueExtractorPath, PojoAugmentedValueModel> valueEntry :
 					augmentedInverseSidePropertyModel.getAugmentedValues().entrySet() ) {
 				ContainerValueExtractorPath inverseSideExtractorPath = valueEntry.getKey();
+				BoundPojoModelPathValueNode<?, ?, ?> inverseSidePathValueNode =
+						bindExtractors( inverseSidePathPropertyNode, inverseSideExtractorPath );
 				PojoAugmentedValueModel augmentedInverseSideValueModel = valueEntry.getValue();
 
 				Optional<PojoModelPathValueNode> candidatePathOptional =
@@ -189,6 +204,7 @@ public final class PojoAssociationPathInverter {
 
 				if ( candidatePathOptional.isPresent()
 						&& associationPathsToMatch.contains( candidatePathOptional.get() ) ) {
+					PojoModelPathValueNode inverseAssociationPath = inverseSidePathValueNode.toUnboundPath();
 					/*
 					 * In order to match, the inverse path, when applied to the inverse entity type,
 					 * must also result in a supertype of the entity type holding the association to invert.
@@ -196,22 +212,36 @@ public final class PojoAssociationPathInverter {
 					 * from multiple different entities: in that case, the "original" associations may have
 					 * the same name and extractors.
 					 */
-					BoundContainerValueExtractorPath<?, ?> resolvedExtractorPath =
-							extractorBinder.bindPath(
-									introspector, inverseSidePropertyModel.getTypeModel(),
-									inverseSideExtractorPath
-							);
 					PojoRawTypeModel<?> rawExtractedTypeModel =
-							resolvedExtractorPath.getExtractedType().getRawType();
+							inverseSidePathValueNode.type().getTypeModel().getRawType();
 					if ( originalSideEntityType.isSubTypeOf( rawExtractedTypeModel ) ) {
-						PojoModelPathValueNode inverseAssociationPath =
-								PojoModelPath.fromRoot( inverseSidePropertyName ).value( inverseSideExtractorPath );
 						return Optional.of( inverseAssociationPath );
+					}
+				}
+
+				if ( augmentedInverseSideValueModel.isAssociationEmbedded() ) {
+					// TODO protect ourselves from infinite recursion (it could happen if the model has embedding cycles)
+					candidatePathOptional = findInverseSidePathFromInverseSideRecursive(
+							inverseSidePathValueNode.type(), originalSideEntityType, associationPathsToMatch
+					);
+					if ( candidatePathOptional.isPresent() ) {
+						return candidatePathOptional;
 					}
 				}
 			}
 		}
 
 		return Optional.empty();
+	}
+
+	private <P> BoundPojoModelPathValueNode<?, P, ?> bindExtractors(
+			BoundPojoModelPathPropertyNode<?, P> inverseSidePathPropertyNode,
+			ContainerValueExtractorPath extractorPath) {
+		BoundContainerValueExtractorPath<P, ?> resolvedExtractorPath =
+				extractorBinder.bindPath(
+						introspector, inverseSidePathPropertyNode.getPropertyModel().getTypeModel(),
+						extractorPath
+				);
+		return inverseSidePathPropertyNode.value( resolvedExtractorPath );
 	}
 }
