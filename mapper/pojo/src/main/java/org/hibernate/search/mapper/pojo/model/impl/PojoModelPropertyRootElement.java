@@ -36,7 +36,7 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>( getTypeModel().getRawType().getCaster() );
+		return new PojoModelRootElementAccessor<>();
 	}
 
 	@Override

@@ -33,7 +33,7 @@ public class PojoModelTypeRootElement extends AbstractPojoModelElement implement
 
 	@Override
 	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>( typeModel.getRawType().getCaster() );
+		return new PojoModelRootElementAccessor<>();
 	}
 
 	@Override
