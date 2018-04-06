@@ -8,30 +8,28 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
-public class PojoModelPropertyRootElement extends AbstractPojoModelElement implements PojoModelProperty {
+public class PojoModelPropertyRootElement<P> extends AbstractPojoModelElement<P> implements PojoModelProperty {
 
-	private final PojoPropertyModel<?> propertyModel;
+	private final BoundPojoModelPathValueNode<?, P, P> modelPath;
 
-	public PojoModelPropertyRootElement(PojoPropertyModel<?> propertyModel,
+	public PojoModelPropertyRootElement(BoundPojoModelPathPropertyNode<?, P> modelPath,
 			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		super( augmentedTypeModelProvider );
-		this.propertyModel = propertyModel;
+		this.modelPath = modelPath.valueWithoutExtractors();
 	}
 
 	@Override
 	public String toString() {
-		return propertyModel.toString();
-	}
-
-	@Override
-	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelRootElementAccessor<>();
+		return modelPath.parent().getPropertyModel().toString();
 	}
 
 	@Override
@@ -41,11 +39,25 @@ public class PojoModelPropertyRootElement extends AbstractPojoModelElement imple
 
 	@Override
 	public String getName() {
-		return propertyModel.getName();
+		return modelPath.parent().getPropertyModel().getName();
+	}
+
+	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {
+		if ( hasAccessor() ) {
+			PojoIndexingDependencyCollectorValueNode<P, P> collectorValueNode =
+					dependencyCollector.value( modelPath.getBoundExtractorPath() );
+			collectorValueNode.collectDependency();
+			contributePropertyDependencies( collectorValueNode.type() );
+		}
 	}
 
 	@Override
-	PojoTypeModel<?> getTypeModel() {
-		return propertyModel.getTypeModel();
+	PojoModelElementAccessor<P> doCreateAccessor() {
+		return new PojoModelRootElementAccessor<>();
+	}
+
+	@Override
+	BoundPojoModelPathTypeNode<P> getModelPathTypeNode() {
+		return modelPath.type();
 	}
 }

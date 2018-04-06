@@ -6,33 +6,38 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 
-public class PojoModelTypeRootElement extends AbstractPojoModelElement implements PojoModelType {
+public class PojoModelTypeRootElement<T> extends AbstractPojoModelElement<T> implements PojoModelType {
 
-	private final PojoTypeModel<?> typeModel;
+	private final BoundPojoModelPathTypeNode<T> modelPath;
 
-	public PojoModelTypeRootElement(PojoTypeModel<?> typeModel,
+	public PojoModelTypeRootElement(BoundPojoModelPathTypeNode<T> modelPath,
 			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		super( augmentedTypeModelProvider );
-		this.typeModel = typeModel;
+		this.modelPath = modelPath;
 	}
 
 	@Override
 	public String toString() {
-		return typeModel.toString();
+		return modelPath.getTypeModel().toString();
+	}
+
+	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
+		contributePropertyDependencies( dependencyCollector );
 	}
 
 	@Override
-	public PojoModelElementAccessor<?> createAccessor() {
+	PojoModelElementAccessor<T> doCreateAccessor() {
 		return new PojoModelRootElementAccessor<>();
 	}
 
 	@Override
-	PojoTypeModel<?> getTypeModel() {
-		return typeModel;
+	BoundPojoModelPathTypeNode<T> getModelPathTypeNode() {
+		return modelPath;
 	}
 }

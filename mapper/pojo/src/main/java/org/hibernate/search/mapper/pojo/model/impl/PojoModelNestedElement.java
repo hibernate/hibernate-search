@@ -8,33 +8,32 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 
-public class PojoModelNestedElement extends AbstractPojoModelElement implements PojoModelProperty {
+class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implements PojoModelProperty {
 
-	private final AbstractPojoModelElement parent;
-	private final PojoPropertyModel<?> propertyModel;
+	private final AbstractPojoModelElement<T> parent;
+	private final BoundPojoModelPathValueNode<T, P, P> modelPath;
 	private final PojoAugmentedPropertyModel augmentedPropertyModel;
 
-	PojoModelNestedElement(AbstractPojoModelElement parent, PojoPropertyModel<?> propertyModel,
+	PojoModelNestedElement(AbstractPojoModelElement<T> parent, BoundPojoModelPathPropertyNode<T, P> modelPath,
 			PojoAugmentedPropertyModel augmentedPropertyModel,
 			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		super( augmentedTypeModelProvider );
 		this.parent = parent;
+		this.modelPath = modelPath.valueWithoutExtractors();
 		this.augmentedPropertyModel = augmentedPropertyModel;
-		this.propertyModel = propertyModel;
-	}
-
-	@Override
-	public PojoModelElementAccessor<?> createAccessor() {
-		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@Override
@@ -42,17 +41,34 @@ public class PojoModelNestedElement extends AbstractPojoModelElement implements 
 		return augmentedPropertyModel.getMarkers( markerType );
 	}
 
-	public PropertyHandle getHandle() {
-		return propertyModel.getHandle();
-	}
-
-	@Override
-	public PojoTypeModel<?> getTypeModel() {
-		return propertyModel.getTypeModel();
-	}
-
 	@Override
 	public String getName() {
-		return propertyModel.getName();
+		return modelPath.parent().getPropertyModel().getName();
+	}
+
+	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
+		if ( hasAccessor() ) {
+			@SuppressWarnings( "unchecked" ) // We used the same handle as in modelPath, on the same type. The result must have the same type.
+			PojoIndexingDependencyCollectorPropertyNode<T, P> collectorPropertyNode =
+					(PojoIndexingDependencyCollectorPropertyNode<T, P>) dependencyCollector.property( getHandle() );
+			PojoIndexingDependencyCollectorValueNode<P, P> collectorValueNode =
+					collectorPropertyNode.value( modelPath.getBoundExtractorPath() );
+			collectorValueNode.collectDependency();
+			contributePropertyDependencies( collectorValueNode.type() );
+		}
+	}
+
+	@Override
+	PojoModelElementAccessor<P> doCreateAccessor() {
+		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
+	}
+
+	@Override
+	BoundPojoModelPathTypeNode<P> getModelPathTypeNode() {
+		return modelPath.type();
+	}
+
+	PropertyHandle getHandle() {
+		return modelPath.parent().getPropertyHandle();
 	}
 }

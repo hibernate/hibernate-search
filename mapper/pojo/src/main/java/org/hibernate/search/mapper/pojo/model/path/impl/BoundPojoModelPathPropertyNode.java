@@ -40,6 +40,10 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 		return parent.rootType();
 	}
 
+	public BoundPojoModelPathValueNode<T, P, P> valueWithoutExtractors() {
+		return value( BoundContainerValueExtractorPath.noExtractors( propertyModel.getTypeModel() ) );
+	}
+
 	public <V> BoundPojoModelPathValueNode<T, P, V> value(BoundContainerValueExtractorPath<P, V> extractorPath) {
 		return new BoundPojoModelPathValueNode<>( this, extractorPath );
 	}

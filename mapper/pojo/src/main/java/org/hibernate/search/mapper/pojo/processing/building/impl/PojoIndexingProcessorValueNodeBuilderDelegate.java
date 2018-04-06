@@ -95,6 +95,10 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 		} );
 	}
 
+	public BoundPojoModelPathValueNode<?, P, V> getModelPath() {
+		return modelPath;
+	}
+
 	Collection<PojoIndexingProcessor<? super V>> build(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		PojoIndexingDependencyCollectorValueNode<P, V> valueDependencyCollector =

@@ -34,7 +34,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 		implements PojoMappingCollectorTypeNode {
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
-	private final PojoModelTypeRootElement pojoModelRootElement;
+	private final PojoModelTypeRootElement<T> pojoModelRootElement;
 
 	private final PojoIdentityMappingCollector identityMappingCollector;
 
@@ -50,9 +50,8 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 		this.modelPath = modelPath;
 
-		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
-		this.pojoModelRootElement = new PojoModelTypeRootElement(
-				modelPath.getTypeModel(), mappingHelper.getAugmentedTypeModelProvider()
+		this.pojoModelRootElement = new PojoModelTypeRootElement<>(
+				modelPath, mappingHelper.getAugmentedTypeModelProvider()
 		);
 
 		this.identityMappingCollector = identityMappingCollector;
@@ -108,6 +107,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			return Optional.empty();
 		}
 		else {
+			pojoModelRootElement.contributeDependencies( dependencyCollector );
 			return Optional.of( new PojoIndexingProcessorTypeNode<>(
 					parentIndexObjectAccessors, immutableBridges, immutablePropertyNodes
 			) );

@@ -10,23 +10,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.SearchException;
 
-abstract class AbstractPojoModelElement implements PojoModelElement {
+abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 
 	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
-	private final Map<String, PojoModelNestedElement> properties = new HashMap<>();
+	private final Map<String, PojoModelNestedElement<V, ?>> properties = new HashMap<>();
 	private PojoAugmentedTypeModel augmentedTypeModel;
 	private boolean propertiesInitialized = false;
+
+	private PojoModelElementAccessor<?> accessor;
 
 	AbstractPojoModelElement(PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
@@ -42,16 +46,30 @@ abstract class AbstractPojoModelElement implements PojoModelElement {
 	}
 
 	@Override
+	public PojoModelElementAccessor<?> createAccessor() {
+		if ( accessor == null ) {
+			accessor = doCreateAccessor();
+		}
+		return accessor;
+	}
+
+	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
 		return getTypeModel().getRawType().isSubTypeOf( clazz );
 	}
 
 	@Override
-	public PojoModelNestedElement property(String relativeName) {
+	public PojoModelNestedElement<?, ?> property(String relativeName) {
 		return properties.computeIfAbsent( relativeName, name -> {
-			PojoPropertyModel<?> model = getTypeModel().getProperty( name );
+			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
+			PojoPropertyModel<?> model = modelPathTypeNode.getTypeModel().getProperty( name );
 			PojoAugmentedPropertyModel augmentedModel = getAugmentedTypeModel().getProperty( name );
-			return new PojoModelNestedElement( this, model, augmentedModel, augmentedTypeModelProvider );
+			return new PojoModelNestedElement<>(
+					this,
+					modelPathTypeNode.property( model.getHandle() ),
+					augmentedModel,
+					augmentedTypeModelProvider
+			);
 		} );
 	}
 
@@ -69,11 +87,27 @@ abstract class AbstractPojoModelElement implements PojoModelElement {
 		return properties.values().stream();
 	}
 
-	abstract PojoTypeModel<?> getTypeModel();
+	abstract PojoModelElementAccessor<V> doCreateAccessor();
+
+	abstract BoundPojoModelPathTypeNode<V> getModelPathTypeNode();
+
+	final boolean hasAccessor() {
+		return accessor != null;
+	}
+
+	final void contributePropertyDependencies(PojoIndexingDependencyCollectorTypeNode<V> dependencyCollector) {
+		for ( Map.Entry<String, PojoModelNestedElement<V, ?>> entry : properties.entrySet() ) {
+			entry.getValue().contributeDependencies( dependencyCollector );
+		}
+	}
+
+	private PojoTypeModel<V> getTypeModel() {
+		return getModelPathTypeNode().getTypeModel();
+	}
 
 	private PojoAugmentedTypeModel getAugmentedTypeModel() {
 		if ( augmentedTypeModel == null ) {
-			augmentedTypeModel = augmentedTypeModelProvider.get( getTypeModel().getRawType() );
+			augmentedTypeModel = augmentedTypeModelProvider.get( getModelPathTypeNode().getTypeModel().getRawType() );
 		}
 		return augmentedTypeModel;
 	}

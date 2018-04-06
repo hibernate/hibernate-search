@@ -39,7 +39,7 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 		implements PojoMappingCollectorPropertyNode {
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
-	private final PojoModelPropertyRootElement pojoModelRootElement;
+	private final PojoModelPropertyRootElement<P> pojoModelRootElement;
 
 	private final PojoIdentityMappingCollector identityMappingCollector;
 
@@ -56,19 +56,14 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 
 		this.modelPath = modelPath;
 
-		// FIXME do something more with the pojoModelRootElement, to be able to use it in containedIn processing in particular
-		this.pojoModelRootElement = new PojoModelPropertyRootElement(
-				modelPath.getPropertyModel(), mappingHelper.getAugmentedTypeModelProvider()
+		this.pojoModelRootElement = new PojoModelPropertyRootElement<>(
+				modelPath, mappingHelper.getAugmentedTypeModelProvider()
 		);
 
 		this.identityMappingCollector = identityMappingCollector;
 
-		BoundContainerValueExtractorPath<P, P> noExtractorsPath = BoundContainerValueExtractorPath.noExtractors(
-				modelPath.getPropertyModel().getTypeModel()
-		);
-
 		this.valueWithoutExtractorBuilderDelegate = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
-				modelPath.value( noExtractorsPath ),
+				modelPath.valueWithoutExtractors(),
 				mappingHelper, bindingContext
 		);
 	}
@@ -172,6 +167,7 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 			return Optional.empty();
 		}
 		else {
+			pojoModelRootElement.contributeDependencies( propertyDependencyCollector );
 			return Optional.of( new PojoIndexingProcessorPropertyNode<>(
 					modelPath.getPropertyHandle(), immutableBridges, immutableNestedNodes
 			) );
