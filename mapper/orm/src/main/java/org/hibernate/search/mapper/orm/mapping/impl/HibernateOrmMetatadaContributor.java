@@ -7,8 +7,10 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.hibernate.boot.Metadata;
@@ -48,33 +50,46 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 
 	@Override
 	public void contribute(BuildContext buildContext, MetadataCollector collector) {
+		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
 		// Ensure all entities are declared as such and have their inverse associations declared
 		for ( PersistentClass persistentClass : metadata.getEntityBindings() ) {
 			Class<?> clazz = persistentClass.getMappedClass();
 			// getMappedClass() can return null, which should be ignored
 			if ( clazz != null ) {
 				PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
+				collectPropertyDelegates( delegatesCollector, clazz, persistentClass.getPropertyIterator() );
 				collector.collectContributor(
 						mapperFactory, typeModel,
-						new HibernateOrmEntityTypeMetadataContributor(
-								createPropertyDelegates( persistentClass.getPropertyIterator() )
-						)
+						new HibernateOrmEntityTypeMetadataContributor( delegatesCollector.buildAndRemove( clazz ) )
+				);
+			}
+		}
+
+		for ( Map.Entry<Class<?>, List<PojoTypeMetadataContributor>> entry :
+				delegatesCollector.buildRemaining().entrySet() ) {
+			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( entry.getKey() );
+			List<PojoTypeMetadataContributor> delegates = entry.getValue();
+			if ( !delegates.isEmpty() ) {
+				collector.collectContributor(
+						mapperFactory, typeModel,
+						new HibernateOrmComponentTypeMetadataContributor( delegates )
 				);
 			}
 		}
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Hibernate ORM gives us raw types, we must make do.
-	private List<PojoTypeMetadataContributor> createPropertyDelegates(Iterator propertyIterator) {
-		List<PojoTypeMetadataContributor> delegates = new ArrayList<>();
+	private void collectPropertyDelegates(PropertyDelegatesCollector collector,
+			Class<?> javaClass, Iterator propertyIterator) {
+		collector.markAsSeen( javaClass );
 		while ( propertyIterator.hasNext() ) {
 			Property property = (Property) propertyIterator.next();
-			collectPropertyMetadataContributors( delegates, property );
+			collectPropertyMetadataContributors( collector, javaClass, property );
 		}
-		return delegates;
 	}
 
-	private void collectPropertyMetadataContributors(List<PojoTypeMetadataContributor> collector, Property property) {
+	private void collectPropertyMetadataContributors(PropertyDelegatesCollector collector,
+			Class<?> javaClass, Property property) {
 		Value value = property.getValue();
 		if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collectionValue = (org.hibernate.mapping.Collection) value;
@@ -95,10 +110,13 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			if ( referencedEntityName != null ) {
 				String mappedByPath = collectionValue.getMappedByProperty();
 				if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
-					collector.add( new HibernateOrmAssociationInverseSideMetadataContributor(
-							property.getName(), getExtractorPath( collectionValue ),
-							resolveMappedByPath( referencedEntityName, mappedByPath )
-					) );
+					collector.collect(
+							javaClass,
+							new HibernateOrmAssociationInverseSideMetadataContributor(
+									property.getName(), getExtractorPath( collectionValue ),
+									resolveMappedByPath( referencedEntityName, mappedByPath )
+							)
+					);
 				}
 			}
 		}
@@ -108,10 +126,37 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			// For *ToOne, the "mappedBy" information is apparently stored in the ReferencedPropertyName
 			String mappedByPath = toOneValue.getReferencedPropertyName();
 			if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
-				collector.add( new HibernateOrmAssociationInverseSideMetadataContributor(
-						property.getName(), getExtractorPath( toOneValue ),
-						resolveMappedByPath( referencedEntityName, mappedByPath )
-				) );
+				collector.collect(
+						javaClass,
+						new HibernateOrmAssociationInverseSideMetadataContributor(
+								property.getName(), getExtractorPath( toOneValue ),
+								resolveMappedByPath( referencedEntityName, mappedByPath )
+						)
+				);
+			}
+		}
+		else if ( value instanceof Component ) {
+			collector.collect(
+					javaClass,
+					new HibernateOrmAssociationEmbeddedMetadataContributor(
+							property.getName(), getExtractorPath( value )
+					)
+			);
+			Component componentValue = (Component) value;
+			Class<?> componentClass = componentValue.getComponentClass();
+			/*
+			 * Different Component instances for the same component class may carry different metadata
+			 * depending on where they appear,
+			 * because Hibernate ORM allows overriding using @AssociationOverride/@AttributeOverride
+			 * on an embedded property.
+			 * But Hibernate ORM does not allow overriding "entity-level" metadata, only "table-level" metadata.
+			 * For instance overriding the name of a property is not allowed, nor is adding another embedded association.
+			 * As a result, all the components should behave similarly in our case, since we are only interested in
+			 * "entity-level" metadata.
+			 * Thus we only use the first Component instance we find, and ignore the others.
+			 */
+			if ( !collector.hasSeen( componentClass ) ) {
+				collectPropertyDelegates( collector, componentClass, componentValue.getPropertyIterator() );
 			}
 		}
 	}
@@ -165,6 +210,36 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 		}
 		else {
 			return CollectionElementExtractor.class;
+		}
+	}
+
+	private static class PropertyDelegatesCollector {
+		private final Map<Class<?>, List<PojoTypeMetadataContributor>> result = new HashMap<>();
+
+		public void markAsSeen(Class<?> clazz) {
+			getList( clazz );
+		}
+
+		public boolean hasSeen(Class<?> clazz) {
+			return result.containsKey( clazz );
+		}
+
+		public void collect(Class<?> clazz, PojoTypeMetadataContributor contributor) {
+			getList( clazz ).add( contributor );
+		}
+
+		public List<PojoTypeMetadataContributor> buildAndRemove(Class<?> clazz) {
+			List<PojoTypeMetadataContributor> built = getList( clazz );
+			result.remove( clazz );
+			return built;
+		}
+
+		public Map<Class<?>, List<PojoTypeMetadataContributor>> buildRemaining() {
+			return result;
+		}
+
+		private List<PojoTypeMetadataContributor> getList(Class<?> clazz) {
+			return result.computeIfAbsent( clazz, ignored -> new ArrayList<>() );
 		}
 	}
 }
