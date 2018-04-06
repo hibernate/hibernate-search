@@ -28,13 +28,15 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtrac
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -50,13 +52,16 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final BridgeResolver bridgeResolver;
+	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
 
 	PojoIndexModelBinderImpl(BuildContext buildContext, PojoBootstrapIntrospector introspector,
-			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver) {
+			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
+			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
 		this.buildContext = buildContext;
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;
+		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
 	}
 
 	@Override
@@ -84,8 +89,9 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> IdentifierBridge<T> createIdentifierBridge(PojoModelElement pojoModelElement, PojoTypeModel<T> typeModel,
+	public <P> IdentifierBridge<P> createIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+		PojoTypeModel<P> typeModel = modelPath.valueWithoutExtractors().type().getTypeModel();
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
@@ -96,32 +102,39 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		 */
 		IdentifierBridge<?> bridge = defaultedBuilder.build( buildContext );
 
-		return (IdentifierBridge<T>) bridge;
+		return (IdentifierBridge<P>) bridge;
 	}
 
 	@Override
-	public RoutingKeyBridge addRoutingKeyBridge(IndexModelBindingContext bindingContext,
-			PojoModelElement pojoModelElement, BridgeBuilder<? extends RoutingKeyBridge> builder) {
+	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> builder) {
 		RoutingKeyBridge bridge = builder.build( buildContext );
-		bridge.bind( pojoModelElement );
+
+		PojoModelTypeRootElement<T> pojoModelRootElement =
+				new PojoModelTypeRootElement<>( modelPath, augmentedTypeModelProvider );
+		bridge.bind( pojoModelRootElement );
 
 		bindingContext.explicitRouting();
 
-		return bridge;
+		return new BoundRoutingKeyBridge<>( bridge, pojoModelRootElement );
 	}
 
 	@Override
-	public Optional<TypeBridge> addTypeBridge(IndexModelBindingContext bindingContext,
-			PojoModelType pojoModelType, BridgeBuilder<? extends TypeBridge> builder) {
+	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
 		TypeBridge bridge = builder.build( buildContext );
 
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
-		bridge.bind( bindingContext.getSchemaElement( listener ), pojoModelType, bindingContext.getSearchModel() );
+		PojoModelTypeRootElement<T> pojoModelRootElement =
+				new PojoModelTypeRootElement<>( modelPath, augmentedTypeModelProvider );
+		bridge.bind(
+				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
+		);
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
-			return Optional.of( bridge );
+			return Optional.of( new BoundTypeBridge<>( bridge, pojoModelRootElement ) );
 		}
 		else {
 			bridge.close();
@@ -130,17 +143,21 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public Optional<PropertyBridge> addPropertyBridge(IndexModelBindingContext bindingContext,
-			PojoModelProperty pojoModelProperty, BridgeBuilder<? extends PropertyBridge> builder) {
+	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
 		PropertyBridge bridge = builder.build( buildContext );
 
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
-		bridge.bind( bindingContext.getSchemaElement( listener ), pojoModelProperty, bindingContext.getSearchModel() );
+		PojoModelPropertyRootElement<P> pojoModelRootElement =
+				new PojoModelPropertyRootElement<>( modelPath, augmentedTypeModelProvider );
+		bridge.bind(
+				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
+		);
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
-			return Optional.of( bridge );
+			return Optional.of( new BoundPropertyBridge<>( bridge, pojoModelRootElement ) );
 		}
 		else {
 			bridge.close();
@@ -149,9 +166,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> Optional<PojoIndexingProcessorValueBridgeNode<T, ?>> addValueBridge(IndexModelBindingContext bindingContext,
-			PojoTypeModel<T> typeModel, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
+	public <V> Optional<BoundValueBridge<? super V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String fieldName, FieldModelContributor contributor) {
+		PojoTypeModel<V> typeModel = modelPath.type().getTypeModel();
+
 		BridgeBuilder<? extends ValueBridge<?, ?>> defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( typeModel );
@@ -169,12 +188,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		}
 
 		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
-				ValueBridge<? super T, ?> typedBridge = (ValueBridge<? super T, ?>) bridge;
+		ValueBridge<? super V, ?> typedBridge = (ValueBridge<? super V, ?>) bridge;
 
 		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, fieldName, contributor );
 	}
 
-	private <T, R> Optional<PojoIndexingProcessorValueBridgeNode<T, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
+	private <T, R> Optional<BoundValueBridge<? super T, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
 			ValueBridge<? super T, R> bridge, GenericTypeContext bridgeTypeContext,
 			String fieldName, FieldModelContributor contributor) {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
@@ -198,7 +217,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
-			return Optional.of( new PojoIndexingProcessorValueBridgeNode<>( bridge, indexFieldAccessor ) );
+			return Optional.of( new BoundValueBridge<>( bridge, indexFieldAccessor ) );
 		}
 		else {
 			bridge.close();

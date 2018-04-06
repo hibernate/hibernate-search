@@ -75,11 +75,11 @@ class PojoMapper<M> implements Mapper<M> {
 
 		BridgeResolver bridgeResolver = new BridgeResolver();
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
-				buildContext, introspector, extractorBinder, bridgeResolver
+				buildContext, introspector, extractorBinder, bridgeResolver, augmentedTypeModelProvider
 		);
 
 		mappingHelper = new PojoMappingHelper(
-				contributorProvider, indexModelBinder, augmentedTypeModelProvider
+				contributorProvider, indexModelBinder
 		);
 	}
 

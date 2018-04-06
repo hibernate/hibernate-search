@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -34,7 +35,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 	private final PojoMappingHelper mappingHelper;
 	private final IndexModelBindingContext bindingContext;
 
-	private final Collection<PojoIndexingProcessorValueBridgeNode<? super V, ?>> bridgeNodes = new ArrayList<>();
+	private final Collection<BoundValueBridge<? super V, ?>> boundBridges = new ArrayList<>();
 
 	private final Collection<PojoIndexingProcessorTypeNodeBuilder<V>> typeNodeBuilders = new ArrayList<>();
 
@@ -60,10 +61,10 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 		}
 
 		mappingHelper.getIndexModelBinder().addValueBridge(
-				bindingContext, modelPath.type().getTypeModel(), builder, defaultedFieldName,
+				bindingContext, modelPath, builder, defaultedFieldName,
 				fieldModelContributor
 		)
-				.ifPresent( bridgeNodes::add );
+				.ifPresent( boundBridges::add );
 	}
 
 	@Override
@@ -105,10 +106,12 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 				parentDependencyCollector.value( modelPath.getBoundExtractorPath() );
 
 		Collection<PojoIndexingProcessor<? super V>> immutableNestedNodes =
-				bridgeNodes.isEmpty() && typeNodeBuilders.isEmpty()
+				boundBridges.isEmpty() && typeNodeBuilders.isEmpty()
 						? Collections.emptyList()
-						: new ArrayList<>( bridgeNodes.size() + typeNodeBuilders.size() );
-		immutableNestedNodes.addAll( bridgeNodes );
+						: new ArrayList<>( boundBridges.size() + typeNodeBuilders.size() );
+		for ( BoundValueBridge<? super V, ?> boundBridge : boundBridges ) {
+			immutableNestedNodes.add( createValueBridgeNode( boundBridge ) );
+		}
 		typeNodeBuilders.stream()
 				.map( builder -> builder.build( valueDependencyCollector.type() ) )
 				.filter( Optional::isPresent )
@@ -120,5 +123,11 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 		}
 
 		return immutableNestedNodes;
+	}
+
+	private static <T, R> PojoIndexingProcessor<T> createValueBridgeNode(BoundValueBridge<T, R> boundBridge) {
+		return new PojoIndexingProcessorValueBridgeNode<>(
+				boundBridge.getBridge(), boundBridge.getIndexFieldAccessor()
+		);
 	}
 }

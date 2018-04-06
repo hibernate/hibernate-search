@@ -21,13 +21,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -39,11 +39,10 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 		implements PojoMappingCollectorPropertyNode {
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
-	private final PojoModelPropertyRootElement<P> pojoModelRootElement;
 
 	private final PojoIdentityMappingCollector identityMappingCollector;
 
-	private final Collection<PropertyBridge> propertyBridges = new ArrayList<>();
+	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
 	private Map<ContainerValueExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
 			containerElementNodeBuilders = new HashMap<>();
@@ -56,10 +55,6 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 
 		this.modelPath = modelPath;
 
-		this.pojoModelRootElement = new PojoModelPropertyRootElement<>(
-				modelPath, mappingHelper.getAugmentedTypeModelProvider()
-		);
-
 		this.identityMappingCollector = identityMappingCollector;
 
 		this.valueWithoutExtractorBuilderDelegate = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
@@ -70,17 +65,15 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 
 	@Override
 	public void bridge(BridgeBuilder<? extends PropertyBridge> builder) {
-		mappingHelper.getIndexModelBinder().addPropertyBridge( bindingContext, pojoModelRootElement, builder )
-				.ifPresent( propertyBridges::add );
+		mappingHelper.getIndexModelBinder().addPropertyBridge( bindingContext, modelPath, builder )
+				.ifPresent( boundPropertyBridges::add );
 	}
 
 	@Override
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		PojoGenericTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().getTypeModel();
-		IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge(
-				pojoModelRootElement, propertyTypeModel, builder
-		);
+		IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge( modelPath, builder );
 		identityMappingCollector.identifierBridge( propertyTypeModel, modelPath.getPropertyHandle(), bridge );
 	}
 
@@ -140,8 +133,12 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 				(PojoIndexingDependencyCollectorPropertyNode<T, P>)
 						parentDependencyCollector.property( modelPath.getPropertyHandle() );
 
-		Collection<PropertyBridge> immutableBridges = propertyBridges.isEmpty()
-				? Collections.emptyList() : new ArrayList<>( propertyBridges );
+		Collection<PropertyBridge> immutableBridges = boundPropertyBridges.isEmpty()
+				? Collections.emptyList() : new ArrayList<>();
+		for ( BoundPropertyBridge<P> boundBridge : boundPropertyBridges ) {
+			immutableBridges.add( boundBridge.getBridge() );
+			boundBridge.getPojoModelRootElement().contributeDependencies( propertyDependencyCollector );
+		}
 		Collection<PojoIndexingProcessor<? super P>> valueWithoutExtractorNodes =
 				valueWithoutExtractorBuilderDelegate.build( propertyDependencyCollector );
 		Collection<PojoIndexingProcessor<? super P>> immutableNestedNodes =
@@ -167,7 +164,6 @@ public class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojo
 			return Optional.empty();
 		}
 		else {
-			pojoModelRootElement.contributeDependencies( propertyDependencyCollector );
 			return Optional.of( new PojoIndexingProcessorPropertyNode<>(
 					modelPath.getPropertyHandle(), immutableBridges, immutableNestedNodes
 			) );

@@ -19,11 +19,12 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundRoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -34,11 +35,11 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 		implements PojoMappingCollectorTypeNode {
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
-	private final PojoModelTypeRootElement<T> pojoModelRootElement;
 
 	private final PojoIdentityMappingCollector identityMappingCollector;
 
-	private final Collection<TypeBridge> bridges = new ArrayList<>();
+	private BoundRoutingKeyBridge<T> boundRoutingKeyBridge;
+	private final Collection<BoundTypeBridge<T>> boundBridges = new ArrayList<>();
 	private final Map<PropertyHandle, PojoIndexingProcessorPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
 			new HashMap<>();
 
@@ -50,24 +51,20 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 		this.modelPath = modelPath;
 
-		this.pojoModelRootElement = new PojoModelTypeRootElement<>(
-				modelPath, mappingHelper.getAugmentedTypeModelProvider()
-		);
-
 		this.identityMappingCollector = identityMappingCollector;
 	}
 
 	@Override
 	public void bridge(BridgeBuilder<? extends TypeBridge> builder) {
-		mappingHelper.getIndexModelBinder().addTypeBridge( bindingContext, pojoModelRootElement, builder )
-				.ifPresent( bridges::add );
+		mappingHelper.getIndexModelBinder().addTypeBridge( bindingContext, modelPath, builder )
+				.ifPresent( boundBridges::add );
 	}
 
 	@Override
 	public void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		RoutingKeyBridge bridge = mappingHelper.getIndexModelBinder()
-				.addRoutingKeyBridge( bindingContext, pojoModelRootElement, builder );
-		identityMappingCollector.routingKeyBridge( bridge );
+		boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
+				.addRoutingKeyBridge( bindingContext, modelPath, builder );
+		identityMappingCollector.routingKeyBridge( boundRoutingKeyBridge.getBridge() );
 	}
 
 	@Override
@@ -89,7 +86,17 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	public Optional<PojoIndexingProcessor<T>> build(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		Collection<IndexObjectFieldAccessor> parentIndexObjectAccessors = bindingContext.getParentIndexObjectAccessors();
-		Collection<TypeBridge> immutableBridges = bridges.isEmpty() ? Collections.emptyList() : new ArrayList<>( bridges );
+
+		if ( boundRoutingKeyBridge != null ) {
+			boundRoutingKeyBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
+		}
+
+		Collection<TypeBridge> immutableBridges = boundBridges.isEmpty() ? Collections.emptyList() : new ArrayList<>();
+		for ( BoundTypeBridge<T> boundBridge : boundBridges ) {
+			immutableBridges.add( boundBridge.getBridge() );
+			boundBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
+		}
+
 		Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> immutablePropertyNodes =
 				propertyNodeBuilders.isEmpty() ? Collections.emptyList()
 						: new ArrayList<>( propertyNodeBuilders.size() );
@@ -107,7 +114,6 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			return Optional.empty();
 		}
 		else {
-			pojoModelRootElement.contributeDependencies( dependencyCollector );
 			return Optional.of( new PojoIndexingProcessorTypeNode<>(
 					parentIndexObjectAccessors, immutableBridges, immutablePropertyNodes
 			) );
