@@ -76,10 +76,8 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public <U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
-		return superClassCandidate.isAssignableFrom( clazz )
-				? Optional.of( introspector.getTypeModel( superClassCandidate ) )
-				: Optional.empty();
+	public boolean isSubTypeOf(Class<?> superClassCandidate) {
+		return superClassCandidate.isAssignableFrom( clazz );
 	}
 
 	@Override

@@ -14,9 +14,11 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoModelCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.util.SearchException;
 
 
 /**
@@ -35,8 +37,17 @@ abstract class AbstractPojoModelElement implements PojoModelElement, PojoModelCo
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // The cast is checked using reflection
+	public final <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
+		if ( !isAssignableTo( requestedType ) ) {
+			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
+		}
+		return (PojoModelElementAccessor<T>) createAccessor();
+	}
+
+	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return getTypeModel().getSuperType( clazz ).isPresent();
+		return getTypeModel().getRawType().isSubTypeOf( clazz );
 	}
 
 	@Override

@@ -93,11 +93,9 @@ abstract class AbstractHibernateOrmTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public <U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
+	public boolean isSubTypeOf(Class<?> superClassCandidate) {
 		XClass superClassCandidateXClass = introspector.toXClass( superClassCandidate );
-		return superClassCandidateXClass.isAssignableFrom( xClass )
-				? Optional.of( introspector.getTypeModel( superClassCandidate ) )
-				: Optional.empty();
+		return superClassCandidateXClass.isAssignableFrom( xClass );
 	}
 
 	@Override

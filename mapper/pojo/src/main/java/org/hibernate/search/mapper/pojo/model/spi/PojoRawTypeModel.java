@@ -37,6 +37,8 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	@Override
 	Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes();
 
+	boolean isSubTypeOf(Class<?> other);
+
 	<A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType);
 
 	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);

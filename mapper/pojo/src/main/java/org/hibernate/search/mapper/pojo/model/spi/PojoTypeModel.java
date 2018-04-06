@@ -6,21 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.util.Optional;
-
 public interface PojoTypeModel<T> {
 
 	/**
 	 * @return A representation of the closest parent Java {@link Class} for this type.
 	 */
 	PojoRawTypeModel<? super T> getRawType();
-
-	/**
-	 * @param superClassCandidate The Java Class representing the candidate supertype
-	 * @return The {@link PojoTypeModel} for this class if it is a supertype of the current type,
-	 * or an empty {@link Optional} if it is not.
-	 */
-	<U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate);
 
 	PojoPropertyModel<?> getProperty(String propertyName);
 }

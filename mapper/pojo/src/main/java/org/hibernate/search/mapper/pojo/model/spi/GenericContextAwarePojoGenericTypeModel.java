@@ -116,11 +116,6 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 	}
 
 	@Override
-	public <U> Optional<PojoRawTypeModel<U>> getSuperType(Class<U> superClassCandidate) {
-		return rawTypeModel.getSuperType( superClassCandidate );
-	}
-
-	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
 		return wrapProperty( rawTypeModel.getProperty( propertyName ) );
 	}

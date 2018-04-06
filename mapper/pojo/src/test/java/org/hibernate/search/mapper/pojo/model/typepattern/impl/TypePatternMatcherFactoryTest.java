@@ -59,7 +59,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	@Test
 	public void rawSuperType() {
 		PojoGenericTypeModel<?> typeToMatchMock = createMock( PojoGenericTypeModel.class );
-		PojoRawTypeModel<String> superTypeMock = createMock( PojoRawTypeModel.class );
+		PojoRawTypeModel typeToMatchRawTypeMock = createMock( PojoRawTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String.class, Integer.class );
@@ -70,8 +70,10 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getSuperType( String.class ) )
-				.andReturn( Optional.of( superTypeMock ) );
+		EasyMock.expect( typeToMatchMock.getRawType() )
+				.andReturn( typeToMatchRawTypeMock );
+		EasyMock.expect( typeToMatchRawTypeMock.isSubTypeOf( String.class ) )
+				.andReturn( true );
 		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();
@@ -82,8 +84,10 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getSuperType( String.class ) )
-				.andReturn( Optional.empty() );
+		EasyMock.expect( typeToMatchMock.getRawType() )
+				.andReturn( (PojoRawTypeModel) typeToMatchRawTypeMock );
+		EasyMock.expect( typeToMatchRawTypeMock.isSubTypeOf( String.class ) )
+				.andReturn( false );
 		replayAll();
 		actualReturn = matcher.match( introspectorMock, typeToMatchMock );
 		verifyAll();
@@ -124,7 +128,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	@Test
 	public void nonGenericArrayElement() {
 		PojoGenericTypeModel<?> typeToMatchMock = createMock( PojoGenericTypeModel.class );
-		PojoRawTypeModel<String[]> superTypeMock = createMock( PojoRawTypeModel.class );
+		PojoRawTypeModel typeToMatchRawTypeMock = createMock( PojoRawTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
 		TypePatternMatcher matcher = factory.create( String[].class, Integer.class );
@@ -135,8 +139,10 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getSuperType( String[].class ) )
-				.andReturn( Optional.of( superTypeMock ) );
+		EasyMock.expect( typeToMatchMock.getRawType() )
+				.andReturn( typeToMatchRawTypeMock );
+		EasyMock.expect( typeToMatchRawTypeMock.isSubTypeOf( String[].class ) )
+				.andReturn( true );
 		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();

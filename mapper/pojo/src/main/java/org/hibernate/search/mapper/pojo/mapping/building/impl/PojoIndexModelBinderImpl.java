@@ -155,7 +155,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
 				.map( ReflectionUtils::getRawType )
 				.orElseThrow( () -> log.unableToInferValueBridgeInputType( bridge ) );
-		if ( !typeModel.getSuperType( bridgeParameterType ).isPresent() ) {
+		if ( !typeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
 			throw log.invalidInputTypeForValueBridge( bridge, typeModel );
 		}
 

@@ -28,7 +28,11 @@ class RawSuperTypeMatcher implements TypePatternMatcher {
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> match(PojoBootstrapIntrospector introspector,
 			PojoGenericTypeModel<?> typeToMatch) {
-		return typeToMatch.getSuperType( matchedRawType )
-				.map( ignored -> introspector.getGenericTypeModel( resultRawType ) );
+		if ( typeToMatch.getRawType().isSubTypeOf( matchedRawType ) ) {
+			return Optional.of( introspector.getGenericTypeModel( resultRawType ) );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 }
