@@ -235,6 +235,20 @@ public class SimpleQueryStringDSLTest {
 				.matchesExactlyIds( "Caramelito" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3039")
+	public void testSearchOnEmbeddedObjectId() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "maker.id" )
+				.matching( "Stable" )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.matchesUnorderedIds( "Dharkan", "Arpeggio", "Decaffeinato" );
+	}
+
 	private QueryBuilder getCoffeeQueryBuilder() {
 		return helper.queryBuilder( Coffee.class );
 	}
@@ -256,159 +270,189 @@ public class SimpleQueryStringDSLTest {
 				"Offers mover services via monkeys instead of trucks for difficult terrains. Coffees from this brand make monkeys work much faster."
 		);
 
+		CoffeeMaker makerStable = new CoffeeMaker();
+		makerStable.setId( "Stable" );
+		makerStable.setName( "Stable Inc." );
+
+		CoffeeMaker makerZoo = new CoffeeMaker();
+		makerZoo.setId( "Zoo" );
+		makerZoo.setName( "Zoo Limited" );
+
 		createCoffee(
 				"Kazaar",
 				"EXCEPTIONALLY INTENSE AND SYRUPY",
 				"A daring blend of two Robustas from Brazil and Guatemala, specially prepared for Nespresso, and a separately roasted Arabica from South America, Kazaar is a coffee of exceptional intensity. Its powerful bitterness and notes of pepper are balanced by a full and creamy texture.",
 				12,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Dharkan",
 				"LONG ROASTED AND VELVETY",
 				"This blend of Arabicas from Latin America and Asia fully unveils its character thanks to the technique of long roasting at a low temperature. Its powerful personality reveals intense roasted notes together with hints of bitter cocoa powder and toasted cereals that express themselves in a silky and velvety txture.",
 				11,
-				brandPony
+				brandPony,
+				makerStable
 		);
 		createCoffee(
 				"Ristretto",
 				"POWERFUL AND CONTRASTING",
 				"A blend of South American and East African Arabicas, with a touch of Robusta, roasted separately to create the subtle fruity note of this full-bodied, intense espresso.",
 				10,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Arpeggio",
 				"INTENSE AND CREAMY",
 				"A dark roast of pure South and Central American Arabicas, Arpeggio has a strong character and intense body, enhanced by cocoa notes.",
 				9,
-				brandPony
+				brandPony,
+				makerStable
 		);
 		createCoffee(
 				"Roma",
 				"FULL AND BALANCED",
 				"The balance of lightly roasted South and Central American Arabicas with Robusta, gives Roma sweet and woody notes and a full, lasting taste on the palate.",
 				8,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Livanto",
 				"ROUND AND BALANCED",
 				"A pure Arabica from South and Central America, Livanto is a well-balanced espresso characterised by a roasted caramelised note.",
 				6,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Capriccio",
 				"RICH AND DISTINCTIVE",
 				"Blending South American Arabicas with a touch of Robusta, Capriccio is an espresso with a rich aroma and a strong typical cereal note.",
 				5,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Volluto",
 				"SWEET AND LIGHT",
 				"A pure and lightly roasted Arabica from South America, Volluto reveals sweet and biscuity flavours, reinforced by a little acidity and a fruity note.",
 				4,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Cosi",
 				"LIGHT AND LEMONY",
 				"Pure, lightly roasted East African, Central and South American Arabicas make Cosi a light-bodied espresso with refreshing citrus notes.",
 				3,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Indriya from India",
 				"POWERFUL AND SPICY",
 				"Indriya from India is the noble marriage of Arabicas with a hint of Robusta from southern India. It is a full-bodied espresso, which has a distinct personality with notes of spices.",
 				10,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Rosabaya de Colombia",
 				"FRUITY AND BALANCED",
 				"This blend of fine, individually roasted Colombian Arabicas, develops a subtle acidity with typical red fruit and winey notes.",
 				6,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Dulsão do Brasil",
 				"SWEET AND SATINY SMOOTH",
 				"A pure Arabica coffee, Dulsão do Brasil is a delicate blend of red and yellow Bourbon beans from Brazil. Its satiny smooth, elegantly balanced flavor is enhanced with a note of delicately toasted grain.",
 				4,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Bukeela ka Ethiopia",
 				"",
 				"This delicate Lungo expresses a floral bouquet reminiscent of jasmine, white lily, bergamot and orange blossom together with notes of wood. A pure Arabica blend composed of two very different coffees coming from the birthplace of coffee, Ethiopia. The blend’s coffees are roasted separately: one portion short and dark to guarantee the body, the other light but longer to preserve the delicate notes.",
 				3,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Fortissio Lungo",
 				"RICH AND INTENSE",
 				"Made from Central and South American Arabicas with just a hint of Robusta, Fortissio Lungo is an intense full-bodied blend with bitterness, which develops notes of dark roasted beans.",
 				7,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Vivalto Lungo",
 				"COMPLEX AND BALANCED",
 				"Vivalto Lungo is a balanced coffee made from a complex blend of separately roasted South American and East African Arabicas, combining roasted and subtle floral notes.",
 				4,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Linizio Lungo",
 				"ROUND AND SMOOTH",
 				"Mild and well-rounded on the palate, Linizio Lungo is a blend of fine Arabica enhancing malt and cereal notes.",
 				4,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Decaffeinato Intenso",
 				"DENSE AND POWERFUL",
 				"Dark roasted South American Arabicas with a touch of Robusta bring out the subtle cocoa and roasted cereal notes of this full-bodied decaffeinated espresso.",
 				7,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Decaffeinato Lungo",
 				"LIGHT AND FULL-FLAVOURED",
 				"The slow roasting of this blend of South American Arabicas with a touch of Robusta gives Decaffeinato Lungo a smooth, creamy body and roasted cereal flavour.",
 				3,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Decaffeinato",
 				"FRUITY AND DELICATE",
 				"A blend of South American Arabicas reinforced with just a touch of Robusta is lightly roasted to reveal an aroma of red fruit.",
 				2,
-				brandPony
+				brandPony,
+				makerStable
 		);
 		createCoffee(
 				"Caramelito",
 				"CARAMEL FLAVOURED",
 				"The sweet flavour of caramel softens the roasted notes of the Livanto Grand Cru. This delicate gourmet marriage evokes the creaminess of soft toffee.",
 				6,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Ciocattino",
 				"CHOCOLATE FLAVOURED",
 				"Dark and bitter chocolate notes meet the caramelized roast of the Livanto Grand Cru. A rich combination reminiscent of a square of dark chocolate.",
 				6,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 		createCoffee(
 				"Vanilio",
 				"VANILLA FLAVOURED",
 				"A balanced harmony between the rich and the velvety aromas of vanilla and the mellow flavour of the Livanto Grand Cru. A blend distinguished by its full flavour, infinitely smooth and silky on the palate.",
 				6,
-				brandMonkey
+				brandMonkey,
+				makerZoo
 		);
 
 		helper.add(
@@ -420,7 +464,7 @@ public class SimpleQueryStringDSLTest {
 		);
 	}
 
-	private void createCoffee(String name, String summary, String description, int intensity, CoffeeBrand brand) {
+	private void createCoffee(String name, String summary, String description, int intensity, CoffeeBrand brand, CoffeeMaker maker) {
 		Coffee coffee = new Coffee();
 		coffee.setId( name );
 		coffee.setName( name );
@@ -428,6 +472,7 @@ public class SimpleQueryStringDSLTest {
 		coffee.setDescription( description );
 		coffee.setIntensity( intensity );
 		coffee.setBrand( brand );
+		coffee.setMaker( maker );
 		helper.add( coffee );
 	}
 }
