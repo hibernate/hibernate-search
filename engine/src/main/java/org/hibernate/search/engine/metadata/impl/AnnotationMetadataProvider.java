@@ -318,20 +318,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
-		// property > entity analyzer (no field analyzer)
 		if ( !parseContext.skipAnalyzers() ) {
-			AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
-					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-					configContext,
-					parseContext.getIndexManagerType()
-			);
-			if ( analyzerReference == null ) {
-				analyzerReference = typeMetadataBuilder.getAnalyzerReference();
-			}
-			if ( analyzerReference == null ) {
-				throw new AssertionFailure( "Analyzer should not be undefined" );
-			}
-			typeMetadataBuilder.addToScopedAnalyzerReference( fieldPath, analyzerReference, index );
+			typeMetadataBuilder.addToScopedAnalyzerReference( fieldPath, null, index );
 		}
 	}
 
