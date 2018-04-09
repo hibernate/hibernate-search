@@ -64,6 +64,11 @@ class Coffee {
 	public void setBrand(CoffeeBrand brand) { this.brand = brand; }
 	private CoffeeBrand brand;
 
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	public CoffeeMaker getMaker() { return maker; }
+	public void setMaker(CoffeeMaker maker) { this.maker = maker; }
+	private CoffeeMaker maker;
+
 	@Override
 	public String toString() {
 		return "Coffee{" +
