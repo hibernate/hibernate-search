@@ -6,15 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
 import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
@@ -30,12 +34,15 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * An object responsible for inverting an association path,
  * i.e. a chain of properties and container value extractors going from one entity to another.
  */
 public final class PojoAssociationPathInverter {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
@@ -170,15 +177,18 @@ public final class PojoAssociationPathInverter {
 			PojoRawTypeModel<?> originalSideEntityType,
 			List<PojoModelPathValueNode> associationPathsToMatch) {
 		BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode = BoundPojoModelPathTypeNode.root( inverseSideTypeModel );
+		Set<PojoRawTypeModel<?>> encounteredAssociationHoldingTypes = new HashSet<>();
 		return findInverseSidePathFromInverseSideRecursive(
-				inverseSidePathTypeNode, originalSideEntityType, associationPathsToMatch
+				inverseSidePathTypeNode, originalSideEntityType, associationPathsToMatch,
+				encounteredAssociationHoldingTypes
 		);
 	}
 
 	private Optional<PojoModelPathValueNode> findInverseSidePathFromInverseSideRecursive(
 			BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode,
 			PojoRawTypeModel<?> originalSideEntityType,
-			List<PojoModelPathValueNode> associationPathsToMatch) {
+			List<PojoModelPathValueNode> associationPathsToMatch,
+			Set<PojoRawTypeModel<?>> encounteredAssociationHoldingTypes) {
 		PojoTypeModel<?> inverseSideTypeModel = inverseSidePathTypeNode.getTypeModel();
 		PojoAugmentedTypeModel augmentedInverseSideTypeModel =
 				augmentedTypeModelProvider.get( inverseSideTypeModel.getRawType() );
@@ -202,6 +212,9 @@ public final class PojoAssociationPathInverter {
 				Optional<PojoModelPathValueNode> candidatePathOptional =
 						augmentedInverseSideValueModel.getInverseSidePath();
 
+				PojoRawTypeModel<?> rawExtractedTypeModel =
+						inverseSidePathValueNode.type().getTypeModel().getRawType();
+
 				if ( candidatePathOptional.isPresent()
 						&& associationPathsToMatch.contains( candidatePathOptional.get() ) ) {
 					PojoModelPathValueNode inverseAssociationPath = inverseSidePathValueNode.toUnboundPath();
@@ -212,18 +225,25 @@ public final class PojoAssociationPathInverter {
 					 * from multiple different entities: in that case, the "original" associations may have
 					 * the same name and extractors.
 					 */
-					PojoRawTypeModel<?> rawExtractedTypeModel =
-							inverseSidePathValueNode.type().getTypeModel().getRawType();
 					if ( originalSideEntityType.isSubTypeOf( rawExtractedTypeModel ) ) {
 						return Optional.of( inverseAssociationPath );
 					}
 				}
 
 				if ( augmentedInverseSideValueModel.isAssociationEmbedded() ) {
-					// TODO protect ourselves from infinite recursion (it could happen if the model has embedding cycles)
+					if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
+						throw log.infiniteRecursionForAssociationEmbeddeds(
+								inverseSidePathValueNode.rootType().getRawType(),
+								inverseSidePathValueNode.toUnboundPath()
+						);
+					}
+
+					encounteredAssociationHoldingTypes.add( rawExtractedTypeModel );
 					candidatePathOptional = findInverseSidePathFromInverseSideRecursive(
-							inverseSidePathValueNode.type(), originalSideEntityType, associationPathsToMatch
+							inverseSidePathValueNode.type(), originalSideEntityType, associationPathsToMatch,
+							encounteredAssociationHoldingTypes
 					);
+					encounteredAssociationHoldingTypes.remove( rawExtractedTypeModel );
 					if ( candidatePathOptional.isPresent() ) {
 						return candidatePathOptional;
 					}

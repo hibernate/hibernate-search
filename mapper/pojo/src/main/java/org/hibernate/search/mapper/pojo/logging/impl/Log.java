@@ -144,4 +144,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 23, value = "Property '%2$s' from type '%1$s' is annotated with @AnnotationInverseSide,"
 			+ " but the inverse path is empty.")
 	SearchException missingInversePathInAssociationInverseSideMapping(PojoRawTypeModel<?> typeModel, String propertyName);
+
+	@Message(id = 24, value = "Found an infinite embedded recursion involving path '%2$s' on type '%1$s'")
+	SearchException infiniteRecursionForAssociationEmbeddeds(PojoRawTypeModel<?> typeModel,
+			PojoModelPathValueNode path);
 }
