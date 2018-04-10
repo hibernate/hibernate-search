@@ -53,7 +53,6 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 		}
 		finally {
 			//clean the Synchronization per Transaction
-			//not strictly required but a cleaner approach and faster than the GC
 			workerPerTransaction.remove( transactionIdentifier );
 		}
 	}
