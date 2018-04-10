@@ -116,7 +116,6 @@ public class HibernateSearchContextService implements Service {
 			if ( worker == null ) {
 				worker = searchManager.createWorker();
 				workerPerTransaction.put( transactionIdentifier, worker );
-				// TODO also create and register a synchronization
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
 						worker, workerPerTransaction, transactionIdentifier
 				);
