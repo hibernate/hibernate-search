@@ -18,7 +18,6 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-// TODO repeatable
 public @interface DocumentId {
 
 	/**

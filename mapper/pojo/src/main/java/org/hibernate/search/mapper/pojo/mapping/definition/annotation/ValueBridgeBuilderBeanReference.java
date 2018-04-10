@@ -20,7 +20,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-// TODO repeatable
 public @interface ValueBridgeBuilderBeanReference {
 
 	String name() default "";
