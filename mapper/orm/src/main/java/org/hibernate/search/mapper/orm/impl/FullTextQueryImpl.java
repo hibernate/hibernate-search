@@ -116,7 +116,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	protected List<R> doHibernateSearchList() {
 		// TODO handle timeouts
 		final List<R> results = searchQuery.execute().getHits();
-		// TODO toDocumentIdentifier the result transformer?
+		// TODO apply the result transformer?
 		return results;
 	}
 
