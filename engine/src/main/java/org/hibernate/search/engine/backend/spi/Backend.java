@@ -16,9 +16,26 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public interface Backend<D extends DocumentElement> extends AutoCloseable {
 
+	/**
+	 * Normalize the name of the index, so that we cannot end up with two index names in Hibernate Search
+	 * that would target the same physical index.
+	 *
+	 * @param rawIndexName The index name to be normalized.
+	 * @return The normalized index name.
+	 */
 	String normalizeIndexName(String rawIndexName);
 
-	IndexManagerBuilder<D> createIndexManagerBuilder(String name, BuildContext context, ConfigurationPropertySource propertySource);
+	/**
+	 * @param normalizedIndexName The (already {@link #normalizeIndexName(String) normalized}) name of the index
+	 * @param context The build context
+	 * @param propertySource A configuration property source, appropriately masked so that the backend
+	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
+	 * can be accessed at the root.
+	 * <strong>CAUTION:</strong> the property key {@code backend} is reserved for use by the engine.
+	 * @return A builder for index managers targeting this backend.
+	 */
+	IndexManagerBuilder<D> createIndexManagerBuilder(String normalizedIndexName, BuildContext context,
+			ConfigurationPropertySource propertySource);
 
 	@Override
 	void close();
