@@ -118,6 +118,7 @@ enqueued as a post-transaction event, consistently with other backends.
 To change this configuration see also <<configuration-worker>>.
 
 
+[[search-architecture-jgroups]]
 ==== JGroups
 
 The JGroups based backend works similar to the JMS one and is designed after the same master/slaves

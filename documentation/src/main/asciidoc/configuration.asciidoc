@@ -1579,6 +1579,14 @@ Several more modules are included but you should not need to refer to the other 
 The feature pack is published on the JBoss Nexus repository and Maven Central as
 link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-engine~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-engine:{hibernateSearchVersion}:zip].
 
+===== JGroups feature pack
+
+This feature pack includes the modules _org.hibernate.search.backend-jgroups_,
+to use the JGroups backend described in <<search-architecture-jgroups, JGroups Architecture>>.
+
+The feature pack is published on the JBoss Nexus repository and Maven Central as
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-jbossmodules-backend-jgroups~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-jbossmodules-orm:{hibernateSearchVersion}:zip].
+
 ===== ORM feature pack
 
 This feature pack includes the following modules:

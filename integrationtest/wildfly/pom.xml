@@ -400,6 +400,12 @@
                             </dependency>
                             <dependency>
                                 <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-jbossmodules-backend-jgroups</artifactId>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
                                 <artifactId>hibernate-search-jbossmodules-testing</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
