@@ -288,6 +288,7 @@
         <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
         <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
         <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
+        <osgi.version-range.org.apache.avro>[${version.org.apache.avro},1.8.0)</osgi.version-range.org.apache.avro>
 
         <!-- Elasticsearch tests properties -->
 

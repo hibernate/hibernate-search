@@ -120,7 +120,7 @@
                         <Import-Package>
                             org.hibernate.annotations.common.*;version="${osgi.version-range.org.hibernate.commons.annotations}",
                             org.hibernate.search.*;version="[${project.version},${project.version}]",
-                            org.apache.avro.*;version="[${avroVersion},1.8.0)"
+                            org.apache.avro.*;version="${osgi.version-range.org.apache.avro}"
                         </Import-Package>
                     </instructions>
                 </configuration>
