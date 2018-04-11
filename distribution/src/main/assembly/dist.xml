@@ -161,7 +161,7 @@
             <includes>
                 <include>org.jboss.spec.javax.jms:*</include>
                 <include>org.jboss.spec.javax.annotation:*</include>
-                <include>org.hibernate.javax.persistence:*</include>
+                <include>javax.persistence:javax.persistence-api</include>
                 <include>org.jboss.spec.javax.transaction:*</include>
                 <include>javax.batch:javax.batch-api</include>
                 <include>javax.inject:javax.inject</include>
