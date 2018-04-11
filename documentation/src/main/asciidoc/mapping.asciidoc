@@ -2226,6 +2226,34 @@ CustomBridge cb = classLoaderService.classForName( "com.package.CustomBridge" );
 ----
 ====
 
+[[section-bridge-dependency-injection]]
+==== Dependency injection in bridges
+
+Hibernate Search offers SPIs that allow dependency injection frameworks
+to be used when instantiating custom bridges, enabling dependency injection in bridges.
+
+When using the Hibernate Search ORM integration,
+Hibernate Search is wired to Hibernate ORM's dependency injection support,
+meaning that if your framework already provides dependency injection to Hibernate ORM
+(for `EntityListener`s and `AttributeConverter`s in particular),
+then dependency injection should automatically work for Hibernate Search bridges, too.
+
+In order to get a bridge injected, you only need to implement a bridge using all the features provided
+by your dependency injection framework (`@Inject`, ...) and register it to your dependency injection context.
+Then you can apply the bridge as usual, using the implementation class or a uniquely identifying superinterface
+to refer to the bridge.
+Hibernate Search will try to use the dependency injection framework to retrieve the bridge,
+and if not found it will default to reflection-based instantiation (using the public, no-argument constructor).
+
+[WARNING]
+====
+Be careful to define the scope of your bridge as appropriate.
+For instance if the bridge implements `AppliedOnTypeAwareBridge`, a singleton bridge will not work,
+since the bridge may be used in multiple places on different properties with different types.
+In that case, a "prototype" (Spring terminology) or "dependent" (CDI terminology) scope is what you want,
+and it's generally the safest choice.
+====
+
 [[search-mapping-indexinginterceptor]]
 === Conditional indexing
 
