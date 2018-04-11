@@ -79,11 +79,11 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		super.setUp();
 
 		Session sessionMetamec = openSessionWithTenantId( METAMEC_TID );
-		persist( sessionMetamec, METAMEC_MODELS );
+		persist( sessionMetamec, (Object[]) METAMEC_MODELS );
 		sessionMetamec.close();
 
 		Session sessionGeochron = openSessionWithTenantId( GEOCHRON_TID );
-		persist( sessionGeochron, GEOCHRON_MODELS );
+		persist( sessionGeochron, (Object[]) GEOCHRON_MODELS );
 		sessionGeochron.close();
 	}
 
