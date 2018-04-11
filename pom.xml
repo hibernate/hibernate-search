@@ -172,10 +172,6 @@
         </mailingList>
     </mailingLists>
 
-    <prerequisites>
-        <maven>${maven.min.version}</maven>
-    </prerequisites>
-
     <properties>
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.9.0.Final</previous.stable>
