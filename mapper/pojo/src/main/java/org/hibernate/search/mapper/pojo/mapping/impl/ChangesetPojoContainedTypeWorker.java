@@ -61,45 +61,42 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 	private class WorkPlanPerDocument {
 		private Supplier<E> entitySupplier;
 
-		private boolean delete;
-		private boolean add;
+		private Boolean createdInThisChangeset;
 
 		private boolean shouldResolveDirty;
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			shouldResolveDirty = true;
-			add = true;
+			if ( createdInThisChangeset == null ) {
+				// No update yet, so we actually did create the entity in this changeset
+				createdInThisChangeset = true;
+			}
 		}
 
 		void update(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			/*
-			 * If add is true, either this is already an update (in which case we don't need to change the flags)
-			 * or we called add() in the same changeset (in which case we don't expect the document to be in the index).
-			 */
-			if ( !add ) {
-				delete = true;
-				add = true;
-			}
 			this.shouldResolveDirty = true;
+			if ( createdInThisChangeset == null ) {
+				// No add yet, and we're performing an update, so we did not create the entity in this changeset
+				createdInThisChangeset = false;
+			}
 		}
 
 		void delete(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			if ( add && !delete ) {
+			if ( createdInThisChangeset == null ) {
+				// No add or update yet, and we're performing a delete, so we did not create the entity in this changeset
+				createdInThisChangeset = false;
+			}
+			else if ( createdInThisChangeset ) {
 				/*
-				 * We called add() in the same changeset, so we don't expect the entity to be contained
+				 * We called the first add() in the same changeset, so we don't expect the entity to be contained
 				 * in existing documents.
-				 * Don't delete, just cancel the addition.
+				 * Cancel everything.
 				 */
 				shouldResolveDirty = false;
-				add = false;
-				delete = false;
-			}
-			else {
-				add = false;
-				delete = true;
+				createdInThisChangeset = null;
 			}
 		}
 
