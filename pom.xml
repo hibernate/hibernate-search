@@ -1476,7 +1476,7 @@
                             <link>http://jgroups.org/javadoc</link>
                             <!-- for javax.batch in the JSR 352 modules -->
                             <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <link>http://docs.jboss.org/jberet/${jberetJavadocVersion}/javadoc/jberet-core/</link>
+                            <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
                         </links>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
