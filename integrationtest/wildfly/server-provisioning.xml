@@ -7,6 +7,10 @@
                 version="${project.version}"/>
         <feature-pack
                 groupId="org.hibernate"
+                artifactId="hibernate-search-jbossmodules-backend-jgroups"
+                version="${project.version}"/>
+        <feature-pack
+                groupId="org.hibernate"
                 artifactId="hibernate-search-jbossmodules-elasticsearch"
                 version="${project.version}"/>
         <feature-pack

@@ -22,6 +22,7 @@
         <module>engine</module>
         <module>hibernate-orm</module>
         <module>orm</module>
+        <module>backend-jgroups</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
         <module>testing</module>
