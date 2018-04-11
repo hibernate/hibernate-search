@@ -1473,7 +1473,7 @@
                             <link>http://lucene.apache.org/core/5_5_4/core/</link>
                             <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
                             <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
-                            <link>http://jgroups.org/javadoc</link>
+                            <link>http://jgroups.org/javadoc/</link>
                             <!-- for javax.batch in the JSR 352 modules -->
                             <link>https://docs.oracle.com/javaee/7/api/</link>
                             <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
