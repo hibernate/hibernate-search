@@ -31,13 +31,13 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 	}
 
 	@Override
-	public BoundPojoModelPathTypeNode<T> parent() {
+	public BoundPojoModelPathTypeNode<T> getParent() {
 		return parent;
 	}
 
 	@Override
-	public PojoTypeModel<?> rootType() {
-		return parent.rootType();
+	public PojoTypeModel<?> getRootType() {
+		return parent.getRootType();
 	}
 
 	public BoundPojoModelPathValueNode<T, P, P> valueWithoutExtractors() {
@@ -58,7 +58,7 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	public PojoModelPathPropertyNode toUnboundPath() {
 		String propertyName = propertyHandle.getName();
-		BoundPojoModelPathValueNode<?, ?, ?> parentParent = parent.parent();
+		BoundPojoModelPathValueNode<?, ?, ?> parentParent = parent.getParent();
 		if ( parentParent == null ) {
 			return PojoModelPath.fromRoot( propertyName );
 		}

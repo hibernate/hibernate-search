@@ -38,7 +38,7 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 	}
 
 	@Override
-	public PojoModelPathValueNode parent() {
+	public PojoModelPathValueNode getParent() {
 		return parent;
 	}
 

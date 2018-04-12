@@ -23,7 +23,7 @@ public class BoundPojoModelPathCastedTypeNode<T, U> extends BoundPojoModelPathTy
 	}
 
 	@Override
-	public BoundPojoModelPathValueNode<?, ?, T> parent() {
+	public BoundPojoModelPathValueNode<?, ?, T> getParent() {
 		return parent;
 	}
 

@@ -41,7 +41,7 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 	 * @return The model path to the property from which the value represented by this node is extracted.
 	 */
 	@Override
-	public PojoModelPathPropertyNode parent() {
+	public PojoModelPathPropertyNode getParent() {
 		return parent;
 	}
 

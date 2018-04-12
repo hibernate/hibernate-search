@@ -38,14 +38,14 @@ public abstract class BoundPojoModelPath {
 		return builder.toString();
 	}
 
-	public abstract BoundPojoModelPath parent();
+	public abstract BoundPojoModelPath getParent();
 
-	public abstract PojoTypeModel<?> rootType();
+	public abstract PojoTypeModel<?> getRootType();
 
 	abstract void appendSelfPath(StringBuilder builder);
 
 	private void appendPath(StringBuilder builder) {
-		BoundPojoModelPath parent = parent();
+		BoundPojoModelPath parent = getParent();
 		if ( parent == null ) {
 			appendSelfPath( builder );
 		}

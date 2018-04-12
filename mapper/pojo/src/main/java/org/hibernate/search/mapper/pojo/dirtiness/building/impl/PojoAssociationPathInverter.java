@@ -57,7 +57,7 @@ public final class PojoAssociationPathInverter {
 
 	public Optional<PojoModelPathValueNode> invertPath(PojoTypeModel<?> inverseSideEntityType,
 			BoundPojoModelPathValueNode<?, ?, ?> pathToInvert) {
-		PojoRawTypeModel<?> originalSideEntityType = pathToInvert.rootType().getRawType();
+		PojoRawTypeModel<?> originalSideEntityType = pathToInvert.getRootType().getRawType();
 
 		// Try to find inverse side information hosted on the side to inverse
 		Optional<PojoModelPathValueNode> inverseSidePathOptional =
@@ -93,8 +93,8 @@ public final class PojoAssociationPathInverter {
 	private void collectAssociationPathsToMatch(
 			List<PojoModelPathValueNode> associationPathsToMatch,
 			BoundPojoModelPathValueNode<?, ?, ?> boundPathToInvert) {
-		BoundPojoModelPathPropertyNode<?, ?> parentPath = boundPathToInvert.parent();
-		BoundPojoModelPathValueNode<?, ?, ?> parentValuePath = parentPath.parent().parent();
+		BoundPojoModelPathPropertyNode<?, ?> parentPath = boundPathToInvert.getParent();
+		BoundPojoModelPathValueNode<?, ?, ?> parentValuePath = parentPath.getParent().getParent();
 		String propertyName = parentPath.getPropertyHandle().getName();
 		ContainerValueExtractorPath extractorPath = boundPathToInvert.getExtractorPath();
 		boolean isDefaultExtractorPath = isDefaultExtractorPath(
@@ -143,8 +143,8 @@ public final class PojoAssociationPathInverter {
 
 	private Optional<PojoModelPathValueNode> findInverseSidePathFromOriginalSide(
 			BoundPojoModelPathValueNode<?, ?, ?> pathToInvert) {
-		BoundPojoModelPathPropertyNode<?, ?> lastPropertyNode = pathToInvert.parent();
-		BoundPojoModelPathTypeNode<?> lastTypeNode = lastPropertyNode.parent();
+		BoundPojoModelPathPropertyNode<?, ?> lastPropertyNode = pathToInvert.getParent();
+		BoundPojoModelPathTypeNode<?> lastTypeNode = lastPropertyNode.getParent();
 		PojoPropertyModel<?> lastPropertyModel = lastPropertyNode.getPropertyModel();
 		PojoTypeModel<?> lastTypeModel = lastTypeNode.getTypeModel();
 
@@ -233,7 +233,7 @@ public final class PojoAssociationPathInverter {
 				if ( augmentedInverseSideValueModel.isAssociationEmbedded() ) {
 					if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
 						throw log.infiniteRecursionForAssociationEmbeddeds(
-								inverseSidePathValueNode.rootType().getRawType(),
+								inverseSidePathValueNode.getRootType().getRawType(),
 								inverseSidePathValueNode.toUnboundPath()
 						);
 					}

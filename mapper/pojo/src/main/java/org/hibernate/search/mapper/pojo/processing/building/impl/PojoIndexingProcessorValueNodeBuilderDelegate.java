@@ -57,7 +57,7 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 			FieldModelContributor fieldModelContributor) {
 		String defaultedFieldName = fieldName;
 		if ( defaultedFieldName == null ) {
-			defaultedFieldName = modelPath.parent().getPropertyHandle().getName();
+			defaultedFieldName = modelPath.getParent().getPropertyHandle().getName();
 		}
 
 		mappingHelper.getIndexModelBinder().addValueBridge(
@@ -72,10 +72,10 @@ public class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements Pojo
 			Integer maxDepth, Set<String> includePaths) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = modelPath.parent().getPropertyHandle().getName() + ".";
+			defaultedRelativePrefix = modelPath.getParent().getPropertyHandle().getName() + ".";
 		}
 
-		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.parent().parent();
+		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.getParent().getParent();
 
 		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				holderTypePath.getTypeModel().getRawType(),

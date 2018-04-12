@@ -226,7 +226,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
 			PojoModelPathValueNode unboundPath) {
 		PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNodeBuilder =
-				applyPath( builder, unboundPath.parent() );
+				applyPath( builder, unboundPath.getParent() );
 		ContainerValueExtractorPath inverseExtractorPath = unboundPath.getExtractorPath();
 		return propertyNodeBuilder.value( inverseExtractorPath );
 	}
@@ -234,7 +234,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> applyPath(
 			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
 			PojoModelPathPropertyNode unboundPath) {
-		PojoModelPathValueNode parent = unboundPath.parent();
+		PojoModelPathValueNode parent = unboundPath.getParent();
 		AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> parentBuilder;
 		if ( parent != null ) {
 			parentBuilder = applyPath( builder, parent ).type();
@@ -248,19 +248,19 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 
 	private BoundPojoModelPathValueNode<?, ?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
 			BoundPojoModelPathValueNode<?, ?, ?> source) {
-		BoundPojoModelPathPropertyNode<?, ?> targetParent = applyProcessingPathToSubType( rootSubType, source.parent() );
+		BoundPojoModelPathPropertyNode<?, ?> targetParent = applyProcessingPathToSubType( rootSubType, source.getParent() );
 		return bindAndApplyExtractorPath( targetParent, source.getExtractorPath() );
 	}
 
 	private BoundPojoModelPathPropertyNode<?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
 			BoundPojoModelPathPropertyNode<?, ?> source) {
-		BoundPojoModelPathTypeNode<?> targetParent = applyProcessingPathToSubType( rootSubType, source.parent() );
+		BoundPojoModelPathTypeNode<?> targetParent = applyProcessingPathToSubType( rootSubType, source.getParent() );
 		return targetParent.property( source.getPropertyHandle() );
 	}
 
 	private BoundPojoModelPathTypeNode<?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
 			BoundPojoModelPathTypeNode<?> source) {
-		BoundPojoModelPathValueNode<?, ?, ?> sourceParent = source.parent();
+		BoundPojoModelPathValueNode<?, ?, ?> sourceParent = source.getParent();
 		if ( sourceParent != null ) {
 			return applyProcessingPathToSubType( rootSubType, sourceParent ).type();
 		}

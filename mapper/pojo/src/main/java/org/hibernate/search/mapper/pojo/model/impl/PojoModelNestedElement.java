@@ -43,7 +43,7 @@ class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implement
 
 	@Override
 	public String getName() {
-		return modelPath.parent().getPropertyModel().getName();
+		return modelPath.getParent().getPropertyModel().getName();
 	}
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
@@ -69,6 +69,6 @@ class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implement
 	}
 
 	PropertyHandle getHandle() {
-		return modelPath.parent().getPropertyHandle();
+		return modelPath.getParent().getPropertyHandle();
 	}
 }

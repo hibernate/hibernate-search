@@ -33,13 +33,13 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	 * @return The model path to the property from which the value represented by this node is extracted.
 	 */
 	@Override
-	public BoundPojoModelPathPropertyNode<T, P> parent() {
+	public BoundPojoModelPathPropertyNode<T, P> getParent() {
 		return parent;
 	}
 
 	@Override
-	public PojoTypeModel<?> rootType() {
-		return parent.rootType();
+	public PojoTypeModel<?> getRootType() {
+		return parent.getRootType();
 	}
 
 	/**

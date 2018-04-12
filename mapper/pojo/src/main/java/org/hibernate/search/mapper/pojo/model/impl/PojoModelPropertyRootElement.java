@@ -29,7 +29,7 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelElement<P>
 
 	@Override
 	public String toString() {
-		return modelPath.parent().getPropertyModel().toString();
+		return modelPath.getParent().getPropertyModel().toString();
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelElement<P>
 
 	@Override
 	public String getName() {
-		return modelPath.parent().getPropertyModel().getName();
+		return modelPath.getParent().getPropertyModel().getName();
 	}
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {

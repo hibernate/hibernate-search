@@ -35,12 +35,12 @@ public abstract class PojoModelPath {
 		return builder.toString();
 	}
 
-	public abstract PojoModelPath parent();
+	public abstract PojoModelPath getParent();
 
 	abstract void appendSelfPath(StringBuilder builder);
 
 	private void appendPath(StringBuilder builder) {
-		PojoModelPath parent = parent();
+		PojoModelPath parent = getParent();
 		if ( parent == null ) {
 			appendSelfPath( builder );
 		}

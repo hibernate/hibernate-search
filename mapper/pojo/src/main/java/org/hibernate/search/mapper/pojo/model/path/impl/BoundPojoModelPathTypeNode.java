@@ -18,13 +18,13 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 	}
 
 	@Override
-	public PojoTypeModel<?> rootType() {
-		BoundPojoModelPathValueNode<?, ?, ?> parent = parent();
+	public PojoTypeModel<?> getRootType() {
+		BoundPojoModelPathValueNode<?, ?, ?> parent = getParent();
 		if ( parent == null ) {
 			return getTypeModel();
 		}
 		else {
-			return parent.rootType();
+			return parent.getRootType();
 		}
 	}
 
@@ -35,7 +35,7 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 	}
 
 	@Override
-	public abstract BoundPojoModelPathValueNode<?, ?, ?> parent();
+	public abstract BoundPojoModelPathValueNode<?, ?, ?> getParent();
 
 	public abstract PojoTypeModel<T> getTypeModel();
 }
