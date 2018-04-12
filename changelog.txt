@@ -1,6 +1,39 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.0.Beta2 (12-04-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3039 Register a pass through analyzer for the @DocumentId field
+    * HSEARCH-3033 Internal links to "section-custom-similarity" in the documentation are dead
+    * HSEARCH-3027 Avoid a possible initialization hang on bootstrap failure
+
+** Improvement
+    * HSEARCH-3036 Upgrade to Hibernate Commons Annotations 5.0.3.Final
+    * HSEARCH-3035 Use source and target properties for JBoss logging processor source and target
+    * HSEARCH-3026 Support the ability to define a pathPrefix for the Elasticsearch REST client
+    * HSEARCH-3024 Make our pom files more consistent with WildFly and JBoss parent pom files
+    * HSEARCH-3015 Update JGroups to 3.6.13.Final
+    * HSEARCH-3013 Update Classmate to 1.3.4
+
+** Remove Feature
+    * HSEARCH-3030 Separate the JGroups integration component into a dedicated WildFly feature pack
+
+** Task
+    * HSEARCH-3043 Upgrade to Byteman version 4.0.2
+    * HSEARCH-3041 Upgrade to Elasticsearch 5.6.8
+    * HSEARCH-3037 Fix incorrect dependency in the IDEA profile leading to JBoss logging annotation processor errors
+    * HSEARCH-3034 Replace Fest-assert with AssertJ
+    * HSEARCH-3032 Add test coverage analysis in an optional build profile
+    * HSEARCH-3029 Use Wildfly JPA 2.2 patch 1.0.0.Beta2 to support WildFly 12
+    * HSEARCH-3028 Upgrade to wildfly-build-tools 1.2.9.Final
+    * HSEARCH-3025 Upgrade recommended SLF4J version to 1.7.25
+    * HSEARCH-3022 Upgrade integration tests to WildFly 12
+    * HSEARCH-3021 Document the integration to DI frameworks
+    * HSEARCH-3020 Fix build warnings in version 5.10
+    * HSEARCH-2598 Upgrade to JGroups 4.0.11.Final
+
 5.10.0.Beta1 (22-02-2018)
 -------------------------
 
