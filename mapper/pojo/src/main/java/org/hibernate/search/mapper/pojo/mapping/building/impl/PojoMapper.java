@@ -36,7 +36,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerConta
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -52,7 +52,7 @@ class PojoMapper<M> implements Mapper<M> {
 	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
-	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
+	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
 
@@ -70,12 +70,12 @@ class PojoMapper<M> implements Mapper<M> {
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 
-		augmentedTypeModelProvider = new PojoAugmentedTypeModelProvider( contributorProvider );
+		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider( contributorProvider );
 		extractorBinder = new ContainerValueExtractorBinder( buildContext );
 
 		BridgeResolver bridgeResolver = new BridgeResolver();
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
-				buildContext, introspector, extractorBinder, bridgeResolver, augmentedTypeModelProvider
+				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
 
 		mappingHelper = new PojoMappingHelper(
@@ -114,7 +114,7 @@ class PojoMapper<M> implements Mapper<M> {
 		PojoContainedTypeManagerContainer.Builder containedTypeManagerContainerBuilder =
 				PojoContainedTypeManagerContainer.builder();
 		PojoAssociationPathInverter pathInverter = new PojoAssociationPathInverter(
-				augmentedTypeModelProvider, introspector, extractorBinder
+				typeAdditionalMetadataProvider, introspector, extractorBinder
 		);
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
@@ -166,7 +166,7 @@ class PojoMapper<M> implements Mapper<M> {
 		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.getTypesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			PojoRawTypeModel<?> pojoRawTypeModel = (PojoRawTypeModel<?>) mappableTypeModel;
-			if ( augmentedTypeModelProvider.get( pojoRawTypeModel ).isEntity() ) {
+			if ( typeAdditionalMetadataProvider.get( pojoRawTypeModel ).isEntity() ) {
 				entityTypes.add( pojoRawTypeModel );
 			}
 		}

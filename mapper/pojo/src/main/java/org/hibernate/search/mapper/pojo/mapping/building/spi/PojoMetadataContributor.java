@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollector;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollector;
 
-public interface PojoMetadataContributor<CMO extends PojoAugmentedModelCollector, CMA extends PojoMappingCollector> {
+public interface PojoMetadataContributor<CMO extends PojoAdditionalMetadataCollector, CMA extends PojoMappingCollector> {
 
 	void contributeModel(CMO collector);
 

@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  */
 public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyDocumentIdMappingContext,
-		PojoMetadataContributor<PojoAugmentedModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
+		PojoMetadataContributor<PojoAdditionalMetadataCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
 	private BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder;
 
@@ -32,7 +32,7 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 	}
 
 	@Override
-	public void contributeModel(PojoAugmentedModelCollectorPropertyNode collector) {
+	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 

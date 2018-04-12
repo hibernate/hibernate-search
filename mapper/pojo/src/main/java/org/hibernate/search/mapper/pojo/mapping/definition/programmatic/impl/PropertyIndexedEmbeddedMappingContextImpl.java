@@ -16,12 +16,12 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
 public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext
 		implements PropertyIndexedEmbeddedMappingContext,
-		PojoMetadataContributor<PojoAugmentedModelCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
+		PojoMetadataContributor<PojoAdditionalMetadataCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
 	private String prefix;
 
@@ -38,7 +38,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public void contributeModel(PojoAugmentedModelCollectorPropertyNode collector) {
+	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 

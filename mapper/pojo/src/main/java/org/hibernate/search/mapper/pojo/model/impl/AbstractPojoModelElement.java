@@ -14,9 +14,9 @@ import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDepe
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -25,15 +25,15 @@ import org.hibernate.search.util.SearchException;
 
 abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 
-	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
+	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final Map<String, PojoModelNestedElement<V, ?>> properties = new HashMap<>();
-	private PojoAugmentedTypeModel augmentedTypeModel;
+	private PojoTypeAdditionalMetadata typeAdditionalMetadata;
 	private boolean propertiesInitialized = false;
 
 	private PojoModelElementAccessor<?> accessor;
 
-	AbstractPojoModelElement(PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
-		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
+	AbstractPojoModelElement(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 	}
 
 	@Override
@@ -63,12 +63,12 @@ abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 		return properties.computeIfAbsent( relativeName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
 			PojoPropertyModel<?> model = modelPathTypeNode.getTypeModel().getProperty( name );
-			PojoAugmentedPropertyModel augmentedModel = getAugmentedTypeModel().getProperty( name );
+			PojoPropertyAdditionalMetadata additionalMetadata = getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );
 			return new PojoModelNestedElement<>(
 					this,
 					modelPathTypeNode.property( model.getHandle() ),
-					augmentedModel,
-					augmentedTypeModelProvider
+					additionalMetadata,
+					typeAdditionalMetadataProvider
 			);
 		} );
 	}
@@ -105,10 +105,10 @@ abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 		return getModelPathTypeNode().getTypeModel();
 	}
 
-	private PojoAugmentedTypeModel getAugmentedTypeModel() {
-		if ( augmentedTypeModel == null ) {
-			augmentedTypeModel = augmentedTypeModelProvider.get( getModelPathTypeNode().getTypeModel().getRawType() );
+	private PojoTypeAdditionalMetadata getTypeAdditionalMetadata() {
+		if ( typeAdditionalMetadata == null ) {
+			typeAdditionalMetadata = typeAdditionalMetadataProvider.get( getModelPathTypeNode().getTypeModel().getRawType() );
 		}
-		return augmentedTypeModel;
+		return typeAdditionalMetadata;
 	}
 }

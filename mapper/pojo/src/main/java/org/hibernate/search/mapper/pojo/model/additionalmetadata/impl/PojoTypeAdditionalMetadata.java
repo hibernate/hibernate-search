@@ -4,23 +4,24 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.augmented.impl;
+package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
 import java.util.Map;
 
-public class PojoAugmentedTypeModel {
+public class PojoTypeAdditionalMetadata {
 	private final boolean entity;
-	private final Map<String, PojoAugmentedPropertyModel> properties;
+	private final Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata;
 
-	public PojoAugmentedTypeModel(boolean entity, Map<String, PojoAugmentedPropertyModel> properties) {
+	public PojoTypeAdditionalMetadata(boolean entity,
+			Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata) {
 		this.entity = entity;
-		this.properties = properties;
+		this.propertiesAdditionalMetadata = propertiesAdditionalMetadata;
 	}
 
 	/**
 	 * Determine whether the given type is an entity type.
 	 * <p>
-	 * Types marked as entity types are guaranteed by the augmented model contributors
+	 * Types marked as entity types are guaranteed by the contributors
 	 * to be the only types that can be the target of an association.
 	 * All other types are assumed to only be able to be embedded in other objects,
 	 * with their lifecycle completely tied to their embedding object.
@@ -33,11 +34,11 @@ public class PojoAugmentedTypeModel {
 		return entity;
 	}
 
-	public PojoAugmentedPropertyModel getProperty(String name) {
-		return properties.getOrDefault( name, PojoAugmentedPropertyModel.EMPTY );
+	public PojoPropertyAdditionalMetadata getPropertyAdditionalMetadata(String name) {
+		return propertiesAdditionalMetadata.getOrDefault( name, PojoPropertyAdditionalMetadata.EMPTY );
 	}
 
-	public Map<String, PojoAugmentedPropertyModel> getAugmentedProperties() {
-		return properties;
+	public Map<String, PojoPropertyAdditionalMetadata> getPropertiesAdditionalMetadata() {
+		return propertiesAdditionalMetadata;
 	}
 }

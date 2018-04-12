@@ -19,10 +19,10 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedValueModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -43,14 +43,14 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 public final class PojoAssociationPathInverter {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
+	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 
-	public PojoAssociationPathInverter(PojoAugmentedTypeModelProvider augmentedTypeModelProvider,
+	public PojoAssociationPathInverter(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder) {
-		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
+		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 	}
@@ -148,13 +148,13 @@ public final class PojoAssociationPathInverter {
 		PojoPropertyModel<?> lastPropertyModel = lastPropertyNode.getPropertyModel();
 		PojoTypeModel<?> lastTypeModel = lastTypeNode.getTypeModel();
 
-		PojoAugmentedTypeModel augmentedTypeModel =
-				augmentedTypeModelProvider.get( lastTypeModel.getRawType() );
-		PojoAugmentedPropertyModel augmentedPropertyModel =
-				augmentedTypeModel.getProperty( lastPropertyNode.getPropertyModel().getName() );
+		PojoTypeAdditionalMetadata typeAdditionalMetadata =
+				typeAdditionalMetadataProvider.get( lastTypeModel.getRawType() );
+		PojoPropertyAdditionalMetadata propertyAdditionalMetadata =
+				typeAdditionalMetadata.getPropertyAdditionalMetadata( lastPropertyNode.getPropertyModel().getName() );
 
-		// First try to query the augmented model with the explicit extractor path
-		Optional<PojoModelPathValueNode> result = augmentedPropertyModel.getValue( pathToInvert.getExtractorPath() )
+		// First try to query the additional metadata with the explicit extractor path
+		Optional<PojoModelPathValueNode> result = propertyAdditionalMetadata.getValueAdditionalMetadata( pathToInvert.getExtractorPath() )
 				.getInverseSidePath();
 		if ( result.isPresent() ) {
 			return result;
@@ -162,10 +162,10 @@ public final class PojoAssociationPathInverter {
 
 		if ( isDefaultExtractorPath( lastPropertyModel, pathToInvert.getBoundExtractorPath() ) ) {
 			/*
-			 * Since the extractor path was the default one, try to query the augmented model
+			 * Since the extractor path was the default one, try to query the additional metadata
 			 * with the implicit default extractor path.
 			 */
-			result = augmentedPropertyModel.getValue( ContainerValueExtractorPath.defaultExtractors() )
+			result = propertyAdditionalMetadata.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
 					.getInverseSidePath();
 		}
 
@@ -190,27 +190,27 @@ public final class PojoAssociationPathInverter {
 			List<PojoModelPathValueNode> associationPathsToMatch,
 			Set<PojoRawTypeModel<?>> encounteredAssociationHoldingTypes) {
 		PojoTypeModel<?> inverseSideTypeModel = inverseSidePathTypeNode.getTypeModel();
-		PojoAugmentedTypeModel augmentedInverseSideTypeModel =
-				augmentedTypeModelProvider.get( inverseSideTypeModel.getRawType() );
+		PojoTypeAdditionalMetadata inverseSideTypeAdditionalMetadata =
+				typeAdditionalMetadataProvider.get( inverseSideTypeModel.getRawType() );
 
-		for ( Map.Entry<String, PojoAugmentedPropertyModel> propertyEntry :
-				augmentedInverseSideTypeModel.getAugmentedProperties().entrySet() ) {
+		for ( Map.Entry<String, PojoPropertyAdditionalMetadata> propertyEntry :
+				inverseSideTypeAdditionalMetadata.getPropertiesAdditionalMetadata().entrySet() ) {
 			String inverseSidePropertyName = propertyEntry.getKey();
 			PojoPropertyModel<?> inverseSidePropertyModel = inverseSideTypeModel.getProperty( inverseSidePropertyName );
 			PropertyHandle propertyHandle = inverseSidePropertyModel.getHandle();
 			BoundPojoModelPathPropertyNode<?, ?> inverseSidePathPropertyNode =
 					inverseSidePathTypeNode.property( propertyHandle );
-			PojoAugmentedPropertyModel augmentedInverseSidePropertyModel = propertyEntry.getValue();
+			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata = propertyEntry.getValue();
 
-			for ( Map.Entry<ContainerValueExtractorPath, PojoAugmentedValueModel> valueEntry :
-					augmentedInverseSidePropertyModel.getAugmentedValues().entrySet() ) {
+			for ( Map.Entry<ContainerValueExtractorPath, PojoValueAdditionalMetadata> valueEntry :
+					inverseSidePropertyAdditionalMetadata.getValuesAdditionalMetadata().entrySet() ) {
 				ContainerValueExtractorPath inverseSideExtractorPath = valueEntry.getKey();
 				BoundPojoModelPathValueNode<?, ?, ?> inverseSidePathValueNode =
 						bindExtractors( inverseSidePathPropertyNode, inverseSideExtractorPath );
-				PojoAugmentedValueModel augmentedInverseSideValueModel = valueEntry.getValue();
+				PojoValueAdditionalMetadata inverseSideValueAdditionalMetadata = valueEntry.getValue();
 
 				Optional<PojoModelPathValueNode> candidatePathOptional =
-						augmentedInverseSideValueModel.getInverseSidePath();
+						inverseSideValueAdditionalMetadata.getInverseSidePath();
 
 				PojoRawTypeModel<?> rawExtractedTypeModel =
 						inverseSidePathValueNode.type().getTypeModel().getRawType();
@@ -230,7 +230,7 @@ public final class PojoAssociationPathInverter {
 					}
 				}
 
-				if ( augmentedInverseSideValueModel.isAssociationEmbedded() ) {
+				if ( inverseSideValueAdditionalMetadata.isAssociationEmbedded() ) {
 					if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
 						throw log.infiniteRecursionForAssociationEmbeddeds(
 								inverseSidePathValueNode.getRootType().getRawType(),

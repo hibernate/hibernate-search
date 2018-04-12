@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.augmented.building.spi;
+package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 
-public interface PojoAugmentedModelCollectorTypeNode extends PojoAugmentedModelCollector {
+public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalMetadataCollector {
 
 	/**
 	 * Mark this type as an entity type.
@@ -21,10 +21,10 @@ public interface PojoAugmentedModelCollectorTypeNode extends PojoAugmentedModelC
 	 * entity subtype not being detected (because only its supertype is mentioned in the schema of indexed entities),
 	 * which could result in incomplete automatic reindexing.
 	 *
-	 * @see PojoAugmentedTypeModel#isEntity()
+	 * @see PojoTypeAdditionalMetadata#isEntity()
 	 */
 	void markAsEntity();
 
-	PojoAugmentedModelCollectorPropertyNode property(String propertyName);
+	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
 
 }

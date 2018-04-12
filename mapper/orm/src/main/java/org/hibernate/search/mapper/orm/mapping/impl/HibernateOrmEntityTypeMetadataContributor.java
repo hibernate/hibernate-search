@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
 final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadataContributor {
 	private final List<PojoTypeMetadataContributor> delegates;
@@ -20,7 +20,7 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 	}
 
 	@Override
-	public void contributeModel(PojoAugmentedModelCollectorTypeNode collector) {
+	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
 		collector.markAsEntity();
 		for ( PojoTypeMetadataContributor delegate : delegates ) {
 			delegate.contributeModel( collector );

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDepe
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -22,8 +22,8 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelElement<P>
 	private final BoundPojoModelPathValueNode<?, P, P> modelPath;
 
 	public PojoModelPropertyRootElement(BoundPojoModelPathPropertyNode<?, P> modelPath,
-			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
-		super( augmentedTypeModelProvider );
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+		super( typeAdditionalMetadataProvider );
 		this.modelPath = modelPath.valueWithoutExtractors();
 	}
 

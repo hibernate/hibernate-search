@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 final class HibernateOrmAssociationInverseSideMetadataContributor implements PojoTypeMetadataContributor {
@@ -25,7 +25,7 @@ final class HibernateOrmAssociationInverseSideMetadataContributor implements Poj
 	}
 
 	@Override
-	public void contributeModel(PojoAugmentedModelCollectorTypeNode collector) {
+	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
 		collector.property( propertyName ).value( extractorPath ).associationInverseSide( inverseSideValuePath );
 	}
 

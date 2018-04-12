@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtrac
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -52,16 +52,16 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final BridgeResolver bridgeResolver;
-	private final PojoAugmentedTypeModelProvider augmentedTypeModelProvider;
+	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 
 	PojoIndexModelBinderImpl(BuildContext buildContext, PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
-			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.buildContext = buildContext;
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;
-		this.augmentedTypeModelProvider = augmentedTypeModelProvider;
+		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		RoutingKeyBridge bridge = builder.build( buildContext );
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, augmentedTypeModelProvider );
+				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		bridge.bind( pojoModelRootElement );
 
 		bindingContext.explicitRouting();
@@ -127,7 +127,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, augmentedTypeModelProvider );
+				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		bridge.bind(
 				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
 		);
@@ -150,7 +150,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
-				new PojoModelPropertyRootElement<>( modelPath, augmentedTypeModelProvider );
+				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		bridge.bind(
 				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
 		);

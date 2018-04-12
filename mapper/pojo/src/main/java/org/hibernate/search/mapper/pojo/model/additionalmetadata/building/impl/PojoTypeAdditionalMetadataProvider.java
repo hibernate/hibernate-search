@@ -4,32 +4,32 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.augmented.building.impl;
+package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedTypeModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public class PojoAugmentedTypeModelProvider {
+public class PojoTypeAdditionalMetadataProvider {
 
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
-	private final Map<PojoRawTypeModel<?>, PojoAugmentedTypeModel> cache = new HashMap<>();
+	private final Map<PojoRawTypeModel<?>, PojoTypeAdditionalMetadata> cache = new HashMap<>();
 
-	public PojoAugmentedTypeModelProvider(
+	public PojoTypeAdditionalMetadataProvider(
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
-	public PojoAugmentedTypeModel get(PojoRawTypeModel<?> typeModel) {
-		return cache.computeIfAbsent( typeModel, this::createAugmentedTypeModel );
+	public PojoTypeAdditionalMetadata get(PojoRawTypeModel<?> typeModel) {
+		return cache.computeIfAbsent( typeModel, this::createTypeAdditionalMetadata );
 	}
 
-	private PojoAugmentedTypeModel createAugmentedTypeModel(PojoRawTypeModel<?> typeModel) {
-		PojoAugmentedTypeModelBuilder builder = new PojoAugmentedTypeModelBuilder();
+	private PojoTypeAdditionalMetadata createTypeAdditionalMetadata(PojoRawTypeModel<?> typeModel) {
+		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder();
 		modelContributorProvider.forEach( typeModel, c -> c.contributeModel( builder ) );
 		return builder.build();
 	}

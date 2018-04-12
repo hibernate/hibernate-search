@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.augmented.building.impl;
+package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorValueNode;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedValueModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-class PojoAugmentedValueModelBuilder implements PojoAugmentedModelCollectorValueNode {
+class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorValueNode {
 	private PojoModelPathValueNode inverseSidePath;
 	private boolean associationEmbedded = false;
 
@@ -24,7 +24,7 @@ class PojoAugmentedValueModelBuilder implements PojoAugmentedModelCollectorValue
 		this.associationEmbedded = true;
 	}
 
-	PojoAugmentedValueModel build() {
-		return new PojoAugmentedValueModel( inverseSidePath, associationEmbedded );
+	PojoValueAdditionalMetadata build() {
+		return new PojoValueAdditionalMetadata( inverseSidePath, associationEmbedded );
 	}
 }

@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.augmented.building.spi.PojoAugmentedModelCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public class AssociationInverseSideMappingContextImpl
 		extends DelegatingPropertyMappingContext
 		implements AssociationInverseSideMappingContext,
-		PojoMetadataContributor<PojoAugmentedModelCollectorPropertyNode, PojoMappingCollector> {
+		PojoMetadataContributor<PojoAdditionalMetadataCollectorPropertyNode, PojoMappingCollector> {
 
 	private final PojoModelPathValueNode inversePath;
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
@@ -32,7 +32,7 @@ public class AssociationInverseSideMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoAugmentedModelCollectorPropertyNode collector) {
+	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		collector.value( extractorPath ).associationInverseSide( inversePath );
 	}
 

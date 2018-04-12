@@ -13,8 +13,8 @@ import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDepe
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.augmented.building.impl.PojoAugmentedTypeModelProvider;
-import org.hibernate.search.mapper.pojo.model.augmented.impl.PojoAugmentedPropertyModel;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -25,20 +25,20 @@ class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implement
 
 	private final AbstractPojoModelElement<T> parent;
 	private final BoundPojoModelPathValueNode<T, P, P> modelPath;
-	private final PojoAugmentedPropertyModel augmentedPropertyModel;
+	private final PojoPropertyAdditionalMetadata propertyAdditionalMetadata;
 
 	PojoModelNestedElement(AbstractPojoModelElement<T> parent, BoundPojoModelPathPropertyNode<T, P> modelPath,
-			PojoAugmentedPropertyModel augmentedPropertyModel,
-			PojoAugmentedTypeModelProvider augmentedTypeModelProvider) {
-		super( augmentedTypeModelProvider );
+			PojoPropertyAdditionalMetadata propertyAdditionalMetadata,
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+		super( typeAdditionalMetadataProvider );
 		this.parent = parent;
 		this.modelPath = modelPath.valueWithoutExtractors();
-		this.augmentedPropertyModel = augmentedPropertyModel;
+		this.propertyAdditionalMetadata = propertyAdditionalMetadata;
 	}
 
 	@Override
 	public <M> Stream<M> markers(Class<M> markerType) {
-		return augmentedPropertyModel.getMarkers( markerType );
+		return propertyAdditionalMetadata.getMarkers( markerType );
 	}
 
 	@Override
