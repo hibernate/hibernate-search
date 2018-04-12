@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
-class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
+class IndexSchemaRootTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 
 	private RoutingType routing = null;
 
@@ -25,12 +25,12 @@ class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 		return null;
 	}
 
-	protected TypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
+	protected RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
 		ElasticsearchIndexSchemaObjectNode node = ElasticsearchIndexSchemaObjectNode.root();
 
 		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), node ) );
 
-		TypeMapping mapping = new TypeMapping();
+		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {
 			mapping.setRouting( routing );
 		}

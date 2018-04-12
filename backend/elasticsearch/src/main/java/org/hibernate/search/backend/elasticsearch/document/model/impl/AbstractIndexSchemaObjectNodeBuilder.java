@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexObjectFieldAccessor;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -52,7 +52,7 @@ abstract class AbstractIndexSchemaObjectNodeBuilder {
 		}
 	}
 
-	final void contributeChildren(TypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
+	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
 			ElasticsearchIndexSchemaNodeCollector collector) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> entry : content.entrySet() ) {
 			String propertyName = entry.getKey();

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 
 /**
  * @author Yoann Rodiere
@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.T
 public class ElasticsearchIndexModel {
 
 	private final URLEncodedString indexName;
-	private final TypeMapping mapping;
+	private final RootTypeMapping mapping;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class ElasticsearchIndexModel {
 		return indexName;
 	}
 
-	public TypeMapping getMapping() {
+	public RootTypeMapping getMapping() {
 		return mapping;
 	}
 

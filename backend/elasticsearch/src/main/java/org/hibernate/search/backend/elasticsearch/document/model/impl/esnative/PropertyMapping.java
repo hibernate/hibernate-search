@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -26,7 +25,7 @@ import com.google.gson.annotations.SerializedName;
  * updated whenever fields of this class are added, renamed or removed.
  */
 @JsonAdapter(PropertyMappingJsonAdapterFactory.class)
-public class PropertyMapping extends TypeMapping {
+public class PropertyMapping extends AbstractTypeMapping {
 
 	private DataType type;
 
@@ -194,10 +193,4 @@ public class PropertyMapping extends TypeMapping {
 	public void setFieldData(FieldDataType fieldData) {
 		this.fieldData = fieldData;
 	}
-
-	@Override
-	public String toString() {
-		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
-	}
-
 }
