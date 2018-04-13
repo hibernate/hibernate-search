@@ -52,37 +52,37 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
-	private final PojoIndexingDependencyCollectorTypeNode<?> entityAncestor;
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromEntity;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode;
+	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
 
 	// First key: inverse side entity type, second key: original side concrete entity type
 	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
-	PojoIndexingDependencyCollectorValueNode(BoundPojoModelPathValueNode<?, P, V> modelPath,
-			PojoIndexingDependencyCollectorTypeNode<?> entityAncestor,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromEntity,
+	PojoIndexingDependencyCollectorValueNode(BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
+			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
+			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.modelPath = modelPath;
-		this.entityAncestor = entityAncestor;
-		this.modelPathFromEntity = modelPathFromEntity;
+		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
+		this.lastEntityNode = lastEntityNode;
+		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 	}
 
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
-				this, modelPath.type(), entityAncestor, modelPathFromEntity.type(), buildingHelper
+				this, modelPathFromRootEntityNode.type(), lastEntityNode, modelPathFromLastEntityNode.type(), buildingHelper
 		);
 	}
 
 	public void collectDependency() {
 		// TODO pass the path to the value somehow, so as to support fine-grained dirty checking
-		entityAncestor.collectDependency();
+		lastEntityNode.collectDependency();
 	}
 
 	PojoTypeModel<V> getTypeModel() {
-		return modelPath.type().getTypeModel();
+		return modelPathFromRootEntityNode.type().getTypeModel();
 	}
 
 	/**
@@ -92,11 +92,11 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNodeBuilder) {
 		PojoTypeModel<?> inverseSideEntityType = typeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
-		PojoTypeModel<V> expectedInverseSideEntityType = modelPath.type().getTypeModel();
+		PojoTypeModel<V> expectedInverseSideEntityType = modelPathFromRootEntityNode.type().getTypeModel();
 		PojoRawTypeModel<?> expectedInverseSideEntityRawType = expectedInverseSideEntityType.getRawType();
 		if ( !inverseSideRawEntityType.isSubTypeOf( expectedInverseSideEntityRawType ) ) {
 			throw new AssertionFailure(
-					"Error while building the automatic reindexing resolver at path " + modelPath
+					"Error while building the automatic reindexing resolver at path " + modelPathFromRootEntityNode
 							+ ": the dependency collector was passed a resolver builder with incorrect type; "
 							+ " got " + inverseSideRawEntityType + ", but a subtype of " + expectedInverseSideEntityRawType
 							+ " was expected."
@@ -119,7 +119,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
-				PojoTypeModel<?> originalSideEntityType = entityAncestor.getTypeModel();
+				PojoTypeModel<?> originalSideEntityType = lastEntityNode.getTypeModel();
 				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.getRawType();
 
 				result = new HashMap<>();
@@ -127,14 +127,14 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				for ( PojoRawTypeModel<?> concreteEntityType :
 						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {
 					BoundPojoModelPathValueNode<?, ?, ?> modelPathFromConcreteEntitySubType =
-							applyProcessingPathToSubType( concreteEntityType, modelPathFromEntity );
+							applyProcessingPathToSubType( concreteEntityType, modelPathFromLastEntityNode );
 					PojoModelPathValueNode inverseAssociationPath = buildingHelper.getPathInverter()
 							.invertPath( inverseSideEntityType, modelPathFromConcreteEntitySubType )
 							.orElse( null );
 					if ( inverseAssociationPath == null ) {
 						throw log.cannotInvertAssociation(
 								inverseSideRawEntityType, concreteEntityType,
-								modelPathFromEntity.toUnboundPath()
+								modelPathFromLastEntityNode.toUnboundPath()
 						);
 					}
 
@@ -190,13 +190,13 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		catch (RuntimeException e) {
 			throw log.cannotApplyInvertAssociationPath(
 					inverseSideRawEntityType, inverseAssociationPath,
-					originalSideRawConcreteEntityType, modelPathFromEntity.toUnboundPath(),
+					originalSideRawConcreteEntityType, modelPathFromLastEntityNode.toUnboundPath(),
 					e.getMessage(), e
 			);
 		}
 
 		// Recurse if necessary
-		PojoIndexingDependencyCollectorValueNode<?, ?> entityNodeParentValueNode = entityAncestor.getParent();
+		PojoIndexingDependencyCollectorValueNode<?, ?> entityNodeParentValueNode = lastEntityNode.getParentNode();
 		if ( entityNodeParentValueNode != null ) {
 			/*
 			 * We did not reach the indexed type yet.

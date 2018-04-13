@@ -23,74 +23,74 @@ import org.hibernate.search.util.AssertionFailure;
  */
 public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoIndexingDependencyCollectorNode {
 
-	private final PojoIndexingDependencyCollectorValueNode<?, T> parent;
-	private final BoundPojoModelPathTypeNode<T> modelPath;
-	private final PojoIndexingDependencyCollectorTypeNode<?> entityAncestor;
-	private final BoundPojoModelPathTypeNode<T> modelPathFromEntity;
+	private final PojoIndexingDependencyCollectorValueNode<?, T> parentNode;
+	private final BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode;
+	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
+	private final BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode;
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.parent = null;
-		this.modelPath = BoundPojoModelPath.root( typeModel );
-		this.entityAncestor = this;
-		this.modelPathFromEntity = modelPath;
+		this.parentNode = null;
+		this.modelPathFromRootEntityNode = BoundPojoModelPath.root( typeModel );
+		this.lastEntityNode = this;
+		this.modelPathFromLastEntityNode = modelPathFromRootEntityNode;
 	}
 
-	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parent,
-			BoundPojoModelPathTypeNode<T> modelPath,
-			PojoIndexingDependencyCollectorTypeNode<?> entityAncestor,
-			BoundPojoModelPathTypeNode<T> modelPathFromEntity,
+	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parentNode,
+			BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode,
+			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
+			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.parent = parent;
-		this.modelPath = modelPath;
-		if ( buildingHelper.isEntity( modelPath.getTypeModel().getRawType() ) ) {
-			this.entityAncestor = this;
-			this.modelPathFromEntity = BoundPojoModelPath.root( modelPath.getTypeModel() );
+		this.parentNode = parentNode;
+		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
+		if ( buildingHelper.isEntity( modelPathFromRootEntityNode.getTypeModel().getRawType() ) ) {
+			this.lastEntityNode = this;
+			this.modelPathFromLastEntityNode = BoundPojoModelPath.root( modelPathFromRootEntityNode.getTypeModel() );
 		}
 		else {
-			this.entityAncestor = entityAncestor;
-			this.modelPathFromEntity = modelPathFromEntity;
+			this.lastEntityNode = lastEntityNode;
+			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
 	}
 
 	/*
-	 * modelPath and modelPathFromEntity represent the same type,
-	 * so applying the same property handle results in the same property type.
+	 * modelPathFromRootEntityNode and modelPathFromLastEntityNode reference the same type, just from a different root.
+	 * Thus applying the same property handle results in the same property type.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
-				modelPath.property( propertyHandle ),
-				entityAncestor,
-				(BoundPojoModelPathPropertyNode) modelPathFromEntity.property( propertyHandle ),
+				modelPathFromRootEntityNode.property( propertyHandle ),
+				lastEntityNode,
+				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyHandle ),
 				buildingHelper
 		);
 	}
 
 	void collectDependency() {
-		if ( entityAncestor != this ) {
+		if ( lastEntityNode != this ) {
 			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
 		}
-		if ( parent != null ) {
+		if ( parentNode != null ) {
 			// This node has an entity type: mark the root for reindexing whenever this node is changed.
-			PojoRawTypeModel<? super T> rawType = modelPath.getTypeModel().getRawType();
+			PojoRawTypeModel<? super T> rawType = modelPathFromRootEntityNode.getTypeModel().getRawType();
 			for ( PojoRawTypeModel<?> concreteEntityType :
 					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
 				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType );
-				parent.markForReindexing( builder );
+				parentNode.markForReindexing( builder );
 			}
 		}
 	}
 
-	PojoIndexingDependencyCollectorValueNode<?, T> getParent() {
-		return parent;
+	PojoIndexingDependencyCollectorValueNode<?, T> getParentNode() {
+		return parentNode;
 	}
 
 	PojoTypeModel<T> getTypeModel() {
-		return modelPath.getTypeModel();
+		return modelPathFromRootEntityNode.getTypeModel();
 	}
 
 }
