@@ -29,10 +29,11 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
 			PojoBootstrapIntrospector introspector,
+			boolean implicitProvidedId,
 			boolean annotatedTypeDiscoveryEnabled) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mapperFactory = new PojoMapperFactory<>(
-				mappingKey, mappingFactory, introspector, annotatedTypeDiscoveryEnabled
+				mappingKey, mappingFactory, introspector, implicitProvidedId
 		);
 		this.introspector = introspector;
 

@@ -35,7 +35,8 @@ public final class JavaBeanMappingContributor extends PojoMappingContributorImpl
 		super(
 				mappingRepositoryBuilder, new JavaBeanMappingKey(),
 				new JavaBeanMappingFactory(),
-				introspector, annotatedTypeDiscoveryEnabled
+				introspector, false,
+				annotatedTypeDiscoveryEnabled
 		);
 	}
 }

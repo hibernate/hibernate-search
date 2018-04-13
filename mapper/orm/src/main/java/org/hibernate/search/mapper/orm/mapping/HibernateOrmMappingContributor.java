@@ -38,7 +38,8 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 		super(
 				mappingRepositoryBuilder, new HibernateOrmMappingKey(),
 				new HibernateOrmMappingFactory( sessionFactoryImplementor ),
-				introspector, annotatedTypeDiscoveryEnabled
+				introspector, false,
+				annotatedTypeDiscoveryEnabled
 		);
 	}
 
