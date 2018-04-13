@@ -9,7 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 /**
- * @author Yoann Rodiere
+ * @param <I> The identifier type for the mapped entity type.
+ * @param <E> The entity type mapped to an index.
  */
 public interface IdentifierMapping<I, E> extends AutoCloseable {
 

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 
 /**
- * @author Yoann Rodiere
+ * @param <D> The expected document type.
  */
 public interface DocumentContributor<D> {
 

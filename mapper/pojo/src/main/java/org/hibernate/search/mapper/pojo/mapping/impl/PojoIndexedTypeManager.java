@@ -22,6 +22,11 @@ import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
+/**
+ * @param <I> The identifier type for the mapped entity type.
+ * @param <E> The entity type mapped to the index.
+ * @param <D> The document type for the index.
+ */
 public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements AutoCloseable, ToStringTreeAppendable {
 
 	private final Class<E> indexedJavaClass;

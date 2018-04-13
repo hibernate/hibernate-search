@@ -17,6 +17,11 @@ import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
+/**
+ * @param <I> The identifier type for the mapped entity type.
+ * @param <E> The entity type mapped to the index.
+ * @param <D> The document type for the index.
+ */
 class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;

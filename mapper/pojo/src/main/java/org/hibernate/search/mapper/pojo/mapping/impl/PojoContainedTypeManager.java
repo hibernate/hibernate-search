@@ -16,6 +16,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
+/**
+ * @param <E> The contained entity type.
+ */
 public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeAppendable {
 
 	private final Class<E> javaClass;

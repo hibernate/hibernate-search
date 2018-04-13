@@ -13,6 +13,9 @@ import java.util.function.Supplier;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
+/**
+ * @param <E> The contained entity type.
+ */
 class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 
 	private final PojoContainedTypeManager<E> typeManager;

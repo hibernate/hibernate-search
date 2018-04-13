@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 /**
- * @author Yoann Rodiere
+ * @param <E> The entity type mapped to an index.
  */
 public interface RoutingKeyProvider<E> extends AutoCloseable {
 
