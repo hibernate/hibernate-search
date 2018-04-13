@@ -66,6 +66,7 @@
         <version.compiler.plugin>3.7.0</version.compiler.plugin>
         <version.dependency.plugin>3.0.2</version.dependency.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
+        <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
         <version.forbiddenapis.plugin>2.4.1</version.forbiddenapis.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
@@ -106,6 +107,10 @@
         <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+
+        <!-- Eclipse plugin options -->
+
+        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     </properties>
 
     <dependencyManagement>
@@ -560,6 +565,119 @@
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>eclipse</id>
+            <activation>
+                <property>
+                    <!-- This is a trick to have the profile automatically activated by Eclipse -->
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <!--
+                                This plugin's configuration is used in m2e only.
+                                We want to configure this in a separate profile because the plugin doesn't really exist
+                                and Maven will complain because it doesn't find it if executed outside of Eclipse.
+                             -->
+                            <groupId>org.eclipse.m2e</groupId>
+                            <artifactId>lifecycle-mapping</artifactId>
+                            <version>${version.org.eclipse.m2e.lifecycle-mapping}</version>
+                            <configuration>
+                                <lifecycleMappingMetadata>
+                                    <pluginExecutions>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-dependency-plugin</artifactId>
+                                                <versionRange>[2.1,)</versionRange>
+                                                <goals>
+                                                    <goal>unpack</goal>
+                                                    <goal>unpack-dependencies</goal>
+                                                    <goal>build-classpath</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.apache.felix</groupId>
+                                                <artifactId>maven-bundle-plugin</artifactId>
+                                                <versionRange>[2.3.7,)</versionRange>
+                                                <goals>
+                                                    <goal>manifest</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.apache.servicemix.tooling</groupId>
+                                                <artifactId>depends-maven-plugin</artifactId>
+                                                <versionRange>[1.2,)</versionRange>
+                                                <goals>
+                                                    <goal>generate-depends-file</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.codehaus.mojo</groupId>
+                                                <artifactId>build-helper-maven-plugin</artifactId>
+                                                <versionRange>[1.9.1,)</versionRange>
+                                                <goals>
+                                                    <goal>parse-version</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>de.thetaphi</groupId>
+                                                <artifactId>forbiddenapis</artifactId>
+                                                <versionRange>[1.8,)</versionRange>
+                                                <goals>
+                                                    <goal>check</goal>
+                                                    <goal>testCheck</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.wildfly.build</groupId>
+                                                <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
+                                                <versionRange>[1.2.6.Final,)</versionRange>
+                                                <goals>
+                                                    <goal>build</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore />
+                                            </action>
+                                        </pluginExecution>
+                                    </pluginExecutions>
+                                </lifecycleMappingMetadata>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
