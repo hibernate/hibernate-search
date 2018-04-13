@@ -20,7 +20,10 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-
+/**
+ * @param <T> The type holding the property.
+ * @param <P> The type of the property.
+ */
 class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implements PojoModelProperty {
 
 	private final AbstractPojoModelElement<T> parent;

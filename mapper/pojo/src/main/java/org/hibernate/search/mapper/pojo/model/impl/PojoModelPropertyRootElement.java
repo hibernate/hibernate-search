@@ -17,6 +17,9 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
+/**
+ * @param <P> The type of the property used as a root element.
+ */
 public class PojoModelPropertyRootElement<P> extends AbstractPojoModelElement<P> implements PojoModelProperty {
 
 	private final BoundPojoModelPathValueNode<?, P, P> modelPath;

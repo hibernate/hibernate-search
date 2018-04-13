@@ -10,7 +10,10 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-class PojoModelPropertyElementAccessor<T> implements PojoModelElementAccessor<T> {
+/**
+ * @param <P> The type of the property.
+ */
+class PojoModelPropertyElementAccessor<P> implements PojoModelElementAccessor<P> {
 
 	private final PojoModelElementAccessor<?> parent;
 	private final PropertyHandle handle;
@@ -21,10 +24,10 @@ class PojoModelPropertyElementAccessor<T> implements PojoModelElementAccessor<T>
 	}
 
 	@Override
-	public T read(PojoElement bridgedElement) {
+	public P read(PojoElement bridgedElement) {
 		Object parentValue = parent.read( bridgedElement );
 		if ( parentValue != null ) {
-			return (T) handle.get( parentValue );
+			return (P) handle.get( parentValue );
 		}
 		else {
 			return null;
