@@ -27,7 +27,7 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 		Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> immutablePropertyNodes =
 				buildPropertyNodes();
 
-		boolean markForReindexing = isMarkForReindexing();
+		boolean markForReindexing = isShouldMarkForReindexing();
 
 		if ( !markForReindexing && immutablePropertyNodes.isEmpty() ) {
 			/*

@@ -217,7 +217,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			for ( PojoRawTypeModel<?> concreteEntityType : valueNodeTypeConcreteEntitySubTypes ) {
 				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseValueTypeBuilder =
 						valueNodeBuilderDelegate.type( concreteEntityType );
-				inverseValueTypeBuilder.markForReindexing();
+				inverseValueTypeBuilder.setShouldMarkForReindexing();
 			}
 		}
 	}

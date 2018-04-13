@@ -26,7 +26,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
 			new HashMap<>();
 
-	private boolean markForReindexing = false;
+	private boolean shouldMarkForReindexing = false;
 
 	AbstractPojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
@@ -47,14 +47,14 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		return getOrCreatePropertyBuilder( propertyName );
 	}
 
-	void markForReindexing() {
-		markForReindexing = true;
+	void setShouldMarkForReindexing() {
+		shouldMarkForReindexing = true;
 	}
 
 	abstract Optional<PojoImplicitReindexingResolver<T>> build();
 
-	final boolean isMarkForReindexing() {
-		return markForReindexing;
+	final boolean isShouldMarkForReindexing() {
+		return shouldMarkForReindexing;
 	}
 
 	final Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> buildPropertyNodes() {

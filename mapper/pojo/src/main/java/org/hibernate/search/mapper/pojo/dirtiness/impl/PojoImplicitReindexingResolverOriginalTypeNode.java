@@ -21,19 +21,19 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImplicitReindexingResolver<T> {
 
-	private final boolean markForReindexing;
+	private final boolean shouldMarkForReindexing;
 	private final Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> propertyNodes;
 
-	public PojoImplicitReindexingResolverOriginalTypeNode(boolean markForReindexing,
+	public PojoImplicitReindexingResolverOriginalTypeNode(boolean shouldMarkForReindexing,
 			Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> propertyNodes) {
-		this.markForReindexing = markForReindexing;
+		this.shouldMarkForReindexing = shouldMarkForReindexing;
 		this.propertyNodes = propertyNodes;
 	}
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "markForReindexing", markForReindexing );
+		builder.attribute( "shouldMarkForReindexing", shouldMarkForReindexing );
 		builder.startList( "propertyNodes" );
 		for ( PojoImplicitReindexingResolverPropertyNode<?, ?> node : propertyNodes ) {
 			builder.value( node );
@@ -44,7 +44,7 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImpli
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty) {
-		if ( markForReindexing ) {
+		if ( shouldMarkForReindexing ) {
 			collector.markForReindexing( dirty );
 		}
 		for ( PojoImplicitReindexingResolverPropertyNode<? super T, ?> node : propertyNodes ) {

@@ -26,14 +26,14 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImplicitReindexingResolver<T> {
 
 	private final PojoCaster<? super U> caster;
-	private final boolean markForReindexing;
+	private final boolean shouldMarkForReindexing;
 	private final Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> propertyNodes;
 
 	public PojoImplicitReindexingResolverCastedTypeNode(PojoCaster<? super U> caster,
-			boolean markForReindexing,
+			boolean shouldMarkForReindexing,
 			Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> propertyNodes) {
 		this.caster = caster;
-		this.markForReindexing = markForReindexing;
+		this.shouldMarkForReindexing = shouldMarkForReindexing;
 		this.propertyNodes = propertyNodes;
 	}
 
@@ -41,7 +41,7 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "caster", caster );
-		builder.attribute( "markForReindexing", markForReindexing );
+		builder.attribute( "shouldMarkForReindexing", shouldMarkForReindexing );
 		builder.startList( "propertyNodes" );
 		for ( PojoImplicitReindexingResolverPropertyNode<?, ?> propertyNode : propertyNodes ) {
 			builder.value( propertyNode );
@@ -55,7 +55,7 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty) {
 		U castedDirty = (U) caster.castOrNull( runtimeIntrospector.unproxy( dirty ) );
 		if ( castedDirty != null ) {
-			if ( markForReindexing ) {
+			if ( shouldMarkForReindexing ) {
 				collector.markForReindexing( castedDirty );
 			}
 			for ( PojoImplicitReindexingResolverPropertyNode<? super U, ?> propertyNode : propertyNodes ) {
