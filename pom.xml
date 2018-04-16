@@ -34,6 +34,7 @@
         <module>mapper/orm</module>
         <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
+        <module>documentation</module>
         <module>reports</module>
     </modules>
 
@@ -90,6 +91,14 @@
             check for regressions. Which is obviously good for us, too.
          -->
         <puppycrawl.checkstyle.version>8.8</puppycrawl.checkstyle.version>
+
+        <!-- Asciidoctor -->
+
+        <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.jruby>9.1.15.0</version.org.jruby>
+        <version.org.asciidoctor.asciidoctorj>1.5.6</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.16</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Build settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

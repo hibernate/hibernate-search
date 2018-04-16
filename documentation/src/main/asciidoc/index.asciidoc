@@ -1,0 +1,23 @@
+= Hibernate Search {hibernateSearchVersion}: Reference Documentation
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:docinfodir: {docinfodir}
+:docinfo:
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+
+include::preface.asciidoc[]
+
+:numbered:
+
+include::getting-started.asciidoc[]
+
+TODO: other top-level sections
+
+include::internals.asciidoc[]
+
+include::further-reading.asciidoc[]
+
+include::credits.asciidoc[]

@@ -1,0 +1,7 @@
+[[internals]]
+== Internals of Hibernate Search
+
+This section is intended for new Hibernate Search contributors looking for an introduction
+to how Hibernate Search works.
+
+TODO
