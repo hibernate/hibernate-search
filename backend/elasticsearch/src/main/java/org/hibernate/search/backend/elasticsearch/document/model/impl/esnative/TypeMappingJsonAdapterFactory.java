@@ -21,7 +21,7 @@ public class TypeMappingJsonAdapterFactory extends AbstractConfiguredExtraProper
 	@Override
 	protected <T> void addFields(Builder<T> builder) {
 		builder.add( "properties", PROPERTY_MAP_TYPE_TOKEN );
-		builder.add( "dynamic", boolean.class );
+		builder.add( "dynamic", DynamicType.class );
 		builder.add( "routing", RoutingType.class );
 	}
 
