@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
@@ -59,6 +60,9 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 				break;
 		}
 		mapping.setType( dataType );
+
+		// TODO allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
+		mapping.setDynamic( DynamicType.STRICT );
 
 		contributeChildren( mapping, node, collector );
 

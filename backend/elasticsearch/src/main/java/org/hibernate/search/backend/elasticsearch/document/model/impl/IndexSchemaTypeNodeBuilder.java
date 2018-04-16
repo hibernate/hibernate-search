@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.TypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -33,6 +34,9 @@ class IndexSchemaTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
 		if ( routing != null ) {
 			mapping.setRouting( routing );
 		}
+
+		// TODO allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
+		mapping.setDynamic( DynamicType.STRICT );
 
 		contributeChildren( mapping, node, collector );
 
