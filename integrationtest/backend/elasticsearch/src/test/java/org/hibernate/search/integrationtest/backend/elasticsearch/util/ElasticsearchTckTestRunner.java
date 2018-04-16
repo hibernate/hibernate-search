@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
  *<p>Adapt the classpath filter as needed to run a single test or an entire test package.
  *
  * <p>Running such tests from the IDE will require having an Elasticsearch
- * node running. You can easily start one by running 'mvn elasticsearch:runforked -Des.wait=true'
+ * node running. You can easily start one by running 'mvn elasticsearch:runforked -Des.setAwait=true'
  * from this module's directory.
  *
  * @author Gunnar Morling
