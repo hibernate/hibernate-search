@@ -36,24 +36,24 @@ public class StubLuceneIndexWorkOrchestrator implements LuceneIndexWorkOrchestra
 
 	@Override
 	public synchronized <T> CompletableFuture<T> submit(LuceneIndexWork<T> work) {
-		// Ignore errors in unrelated changesets
-		latestFuture = latestFuture.exceptionally( ignore -> null );
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
 				ignored -> work.execute( context )
 		) );
-		latestFuture = future;
+		// Ignore errors in future changesets and during close(): error handling is the client's responsibility.
+		latestFuture = future.exceptionally( ignore -> null );
 		return future;
 	}
 
 	@Override
 	public synchronized CompletableFuture<?> submit(List<LuceneIndexWork<?>> works) {
-		// Ignore errors in unrelated changesets
-		latestFuture = latestFuture.exceptionally( ignore -> null );
+		CompletableFuture<?> future = latestFuture;
 		for ( LuceneIndexWork<?> work : works ) {
-			latestFuture = latestFuture.thenCompose( Futures.safeComposer(
+			future = future.thenCompose( Futures.safeComposer(
 					ignored -> work.execute( context )
 			) );
 		}
-		return latestFuture;
+		// Ignore errors in future changesets and during close(): error handling is the client's responsibility.
+		latestFuture = future.exceptionally( ignore -> null );
+		return future;
 	}
 }
