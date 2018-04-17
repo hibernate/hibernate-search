@@ -25,7 +25,7 @@ public class StubMetadataContributor implements MetadataContributor {
 	public StubMetadataContributor(SearchMappingRepositoryBuilder searchBuilder, boolean multiTenancyEnabled) {
 		this.searchBuilder = searchBuilder;
 		this.mapperFactory = new StubMapperFactory( multiTenancyEnabled );
-		searchBuilder.addMapping( this );
+		searchBuilder.addMetadataContributor( this );
 	}
 
 	public void add(String typeIdentifier, String indexName, Consumer<IndexModelBindingContext> mappingContributor) {

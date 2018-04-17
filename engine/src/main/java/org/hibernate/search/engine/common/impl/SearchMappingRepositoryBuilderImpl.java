@@ -78,8 +78,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder addMapping(MetadataContributor mappingContributor) {
-		contributors.add( mappingContributor );
+	public SearchMappingRepositoryBuilder addMetadataContributor(MetadataContributor contributor) {
+		contributors.add( contributor );
 		return this;
 	}
 

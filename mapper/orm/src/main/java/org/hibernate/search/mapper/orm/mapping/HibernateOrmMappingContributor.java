@@ -53,7 +53,7 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 				annotatedTypeDiscoveryEnabled,
 				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
 		);
-		mappingRepositoryBuilder.addMapping(
+		mappingRepositoryBuilder.addMetadataContributor(
 				new HibernateOrmMetatadaContributor( getMapperFactory(), introspector, metadata )
 		);
 	}

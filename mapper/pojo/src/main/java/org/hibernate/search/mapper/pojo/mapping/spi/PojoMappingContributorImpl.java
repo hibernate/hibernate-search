@@ -50,14 +50,14 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 		annotationMappingDefinition = new AnnotationMappingDefinitionImpl(
 				mapperFactory, introspector, annotatedTypeDiscoveryEnabled
 		);
-		mappingRepositoryBuilder.addMapping( annotationMappingDefinition );
+		mappingRepositoryBuilder.addMetadataContributor( annotationMappingDefinition );
 	}
 
 	@Override
 	public ProgrammaticMappingDefinition programmaticMapping() {
 		ProgrammaticMappingDefinitionImpl definition =
 				new ProgrammaticMappingDefinitionImpl( mapperFactory, introspector );
-		mappingRepositoryBuilder.addMapping( definition );
+		mappingRepositoryBuilder.addMetadataContributor( definition );
 		return definition;
 	}
 

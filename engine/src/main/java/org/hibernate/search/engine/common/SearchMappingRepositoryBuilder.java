@@ -22,7 +22,7 @@ public interface SearchMappingRepositoryBuilder {
 
 	SearchMappingRepositoryBuilder setProperties(Properties properties);
 
-	SearchMappingRepositoryBuilder addMapping(MetadataContributor mappingContributor);
+	SearchMappingRepositoryBuilder addMetadataContributor(MetadataContributor contributor);
 
 	SearchMappingRepository build();
 
