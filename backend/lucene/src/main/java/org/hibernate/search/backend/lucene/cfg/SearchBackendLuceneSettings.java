@@ -14,6 +14,10 @@ public final class SearchBackendLuceneSettings {
 	private SearchBackendLuceneSettings() {
 	}
 
+	public static final String LUCENE_DIRECTORY_PROVIDER = "lucene.directory_provider";
+
+	public static final String LUCENE_ROOT_DIRECTORY = "lucene.root_directory";
+
 	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy_strategy";
 
 	/**

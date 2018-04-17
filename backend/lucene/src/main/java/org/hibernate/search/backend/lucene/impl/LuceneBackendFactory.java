@@ -31,13 +31,15 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Optional<String>> DIRECTORY_PROVIDER = ConfigurationProperty.forKey( "lucene.directory_provider" )
-			.asString()
-			.build();
+	private static final ConfigurationProperty<Optional<String>> DIRECTORY_PROVIDER =
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_DIRECTORY_PROVIDER )
+					.asString()
+					.build();
 
-	private static final ConfigurationProperty<Optional<Path>> ROOT_DIRECTORY = ConfigurationProperty.forKey( "lucene.root_directory" )
-			.as( Path.class, Paths::get )
-			.build();
+	private static final ConfigurationProperty<Optional<Path>> ROOT_DIRECTORY =
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_ROOT_DIRECTORY )
+					.as( Path.class, Paths::get )
+					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.MULTI_TENANCY_STRATEGY )
