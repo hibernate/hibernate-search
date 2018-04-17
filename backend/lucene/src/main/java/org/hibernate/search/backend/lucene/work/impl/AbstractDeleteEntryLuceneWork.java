@@ -11,18 +11,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
-public class UpdateEntryLuceneWork extends AbstractLuceneWork<Long> {
+public abstract class AbstractDeleteEntryLuceneWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,45 +26,36 @@ public class UpdateEntryLuceneWork extends AbstractLuceneWork<Long> {
 
 	private final String id;
 
-	private final LuceneIndexEntry indexEntry;
-
-	public UpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( "updateEntry", indexName );
+	public AbstractDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
+		super( "deleteEntry", indexName );
 		this.tenantId = tenantId;
 		this.id = id;
-		this.indexEntry = indexEntry;
 	}
 
 	@Override
 	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> CompletableFuture.completedFuture( updateEntry( context.getIndexWriter() ) ) );
+		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
 	}
 
-	private long updateEntry(IndexWriter indexWriter) {
+	private Long deleteDocuments(IndexWriter indexWriter) {
 		try {
-			if ( tenantId == null ) {
-				// if the tenantId is null, we can do an atomic update
-				// we don't expose the query construction in LuceneQueries as it is not considered safe and should be
-				// used with care
-				return indexWriter.updateDocuments( new Term( LuceneFields.idFieldName(), id ), indexEntry );
-			}
-			else {
-				indexWriter.deleteDocuments( LuceneQueries.documentIdQuery( tenantId, id ) );
-				return indexWriter.addDocuments( indexEntry );
-			}
+			return doDeleteDocuments( indexWriter, tenantId, id );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( indexName, tenantId, id, e );
+			throw log.unableToDeleteEntryFromIndex( indexName, tenantId, id, e );
 		}
 	}
+
+	protected abstract long doDeleteDocuments(IndexWriter indexWriter, String tenantId, String id) throws IOException;
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
-				.append( ", entry=" ).append( indexEntry )
+				.append( ", indexName=" ).append( indexName )
+				.append( ", id=" ).append( id )
 				.append( "]" );
 		return sb.toString();
 	}

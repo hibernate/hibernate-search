@@ -127,6 +127,8 @@ class SearchQueryFactoryImpl
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
 		Set<String> storedFields = new HashSet<>();
 		hitExtractor.contributeFields( storedFields );
 
@@ -134,6 +136,7 @@ class SearchQueryFactoryImpl
 				backend.getQueryOrchestrator(),
 				backend.getWorkFactory(),
 				searchTargetModel,
+				backend.getMultiTenancyStrategy(),
 				sessionContext,
 				new ReusableDocumentStoredFieldVisitor( storedFields ),
 				hitExtractor,

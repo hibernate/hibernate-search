@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -28,8 +29,8 @@ public class LuceneChangesetIndexWorker extends LuceneIndexWorker implements Cha
 
 	public LuceneChangesetIndexWorker(LuceneWorkFactory factory,
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, SessionContext context) {
-		super( factory, indexName, context );
+			String indexName, MultiTenancyStrategy multiTenancyStrategy, SessionContext sessionContext) {
+		super( factory, indexName, multiTenancyStrategy, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

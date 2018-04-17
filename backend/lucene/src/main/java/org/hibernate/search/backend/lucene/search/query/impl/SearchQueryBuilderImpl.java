@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 class SearchQueryBuilderImpl<C, T>
 		implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
+	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final String tenantId;
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
@@ -38,11 +40,13 @@ class SearchQueryBuilderImpl<C, T>
 			LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory,
 			LuceneSearchTargetModel searchTargetModel,
-			SessionContext context,
+			MultiTenancyStrategy multiTenancyStrategy,
+			SessionContext sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
-		this.tenantId = context.getTenantIdentifier();
+		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.tenantId = sessionContext.getTenantIdentifier();
 
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.hitExtractor = hitExtractor;
@@ -70,13 +74,11 @@ class SearchQueryBuilderImpl<C, T>
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
-		if ( tenantId != null ) {
-			luceneQueryBuilder.add( LuceneQueries.tenantIdQuery( tenantId ), Occur.FILTER );
-		}
 
 		return new LuceneSearchQuery<T>( queryOrchestrator, workFactory,
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),
-				luceneQueryBuilder.build(), elementCollector.toLuceneSort(),
+				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), tenantId ),
+				elementCollector.toLuceneSort(),
 				hitExtractor, searchResultExtractor );
 	}
 

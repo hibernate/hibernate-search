@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
 
 
@@ -15,19 +16,26 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
  */
 public class StubLuceneWorkFactory implements LuceneWorkFactory {
 
+	private final MultiTenancyStrategy multiTenancyStrategy;
+
+	public StubLuceneWorkFactory(MultiTenancyStrategy multiTenancyStrategy) {
+		this.multiTenancyStrategy = multiTenancyStrategy;
+	}
+
 	@Override
 	public LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
 		return new AddEntryLuceneWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
-		return new UpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
+	public LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey,
+			LuceneIndexEntry indexEntry) {
+		return multiTenancyStrategy.createUpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
 	public LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey) {
-		return new DeleteEntryLuceneWork( indexName, tenantId, id );
+		return multiTenancyStrategy.createDeleteEntryLuceneWork( indexName, tenantId, id );
 	}
 
 	@Override

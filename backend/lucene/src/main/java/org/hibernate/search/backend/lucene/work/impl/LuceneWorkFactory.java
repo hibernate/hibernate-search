@@ -16,7 +16,8 @@ public interface LuceneWorkFactory {
 
 	LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
 
-	LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
+	LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey,
+			LuceneIndexEntry indexEntry);
 
 	LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey);
 

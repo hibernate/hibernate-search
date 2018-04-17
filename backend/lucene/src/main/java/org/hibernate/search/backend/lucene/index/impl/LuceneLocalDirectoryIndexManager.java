@@ -38,16 +38,16 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneBackend backend;
-	private final String name;
+	private final String indexName;
 	private final LuceneIndexModel model;
 	private final LuceneWorkFactory workFactory;
 	private final LuceneIndexWorkOrchestrator changesetOrchestrator;
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
-	public LuceneLocalDirectoryIndexManager(LuceneBackend backend, String name, LuceneIndexModel model, IndexWriter indexWriter) {
+	public LuceneLocalDirectoryIndexManager(LuceneBackend backend, String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
 		this.backend = backend;
-		this.name = name;
+		this.indexName = indexName;
 		this.model = model;
 		this.workFactory = backend.getWorkFactory();
 		this.changesetOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
@@ -57,7 +57,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 
 	@Override
 	public String getName() {
-		return name;
+		return indexName;
 	}
 
 	@Override
@@ -66,13 +66,17 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 	}
 
 	@Override
-	public ChangesetIndexWorker<LuceneRootDocumentBuilder> createWorker(SessionContext context) {
-		return new LuceneChangesetIndexWorker( workFactory, changesetOrchestrator, name, context );
+	public ChangesetIndexWorker<LuceneRootDocumentBuilder> createWorker(SessionContext sessionContext) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
+		return new LuceneChangesetIndexWorker( workFactory, changesetOrchestrator, indexName, backend.getMultiTenancyStrategy(), sessionContext );
 	}
 
 	@Override
-	public StreamIndexWorker<LuceneRootDocumentBuilder> createStreamWorker(SessionContext context) {
-		return new LuceneStreamIndexWorker( workFactory, streamOrchestrator, name, context );
+	public StreamIndexWorker<LuceneRootDocumentBuilder> createStreamWorker(SessionContext sessionContext) {
+		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
+
+		return new LuceneStreamIndexWorker( workFactory, streamOrchestrator, indexName, backend.getMultiTenancyStrategy(), sessionContext );
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "name=" ).append( name )
+				.append( "name=" ).append( indexName )
 				.append( "]")
 				.toString();
 	}
@@ -122,7 +126,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 			return DirectoryReader.open( indexWriter );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexReader( backend.getName(), name, e );
+			throw log.unableToCreateIndexReader( backend, indexName, e );
 		}
 	}
 
@@ -132,7 +136,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 			reader.close();
 		}
 		catch (IOException e) {
-			log.unableToCloseIndexReader( backend.getName(), name, e );
+			log.unableToCloseIndexReader( backend, indexName, e );
 		}
 	}
 }

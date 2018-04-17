@@ -34,21 +34,15 @@ public class LuceneQueries {
 		return new TermQuery( new Term( LuceneFields.nestedDocumentPathFieldName(), absoluteFieldPath ) );
 	}
 
-	public static Query tenantIdQuery(String tenantId) {
-		return new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) );
+	public static Query discriminatorMultiTenancyDeleteDocumentQuery(String tenantId, String id) {
+		return wrapWithDiscriminatorTenantIdQuery( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), tenantId );
 	}
 
-	public static Query documentIdQuery(String tenantId, String id) {
-		Query idQuery = new TermQuery( new Term( LuceneFields.idFieldName(), id ) );
+	public static Query wrapWithDiscriminatorTenantIdQuery(Query originalLuceneQuery, String tenantId) {
+		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		queryBuilder.add( originalLuceneQuery, Occur.MUST );
+		queryBuilder.add( new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) ), Occur.FILTER );
 
-		if ( tenantId == null ) {
-			return idQuery;
-		}
-
-		BooleanQuery.Builder documentIdQuery = new BooleanQuery.Builder();
-		documentIdQuery.add( idQuery, Occur.MUST );
-		documentIdQuery.add( tenantIdQuery( tenantId ), Occur.FILTER );
-
-		return documentIdQuery.build();
+		return queryBuilder.build();
 	}
 }

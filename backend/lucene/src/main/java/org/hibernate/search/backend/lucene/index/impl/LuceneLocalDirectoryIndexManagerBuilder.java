@@ -62,7 +62,7 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 
 	private IndexWriter createIndexWriter(LuceneIndexModel model) {
 		Path directoryPath = backend.getRootDirectory().resolve( normalizedIndexName );
-		initializeIndexDirectory( backend.getName(), directoryPath );
+		initializeIndexDirectory( directoryPath );
 
 		// FIXME properly close all the resources, this will be pretty convoluted and we will likely drop this code
 		// altogether so let's be naive for now
@@ -74,14 +74,14 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 			return new IndexWriter( directory, indexWriterConfig );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexWriter( backend.getName(), model.getIndexName(), directoryPath, e );
+			throw log.unableToCreateIndexWriter( backend, model.getIndexName(), directoryPath, e );
 		}
 	}
 
-	private static void initializeIndexDirectory(String backendName, Path indexDirectory) {
+	private void initializeIndexDirectory(Path indexDirectory) {
 		if ( Files.exists( indexDirectory ) ) {
 			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
-				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( backendName, indexDirectory );
+				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( backend, indexDirectory );
 			}
 		}
 		else {
@@ -89,7 +89,7 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 				Files.createDirectories( indexDirectory );
 			}
 			catch (Exception e) {
-				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( backendName, indexDirectory, e );
+				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( backend, indexDirectory, e );
 			}
 		}
 	}

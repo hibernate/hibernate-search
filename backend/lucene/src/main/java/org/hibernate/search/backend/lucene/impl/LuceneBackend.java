@@ -20,5 +20,5 @@ public interface LuceneBackend extends Backend<LuceneRootDocumentBuilder> {
 
 	LuceneQueryWorkOrchestrator getQueryOrchestrator();
 
-	String getName();
+	MultiTenancyStrategy getMultiTenancyStrategy();
 }

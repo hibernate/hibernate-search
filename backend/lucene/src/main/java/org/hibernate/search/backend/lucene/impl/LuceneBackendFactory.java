@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
+import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.work.impl.StubLuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.Backend;
@@ -18,6 +20,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -36,6 +39,12 @@ public class LuceneBackendFactory implements BackendFactory {
 			.as( Path.class, Paths::get )
 			.build();
 
+	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.MULTI_TENANCY_STRATEGY )
+					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
+					.withDefault( SearchBackendLuceneSettings.Defaults.MULTI_TENANCY_STRATEGY )
+					.build();
+
 	@Override
 	public Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
 		// TODO be more clever about the type, also supports providing a class
@@ -51,9 +60,25 @@ public class LuceneBackendFactory implements BackendFactory {
 			// TODO GSM: implement the checks properly
 			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).get().toAbsolutePath();
 
-			return new LuceneLocalDirectoryBackend( name, rootDirectory, new StubLuceneWorkFactory() );
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
+
+			return new LuceneLocalDirectoryBackend( name, rootDirectory, new StubLuceneWorkFactory( multiTenancyStrategy ), multiTenancyStrategy );
 		}
 
 		throw log.unrecognizedLuceneDirectoryProvider( name, directoryProvider );
+	}
+
+	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
+		MultiTenancyStrategyConfiguration multiTenancyStrategyConfiguration = MULTI_TENANCY_STRATEGY.get( propertySource );
+
+		switch ( multiTenancyStrategyConfiguration ) {
+			case NONE:
+				return new NoMultiTenancyStrategyImpl();
+			case DISCRIMINATOR:
+				return new DiscriminatorMultiTenancyStrategyImpl();
+			default:
+				throw new AssertionFailure( String.format( "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'", backendName,
+						multiTenancyStrategyConfiguration ) );
+		}
 	}
 }

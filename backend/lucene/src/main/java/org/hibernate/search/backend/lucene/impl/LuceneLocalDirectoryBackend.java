@@ -37,13 +37,17 @@ public class LuceneLocalDirectoryBackend implements LuceneBackend {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 
-	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory) {
+	private final MultiTenancyStrategy multiTenancyStrategy;
+
+	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
 
 		this.workFactory = workFactory;
 
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
+
+		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		initializeRootDirectory( name, rootDirectory );
 	}
@@ -56,12 +60,11 @@ public class LuceneLocalDirectoryBackend implements LuceneBackend {
 	@Override
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
 			String indexName, boolean multiTenancyEnabled, BuildContext context, ConfigurationPropertySource propertySource) {
-		return new LuceneLocalDirectoryIndexManagerBuilder( this, normalizeIndexName( indexName ), context, propertySource );
-	}
+		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
+			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
+		}
 
-	@Override
-	public String getName() {
-		return name;
+		return new LuceneLocalDirectoryIndexManagerBuilder( this, normalizeIndexName( indexName ), context, propertySource );
 	}
 
 	public Path getRootDirectory() {
@@ -76,6 +79,11 @@ public class LuceneLocalDirectoryBackend implements LuceneBackend {
 	@Override
 	public LuceneQueryWorkOrchestrator getQueryOrchestrator() {
 		return queryOrchestrator;
+	}
+
+	@Override
+	public MultiTenancyStrategy getMultiTenancyStrategy() {
+		return multiTenancyStrategy;
 	}
 
 	@Override

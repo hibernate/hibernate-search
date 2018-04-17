@@ -14,6 +14,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 
 /**
  * @author Guillaume Smet
@@ -34,17 +35,17 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 	}
 
 	@Override
-	void contribute(String rootIndexName, String tenantId, String rootId, Document currentDocument, List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId, Document currentDocument,
+			List<Document> nestedDocuments) {
 		nestedDocument.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT, Store.YES ) );
 		nestedDocument.add( new StringField( LuceneFields.rootIndexFieldName(), rootIndexName, Store.YES ) );
-		if ( tenantId != null ) {
-			nestedDocument.add( new StringField( LuceneFields.tenantIdFieldName(), tenantId, Store.YES ) );
-		}
 		nestedDocument.add( new StringField( LuceneFields.rootIdFieldName(), rootId, Store.YES ) );
 		nestedDocument.add( new StringField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath(), Store.YES ) );
 
+		multiTenancyStrategy.contributeToIndexedDocument( nestedDocument, tenantId );
+
 		nestedDocuments.add( nestedDocument );
 
-		super.contribute( rootIndexName, tenantId, rootId, nestedDocument, nestedDocuments );
+		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocument, nestedDocuments );
 	}
 }

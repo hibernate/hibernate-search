@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 
 /**
  * @author Guillaume Smet
@@ -33,11 +34,12 @@ class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder
 	}
 
 	@Override
-	void contribute(String rootIndexName, String tenantId, String rootId, Document currentDocument, List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId, Document currentDocument,
+			List<Document> nestedDocuments) {
 		for ( IndexableField field : fields ) {
 			currentDocument.add( field );
 		}
 
-		super.contribute( rootIndexName, tenantId, rootId, currentDocument, nestedDocuments );
+		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, currentDocument, nestedDocuments );
 	}
 }

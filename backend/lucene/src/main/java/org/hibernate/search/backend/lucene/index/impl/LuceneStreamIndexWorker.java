@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -23,8 +24,8 @@ public class LuceneStreamIndexWorker extends LuceneIndexWorker implements Stream
 
 	public LuceneStreamIndexWorker(LuceneWorkFactory factory,
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, SessionContext context) {
-		super( factory, indexName, context );
+			String indexName, MultiTenancyStrategy multiTenancyStrategy, SessionContext sessionContext) {
+		super( factory, indexName, multiTenancyStrategy, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 
