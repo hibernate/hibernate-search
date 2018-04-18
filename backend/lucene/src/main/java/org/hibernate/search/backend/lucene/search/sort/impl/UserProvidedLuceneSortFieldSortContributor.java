@@ -12,14 +12,14 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 
 class UserProvidedLuceneSortFieldSortContributor implements SearchSortContributor<LuceneSearchSortCollector> {
 
-	private final SortField sortField;
+	private final SortField luceneSortField;
 
-	UserProvidedLuceneSortFieldSortContributor(SortField sortField) {
-		this.sortField = sortField;
+	UserProvidedLuceneSortFieldSortContributor(SortField luceneSortField) {
+		this.luceneSortField = luceneSortField;
 	}
 
 	@Override
 	public void contribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( sortField );
+		collector.collectSortField( luceneSortField );
 	}
 }

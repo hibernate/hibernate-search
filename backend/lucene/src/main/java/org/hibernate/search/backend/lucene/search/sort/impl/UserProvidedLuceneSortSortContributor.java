@@ -9,12 +9,20 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-public interface LuceneSearchSortFactory extends SearchSortFactory<LuceneSearchSortCollector> {
 
-	SearchSortContributor<LuceneSearchSortCollector> fromLuceneSortField(SortField luceneSortField);
+class UserProvidedLuceneSortSortContributor implements SearchSortContributor<LuceneSearchSortCollector> {
 
-	SearchSortContributor<LuceneSearchSortCollector> fromLuceneSort(Sort luceneSort);
+	private final Sort luceneSort;
 
+	UserProvidedLuceneSortSortContributor(Sort luceneSort) {
+		this.luceneSort = luceneSort;
+	}
+
+	@Override
+	public void contribute(LuceneSearchSortCollector collector) {
+		for ( SortField luceneSortField : luceneSort.getSort() ) {
+			collector.collectSortField( luceneSortField );
+		}
+	}
 }

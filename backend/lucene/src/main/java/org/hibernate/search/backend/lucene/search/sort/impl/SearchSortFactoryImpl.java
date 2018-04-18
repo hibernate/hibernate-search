@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -69,7 +70,12 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> fromLuceneSortField(SortField sortField) {
-		return new UserProvidedLuceneSortFieldSortContributor( sortField );
+	public SearchSortContributor<LuceneSearchSortCollector> fromLuceneSortField(SortField luceneSortField) {
+		return new UserProvidedLuceneSortFieldSortContributor( luceneSortField );
+	}
+
+	@Override
+	public SearchSortContributor<LuceneSearchSortCollector> fromLuceneSort(Sort luceneSort) {
+		return new UserProvidedLuceneSortSortContributor( luceneSort );
 	}
 }
