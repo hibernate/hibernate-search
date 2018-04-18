@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="57cm" height="45cm" viewBox="85 445 1125 900" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="478.736" y="446.336" width="367.7" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="478.736" y="446.336" width="367.7" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="662.586" y="467.886">
+      <tspan x="662.586" y="467.886">IndexedEntityClass:PojoIndexingDependencyCollectorTypeNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="488.736" y1="471.436" x2="836.436" y2="471.436"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="139.425" y="527.848" width="343.05" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="139.425" y="527.848" width="343.05" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.95" y="549.398">
+      <tspan x="310.95" y="549.398">embedded:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="149.425" y1="552.948" x2="472.475" y2="552.948"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="490.604" y="527.848" width="344.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="490.604" y="527.848" width="344.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="662.679" y="549.398">
+      <tspan x="662.679" y="549.398">stringField:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="500.604" y1="552.948" x2="824.754" y2="552.948"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="662.586,483.345 662.586,505.092 310.95,505.092 310.95,526.839 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="486.768" y="501.092"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.586" y="495.345"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.95" y="522.839"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="662.586,483.345 662.586,505.092 662.679,505.092 662.679,526.839 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="662.632" y="501.092"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.586" y="495.345"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.679" y="522.839"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="106.166" y="772.423" width="409.65" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="106.166" y="772.423" width="409.65" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.991" y="793.973">
+      <tspan x="310.991" y="793.973">secondLevelEmbedded:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="116.166" y1="797.523" x2="505.816" y2="797.523"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="844.174" y="527.848" width="356.95" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="844.174" y="527.848" width="356.95" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1022.65" y="549.398">
+      <tspan x="1022.65" y="549.398">booleanField:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="854.174" y1="552.948" x2="1191.12" y2="552.948"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="662.586,483.331 662.586,504.67 1022.65,504.67 1022.65,527.848 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="842.617" y="500.67"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.586" y="495.331"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1026.65" y="523.848"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="119.887" y="694.46" width="382" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="119.887" y="694.46" width="382" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.887" y="716.01">
+      <tspan x="310.887" y="716.01">EmbeddedEntityClass:PojoIndexingDependencyCollectorTypeNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="129.887" y1="719.56" x2="491.887" y2="719.56"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.95,563.848 310.95,624.792 310.83,624.792 310.83,619.781 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.89" y="620.792"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.95" y="575.848"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.83" y="631.781"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="542.399" y="772.423" width="327.55" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="542.399" y="772.423" width="327.55" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="706.174" y="793.973">
+      <tspan x="706.174" y="793.973">intField:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="552.399" y1="797.523" x2="859.949" y2="797.523"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="531.52" y="1031.79" width="337.2" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="531.52" y="1031.79" width="337.2" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="700.12" y="1053.34">
+      <tspan x="700.12" y="1053.34">longField:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="541.52" y1="1056.89" x2="858.72" y2="1056.89"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="86.0341" y="949.552" width="449.65" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="86.0341" y="949.552" width="449.65" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="971.102">
+      <tspan x="310.859" y="971.102">SecondLevelEmbeddedEntityClass:PojoIndexingDependencyCollectorTypeNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="96.0341" y1="974.652" x2="525.684" y2="974.652"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.887,730.46 310.887,744.08 310.991,744.08 310.991,771.505 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.939" y="740.08"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.887" y="742.46"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.991" y="767.505"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.991,809.424 310.991,847.462 310.911,847.462 310.911,845.697 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.951" y="843.462"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.991" y="821.424"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.911" y="857.697"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,985.552 310.859,1011.13 700.12,1011.13 700.12,1030.79 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="505.49" y="1007.13"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="997.552"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.12" y="1026.79"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.887,731.442 310.887,750.058 706.174,750.058 706.174,771.413 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="508.531" y="746.058"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.887" y="743.442"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="710.174" y="767.413"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="176.286" y="827.697" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="176.286" y="827.697" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.911" y="849.247">
+      <tspan x="310.911" y="849.247">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="186.286" y1="852.797" x2="435.536" y2="852.797"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.911,864.698 310.911,931.934 310.859,931.934 310.859,948.552 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.885" y="927.934"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.911" y="876.698"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="944.552"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="111.984" y="1031.79" width="397.75" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="111.984" y="1031.79" width="397.75" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="1053.34">
+      <tspan x="310.859" y="1053.34">thirdLevelEmbedded:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="121.984" y1="1056.89" x2="499.734" y2="1056.89"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="139.384" y="1183.33" width="342.95" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="139.384" y="1183.33" width="342.95" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="1204.88">
+      <tspan x="310.859" y="1204.88">IndexedEntityClass:PojoIndexingProcessorTypeNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="149.384" y1="1208.43" x2="472.334" y2="1208.43"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="312.44,1116.83 312.44,1114.27 310.859,1114.27 310.859,1183.33 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="311.649" y="1110.27"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="316.44" y="1112.83"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1179.33"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,986.561 310.859,987.561 310.859,1029.78 310.859,1030.78 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.859" y="1004.67"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="998.561"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1026.78"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="540.799" y="1250.92" width="319.4" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540.799" y="1250.92" width="319.4" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="700.499" y="1272.47">
+      <tspan x="700.499" y="1272.47">stringField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="550.799" y1="1276.02" x2="850.199" y2="1276.02"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,1219.33 310.859,1235.12 700.499,1235.12 700.499,1250.92 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="505.679" y="1231.12"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1231.33"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.499" y="1246.92"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="876.77" y="1250.92" width="332.2" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="876.77" y="1250.92" width="332.2" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1042.87" y="1272.47">
+      <tspan x="1042.87" y="1272.47">booleanField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="886.77" y1="1276.02" x2="1198.97" y2="1276.02"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,1219.33 310.859,1235.12 1042.87,1235.12 1042.87,1250.92 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="676.865" y="1231.12"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1231.33"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1046.87" y="1246.92"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="176.205" y="582.812" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="176.205" y="582.812" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.83" y="604.362">
+      <tspan x="310.83" y="604.362">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="186.205" y1="607.912" x2="435.455" y2="607.912"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.83,618.812 310.83,657.377 310.887,657.377 310.887,694.46 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.859" y="657.377"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.83" y="630.812"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.887" y="690.46"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="887.934" y="582.812" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="887.934" y="582.812" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1022.56" y="604.362">
+      <tspan x="1022.56" y="604.362">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="897.934" y1="607.912" x2="1147.18" y2="607.912"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="528.06" y="582.812" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="528.06" y="582.812" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="662.685" y="604.362">
+      <tspan x="662.685" y="604.362">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="538.06" y1="607.912" x2="787.31" y2="607.912"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="662.679,563.848 662.679,571.381 662.685,571.381 662.685,581.807 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="662.682" y="571.381"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.679" y="575.848"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="666.685" y="577.807"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1022.65,563.848 1022.65,573.249 1022.56,573.249 1022.56,581.836 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1022.6" y="573.249"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1026.65" y="575.848"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1026.56" y="577.836"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="571.549" y="827.697" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="571.549" y="827.697" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="706.174" y="849.247">
+      <tspan x="706.174" y="849.247">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="581.549" y1="852.797" x2="830.799" y2="852.797"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="706.174,808.423 706.174,815.119 706.174,815.119 706.174,827.697 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="708.174" y="815.119"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="710.174" y="820.423"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="710.174" y="823.697"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="176.234" y="1088.11" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="176.234" y="1088.11" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="1109.66">
+      <tspan x="310.859" y="1109.66">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="186.234" y1="1113.21" x2="435.484" y2="1113.21"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,1067.79 310.859,1076.38 310.859,1076.38 310.859,1088.11 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.859" y="1076.38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1079.79"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1084.11"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="565.495" y="1088.11" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="565.495" y="1088.11" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="700.12" y="1109.66">
+      <tspan x="700.12" y="1109.66">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="575.495" y1="1113.21" x2="824.745" y2="1113.21"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="700.12,1067.79 700.12,1075.53 700.12,1075.53 700.12,1088.11 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="702.12" y="1075.53"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.12" y="1079.79"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.12" y="1084.11"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="565.874" y="1307.37" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="565.874" y="1307.37" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="700.499" y="1328.92">
+      <tspan x="700.499" y="1328.92">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="575.874" y1="1332.47" x2="825.124" y2="1332.47"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="700.499,1286.92 700.499,1300.13 700.499,1300.13 700.499,1307.37 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="702.499" y="1300.13"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.499" y="1298.92"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="704.499" y="1303.37"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="908.245" y="1307.37" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ff0000" x="908.245" y="1307.37" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1042.87" y="1328.92">
+      <tspan x="1042.87" y="1328.92">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="918.245" y1="1332.47" x2="1167.49" y2="1332.47"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1042.87,1286.92 1042.87,1295.92 1042.87,1295.92 1042.87,1307.37 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.87" y="1295.92"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1046.87" y="1298.92"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1046.87" y="1303.37"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="139.334" y="1250.92" width="343.05" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="139.334" y="1250.92" width="343.05" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="1272.47">
+      <tspan x="310.859" y="1272.47">embedded:PojoIndexingDependencyCollectorPropertyNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="149.334" y1="1276.02" x2="472.384" y2="1276.02"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="176.234" y="1307.37" width="269.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="176.234" y="1307.37" width="269.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.859" y="1328.92">
+      <tspan x="310.859" y="1328.92">:PojoIndexingDependencyCollectorValueNode</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="186.234" y1="1332.47" x2="435.484" y2="1332.47"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,1219.33 310.859,1220.33 310.859,1249.92 310.859,1250.92 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.859" y="1235.12"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1231.33"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1246.92"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.859,1286.92 310.859,1295.77 310.859,1295.77 310.859,1307.37 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.859" y="1295.77"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1298.92"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.859" y="1303.37"/>
+  </g>
+</svg>

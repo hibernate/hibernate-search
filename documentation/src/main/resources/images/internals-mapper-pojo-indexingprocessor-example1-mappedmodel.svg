@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="35cm" height="19cm" viewBox="350 4 690 380" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="364.334" y="5.19374" width="256.4" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="364.334" y="5.19374" width="256.4" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="492.534" y="21.1937">&lt;&lt;Indexed&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="492.534" y="40.1937">IndexedEntityClass</text>
+    <rect style="fill: #ffffff" x="364.334" y="49.1937" width="256.4" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="364.334" y="49.1937" width="256.4" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="367.334" y="63.1937"> &lt;&lt;Field&gt;&gt; stringField: String</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="367.334" y="79.1937"> &lt;&lt;Field&gt;&gt; booleanField: boolean</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="395.01" y="170.868" width="194.8" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="395.01" y="170.868" width="194.8" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="492.41" y="189.868">EmbeddedEntityClass</text>
+    <rect style="fill: #ffffff" x="395.01" y="198.868" width="194.8" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="395.01" y="198.868" width="194.8" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="398.01" y="212.868"> &lt;&lt;Field&gt;&gt; intField: int</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="492.534,111.368 492.534,152.836 492.41,152.836 492.41,169.86 "/>
+    <polygon style="fill: #ffffff" points="492.534,86.1968 497.334,100.197 492.534,114.197 487.734,100.197 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="492.534,86.1968 497.334,100.197 492.534,114.197 487.734,100.197 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="492.472" y="148.836"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="503.534" y="98.1968"> embedding</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="503.534" y="114.197">0..*</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="496.41" y="149.86"> embedded &lt;&lt;IndexedEmbedded&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="496.41" y="165.86">0..1</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="351.22" y="329.634" width="282.55" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="351.22" y="329.634" width="282.55" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="492.495" y="348.634">     SecondLevelEmbeddedEntityClass     </text>
+    <rect style="fill: #ffffff" x="351.22" y="357.634" width="282.55" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="351.22" y="357.634" width="282.55" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="354.22" y="371.634"> &lt;&lt;Field&gt;&gt; longField: Long</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="492.41,245.045 492.41,281.251 492.495,281.251 492.495,328.628 "/>
+    <polygon style="fill: #ffffff" points="492.41,219.874 497.21,233.874 492.41,247.874 487.61,233.874 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="492.41,219.874 497.21,233.874 492.41,247.874 487.61,233.874 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="492.452" y="277.251"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="503.41" y="231.874"> secondLevelEmbedding</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="503.41" y="247.874">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="496.495" y="308.628"> secondLevelEmbedded &lt;&lt;IndexedEmbedded&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="496.495" y="324.628">0..*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="620.734,59.1938 1037.25,59.1938 1037.25,367.634 658.942,367.634 "/>
+    <polygon style="fill: #ffffff" points="633.77,367.634 647.77,362.834 661.77,367.634 647.77,372.434 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="633.77,367.634 647.77,362.834 661.77,367.634 647.77,372.434 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1039.25" y="209.414"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="624.734" y="55.1938"> 0..1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="624.734" y="71.1938">thirdLevelEmbedded &lt;&lt;IndexedEmbedded&gt;&gt; {maxDepth=1}</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="665.77" y="363.634"> 0..1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="665.77" y="379.634">thirdLevelEmbedding</text>
+  </g>
+</svg>

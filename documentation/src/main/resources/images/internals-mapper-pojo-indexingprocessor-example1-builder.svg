@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="53cm" height="45cm" viewBox="97 445 1057 900" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="389.012" y="446.336" width="342.95" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="389.012" y="446.336" width="342.95" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="560.487" y="467.886">
+      <tspan x="560.487" y="467.886">IndexedEntityClass:PojoIndexingProcessorTypeNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="399.012" y1="471.436" x2="721.962" y2="471.436"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="151.804" y="553.524" width="318.3" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="151.804" y="553.524" width="318.3" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.954" y="575.074">
+      <tspan x="310.954" y="575.074">embedded:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="161.804" y1="578.624" x2="460.104" y2="578.624"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="485.206" y="553.524" width="319.4" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="485.206" y="553.524" width="319.4" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="644.906" y="575.074">
+      <tspan x="644.906" y="575.074">stringField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="495.206" y1="578.624" x2="794.606" y2="578.624"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="560.487,483.345 560.487,517.93 310.954,517.93 310.954,552.515 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="435.72" y="513.93"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="564.487" y="495.345"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="532.515"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="548.515"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="560.487,483.345 560.487,517.93 644.906,517.93 644.906,552.515 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="602.697" y="513.93"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="564.487" y="495.345"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="648.906" y="532.515"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="648.906" y="548.515"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="118.504" y="775.958" width="384.9" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="118.504" y="775.958" width="384.9" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.954" y="797.508">
+      <tspan x="310.954" y="797.508">secondLevelEmbedded:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="128.504" y1="801.058" x2="493.404" y2="801.058"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="820.27" y="553.524" width="332.2" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="820.27" y="553.524" width="332.2" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="986.37" y="575.074">
+      <tspan x="986.37" y="575.074">booleanField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="830.27" y1="578.624" x2="1142.47" y2="578.624"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="560.487,483.345 560.487,517.93 986.37,517.93 986.37,552.515 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="773.428" y="513.93"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="564.487" y="495.345"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="990.37" y="532.515"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="990.37" y="548.515"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="132.329" y="671.836" width="357.25" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="132.329" y="671.836" width="357.25" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.954" y="693.386">
+      <tspan x="310.954" y="693.386">EmbeddedEntityClass:PojoIndexingProcessorTypeNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="142.329" y1="696.936" x2="479.579" y2="696.936"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.954,589.524 310.954,624.792 310.954,624.792 310.954,671.836 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.954" y="620.792"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="601.524"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="667.836"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="536.345" y="775.958" width="302.8" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="536.345" y="775.958" width="302.8" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="687.745" y="797.508">
+      <tspan x="687.745" y="797.508">intField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="546.345" y1="801.058" x2="829.145" y2="801.058"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="531.52" y="1041.88" width="312.45" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="531.52" y="1041.88" width="312.45" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="687.745" y="1063.43">
+      <tspan x="687.745" y="1063.43">longField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="541.52" y1="1066.98" x2="833.97" y2="1066.98"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="98.4126" y="949.552" width="424.9" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="98.4126" y="949.552" width="424.9" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.863" y="971.102">
+      <tspan x="310.863" y="971.102">SecondLevelEmbeddedEntityClass:PojoIndexingProcessorTypeNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="108.413" y1="974.652" x2="513.313" y2="974.652"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.954,707.836 310.954,744.08 310.954,744.08 310.954,774.955 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.954" y="740.08"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="719.836"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="754.955"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="770.955"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.954,812.872 310.954,847.462 310.92,847.462 310.92,856.635 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.937" y="843.462"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="824.872"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.92" y="852.635"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,985.552 310.863,1011.13 687.745,1011.13 687.745,1040.87 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="499.304" y="1007.13"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="997.552"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="691.745" y="1020.87"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="691.745" y="1036.87"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.954,708.755 310.954,737.088 687.745,737.088 687.745,774.957 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="499.349" y="733.088"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.954" y="720.755"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="691.745" y="754.957"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="691.745" y="770.957"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="154.696" y="857.628" width="312.45" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="154.696" y="857.628" width="312.45" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.921" y="879.178">
+      <tspan x="310.921" y="879.178">:PojoIndexingProcessorContainerElementNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="164.696" y1="882.728" x2="457.146" y2="882.728"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.921,894.633 310.92,931.934 310.863,931.934 310.863,948.552 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="310.891" y="927.934"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.921" y="906.633"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="944.552"/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="577.408,833.91 991.508,833.91 1003.51,845.91 1003.51,915.91 577.408,915.91 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="577.408,833.91 991.508,833.91 1003.51,845.91 1003.51,915.91 577.408,915.91 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="991.508,833.91 991.508,845.91 1003.51,845.91 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="584.408" y="858.81">
+      <tspan x="584.408" y="858.81">Necessary because secondLevelEmbedded is multi-valued</tspan>
+      <tspan x="584.408" y="874.81">(probably a List or Set in the Java model) and thus</tspan>
+      <tspan x="584.408" y="890.81">its values need to be extracted before we can apply</tspan>
+      <tspan x="584.408" y="906.81">the @IndexedEmbedded.</tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="555.808,662.416 877.508,662.416 889.508,674.416 889.508,712.416 555.808,712.416 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="555.808,662.416 877.508,662.416 889.508,674.416 889.508,712.416 555.808,712.416 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="877.508,662.416 877.508,674.416 889.508,674.416 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="562.808" y="687.316">
+      <tspan x="562.808" y="687.316">Represents EmbeddedEntityClass instances </tspan>
+      <tspan x="562.808" y="703.316">indexed-embedded in IndexedEntityClass</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="576.401,874.91 526.278,874.91 526.278,875.628 474.86,875.628 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="487.508,870.628 471.508,875.628 487.508,880.628 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="554.803,687.416 526.191,687.416 526.191,689.836 496.284,689.836 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="508.931,684.836 492.931,689.836 508.931,694.836 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="577.094,967 554.706,967 554.706,967.552 531.024,967.552 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="543.672,962.552 527.672,967.552 543.672,972.552 "/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="578.1,942 984.5,942 996.5,954 996.5,992 578.1,992 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="578.1,942 984.5,942 996.5,954 996.5,992 578.1,992 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="984.5,942 984.5,954 996.5,954 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="585.1" y="966.9">
+      <tspan x="585.1" y="966.9">Represents SecondLevelEmbeddedEntityClass instances </tspan>
+      <tspan x="585.1" y="982.9">indexed-embedded in EmbeddedEntityClass</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="124.363" y="1043" width="373" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="124.363" y="1043" width="373" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.863" y="1064.55">
+      <tspan x="310.863" y="1064.55">thirdLevelEmbedded:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="134.363" y1="1068.1" x2="487.363" y2="1068.1"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="139.388" y="1139.31" width="342.95" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="139.388" y="1139.31" width="342.95" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.863" y="1160.86">
+      <tspan x="310.863" y="1160.86">IndexedEntityClass:PojoIndexingProcessorTypeNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="149.388" y1="1164.41" x2="472.338" y2="1164.41"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,1079 310.863,1114.27 310.863,1114.27 310.863,1139.31 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.863" y="1110.27"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1091"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1135.31"/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="525.58,1132.98 916.58,1132.98 928.58,1144.98 928.58,1182.98 525.58,1182.98 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="525.58,1132.98 916.58,1132.98 928.58,1144.98 928.58,1182.98 525.58,1182.98 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="916.58,1132.98 916.58,1144.98 928.58,1144.98 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="532.58" y="1157.88">
+      <tspan x="532.58" y="1157.88">Represents IndexedEntityClass instances </tspan>
+      <tspan x="532.58" y="1173.88">indexed-embedded in SecondLevelEmbeddedEntityClass</tspan>
+    </text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="524.574,1157.98 507.958,1157.98 507.958,1157.31 490.048,1157.31 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="502.695,1152.31 486.695,1157.31 502.695,1162.31 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,986.561 310.863,987.561 310.863,1040.99 310.863,1041.99 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.863" y="1010.28"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="998.561"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1021.99"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1037.99"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="482.1" y="1246.43" width="319.4" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="482.1" y="1246.43" width="319.4" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="641.8" y="1267.98">
+      <tspan x="641.8" y="1267.98">stringField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="492.1" y1="1271.53" x2="791.5" y2="1271.53"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,1175.31 310.863,1210.87 641.8,1210.87 641.8,1246.43 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="476.331" y="1206.87"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1187.31"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="645.8" y="1226.43"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="645.8" y="1242.43"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="817.164" y="1246.43" width="332.2" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="817.164" y="1246.43" width="332.2" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="983.264" y="1267.98">
+      <tspan x="983.264" y="1267.98">booleanField:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="827.164" y1="1271.53" x2="1139.36" y2="1271.53"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,1175.31 310.863,1210.87 983.264,1210.87 983.264,1246.43 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="647.063" y="1206.87"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1187.31"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="987.264" y="1226.43"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="987.264" y="1242.43"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="614.832" y="607" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="614.832" y="607" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="606.832" y="615" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="606.832" y="615" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="640.907" y="636.55">
+      <tspan x="640.907" y="636.55">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="620.832" y1="640.1" x2="668.982" y2="640.1"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="956.296" y="607" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="956.296" y="607" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="948.296" y="615" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="948.296" y="615" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="982.371" y="636.55">
+      <tspan x="982.371" y="636.55">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="962.296" y1="640.1" x2="1010.45" y2="640.1"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="644.906,589.524 646,589.524 646,607 644.906,607 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="648" y="594.262"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="648.906" y="585.524"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="648.906" y="603"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="986.37,589.524 986,589.524 986,607 986.37,607 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="988" y="594.262"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="982.37" y="585.524"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="982.37" y="603"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="895.15" y="772.226" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="895.15" y="772.226" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="887.15" y="780.226" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="887.15" y="780.226" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="921.225" y="801.776">
+      <tspan x="921.225" y="801.776">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="901.15" y1="805.326" x2="949.3" y2="805.326"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="839.145,793.958 864,793.958 864,794.226 887.15,794.226 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="866" y="790.092"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="843.145" y="789.958"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="883.15" y="790.226"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="895.15" y="1037.73" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="895.15" y="1037.73" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="887.15" y="1045.73" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="887.15" y="1045.73" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="921.225" y="1067.28">
+      <tspan x="921.225" y="1067.28">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="901.15" y1="1070.83" x2="949.3" y2="1070.83"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="843.97,1059.88 860,1059.88 860,1059.73 887.15,1059.73 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="862" y="1055.8"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="847.97" y="1055.88"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="883.15" y="1055.73"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="954.3" y="1300.23" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="954.3" y="1300.23" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="946.3" y="1308.23" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="946.3" y="1308.23" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="980.375" y="1329.78">
+      <tspan x="980.375" y="1329.78">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="960.3" y1="1333.33" x2="1008.45" y2="1333.33"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="983.264,1282.43 984,1282.43 984,1300.23 984.375,1300.23 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="986" y="1287.33"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="987.264" y="1278.43"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="980.375" y="1296.23"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="611.724" y="1299.98" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="611.724" y="1299.98" width="68.15" height="36"/>
+    <rect style="fill: #ffffff" x="603.724" y="1307.98" width="68.15" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="603.724" y="1307.98" width="68.15" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="637.799" y="1329.53">
+      <tspan x="637.799" y="1329.53">Bridge(s)</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="617.724" y1="1333.08" x2="665.874" y2="1333.08"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="641.8,1282.43 642,1282.43 642,1299.98 641.799,1299.98 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="644" y="1287.2"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="645.8" y="1278.43"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="645.799" y="1295.98"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="151.713" y="1246.43" width="318.3" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="151.713" y="1246.43" width="318.3" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="310.863" y="1267.98">
+      <tspan x="310.863" y="1267.98">embedded:PojoIndexingProcessorPropertyNodeBuilder</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="161.713" y1="1271.53" x2="460.013" y2="1271.53"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="310.863,1176.32 310.863,1177.32 310.863,1245.43 310.863,1246.43 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="312.863" y="1211.37"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1188.32"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1226.43"> propertyNodeBuilders</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="314.863" y="1242.43"/>
+  </g>
+</svg>
