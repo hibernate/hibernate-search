@@ -24,8 +24,6 @@ import java.util.StringJoiner;
  * which means "whatever default Hibernate Search manages to apply using its internal extractor resolution algorithm".
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.
  * </ul>
- * <p>
- *
  */
 public class ContainerValueExtractorPath {
 

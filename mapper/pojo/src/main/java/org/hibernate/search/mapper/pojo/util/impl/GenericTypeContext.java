@@ -47,7 +47,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * ... if an instance of this implementation was used to model the type of {@code B.propertyOfA},
  * then the property {@code B.propertyOfA} would appear to have type {@code List<D>} as one would expect,
  * instead of type {@code T extends C} if we inferred the type solely based on generics information from type {@code A}.
- * <p></p>
+ * <p>
  * This will also be true for more deeply nested references to a type variable,
  * for instance the type of property {@code B.propertyOfA.propertyOfGenericType} will correctly be inferred as D.
  * <p>
