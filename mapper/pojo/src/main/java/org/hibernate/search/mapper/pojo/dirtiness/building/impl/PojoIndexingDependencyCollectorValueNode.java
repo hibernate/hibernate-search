@@ -81,10 +81,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		lastEntityNode.collectDependency();
 	}
 
-	PojoTypeModel<V> getTypeModel() {
-		return modelPathFromRootEntityNode.type().getTypeModel();
-	}
-
 	/**
 	 * @param typeNodeBuilder A type node builder representing the type of this value as viewed from the contained side.
 	 * Its type must be a subtype of the raw type of this value.
