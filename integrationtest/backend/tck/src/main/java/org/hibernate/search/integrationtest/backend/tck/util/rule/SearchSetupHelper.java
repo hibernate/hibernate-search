@@ -56,7 +56,7 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	protected void before(Description description) {
-		testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName() + "-";
+		testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
 	}
 
 	public SetupContext withDefaultConfiguration() {
