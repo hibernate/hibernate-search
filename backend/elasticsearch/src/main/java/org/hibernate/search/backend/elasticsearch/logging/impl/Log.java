@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
@@ -115,8 +115,8 @@ public interface Log extends BasicLogger {
 	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
 
 	@Message(id = 516, value = "Tenant identifier '%2$s' is provided, but multi-tenancy is disabled for the backend '%1$s'.")
-	SearchException tenantIdProvidedButMultiTenancyDisabled(Backend<?> backend, String tenantId);
+	SearchException tenantIdProvidedButMultiTenancyDisabled(BackendImplementor<?> backend, String tenantId);
 
 	@Message(id = 517, value = "Backend '%1$s' has multi-tenancy enabled, but no tenant identifier is provided.")
-	SearchException multiTenancyEnabledButNoTenantIdProvided(Backend<?> backend);
+	SearchException multiTenancyEnabledButNoTenantIdProvided(BackendImplementor<?> backend);
 }

@@ -14,7 +14,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManager;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
@@ -38,7 +38,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = 55, value = "Unable to close the index reader for index '%2$s' of backend '%1$s'.")
-	void unableToCloseIndexReader(Backend<?> backend, String indexName, @Cause Exception e);
+	void unableToCloseIndexReader(BackendImplementor<?> backend, String indexName, @Cause Exception e);
 
 	@Message(id = 284, value = "An IOException happened while opening multiple indexes %1$s." )
 	SearchException ioExceptionOnMultiReaderRefresh(Collection<String> indexNames, @Cause IOException e);
@@ -103,7 +103,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = 515, value = "Unable to create the IndexWriter for backend '%1$s', index '%2$s' and path '%3$s'." )
-	SearchException unableToCreateIndexWriter(Backend<?> backend, String indexName, Path directoryPath, @Cause Exception e);
+	SearchException unableToCreateIndexWriter(BackendImplementor<?> backend, String indexName, Path directoryPath, @Cause Exception e);
 
 	@Message(id = 516, value = "Unable to index entry '%3$s' for index '%1$s' and tenant identifier '%2$s'." )
 	SearchException unableToIndexEntry(String indexName, String tenantId, String id, @Cause Exception e);
@@ -118,13 +118,13 @@ public interface Log extends BasicLogger {
 	SearchException unableToCommitIndex(String indexName, @Cause Exception e);
 
 	@Message(id = 520, value = "Index directory '%2$s' of backend '%1$s' exists but is not a writable directory.")
-	SearchException localDirectoryIndexRootDirectoryNotWritableDirectory(Backend<?> backend, Path indexDirectory);
+	SearchException localDirectoryIndexRootDirectoryNotWritableDirectory(BackendImplementor<?> backend, Path indexDirectory);
 
 	@Message(id = 521, value = "Unable to create index root directory '%2$s' for backend '%1$s'.")
-	SearchException unableToCreateIndexRootDirectoryForLocalDirectoryBackend(Backend<?> backend, Path indexDirectory, @Cause Exception e);
+	SearchException unableToCreateIndexRootDirectoryForLocalDirectoryBackend(BackendImplementor<?> backend, Path indexDirectory, @Cause Exception e);
 
 	@Message(id = 522, value = "Could not open an index reader for index '%2$s' of backend '%1$s'.")
-	SearchException unableToCreateIndexReader(Backend<?> backend, String indexName, @Cause Exception e);
+	SearchException unableToCreateIndexReader(BackendImplementor<?> backend, String indexName, @Cause Exception e);
 
 	@Message(id = 524, value = "A search query cannot target both a Lucene index and other types of index."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
@@ -144,14 +144,14 @@ public interface Log extends BasicLogger {
 	SearchException cannotUseSortableOnFieldType(String fieldName);
 
 	@Message(id = 529, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
-	SearchException multiTenancyRequiredButNotSupportedByBackend(Backend<?> backend, String indexName);
+	SearchException multiTenancyRequiredButNotSupportedByBackend(BackendImplementor<?> backend, String indexName);
 
 	@Message(id = 530, value = "Unknown multi-tenancy strategy '%1$s'.")
 	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
 
 	@Message(id = 531, value = "Tenant identifier '%2$s' is provided, but multi-tenancy is disabled for the backend '%1$s'.")
-	SearchException tenantIdProvidedButMultiTenancyDisabled(Backend<?> backend, String tenantId);
+	SearchException tenantIdProvidedButMultiTenancyDisabled(BackendImplementor<?> backend, String tenantId);
 
 	@Message(id = 532, value = "Backend '%1$s' has multi-tenancy enabled, but no tenant identifier is provided.")
-	SearchException multiTenancyEnabledButNoTenantIdProvided(Backend<?> backend);
+	SearchException multiTenancyEnabledButNoTenantIdProvided(BackendImplementor<?> backend);
 }

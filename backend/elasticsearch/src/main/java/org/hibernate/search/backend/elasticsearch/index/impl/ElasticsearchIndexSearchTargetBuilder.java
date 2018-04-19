@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -26,17 +26,17 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackend backend;
+	private final ElasticsearchBackendImpl backend;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManager> indexManagers = new LinkedHashSet<>();
 
-	ElasticsearchIndexSearchTargetBuilder(ElasticsearchBackend backend, ElasticsearchIndexManager indexManager) {
+	ElasticsearchIndexSearchTargetBuilder(ElasticsearchBackendImpl backend, ElasticsearchIndexManager indexManager) {
 		this.backend = backend;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(ElasticsearchBackend backend, ElasticsearchIndexManager indexManager) {
+	void add(ElasticsearchBackendImpl backend, ElasticsearchIndexManager indexManager) {
 		if ( ! this.backend.equals( backend ) ) {
 			throw log.cannotMixElasticsearchSearchTargetWithOtherBackend( this, indexManager );
 		}

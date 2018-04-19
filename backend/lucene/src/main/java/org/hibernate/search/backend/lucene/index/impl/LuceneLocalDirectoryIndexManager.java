@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.impl.LuceneBackend;
+import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
@@ -37,7 +37,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackend backend;
+	private final LuceneBackendImplementor backend;
 	private final String indexName;
 	private final LuceneIndexModel model;
 	private final LuceneWorkFactory workFactory;
@@ -45,7 +45,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
-	public LuceneLocalDirectoryIndexManager(LuceneBackend backend, String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
+	public LuceneLocalDirectoryIndexManager(LuceneBackendImplementor backend, String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
 		this.backend = backend;
 		this.indexName = indexName;
 		this.model = model;

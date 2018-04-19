@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -41,7 +41,7 @@ class IndexManagerBuildingStateHolder {
 	private final ConfigurationPropertySource propertySource;
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
-	private final Map<String, Backend<?>> backendsByName = new HashMap<>();
+	private final Map<String, BackendImplementor<?>> backendsByName = new HashMap<>();
 	private final Map<String, IndexManagerBuildingState<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	IndexManagerBuildingStateHolder(BuildContext buildContext,
@@ -56,7 +56,7 @@ class IndexManagerBuildingStateHolder {
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
-		Backend<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
+		BackendImplementor<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
 		String normalizedIndexName = backend.normalizeIndexName( rawIndexName );
 
 		IndexManagerBuildingState<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
@@ -67,19 +67,20 @@ class IndexManagerBuildingStateHolder {
 		return state;
 	}
 
-	public Map<String, Backend<?>> getBackendsByName() {
+	public Map<String, BackendImplementor<?>> getBackendsByName() {
 		return backendsByName;
 	}
 
 	private <D extends DocumentElement> IndexManagerBuildingState<D> createIndexManagerBuildingState(
-			Backend<D> backend, String normalizedIndexName, boolean multiTenancyEnabled, ConfigurationPropertySource indexPropertySource) {
+			BackendImplementor<D> backend, String normalizedIndexName, boolean multiTenancyEnabled,
+			ConfigurationPropertySource indexPropertySource) {
 		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, multiTenancyEnabled, buildContext, indexPropertySource );
 		IndexSchemaCollector schemaCollector = builder.getSchemaCollector();
 		IndexModelBindingContext bindingContext = new IndexModelBindingContextImpl( schemaCollector );
 		return new IndexMappingBuildingStateImpl<>( normalizedIndexName, builder, bindingContext );
 	}
 
-	private Backend<?> createBackend(String backendName) {
+	private BackendImplementor<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backend." + backendName );
 		// TODO more checks on the backend type (non-null, non-empty)
 		String backendType = BACKEND_TYPE.get( backendPropertySource ).get();

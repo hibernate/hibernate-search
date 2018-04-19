@@ -23,6 +23,6 @@ public interface BackendFactory {
 	 * <strong>CAUTION:</strong> the property key {@code type} is reserved for use by the engine.
 	 * @return A backend.
 	 */
-	Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource);
+	BackendImplementor<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource);
 
 }

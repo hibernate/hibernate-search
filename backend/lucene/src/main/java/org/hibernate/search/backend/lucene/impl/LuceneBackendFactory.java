@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.work.impl.StubLuceneWorkFactory;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -48,7 +48,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public Backend<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
+	public BackendImplementor<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
 		// TODO be more clever about the type, also supports providing a class
 		Optional<String> directoryProviderProperty = DIRECTORY_PROVIDER.get( propertySource );
 

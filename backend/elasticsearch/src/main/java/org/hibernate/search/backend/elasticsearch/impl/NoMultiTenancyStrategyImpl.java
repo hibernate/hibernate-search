@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -55,7 +55,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void checkTenantId(Backend<?> backend, String tenantId) {
+	public void checkTenantId(BackendImplementor<?> backend, String tenantId) {
 		if ( tenantId != null ) {
 			throw log.tenantIdProvidedButMultiTenancyDisabled( backend, tenantId );
 		}

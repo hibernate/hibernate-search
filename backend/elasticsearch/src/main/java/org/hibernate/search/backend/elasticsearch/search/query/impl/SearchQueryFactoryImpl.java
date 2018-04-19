@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
@@ -37,7 +37,7 @@ class SearchQueryFactoryImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackend backend;
+	private final ElasticsearchBackendImpl backend;
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
@@ -47,7 +47,7 @@ class SearchQueryFactoryImpl
 
 	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
 
-	SearchQueryFactoryImpl(ElasticsearchBackend backend, ElasticsearchSearchTargetModel searchTargetModel) {
+	SearchQueryFactoryImpl(ElasticsearchBackendImpl backend, ElasticsearchSearchTargetModel searchTargetModel) {
 		this.backend = backend;
 		this.searchTargetModel = searchTargetModel;
 

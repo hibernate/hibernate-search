@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -14,7 +15,12 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 /**
  * @author Yoann Rodiere
  */
-public interface Backend<D extends DocumentElement> extends AutoCloseable {
+public interface BackendImplementor<D extends DocumentElement> extends AutoCloseable {
+
+	/**
+	 * @return The object that should be exposed as API to users.
+	 */
+	Backend toAPI();
 
 	/**
 	 * Normalize the name of the index, so that we cannot end up with two index names in Hibernate Search

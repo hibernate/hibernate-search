@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
@@ -26,7 +26,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 	private final SearchTargetContext<?> searchTargetContext;
 
-	ElasticsearchIndexSearchTarget(ElasticsearchBackend backend, Set<ElasticsearchIndexModel> indexModels) {
+	ElasticsearchIndexSearchTarget(ElasticsearchBackendImpl backend, Set<ElasticsearchIndexModel> indexModels) {
 		this.searchTargetModel = new ElasticsearchSearchTargetModel( indexModels );
 		this.searchTargetContext = new ElasticsearchSearchTargetContext( backend, searchTargetModel );
 	}

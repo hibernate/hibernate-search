@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -98,7 +98,7 @@ class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void checkTenantId(Backend<?> backend, String tenantId) {
+	public void checkTenantId(BackendImplementor<?> backend, String tenantId) {
 		if ( tenantId == null ) {
 			throw log.multiTenancyEnabledButNoTenantIdProvided( backend );
 		}

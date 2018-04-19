@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.impl;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 
 /**
  * @author Guillaume Smet
  */
-public interface LuceneBackend extends Backend<LuceneRootDocumentBuilder> {
+public interface LuceneBackendImplementor extends BackendImplementor<LuceneRootDocumentBuilder> {
 
 	LuceneWorkFactory getWorkFactory();
 

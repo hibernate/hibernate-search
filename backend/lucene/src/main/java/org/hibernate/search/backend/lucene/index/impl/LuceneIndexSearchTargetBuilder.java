@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.impl.LuceneBackend;
+import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -28,17 +28,17 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackend backend;
+	private final LuceneBackendImplementor backend;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<LuceneIndexManager> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexSearchTargetBuilder(LuceneBackend backend, LuceneIndexManager indexManager) {
+	LuceneIndexSearchTargetBuilder(LuceneBackendImplementor backend, LuceneIndexManager indexManager) {
 		this.backend = backend;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(LuceneBackend backend, LuceneIndexManager indexManager) {
+	void add(LuceneBackendImplementor backend, LuceneIndexManager indexManager) {
 		if ( ! this.backend.equals( backend ) ) {
 			throw log.cannotMixLuceneSearchTargetWithOtherBackend( this, indexManager );
 		}

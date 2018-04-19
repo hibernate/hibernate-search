@@ -8,7 +8,8 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.spi.Backend;
+import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -18,9 +19,10 @@ import org.hibernate.search.util.impl.common.Closer;
 public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 
 	private final Map<MappingKey<?>, MappingImplementor<?>> mappings;
-	private final Map<String, Backend<?>> backends;
+	private final Map<String, BackendImplementor<?>> backends;
 
-	SearchMappingRepositoryImpl(Map<MappingKey<?>, MappingImplementor<?>> mappings, Map<String, Backend<?>> backends) {
+	SearchMappingRepositoryImpl(Map<MappingKey<?>, MappingImplementor<?>> mappings,
+			Map<String, BackendImplementor<?>> backends) {
 		this.mappings = mappings;
 		this.backends = backends;
 	}
@@ -37,10 +39,19 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 	}
 
 	@Override
+	public Backend getBackend(String backendName) {
+		BackendImplementor<?> backend = backends.get( backendName );
+		if ( backend == null ) {
+			throw new SearchException( "No backend registered for backend name '" + backendName + "'" );
+		}
+		return backend.toAPI();
+	}
+
+	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingImplementor::close, mappings.values() );
-			closer.pushAll( Backend::close, backends.values() );
+			closer.pushAll( BackendImplementor::close, backends.values() );
 		}
 	}
 }

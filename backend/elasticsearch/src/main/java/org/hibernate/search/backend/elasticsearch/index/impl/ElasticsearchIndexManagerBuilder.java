@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaCollectorImpl;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -24,14 +24,14 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
-	private final ElasticsearchBackend backend;
+	private final ElasticsearchBackendImpl backend;
 	private final String indexName;
 	private final BuildContext context;
 	private final ConfigurationPropertySource propertySource;
 
 	private final ElasticsearchRootIndexSchemaCollectorImpl collector;
 
-	public ElasticsearchIndexManagerBuilder(ElasticsearchBackend backend, String indexName,
+	public ElasticsearchIndexManagerBuilder(ElasticsearchBackendImpl backend, String indexName,
 			BuildContext context, ConfigurationPropertySource propertySource) {
 		this.backend = backend;
 		this.indexName = indexName;

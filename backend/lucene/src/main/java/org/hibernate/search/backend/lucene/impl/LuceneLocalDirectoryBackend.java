@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.index.impl.LuceneLocalDirectoryIndexManagerBuilder;
@@ -25,7 +26,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryBackend implements LuceneBackend {
+public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Backend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -50,6 +51,11 @@ public class LuceneLocalDirectoryBackend implements LuceneBackend {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		initializeRootDirectory( name, rootDirectory );
+	}
+
+	@Override
+	public Backend toAPI() {
+		return this;
 	}
 
 	@Override

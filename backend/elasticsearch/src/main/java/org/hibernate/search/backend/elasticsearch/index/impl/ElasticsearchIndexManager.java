@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
@@ -29,14 +29,14 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackend backend;
+	private final ElasticsearchBackendImpl backend;
 	private final URLEncodedString name;
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
-	public ElasticsearchIndexManager(ElasticsearchBackend backend, URLEncodedString name, URLEncodedString typeName,
+	public ElasticsearchIndexManager(ElasticsearchBackendImpl backend, URLEncodedString name, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		this.backend = backend;
 		this.name = name;

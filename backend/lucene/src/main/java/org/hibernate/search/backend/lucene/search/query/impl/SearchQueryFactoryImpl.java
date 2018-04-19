@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.impl.LuceneBackend;
+import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
@@ -37,11 +37,11 @@ class SearchQueryFactoryImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackend backend;
+	private final LuceneBackendImplementor backend;
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	SearchQueryFactoryImpl(LuceneBackend backend, LuceneSearchTargetModel searchTargetModel) {
+	SearchQueryFactoryImpl(LuceneBackendImplementor backend, LuceneSearchTargetModel searchTargetModel) {
 		this.backend = backend;
 		this.searchTargetModel = searchTargetModel;
 	}
