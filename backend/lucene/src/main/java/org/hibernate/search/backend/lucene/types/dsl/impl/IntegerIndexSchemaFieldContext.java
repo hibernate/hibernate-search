@@ -33,16 +33,16 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 /**
  * @author Guillaume Smet
  */
-public class IndexSchemaFieldIntegerContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
+public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
 
 	private Sortable sortable;
 
-	public IndexSchemaFieldIntegerContext(String fieldName) {
+	public IntegerIndexSchemaFieldContext(String fieldName) {
 		super( fieldName );
 	}
 
 	@Override
-	public IndexSchemaFieldIntegerContext sortable(Sortable sortable) {
+	public IntegerIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}

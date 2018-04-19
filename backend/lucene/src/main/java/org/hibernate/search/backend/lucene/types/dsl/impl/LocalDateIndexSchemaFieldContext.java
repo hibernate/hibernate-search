@@ -43,16 +43,16 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 /**
  * @author Guillaume Smet
  */
-public class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTypedContext<LocalDate> {
+public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<LocalDate> {
 
 	private Sortable sortable;
 
-	public IndexSchemaFieldLocalDateContext(String fieldName) {
+	public LocalDateIndexSchemaFieldContext(String fieldName) {
 		super( fieldName );
 	}
 
 	@Override
-	public IndexSchemaFieldLocalDateContext sortable(Sortable sortable) {
+	public LocalDateIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}

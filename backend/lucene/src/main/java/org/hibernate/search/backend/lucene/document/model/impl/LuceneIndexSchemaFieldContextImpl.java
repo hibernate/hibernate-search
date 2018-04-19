@@ -10,10 +10,10 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldGeoPointContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldIntegerContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldLocalDateContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldStringContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.GeoPointIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.IntegerIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LocalDateIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
@@ -54,22 +54,22 @@ public class LuceneIndexSchemaFieldContextImpl implements IndexSchemaFieldContex
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new IndexSchemaFieldStringContext( relativeName ) );
+		return setDelegate( new StringIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IndexSchemaFieldIntegerContext( relativeName ) );
+		return setDelegate( new IntegerIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new IndexSchemaFieldLocalDateContext( relativeName ) );
+		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new IndexSchemaFieldGeoPointContext( relativeName ) );
+		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override

@@ -42,7 +42,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 /**
  * @author Guillaume Smet
  */
-public class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFieldTypedContext<String> {
+public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<String> {
 
 	private static final Analyzer STANDARD_ANALYZER = new StandardAnalyzer();
 
@@ -52,12 +52,12 @@ public class IndexSchemaFieldStringContext extends AbstractLuceneIndexSchemaFiel
 
 	private Analyzer normalizer;
 
-	public IndexSchemaFieldStringContext(String fieldName) {
+	public StringIndexSchemaFieldContext(String fieldName) {
 		super( fieldName );
 	}
 
 	@Override
-	public IndexSchemaFieldStringContext sortable(Sortable sortable) {
+	public StringIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
