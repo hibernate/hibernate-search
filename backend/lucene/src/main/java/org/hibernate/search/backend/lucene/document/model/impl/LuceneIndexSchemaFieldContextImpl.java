@@ -10,6 +10,10 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldGeoPointContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldIntegerContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldLocalDateContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.IndexSchemaFieldStringContext;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.document.model.impl;
+package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
@@ -30,13 +30,20 @@ import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.MatchQueryOptions;
+import org.hibernate.search.backend.lucene.document.model.impl.RangeQueryOptions;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 /**
  * @author Guillaume Smet
  */
-class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTypedContext<LocalDate> {
+public class IndexSchemaFieldLocalDateContext extends AbstractLuceneIndexSchemaFieldTypedContext<LocalDate> {
 
 	private Sortable sortable;
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.document.model.impl;
+package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import static org.hibernate.search.backend.lucene.document.model.impl.LuceneFields.internalFieldName;
 
@@ -20,6 +20,10 @@ import org.hibernate.search.engine.backend.document.impl.DeferredInitializationI
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -27,7 +31,7 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 /**
  * @author Guillaume Smet
  */
-class IndexSchemaFieldGeoPointContext extends AbstractLuceneIndexSchemaFieldTypedContext<GeoPoint> {
+public class IndexSchemaFieldGeoPointContext extends AbstractLuceneIndexSchemaFieldTypedContext<GeoPoint> {
 
 	public IndexSchemaFieldGeoPointContext(String fieldName) {
 		super( fieldName );
