@@ -9,20 +9,16 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.model.LuceneIndexSchemaFieldTypedContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldSortContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.document.model.impl.SortMissingValue;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -91,37 +87,5 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	protected Analyzer getNormalizer() {
 		return null;
-	}
-
-	abstract static class AbstractScalarLuceneFieldSortContributor implements LuceneFieldSortContributor {
-
-		private Object sortMissingValueFirstPlaceholder;
-
-		private Object sortMissingValueLastPlaceholder;
-
-		protected AbstractScalarLuceneFieldSortContributor(Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
-			this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
-			this.sortMissingValueLastPlaceholder = sortMissingValueLastPlaceholder;
-		}
-
-		protected void setEffectiveMissingValue(SortField sortField, Object missingValue, SortOrder order) {
-			if ( missingValue == null ) {
-				return;
-			}
-
-			// TODO so this is to mimic the Elasticsearch behavior, I'm not totally convinced it's the good choice though
-			Object effectiveMissingValue;
-			if ( missingValue == SortMissingValue.MISSING_FIRST ) {
-				effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueLastPlaceholder : sortMissingValueFirstPlaceholder;
-			}
-			else if ( missingValue == SortMissingValue.MISSING_LAST ) {
-				effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueFirstPlaceholder : sortMissingValueLastPlaceholder;
-			}
-			else {
-				effectiveMissingValue = missingValue;
-			}
-
-			sortField.setMissingValue( effectiveMissingValue );
-		}
 	}
 }
