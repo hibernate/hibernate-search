@@ -43,6 +43,7 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexFamily;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
@@ -270,8 +271,10 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 					closer.push( serviceManager::releaseService, LuceneWorkSerializer.class );
 				}
 
-				closer.push( serviceManager::releaseAllServices );
+				// Execute this before closing the service manager to allow integrations to release services
 				closer.pushAll( SearchIntegration::close, this.integrations.values() );
+
+				closer.push( serviceManager::releaseAllServices );
 
 				// unregister statistic mbean
 				if ( statisticsMBeanName != null ) {
@@ -643,6 +646,17 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public boolean enlistWorkerInTransaction() {
 		return enlistWorkerInTransaction;
+	}
+
+	@Override
+	public IndexFamily getIndexFamily(IndexManagerType indexManagerType) {
+		SearchIntegration integration = integrations.get( indexManagerType );
+		if ( integration != null ) {
+			return integration.getIndexFamily();
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

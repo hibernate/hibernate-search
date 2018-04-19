@@ -19,7 +19,9 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexFamily;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -207,6 +209,13 @@ public interface SearchIntegrator extends AutoCloseable {
 	 */
 	@Override
 	void close();
+
+	/**
+	 * Get an {@link org.hibernate.search.indexes.spi.IndexFamily} using the index manager type.
+	 * @param indexManagerType the type of index managers of the requested family
+	 * @return the selected {@link IndexFamily}, or null if it doesn't exist
+	 */
+	IndexFamily getIndexFamily(IndexManagerType indexManagerType);
 
 	/**
 	 * Get an {@link IndexManager} using the name

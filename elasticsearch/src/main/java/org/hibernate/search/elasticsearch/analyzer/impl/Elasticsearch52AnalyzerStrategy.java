@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
@@ -21,8 +20,8 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  */
 public class Elasticsearch52AnalyzerStrategy extends Elasticsearch2AnalyzerStrategy {
 
-	public Elasticsearch52AnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
-		super( serviceManager, cfg );
+	public Elasticsearch52AnalyzerStrategy(ServiceManager serviceManager, String analysisDefinitionProviderClassName) {
+		super( serviceManager, analysisDefinitionProviderClassName );
 	}
 
 	@Override

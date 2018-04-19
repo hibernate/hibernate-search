@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es52;
 
+import java.util.Properties;
+
 import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch52AnalyzerStrategy;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
@@ -21,6 +23,10 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  */
 public class Elasticsearch52Dialect extends Elasticsearch50Dialect {
 
+	public Elasticsearch52Dialect(Properties properties) {
+		super( properties );
+	}
+
 	@Override
 	public ElasticsearchSchemaTranslator createSchemaTranslator() {
 		return new Elasticsearch52SchemaTranslator();
@@ -33,7 +39,7 @@ public class Elasticsearch52Dialect extends Elasticsearch50Dialect {
 
 	@Override
 	public ElasticsearchAnalyzerStrategyFactory createAnalyzerStrategyFactory(ServiceManager serviceManager) {
-		return configuration -> new Elasticsearch52AnalyzerStrategy( serviceManager, configuration );
+		return () -> new Elasticsearch52AnalyzerStrategy( serviceManager, getAnalysisDefinitionProviderClassName() );
 	}
 
 }

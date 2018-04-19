@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,14 +18,12 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.NormalizerDef;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ChainingElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryBuilderImpl;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.NamespaceMergingElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -33,7 +32,6 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 
 /**
@@ -49,21 +47,20 @@ public class Elasticsearch2AnalyzerStrategy implements AnalyzerStrategy {
 
 	private final SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry;
 
-	public Elasticsearch2AnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+	public Elasticsearch2AnalyzerStrategy(ServiceManager serviceManager, String analysisDefinitionProviderClassName) {
 		this.serviceManager = serviceManager;
 		/*
 		 * Make sure to re-create the default definition registry with each newly instantiated strategy,
 		 * so that the definition providers can add new definitions between two SearchFactory increments.
 		 * Caching those in a Service, for instance, would prevent that.
 		 */
-		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry( cfg );
+		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry( analysisDefinitionProviderClassName );
 	}
 
-	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry( SearchConfiguration cfg ) {
+	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry(String providerClassName) {
 		ElasticsearchAnalysisDefinitionRegistryBuilderImpl builder =
 				new ElasticsearchAnalysisDefinitionRegistryBuilderImpl();
 
-		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER );
 		if ( providerClassName != null ) {
 			ElasticsearchAnalysisDefinitionProvider provider;
 			try {

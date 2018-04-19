@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.indexes.spi;
 
-import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
@@ -36,14 +34,7 @@ public interface IndexManagerType {
 	/**
 	 * @param serviceManager the service manager
 	 * @param cfg the Hibernate Search configuration, providing in particular access to configuration properties.
-	 * @return a newly created strategy of analyzer execution employed by index managers of this family.
+	 * @return a newly created index family.
 	 */
-	AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
-
-	/**
-	 * @param serviceManager the service manager
-	 * @param cfg the Hibernate Search configuration, providing in particular access to configuration properties.
-	 * @return a newly created strategy for missing values employed by index managers of this family.
-	 */
-	MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
+	IndexFamilyImplementor createIndexFamily(ServiceManager serviceManager, SearchConfiguration cfg);
 }

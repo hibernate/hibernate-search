@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.indexes.spi;
 
-import org.hibernate.search.analyzer.impl.LuceneEmbeddedAnalyzerStrategy;
-import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.nulls.impl.LuceneMissingValueStrategy;
-import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.indexes.impl.LuceneEmbeddedIndexFamilyImpl;
 
 public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 
@@ -22,12 +19,7 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 	}
 
 	@Override
-	public AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
-		return new LuceneEmbeddedAnalyzerStrategy( serviceManager, cfg );
-	}
-
-	@Override
-	public MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
-		return LuceneMissingValueStrategy.INSTANCE;
+	public IndexFamilyImplementor createIndexFamily(ServiceManager serviceManager, SearchConfiguration cfg) {
+		return new LuceneEmbeddedIndexFamilyImpl( serviceManager, cfg );
 	}
 }

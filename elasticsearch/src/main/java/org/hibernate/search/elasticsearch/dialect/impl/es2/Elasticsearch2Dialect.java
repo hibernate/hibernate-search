@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es2;
 
+import java.util.Properties;
+
 import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.query.impl.Elasticsearch2QueryFactory;
@@ -34,12 +37,18 @@ import com.google.gson.GsonBuilder;
  */
 public class Elasticsearch2Dialect implements ElasticsearchDialect {
 
+	private final String analysisDefinitionProviderClassName;
+
+	public Elasticsearch2Dialect(Properties properties) {
+		this.analysisDefinitionProviderClassName = properties.getProperty( "elasticsearch.analysis_definition_provider" );
+	}
+
 	@Override
 	public GsonBuilder createGsonBuilderBase() {
 		return new GsonBuilder()
-					.registerTypeAdapter( IndexType.class, new ES2IndexTypeJsonAdapter().nullSafe() )
-					.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() )
-					.registerTypeAdapter( NormsType.class, new ES2NormsTypeJsonAdapter().nullSafe() );
+				.registerTypeAdapter( IndexType.class, new ES2IndexTypeJsonAdapter().nullSafe() )
+				.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() )
+				.registerTypeAdapter( NormsType.class, new ES2NormsTypeJsonAdapter().nullSafe() );
 	}
 
 	@Override
@@ -59,7 +68,7 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 
 	@Override
 	public ElasticsearchAnalyzerStrategyFactory createAnalyzerStrategyFactory(ServiceManager serviceManager) {
-		return configuration -> new Elasticsearch2AnalyzerStrategy( serviceManager, configuration );
+		return () -> new Elasticsearch2AnalyzerStrategy( serviceManager, analysisDefinitionProviderClassName );
 	}
 
 	@Override
@@ -67,4 +76,7 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 		return new Elasticsearch2QueryFactory();
 	}
 
+	protected final String getAnalysisDefinitionProviderClassName() {
+		return analysisDefinitionProviderClassName;
+	}
 }

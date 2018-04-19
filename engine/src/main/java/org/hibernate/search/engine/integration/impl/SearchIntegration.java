@@ -9,6 +9,7 @@ package org.hibernate.search.engine.integration.impl;
 
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.NormalizerRegistry;
+import org.hibernate.search.indexes.spi.IndexFamilyImplementor;
 
 /**
  * Groups metadata relative to a specific integration (Lucene, Elasticsearch, ...).
@@ -16,6 +17,8 @@ import org.hibernate.search.engine.impl.NormalizerRegistry;
  * @author Yoann Rodiere
  */
 public interface SearchIntegration {
+
+	IndexFamilyImplementor getIndexFamily();
 
 	AnalyzerRegistry getAnalyzerRegistry();
 
