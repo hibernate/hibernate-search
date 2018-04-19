@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
 
-public final class LocalDateFieldFormatter implements LuceneFieldFormatter<LocalDate> {
+public final class LocalDateFieldFormatter implements LuceneFieldFormatter<Long> {
 
 	public static final LocalDateFieldFormatter INSTANCE = new LocalDateFieldFormatter();
 
@@ -18,7 +18,11 @@ public final class LocalDateFieldFormatter implements LuceneFieldFormatter<Local
 	}
 
 	@Override
-	public Object format(Object value) {
+	public Long format(Object value) {
+		if ( value == null ) {
+			return null;
+		}
+
 		return ((LocalDate) value).toEpochDay();
 	}
 }

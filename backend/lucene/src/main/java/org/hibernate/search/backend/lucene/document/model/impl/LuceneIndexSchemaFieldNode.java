@@ -19,7 +19,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldFormatter<T> formatter;
+	private final LuceneFieldFormatter<?> formatter;
 
 	private final LuceneFieldCodec<T> codec;
 
@@ -27,7 +27,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final LuceneFieldSortContributor sortContributor;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<T> formatter, LuceneFieldCodec<T> codec,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<T> codec,
 			LuceneFieldQueryFactory queryFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
 		this.fieldName = fieldName;
@@ -50,7 +50,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 		return absoluteFieldPath;
 	}
 
-	public LuceneFieldFormatter<T> getFormatter() {
+	public LuceneFieldFormatter<?> getFormatter() {
 		return formatter;
 	}
 

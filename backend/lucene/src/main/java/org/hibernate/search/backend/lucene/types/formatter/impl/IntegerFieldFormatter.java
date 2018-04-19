@@ -16,7 +16,7 @@ public final class IntegerFieldFormatter implements LuceneFieldFormatter<Integer
 	}
 
 	@Override
-	public Object format(Object value) {
-		return value;
+	public Integer format(Object value) {
+		return (Integer) value;
 	}
 }

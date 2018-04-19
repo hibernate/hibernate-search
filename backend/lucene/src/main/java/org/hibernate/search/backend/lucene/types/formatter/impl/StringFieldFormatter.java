@@ -16,7 +16,7 @@ public final class StringFieldFormatter implements LuceneFieldFormatter<String> 
 	}
 
 	@Override
-	public Object format(Object value) {
-		return value;
+	public String format(Object value) {
+		return (String) value;
 	}
 }
