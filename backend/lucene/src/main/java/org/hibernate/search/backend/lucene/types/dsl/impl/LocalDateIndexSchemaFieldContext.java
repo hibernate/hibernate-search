@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccesso
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.types.codec.impl.LocalDateFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LocalDateFieldQueryFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortContributor;
@@ -38,13 +39,12 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 	@Override
 	protected void contribute(DeferredInitializationIndexFieldAccessor<LocalDate> accessor, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
-		LocalDateFieldFormatter localDateFieldFormatter = new LocalDateFieldFormatter( getStore(), sortable );
-
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getFieldName(),
-				localDateFieldFormatter,
-				new LocalDateFieldQueryFactory( localDateFieldFormatter ),
+				LocalDateFieldFormatter.INSTANCE,
+				new LocalDateFieldCodec( getStore(), sortable ),
+				new LocalDateFieldQueryFactory( LocalDateFieldFormatter.INSTANCE ),
 				LocalDateFieldSortContributor.INSTANCE
 		);
 

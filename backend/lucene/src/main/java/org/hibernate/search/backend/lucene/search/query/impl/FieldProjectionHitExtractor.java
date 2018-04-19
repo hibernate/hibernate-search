@@ -9,18 +9,18 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 class FieldProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldFormatter<?> formatter;
+	private final LuceneFieldCodec<?> codec;
 
-	FieldProjectionHitExtractor(String absoluteFieldPath, LuceneFieldFormatter<?> formatter) {
-		this.formatter = formatter;
+	FieldProjectionHitExtractor(String absoluteFieldPath, LuceneFieldCodec<?> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.codec = codec;
 	}
 
 	@Override
@@ -30,16 +30,16 @@ class FieldProjectionHitExtractor implements HitExtractor<ProjectionHitCollector
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		if ( formatter.getOverriddenStoredFields().isEmpty() ) {
+		if ( codec.getOverriddenStoredFields().isEmpty() ) {
 			absoluteFieldPaths.add( absoluteFieldPath );
 		}
 		else {
-			absoluteFieldPaths.addAll( formatter.getOverriddenStoredFields() );
+			absoluteFieldPaths.addAll( codec.getOverriddenStoredFields() );
 		}
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, Document document) {
-		collector.collectProjection( formatter.parse( document, absoluteFieldPath ) );
+		collector.collectProjection( codec.decode( document, absoluteFieldPath ) );
 	}
 }

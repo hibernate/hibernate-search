@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccesso
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.GeoPointFieldFormatter;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 
@@ -29,7 +30,8 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getFieldName(),
-				new GeoPointFieldFormatter( parentNode.getAbsolutePath( getFieldName() ), getStore() ),
+				GeoPointFieldFormatter.INSTANCE,
+				new GeoPointFieldCodec( parentNode.getAbsolutePath( getFieldName() ), getStore() ),
 				null, // for now we don't have a query factory for GeoPoint
 				null // for now we don't have a sort contributor for GeoPoint
 		);

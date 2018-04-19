@@ -21,16 +21,19 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final LuceneFieldFormatter<T> formatter;
 
+	private final LuceneFieldCodec<T> codec;
+
 	private final LuceneFieldQueryFactory queryFactory;
 
 	private final LuceneFieldSortContributor sortContributor;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<T> formatter,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<T> formatter, LuceneFieldCodec<T> codec,
 			LuceneFieldQueryFactory queryFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
 		this.fieldName = fieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( fieldName );
 		this.formatter = formatter;
+		this.codec = codec;
 		this.queryFactory = queryFactory;
 		this.sortContributor = sortContributor;
 	}
@@ -51,6 +54,10 @@ public class LuceneIndexSchemaFieldNode<T> {
 		return formatter;
 	}
 
+	public LuceneFieldCodec<T> getEncoding() {
+		return codec;
+	}
+
 	public LuceneFieldQueryFactory getQueryFactory() {
 		return queryFactory;
 	}
@@ -60,8 +67,10 @@ public class LuceneIndexSchemaFieldNode<T> {
 	}
 
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
-		if ( !Objects.equals( sortContributor, other.sortContributor ) || !Objects.equals( formatter, other.formatter )
-				|| !Objects.equals( queryFactory, other.queryFactory ) ) {
+		if ( !Objects.equals( formatter, other.formatter )
+				|| !Objects.equals( codec, other.codec )
+				|| !Objects.equals( queryFactory, other.queryFactory )
+				|| !Objects.equals( sortContributor, other.sortContributor ) ) {
 			return false;
 		}
 		return true;
@@ -73,6 +82,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 				.append( "parent=" ).append( parent )
 				.append( ", fieldName=" ).append( fieldName )
 				.append( ", formatter=" ).append( formatter )
+				.append( ", codec=" ).append( codec )
 				.append( ", queryFactory=" ).append( queryFactory )
 				.append( ", sortContributor" ).append( sortContributor )
 				.append( "]" );

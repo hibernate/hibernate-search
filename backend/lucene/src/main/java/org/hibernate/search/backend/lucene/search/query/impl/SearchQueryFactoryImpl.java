@@ -110,10 +110,10 @@ class SearchQueryFactoryImpl
 					extractors.add( DocumentReferenceProjectionHitExtractor.get() );
 					break;
 				default:
-					LuceneIndexSchemaFieldNode<?> node = indexModel.getFieldNode( projection );
-					if ( node != null ) {
+					LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( projection );
+					if ( schemaNode != null ) {
 						projectionFound.set( i );
-						extractors.add( new FieldProjectionHitExtractor( projection, node.getFormatter() ) );
+						extractors.add( new FieldProjectionHitExtractor( projection, schemaNode.getEncoding() ) );
 					}
 					else {
 						// Make sure that the result list will have the correct indices and size

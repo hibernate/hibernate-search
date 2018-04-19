@@ -6,24 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.Collections;
-import java.util.Set;
-
-import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-
 /**
  * @author Guillaume Smet
  */
 public interface LuceneFieldFormatter<T> {
-
-	void addFields(LuceneDocumentBuilder documentBuilder, LuceneIndexSchemaObjectNode parentNode, String fieldName, T value);
-
-	default Set<String> getOverriddenStoredFields() {
-		return Collections.emptySet();
-	}
-
-	T parse(Document document, String fieldName);
 
 	Object format(Object value);
 }
