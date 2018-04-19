@@ -1,6 +1,9 @@
 # Typically *NIX text editors, by default, append '~' to files on saving to make backups
 *~
 
+# Some editors, such as DIA, use this extension for automatic saves
+*.autosave
+
 # Our build scripts - necessary for our release jobs
 hibernate-noorm-release-scripts
 
