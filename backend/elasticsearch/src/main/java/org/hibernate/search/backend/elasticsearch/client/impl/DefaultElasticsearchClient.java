@@ -84,6 +84,15 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 		return result;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T unwrap(Class<T> clientClass) {
+		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
+			return (T) restClient;
+		}
+		throw log.clientUnwrappingWithUnkownType( clientClass, RestClient.class );
+	}
+
 	private CompletableFuture<Response> send(ElasticsearchRequest request) {
 		Gson gson = gsonProvider.getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );

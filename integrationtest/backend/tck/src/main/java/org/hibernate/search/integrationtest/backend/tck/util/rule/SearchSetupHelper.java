@@ -60,10 +60,14 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	public SetupContext withDefaultConfiguration() {
+		return withDefaultConfiguration( "testedBackend" );
+	}
+
+	public SetupContext withDefaultConfiguration(String backendName) {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId ).withPrefix( "backend.testedBackend" );
+		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId ).withPrefix( "backend." + backendName );
 		return new SetupContext( propertySource )
-				.withProperty( "index.default.backend", "testedBackend" );
+				.withProperty( "index.default.backend", backendName );
 	}
 
 	public SetupContext withMultiTenancyConfiguration() {
@@ -100,7 +104,7 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
-		public void setup() {
+		public SearchMappingRepository setup() {
 			SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder( propertySource );
 
 			for ( Map.Entry<String, String> entry : overriddenProperties.entrySet() ) {
@@ -115,6 +119,8 @@ public class SearchSetupHelper implements TestRule {
 
 			StubMapping mapping = contributor.getResult();
 			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
+
+			return mappingRepository;
 		}
 
 	}

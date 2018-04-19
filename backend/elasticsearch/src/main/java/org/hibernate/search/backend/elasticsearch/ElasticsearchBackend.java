@@ -10,5 +10,15 @@ import org.hibernate.search.engine.backend.Backend;
 
 public interface ElasticsearchBackend extends Backend {
 
-	// TODO add Elasticsearch-specific backend APIs
+	/**
+	 * Retrieve the underlying, low-level client used to communicate with the Elasticsearch cluster.
+	 * <p>
+	 * <strong>WARNING - Unsupported API:</strong> the underlying client class may change without notice.
+	 *
+	 * @param clientClass The {@link Class} representing the expected client type
+	 * @return The client.
+	 * @throws org.hibernate.search.util.SearchException if the underlying client does not implement the given class.
+	 */
+	<T> T getClient(Class<T> clientClass);
+
 }

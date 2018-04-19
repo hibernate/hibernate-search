@@ -9,15 +9,19 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -28,8 +32,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import org.apache.http.nio.client.HttpAsyncClient;
+import org.assertj.core.api.Assertions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 
 public class ExtensionIT {
+
+	private static final String BACKEND_NAME = "myElasticsearchBackend";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -41,6 +53,10 @@ public class ExtensionIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	private SearchMappingRepository mappingRepository;
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
 	private String indexName;
@@ -48,7 +64,7 @@ public class ExtensionIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		this.mappingRepository = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						"MappedType", "IndexName",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
@@ -261,6 +277,30 @@ public class ExtensionIT {
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( indexName, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+	}
+
+	@Test
+	public void backend_getClient() throws Exception {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		ElasticsearchBackend elasticsearchBackend = backend.withExtension( ElasticsearchExtension.get() );
+		RestClient restClient = elasticsearchBackend.getClient( RestClient.class );
+
+		// Test that the client actually works
+		Response response = restClient.performRequest( "GET", "/" );
+		Assertions.assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
+	}
+
+	@Test
+	public void backend_getClient_error_invalidClass() {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		ElasticsearchBackend elasticsearchBackend = backend.withExtension( ElasticsearchExtension.get() );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( HttpAsyncClient.class.getName() );
+		thrown.expectMessage( "the client can only be unwrapped to" );
+		thrown.expectMessage( RestClient.class.getName() );
+
+		elasticsearchBackend.getClient( HttpAsyncClient.class );
 	}
 
 	private void initData() {

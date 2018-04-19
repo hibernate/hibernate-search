@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -119,4 +120,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 517, value = "Backend '%1$s' has multi-tenancy enabled, but no tenant identifier is provided.")
 	SearchException multiTenancyEnabledButNoTenantIdProvided(BackendImplementor<?> backend);
+
+	@Message(id = 518, value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
+			+ " but the client can only be unwrapped to %2$s." )
+	SearchException clientUnwrappingWithUnkownType(Class<?> requestedClass, Class<?> actualClass);
 }

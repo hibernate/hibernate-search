@@ -23,4 +23,14 @@ public interface ElasticsearchClient extends Closeable {
 	 */
 	CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request);
 
+	/**
+	 * Unwrap the client to some implementation-specific type.
+	 *
+	 * @param clientClass The {@link Class} representing the expected client type
+	 * @return The unwrapped client.
+	 * @throws org.hibernate.search.util.SearchException if the client implementation does not support
+	 * unwrapping to the given class.
+	 */
+	<T> T unwrap(Class<T> clientClass);
+
 }

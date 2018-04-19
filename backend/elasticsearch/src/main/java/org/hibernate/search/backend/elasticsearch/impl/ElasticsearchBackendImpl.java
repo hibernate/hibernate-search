@@ -62,6 +62,11 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 	}
 
 	@Override
+	public <T> T getClient(Class<T> clientClass) {
+		return client.unwrap( clientClass );
+	}
+
+	@Override
 	public String normalizeIndexName(String rawIndexName) {
 		return ElasticsearchIndexNameNormalizer.normalize( rawIndexName );
 	}
