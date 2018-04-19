@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.impl;
 
 import org.hibernate.search.engine.integration.impl.SearchIntegration;
+import org.hibernate.search.util.impl.Closer;
 
 /**
  * @author Yoann Rodiere
@@ -36,7 +37,10 @@ public class ImmutableSearchIntegration implements SearchIntegration {
 
 	@Override
 	public void close() {
-		analyzerRegistry.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( AnalyzerRegistry::close, analyzerRegistry );
+			closer.push( NormalizerRegistry::close, normalizerRegistry );
+		}
 	}
 
 }
