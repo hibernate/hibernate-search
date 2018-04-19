@@ -8,14 +8,14 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
 
-public final class LocalDateFieldQueryFactory implements LuceneFieldQueryFactory {
+public final class LocalDateFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
 
 	private final LocalDateFieldFormatter formatter;
 
-	public LocalDateFieldQueryFactory(LocalDateFieldFormatter formatter) {
+	public LocalDateFieldPredicateBuilderFactory(LocalDateFieldFormatter formatter) {
 		this.formatter = formatter;
 	}
 
@@ -37,11 +37,11 @@ public final class LocalDateFieldQueryFactory implements LuceneFieldQueryFactory
 		if ( obj == null ) {
 			return false;
 		}
-		if ( LocalDateFieldQueryFactory.class != obj.getClass() ) {
+		if ( LocalDateFieldPredicateBuilderFactory.class != obj.getClass() ) {
 			return false;
 		}
 
-		LocalDateFieldQueryFactory other = (LocalDateFieldQueryFactory) obj;
+		LocalDateFieldPredicateBuilderFactory other = (LocalDateFieldPredicateBuilderFactory) obj;
 
 		return Objects.equals( formatter, other.formatter );
 	}

@@ -9,10 +9,10 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
 
-public class StringFieldQueryFactory implements LuceneFieldQueryFactory {
+public class StringFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
 
 	private final StringFieldFormatter formatter;
 
@@ -20,7 +20,7 @@ public class StringFieldQueryFactory implements LuceneFieldQueryFactory {
 
 	private final QueryBuilder queryBuilder;
 
-	public StringFieldQueryFactory(StringFieldFormatter formatter, boolean tokenized, QueryBuilder queryBuilder) {
+	public StringFieldPredicateBuilderFactory(StringFieldFormatter formatter, boolean tokenized, QueryBuilder queryBuilder) {
 		this.formatter = formatter;
 		this.tokenized = tokenized;
 		this.queryBuilder = queryBuilder;
@@ -48,7 +48,7 @@ public class StringFieldQueryFactory implements LuceneFieldQueryFactory {
 			return false;
 		}
 
-		StringFieldQueryFactory other = (StringFieldQueryFactory) obj;
+		StringFieldPredicateBuilderFactory other = (StringFieldPredicateBuilderFactory) obj;
 
 		return Objects.equals( formatter, other.formatter ) &&
 				tokenized == other.tokenized &&

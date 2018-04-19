@@ -23,18 +23,18 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final LuceneFieldCodec<T> codec;
 
-	private final LuceneFieldQueryFactory queryFactory;
+	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 
 	private final LuceneFieldSortContributor sortContributor;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<T> codec,
-			LuceneFieldQueryFactory queryFactory, LuceneFieldSortContributor sortContributor) {
+			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
 		this.fieldName = fieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( fieldName );
 		this.formatter = formatter;
 		this.codec = codec;
-		this.queryFactory = queryFactory;
+		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortContributor = sortContributor;
 	}
 
@@ -58,8 +58,8 @@ public class LuceneIndexSchemaFieldNode<T> {
 		return codec;
 	}
 
-	public LuceneFieldQueryFactory getQueryFactory() {
-		return queryFactory;
+	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+		return predicateBuilderFactory;
 	}
 
 	public LuceneFieldSortContributor getSortContributor() {
@@ -69,7 +69,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
 		if ( !Objects.equals( formatter, other.formatter )
 				|| !Objects.equals( codec, other.codec )
-				|| !Objects.equals( queryFactory, other.queryFactory )
+				|| !Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory )
 				|| !Objects.equals( sortContributor, other.sortContributor ) ) {
 			return false;
 		}
@@ -83,7 +83,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 				.append( ", fieldName=" ).append( fieldName )
 				.append( ", formatter=" ).append( formatter )
 				.append( ", codec=" ).append( codec )
-				.append( ", queryFactory=" ).append( queryFactory )
+				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
 				.append( ", sortContributor" ).append( sortContributor )
 				.append( "]" );
 		return sb.toString();

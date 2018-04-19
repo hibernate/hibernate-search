@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.IntegerFieldFormatter;
 
-public final class IntegerFieldQueryFactory implements LuceneFieldQueryFactory {
+public final class IntegerFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
 
-	public static final IntegerFieldQueryFactory INSTANCE = new IntegerFieldQueryFactory();
+	public static final IntegerFieldPredicateBuilderFactory INSTANCE = new IntegerFieldPredicateBuilderFactory();
 
-	private IntegerFieldQueryFactory() {
+	private IntegerFieldPredicateBuilderFactory() {
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 				getFieldName(),
 				GeoPointFieldFormatter.INSTANCE,
 				new GeoPointFieldCodec( parentNode.getAbsolutePath( getFieldName() ), getStore() ),
-				null, // for now we don't have a query factory for GeoPoint
+				null, // for now we don't have a predicate builder factory for GeoPoint
 				null // for now we don't have a sort contributor for GeoPoint
 		);
 
