@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import org.apache.lucene.search.Query;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 /**
  * @author Guillaume Smet
  */
 public interface LuceneFieldQueryFactory {
 
-	Query createMatchQuery(String fieldName, Object value, MatchQueryOptions matchQueryOptions);
+	MatchPredicateBuilder<LuceneSearchPredicateCollector> createMatchPredicateBuilder(String absoluteFieldPath);
 
-	Query createRangeQuery(String fieldName, Object lowerLimit, Object upperLimit, RangeQueryOptions rangeQueryOptions);
+	RangePredicateBuilder<LuceneSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath);
 }

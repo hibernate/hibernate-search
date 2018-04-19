@@ -6,17 +6,32 @@
  */
 package org.hibernate.search.backend.lucene.types.formatter.impl;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public final class StringFieldFormatter implements LuceneFieldFormatter<String> {
 
-	public static final StringFieldFormatter INSTANCE = new StringFieldFormatter();
+	private final Analyzer analyzerOrNormalizer;
 
-	private StringFieldFormatter() {
+	public StringFieldFormatter(Analyzer analyzerOrNormalizer) {
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
 	public String format(Object value) {
 		return (String) value;
+	}
+
+	public String normalize(String absoluteFieldPath, String value) {
+		if ( value == null ) {
+			return null;
+		}
+
+		if ( analyzerOrNormalizer == null ) {
+			return value;
+		}
+
+		return AnalyzerUtils.analyzeSortableValue( analyzerOrNormalizer, absoluteFieldPath, value );
 	}
 }

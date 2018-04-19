@@ -61,12 +61,12 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateCollector> match(String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getSchemaNode( absoluteFieldPath ).getQueryFactory() );
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getQueryFactory().createMatchPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateCollector> range(String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getSchemaNode( absoluteFieldPath ).getQueryFactory() );
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getQueryFactory().createRangePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

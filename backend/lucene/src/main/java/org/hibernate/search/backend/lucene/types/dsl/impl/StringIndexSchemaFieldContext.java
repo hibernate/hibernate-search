@@ -59,16 +59,18 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
+		StringFieldFormatter formatter = new StringFieldFormatter( analyzerOrNormalizer );
+
 		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getFieldName(),
-				StringFieldFormatter.INSTANCE,
+				formatter,
 				new StringFieldCodec(
 						sortable,
 						getFieldType( getStore(), analyzer != null ),
 						analyzerOrNormalizer
 				),
-				new StringFieldQueryFactory( analyzerOrNormalizer, analyzer != null, queryBuilder ),
+				new StringFieldQueryFactory( formatter, analyzer != null, queryBuilder ),
 				StringFieldSortContributor.INSTANCE
 		);
 

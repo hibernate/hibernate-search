@@ -8,61 +8,32 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldQueryFactory;
-import org.hibernate.search.backend.lucene.document.model.impl.MatchQueryOptions;
-import org.hibernate.search.backend.lucene.document.model.impl.RangeQueryOptions;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
-import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public class StringFieldQueryFactory implements LuceneFieldQueryFactory {
 
-	private final Analyzer analyzerOrNormalizer;
+	private final StringFieldFormatter formatter;
 
 	private final boolean tokenized;
 
 	private final QueryBuilder queryBuilder;
 
-	public StringFieldQueryFactory(Analyzer analyzerOrNormalizer, boolean tokenized, QueryBuilder queryBuilder) {
-		this.analyzerOrNormalizer = analyzerOrNormalizer;
+	public StringFieldQueryFactory(StringFieldFormatter formatter, boolean tokenized, QueryBuilder queryBuilder) {
+		this.formatter = formatter;
 		this.tokenized = tokenized;
 		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
-	public Query createMatchQuery(String fieldName, Object value, MatchQueryOptions matchQueryOptions) {
-		String stringValue = (String) value;
-
-		if ( queryBuilder != null ) {
-			return queryBuilder.createBooleanQuery( fieldName, stringValue, matchQueryOptions.getOperator() );
-		}
-		else {
-			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
-			// the queryBuilder case above
-
-			return new TermQuery( new Term( fieldName, getAnalyzedValue( analyzerOrNormalizer, fieldName, stringValue ) ) );
-		}
+	public StringMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
+		return new StringMatchPredicateBuilder( absoluteFieldPath, formatter, queryBuilder );
 	}
 
 	@Override
-	public Query createRangeQuery(String fieldName, Object lowerLimit, Object upperLimit, RangeQueryOptions rangeQueryOptions) {
-		// Note that a range query only makes sense if only one token is returned by the analyzer
-		// and we should even consider forcing having a normalizer here, instead of supporting
-		// range queries on analyzed fields.
-
-		return TermRangeQuery.newStringRange(
-				fieldName,
-				getAnalyzedValue( analyzerOrNormalizer, fieldName, (String) lowerLimit ),
-				getAnalyzedValue( analyzerOrNormalizer, fieldName, (String) upperLimit ),
-				// we force the true value if the limit is null because of some Lucene checks down the hill
-				lowerLimit == null ? true : !rangeQueryOptions.isExcludeLowerLimit(),
-				upperLimit == null ? true : !rangeQueryOptions.isExcludeUpperLimit()
-		);
+	public StringRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
+		return new StringRangePredicateBuilder( absoluteFieldPath, formatter );
 	}
 
 	@Override
@@ -79,21 +50,13 @@ public class StringFieldQueryFactory implements LuceneFieldQueryFactory {
 
 		StringFieldQueryFactory other = (StringFieldQueryFactory) obj;
 
-		return Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer ) &&
+		return Objects.equals( formatter, other.formatter ) &&
 				tokenized == other.tokenized &&
 				Objects.equals( queryBuilder, other.queryBuilder );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( analyzerOrNormalizer, tokenized, queryBuilder );
-	}
-
-	private static String getAnalyzedValue(Analyzer analyzerOrNormalizer, String fieldName, String stringValue) {
-		if ( analyzerOrNormalizer == null ) {
-			return stringValue;
-		}
-
-		return AnalyzerUtils.analyzeSortableValue( analyzerOrNormalizer, fieldName, stringValue );
+		return Objects.hash( formatter, tokenized, queryBuilder );
 	}
 }
