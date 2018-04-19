@@ -27,12 +27,13 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 
 	@Override
 	public <M> M getMapping(MappingKey<M> mappingKey) {
-		@SuppressWarnings("unchecked") // See SearchMappingRepositoryBuilderImpl: we are sure that, if there is a mapping, it implements M
-		M mapping = (M) mappings.get( mappingKey ).toAPI();
-		if ( mapping == null ) {
+		// See SearchMappingRepositoryBuilderImpl: we are sure that, if there is a mapping, it implements MappingImplementor<M>
+		@SuppressWarnings("unchecked")
+		MappingImplementor<M> mappingImplementor = (MappingImplementor<M>) mappings.get( mappingKey );
+		if ( mappingImplementor == null ) {
 			throw new SearchException( "No mapping registered for mapping key '" + mappingKey + "'" );
 		}
-		return mapping;
+		return mappingImplementor.toAPI();
 	}
 
 	@Override
