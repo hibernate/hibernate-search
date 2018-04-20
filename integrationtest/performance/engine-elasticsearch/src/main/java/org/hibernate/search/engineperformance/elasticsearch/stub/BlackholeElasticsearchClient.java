@@ -14,6 +14,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
 
 import com.google.gson.JsonObject;
@@ -51,6 +52,11 @@ public class BlackholeElasticsearchClient implements ElasticsearchClientImplemen
 	@Override
 	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
 		return CompletableFuture.completedFuture( generateResponse( request ) );
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clientClass) {
+		throw new SearchException( getClass().getSimpleName() + " cannot be unwrapped" );
 	}
 
 	public ElasticsearchResponse generateResponse(ElasticsearchRequest request) {

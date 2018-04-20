@@ -39,6 +39,11 @@ public class ElasticsearchIndexFamilyImpl implements IndexFamilyImplementor, Ela
 	}
 
 	@Override
+	public <T> T getClient(Class<T> clientClass) {
+		return elasticsearchService.getClient( clientClass );
+	}
+
+	@Override
 	public AnalyzerStrategy createAnalyzerStrategy() {
 		return elasticsearchService.getAnalyzerStrategyFactory().create();
 	}

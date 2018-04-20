@@ -49,4 +49,6 @@ public interface ElasticsearchService extends Service {
 
 	ElasticsearchQueryOptions getQueryOptions();
 
+	<T> T getClient(Class<T> clientClass);
+
 }

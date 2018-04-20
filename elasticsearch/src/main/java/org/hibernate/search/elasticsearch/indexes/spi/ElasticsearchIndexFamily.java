@@ -10,4 +10,15 @@ import org.hibernate.search.indexes.spi.IndexFamily;
 
 public interface ElasticsearchIndexFamily extends IndexFamily {
 
+	/**
+	 * Retrieve the underlying, low-level client used to communicate with the Elasticsearch cluster.
+	 * <p>
+	 * <strong>WARNING - Unsupported API:</strong> the underlying client class may change without notice.
+	 *
+	 * @param clientClass The {@link Class} representing the expected client type
+	 * @return The client.
+	 * @throws org.hibernate.search.exception.SearchException if the underlying client does not implement the given class.
+	 */
+	<T> T getClient(Class<T> clientClass);
+
 }

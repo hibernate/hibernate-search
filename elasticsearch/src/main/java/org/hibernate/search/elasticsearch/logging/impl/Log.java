@@ -516,4 +516,9 @@ public interface Log extends BaseHibernateSearchLogger {
 	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 94,
+			value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
+					+ " but the client can only be unwrapped to %2$s." )
+	SearchException clientUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
 }

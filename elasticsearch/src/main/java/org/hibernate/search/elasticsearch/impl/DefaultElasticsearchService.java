@@ -200,6 +200,11 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		return queryOptions;
 	}
 
+	@Override
+	public <T> T getClient(Class<T> clientClass) {
+		return client.unwrap( clientClass );
+	}
+
 	private ElasticsearchQueryOptions createQueryOptions(Properties properties) {
 		String scrollTimeout = ConfigurationParseHelper.getIntValue(
 				properties,
