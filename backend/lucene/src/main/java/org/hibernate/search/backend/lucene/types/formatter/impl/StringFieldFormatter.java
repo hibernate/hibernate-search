@@ -31,6 +31,6 @@ public final class StringFieldFormatter implements LuceneFieldFormatter<String> 
 			return value;
 		}
 
-		return AnalyzerUtils.analyzeSortableValue( analyzerOrNormalizer, absoluteFieldPath, value );
+		return AnalyzerUtils.normalize( analyzerOrNormalizer, absoluteFieldPath, value );
 	}
 }

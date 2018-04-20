@@ -44,7 +44,7 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 		if ( Sortable.YES.equals( sortable ) ) {
 			documentBuilder.addField( parentNode, new SortedDocValuesField(
 					fieldName,
-					new BytesRef( normalizer != null ? AnalyzerUtils.analyzeSortableValue( normalizer, fieldName, value ) : value )
+					new BytesRef( normalizer != null ? AnalyzerUtils.normalize( normalizer, fieldName, value ) : value )
 			) );
 		}
 	}

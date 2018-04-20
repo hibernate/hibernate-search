@@ -40,7 +40,7 @@ public final class AnalyzerUtils {
 	 *
 	 * @throws SearchException if a problem occurs when analyzing the sortable field's value.
 	 */
-	public static String analyzeSortableValue(Analyzer analyzer, String fieldName, String text) {
+	public static String normalize(Analyzer analyzer, String fieldName, String text) {
 		final TokenStream stream = analyzer.tokenStream( fieldName, new StringReader( text ) );
 		try {
 			try {
@@ -50,7 +50,7 @@ public final class AnalyzerUtils {
 				if ( stream.incrementToken() ) {
 					firstToken = new String( term.buffer(), 0, term.length() );
 					if ( stream.incrementToken() ) {
-						log.multipleTermsInAnalyzedSortableField( fieldName );
+						log.multipleTermsDetectedDuringNormalization( fieldName );
 					}
 					else {
 						stream.end();
@@ -63,7 +63,7 @@ public final class AnalyzerUtils {
 			}
 		}
 		catch (SearchException | IOException e) {
-			throw log.couldNotAnalyzeSortableField( fieldName, e );
+			throw log.couldNotNormalizeField( fieldName, e );
 		}
 	}
 }
