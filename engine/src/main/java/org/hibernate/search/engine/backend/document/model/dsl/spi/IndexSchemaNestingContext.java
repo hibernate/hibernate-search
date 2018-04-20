@@ -14,10 +14,10 @@ import java.util.function.Function;
  */
 public interface IndexSchemaNestingContext {
 
-	<T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+	<T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
 			Function<String, T> nestedElementFactoryIfExcluded);
 
-	<T> T nest(String relativeName, BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
+	<T> T nest(String relativeFieldName, BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded);
 
 	static IndexSchemaNestingContext excludeAll() {

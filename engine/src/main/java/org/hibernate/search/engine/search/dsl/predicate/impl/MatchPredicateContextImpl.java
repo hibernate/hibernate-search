@@ -24,8 +24,8 @@ class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, Searc
 	}
 
 	@Override
-	public MatchPredicateFieldSetContext<N> onFields(String ... fieldName) {
-		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( fieldName ) );
+	public MatchPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths) {
+		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override

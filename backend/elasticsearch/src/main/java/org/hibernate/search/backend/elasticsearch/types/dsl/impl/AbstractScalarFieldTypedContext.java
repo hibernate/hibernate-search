@@ -26,15 +26,15 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String relativeName;
+	private final String relativeFieldName;
 	private final DataType dataType;
 	private String analyzerName;
 	private String normalizerName;
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public AbstractScalarFieldTypedContext(String relativeName, DataType dataType) {
-		this.relativeName = relativeName;
+	public AbstractScalarFieldTypedContext(String relativeFieldName, DataType dataType) {
+		this.relativeFieldName = relativeFieldName;
 		this.dataType = dataType;
 	}
 
@@ -72,10 +72,10 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 		mapping.setType( dataType );
 
 		if ( analyzerName != null ) {
-			throw log.cannotUseAnalyzerOnFieldType( parentNode.getAbsolutePath( relativeName ), dataType );
+			throw log.cannotUseAnalyzerOnFieldType( parentNode.getAbsolutePath( relativeFieldName ), dataType );
 		}
 		if ( normalizerName != null ) {
-			throw log.cannotUseNormalizerOnFieldType( parentNode.getAbsolutePath( relativeName ), dataType );
+			throw log.cannotUseNormalizerOnFieldType( parentNode.getAbsolutePath( relativeFieldName ), dataType );
 		}
 
 		switch ( store ) {

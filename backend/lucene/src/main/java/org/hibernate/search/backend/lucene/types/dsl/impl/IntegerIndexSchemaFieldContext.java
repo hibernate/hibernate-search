@@ -24,8 +24,8 @@ public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFie
 
 	private Sortable sortable;
 
-	public IntegerIndexSchemaFieldContext(String fieldName) {
-		super( fieldName );
+	public IntegerIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName );
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFie
 			LuceneIndexSchemaObjectNode parentNode) {
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
-				getFieldName(),
+				getRelativeFieldName(),
 				IntegerFieldFormatter.INSTANCE,
 				new IntegerFieldCodec( getStore(), sortable ),
 				IntegerFieldPredicateBuilderFactory.INSTANCE,

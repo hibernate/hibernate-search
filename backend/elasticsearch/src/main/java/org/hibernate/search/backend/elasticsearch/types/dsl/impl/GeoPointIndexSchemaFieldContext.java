@@ -25,11 +25,11 @@ import com.google.gson.JsonElement;
  */
 public class GeoPointIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<GeoPoint> {
 
-	private final String relativeName;
+	private final String relativeFieldName;
 
-	public GeoPointIndexSchemaFieldContext(String relativeName) {
-		super( relativeName, DataType.GEO_POINT );
-		this.relativeName = relativeName;
+	public GeoPointIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName, DataType.GEO_POINT );
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -40,11 +40,11 @@ public class GeoPointIndexSchemaFieldContext extends AbstractScalarFieldTypedCon
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, GeoPointFieldCodec.INSTANCE );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
-		String absolutePath = parentNode.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, node );
+		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
+		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}

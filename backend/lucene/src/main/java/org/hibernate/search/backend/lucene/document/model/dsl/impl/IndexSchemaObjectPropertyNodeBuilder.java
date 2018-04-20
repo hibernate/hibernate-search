@@ -20,17 +20,17 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaNodeBuilde
 	private final DeferredInitializationIndexObjectFieldAccessor accessor =
 			new DeferredInitializationIndexObjectFieldAccessor();
 
-	private final String absolutePath;
+	private final String absoluteFieldPath;
 
 	private ObjectFieldStorage storage = ObjectFieldStorage.DEFAULT;
 
-	IndexSchemaObjectPropertyNodeBuilder(String parentPath, String relativeName) {
-		this.absolutePath = LuceneFields.compose( parentPath, relativeName );
+	IndexSchemaObjectPropertyNodeBuilder(String parentPath, String relativeFieldName) {
+		this.absoluteFieldPath = LuceneFields.compose( parentPath, relativeFieldName );
 	}
 
 	@Override
 	public String getAbsolutePath() {
-		return absolutePath;
+		return absoluteFieldPath;
 	}
 
 	public DeferredInitializationIndexObjectFieldAccessor getAccessor() {
@@ -43,8 +43,8 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaNodeBuilde
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode( parentNode, absolutePath, storage );
-		collector.collectObjectNode( absolutePath, node );
+		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
+		collector.collectObjectNode( absoluteFieldPath, node );
 
 		accessor.initialize( new LuceneIndexObjectFieldAccessor( node, storage ) );
 

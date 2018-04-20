@@ -39,8 +39,8 @@ class NestedPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public NestedPredicateFieldContext<N> onObjectField(String fieldName) {
-		this.builder = factory.nested( fieldName );
+	public NestedPredicateFieldContext<N> onObjectField(String absoluteFieldPath) {
+		this.builder = factory.nested( absoluteFieldPath );
 		return new NestedPredicateFieldContextImpl<>( containerContext, builder );
 	}
 

@@ -20,7 +20,7 @@ public interface PojoModelElement {
 
 	boolean isAssignableTo(Class<?> clazz);
 
-	PojoModelProperty property(String relativeName);
+	PojoModelProperty property(String relativeFieldName);
 
 	Stream<? extends PojoModelProperty> properties();
 

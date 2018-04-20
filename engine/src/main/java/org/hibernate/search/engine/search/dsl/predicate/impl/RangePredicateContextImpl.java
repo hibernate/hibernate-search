@@ -24,8 +24,8 @@ class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, Searc
 	}
 
 	@Override
-	public RangePredicateFieldSetContext<N> onFields(String ... fieldName) {
-		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( fieldName ) );
+	public RangePredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths) {
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override

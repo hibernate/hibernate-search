@@ -20,8 +20,8 @@ import org.hibernate.search.engine.backend.spatial.GeoPoint;
  */
 public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<GeoPoint> {
 
-	public GeoPointIndexSchemaFieldContext(String fieldName) {
-		super( fieldName );
+	public GeoPointIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName );
 	}
 
 	@Override
@@ -29,9 +29,9 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 			LuceneIndexSchemaObjectNode parentNode) {
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
-				getFieldName(),
+				getRelativeFieldName(),
 				GeoPointFieldFormatter.INSTANCE,
-				new GeoPointFieldCodec( parentNode.getAbsolutePath( getFieldName() ), getStore() ),
+				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore() ),
 				null, // for now we don't have a predicate builder factory for GeoPoint
 				null // for now we don't have a sort contributor for GeoPoint
 		);

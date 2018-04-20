@@ -30,22 +30,22 @@ class MatchPredicateFieldSetContextImpl<N, C>
 
 	private final CommonState<N, C> commonState;
 
-	private final List<String> fieldNames;
+	private final List<String> absoluteFieldPaths;
 	private final List<MatchPredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
+	MatchPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.fieldNames = fieldNames;
+		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
-		for ( String fieldName : fieldNames ) {
-			queryBuilders.add( predicateFactory.match( fieldName ) );
+		for ( String absoluteFieldPath : absoluteFieldPaths ) {
+			queryBuilders.add( predicateFactory.match( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public MatchPredicateFieldSetContext<N> orFields(String... fields) {
-		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( fields ) );
+	public MatchPredicateFieldSetContext<N> orFields(String... absoluteFieldPaths) {
+		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
@@ -72,14 +72,14 @@ class MatchPredicateFieldSetContextImpl<N, C>
 
 		public N matching(Object value) {
 			if ( value == null ) {
-				throw log.matchPredicateCannotMatchNullValue( collectFieldNames() );
+				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
 			getQueryBuilders().forEach( b -> b.value( value ) );
 			return getNextContextProvider().get();
 		}
 
-		private List<String> collectFieldNames() {
-			return getFieldSetContexts().stream().flatMap( f -> f.fieldNames.stream() )
+		private List<String> collectAbsoluteFieldPaths() {
+			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
 		}
 

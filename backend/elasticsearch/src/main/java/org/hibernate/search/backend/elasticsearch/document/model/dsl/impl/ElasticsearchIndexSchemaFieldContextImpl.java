@@ -30,12 +30,12 @@ import org.hibernate.search.util.SearchException;
 public class ElasticsearchIndexSchemaFieldContextImpl
 		implements ElasticsearchIndexSchemaFieldContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
-	private final String relativeName;
+	private final String relativeFieldName;
 
 	private ElasticsearchIndexSchemaNodeContributor<PropertyMapping> delegate;
 
-	public ElasticsearchIndexSchemaFieldContextImpl(String relativeName) {
-		this.relativeName = relativeName;
+	public ElasticsearchIndexSchemaFieldContextImpl(String relativeFieldName) {
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -61,27 +61,27 @@ public class ElasticsearchIndexSchemaFieldContextImpl
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new StringIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new StringIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IntegerIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new IntegerIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTerminalContext<String> asJsonString(String mappingJsonString) {
-		return setDelegate( new JsonStringIndexSchemaFieldContext( relativeName, mappingJsonString ) );
+		return setDelegate( new JsonStringIndexSchemaFieldContext( relativeFieldName, mappingJsonString ) );
 	}
 
 	@Override

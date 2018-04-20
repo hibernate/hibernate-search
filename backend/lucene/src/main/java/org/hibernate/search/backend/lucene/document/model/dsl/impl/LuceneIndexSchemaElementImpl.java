@@ -37,9 +37,9 @@ class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
 	}
 
 	@Override
-	public IndexSchemaFieldContext field(String relativeName) {
+	public IndexSchemaFieldContext field(String relativeFieldName) {
 		return nestingContext.nest(
-				relativeName,
+				relativeFieldName,
 				// If the field is included
 				prefixedName -> {
 					LuceneIndexSchemaFieldContextImpl fieldContext = new LuceneIndexSchemaFieldContextImpl( prefixedName );
@@ -52,9 +52,9 @@ class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
 	}
 
 	@Override
-	public LuceneIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage) {
+	public LuceneIndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		return nestingContext.nest(
-				relativeName,
+				relativeFieldName,
 				// If the field is included
 				(prefixedName, filter) -> {
 					IndexSchemaObjectPropertyNodeBuilder nodeBuilder =

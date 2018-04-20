@@ -77,15 +77,15 @@ public class LuceneFields {
 		return NESTED_DOCUMENT_PATH;
 	}
 
-	public static String compose(String absolutePath, String relativeName) {
+	public static String compose(String absolutePath, String relativeFieldName) {
 		if ( absolutePath == null ) {
-			return relativeName;
+			return relativeFieldName;
 		}
 
-		StringBuilder sb = new StringBuilder( absolutePath.length() + relativeName.length() + 1 );
+		StringBuilder sb = new StringBuilder( absolutePath.length() + relativeFieldName.length() + 1 );
 		sb.append( absolutePath )
 				.append( PATH_SEPARATOR )
-				.append( relativeName );
+				.append( relativeFieldName );
 
 		return sb.toString();
 	}

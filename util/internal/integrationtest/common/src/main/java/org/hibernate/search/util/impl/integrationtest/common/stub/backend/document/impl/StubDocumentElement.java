@@ -17,17 +17,17 @@ public class StubDocumentElement implements DocumentElement {
 		this.builder = builder;
 	}
 
-	public void putValue(String relativeName, Object value) {
-		builder.field( relativeName, value );
+	public void putValue(String relativeFieldName, Object value) {
+		builder.field( relativeFieldName, value );
 	}
 
-	public StubDocumentElement putChild(String relativeName) {
-		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, relativeName );
+	public StubDocumentElement putChild(String relativeFieldName) {
+		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, relativeFieldName );
 		builder.child( childBuilder );
 		return new StubDocumentElement( childBuilder );
 	}
 
-	public void putMissingChild(String relativeName) {
-		builder.missingObjectField( relativeName );
+	public void putMissingChild(String relativeFieldName) {
+		builder.missingObjectField( relativeFieldName );
 	}
 }

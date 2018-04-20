@@ -15,10 +15,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public interface ElasticsearchIndexSchemaElement extends IndexSchemaElement {
 
 	@Override
-	default ElasticsearchIndexSchemaObjectField objectField(String relativeName) {
-		return objectField( relativeName, ObjectFieldStorage.DEFAULT );
+	default ElasticsearchIndexSchemaObjectField objectField(String relativeFieldName) {
+		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );
 	}
 
 	@Override
-	ElasticsearchIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage);
+	ElasticsearchIndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
 }

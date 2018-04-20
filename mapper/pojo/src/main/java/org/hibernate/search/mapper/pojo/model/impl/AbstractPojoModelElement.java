@@ -62,8 +62,8 @@ abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 	}
 
 	@Override
-	public PojoModelNestedElement<?, ?> property(String relativeName) {
-		return properties.computeIfAbsent( relativeName, name -> {
+	public PojoModelNestedElement<?, ?> property(String relativeFieldName) {
+		return properties.computeIfAbsent( relativeFieldName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
 			PojoPropertyModel<?> model = modelPathTypeNode.getTypeModel().getProperty( name );
 			PojoPropertyAdditionalMetadata additionalMetadata = getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );

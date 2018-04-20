@@ -48,27 +48,27 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, LocalDate value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value) {
 		if ( value == null ) {
 			return;
 		}
 
 		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( fieldName, FORMATTER.format( value ) ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 		}
 
 		long valueToEpochDay = value.toEpochDay();
 
 		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( new NumericDocValuesField( fieldName, valueToEpochDay ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
 		}
 
-		documentBuilder.addField( new LongPoint( fieldName, valueToEpochDay ) );
+		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );
 	}
 
 	@Override
-	public LocalDate decode(Document document, String fieldName) {
-		IndexableField field = document.getField( fieldName );
+	public LocalDate decode(Document document, String absoluteFieldPath) {
+		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;

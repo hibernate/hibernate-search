@@ -104,10 +104,10 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = 512, value = "An analyzer was set on field '%1$s' of type '%2$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseAnalyzerOnFieldType(String fieldName, DataType fieldType);
+	SearchException cannotUseAnalyzerOnFieldType(String absoluteFieldPath, DataType fieldType);
 
 	@Message(id = 513, value = "A normalizer was set on field '%1$s' of type '%2$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseNormalizerOnFieldType(String fieldName, DataType fieldType);
+	SearchException cannotUseNormalizerOnFieldType(String absoluteFieldPath, DataType fieldType);
 
 	@Message(id = 514, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String backendName, String indexName);

@@ -25,13 +25,13 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		return new Builder( null, null, Type.ROOT );
 	}
 
-	public static Builder objectField(Builder parent, String relativeName, ObjectFieldStorage storage) {
-		return new Builder( parent, relativeName, Type.OBJECT_FIELD )
+	public static Builder objectField(Builder parent, String relativeFieldName, ObjectFieldStorage storage) {
+		return new Builder( parent, relativeFieldName, Type.OBJECT_FIELD )
 				.objectFieldStorage( storage );
 	}
 
-	public static Builder field(Builder parent, String relativeName, Class<?> inputType) {
-		return new Builder( parent, relativeName, Type.NON_OBJECT_FIELD )
+	public static Builder field(Builder parent, String relativeFieldName, Class<?> inputType) {
+		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD )
 				.inputType( inputType );
 	}
 
@@ -41,30 +41,30 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static class Builder extends StubTreeNode.Builder<StubIndexSchemaNode> {
 
-		private Builder(Builder parent, String relativeName, Type type) {
-			super( parent, relativeName );
+		private Builder(Builder parent, String relativeFieldName, Type type) {
+			super( parent, relativeFieldName );
 			attribute( "type", type );
 		}
 
-		public Builder field(String relativeName, Class<?> inputType) {
-			return field( relativeName, inputType, b -> {
+		public Builder field(String relativeFieldName, Class<?> inputType) {
+			return field( relativeFieldName, inputType, b -> {
 			} );
 		}
 
-		public Builder field(String relativeName, Class<?> inputType, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.field( this, relativeName, inputType );
+		public Builder field(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName, inputType );
 			contributor.accept( builder );
 			child( builder );
 			return this;
 		}
 
-		public Builder objectField(String relativeName, Consumer<Builder> contributor) {
-			return objectField( relativeName, ObjectFieldStorage.DEFAULT, contributor );
+		public Builder objectField(String relativeFieldName, Consumer<Builder> contributor) {
+			return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT, contributor );
 
 		}
 
-		public Builder objectField(String relativeName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectField( this, relativeName, storage );
+		public Builder objectField(String relativeFieldName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.objectField( this, relativeFieldName, storage );
 			contributor.accept( builder );
 			child( builder );
 			return this;

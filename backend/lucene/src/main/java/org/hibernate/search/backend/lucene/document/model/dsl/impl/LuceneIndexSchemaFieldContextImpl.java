@@ -26,12 +26,12 @@ import org.hibernate.search.util.SearchException;
  */
 public class LuceneIndexSchemaFieldContextImpl implements IndexSchemaFieldContext, LuceneIndexSchemaNodeContributor {
 
-	private final String relativeName;
+	private final String relativeFieldName;
 
 	private LuceneIndexSchemaNodeContributor delegate;
 
-	public LuceneIndexSchemaFieldContextImpl(String relativeName) {
-		this.relativeName = relativeName;
+	public LuceneIndexSchemaFieldContextImpl(String relativeFieldName) {
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -57,22 +57,22 @@ public class LuceneIndexSchemaFieldContextImpl implements IndexSchemaFieldContex
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new StringIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new StringIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IntegerIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new IntegerIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeName ) );
+		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeFieldName ) );
 	}
 
 	@Override

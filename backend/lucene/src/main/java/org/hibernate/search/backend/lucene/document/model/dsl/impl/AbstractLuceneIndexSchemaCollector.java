@@ -37,11 +37,11 @@ abstract class AbstractLuceneIndexSchemaCollector<B extends AbstractIndexSchemaN
 	public abstract LuceneIndexSchemaElement withContext(IndexSchemaNestingContext context);
 
 	@Override
-	public ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage) {
+	public ObjectFieldIndexSchemaCollector objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		IndexSchemaObjectPropertyNodeBuilder nodeBuilder =
-				new IndexSchemaObjectPropertyNodeBuilder( this.nodeBuilder.getAbsolutePath(), relativeName );
+				new IndexSchemaObjectPropertyNodeBuilder( this.nodeBuilder.getAbsolutePath(), relativeFieldName );
 		nodeBuilder.setStorage( storage );
-		this.nodeBuilder.putProperty( relativeName, nodeBuilder );
+		this.nodeBuilder.putProperty( relativeFieldName, nodeBuilder );
 		return new LuceneObjectFieldIndexSchemaCollectorImpl( nodeBuilder );
 	}
 }

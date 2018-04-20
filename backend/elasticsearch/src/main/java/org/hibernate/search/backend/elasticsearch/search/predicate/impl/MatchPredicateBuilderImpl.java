@@ -21,12 +21,12 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
 
-	private final String fieldName;
+	private final String absoluteFieldPath;
 
 	private final ElasticsearchFieldCodec codec;
 
-	public MatchPredicateBuilderImpl(String fieldName, ElasticsearchFieldCodec codec) {
-		this.fieldName = fieldName;
+	public MatchPredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}
 
@@ -39,7 +39,7 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
-		middleObject.add( fieldName, getInnerObject() );
+		middleObject.add( absoluteFieldPath, getInnerObject() );
 		outerObject.add( "match", middleObject );
 		collector.collectPredicate( outerObject );
 	}

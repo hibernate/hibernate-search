@@ -38,9 +38,9 @@ class ElasticsearchIndexSchemaElementImpl
 	}
 
 	@Override
-	public IndexSchemaFieldContext field(String relativeName) {
+	public IndexSchemaFieldContext field(String relativeFieldName) {
 		return nestingContext.nest(
-				relativeName,
+				relativeFieldName,
 				// If the field is included
 				prefixedName -> {
 					ElasticsearchIndexSchemaFieldContextImpl fieldContext =
@@ -55,9 +55,9 @@ class ElasticsearchIndexSchemaElementImpl
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage) {
+	public ElasticsearchIndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		return nestingContext.nest(
-				relativeName,
+				relativeFieldName,
 				// If the field is included
 				(prefixedName, filter) -> {
 					IndexSchemaObjectPropertyNodeBuilder nodeBuilder =

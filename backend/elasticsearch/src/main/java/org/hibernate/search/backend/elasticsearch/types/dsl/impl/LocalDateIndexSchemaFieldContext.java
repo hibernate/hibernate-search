@@ -46,12 +46,12 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 							.withResolverStyle( ResolverStyle.STRICT )
 			);
 
-	private final String relativeName;
+	private final String relativeFieldName;
 	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	public LocalDateIndexSchemaFieldContext(String relativeName) {
-		super( relativeName, DataType.DATE );
-		this.relativeName = relativeName;
+	public LocalDateIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName, DataType.DATE );
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -62,13 +62,13 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, codec );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
 
-		String absolutePath = parentNode.getAbsolutePath( relativeName );
+		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
 
-		collector.collect( absolutePath, node );
+		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}

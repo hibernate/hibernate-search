@@ -105,8 +105,8 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public PropertyFieldMappingContext field(String fieldName) {
-		PropertyFieldMappingContextImpl child = new PropertyFieldMappingContextImpl( this, fieldName );
+	public PropertyFieldMappingContext field(String relativeFieldName) {
+		PropertyFieldMappingContextImpl child = new PropertyFieldMappingContextImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}

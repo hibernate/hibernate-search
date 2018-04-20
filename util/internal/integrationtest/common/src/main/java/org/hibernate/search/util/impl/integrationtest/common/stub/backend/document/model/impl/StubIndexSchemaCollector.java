@@ -22,8 +22,8 @@ class StubIndexSchemaCollector implements IndexSchemaCollector {
 	}
 
 	@Override
-	public ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage) {
-		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.objectField( builder, relativeName, storage );
+	public ObjectFieldIndexSchemaCollector objectField(String relativeFieldName, ObjectFieldStorage storage) {
+		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
 		builder.child( childBuilder );
 		return new StubObjectFieldIndexSchemaCollector( childBuilder );
 	}

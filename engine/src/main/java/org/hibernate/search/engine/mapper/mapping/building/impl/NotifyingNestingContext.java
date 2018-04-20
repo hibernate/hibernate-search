@@ -22,10 +22,10 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
 			Function<String, T> nestedElementFactoryIfExcluded) {
 		return delegate.nest(
-				relativeName,
+				relativeFieldName,
 				prefixedName -> {
 					listener.onSchemaContributed();
 					return nestedElementFactoryIfIncluded.apply( prefixedName );
@@ -35,11 +35,11 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName,
+	public <T> T nest(String relativeFieldName,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
 		return delegate.nest(
-				relativeName,
+				relativeFieldName,
 				(prefixedName, nestingContext) -> {
 					listener.onSchemaContributed();
 					return nestedElementFactoryIfIncluded.apply(

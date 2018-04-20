@@ -19,8 +19,8 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		return new Builder( null, null );
 	}
 
-	public static Builder object(Builder parent, String relativeName) {
-		return new Builder( parent, relativeName );
+	public static Builder object(Builder parent, String relativeFieldName) {
+		return new Builder( parent, relativeFieldName );
 	}
 
 	private StubDocumentNode(Builder builder) {
@@ -29,12 +29,12 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 
 	public static class Builder extends StubTreeNode.Builder<StubDocumentNode> {
 
-		private Builder(Builder parent, String relativeName) {
-			super( parent, relativeName );
+		private Builder(Builder parent, String relativeFieldName) {
+			super( parent, relativeFieldName );
 		}
 
-		public Builder field(String relativeName, Object value) {
-			attribute( relativeName, value );
+		public Builder field(String relativeFieldName, Object value) {
+			attribute( relativeFieldName, value );
 			return this;
 		}
 
@@ -43,23 +43,23 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		 * we want to avoid ambiguity on the call site when passing null
 		 * to the other version of this method.
 		 */
-		public Builder field(String relativeName, Object value, Object ... values) {
+		public Builder field(String relativeFieldName, Object value, Object ... values) {
 			List<Object> list = new ArrayList<>();
 			list.add( value );
 			Collections.addAll( list, values );
-			attribute( relativeName, list.toArray() );
+			attribute( relativeFieldName, list.toArray() );
 			return this;
 		}
 
-		public Builder objectField(String relativeName, Consumer<Builder> contributor) {
-			Builder childBuilder = StubDocumentNode.object( this, relativeName );
+		public Builder objectField(String relativeFieldName, Consumer<Builder> contributor) {
+			Builder childBuilder = StubDocumentNode.object( this, relativeFieldName );
 			contributor.accept( childBuilder );
 			child( childBuilder );
 			return this;
 		}
 
-		public Builder missingObjectField(String relativeName) {
-			missingChild( relativeName );
+		public Builder missingObjectField(String relativeFieldName) {
+			missingChild( relativeFieldName );
 			return this;
 		}
 

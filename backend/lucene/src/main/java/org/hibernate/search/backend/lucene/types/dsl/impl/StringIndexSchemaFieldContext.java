@@ -37,8 +37,8 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 	private Analyzer normalizer;
 
-	public StringIndexSchemaFieldContext(String fieldName) {
-		super( fieldName );
+	public StringIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName );
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 			LuceneIndexSchemaObjectNode parentNode) {
 		// TODO For now, we allow the sortable - analyzed combination, it will be disallowed later
 //		if ( Sortable.YES.equals( getSortable() ) && getAnalyzer() != null ) {
-//			throw log.cannotUseAnalyzerOnSortableField( getFieldName() );
+//			throw log.cannotUseAnalyzerOnSortableField( getRelativeFieldName() );
 //		}
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
@@ -63,7 +63,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
-				getFieldName(),
+				getRelativeFieldName(),
 				formatter,
 				new StringFieldCodec(
 						sortable,

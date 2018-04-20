@@ -18,11 +18,11 @@ class StubExcludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absolutePath;
-	private final String relativeName;
+	private final String relativeFieldName;
 
-	StubExcludedIndexFieldAccessor(String absolutePath, String relativeName) {
+	StubExcludedIndexFieldAccessor(String absolutePath, String relativeFieldName) {
 		this.absolutePath = absolutePath;
-		this.relativeName = relativeName;
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -33,6 +33,6 @@ class StubExcludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 	@Override
 	public void write(DocumentElement target, T value) {
 		log.tracev( "Ignoring write on document element {}, field '{}' with value '{}'" +
-				" because the field was excluded during bootstrap.", target, relativeName, value );
+				" because the field was excluded during bootstrap.", target, relativeFieldName, value );
 	}
 }

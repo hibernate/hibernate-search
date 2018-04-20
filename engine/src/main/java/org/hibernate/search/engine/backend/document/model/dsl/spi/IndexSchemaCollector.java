@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
  */
 public interface IndexSchemaCollector {
 
-	ObjectFieldIndexSchemaCollector objectField(String relativeName, ObjectFieldStorage storage);
+	ObjectFieldIndexSchemaCollector objectField(String relativeFieldName, ObjectFieldStorage storage);
 
 	IndexSchemaElement withContext(IndexSchemaNestingContext context);
 

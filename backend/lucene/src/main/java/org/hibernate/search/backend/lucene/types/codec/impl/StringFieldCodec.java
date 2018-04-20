@@ -33,24 +33,24 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, String value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, String value) {
 		if ( value == null ) {
 			return;
 		}
 
-		documentBuilder.addField( new Field( fieldName, value, fieldType ) );
+		documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
 
 		if ( Sortable.YES.equals( sortable ) ) {
 			documentBuilder.addField( new SortedDocValuesField(
-					fieldName,
-					new BytesRef( normalizer != null ? AnalyzerUtils.normalize( normalizer, fieldName, value ) : value )
+					absoluteFieldPath,
+					new BytesRef( normalizer != null ? AnalyzerUtils.normalize( normalizer, absoluteFieldPath, value ) : value )
 			) );
 		}
 	}
 
 	@Override
-	public String decode(Document document, String fieldName) {
-		return document.get( fieldName );
+	public String decode(Document document, String absoluteFieldPath) {
+		return document.get( absoluteFieldPath );
 	}
 
 	@Override

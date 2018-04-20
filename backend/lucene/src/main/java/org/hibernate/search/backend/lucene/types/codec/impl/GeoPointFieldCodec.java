@@ -29,44 +29,44 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
 	private final Store store;
 
-	private final String latitudeFieldName;
-	private final String longitudeFieldName;
+	private final String latitudeAbsoluteFieldPath;
+	private final String longitudeAbsoluteFieldPath;
 
 	private final Set<String> storedFields;
 
-	public GeoPointFieldCodec(String fieldName, Store store) {
+	public GeoPointFieldCodec(String absoluteFieldPath, Store store) {
 		this.store = store;
 
 		if ( Store.YES.equals( store ) ) {
-			latitudeFieldName = internalFieldName( fieldName, LATITUDE );
-			longitudeFieldName = internalFieldName( fieldName, LONGITUDE );
-			storedFields = CollectionHelper.asSet( latitudeFieldName, longitudeFieldName );
+			latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
+			longitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LONGITUDE );
+			storedFields = CollectionHelper.asSet( latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
 		}
 		else {
-			latitudeFieldName = null;
-			longitudeFieldName = null;
+			latitudeAbsoluteFieldPath = null;
+			longitudeAbsoluteFieldPath = null;
 			storedFields = Collections.emptySet();
 		}
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, GeoPoint value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, GeoPoint value) {
 		if ( value == null ) {
 			return;
 		}
 
 		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( latitudeFieldName, value.getLatitude() ) );
-			documentBuilder.addField( new StoredField( longitudeFieldName, value.getLongitude() ) );
+			documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
+			documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
 		}
 
-		documentBuilder.addField( new LatLonPoint( fieldName, value.getLatitude(), value.getLongitude() ) );
+		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 	}
 
 	@Override
-	public GeoPoint decode(Document document, String fieldName) {
-		IndexableField latitudeField = document.getField( latitudeFieldName );
-		IndexableField longitudeField = document.getField( longitudeFieldName );
+	public GeoPoint decode(Document document, String absoluteFieldPath) {
+		IndexableField latitudeField = document.getField( latitudeAbsoluteFieldPath );
+		IndexableField longitudeField = document.getField( longitudeAbsoluteFieldPath );
 
 		if ( latitudeField == null || longitudeField == null ) {
 			return null;
@@ -95,12 +95,12 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 		GeoPointFieldCodec other = (GeoPointFieldCodec) obj;
 
 		return Objects.equals( store, other.store ) &&
-				Objects.equals( latitudeFieldName, other.latitudeFieldName ) &&
-				Objects.equals( longitudeFieldName, other.longitudeFieldName );
+				Objects.equals( latitudeAbsoluteFieldPath, other.latitudeAbsoluteFieldPath ) &&
+				Objects.equals( longitudeAbsoluteFieldPath, other.longitudeAbsoluteFieldPath );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( store, latitudeFieldName, longitudeFieldName );
+		return Objects.hash( store, latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
 	}
 }

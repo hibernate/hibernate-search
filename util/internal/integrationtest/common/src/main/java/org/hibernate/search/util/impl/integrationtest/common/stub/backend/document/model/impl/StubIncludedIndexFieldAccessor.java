@@ -12,11 +12,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 
 class StubIncludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 	private final String absolutePath;
-	private final String relativeName;
+	private final String relativeFieldName;
 
-	StubIncludedIndexFieldAccessor(String absolutePath, String relativeName) {
+	StubIncludedIndexFieldAccessor(String absolutePath, String relativeFieldName) {
 		this.absolutePath = absolutePath;
-		this.relativeName = relativeName;
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -27,6 +27,6 @@ class StubIncludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 	@Override
 	public void write(DocumentElement target, T value) {
 		StubDocumentElement stubTarget = (StubDocumentElement) target;
-		stubTarget.putValue( relativeName, value );
+		stubTarget.putValue( relativeFieldName, value );
 	}
 }

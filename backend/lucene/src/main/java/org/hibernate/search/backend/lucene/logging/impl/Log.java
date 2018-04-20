@@ -44,12 +44,12 @@ public interface Log extends BasicLogger {
 	SearchException ioExceptionOnMultiReaderRefresh(Collection<String> indexNames, @Cause IOException e);
 
 	@Message(id = 320, value = "Could not normalize value for field '%1$s'.")
-	SearchException couldNotNormalizeField(String fieldName, @Cause Exception cause);
+	SearchException couldNotNormalizeField(String absoluteFieldPath, @Cause Exception cause);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = 321, value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
 			+ " (synonyms) should not be used on sortable fields or range queries. Only the first token will be considered.")
-	void multipleTermsDetectedDuringNormalization(String fieldName);
+	void multipleTermsDetectedDuringNormalization(String absoluteFieldPath);
 
 	// -----------------------
 	// New messages
@@ -75,13 +75,10 @@ public interface Log extends BasicLogger {
 	SearchException luceneExtensionOnUnknownType(Object context);
 
 	@Message(id = 506, value = "An analyzer was set on field '%1$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseAnalyzerOnFieldType(String fieldName);
+	SearchException cannotUseAnalyzerOnFieldType(String relativeFieldName);
 
 	@Message(id = 507, value = "A normalizer was set on field '%1$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseNormalizerOnFieldType(String fieldName);
-
-	@Message(id = 508, value = "Cannot use an analyzer on field '%1$s' because it is sortable." )
-	SearchException cannotUseAnalyzerOnSortableField(String fieldName);
+	SearchException cannotUseNormalizerOnFieldType(String relativeFieldName);
 
 	@Message(id = 510, value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
 			+ " Given predicate was: '%1$s'" )
@@ -141,7 +138,7 @@ public interface Log extends BasicLogger {
 	SearchException ioExceptionOnQueryExecution(Query luceneQuery, Collection<String> indexNames, @Cause IOException e);
 
 	@Message(id = 528, value = "Cannot define field '%1$s' as sortable: fields of this type cannot be sortable." )
-	SearchException cannotUseSortableOnFieldType(String fieldName);
+	SearchException cannotUseSortableOnFieldType(String relativeFieldName);
 
 	@Message(id = 529, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(BackendImplementor<?> backend, String indexName);

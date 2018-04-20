@@ -60,15 +60,15 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 	}
 
 	@Override
-	public void valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder, String fieldName,
+	public void valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder, String relativeFieldName,
 			FieldModelContributor fieldModelContributor) {
-		String defaultedFieldName = fieldName;
-		if ( defaultedFieldName == null ) {
-			defaultedFieldName = modelPath.getParent().getPropertyHandle().getName();
+		String defaultedRelativeFieldName = relativeFieldName;
+		if ( defaultedRelativeFieldName == null ) {
+			defaultedRelativeFieldName = modelPath.getParent().getPropertyHandle().getName();
 		}
 
 		mappingHelper.getIndexModelBinder().addValueBridge(
-				bindingContext, modelPath, builder, defaultedFieldName,
+				bindingContext, modelPath, builder, defaultedRelativeFieldName,
 				fieldModelContributor
 		)
 				.ifPresent( boundBridges::add );

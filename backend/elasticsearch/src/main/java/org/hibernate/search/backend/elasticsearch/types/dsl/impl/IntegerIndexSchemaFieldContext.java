@@ -24,11 +24,11 @@ import com.google.gson.JsonElement;
  */
 public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<Integer> {
 
-	private final String relativeName;
+	private final String relativeFieldName;
 
-	public IntegerIndexSchemaFieldContext(String relativeName) {
-		super( relativeName, DataType.INTEGER );
-		this.relativeName = relativeName;
+	public IntegerIndexSchemaFieldContext(String relativeFieldName) {
+		super( relativeFieldName, DataType.INTEGER );
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -39,11 +39,11 @@ public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedCont
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldCodec.INSTANCE );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
-		String absolutePath = parentNode.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, node );
+		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
+		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}

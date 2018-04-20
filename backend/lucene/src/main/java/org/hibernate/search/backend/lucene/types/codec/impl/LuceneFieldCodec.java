@@ -17,11 +17,11 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
  */
 public interface LuceneFieldCodec<T> {
 
-	void encode(LuceneDocumentBuilder documentBuilder, String fieldName, T value);
+	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, T value);
 
 	default Set<String> getOverriddenStoredFields() {
 		return Collections.emptySet();
 	}
 
-	T decode(Document document, String fieldName);
+	T decode(Document document, String absoluteFieldPath);
 }

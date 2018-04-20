@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 
 	void valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder,
-			String fieldName, FieldModelContributor fieldModelContributor);
+			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
 	void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 

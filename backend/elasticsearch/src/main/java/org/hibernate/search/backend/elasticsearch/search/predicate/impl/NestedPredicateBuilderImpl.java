@@ -21,10 +21,10 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private static final JsonAccessor<String> PATH = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY = JsonAccessor.root().property( "query" ).asObject();
 
-	private final String fieldName;
+	private final String absoluteFieldPath;
 
-	NestedPredicateBuilderImpl(String fieldName) {
-		this.fieldName = fieldName;
+	NestedPredicateBuilderImpl(String absoluteFieldPath) {
+		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject innerObject = getInnerObject();
-		PATH.set( innerObject, fieldName );
+		PATH.set( innerObject, absoluteFieldPath );
 		outerObject.add( "nested", getInnerObject() );
 		collector.collectPredicate( outerObject );
 	}

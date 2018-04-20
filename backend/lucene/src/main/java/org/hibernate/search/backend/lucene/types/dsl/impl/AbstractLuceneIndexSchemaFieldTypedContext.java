@@ -31,12 +31,12 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	private DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
-	private final String fieldName;
+	private final String relativeFieldName;
 
 	private Store store;
 
-	protected AbstractLuceneIndexSchemaFieldTypedContext(String fieldName) {
-		this.fieldName = fieldName;
+	protected AbstractLuceneIndexSchemaFieldTypedContext(String relativeFieldName) {
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -60,21 +60,21 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> sortable(Sortable sortable) {
-		throw log.cannotUseSortableOnFieldType( fieldName );
+		throw log.cannotUseSortableOnFieldType( relativeFieldName );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
-		throw log.cannotUseAnalyzerOnFieldType( fieldName );
+		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
-		throw log.cannotUseNormalizerOnFieldType( fieldName );
+		throw log.cannotUseNormalizerOnFieldType( relativeFieldName );
 	}
 
-	protected String getFieldName() {
-		return fieldName;
+	protected String getRelativeFieldName() {
+		return relativeFieldName;
 	}
 
 	protected Store getStore() {

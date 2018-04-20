@@ -41,8 +41,8 @@ public class LuceneIndexSchemaObjectNode {
 		return absolutePath;
 	}
 
-	public String getAbsolutePath(String relativeName) {
-		return LuceneFields.compose( absolutePath, relativeName );
+	public String getAbsolutePath(String relativeFieldName) {
+		return LuceneFields.compose( absolutePath, relativeFieldName );
 	}
 
 	public ObjectFieldStorage getStorage() {

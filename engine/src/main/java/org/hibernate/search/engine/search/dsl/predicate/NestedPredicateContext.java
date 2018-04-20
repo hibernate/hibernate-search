@@ -14,6 +14,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface NestedPredicateContext<N> {
 
-	NestedPredicateFieldContext<N> onObjectField(String fieldName);
+	NestedPredicateFieldContext<N> onObjectField(String absoluteFieldPath);
 
 }

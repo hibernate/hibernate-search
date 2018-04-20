@@ -37,12 +37,12 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 	private DeferredInitializationIndexFieldAccessor<String> reference =
 			new DeferredInitializationIndexFieldAccessor<>();
 
-	private final String relativeName;
+	private final String relativeFieldName;
 
 	private final String mappingJsonString;
 
-	public JsonStringIndexSchemaFieldContext(String relativeName, String mappingJsonString) {
-		this.relativeName = relativeName;
+	public JsonStringIndexSchemaFieldContext(String relativeFieldName, String mappingJsonString) {
+		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;
 	}
 
@@ -58,11 +58,11 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, CODEC );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
-		String absolutePath = parentNode.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, node );
+		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
+		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}

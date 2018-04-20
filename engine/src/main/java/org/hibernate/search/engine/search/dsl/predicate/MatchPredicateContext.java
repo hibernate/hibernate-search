@@ -16,10 +16,10 @@ public interface MatchPredicateContext<N> {
 
 	// TODO wildcard, fuzzy. Or maybe a separate context?
 
-	default MatchPredicateFieldSetContext<N> onField(String fieldName) {
-		return onFields( fieldName );
+	default MatchPredicateFieldSetContext<N> onField(String absoluteFieldPath) {
+		return onFields( absoluteFieldPath );
 	}
 
-	MatchPredicateFieldSetContext<N> onFields(String ... fieldNames);
+	MatchPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
 
 }

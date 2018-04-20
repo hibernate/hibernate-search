@@ -20,11 +20,11 @@ class StubExcludedIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absolutePath;
-	private final String relativeName;
+	private final String relativeFieldName;
 
-	StubExcludedIndexObjectFieldAccessor(String absolutePath, String relativeName) {
+	StubExcludedIndexObjectFieldAccessor(String absolutePath, String relativeFieldName) {
 		this.absolutePath = absolutePath;
-		this.relativeName = relativeName;
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -35,13 +35,13 @@ class StubExcludedIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
 	@Override
 	public DocumentElement add(DocumentElement target) {
 		log.tracev( "Ignoring add on document element {}, object field '{}'" +
-				" because the field was excluded during bootstrap.", target, relativeName );
-		return new StubDocumentElement( StubDocumentNode.object( null, relativeName ) );
+				" because the field was excluded during bootstrap.", target, relativeFieldName );
+		return new StubDocumentElement( StubDocumentNode.object( null, relativeFieldName ) );
 	}
 
 	@Override
 	public void addMissing(DocumentElement target) {
 		log.tracev( "Ignoring add missing on document element {}, object field '{}'" +
-				" because the field was excluded during bootstrap.", target, relativeName );
+				" because the field was excluded during bootstrap.", target, relativeFieldName );
 	}
 }

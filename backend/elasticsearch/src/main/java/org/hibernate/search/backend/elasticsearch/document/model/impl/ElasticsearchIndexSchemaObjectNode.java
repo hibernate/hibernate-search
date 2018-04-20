@@ -46,8 +46,8 @@ public class ElasticsearchIndexSchemaObjectNode {
 		return absolutePath;
 	}
 
-	public String getAbsolutePath(String relativeName) {
-		return absolutePath == null ? relativeName : absolutePath + "." + relativeName;
+	public String getAbsolutePath(String relativeFieldName) {
+		return absolutePath == null ? relativeFieldName : absolutePath + "." + relativeFieldName;
 	}
 
 	public ObjectFieldStorage getStorage() {

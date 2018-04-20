@@ -69,8 +69,8 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public PropertyFieldMappingContext field(String fieldName) {
-		return delegate.field( fieldName );
+	public PropertyFieldMappingContext field(String relativeFieldName) {
+		return delegate.field( relativeFieldName );
 	}
 
 	@Override

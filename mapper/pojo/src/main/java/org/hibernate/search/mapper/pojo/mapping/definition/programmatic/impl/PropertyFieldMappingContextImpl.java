@@ -30,7 +30,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 		implements PropertyFieldMappingContext,
 		PojoMetadataContributor<PojoAdditionalMetadataCollectorPropertyNode, PojoMappingCollectorPropertyNode> {
 
-	private final String fieldName;
+	private final String relativeFieldName;
 
 	private BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder;
 
@@ -38,9 +38,9 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 
-	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String fieldName) {
+	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
 		super( parent );
-		this.fieldName = fieldName;
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath )
-				.valueBridge( bridgeBuilder, fieldName, fieldModelContributor );
+				.valueBridge( bridgeBuilder, relativeFieldName, fieldModelContributor );
 	}
 
 	@Override

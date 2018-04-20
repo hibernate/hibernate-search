@@ -162,9 +162,9 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 	}
 
 	private void addField(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel, Field annotation) {
-		String cleanedUpFieldName = annotation.name();
-		if ( cleanedUpFieldName.isEmpty() ) {
-			cleanedUpFieldName = null;
+		String cleanedUpRelativeFieldName = annotation.name();
+		if ( cleanedUpRelativeFieldName.isEmpty() ) {
+			cleanedUpRelativeFieldName = null;
 		}
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> builder = createValueBridgeBuilder( annotation, propertyModel );
@@ -173,7 +173,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				getExtractorPath( annotation.extractors(), Field.DefaultExtractors.class );
 
 		collector.value( extractorPath )
-				.valueBridge( builder, cleanedUpFieldName, new AnnotationFieldModelContributor( annotation ) );
+				.valueBridge( builder, cleanedUpRelativeFieldName, new AnnotationFieldModelContributor( annotation ) );
 	}
 
 	private void addIndexedEmbedded(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel,

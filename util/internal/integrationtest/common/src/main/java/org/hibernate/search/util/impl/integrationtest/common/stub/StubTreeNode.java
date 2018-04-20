@@ -90,28 +90,28 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 	public abstract static class Builder<N> {
 
 		private final Builder<?> parent;
-		private final String relativeName;
+		private final String relativeFieldName;
 		private final String absolutePath;
 
 		private final Map<String, List<Object>> attributes = new LinkedHashMap<>();
 		private final Map<String, List<Builder<N>>> children = new LinkedHashMap<>();
 
-		protected Builder(Builder<?> parent, String relativeName) {
+		protected Builder(Builder<?> parent, String relativeFieldName) {
 			this.parent = parent;
-			this.relativeName = relativeName;
+			this.relativeFieldName = relativeFieldName;
 			if ( parent == null ) {
 				this.absolutePath = "<ROOT>";
 			}
 			else if ( parent.parent == null ) {
-				this.absolutePath = relativeName;
+				this.absolutePath = relativeFieldName;
 			}
 			else {
-				this.absolutePath = parent.getAbsolutePath() + "." + relativeName;
+				this.absolutePath = parent.getAbsolutePath() + "." + relativeFieldName;
 			}
 		}
 
 		public String getRelativeName() {
-			return relativeName;
+			return relativeFieldName;
 		}
 
 		public String getAbsolutePath() {
@@ -123,13 +123,13 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 			Collections.addAll( attributeValues, values );
 		}
 
-		protected void missingChild(String relativeName) {
-			children.computeIfAbsent( relativeName, ignored -> new ArrayList<>() )
+		protected void missingChild(String relativeFieldName) {
+			children.computeIfAbsent( relativeFieldName, ignored -> new ArrayList<>() )
 					.add( null );
 		}
 
 		protected void child(Builder<N> nodeBuilder) {
-			children.computeIfAbsent( nodeBuilder.relativeName, ignored -> new ArrayList<>() )
+			children.computeIfAbsent( nodeBuilder.relativeFieldName, ignored -> new ArrayList<>() )
 					.add( nodeBuilder );
 		}
 

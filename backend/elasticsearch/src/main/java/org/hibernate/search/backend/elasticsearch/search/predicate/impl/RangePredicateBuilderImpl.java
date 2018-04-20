@@ -24,7 +24,7 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private static final JsonAccessor<JsonElement> LT = JsonAccessor.root().property( "lt" );
 	private static final JsonAccessor<JsonElement> LTE = JsonAccessor.root().property( "lte" );
 
-	private final String fieldName;
+	private final String absoluteFieldPath;
 
 	private final ElasticsearchFieldCodec codec;
 
@@ -33,8 +33,8 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private JsonElement upperLimit;
 	private boolean excludeUpperLimit = false;
 
-	public RangePredicateBuilderImpl(String fieldName, ElasticsearchFieldCodec codec) {
-		this.fieldName = fieldName;
+	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}
 
@@ -73,7 +73,7 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
-		middleObject.add( fieldName, innerObject );
+		middleObject.add( absoluteFieldPath, innerObject );
 		outerObject.add( "range", middleObject );
 
 		collector.collectPredicate( outerObject );

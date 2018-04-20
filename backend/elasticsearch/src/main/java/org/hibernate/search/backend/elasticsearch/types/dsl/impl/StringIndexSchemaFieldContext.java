@@ -28,14 +28,14 @@ import com.google.gson.JsonElement;
  */
 public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
-	private final String relativeName;
+	private final String relativeFieldName;
 	private String analyzerName;
 	private String normalizerName;
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public StringIndexSchemaFieldContext(String relativeName) {
-		this.relativeName = relativeName;
+	public StringIndexSchemaFieldContext(String relativeFieldName) {
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, StringFieldCodec.INSTANCE );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		// TODO Use sub-fields? (but in that case, adjust projections accordingly)
 		if ( analyzerName != null ) {
@@ -117,8 +117,8 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 				break;
 		}
 
-		String absolutePath = parentNode.getAbsolutePath( relativeName );
-		collector.collect( absolutePath, node );
+		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
+		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}

@@ -15,10 +15,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public interface LuceneIndexSchemaElement extends IndexSchemaElement {
 
 	@Override
-	default LuceneIndexSchemaObjectField objectField(String relativeName) {
-		return objectField( relativeName, ObjectFieldStorage.DEFAULT );
+	default LuceneIndexSchemaObjectField objectField(String relativeFieldName) {
+		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );
 	}
 
 	@Override
-	LuceneIndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage);
+	LuceneIndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
 }

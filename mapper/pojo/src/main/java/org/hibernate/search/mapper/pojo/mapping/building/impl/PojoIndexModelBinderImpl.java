@@ -168,7 +168,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <V> Optional<BoundValueBridge<? super V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
-			String fieldName, FieldModelContributor contributor) {
+			String relativeFieldName, FieldModelContributor contributor) {
 		PojoTypeModel<V> typeModel = modelPath.type().getTypeModel();
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> defaultedBuilder = builder;
@@ -190,15 +190,15 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
 		ValueBridge<? super V, ?> typedBridge = (ValueBridge<? super V, ?>) bridge;
 
-		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, fieldName, contributor );
+		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, relativeFieldName, contributor );
 	}
 
 	private <T, R> Optional<BoundValueBridge<? super T, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
 			ValueBridge<? super T, R> bridge, GenericTypeContext bridgeTypeContext,
-			String fieldName, FieldModelContributor contributor) {
+			String relativeFieldName, FieldModelContributor contributor) {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
-		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( fieldName );
+		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
 
 		// First give the bridge a chance to contribute to the model
 		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind( fieldContext );

@@ -474,29 +474,29 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	}
 
 	private void checkLeafIncluded(String expectedPrefixedName, IndexSchemaNestingContext context,
-			String relativeName) {
+			String relativeFieldName) {
 		resetAll();
 		Object expectedReturn = new Object();
 		EasyMock.expect( leafFactoryIfIncludedMock.apply( expectedPrefixedName ) ).andReturn( expectedReturn );
 		replayAll();
-		Object actualReturn = context.nest( relativeName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
+		Object actualReturn = context.nest( relativeFieldName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn );
 	}
 
 	private void checkLeafExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
-			String relativeName) {
+			String relativeFieldName) {
 		resetAll();
 		Object expectedReturn = new Object();
 		EasyMock.expect( leafFactoryIfExcludedMock.apply( expectedPrefixedName ) ).andReturn( expectedReturn );
 		replayAll();
-		Object actualReturn = context.nest( relativeName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
+		Object actualReturn = context.nest( relativeFieldName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn );
 	}
 
 	private IndexSchemaNestingContext checkCompositeIncluded(String expectedPrefixedName,
-			IndexSchemaNestingContext context, String relativeName) {
+			IndexSchemaNestingContext context, String relativeFieldName) {
 		Capture<IndexSchemaNestingContext> nestedContextCapture = new Capture<>();
 		resetAll();
 		Object expectedReturn = new Object();
@@ -505,19 +505,19 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		) )
 				.andReturn( expectedReturn );
 		replayAll();
-		Object actualReturn = context.nest( relativeName, compositeFactoryIfIncludedMock, compositeFactoryIfExcludedMock );
+		Object actualReturn = context.nest( relativeFieldName, compositeFactoryIfIncludedMock, compositeFactoryIfExcludedMock );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn );
 		return nestedContextCapture.getValue();
 	}
 
 	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
-			String relativeName) {
-		checkCompositeExcluded( expectedPrefixedName, context, relativeName, true );
+			String relativeFieldName) {
+		checkCompositeExcluded( expectedPrefixedName, context, relativeFieldName, true );
 	}
 
 	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
-			String relativeName, boolean recurse) {
+			String relativeFieldName, boolean recurse) {
 		Capture<IndexSchemaNestingContext> nestedContextCapture = new Capture<>();
 		resetAll();
 		Object expectedReturn = new Object();
@@ -526,7 +526,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		) )
 				.andReturn( expectedReturn );
 		replayAll();
-		Object actualReturn = context.nest( relativeName, compositeFactoryIfIncludedMock, compositeFactoryIfExcludedMock );
+		Object actualReturn = context.nest( relativeFieldName, compositeFactoryIfIncludedMock, compositeFactoryIfExcludedMock );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn );
 

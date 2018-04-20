@@ -49,10 +49,10 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
 			Function<String, T> nestedElementFactoryIfExcluded) {
-		String nameRelativeToFilter = prefixFromFilter + relativeName;
-		String prefixedRelativeName = unconsumedPrefix + relativeName;
+		String nameRelativeToFilter = prefixFromFilter + relativeFieldName;
+		String prefixedRelativeName = unconsumedPrefix + relativeFieldName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
 			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName );
 		}
@@ -62,11 +62,11 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName,
+	public <T> T nest(String relativeFieldName,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
-		String nameRelativeToFilter = prefixFromFilter + relativeName;
-		String prefixedRelativeName = unconsumedPrefix + relativeName;
+		String nameRelativeToFilter = prefixFromFilter + relativeFieldName;
+		String prefixedRelativeName = unconsumedPrefix + relativeFieldName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
 			IndexSchemaNestingContextImpl nestedFilter =
 					new IndexSchemaNestingContextImpl( filter, nameRelativeToFilter + ".", "" );

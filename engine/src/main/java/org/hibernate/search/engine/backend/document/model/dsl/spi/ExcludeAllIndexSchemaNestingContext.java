@@ -21,16 +21,16 @@ class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, Function<String, T> nestedElementFactoryIfIncluded,
+	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
 			Function<String, T> nestedElementFactoryIfExcluded) {
-		return nestedElementFactoryIfExcluded.apply( relativeName );
+		return nestedElementFactoryIfExcluded.apply( relativeFieldName );
 	}
 
 	@Override
-	public <T> T nest(String relativeName,
+	public <T> T nest(String relativeFieldName,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
 			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
-		return nestedElementFactoryIfExcluded.apply( relativeName, INSTANCE );
+		return nestedElementFactoryIfExcluded.apply( relativeFieldName, INSTANCE );
 	}
 
 }

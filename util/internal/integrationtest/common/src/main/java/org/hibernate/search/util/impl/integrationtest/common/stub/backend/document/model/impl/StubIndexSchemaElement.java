@@ -28,12 +28,12 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 	}
 
 	@Override
-	public IndexSchemaFieldContext field(String relativeName) {
+	public IndexSchemaFieldContext field(String relativeFieldName) {
 		return new IndexSchemaFieldContext() {
 			@Override
 			public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
 				return context.nest(
-						relativeName,
+						relativeFieldName,
 						// If the field is included, make sure to link it to the parent
 						prefixedName -> {
 							StubIndexSchemaNode.Builder childBuilder =
@@ -73,9 +73,9 @@ class StubIndexSchemaElement implements IndexSchemaElement {
 	}
 
 	@Override
-	public IndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage) {
+	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		return context.nest(
-				relativeName,
+				relativeFieldName,
 				// If the field is included, make sure to link it to the parent
 				(prefixedName, nestingContext) -> {
 					StubIndexSchemaNode.Builder childBuilder =

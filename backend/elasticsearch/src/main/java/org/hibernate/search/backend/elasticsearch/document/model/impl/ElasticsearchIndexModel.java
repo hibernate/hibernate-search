@@ -31,8 +31,8 @@ public class ElasticsearchIndexModel {
 			}
 
 			@Override
-			public void collect(String absolutePath, ElasticsearchIndexSchemaFieldNode node) {
-				fieldNodes.put( absolutePath, node );
+			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode node) {
+				fieldNodes.put( absoluteFieldPath, node );
 			}
 		} );
 	}
@@ -49,8 +49,8 @@ public class ElasticsearchIndexModel {
 		return objectNodes.get( absolutePath );
 	}
 
-	public ElasticsearchIndexSchemaFieldNode getFieldNode(String absolutePath) {
-		return fieldNodes.get( absolutePath );
+	public ElasticsearchIndexSchemaFieldNode getFieldNode(String absoluteFieldPath) {
+		return fieldNodes.get( absoluteFieldPath );
 	}
 
 	@Override

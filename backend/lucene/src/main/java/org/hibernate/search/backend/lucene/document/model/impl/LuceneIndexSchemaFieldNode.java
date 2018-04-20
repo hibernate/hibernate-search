@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContri
  */
 public class LuceneIndexSchemaFieldNode<T> {
 
-	private final String fieldName;
+	private final String relativeFieldName;
 
 	private final LuceneIndexSchemaObjectNode parent;
 
@@ -32,11 +32,11 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final LuceneFieldSortContributor sortContributor;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String fieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<T> codec,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<T> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
-		this.fieldName = fieldName;
-		this.absoluteFieldPath = parent.getAbsolutePath( fieldName );
+		this.relativeFieldName = relativeFieldName;
+		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
 		this.formatter = formatter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
@@ -48,7 +48,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 	}
 
 	public String getFieldName() {
-		return fieldName;
+		return relativeFieldName;
 	}
 
 	public String getAbsoluteFieldPath() {
@@ -85,7 +85,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
-				.append( ", fieldName=" ).append( fieldName )
+				.append( ", relativeFieldName=" ).append( relativeFieldName )
 				.append( ", formatter=" ).append( formatter )
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )

@@ -32,22 +32,22 @@ class RangePredicateFieldSetContextImpl<N, C>
 
 	private final CommonState<N, C> commonState;
 
-	private final List<String> fieldNames;
+	private final List<String> absoluteFieldPaths;
 	private final List<RangePredicateBuilder<C>> queryBuilders = new ArrayList<>();
 
-	RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> fieldNames) {
+	RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.fieldNames = fieldNames;
+		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
-		for ( String fieldName : fieldNames ) {
-			queryBuilders.add( predicateFactory.range( fieldName ) );
+		for ( String absoluteFieldPath : absoluteFieldPaths ) {
+			queryBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public RangePredicateFieldSetContext<N> orFields(String... fields) {
-		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( fields ) );
+	public RangePredicateFieldSetContext<N> orFields(String... absoluteFieldPaths) {
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
@@ -143,14 +143,14 @@ class RangePredicateFieldSetContextImpl<N, C>
 			return getNextContextProvider().get();
 		}
 
-		private List<String> collectFieldNames() {
-			return getFieldSetContexts().stream().flatMap( f -> f.fieldNames.stream() )
+		private List<String> collectAbsoluteFieldPaths() {
+			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
 		}
 
 		private void checkHasNonNullBound() {
 			if ( !hasNonNullBound ) {
-				throw log.rangePredicateCannotMatchNullValue( collectFieldNames() );
+				throw log.rangePredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
 		}
 

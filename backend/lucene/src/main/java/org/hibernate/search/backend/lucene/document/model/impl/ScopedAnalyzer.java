@@ -29,8 +29,8 @@ public class ScopedAnalyzer extends AnalyzerWrapper {
 	}
 
 	@Override
-	protected Analyzer getWrappedAnalyzer(String fieldName) {
-		Analyzer analyzer = scopedAnalyzers.get( fieldName );
+	protected Analyzer getWrappedAnalyzer(String absoluteFieldPath) {
+		Analyzer analyzer = scopedAnalyzers.get( absoluteFieldPath );
 
 		if ( analyzer == null ) {
 			return globalAnalyzer;
@@ -49,8 +49,8 @@ public class ScopedAnalyzer extends AnalyzerWrapper {
 			this.globalAnalyzer = globalAnalyzer;
 		}
 
-		void setAnalyzer(String fieldName, Analyzer analyzer) {
-			this.scopedAnalyzers.put( fieldName, analyzer );
+		void setAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
+			this.scopedAnalyzers.put( absoluteFieldPath, analyzer );
 		}
 
 		ScopedAnalyzer build() {

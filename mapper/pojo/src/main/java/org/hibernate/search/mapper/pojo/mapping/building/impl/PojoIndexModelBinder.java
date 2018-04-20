@@ -71,6 +71,6 @@ public interface PojoIndexModelBinder {
 
 	<V> Optional<BoundValueBridge<? super V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder,
-			String fieldName, FieldModelContributor contributor);
+			String relativeFieldName, FieldModelContributor contributor);
 
 }

@@ -38,8 +38,8 @@ public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortCo
 	}
 
 	@Override
-	public FieldSortContext<N> byField(String fieldName) {
-		return delegate.byField( fieldName );
+	public FieldSortContext<N> byField(String absoluteFieldPath) {
+		return delegate.byField( absoluteFieldPath );
 	}
 
 	@Override

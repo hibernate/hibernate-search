@@ -15,10 +15,10 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface RangePredicateContext<N> {
 
-	default RangePredicateFieldSetContext<N> onField(String fieldName) {
-		return onFields( fieldName );
+	default RangePredicateFieldSetContext<N> onField(String absoluteFieldPath) {
+		return onFields( absoluteFieldPath );
 	}
 
-	RangePredicateFieldSetContext<N> onFields(String ... fieldName);
+	RangePredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
 
 }

@@ -36,13 +36,13 @@ public class LuceneIndexModel {
 		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder( new KeywordAnalyzer() );
 		contributor.contribute( new LuceneIndexSchemaNodeCollector() {
 			@Override
-			public void collectAnalyzer(String absolutePath, Analyzer analyzer) {
-				scopedAnalyzerBuilder.setAnalyzer( absolutePath, analyzer );
+			public void collectAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
+				scopedAnalyzerBuilder.setAnalyzer( absoluteFieldPath, analyzer );
 			}
 
 			@Override
-			public void collectFieldNode(String absolutePath, LuceneIndexSchemaFieldNode<?> node) {
-				fieldNodesBuilder.put( absolutePath, node );
+			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
+				fieldNodesBuilder.put( absoluteFieldPath, node );
 			}
 
 			@Override
@@ -60,8 +60,8 @@ public class LuceneIndexModel {
 		return indexName;
 	}
 
-	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath) {
-		return fieldNodes.get( absolutePath );
+	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absoluteFieldPath) {
+		return fieldNodes.get( absoluteFieldPath );
 	}
 
 	public LuceneIndexSchemaObjectNode getObjectNode(String absolutePath) {

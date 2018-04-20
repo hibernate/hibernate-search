@@ -29,25 +29,25 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, Integer value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Integer value) {
 		if ( value == null ) {
 			return;
 		}
 
 		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( fieldName, value ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
 		}
 
 		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( new NumericDocValuesField( fieldName, value.longValue() ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
 		}
 
-		documentBuilder.addField( new IntPoint( fieldName, value ) );
+		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );
 	}
 
 	@Override
-	public Integer decode(Document document, String fieldName) {
-		IndexableField field = document.getField( fieldName );
+	public Integer decode(Document document, String absoluteFieldPath) {
+		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;

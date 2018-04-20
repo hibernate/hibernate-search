@@ -14,12 +14,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
  */
 public interface IndexSchemaElement {
 
-	IndexSchemaFieldContext field(String relativeName);
+	IndexSchemaFieldContext field(String relativeFieldName);
 
-	default IndexSchemaObjectField objectField(String relativeName) {
-		return objectField( relativeName, ObjectFieldStorage.DEFAULT );
+	default IndexSchemaObjectField objectField(String relativeFieldName) {
+		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );
 	}
 
-	IndexSchemaObjectField objectField(String relativeName, ObjectFieldStorage storage);
+	IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
 
 }
