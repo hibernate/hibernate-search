@@ -4,28 +4,29 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.impl;
+package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.IntegerFieldCodec;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Integer> {
+public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<Integer> {
 
 	private final String relativeName;
 
-	public IndexSchemaFieldIntegerContext(String relativeName) {
+	public IntegerIndexSchemaFieldContext(String relativeName) {
 		super( relativeName, DataType.INTEGER );
 		this.relativeName = relativeName;
 	}
@@ -36,7 +37,7 @@ class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Int
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldFormatter.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldCodec.INSTANCE );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeName );
 		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
@@ -45,30 +46,5 @@ class IndexSchemaFieldIntegerContext extends AbstractScalarFieldTypedContext<Int
 		collector.collect( absolutePath, node );
 
 		return mapping;
-	}
-
-	private static final class IntegerFieldFormatter implements ElasticsearchFieldFormatter {
-		// Must be a singleton so that equals() works as required by the interface
-		public static final IntegerFieldFormatter INSTANCE = new IntegerFieldFormatter();
-
-		private IntegerFieldFormatter() {
-		}
-
-		@Override
-		public JsonElement format(Object object) {
-			if ( object == null ) {
-				return JsonNull.INSTANCE;
-			}
-			Integer value = (Integer) object;
-			return new JsonPrimitive( value );
-		}
-
-		@Override
-		public Object parse(JsonElement element) {
-			if ( element == null || element.isJsonNull() ) {
-				return null;
-			}
-			return JsonElementType.INTEGER.fromElement( element );
-		}
 	}
 }

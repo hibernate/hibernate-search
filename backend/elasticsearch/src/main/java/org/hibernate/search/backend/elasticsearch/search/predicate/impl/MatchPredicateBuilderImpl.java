@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -23,16 +23,16 @@ class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String fieldName;
 
-	private final ElasticsearchFieldFormatter formatter;
+	private final ElasticsearchFieldCodec codec;
 
-	public MatchPredicateBuilderImpl(String fieldName, ElasticsearchFieldFormatter formatter) {
+	public MatchPredicateBuilderImpl(String fieldName, ElasticsearchFieldCodec codec) {
 		this.fieldName = fieldName;
-		this.formatter = formatter;
+		this.codec = codec;
 	}
 
 	@Override
 	public void value(Object value) {
-		QUERY.set( getInnerObject(), formatter.format( value ) );
+		QUERY.set( getInnerObject(), codec.encode( value ) );
 	}
 
 	@Override

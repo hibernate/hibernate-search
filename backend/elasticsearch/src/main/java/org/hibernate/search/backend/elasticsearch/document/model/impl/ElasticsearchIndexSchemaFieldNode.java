@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+
 /**
  * @author Yoann Rodiere
  */
@@ -13,11 +15,11 @@ public class ElasticsearchIndexSchemaFieldNode {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
 
-	private final ElasticsearchFieldFormatter formatter;
+	private final ElasticsearchFieldCodec codec;
 
-	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, ElasticsearchFieldFormatter formatter) {
+	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, ElasticsearchFieldCodec codec) {
 		this.parent = parent;
-		this.formatter = formatter;
+		this.codec = codec;
 	}
 
 	@Override
@@ -29,7 +31,7 @@ public class ElasticsearchIndexSchemaFieldNode {
 		return parent;
 	}
 
-	public ElasticsearchFieldFormatter getFormatter() {
-		return formatter;
+	public ElasticsearchFieldCodec getCodec() {
+		return codec;
 	}
 }

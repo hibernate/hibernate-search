@@ -12,6 +12,11 @@ import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTermin
 import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.GeoPointIndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.IntegerIndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
@@ -53,27 +58,27 @@ public class ElasticsearchIndexSchemaFieldContextImpl
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new IndexSchemaFieldStringContext( relativeName ) );
+		return setDelegate( new StringIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IndexSchemaFieldIntegerContext( relativeName ) );
+		return setDelegate( new IntegerIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new IndexSchemaFieldLocalDateContext( relativeName ) );
+		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new IndexSchemaFieldGeoPointContext( relativeName ) );
+		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTerminalContext<String> asJsonString(String mappingJsonString) {
-		return setDelegate( new IndexSchemaFieldJsonStringContext( relativeName, mappingJsonString ) );
+		return setDelegate( new JsonStringIndexSchemaFieldContext( relativeName, mappingJsonString ) );
 	}
 
 	@Override

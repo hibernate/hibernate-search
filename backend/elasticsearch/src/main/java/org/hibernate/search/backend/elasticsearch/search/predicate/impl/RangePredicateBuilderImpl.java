@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -26,21 +26,21 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String fieldName;
 
-	private final ElasticsearchFieldFormatter formatter;
+	private final ElasticsearchFieldCodec codec;
 
 	private JsonElement lowerLimit;
 	private boolean excludeLowerLimit = false;
 	private JsonElement upperLimit;
 	private boolean excludeUpperLimit = false;
 
-	public RangePredicateBuilderImpl(String fieldName, ElasticsearchFieldFormatter formatter) {
+	public RangePredicateBuilderImpl(String fieldName, ElasticsearchFieldCodec codec) {
 		this.fieldName = fieldName;
-		this.formatter = formatter;
+		this.codec = codec;
 	}
 
 	@Override
 	public void lowerLimit(Object value) {
-		this.lowerLimit = formatter.format( value );
+		this.lowerLimit = codec.encode( value );
 	}
 
 	@Override
@@ -50,7 +50,7 @@ class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	@Override
 	public void upperLimit(Object value) {
-		this.upperLimit = formatter.format( value );
+		this.upperLimit = codec.encode( value );
 	}
 
 	@Override

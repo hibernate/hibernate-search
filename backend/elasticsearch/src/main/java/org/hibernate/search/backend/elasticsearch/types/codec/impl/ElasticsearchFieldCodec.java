@@ -4,23 +4,23 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.impl;
+package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import com.google.gson.JsonElement;
 
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchFieldFormatter {
+public interface ElasticsearchFieldCodec {
 
-	JsonElement format(Object object);
+	JsonElement encode(Object object);
 
-	Object parse(JsonElement element);
+	Object decode(JsonElement element);
 
 	/**
 	 * @param obj An object to compare
-	 * @return {@code true} if {@code obj} is a formatter whose {@link #format(Object)} method is
-	 * guaranteed to always return the exact same output value as this formatter for any input value,
+	 * @return {@code true} if {@code obj} is a codec whose {@link #encode(Object)} method is
+	 * guaranteed to always return the exact same output value as this codec for any input value,
 	 * {@code false} otherwise.
 	 */
 	@Override

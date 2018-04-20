@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -78,9 +78,9 @@ public interface Log extends BasicLogger {
 	SearchException unknownFieldForSearch(String absoluteFieldPath, Collection<URLEncodedString> indexNames);
 
 	@Message(id = 505, value = "Multiple conflicting types for field '%1$s': '%2$s' in index '%3$s', but '%4$s' in index '%5$s'." )
-	SearchException conflictingFieldFormattersForSearch(String absoluteFieldPath,
-			ElasticsearchFieldFormatter formatter1, URLEncodedString indexName1,
-			ElasticsearchFieldFormatter formatter2, URLEncodedString indexName2);
+	SearchException conflictingFieldCodecsForSearch(String absoluteFieldPath,
+			ElasticsearchFieldCodec codec1, URLEncodedString indexName1,
+			ElasticsearchFieldCodec codec2, URLEncodedString indexName2);
 
 	@Message(id = 506, value = "The Elasticsearch extension can only be applied to objects"
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )

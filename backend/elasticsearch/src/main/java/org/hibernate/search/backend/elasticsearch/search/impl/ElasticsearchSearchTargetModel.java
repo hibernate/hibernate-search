@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFieldFormatter;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ElasticsearchSearchTargetModel {
@@ -41,30 +41,30 @@ public class ElasticsearchSearchTargetModel {
 		return indexModels;
 	}
 
-	public ElasticsearchFieldFormatter getFieldFormatter(String absoluteFieldPath) {
-		ElasticsearchIndexModel indexModelForSelectedFormatter = null;
-		ElasticsearchFieldFormatter selectedFormatter = null;
+	public ElasticsearchFieldCodec getFieldCodec(String absoluteFieldPath) {
+		ElasticsearchIndexModel indexModelForSelectedCodec = null;
+		ElasticsearchFieldCodec selectedCodec = null;
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 			if ( schemaNode != null ) {
-				ElasticsearchFieldFormatter formatter = schemaNode.getFormatter();
-				if ( selectedFormatter == null ) {
-					selectedFormatter = formatter;
-					indexModelForSelectedFormatter = indexModel;
+				ElasticsearchFieldCodec codec = schemaNode.getCodec();
+				if ( selectedCodec == null ) {
+					selectedCodec = codec;
+					indexModelForSelectedCodec = indexModel;
 				}
-				else if ( !selectedFormatter.equals( formatter ) ) {
-					throw log.conflictingFieldFormattersForSearch(
+				else if ( !selectedCodec.equals( codec ) ) {
+					throw log.conflictingFieldCodecsForSearch(
 							absoluteFieldPath,
-							selectedFormatter, indexModelForSelectedFormatter.getIndexName(),
-							formatter, indexModel.getIndexName()
+							selectedCodec, indexModelForSelectedCodec.getIndexName(),
+							codec, indexModel.getIndexName()
 					);
 				}
 			}
 		}
-		if ( selectedFormatter == null ) {
+		if ( selectedCodec == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
 		}
-		return selectedFormatter;
+		return selectedCodec;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

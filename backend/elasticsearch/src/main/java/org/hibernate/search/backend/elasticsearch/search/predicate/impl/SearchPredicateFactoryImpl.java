@@ -67,12 +67,12 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> match(String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldFormatter( absoluteFieldPath ) );
+		return new MatchPredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldCodec( absoluteFieldPath ) );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> range(String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldFormatter( absoluteFieldPath ) );
+		return new RangePredicateBuilderImpl( absoluteFieldPath, searchTargetModel.getFieldCodec( absoluteFieldPath ) );
 	}
 
 	@Override
