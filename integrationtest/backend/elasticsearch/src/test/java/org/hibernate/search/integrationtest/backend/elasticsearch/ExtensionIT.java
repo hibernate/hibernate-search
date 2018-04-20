@@ -282,7 +282,7 @@ public class ExtensionIT {
 	@Test
 	public void backend_getClient() throws Exception {
 		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
-		ElasticsearchBackend elasticsearchBackend = backend.withExtension( ElasticsearchExtension.get() );
+		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 		RestClient restClient = elasticsearchBackend.getClient( RestClient.class );
 
 		// Test that the client actually works
@@ -293,7 +293,7 @@ public class ExtensionIT {
 	@Test
 	public void backend_getClient_error_invalidClass() {
 		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
-		ElasticsearchBackend elasticsearchBackend = backend.withExtension( ElasticsearchExtension.get() );
+		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( HttpAsyncClient.class.getName() );

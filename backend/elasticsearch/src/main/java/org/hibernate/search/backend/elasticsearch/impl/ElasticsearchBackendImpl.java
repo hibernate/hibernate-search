@@ -57,6 +57,14 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 	}
 
 	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		if ( ElasticsearchBackend.class.isAssignableFrom( clazz ) ) {
+			return (T) this;
+		}
+		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class );
+	}
+
+	@Override
 	public Backend toAPI() {
 		return this;
 	}

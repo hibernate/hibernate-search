@@ -154,4 +154,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 532, value = "Backend '%1$s' has multi-tenancy enabled, but no tenant identifier is provided.")
 	SearchException multiTenancyEnabledButNoTenantIdProvided(BackendImplementor<?> backend);
+
+	@Message(id = 533, value = "Attempt to unwrap a Lucene backend to %1$s,"
+			+ " but this backend can only be unwrapped to %2$s." )
+	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
 }

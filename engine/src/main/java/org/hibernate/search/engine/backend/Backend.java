@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.engine.backend;
 
-import org.hibernate.search.engine.backend.spi.BackendExtension;
-
 public interface Backend {
 
 	// TODO add standard APIs related to analysis (which is backend-scoped). To test if an analyzer is defined, for example.
 	// TODO add standard APIs related to statistics?
 	// TODO add other standard backend APIs?
 
-	default <T extends Backend> T withExtension(BackendExtension<T> extension) {
-		return extension.extendOrFail( this );
-	}
+	/**
+	 * Unwrap the backend to some implementation-specific type.
+	 *
+	 * @param clazz The {@link Class} representing the expected type
+	 * @return The unwrapped backend.
+	 * @throws org.hibernate.search.util.SearchException if the backend implementation does not support
+	 * unwrapping to the given class.
+	 */
+	<T> T unwrap(Class<T> clazz);
 
 }

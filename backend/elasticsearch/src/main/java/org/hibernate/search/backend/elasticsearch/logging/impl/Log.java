@@ -124,4 +124,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 518, value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
 			+ " but the client can only be unwrapped to %2$s." )
 	SearchException clientUnwrappingWithUnkownType(Class<?> requestedClass, Class<?> actualClass);
+
+	@Message(id = 519, value = "Attempt to unwrap an Elasticsearch backend to %1$s,"
+			+ " but this backend can only be unwrapped to %2$s." )
+	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
 }

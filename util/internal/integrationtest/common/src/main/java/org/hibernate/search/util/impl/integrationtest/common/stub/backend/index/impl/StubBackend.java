@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -26,6 +27,11 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	@Override
 	public String toString() {
 		return StubBackend.class.getSimpleName() + "[" + name + "]";
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		throw new AssertionFailure( getClass().getName() + " cannot be unwrapped" );
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.index.impl.LuceneLocalDirectoryIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -51,6 +52,14 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		initializeRootDirectory( name, rootDirectory );
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		if ( LuceneBackend.class.isAssignableFrom( clazz ) ) {
+			return (T) this;
+		}
+		throw log.backendUnwrappingWithUnknownType( clazz, LuceneBackend.class );
 	}
 
 	@Override
