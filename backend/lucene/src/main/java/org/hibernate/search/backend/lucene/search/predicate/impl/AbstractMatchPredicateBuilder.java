@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 

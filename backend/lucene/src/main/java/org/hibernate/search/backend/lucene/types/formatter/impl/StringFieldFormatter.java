@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.formatter.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public final class StringFieldFormatter implements LuceneFieldFormatter<String> {

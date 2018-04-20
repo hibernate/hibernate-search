@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 class FieldProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {

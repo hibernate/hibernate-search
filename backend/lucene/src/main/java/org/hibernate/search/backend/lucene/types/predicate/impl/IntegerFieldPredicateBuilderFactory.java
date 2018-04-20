@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.IntegerFieldFormatter;
 
 public final class IntegerFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {

@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldSortContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.SortMissingValue;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 abstract class AbstractScalarLuceneFieldSortContributor implements LuceneFieldSortContributor {

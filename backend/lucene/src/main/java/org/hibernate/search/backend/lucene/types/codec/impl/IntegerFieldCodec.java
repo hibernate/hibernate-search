@@ -16,7 +16,6 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.model.Sortable;
 import org.hibernate.search.engine.backend.document.model.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 
 public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {

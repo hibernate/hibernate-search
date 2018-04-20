@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldFormatter;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldSortContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.SortMissingValue;
+import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortBuilderImpl extends AbstractSearchSortBuilder

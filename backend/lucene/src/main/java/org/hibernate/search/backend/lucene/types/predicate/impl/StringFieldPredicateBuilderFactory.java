@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
 
 public class StringFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {

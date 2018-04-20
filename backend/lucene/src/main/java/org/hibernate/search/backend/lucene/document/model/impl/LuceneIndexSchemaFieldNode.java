@@ -8,6 +8,11 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+
 /**
  * @author Guillaume Smet
  */

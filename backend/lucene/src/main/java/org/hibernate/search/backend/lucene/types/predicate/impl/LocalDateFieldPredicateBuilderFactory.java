@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
 
 public final class LocalDateFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
