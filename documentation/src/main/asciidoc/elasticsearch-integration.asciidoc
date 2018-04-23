@@ -1116,6 +1116,32 @@ The optimization features documented in <<search-optimize>> are only partially i
  * The automatic optimization is not implemented and most probably never will be.
  * The manual optimization (`searchFactory.optimize()`) is implemented.
 
+[[elasticsearch-client-access]]
+=== Direct access to the Elasticsearch client
+
+When writing complex applications with advanced requirements,
+it may be necessary from time to time to send requests to the Elasticsearch cluster directly,
+in particular if Hibernate Search does not support this kind of requests out of the box.
+
+To that end, you can access the Elasticsearch client
+used by Hibernate Search internally with the following snippet of code:
+
+[source,java]
+--
+SearchFactory searchFactory = fullTextSession.getSearchFactory();
+IndexFamily indexFamily = searchFactory.getIndexFamily( ElasticsearchIndexFamilyType.get() );
+ElasticsearchIndexFamily elasticsearchIndexFamily = indexFamily.unwrap( ElasticsearchIndexFamily.class );
+RestClient restClient = elasticsearchIndexFamily.getClient( RestClient.class );
+--
+
+[WARNING]
+====
+The client itself is not part of the Hibernate Search API, but of the official Elasticsearch REST client API.
+
+If we have to switch the internal implementation to another client with a different Java type,
+which we may do without prior notice, the snippet of code above will throw an exception.
+====
+
 [[elasticsearch-logging]]
 ==== Logging executed requests
 
