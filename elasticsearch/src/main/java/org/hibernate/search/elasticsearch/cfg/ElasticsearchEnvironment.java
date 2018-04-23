@@ -316,8 +316,11 @@ public final class ElasticsearchEnvironment {
 	 * Provider of default analysis-related definitions for Elasticsearch.
 	 * <p>
 	 * The value must be the fully-qualified name of a class implementing {@link ElasticsearchAnalysisDefinitionProvider}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.elasticsearch.analysis_definition_provider=com.acme.MyClass}).
 	 */
-	public static final String ANALYSIS_DEFINITION_PROVIDER = "hibernate.search.elasticsearch.analysis_definition_provider";
+	public static final String ANALYSIS_DEFINITION_PROVIDER = "elasticsearch.analysis_definition_provider";
 
 	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).

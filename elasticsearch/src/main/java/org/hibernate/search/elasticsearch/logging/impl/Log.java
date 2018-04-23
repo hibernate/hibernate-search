@@ -422,7 +422,7 @@ public interface Log extends BaseHibernateSearchLogger {
 	SearchException analyzerNamingConflict(String remoteName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 75,
-			value = "Property '" + ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
+			value = "Property 'hibernate.search." + ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
 					+ " The value must be the fully-qualified name of a class with a public, no-arg constructor in your classpath."
 					+ " Also, the class must either implement ElasticsearchAnalyzerDefinitionProvider or expose a public,"
 					+ " @Factory-annotated method returning a ElasticsearchAnalyzerDefinitionProvider.")

@@ -40,7 +40,8 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 	private final String analysisDefinitionProviderClassName;
 
 	public Elasticsearch2Dialect(Properties properties) {
-		this.analysisDefinitionProviderClassName = properties.getProperty( "elasticsearch.analysis_definition_provider" );
+		this.analysisDefinitionProviderClassName =
+				properties.getProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER );
 	}
 
 	@Override

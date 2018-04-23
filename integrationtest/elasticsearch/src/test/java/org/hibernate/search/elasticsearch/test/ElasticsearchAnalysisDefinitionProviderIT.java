@@ -42,6 +42,7 @@ import org.junit.rules.ExpectedException;
  */
 @TestForIssue(jiraKey = "HSEARCH-2418")
 public class ElasticsearchAnalysisDefinitionProviderIT {
+	private static final String PROPERTY_PREFIX = "hibernate.search.";
 
 	private static final String CUSTOM_ANALYZER_NAME = "custom-analyzer";
 
@@ -169,7 +170,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void invalid_notAClass() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, "invalidValue" );
+		cfg.addProperty( PROPERTY_PREFIX + ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, "invalidValue" );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
@@ -181,7 +182,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void invalid_luceneProvider() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, LuceneAnalyzerDefinitionProviderImpl.class.getName() );
+		cfg.addProperty( PROPERTY_PREFIX + ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, LuceneAnalyzerDefinitionProviderImpl.class.getName() );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
@@ -234,7 +235,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, providerClass.getName() );
+		cfg.addProperty( PROPERTY_PREFIX + ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, providerClass.getName() );
 		return integratorResource.create( cfg );
 	}
 
