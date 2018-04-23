@@ -29,10 +29,11 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexFamily;
+import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -333,8 +334,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public IndexFamily getIndexFamily(IndexManagerType indexManagerType) {
-		return delegate.getIndexFamily( indexManagerType );
+	public IndexFamily getIndexFamily(IndexFamilyType indexFamilyType) {
+		return delegate.getIndexFamily( indexFamilyType );
 	}
 
 	@Override

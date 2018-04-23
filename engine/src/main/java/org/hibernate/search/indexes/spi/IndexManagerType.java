@@ -8,6 +8,7 @@ package org.hibernate.search.indexes.spi;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.indexes.IndexFamilyType;
 
 /**
  * Since Hibernate Search supports different types of indexing and query technologies,
@@ -29,7 +30,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  *    You should be prepared for incompatible changes in future releases.
  * @since 5.6
  */
-public interface IndexManagerType {
+public interface IndexManagerType extends IndexFamilyType {
 
 	/**
 	 * @param serviceManager the service manager

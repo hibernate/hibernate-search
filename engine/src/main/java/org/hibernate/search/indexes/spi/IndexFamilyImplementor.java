@@ -8,6 +8,7 @@ package org.hibernate.search.indexes.spi;
 
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+import org.hibernate.search.indexes.IndexFamily;
 
 /**
  * The SPI contract for {@link IndexFamily} implementors.

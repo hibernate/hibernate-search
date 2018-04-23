@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
-import org.hibernate.search.elasticsearch.indexes.spi.ElasticsearchIndexFamily;
+import org.hibernate.search.elasticsearch.indexes.ElasticsearchIndexFamily;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;

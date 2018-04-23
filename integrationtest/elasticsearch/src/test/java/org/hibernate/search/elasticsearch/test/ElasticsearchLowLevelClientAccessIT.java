@@ -10,14 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexFamily;
-import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
+import org.hibernate.search.elasticsearch.indexes.ElasticsearchIndexFamily;
+import org.hibernate.search.elasticsearch.indexes.ElasticsearchIndexFamilyType;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.IndexFamily;
-import org.hibernate.search.orm.spi.SearchIntegratorHelper;
-import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
@@ -41,8 +40,8 @@ public class ElasticsearchLowLevelClientAccessIT extends SearchTestBase {
 
 	@Test
 	public void indexFamily_getClient() throws Exception {
-		SearchIntegrator integrator = SearchIntegratorHelper.extractFromSessionFactory( getSessionFactory() );
-		IndexFamily indexFamily = integrator.getIndexFamily( ElasticsearchIndexManagerType.INSTANCE );
+		SearchFactory searchFactory = getSearchFactory();
+		IndexFamily indexFamily = searchFactory.getIndexFamily( ElasticsearchIndexFamilyType.get() );
 		ElasticsearchIndexFamily elasticsearchIndexFamily = indexFamily.unwrap( ElasticsearchIndexFamily.class );
 		RestClient restClient = elasticsearchIndexFamily.getClient( RestClient.class );
 
@@ -53,8 +52,8 @@ public class ElasticsearchLowLevelClientAccessIT extends SearchTestBase {
 
 	@Test
 	public void indexFamily_getClient_error_invalidClass() {
-		SearchIntegrator integrator = SearchIntegratorHelper.extractFromSessionFactory( getSessionFactory() );
-		IndexFamily indexFamily = integrator.getIndexFamily( ElasticsearchIndexManagerType.INSTANCE );
+		SearchFactory searchFactory = getSearchFactory();
+		IndexFamily indexFamily = searchFactory.getIndexFamily( ElasticsearchIndexFamilyType.get() );
 		ElasticsearchIndexFamily elasticsearchIndexFamily = indexFamily.unwrap( ElasticsearchIndexFamily.class );
 
 		thrown.expect( SearchException.class );

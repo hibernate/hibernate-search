@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.indexes.spi;
+package org.hibernate.search.indexes;
 
 /**
  * An IndexFamily abstracts the specific configuration and implementations
  * being used on a "family" of indexes, i.e. all the indexes using the same underlying
- * {@link IndexManagerType indexing technology}.
+ * {@link IndexFamilyType indexing technology}.
  * <p>
  * Ideally this class would be called a "Backend" or "BackendManager",
  * but in Search 5 the term "backend" already means something subtly different,

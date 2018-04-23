@@ -11,6 +11,8 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.IndexFamily;
+import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -80,6 +82,11 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	private IndexedTypeIdentifier convertTypeIdentifier(Class<?> clazz) {
 		return searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
+	}
+
+	@Override
+	public IndexFamily getIndexFamily(IndexFamilyType indexFamilyType) {
+		return searchIntegrator.getIndexFamily( indexFamilyType );
 	}
 
 	@Override

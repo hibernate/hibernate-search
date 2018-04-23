@@ -39,11 +39,12 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexFamily;
+import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
@@ -649,8 +650,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public IndexFamily getIndexFamily(IndexManagerType indexManagerType) {
-		SearchIntegration integration = integrations.get( indexManagerType );
+	public IndexFamily getIndexFamily(IndexFamilyType indexFamilyType) {
+		SearchIntegration integration = integrations.get( indexFamilyType );
 		if ( integration != null ) {
 			return integration.getIndexFamily();
 		}

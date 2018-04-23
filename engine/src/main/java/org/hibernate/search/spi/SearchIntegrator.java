@@ -8,8 +8,6 @@ package org.hibernate.search.spi;
 
 import java.util.function.Predicate;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.backend.spi.Worker;
@@ -17,16 +15,19 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.IndexFamily;
+import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexFamily;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.stat.Statistics;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Query;
 
 /**
  * This contract gives access to lower level APIs of Hibernate Search for
@@ -211,11 +212,11 @@ public interface SearchIntegrator extends AutoCloseable {
 	void close();
 
 	/**
-	 * Get an {@link org.hibernate.search.indexes.spi.IndexFamily} using the index manager type.
-	 * @param indexManagerType the type of index managers of the requested family
+	 * Get an {@link IndexFamily} using the index family type.
+	 * @param indexFamilyType the type of index family to retrieve
 	 * @return the selected {@link IndexFamily}, or null if it doesn't exist
 	 */
-	IndexFamily getIndexFamily(IndexManagerType indexManagerType);
+	IndexFamily getIndexFamily(IndexFamilyType indexFamilyType);
 
 	/**
 	 * Get an {@link IndexManager} using the name
