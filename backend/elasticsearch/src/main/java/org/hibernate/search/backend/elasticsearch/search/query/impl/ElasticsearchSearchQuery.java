@@ -23,8 +23,8 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
-	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
@@ -33,11 +33,12 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
-	public ElasticsearchSearchQuery(ElasticsearchWorkOrchestrator queryOrchestrator,
-			ElasticsearchWorkFactory workFactory, Set<URLEncodedString> indexNames, Set<String> routingKeys,
+	public ElasticsearchSearchQuery(ElasticsearchWorkFactory workFactory,
+			ElasticsearchWorkOrchestrator queryOrchestrator,
+			Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, SearchResultExtractor<T> searchResultExtractor) {
-		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
+		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
 		this.routingKeys = routingKeys;
 		this.payload = payload;

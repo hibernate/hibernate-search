@@ -27,33 +27,37 @@ import com.google.gson.JsonObject;
 class SearchQueryBuilderImpl<C, T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
-	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchWorkOrchestrator queryOrchestrator;
+	private final MultiTenancyStrategy multiTenancyStrategy;
+
 	private final Set<URLEncodedString> indexNames;
+	private final String tenantId;
 	private final Set<String> routingKeys;
+
+	private final ElasticsearchSearchQueryElementCollector elementCollector;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
-	private final ElasticsearchSearchQueryElementCollector elementCollector;
-	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final String tenantId;
 
-	public SearchQueryBuilderImpl(
-			ElasticsearchWorkOrchestrator queryOrchestrator,
+	SearchQueryBuilderImpl(
 			ElasticsearchWorkFactory workFactory,
-			Set<URLEncodedString> indexNames,
+			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
+			Set<URLEncodedString> indexNames,
 			SessionContext sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
+		this.workFactory = workFactory;
+		this.queryOrchestrator = queryOrchestrator;
+		this.multiTenancyStrategy = multiTenancyStrategy;
+
+		this.indexNames = indexNames;
+		this.tenantId = sessionContext.getTenantIdentifier();
+		this.routingKeys = new HashSet<>();
+
+		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
-		this.queryOrchestrator = queryOrchestrator;
-		this.workFactory = workFactory;
-		this.indexNames = indexNames;
-		this.routingKeys = new HashSet<>();
-		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
-		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
@@ -84,9 +88,12 @@ class SearchQueryBuilderImpl<C, T>
 		SearchResultExtractor<T> searchResultExtractor =
 				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );
 
-		return new ElasticsearchSearchQuery<>( queryOrchestrator, workFactory,
+		return new ElasticsearchSearchQuery<>(
+				workFactory, queryOrchestrator,
 				indexNames, routingKeys,
-				payload, searchResultExtractor );
+				payload,
+				searchResultExtractor
+		);
 	}
 
 	private JsonObject getJsonQuery() {

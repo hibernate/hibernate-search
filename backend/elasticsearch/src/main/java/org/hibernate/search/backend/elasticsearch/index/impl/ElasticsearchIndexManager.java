@@ -33,6 +33,7 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	private final URLEncodedString name;
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
+
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 

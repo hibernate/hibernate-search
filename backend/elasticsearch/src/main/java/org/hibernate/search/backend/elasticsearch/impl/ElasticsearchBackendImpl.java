@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElasticsearchWorkOrchestrator;
@@ -40,12 +41,12 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 	private final String name;
 
 	private final ElasticsearchWorkFactory workFactory;
-
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
-
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
+
+	private final SearchBackendContext searchContext;
 
 	public ElasticsearchBackendImpl(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
@@ -54,6 +55,9 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
+		this.searchContext = new SearchBackendContext(
+				this, workFactory, multiTenancyStrategy, queryOrchestrator
+		);
 	}
 
 	@Override
@@ -105,8 +109,8 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 		return streamOrchestrator;
 	}
 
-	public ElasticsearchWorkOrchestrator getQueryOrchestrator() {
-		return queryOrchestrator;
+	public SearchBackendContext getSearchContext() {
+		return searchContext;
 	}
 
 	@Override
@@ -130,5 +134,4 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 				.append( "]")
 				.toString();
 	}
-
 }

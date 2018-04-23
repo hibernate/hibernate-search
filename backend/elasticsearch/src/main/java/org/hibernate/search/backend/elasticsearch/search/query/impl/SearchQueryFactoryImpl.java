@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
-import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
@@ -37,36 +35,30 @@ class SearchQueryFactoryImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackendImpl backend;
+	private final SearchBackendContext searchBackendContext;
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	private final DocumentReferenceHitExtractor documentReferenceHitExtractor;
-
-	private final ObjectHitExtractor objectHitExtractor;
-
-	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
-
-	SearchQueryFactoryImpl(ElasticsearchBackendImpl backend, ElasticsearchSearchTargetModel searchTargetModel) {
-		this.backend = backend;
+	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
 
-		MultiTenancyStrategy multiTenancyStrategy = backend.getMultiTenancyStrategy();
-		this.documentReferenceHitExtractor = new DocumentReferenceHitExtractor( multiTenancyStrategy );
-		this.objectHitExtractor = new ObjectHitExtractor( multiTenancyStrategy );
-		this.documentReferenceProjectionHitExtractor = new DocumentReferenceProjectionHitExtractor( multiTenancyStrategy );
 	}
 
 	@Override
 	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObjects(
 			SessionContext sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
-		return createSearchQueryBuilder( sessionContext, objectHitExtractor, hitAggregator );
+		return createSearchQueryBuilder(
+				sessionContext, searchBackendContext.getObjectHitExtractor(), hitAggregator
+		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
 			SessionContext sessionContext, HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator) {
-		return createSearchQueryBuilder( sessionContext, documentReferenceHitExtractor, hitAggregator );
+		return createSearchQueryBuilder(
+				sessionContext, searchBackendContext.getDocumentReferenceHitExtractor(), hitAggregator
+		);
 	}
 
 	@Override
@@ -110,15 +102,15 @@ class SearchQueryFactoryImpl
 			switch ( projection ) {
 				case ProjectionConstants.OBJECT:
 					projectionFound.set( i );
-					extractors.add( objectHitExtractor );
+					extractors.add( searchBackendContext.getObjectHitExtractor() );
 					break;
 				case ProjectionConstants.REFERENCE:
 					projectionFound.set( i );
-					extractors.add( documentReferenceHitExtractor );
+					extractors.add( searchBackendContext.getDocumentReferenceHitExtractor() );
 					break;
 				case ProjectionConstants.DOCUMENT_REFERENCE:
 					projectionFound.set( i );
-					extractors.add( documentReferenceProjectionHitExtractor );
+					extractors.add( searchBackendContext.getDocumentReferenceProjectionHitExtractor() );
 					break;
 				default:
 					ElasticsearchIndexSchemaFieldNode node = indexModel.getFieldNode( projection );
@@ -138,13 +130,8 @@ class SearchQueryFactoryImpl
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
-		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
-
-		return new SearchQueryBuilderImpl<>(
-				backend.getQueryOrchestrator(),
-				backend.getWorkFactory(),
+		return searchBackendContext.createSearchQueryBuilder(
 				searchTargetModel.getIndexNames(),
-				backend.getMultiTenancyStrategy(),
 				sessionContext,
 				hitExtractor, hitAggregator
 		);

@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -26,9 +24,10 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 	private final SearchTargetContext<?> searchTargetContext;
 
-	ElasticsearchIndexSearchTarget(ElasticsearchBackendImpl backend, Set<ElasticsearchIndexModel> indexModels) {
-		this.searchTargetModel = new ElasticsearchSearchTargetModel( indexModels );
-		this.searchTargetContext = new ElasticsearchSearchTargetContext( backend, searchTargetModel );
+	ElasticsearchIndexSearchTarget(SearchBackendContext searchBackendContext,
+			ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchTargetModel = searchTargetModel;
+		this.searchTargetContext = new ElasticsearchSearchTargetContext( searchBackendContext, searchTargetModel );
 	}
 
 	@Override
