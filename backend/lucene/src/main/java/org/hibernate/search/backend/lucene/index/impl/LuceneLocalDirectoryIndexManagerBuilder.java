@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneRootIndexSchemaCollectorImpl;
-import org.hibernate.search.backend.lucene.impl.LuceneLocalDirectoryBackend;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -31,18 +31,24 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneLocalDirectoryBackend backend;
+	private final IndexingBackendContext indexingBackendContext;
+	private final SearchBackendContext searchBackendContext;
+
 	private final String normalizedIndexName;
-	private final BuildContext context;
+
+	private final BuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
 	private final LuceneRootIndexSchemaCollectorImpl collector = new LuceneRootIndexSchemaCollectorImpl();
 
-	public LuceneLocalDirectoryIndexManagerBuilder(LuceneLocalDirectoryBackend backend, String normalizedIndexName,
-			BuildContext context, ConfigurationPropertySource propertySource) {
-		this.backend = backend;
+	public LuceneLocalDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
+			SearchBackendContext searchBackendContext,
+			String normalizedIndexName,
+			BuildContext buildContext, ConfigurationPropertySource propertySource) {
+		this.indexingBackendContext = indexingBackendContext;
+		this.searchBackendContext = searchBackendContext;
 		this.normalizedIndexName = normalizedIndexName;
-		this.context = context;
+		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 	}
 
@@ -55,7 +61,9 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 	public LuceneLocalDirectoryIndexManager build() {
 		LuceneIndexModel model = new LuceneIndexModel( normalizedIndexName, collector );
 
-		return new LuceneLocalDirectoryIndexManager( backend, normalizedIndexName, model, createIndexWriter( model ) );
+		return new LuceneLocalDirectoryIndexManager(
+				indexingBackendContext, searchBackendContext, normalizedIndexName, model, createIndexWriter( model )
+		);
 	}
 
 	private IndexWriter createIndexWriter(LuceneIndexModel model) {
@@ -64,11 +72,13 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 
 		try {
 			IndexWriterConfig indexWriterConfig = new IndexWriterConfig( model.getScopedAnalyzer() );
-			Directory directory = backend.getIndexingContext().createDirectory( normalizedIndexName );
+			Directory directory = indexingBackendContext.createDirectory( normalizedIndexName );
 			return new IndexWriter( directory, indexWriterConfig );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexWriter( backend, model.getIndexName(), e );
+			throw log.unableToCreateIndexWriter(
+					indexingBackendContext.getBackendImplementor(), model.getIndexName(), e
+			);
 		}
 	}
 }

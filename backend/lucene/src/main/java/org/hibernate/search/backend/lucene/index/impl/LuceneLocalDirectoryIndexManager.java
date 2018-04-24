@@ -14,11 +14,11 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
@@ -33,21 +33,29 @@ import org.apache.lucene.index.IndexWriter;
  * @author Guillaume Smet
  */
 // TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
+class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackendImplementor backend;
+	private final IndexingBackendContext indexingBackendContext;
+	private final SearchBackendContext searchBackendContext;
+
 	private final String indexName;
 	private final LuceneIndexModel model;
+
 	private final LuceneIndexWorkOrchestrator changesetOrchestrator;
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
-	public LuceneLocalDirectoryIndexManager(LuceneBackendImplementor backend, String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
-		this.backend = backend;
+	LuceneLocalDirectoryIndexManager(IndexingBackendContext indexingBackendContext,
+			SearchBackendContext searchBackendContext,
+			String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
+		this.indexingBackendContext = indexingBackendContext;
+		this.searchBackendContext = searchBackendContext;
+
 		this.indexName = indexName;
 		this.model = model;
+
 		this.changesetOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
 		this.streamOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
 		this.indexWriter = indexWriter;
@@ -65,21 +73,21 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 
 	@Override
 	public ChangesetIndexWorker<LuceneRootDocumentBuilder> createWorker(SessionContext sessionContext) {
-		return backend.getIndexingContext().createChangesetIndexWorker(
+		return indexingBackendContext.createChangesetIndexWorker(
 				changesetOrchestrator, indexName, sessionContext
 		);
 	}
 
 	@Override
 	public StreamIndexWorker<LuceneRootDocumentBuilder> createStreamWorker(SessionContext sessionContext) {
-		return backend.getIndexingContext().createStreamIndexWorker(
+		return indexingBackendContext.createStreamIndexWorker(
 				streamOrchestrator, indexName, sessionContext
 		);
 	}
 
 	@Override
 	public IndexSearchTargetBuilder createSearchTarget() {
-		return new LuceneIndexSearchTargetBuilder( backend, this );
+		return new LuceneIndexSearchTargetBuilder( searchBackendContext, this );
 	}
 
 	@Override
@@ -89,7 +97,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 		}
 
 		LuceneIndexSearchTargetBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetBuilder) searchTargetBuilder;
-		luceneSearchTargetBuilder.add( backend, this );
+		luceneSearchTargetBuilder.add( searchBackendContext, this );
 	}
 
 	@Override
@@ -125,7 +133,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 			return DirectoryReader.open( indexWriter );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexReader( backend, indexName, e );
+			throw log.unableToCreateIndexReader( indexingBackendContext.getBackendImplementor(), indexName, e );
 		}
 	}
 
@@ -135,7 +143,7 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 			reader.close();
 		}
 		catch (IOException e) {
-			log.unableToCloseIndexReader( backend, indexName, e );
+			log.unableToCloseIndexReader( indexingBackendContext.getBackendImplementor(), indexName, e );
 		}
 	}
 }

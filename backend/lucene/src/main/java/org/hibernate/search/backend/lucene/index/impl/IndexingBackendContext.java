@@ -42,6 +42,11 @@ public class IndexingBackendContext {
 		return getClass().getSimpleName() + "[backend=" + backend + "]";
 	}
 
+	// TODO use a dedicated object for the error context instead of the backend
+	BackendImplementor<?> getBackendImplementor() {
+		return backend;
+	}
+
 	Directory createDirectory(String indexName) throws IOException {
 		return directoryProvider.createDirectory( indexName );
 	}

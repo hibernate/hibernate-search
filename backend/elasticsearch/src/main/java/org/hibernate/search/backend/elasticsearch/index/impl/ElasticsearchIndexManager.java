@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -29,7 +29,8 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackendImpl backend;
+	private final IndexingBackendContext indexingBackendContext;
+	private final SearchBackendContext searchBackendContext;
 
 	private final URLEncodedString name;
 	private final URLEncodedString typeName;
@@ -37,14 +38,15 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
 
-	ElasticsearchIndexManager(ElasticsearchBackendImpl backend,
+	ElasticsearchIndexManager(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			URLEncodedString name, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
-		this.backend = backend;
+		this.indexingBackendContext = indexingBackendContext;
+		this.searchBackendContext = searchBackendContext;
 		this.name = name;
 		this.typeName = typeName;
 		this.model = model;
-		this.changesetOrchestrator = backend.getIndexingContext().createChangesetOrchestrator();
+		this.changesetOrchestrator = indexingBackendContext.createChangesetOrchestrator();
 	}
 
 	@Override
@@ -63,17 +65,17 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 
 	@Override
 	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
-		return backend.getIndexingContext().createChangesetIndexWorker( changesetOrchestrator, name, typeName, sessionContext );
+		return indexingBackendContext.createChangesetIndexWorker( changesetOrchestrator, name, typeName, sessionContext );
 	}
 
 	@Override
 	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext sessionContext) {
-		return backend.getIndexingContext().createStreamIndexWorker( name, typeName, sessionContext );
+		return indexingBackendContext.createStreamIndexWorker( name, typeName, sessionContext );
 	}
 
 	@Override
 	public IndexSearchTargetBuilder createSearchTarget() {
-		return new ElasticsearchIndexSearchTargetBuilder( backend, this );
+		return new ElasticsearchIndexSearchTargetBuilder( searchBackendContext, this );
 	}
 
 	@Override
@@ -83,7 +85,7 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 		}
 
 		ElasticsearchIndexSearchTargetBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetBuilder) searchTargetBuilder;
-		esSearchTargetBuilder.add( backend, this );
+		esSearchTargetBuilder.add( searchBackendContext, this );
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrc
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.impl.common.Closer;
@@ -29,7 +30,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Backend {
+public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRootDocumentBuilder>, Backend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,7 +44,7 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory,
+	LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
@@ -87,21 +88,9 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
 		}
 
-		return new LuceneLocalDirectoryIndexManagerBuilder( this, normalizeIndexName( indexName ), context, propertySource );
-	}
-
-	public Path getRootDirectory() {
-		return rootDirectory;
-	}
-
-	@Override
-	public IndexingBackendContext getIndexingContext() {
-		return indexingContext;
-	}
-
-	@Override
-	public SearchBackendContext getSearchContext() {
-		return searchContext;
+		return new LuceneLocalDirectoryIndexManagerBuilder(
+				indexingContext, searchContext, normalizeIndexName( indexName ), context, propertySource
+		);
 	}
 
 	@Override

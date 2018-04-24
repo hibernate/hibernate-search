@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaCollectorImpl;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -21,7 +21,8 @@ import org.hibernate.search.engine.common.spi.BuildContext;
  */
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
-	private final ElasticsearchBackendImpl backend;
+	private final IndexingBackendContext indexingBackendContext;
+	private final SearchBackendContext searchBackendContext;
 
 	private final String indexName;
 	private final ElasticsearchRootIndexSchemaCollectorImpl schemaCollector;
@@ -29,10 +30,12 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final BuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
-	public ElasticsearchIndexManagerBuilder(ElasticsearchBackendImpl backend,
+	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
+			SearchBackendContext searchBackendContext,
 			String indexName, ElasticsearchRootIndexSchemaCollectorImpl schemaCollector,
 			BuildContext buildContext, ConfigurationPropertySource propertySource) {
-		this.backend = backend;
+		this.indexingBackendContext = indexingBackendContext;
+		this.searchBackendContext = searchBackendContext;
 
 		this.indexName = indexName;
 		this.schemaCollector = schemaCollector;
@@ -55,10 +58,12 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		ElasticsearchIndexModel model = new ElasticsearchIndexModel( encodedIndexName, schemaCollector );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
-		backend.getIndexingContext().initializeIndex( encodedIndexName, encodedTypeName, model )
+		indexingBackendContext.initializeIndex( encodedIndexName, encodedTypeName, model )
 				.join();
 
-		return new ElasticsearchIndexManager( backend, encodedIndexName, encodedTypeName, model );
+		return new ElasticsearchIndexManager(
+				indexingBackendContext, searchBackendContext, encodedIndexName, encodedTypeName, model
+		);
 	}
 
 }

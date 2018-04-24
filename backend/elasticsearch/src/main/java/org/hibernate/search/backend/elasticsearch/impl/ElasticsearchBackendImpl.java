@@ -33,7 +33,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocumentObjectBuilder>,
+class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocumentObjectBuilder>,
 		ElasticsearchBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -50,7 +50,7 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	public ElasticsearchBackendImpl(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory,
+	ElasticsearchBackendImpl(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
@@ -99,16 +99,8 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 				new ElasticsearchRootIndexSchemaCollectorImpl( multiTenancyStrategy );
 
 		return new ElasticsearchIndexManagerBuilder(
-				this, normalizedIndexName, schemaCollector, buildContext, propertySource
+				indexingContext, searchContext, normalizedIndexName, schemaCollector, buildContext, propertySource
 		);
-	}
-
-	public IndexingBackendContext getIndexingContext() {
-		return indexingContext;
-	}
-
-	public SearchBackendContext getSearchContext() {
-		return searchContext;
 	}
 
 	@Override

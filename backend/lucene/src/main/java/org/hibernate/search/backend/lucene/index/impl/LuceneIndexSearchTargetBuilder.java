@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -28,18 +28,18 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackendImplementor backend;
+	private final SearchBackendContext searchBackendContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<LuceneIndexManager> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexSearchTargetBuilder(LuceneBackendImplementor backend, LuceneIndexManager indexManager) {
-		this.backend = backend;
+	LuceneIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, LuceneIndexManager indexManager) {
+		this.searchBackendContext = searchBackendContext;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(LuceneBackendImplementor backend, LuceneIndexManager indexManager) {
-		if ( ! this.backend.equals( backend ) ) {
+	void add(SearchBackendContext searchBackendContext, LuceneIndexManager indexManager) {
+		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
 			throw log.cannotMixLuceneSearchTargetWithOtherBackend( this, indexManager );
 		}
 		indexManagers.add( indexManager );
@@ -55,14 +55,14 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManager::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		return new LuceneIndexSearchTarget( backend.getSearchContext(), indexModels, readerProviders );
+		return new LuceneIndexSearchTarget( searchBackendContext, indexModels, readerProviders );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "backend=" ).append( backend )
+				.append( "searchBackendContext=" ).append( searchBackendContext )
 				.append( ", indexManagers=" ).append( indexManagers )
 				.append( "]")
 				.toString();

@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendImpl;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -27,18 +27,18 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchBackendImpl backend;
+	private final SearchBackendContext searchBackendContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManager> indexManagers = new LinkedHashSet<>();
 
-	ElasticsearchIndexSearchTargetBuilder(ElasticsearchBackendImpl backend, ElasticsearchIndexManager indexManager) {
-		this.backend = backend;
+	ElasticsearchIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, ElasticsearchIndexManager indexManager) {
+		this.searchBackendContext = searchBackendContext;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(ElasticsearchBackendImpl backend, ElasticsearchIndexManager indexManager) {
-		if ( ! this.backend.equals( backend ) ) {
+	void add(SearchBackendContext searchBackendContext, ElasticsearchIndexManager indexManager) {
+		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
 			throw log.cannotMixElasticsearchSearchTargetWithOtherBackend( this, indexManager );
 		}
 		indexManagers.add( indexManager );
@@ -50,14 +50,14 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManager::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		ElasticsearchSearchTargetModel searchTargetModel = new ElasticsearchSearchTargetModel( indexModels );
-		return new ElasticsearchIndexSearchTarget( backend.getSearchContext(), searchTargetModel );
+		return new ElasticsearchIndexSearchTarget( searchBackendContext, searchTargetModel );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "backend=" ).append( backend )
+				.append( "searchBackendContext=" ).append( searchBackendContext )
 				.append( ", indexManagers=" ).append( indexManagers )
 				.append( "]")
 				.toString();
