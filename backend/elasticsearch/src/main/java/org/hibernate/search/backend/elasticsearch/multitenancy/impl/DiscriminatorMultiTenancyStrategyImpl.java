@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchFields;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;

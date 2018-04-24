@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.engine.search.DocumentReference;
 

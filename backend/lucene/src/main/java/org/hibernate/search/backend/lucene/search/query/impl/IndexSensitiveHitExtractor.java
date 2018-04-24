@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 

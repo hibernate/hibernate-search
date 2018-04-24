@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import static org.hibernate.search.backend.lucene.document.model.impl.LuceneFields.internalFieldName;
+import static org.hibernate.search.backend.lucene.util.impl.LuceneFields.internalFieldName;
 
 import java.util.Collections;
 import java.util.Objects;

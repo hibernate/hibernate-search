@@ -11,7 +11,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 public class LuceneQueries {
 
