@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneRootIndexSchemaCollectorImpl;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
 /**
@@ -28,14 +27,14 @@ public class LuceneIndexModel {
 
 	private final ScopedAnalyzer scopedAnalyzer;
 
-	public LuceneIndexModel(String indexName, LuceneRootIndexSchemaCollectorImpl collector) {
+	public LuceneIndexModel(String indexName, LuceneRootIndexSchemaContributor contributor) {
 		this.indexName = indexName;
 
 		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
 		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
 		// TODO the default analyzer should be configurable, for now, we default to no analysis
 		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder( new KeywordAnalyzer() );
-		collector.contribute( new LuceneIndexSchemaNodeCollector() {
+		contributor.contribute( new LuceneIndexSchemaNodeCollector() {
 			@Override
 			public void collectAnalyzer(String absolutePath, Analyzer analyzer) {
 				scopedAnalyzerBuilder.setAnalyzer( absolutePath, analyzer );

@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 
@@ -23,9 +22,9 @@ public class ElasticsearchIndexModel {
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
 
-	public ElasticsearchIndexModel(URLEncodedString indexName, ElasticsearchRootIndexSchemaCollectorImpl collector) {
+	public ElasticsearchIndexModel(URLEncodedString indexName, ElasticsearchRootIndexSchemaContributor contributor) {
 		this.indexName = indexName;
-		this.mapping = collector.contribute( new ElasticsearchIndexSchemaNodeCollector() {
+		this.mapping = contributor.contribute( new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node) {
 				objectNodes.put( absolutePath, node );

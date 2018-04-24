@@ -9,12 +9,14 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaNestingContext;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 
 public class ElasticsearchRootIndexSchemaCollectorImpl
-		extends AbstractElasticsearchIndexSchemaCollector<IndexSchemaRootTypeNodeBuilder> {
+		extends AbstractElasticsearchIndexSchemaCollector<IndexSchemaRootTypeNodeBuilder> implements
+		ElasticsearchRootIndexSchemaContributor {
 
 	public ElasticsearchRootIndexSchemaCollectorImpl(MultiTenancyStrategy multiTenancyStrategy) {
 		super( new IndexSchemaRootTypeNodeBuilder( multiTenancyStrategy ) );
@@ -34,6 +36,7 @@ public class ElasticsearchRootIndexSchemaCollectorImpl
 		nodeBuilder.setRouting( RoutingType.REQUIRED );
 	}
 
+	@Override
 	public RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
 		return nodeBuilder.contribute( collector );
 	}
