@@ -24,12 +24,11 @@ public class ElasticsearchStreamIndexWorker extends ElasticsearchIndexWorker
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
 
-	public ElasticsearchStreamIndexWorker(ElasticsearchWorkFactory factory,
+	ElasticsearchStreamIndexWorker(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
-			MultiTenancyStrategy multiTenancyStrategy,
 			SessionContext sessionContext) {
-		super( factory, indexName, typeName, multiTenancyStrategy, sessionContext );
+		super( factory, multiTenancyStrategy, indexName, typeName, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

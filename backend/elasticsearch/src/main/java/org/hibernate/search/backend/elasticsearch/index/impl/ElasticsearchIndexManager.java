@@ -30,25 +30,26 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchBackendImpl backend;
+
 	private final URLEncodedString name;
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
-	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
-	public ElasticsearchIndexManager(ElasticsearchBackendImpl backend, URLEncodedString name, URLEncodedString typeName,
+	ElasticsearchIndexManager(ElasticsearchBackendImpl backend,
+			URLEncodedString name, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		this.backend = backend;
 		this.name = name;
 		this.typeName = typeName;
 		this.model = model;
-		this.changesetOrchestrator = backend.createChangesetOrchestrator();
-		this.streamOrchestrator = backend.getStreamOrchestrator();
+		this.changesetOrchestrator = backend.getIndexingContext().createChangesetOrchestrator();
 	}
 
 	@Override
 	public void close() {
+		// Index managers own the changeset context, but not the stream context (which is shared)
 		changesetOrchestrator.close();
 	}
 
@@ -62,18 +63,12 @@ public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocu
 
 	@Override
 	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
-		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
-
-		return new ElasticsearchChangesetIndexWorker( backend.getWorkFactory(), changesetOrchestrator, name, typeName, backend.getMultiTenancyStrategy(),
-				sessionContext );
+		return backend.getIndexingContext().createChangesetIndexWorker( changesetOrchestrator, name, typeName, sessionContext );
 	}
 
 	@Override
 	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext sessionContext) {
-		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
-
-		return new ElasticsearchStreamIndexWorker( backend.getWorkFactory(), streamOrchestrator, name, typeName, backend.getMultiTenancyStrategy(),
-				sessionContext );
+		return backend.getIndexingContext().createStreamIndexWorker( name, typeName, sessionContext );
 	}
 
 	@Override

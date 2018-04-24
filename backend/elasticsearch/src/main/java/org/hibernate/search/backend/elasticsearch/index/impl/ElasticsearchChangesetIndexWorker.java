@@ -29,12 +29,11 @@ public class ElasticsearchChangesetIndexWorker extends ElasticsearchIndexWorker
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
 
-	public ElasticsearchChangesetIndexWorker(ElasticsearchWorkFactory factory,
+	ElasticsearchChangesetIndexWorker(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
-			MultiTenancyStrategy multiTenancyStrategy,
 			SessionContext sessionContext) {
-		super( factory, indexName, typeName, multiTenancyStrategy, sessionContext );
+		super( factory, multiTenancyStrategy, indexName, typeName, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

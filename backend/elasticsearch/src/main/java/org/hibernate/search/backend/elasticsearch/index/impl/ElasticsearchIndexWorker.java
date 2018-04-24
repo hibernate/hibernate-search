@@ -25,18 +25,19 @@ import com.google.gson.JsonObject;
 public abstract class ElasticsearchIndexWorker implements IndexWorker<ElasticsearchDocumentObjectBuilder> {
 
 	protected final ElasticsearchWorkFactory factory;
+	protected final MultiTenancyStrategy multiTenancyStrategy;
 	protected final URLEncodedString indexName;
 	protected final URLEncodedString typeName;
-	protected final MultiTenancyStrategy multiTenancyStrategy;
 	protected final String tenantId;
 
-	public ElasticsearchIndexWorker(ElasticsearchWorkFactory factory, URLEncodedString indexName,
-			URLEncodedString typeName, MultiTenancyStrategy multiTenancyStrategy, SessionContext context) {
+	ElasticsearchIndexWorker(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+			URLEncodedString indexName, URLEncodedString typeName,
+			SessionContext sessionContext) {
 		this.factory = factory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.indexName = indexName;
 		this.typeName = typeName;
-		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.tenantId = context.getTenantIdentifier();
+		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
