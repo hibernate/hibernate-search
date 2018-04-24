@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;

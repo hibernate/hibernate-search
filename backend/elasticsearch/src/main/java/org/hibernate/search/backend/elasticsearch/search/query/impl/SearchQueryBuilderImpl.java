@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;

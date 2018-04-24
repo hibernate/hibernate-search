@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.impl;
+package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
@@ -22,7 +22,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
+public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

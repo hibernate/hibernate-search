@@ -12,7 +12,7 @@ import java.util.Objects;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
