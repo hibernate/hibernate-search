@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
-import org.hibernate.search.backend.lucene.index.impl.LuceneLocalDirectoryIndexManagerBuilder;
+import org.hibernate.search.backend.lucene.index.impl.LuceneDirectoryIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWorkOrchestrator;
@@ -88,7 +88,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
 		}
 
-		return new LuceneLocalDirectoryIndexManagerBuilder(
+		return new LuceneDirectoryIndexManagerBuilder(
 				indexingContext, searchContext, normalizeIndexName( indexName ), context, propertySource
 		);
 	}

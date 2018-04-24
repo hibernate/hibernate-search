@@ -33,7 +33,7 @@ import org.apache.lucene.index.IndexWriter;
  * @author Guillaume Smet
  */
 // TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
+class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,7 +47,7 @@ class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, ReaderProv
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
-	LuceneLocalDirectoryIndexManager(IndexingBackendContext indexingBackendContext,
+	LuceneDirectoryIndexManager(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
 		this.indexingBackendContext = indexingBackendContext;

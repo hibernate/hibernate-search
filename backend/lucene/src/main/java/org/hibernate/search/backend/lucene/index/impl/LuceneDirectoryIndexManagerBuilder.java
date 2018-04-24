@@ -27,7 +27,7 @@ import org.apache.lucene.store.Directory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
+public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,7 +41,7 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 
 	private final LuceneRootIndexSchemaCollectorImpl collector = new LuceneRootIndexSchemaCollectorImpl();
 
-	public LuceneLocalDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
+	public LuceneDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String normalizedIndexName,
 			BuildContext buildContext, ConfigurationPropertySource propertySource) {
@@ -58,10 +58,10 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 	}
 
 	@Override
-	public LuceneLocalDirectoryIndexManager build() {
+	public LuceneDirectoryIndexManager build() {
 		LuceneIndexModel model = new LuceneIndexModel( normalizedIndexName, collector );
 
-		return new LuceneLocalDirectoryIndexManager(
+		return new LuceneDirectoryIndexManager(
 				indexingBackendContext, searchBackendContext, normalizedIndexName, model, createIndexWriter( model )
 		);
 	}
