@@ -17,6 +17,11 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!-- Do NOT skip jqassistant: we want to execute analysis here so as to fail the build if anything is wrong.
+             Reminder: jqassistant only executes analysis in the last module of the build,
+             so if we skip it in the last module, it just won't execute analysis... ever.
+        <jqassistant.skip>true</jqassistant.skip>
+         -->
     </properties>
 
     <dependencies>
