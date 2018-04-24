@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 
 /**
  * A bridge between a POJO-extracted value of type {@code T} and an index field of type {@code R}.

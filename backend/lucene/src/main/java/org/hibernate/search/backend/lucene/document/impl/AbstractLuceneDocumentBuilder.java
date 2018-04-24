@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.document.Document;
 
 /**
  * @author Guillaume Smet

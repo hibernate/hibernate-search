@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 

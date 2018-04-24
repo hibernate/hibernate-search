@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;

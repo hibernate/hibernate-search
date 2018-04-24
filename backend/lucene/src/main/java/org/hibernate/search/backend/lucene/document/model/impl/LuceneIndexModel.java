@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
+
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneRootIndexSchemaCollectorImpl;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
 /**

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.common.SearchMappingRepository;

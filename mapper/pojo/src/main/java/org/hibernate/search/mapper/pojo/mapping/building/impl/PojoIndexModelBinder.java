@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;

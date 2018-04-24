@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneRootIndexSchemaCollectorImpl;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;

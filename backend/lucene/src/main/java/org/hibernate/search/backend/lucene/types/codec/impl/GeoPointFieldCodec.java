@@ -16,7 +16,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;

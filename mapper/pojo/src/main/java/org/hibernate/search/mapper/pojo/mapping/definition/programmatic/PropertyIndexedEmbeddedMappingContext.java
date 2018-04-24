@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.hibernate.search.engine.backend.document.model.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 

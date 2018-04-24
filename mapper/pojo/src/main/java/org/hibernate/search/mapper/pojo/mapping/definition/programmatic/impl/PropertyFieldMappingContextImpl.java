@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.document.model.IndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.Sortable;
-import org.hibernate.search.engine.backend.document.model.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;

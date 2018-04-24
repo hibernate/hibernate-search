@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 

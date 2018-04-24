@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCollector;
 
 /**
  * @author Yoann Rodiere
