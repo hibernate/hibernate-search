@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;

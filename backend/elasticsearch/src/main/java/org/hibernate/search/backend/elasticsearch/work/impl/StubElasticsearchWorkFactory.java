@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchResultExtractor;

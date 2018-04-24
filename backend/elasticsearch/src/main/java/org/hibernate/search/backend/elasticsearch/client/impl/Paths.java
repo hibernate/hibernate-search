@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+
 /**
  * Useful paths to compose Elasticsearch URLs.
  */

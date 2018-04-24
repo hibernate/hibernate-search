@@ -10,7 +10,7 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
