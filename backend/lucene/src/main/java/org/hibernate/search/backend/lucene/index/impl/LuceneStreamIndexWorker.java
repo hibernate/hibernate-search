@@ -18,14 +18,14 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Guillaume Smet
  */
-public class LuceneStreamIndexWorker extends LuceneIndexWorker implements StreamIndexWorker<LuceneRootDocumentBuilder> {
+class LuceneStreamIndexWorker extends LuceneIndexWorker implements StreamIndexWorker<LuceneRootDocumentBuilder> {
 
 	private final LuceneIndexWorkOrchestrator orchestrator;
 
-	public LuceneStreamIndexWorker(LuceneWorkFactory factory,
+	LuceneStreamIndexWorker(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, MultiTenancyStrategy multiTenancyStrategy, SessionContext sessionContext) {
-		super( factory, indexName, multiTenancyStrategy, sessionContext );
+			String indexName, SessionContext sessionContext) {
+		super( factory, multiTenancyStrategy, indexName, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

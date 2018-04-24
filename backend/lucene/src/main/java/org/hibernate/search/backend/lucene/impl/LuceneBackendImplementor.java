@@ -7,9 +7,8 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 
 /**
@@ -17,9 +16,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
  */
 public interface LuceneBackendImplementor extends BackendImplementor<LuceneRootDocumentBuilder> {
 
-	LuceneWorkFactory getWorkFactory();
-
-	MultiTenancyStrategy getMultiTenancyStrategy();
+	IndexingBackendContext getIndexingContext();
 
 	SearchBackendContext getSearchContext();
 }

@@ -20,17 +20,18 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Guillaume Smet
  */
-public abstract class LuceneIndexWorker implements IndexWorker<LuceneRootDocumentBuilder> {
+abstract class LuceneIndexWorker implements IndexWorker<LuceneRootDocumentBuilder> {
 
 	protected final LuceneWorkFactory factory;
 	protected final MultiTenancyStrategy multiTenancyStrategy;
 	protected final String indexName;
 	protected final String tenantId;
 
-	protected LuceneIndexWorker(LuceneWorkFactory factory, String indexName, MultiTenancyStrategy multiTenancyStrategy, SessionContext sessionContext) {
+	protected LuceneIndexWorker(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy, String indexName,
+			SessionContext sessionContext) {
 		this.factory = factory;
-		this.indexName = indexName;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.indexName = indexName;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 

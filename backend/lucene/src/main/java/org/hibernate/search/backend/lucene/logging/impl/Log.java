@@ -102,8 +102,8 @@ public interface Log extends BasicLogger {
 			+ " Given sort was: '%1$s'" )
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
-	@Message(id = 515, value = "Unable to create the IndexWriter for backend '%1$s', index '%2$s' and path '%3$s'." )
-	SearchException unableToCreateIndexWriter(BackendImplementor<?> backend, String indexName, Path directoryPath, @Cause Exception e);
+	@Message(id = 515, value = "Unable to create the IndexWriter for backend '%1$s', index '%2$s'." )
+	SearchException unableToCreateIndexWriter(BackendImplementor<?> backend, String indexName, @Cause Exception e);
 
 	@Message(id = 516, value = "Unable to index entry '%3$s' for index '%1$s' and tenant identifier '%2$s'." )
 	SearchException unableToIndexEntry(String indexName, String tenantId, String id, @Cause Exception e);

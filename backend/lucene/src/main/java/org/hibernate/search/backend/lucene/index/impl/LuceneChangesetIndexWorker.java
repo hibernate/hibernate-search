@@ -22,15 +22,15 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Guillaume Smet
  */
-public class LuceneChangesetIndexWorker extends LuceneIndexWorker implements ChangesetIndexWorker<LuceneRootDocumentBuilder> {
+class LuceneChangesetIndexWorker extends LuceneIndexWorker implements ChangesetIndexWorker<LuceneRootDocumentBuilder> {
 
 	private final LuceneIndexWorkOrchestrator orchestrator;
 	private final List<LuceneIndexWork<?>> works = new ArrayList<>();
 
-	public LuceneChangesetIndexWorker(LuceneWorkFactory factory,
+	LuceneChangesetIndexWorker(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, MultiTenancyStrategy multiTenancyStrategy, SessionContext sessionContext) {
-		super( factory, indexName, multiTenancyStrategy, sessionContext );
+			String indexName, SessionContext sessionContext) {
+		super( factory, multiTenancyStrategy, indexName, sessionContext );
 		this.orchestrator = orchestrator;
 	}
 

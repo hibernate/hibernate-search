@@ -8,13 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 import org.hibernate.search.engine.backend.document.model.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -25,6 +19,10 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.Directory;
 
 /**
  * @author Guillaume Smet
@@ -61,36 +59,16 @@ public class LuceneLocalDirectoryIndexManagerBuilder implements IndexManagerBuil
 	}
 
 	private IndexWriter createIndexWriter(LuceneIndexModel model) {
-		Path directoryPath = backend.getRootDirectory().resolve( normalizedIndexName );
-		initializeIndexDirectory( directoryPath );
-
 		// FIXME properly close all the resources, this will be pretty convoluted and we will likely drop this code
 		// altogether so let's be naive for now
 
 		try {
 			IndexWriterConfig indexWriterConfig = new IndexWriterConfig( model.getScopedAnalyzer() );
-			Directory directory = new MMapDirectory( directoryPath );
-
+			Directory directory = backend.getIndexingContext().createDirectory( normalizedIndexName );
 			return new IndexWriter( directory, indexWriterConfig );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexWriter( backend, model.getIndexName(), directoryPath, e );
-		}
-	}
-
-	private void initializeIndexDirectory(Path indexDirectory) {
-		if ( Files.exists( indexDirectory ) ) {
-			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
-				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( backend, indexDirectory );
-			}
-		}
-		else {
-			try {
-				Files.createDirectories( indexDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( backend, indexDirectory, e );
-			}
+			throw log.unableToCreateIndexWriter( backend, model.getIndexName(), e );
 		}
 	}
 }

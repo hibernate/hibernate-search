@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneLocalDirectoryIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
@@ -36,20 +37,24 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 
 	private final Path rootDirectory;
 
-	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
+	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy) {
+	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory,
+			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
 
-		this.workFactory = workFactory;
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
+		this.indexingContext = new IndexingBackendContext(
+				this, new MMapDirectoryProvider( this, rootDirectory ),
+				workFactory, multiTenancyStrategy
+		);
 		this.searchContext = new SearchBackendContext(
 				this, workFactory, multiTenancyStrategy, queryOrchestrator
 		);
@@ -90,13 +95,8 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 	}
 
 	@Override
-	public LuceneWorkFactory getWorkFactory() {
-		return workFactory;
-	}
-
-	@Override
-	public MultiTenancyStrategy getMultiTenancyStrategy() {
-		return multiTenancyStrategy;
+	public IndexingBackendContext getIndexingContext() {
+		return indexingContext;
 	}
 
 	@Override
