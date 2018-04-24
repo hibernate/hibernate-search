@@ -15,9 +15,12 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
  */
 public interface LuceneDocumentBuilder extends DocumentElement {
 
-	void addField(LuceneIndexSchemaObjectNode expectedParentNode, IndexableField field);
+	void addField(IndexableField field);
 
-	void addNestedObjectDocumentBuilder(LuceneIndexSchemaObjectNode parentNode, LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder);
+	void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder);
 
-	void addFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode parentNode, LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder);
+	void addFlattenedObjectDocumentBuilder(LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder);
+
+	void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode);
+
 }

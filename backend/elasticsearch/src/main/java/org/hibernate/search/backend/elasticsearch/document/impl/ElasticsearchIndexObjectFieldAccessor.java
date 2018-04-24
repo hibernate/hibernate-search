@@ -21,23 +21,27 @@ public class ElasticsearchIndexObjectFieldAccessor implements IndexObjectFieldAc
 
 	private final JsonAccessor<JsonObject> relativeAccessor;
 
-	private final ElasticsearchIndexSchemaObjectNode node;
+	private final ElasticsearchIndexSchemaObjectNode schemaNode;
 
 	public ElasticsearchIndexObjectFieldAccessor(JsonAccessor<JsonObject> relativeAccessor,
-			ElasticsearchIndexSchemaObjectNode node) {
+			ElasticsearchIndexSchemaObjectNode schemaNode) {
 		this.relativeAccessor = relativeAccessor;
-		this.node = node;
+		this.schemaNode = schemaNode;
 	}
 
 	@Override
 	public DocumentElement add(DocumentElement target) {
+		ElasticsearchDocumentObjectBuilder builder = (ElasticsearchDocumentObjectBuilder) target;
+		builder.checkTreeConsistency( schemaNode.getParent() );
 		JsonObject jsonObject = new JsonObject();
-		((ElasticsearchDocumentObjectBuilder) target).add( node.getParent(), relativeAccessor, jsonObject );
-		return new ElasticsearchDocumentObjectBuilder( node, jsonObject );
+		builder.add( relativeAccessor, jsonObject );
+		return new ElasticsearchDocumentObjectBuilder( schemaNode, jsonObject );
 	}
 
 	@Override
 	public void addMissing(DocumentElement target) {
-		((ElasticsearchDocumentObjectBuilder) target).add( node.getParent(), relativeAccessor, null );
+		ElasticsearchDocumentObjectBuilder builder = (ElasticsearchDocumentObjectBuilder) target;
+		builder.checkTreeConsistency( schemaNode.getParent() );
+		builder.add( relativeAccessor, null );
 	}
 }

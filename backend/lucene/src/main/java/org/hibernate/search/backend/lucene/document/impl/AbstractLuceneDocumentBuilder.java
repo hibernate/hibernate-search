@@ -36,9 +36,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 	}
 
 	@Override
-	public void addNestedObjectDocumentBuilder(LuceneIndexSchemaObjectNode expectedParentNode, LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
-		checkTreeConsistency( expectedParentNode );
-
+	public void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
 		if ( nestedObjectDocumentBuilders == null ) {
 			nestedObjectDocumentBuilders = new ArrayList<>();
 		}
@@ -47,9 +45,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 	}
 
 	@Override
-	public void addFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode expectedParentNode, LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
-		checkTreeConsistency( expectedParentNode );
-
+	public void addFlattenedObjectDocumentBuilder(LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
 		if ( flattenedObjectDocumentBuilders == null ) {
 			flattenedObjectDocumentBuilders = new ArrayList<>();
 		}
@@ -57,7 +53,8 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 		flattenedObjectDocumentBuilders.add( flattenedObjectDocumentBuilder );
 	}
 
-	protected void checkTreeConsistency( LuceneIndexSchemaObjectNode expectedParentNode ) {
+	@Override
+	public void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
 			throw log.invalidParentDocumentObjectState( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}

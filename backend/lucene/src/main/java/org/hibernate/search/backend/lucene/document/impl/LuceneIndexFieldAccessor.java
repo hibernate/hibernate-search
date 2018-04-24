@@ -24,7 +24,9 @@ public class LuceneIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 
 	@Override
 	public void write(DocumentElement target, T value) {
-		schemaNode.getEncoding().encode( (LuceneDocumentBuilder) target, schemaNode.getParent(), schemaNode.getAbsoluteFieldPath(), value );
+		LuceneDocumentBuilder documentBuilder = (LuceneDocumentBuilder) target;
+		documentBuilder.checkTreeConsistency( schemaNode.getParent() );
+		schemaNode.getEncoding().encode( documentBuilder, schemaNode.getAbsoluteFieldPath(), value );
 	}
 
 	@Override

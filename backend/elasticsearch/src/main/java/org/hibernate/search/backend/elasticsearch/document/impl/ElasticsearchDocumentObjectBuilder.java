@@ -37,11 +37,14 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		this.content = content;
 	}
 
-	public <T> void add(ElasticsearchIndexSchemaObjectNode expectedParentNode, JsonAccessor<T> relativeAccessor, T value) {
+	public <T> void add(JsonAccessor<T> relativeAccessor, T value) {
+		relativeAccessor.add( content, value );
+	}
+
+	public void checkTreeConsistency(ElasticsearchIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
 			throw log.invalidParentDocumentObjectState( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}
-		relativeAccessor.add( content, value );
 	}
 
 	public JsonObject build(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {

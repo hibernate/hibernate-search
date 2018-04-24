@@ -18,7 +18,6 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -51,17 +50,17 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, LuceneIndexSchemaObjectNode parentNode, String fieldName, GeoPoint value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, GeoPoint value) {
 		if ( value == null ) {
 			return;
 		}
 
 		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( parentNode, new StoredField( latitudeFieldName, value.getLatitude() ) );
-			documentBuilder.addField( parentNode, new StoredField( longitudeFieldName, value.getLongitude() ) );
+			documentBuilder.addField( new StoredField( latitudeFieldName, value.getLatitude() ) );
+			documentBuilder.addField( new StoredField( longitudeFieldName, value.getLongitude() ) );
 		}
 
-		documentBuilder.addField( parentNode, new LatLonPoint( fieldName, value.getLatitude(), value.getLongitude() ) );
+		documentBuilder.addField( new LatLonPoint( fieldName, value.getLatitude(), value.getLongitude() ) );
 	}
 
 	@Override

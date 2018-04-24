@@ -29,9 +29,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentBuilder {
 	}
 
 	@Override
-	public void addField(LuceneIndexSchemaObjectNode expectedParentNode, IndexableField field) {
-		checkTreeConsistency( expectedParentNode );
-
+	public void addField(IndexableField field) {
 		rootDocument.add( field );
 	}
 

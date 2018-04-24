@@ -26,7 +26,6 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 
 public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
@@ -49,22 +48,22 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, LuceneIndexSchemaObjectNode parentNode, String fieldName, LocalDate value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, LocalDate value) {
 		if ( value == null ) {
 			return;
 		}
 
 		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( parentNode, new StoredField( fieldName, FORMATTER.format( value ) ) );
+			documentBuilder.addField( new StoredField( fieldName, FORMATTER.format( value ) ) );
 		}
 
 		long valueToEpochDay = value.toEpochDay();
 
 		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( parentNode, new NumericDocValuesField( fieldName, valueToEpochDay ) );
+			documentBuilder.addField( new NumericDocValuesField( fieldName, valueToEpochDay ) );
 		}
 
-		documentBuilder.addField( parentNode, new LongPoint( fieldName, valueToEpochDay ) );
+		documentBuilder.addField( new LongPoint( fieldName, valueToEpochDay ) );
 	}
 
 	@Override

@@ -30,15 +30,17 @@ public class LuceneIndexObjectFieldAccessor implements IndexObjectFieldAccessor 
 	public DocumentElement add(DocumentElement target) {
 		LuceneDocumentBuilder currentDocumentBuilder = (LuceneDocumentBuilder) target;
 
+		currentDocumentBuilder.checkTreeConsistency( schemaNode.getParent() );
+
 		switch ( storage ) {
 			case NESTED:
 				LuceneNestedObjectDocumentBuilder nestedDocumentBuilder = new LuceneNestedObjectDocumentBuilder( schemaNode );
-				currentDocumentBuilder.addNestedObjectDocumentBuilder( schemaNode.getParent(), nestedDocumentBuilder );
+				currentDocumentBuilder.addNestedObjectDocumentBuilder( nestedDocumentBuilder );
 
 				return nestedDocumentBuilder;
 			default:
 				LuceneFlattenedObjectDocumentBuilder flattenedDocumentBuilder = new LuceneFlattenedObjectDocumentBuilder( schemaNode );
-				currentDocumentBuilder.addFlattenedObjectDocumentBuilder( schemaNode.getParent(), flattenedDocumentBuilder );
+				currentDocumentBuilder.addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
 
 				return flattenedDocumentBuilder;
 		}

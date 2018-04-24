@@ -11,14 +11,13 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 
 /**
  * @author Guillaume Smet
  */
 public interface LuceneFieldCodec<T> {
 
-	void encode(LuceneDocumentBuilder documentBuilder, LuceneIndexSchemaObjectNode parentNode, String fieldName, T value);
+	void encode(LuceneDocumentBuilder documentBuilder, String fieldName, T value);
 
 	default Set<String> getOverriddenStoredFields() {
 		return Collections.emptySet();

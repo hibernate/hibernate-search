@@ -28,9 +28,7 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 	}
 
 	@Override
-	public void addField(LuceneIndexSchemaObjectNode expectedParentNode, IndexableField field) {
-		checkTreeConsistency( expectedParentNode );
-
+	public void addField(IndexableField field) {
 		nestedDocument.add( field );
 	}
 

@@ -35,8 +35,10 @@ public class ElasticsearchIndexFieldAccessor<T> implements IndexFieldAccessor<T>
 	}
 
 	@Override
-	public void write(DocumentElement state, T value) {
-		((ElasticsearchDocumentObjectBuilder) state).add( schemaNode.getParent(), accessor, schemaNode.getCodec().encode( value ) );
+	public void write(DocumentElement target, T value) {
+		ElasticsearchDocumentObjectBuilder builder = (ElasticsearchDocumentObjectBuilder) target;
+		builder.checkTreeConsistency( schemaNode.getParent() );
+		builder.add( accessor, schemaNode.getCodec().encode( value ) );
 	}
 
 }

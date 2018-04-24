@@ -16,7 +16,6 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public final class StringFieldCodec implements LuceneFieldCodec<String> {
@@ -34,15 +33,15 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, LuceneIndexSchemaObjectNode parentNode, String fieldName, String value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String fieldName, String value) {
 		if ( value == null ) {
 			return;
 		}
 
-		documentBuilder.addField( parentNode, new Field( fieldName, value, fieldType ) );
+		documentBuilder.addField( new Field( fieldName, value, fieldType ) );
 
 		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( parentNode, new SortedDocValuesField(
+			documentBuilder.addField( new SortedDocValuesField(
 					fieldName,
 					new BytesRef( normalizer != null ? AnalyzerUtils.normalize( normalizer, fieldName, value ) : value )
 			) );
