@@ -106,9 +106,10 @@ public class LuceneLocalDirectoryIndexManager implements LuceneIndexManager, Rea
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( indexWriter::close );
 			closer.push( changesetOrchestrator::close );
 			closer.push( streamOrchestrator::close );
+			// Close the index writer after the orchestrators, when we're sure all works have been performed
+			closer.push( indexWriter::close );
 		}
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Lucene index manager", e );
