@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
