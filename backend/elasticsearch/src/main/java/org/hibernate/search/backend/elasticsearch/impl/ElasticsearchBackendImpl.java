@@ -114,6 +114,7 @@ public class ElasticsearchBackendImpl implements BackendImplementor<Elasticsearc
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( client::close );
 			closer.push( streamOrchestrator::close );
+			closer.push( queryOrchestrator::close );
 		}
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Elasticsearch backend", e );
