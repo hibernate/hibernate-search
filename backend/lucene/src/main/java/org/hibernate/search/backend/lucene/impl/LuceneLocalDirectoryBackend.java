@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneDirectoryIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
