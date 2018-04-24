@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.List;
 import java.util.function.Function;
 
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
 import org.hibernate.search.backend.lucene.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
@@ -22,39 +20,44 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+
 class SearchQueryBuilderImpl<C, T>
 		implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
+	private final LuceneWorkFactory workFactory;
+	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+
+	private final LuceneSearchTargetModel searchTargetModel;
 	private final String tenantId;
 
-	private final LuceneQueryWorkOrchestrator queryOrchestrator;
-	private final LuceneWorkFactory workFactory;
-	private final LuceneSearchTargetModel searchTargetModel;
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
-	public SearchQueryBuilderImpl(
-			LuceneQueryWorkOrchestrator queryOrchestrator,
+	SearchQueryBuilderImpl(
 			LuceneWorkFactory workFactory,
-			LuceneSearchTargetModel searchTargetModel,
+			LuceneQueryWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
+			LuceneSearchTargetModel searchTargetModel,
 			SessionContext sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
+		this.workFactory = workFactory;
+		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+
+		this.searchTargetModel = searchTargetModel;
 		this.tenantId = sessionContext.getTenantIdentifier();
 
+		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
-		this.queryOrchestrator = queryOrchestrator;
-		this.workFactory = workFactory;
-		this.searchTargetModel = searchTargetModel;
-		this.elementCollector = new LuceneSearchQueryElementCollector();
 	}
 
 	@Override

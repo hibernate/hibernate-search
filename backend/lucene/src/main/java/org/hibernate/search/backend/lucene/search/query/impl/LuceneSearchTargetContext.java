@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
@@ -28,10 +27,10 @@ public class LuceneSearchTargetContext
 	private final SearchSortFactory<LuceneSearchSortCollector> searchSortFactory;
 	private final SearchQueryFactory<LuceneSearchQueryElementCollector> searchQueryFactory;
 
-	public LuceneSearchTargetContext(LuceneBackendImplementor backend, LuceneSearchTargetModel searchTargetModel) {
+	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchQueryFactory = new SearchQueryFactoryImpl( backend, searchTargetModel );
+		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel );
 	}
 
 	@Override

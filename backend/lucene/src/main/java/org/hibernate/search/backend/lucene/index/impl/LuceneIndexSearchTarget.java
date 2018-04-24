@@ -11,10 +11,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchTargetContext;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
@@ -32,9 +32,10 @@ class LuceneIndexSearchTarget extends IndexSearchTargetBase {
 	private final LuceneSearchTargetModel searchTargetModel;
 	private final SearchTargetContext<?> searchTargetContext;
 
-	LuceneIndexSearchTarget(LuceneBackendImplementor backend, Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
+	LuceneIndexSearchTarget(SearchBackendContext searchBackendContext,
+			Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
 		this.searchTargetModel = new LuceneSearchTargetModel( indexModels, readerProviders );
-		this.searchTargetContext = new LuceneSearchTargetContext( backend, searchTargetModel );
+		this.searchTargetContext = new LuceneSearchTargetContext( searchBackendContext, searchTargetModel );
 	}
 
 	@Override

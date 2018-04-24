@@ -55,7 +55,7 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManager::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		return new LuceneIndexSearchTarget( backend, indexModels, readerProviders );
+		return new LuceneIndexSearchTarget( backend.getSearchContext(), indexModels, readerProviders );
 	}
 
 	@Override

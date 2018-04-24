@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.index.impl.LuceneLocalDirectoryIndexM
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -36,20 +37,22 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 	private final Path rootDirectory;
 
 	private final LuceneWorkFactory workFactory;
-
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
-
 	private final MultiTenancyStrategy multiTenancyStrategy;
+
+	private final SearchBackendContext searchContext;
 
 	public LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory, MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
 
 		this.workFactory = workFactory;
-
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
-
 		this.multiTenancyStrategy = multiTenancyStrategy;
+
+		this.searchContext = new SearchBackendContext(
+				this, workFactory, multiTenancyStrategy, queryOrchestrator
+		);
 
 		initializeRootDirectory( name, rootDirectory );
 	}
@@ -92,13 +95,13 @@ public class LuceneLocalDirectoryBackend implements LuceneBackendImplementor, Ba
 	}
 
 	@Override
-	public LuceneQueryWorkOrchestrator getQueryOrchestrator() {
-		return queryOrchestrator;
+	public MultiTenancyStrategy getMultiTenancyStrategy() {
+		return multiTenancyStrategy;
 	}
 
 	@Override
-	public MultiTenancyStrategy getMultiTenancyStrategy() {
-		return multiTenancyStrategy;
+	public SearchBackendContext getSearchContext() {
+		return searchContext;
 	}
 
 	@Override

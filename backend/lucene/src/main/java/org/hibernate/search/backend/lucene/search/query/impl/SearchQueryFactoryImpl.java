@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.impl.LuceneBackendImplementor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
@@ -37,12 +35,12 @@ class SearchQueryFactoryImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneBackendImplementor backend;
+	private final SearchBackendContext searchBackendContext;
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	SearchQueryFactoryImpl(LuceneBackendImplementor backend, LuceneSearchTargetModel searchTargetModel) {
-		this.backend = backend;
+	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
+		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
 	}
 
@@ -127,20 +125,8 @@ class SearchQueryFactoryImpl
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
-		backend.getMultiTenancyStrategy().checkTenantId( backend, sessionContext.getTenantIdentifier() );
-
-		Set<String> storedFields = new HashSet<>();
-		hitExtractor.contributeFields( storedFields );
-
-		return new SearchQueryBuilderImpl<>(
-				backend.getQueryOrchestrator(),
-				backend.getWorkFactory(),
-				searchTargetModel,
-				backend.getMultiTenancyStrategy(),
-				sessionContext,
-				new ReusableDocumentStoredFieldVisitor( storedFields ),
-				hitExtractor,
-				hitAggregator
+		return searchBackendContext.createSearchQueryBuilder(
+				searchTargetModel, sessionContext, hitExtractor, hitAggregator
 		);
 	}
 }
