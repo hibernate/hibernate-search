@@ -1009,4 +1009,9 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ "or not compatible with this version of Hibernate Search." )
 	SearchException incompatibleEntityManagerFactory(String emfClassName);
 
+	@Message(id = 348, value = "Some of the specified entity types ('%s') are not configured, nor is any of their subclasses." )
+	IllegalArgumentException someTargetedEntityTypesNotConfigured(String targetedEntities);
+
+	@Message(id = 349, value = "Some of the specified entity types ('%s') are not indexed, nor is any of their subclasses." )
+	IllegalArgumentException someTargetedEntityTypesNotIndexed(String targetedEntities);
 }
