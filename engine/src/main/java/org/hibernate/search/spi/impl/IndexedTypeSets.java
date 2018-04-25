@@ -7,6 +7,7 @@
 package org.hibernate.search.spi.impl;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -25,6 +26,16 @@ public final class IndexedTypeSets {
 
 	private IndexedTypeSets() {
 		//Utility class: not to be constructed
+	}
+
+	public static IndexedTypeSet fromClasses(Collection<Class<?>> classes) {
+		if ( classes == null || classes.isEmpty() ) {
+			// "null" needs to be acceptable to support some legacy use cases
+			return empty();
+		}
+		else {
+			return classes.stream().filter( c -> c != null ).map( PojoIndexedTypeIdentifier::new ).collect( streamCollector() );
+		}
 	}
 
 	public static IndexedTypeSet fromClasses(Class<?>... classes) {

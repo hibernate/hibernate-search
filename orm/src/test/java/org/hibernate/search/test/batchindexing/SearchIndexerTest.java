@@ -13,7 +13,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -29,6 +32,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SearchIndexerTest {
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	/**
 	 * test that the MassIndexer is properly identifying the root entities
@@ -221,6 +227,50 @@ public class SearchIndexerTest {
 			);
 		}
 		ftsb.close();
+	}
+
+	@Test
+	public void testNonConfiguredEntityHierarchy() {
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				//.addAnnotatedClass( Dvd.class ) // Do not configure this class
+				.addAnnotatedClass( Nation.class )
+				.addAnnotatedClass( Book.class )
+				.addAnnotatedClass( WeirdlyIdentifiedEntity.class )
+				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
+				.build();
+
+		try ( FullTextSession fullTextSession = ftsb.openFullTextSession() ) {
+			thrown.expect( IllegalArgumentException.class );
+			thrown.expectMessage( "Some of the specified entity types" );
+			thrown.expectMessage( Dvd.class.getName() );
+			thrown.expectMessage( "are not configured" );
+			thrown.expectMessage( "nor is any of their subclasses" );
+
+			fullTextSession.createIndexer( Dvd.class, Book.class );
+		}
+	}
+
+	@Test
+	public void testNonIndexedEntityHierarchy() {
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				.addAnnotatedClass( Dvd.class )
+				.addAnnotatedClass( Nation.class ) // This class is not annotated with @Indexed
+				.addAnnotatedClass( Book.class )
+				.addAnnotatedClass( WeirdlyIdentifiedEntity.class )
+				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
+				.build();
+
+		try ( FullTextSession fullTextSession = ftsb.openFullTextSession() ) {
+			thrown.expect( IllegalArgumentException.class );
+			thrown.expectMessage( "Some of the specified entity types" );
+			thrown.expectMessage( Nation.class.getName() );
+			thrown.expectMessage( "are not indexed" );
+			thrown.expectMessage( "nor is any of their subclasses" );
+
+			fullTextSession.createIndexer( Nation.class, Dvd.class );
+		}
 	}
 
 	//helper method

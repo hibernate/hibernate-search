@@ -17,6 +17,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -78,16 +79,32 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	 * @return a new set of entities
 	 */
 	private static IndexedTypeSet toRootEntities(ExtendedSearchIntegrator extendedIntegrator, Class<?>... selection) {
-		Set<Class<?>> entities = new HashSet<Class<?>>();
 		//first build the "entities" set containing all indexed subtypes of "selection".
+		Set<Class<?>> entities = new HashSet<>();
+		Set<Class<?>> nonIndexedEntities = new HashSet<>();
 		for ( Class<?> entityType : selection ) {
-			IndexedTypeSet targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( IndexedTypeSets.fromClass( entityType ) );
+			IndexedTypeSet entityTypeAsSet = IndexedTypeSets.fromClass( entityType );
+			IndexedTypeSet targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( entityTypeAsSet );
 			if ( targetedClasses.isEmpty() ) {
-				String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
-				throw new IllegalArgumentException( msg );
+				nonIndexedEntities.add( entityType );
 			}
-			entities.addAll( targetedClasses.toPojosSet() );
+			else {
+				entities.addAll( targetedClasses.toPojosSet() );
+			}
 		}
+
+		if ( !nonIndexedEntities.isEmpty() ) {
+			IndexedTypeSet nonIndexedEntitiesAsSet = IndexedTypeSets.fromClasses( nonIndexedEntities );
+			IndexedTypeSet configuredTargetEntities =
+					extendedIntegrator.getConfiguredTypesPolymorphic( nonIndexedEntitiesAsSet );
+			if ( configuredTargetEntities.isEmpty() ) {
+				throw log.someTargetedEntityTypesNotConfigured( StringHelper.join( nonIndexedEntities, "," ) );
+			}
+			else {
+				throw log.someTargetedEntityTypesNotIndexed( StringHelper.join( nonIndexedEntities, "," ) );
+			}
+		}
+
 		Set<Class<?>> cleaned = new HashSet<Class<?>>();
 		Set<Class<?>> toRemove = new HashSet<Class<?>>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
