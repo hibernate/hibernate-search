@@ -11,9 +11,12 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.IndexFamilyType;
 
 /**
- * Since Hibernate Search supports different types of indexing and query technologies,
- * such as embedding Apache Lucene or remote via Elasticsearch, the type of
- * such storage is represented by an instance implementing this interface.
+ * The SPI contract for {@link IndexFamilyType}, i.e. for representations of indexing and query technologies,
+ * such as embedding Apache Lucene or remote via Elasticsearch.
+ * <p>
+ * From the point of view of Hibernate Search, an {@code IndexManagerType} is the same as an {@link IndexFamilyType},
+ * but {@link IndexFamilyType} is part of Hibernate Search APIs
+ * and we simply don't want to expose the methods of {@code IndexManagerType} to users.
  * <p>
  * Instances of implementations of this interface could be used as keys in a Map,
  * so make sure to implement appropriate equals and hashCode functions.
