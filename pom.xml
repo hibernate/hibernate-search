@@ -190,7 +190,7 @@
 
         <version.org.infinispan>9.0.1.Final</version.org.infinispan>
 
-        <version.net.bytebuddy>1.7.9</version.net.bytebuddy>
+        <version.net.bytebuddy>1.8.0</version.net.bytebuddy>
 
         <version.wildfly>12.0.0.Final</version.wildfly>
 
