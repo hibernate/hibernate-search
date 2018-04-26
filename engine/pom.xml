@@ -261,6 +261,23 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <!--
+                     Use briger to restore binary compatibility with Hibernate Search 5.5; see HSEARCH-3138.
+                     The only bridged class is org.hibernate.search.filter.FilterCachingStrategy at the moment.
+                 -->
+                <groupId>org.jboss.bridger</groupId>
+                <artifactId>bridger</artifactId>
+                <executions>
+                    <execution>
+                        <id>weave</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
