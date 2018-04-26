@@ -66,8 +66,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-jbossmodules-hibernate-orm</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-orm-jbossmodules</artifactId>
             <type>zip</type>
             <exclusions>
                 <exclusion>

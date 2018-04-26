@@ -20,7 +20,6 @@
 
     <modules>
         <module>engine</module>
-        <module>hibernate-orm</module>
         <module>orm</module>
         <module>backend-jgroups</module>
         <module>elasticsearch</module>
