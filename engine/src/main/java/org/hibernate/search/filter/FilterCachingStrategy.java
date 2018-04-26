@@ -8,6 +8,8 @@ package org.hibernate.search.filter;
 
 import java.util.Properties;
 
+import org.hibernate.search.exception.SearchException;
+
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
@@ -26,13 +28,35 @@ public interface FilterCachingStrategy {
 	 * @param properties the caching strategy configuration
 	 */
 	void initialize(Properties properties);
+
 	/**
 	 * Retrieve the cached filter for a given key or null if not cached.
+	 * <p>
+	 * <strong>Caution:</strong> this method has a default implementation for technical reasons,
+	 * but it <em>must</em> be implemented.
 	 *
 	 * @param key the filter key
 	 * @return the cached filter or null if not cached
 	 */
-	Query getCachedFilter(FilterKey key);
+	default Query getCachedFilter(FilterKey key) {
+		return getCachedFilter$$bridge$$FilterReturnType( key );
+	}
+
+	/**
+	 * <strong>Not part of the API!</strong> Do not use or implement this.
+	 * @deprecated This method is only here so that Hibernate Search build tools can generate bytecode
+	 * allowing to preserve binary compatibility with applications written for Hibernate Search 5.5.
+	 * It will be removed in a future version. Please implement {@link #getCachedFilter(FilterKey)} instead.
+	 * @param key the filter key
+	 * @return the cached filter or null if not cached
+	 */
+	@Deprecated
+	default Filter getCachedFilter$$bridge$$FilterReturnType(FilterKey key) {
+		throw new SearchException(
+				"Custom filter caching strategy " + getClass().getName()
+				+ " does not implement getCachedFilter(FilterKey) as required."
+		);
+	}
 
 	/**
 	 * Propose a candidate filter for caching
