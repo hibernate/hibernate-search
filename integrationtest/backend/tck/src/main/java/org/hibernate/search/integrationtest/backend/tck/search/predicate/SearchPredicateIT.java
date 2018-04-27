@@ -4,16 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.tck.search;
+package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.fail;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -23,32 +17,27 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.SearchException;
-
+import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class SearchPredicateIT {
-
-	// TODO tests related to search predicates
-	// - test each type of predicate
-	// - test each syntax (fluid, lambda, SearchPredicate objects)
-	// - ... ?
 
 	private static final String MATCHING_ID = "matching";
 	private static final String NON_MATCHING_ID = "nonMatching";
 	private static final String EMPTY_ID = "empty";
 
-	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	private static final String MATCHING_STRING = "Irving";
+
+	private static final String NON_MATCHING_STRING = "Auster";
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
@@ -72,76 +61,53 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_error_null() {
+	public void match_fluid() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		for ( String fieldPath : Arrays.asList( "string", "string_analyzed", "integer", "localDate" ) ) {
-			try {
-				searchTarget.predicate().match().onField( fieldPath ).matching( null );
-				fail( "Expected matching() predicate with null value to match to throw exception on field " + fieldPath );
-			}
-			catch (SearchException e) {
-				assertThat( e.getMessage() )
-						.contains( "Invalid value" )
-						.contains( "value to match" )
-						.contains( "must be non-null" )
-						.contains( fieldPath );
-			}
-		}
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().match().onField( "string" ).matching( MATCHING_STRING )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
 	}
 
 	@Test
-	public void range_error_null() {
+	public void match_search_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		List<String> fieldPaths = Arrays.asList(
-				"string", "string_analyzed", "integer", "localDate"
-		);
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( MATCHING_STRING );
 
-		for ( String fieldPath : fieldPaths ) {
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).from( null ).to( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (SearchException e) {
-				assertThat( e.getMessage() )
-						.contains( "Invalid value" )
-						.contains( "at least one bound" )
-						.contains( "must be non-null" )
-						.contains( fieldPath );
-			}
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).above( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (SearchException e) {
-				assertThat( e.getMessage() )
-						.contains( "Invalid value" )
-						.contains( "at least one bound" )
-						.contains( "must be non-null" )
-						.contains( fieldPath );
-			}
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).below( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (SearchException e) {
-				assertThat( e.getMessage() )
-						.contains( "Invalid value" )
-						.contains( "at least one bound" )
-						.contains( "must be non-null" )
-						.contains( fieldPath );
-			}
-		}
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( predicate )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+	}
+
+	@Test
+	public void match_lambda() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( c -> c.match().onField( "string" ).matching( MATCHING_STRING ) )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
 	}
 
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( MATCHING_ID ), document -> {
-			// TODO add matching values
+			indexAccessors.string.write( document, MATCHING_STRING );
 		} );
 		worker.add( referenceProvider( NON_MATCHING_ID ), document -> {
-			// TODO add non-matching values
+			indexAccessors.string.write( document, NON_MATCHING_STRING );
 		} );
 		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -158,16 +124,9 @@ public class SearchPredicateIT {
 
 	private static class IndexAccessors {
 		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> string_analyzed;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<LocalDate> localDate;
 
 		IndexAccessors(IndexSchemaElement root) {
 			string = root.field( "string" ).asString().createAccessor();
-			string_analyzed = root.field( "string_analyzed" ).asString()
-					.analyzer( "default" ).createAccessor();
-			integer = root.field( "integer" ).asInteger().createAccessor();
-			localDate = root.field( "localDate" ).asLocalDate().createAccessor();
 		}
 	}
 }
