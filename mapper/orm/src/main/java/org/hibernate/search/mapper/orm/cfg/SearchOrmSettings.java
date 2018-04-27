@@ -15,6 +15,15 @@ public final class SearchOrmSettings {
 	public static final String PREFIX = "hibernate.search.";
 
 	/**
+	 * When enabled, Hibernate Search will track the parts of the provided configuration that are actually used
+	 * and log a warning if any configuration property is never used, which might indicate a configuration issue.
+	 * <p>
+	 * Enabled by default.
+	 */
+	public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING =
+			PREFIX + Radicals.ENABLE_CONFIGURATION_PROPERTY_TRACKING;
+
+	/**
 	 * Enable listeners auto registration in Hibernate Annotations and EntityManager. Default to true.
 	 */
 	public static final String AUTOREGISTER_LISTENERS = PREFIX + Radicals.AUTOREGISTER_LISTENERS;
@@ -49,6 +58,7 @@ public final class SearchOrmSettings {
 	public static final String MAPPING_CONTRIBUTOR = PREFIX + Radicals.MAPPING_CONTRIBUTOR;
 
 	public static class Radicals {
+		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
 		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
 		public static final String INDEXING_STRATEGY = "indexing_strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
@@ -67,6 +77,7 @@ public final class SearchOrmSettings {
 		private Defaults() {
 		}
 
+		public static final boolean ENABLE_CONFIGURATION_PROPERTY_TRACKING = true;
 		public static final boolean AUTOREGISTER_LISTENERS = true;
 		public static final IndexingStrategyConfiguration INDEXING_STRATEGY = IndexingStrategyConfiguration.EVENT;
 		public static final boolean ENABLE_DIRTY_CHECK = true;
