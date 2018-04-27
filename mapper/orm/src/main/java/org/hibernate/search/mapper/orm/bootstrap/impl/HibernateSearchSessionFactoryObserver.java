@@ -44,7 +44,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
 					.asBoolean()
-					.withDefault( true )
+					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
 					.build();
 
 	private final ConfigurationPropertySource propertySource;

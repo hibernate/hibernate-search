@@ -45,19 +45,19 @@ public class HibernateSearchIntegrator implements Integrator {
 	private static final ConfigurationProperty<Boolean> AUTOREGISTER_LISTENERS =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.AUTOREGISTER_LISTENERS )
 					.asBoolean()
-					.withDefault( true )
+					.withDefault( SearchOrmSettings.Defaults.AUTOREGISTER_LISTENERS )
 					.build();
 
 	private static final ConfigurationProperty<IndexingStrategyConfiguration> INDEXING_MODE =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.INDEXING_STRATEGY )
 					.as( IndexingStrategyConfiguration.class, IndexingStrategyConfiguration::fromExternalRepresentation )
-					.withDefault( IndexingStrategyConfiguration.EVENT )
+					.withDefault( SearchOrmSettings.Defaults.INDEXING_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_PROCESSING_ENABLED =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_DIRTY_CHECK )
 					.asBoolean()
-					.withDefault( true )
+					.withDefault( SearchOrmSettings.Defaults.ENABLE_DIRTY_CHECK )
 					.build();
 
 	@Override

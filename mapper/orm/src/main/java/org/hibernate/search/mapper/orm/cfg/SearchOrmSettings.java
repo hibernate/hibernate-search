@@ -59,6 +59,20 @@ public final class SearchOrmSettings {
 		}
 	}
 
+	/**
+	 * Default values for the different settings if no values are given.
+	 */
+	public static final class Defaults {
+
+		private Defaults() {
+		}
+
+		public static final boolean AUTOREGISTER_LISTENERS = true;
+		public static final IndexingStrategyConfiguration INDEXING_STRATEGY = IndexingStrategyConfiguration.EVENT;
+		public static final boolean ENABLE_DIRTY_CHECK = true;
+		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
+	}
+
 	private SearchOrmSettings() {
 	}
 
