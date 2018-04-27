@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import java.util.function.Function;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -24,13 +22,11 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
 	private final String absoluteFieldPath;
-	private final Function<String, ElasticsearchFieldCodec> fieldCodecFunction;
 	private ElasticsearchFieldCodec fieldCodec;
 
-	FieldSortBuilderImpl(String absoluteFieldPath,
-			Function<String, ElasticsearchFieldCodec> fieldCodecFunction) {
+	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec fieldCodec) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.fieldCodecFunction = fieldCodecFunction;
+		this.fieldCodec = fieldCodec;
 	}
 
 	@Override
@@ -45,7 +41,7 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	@Override
 	public void missingAs(Object value) {
-		MISSING.set( getInnerObject(), getFieldCodec().encode( value ) );
+		MISSING.set( getInnerObject(), fieldCodec.encode( value ) );
 	}
 
 	@Override
@@ -59,12 +55,5 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 			outerObject.add( absoluteFieldPath, innerObject );
 			collector.collectSort( outerObject );
 		}
-	}
-
-	private ElasticsearchFieldCodec getFieldCodec() {
-		if ( fieldCodec == null ) {
-			fieldCodec = fieldCodecFunction.apply( absoluteFieldPath );
-		}
-		return fieldCodec;
 	}
 }

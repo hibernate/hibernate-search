@@ -10,16 +10,15 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -78,9 +77,9 @@ public interface Log extends BasicLogger {
 	SearchException unknownFieldForSearch(String absoluteFieldPath, Collection<URLEncodedString> indexNames);
 
 	@Message(id = 505, value = "Multiple conflicting types for field '%1$s': '%2$s' in index '%3$s', but '%4$s' in index '%5$s'." )
-	SearchException conflictingFieldCodecsForSearch(String absoluteFieldPath,
-			ElasticsearchFieldCodec codec1, URLEncodedString indexName1,
-			ElasticsearchFieldCodec codec2, URLEncodedString indexName2);
+	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
+			ElasticsearchIndexSchemaFieldNode schemaNode1, URLEncodedString indexName1,
+			ElasticsearchIndexSchemaFieldNode schemaNode2, URLEncodedString indexName2);
 
 	@Message(id = 506, value = "The Elasticsearch extension can only be applied to objects"
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
@@ -144,4 +143,10 @@ public interface Log extends BasicLogger {
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
 	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
+
+	@Message(id = 523, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
+	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
+
+	@Message(id = 524, value = "Match predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
+	SearchException matchPredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
 }

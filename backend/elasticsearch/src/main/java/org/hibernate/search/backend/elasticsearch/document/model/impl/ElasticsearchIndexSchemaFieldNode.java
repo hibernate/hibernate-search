@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.Objects;
+
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 
 /**
  * @author Yoann Rodiere
@@ -17,14 +20,13 @@ public class ElasticsearchIndexSchemaFieldNode {
 
 	private final ElasticsearchFieldCodec codec;
 
-	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, ElasticsearchFieldCodec codec) {
+	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
+
+	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, ElasticsearchFieldCodec codec,
+			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory) {
 		this.parent = parent;
 		this.codec = codec;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[parent=" + parent + "]";
+		this.predicateBuilderFactory = predicateBuilderFactory;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getParent() {
@@ -33,5 +35,24 @@ public class ElasticsearchIndexSchemaFieldNode {
 
 	public ElasticsearchFieldCodec getCodec() {
 		return codec;
+	}
+
+	public ElasticsearchFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+		return predicateBuilderFactory;
+	}
+
+	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode other) {
+		return Objects.equals( codec, other.codec )
+				&& Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory );
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
+				.append( "parent=" ).append( parent )
+				.append( ", codec=" ).append( codec )
+				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
+				.append( "]" );
+		return sb.toString();
 	}
 }

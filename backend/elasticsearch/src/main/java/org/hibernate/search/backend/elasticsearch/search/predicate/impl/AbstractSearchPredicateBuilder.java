@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+public abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<Float> BOOST = JsonAccessor.root().property( "boost" ).asFloat();
 

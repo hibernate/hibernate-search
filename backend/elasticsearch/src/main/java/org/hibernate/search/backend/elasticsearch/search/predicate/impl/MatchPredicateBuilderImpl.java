@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );

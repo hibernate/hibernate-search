@@ -11,12 +11,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ElasticsearchSearchTargetModel {
@@ -41,30 +40,29 @@ public class ElasticsearchSearchTargetModel {
 		return indexModels;
 	}
 
-	public ElasticsearchFieldCodec getFieldCodec(String absoluteFieldPath) {
-		ElasticsearchIndexModel indexModelForSelectedCodec = null;
-		ElasticsearchFieldCodec selectedCodec = null;
+	public ElasticsearchIndexSchemaFieldNode getSchemaNode(String absoluteFieldPath) {
+		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
+		ElasticsearchIndexSchemaFieldNode selectedSchemaNode = null;
+
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 			if ( schemaNode != null ) {
-				ElasticsearchFieldCodec codec = schemaNode.getCodec();
-				if ( selectedCodec == null ) {
-					selectedCodec = codec;
-					indexModelForSelectedCodec = indexModel;
+				if ( selectedSchemaNode == null ) {
+					selectedSchemaNode = schemaNode;
+					indexModelForSelectedSchemaNode = indexModel;
 				}
-				else if ( !selectedCodec.equals( codec ) ) {
-					throw log.conflictingFieldCodecsForSearch(
+				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
+					throw log.conflictingFieldTypesForSearch(
 							absoluteFieldPath,
-							selectedCodec, indexModelForSelectedCodec.getIndexName(),
-							codec, indexModel.getIndexName()
-					);
+							selectedSchemaNode, indexModelForSelectedSchemaNode.getIndexName(),
+							schemaNode, indexModel.getIndexName() );
 				}
 			}
 		}
-		if ( selectedCodec == null ) {
+		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
 		}
-		return selectedCodec;
+		return selectedSchemaNode;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

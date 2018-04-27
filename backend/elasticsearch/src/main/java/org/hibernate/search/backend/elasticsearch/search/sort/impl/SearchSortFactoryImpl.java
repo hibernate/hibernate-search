@@ -59,7 +59,7 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortCollector> field(String absoluteFieldPath) {
-		return new FieldSortBuilderImpl( absoluteFieldPath, searchTargetModel::getFieldCodec );
+		return new FieldSortBuilderImpl( absoluteFieldPath, searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec() );
 	}
 
 	@Override

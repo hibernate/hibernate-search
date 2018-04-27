@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonElement> GT = JsonAccessor.root().property( "gt" );
