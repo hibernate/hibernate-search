@@ -127,8 +127,10 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 				.pathComponent( Paths._SEARCH )
 				.body( payload );
 
-		if ( offset != null && limit != null ) {
+		if ( offset != null ) {
 			builder.param( "from", offset );
+		}
+		if ( limit != null ) {
 			builder.param( "size", limit );
 		}
 
