@@ -6,17 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaNestingContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaElement;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaObjectField;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.StringHelper;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
 class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final AbstractIndexSchemaNodeBuilder nodeBuilder;
 
@@ -38,6 +44,7 @@ class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
 
 	@Override
 	public IndexSchemaFieldContext field(String relativeFieldName) {
+		checkRelativeFieldName( relativeFieldName );
 		return nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
@@ -53,6 +60,7 @@ class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
 
 	@Override
 	public LuceneIndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
+		checkRelativeFieldName( relativeFieldName );
 		return nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
@@ -71,5 +79,14 @@ class LuceneIndexSchemaElementImpl implements LuceneIndexSchemaElement {
 					nodeBuilder.setStorage( storage );
 					return new LuceneIndexSchemaObjectFieldImpl( nodeBuilder, filter );
 				} );
+	}
+
+	private static void checkRelativeFieldName(String relativeFieldName) {
+		if ( StringHelper.isEmpty( relativeFieldName ) ) {
+			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName );
+		}
+		if ( relativeFieldName.contains( "." ) ) {
+			throw log.relativeFieldNameCannotContainDot( relativeFieldName );
+		}
 	}
 }

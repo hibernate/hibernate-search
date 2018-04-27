@@ -162,4 +162,13 @@ public interface Log extends BasicLogger {
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
 	SearchException indexSchemaNodeNameConflict(String absolutePath, String name);
+
+	@Message(id = 535, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
+	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName);
+
+	@Message(id = 536, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
+			+ " Remove the dot from your field name,"
+			+ " or if you are declaring the field in a bridge and want a tree of fields,"
+			+ " declare an object field using the objectField() method." )
+	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
 }
