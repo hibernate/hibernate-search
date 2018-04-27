@@ -11,11 +11,11 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-class StubTypeModel implements MappableTypeModel {
+public class StubTypeModel implements MappableTypeModel {
 
 	private final String typeIdentifier;
 
-	StubTypeModel(String typeIdentifier) {
+	public StubTypeModel(String typeIdentifier) {
 		this.typeIdentifier = typeIdentifier;
 	}
 
