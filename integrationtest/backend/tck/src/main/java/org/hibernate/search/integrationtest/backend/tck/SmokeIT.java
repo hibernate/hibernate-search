@@ -329,14 +329,6 @@ public class SmokeIT {
 			indexAccessors.integer.write( document, 3 );
 		} );
 
-		// Expect the following add + delete to be simplified to a no-op by the engine
-		worker.add( referenceProvider( "4" ), document -> {
-			indexAccessors.string.write( document, "text 4" );
-			indexAccessors.string_analyzed.write( document, "text 4" );
-			indexAccessors.integer.write( document, 4 );
-		} );
-		worker.delete( referenceProvider( "4" ) );
-
 		worker.add( referenceProvider( "neverMatching" ), document -> {
 			indexAccessors.string.write( document, "never matching" );
 			indexAccessors.string_analyzed.write( document, "never matching" );
