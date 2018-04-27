@@ -61,6 +61,7 @@
         <bundle>mvn:org.jboss/jandex/${version.org.jboss.jandex}</bundle>
         <bundle>mvn:com.fasterxml/classmate/${version.com.fasterxml.classmate}</bundle>
         <bundle>mvn:org.javassist/javassist/${version.org.javassist}</bundle>
+        <bundle>mvn:net.bytebuddy/byte-buddy/${version.net.bytebuddy}</bundle>
 
         <!-- Hibernate ORM -->
         <bundle>mvn:org.hibernate/hibernate-core/${version.org.hibernate}</bundle>
