@@ -155,4 +155,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 533, value = "Attempt to unwrap a Lucene backend to %1$s,"
 			+ " but this backend can only be unwrapped to %2$s." )
 	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
+
+	@Message(id = 534, value = "The index schema node '%2$s' was added twice at path '%1$s'."
+			+ " Multiple bridges may be trying to access the same index field, "
+			+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
+			+ " or you may have declared multiple conflicting mappings."
+			+ " In any case, there is something wrong with your mapping and you should fix it." )
+	SearchException indexSchemaNodeNameConflict(String absolutePath, String name);
 }

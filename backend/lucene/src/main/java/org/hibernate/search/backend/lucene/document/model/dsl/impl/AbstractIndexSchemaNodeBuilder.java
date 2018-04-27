@@ -6,18 +6,21 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A schema node builder.
  */
 abstract class AbstractIndexSchemaNodeBuilder {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, LuceneIndexSchemaNodeContributor> content = new HashMap<>();
 
@@ -35,12 +38,7 @@ abstract class AbstractIndexSchemaNodeBuilder {
 	public void putProperty(String name, LuceneIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			// TODO more explicit error message
-			throw new SearchException( "The index model node '" + name + "' was added twice at path '" + getAbsolutePath() + "'."
-					+ " Multiple bridges may be trying to access the same index field, "
-					+ " or two indexedEmbeddeds may have prefixes that end up mixing fields together,"
-					+ " or you may have declared multiple conflicting mappings."
-					+ " In any case, there is something wrong with your mapping and you should fix it." );
+			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name);
 		}
 	}
 
