@@ -20,6 +20,7 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
@@ -47,10 +48,10 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( true )
 					.build();
 
-	private static final ConfigurationProperty<IndexingMode> INDEXING_MODE =
+	private static final ConfigurationProperty<IndexingStrategyConfiguration> INDEXING_MODE =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.INDEXING_STRATEGY )
-					.as( IndexingMode.class, IndexingMode::fromExternalRepresentation )
-					.withDefault( IndexingMode.EVENT )
+					.as( IndexingStrategyConfiguration.class, IndexingStrategyConfiguration::fromExternalRepresentation )
+					.withDefault( IndexingStrategyConfiguration.EVENT )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_PROCESSING_ENABLED =
@@ -72,7 +73,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		}
 
 		FullTextIndexEventListener fullTextIndexEventListener = new FullTextIndexEventListener(
-				IndexingMode.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
+				IndexingStrategyConfiguration.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
 				DIRTY_PROCESSING_ENABLED.get( propertySource )
 		);
 		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );

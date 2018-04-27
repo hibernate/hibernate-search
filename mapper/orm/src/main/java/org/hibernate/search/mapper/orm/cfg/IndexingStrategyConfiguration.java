@@ -4,12 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.bootstrap.impl;
+package org.hibernate.search.mapper.orm.cfg;
 
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -18,7 +17,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public enum IndexingMode {
+public enum IndexingStrategyConfiguration {
 
 	/**
 	 * Indexing is triggered automatically upon entity insertion, update etc.
@@ -34,22 +33,22 @@ public enum IndexingMode {
 
 	private String externalRepresentation;
 
-	private IndexingMode(String externalRepresentation) {
+	private IndexingStrategyConfiguration(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 
 	/**
-	 * Returns the {@link IndexingMode} matching the given external representation as specified via
+	 * Returns the {@link IndexingStrategyConfiguration} matching the given external representation as specified via
 	 * {@link SearchOrmSettings#INDEXING_STRATEGY}
 	 * @param indexingMode the indexing mode external representation
-	 * @return the {@link IndexingMode}
+	 * @return the {@link IndexingStrategyConfiguration}
 	 */
-	public static IndexingMode fromExternalRepresentation(String indexingMode) {
+	public static IndexingStrategyConfiguration fromExternalRepresentation(String indexingMode) {
 		if ( EVENT.toExternalRepresentation().equals( indexingMode ) ) {
-			return IndexingMode.EVENT;
+			return IndexingStrategyConfiguration.EVENT;
 		}
 		else if ( MANUAL.toExternalRepresentation().equals( indexingMode ) ) {
-			return IndexingMode.MANUAL;
+			return IndexingStrategyConfiguration.MANUAL;
 		}
 		else {
 			throw LOG.unknownIndexingMode( indexingMode );
