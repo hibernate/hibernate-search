@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.formatter.impl;
 
-public final class GeoPointFieldFormatter implements LuceneFieldFormatter<Void> {
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
+
+public final class GeoPointFieldFormatter implements LuceneFieldFormatter<GeoPoint> {
 
 	public static final GeoPointFieldFormatter INSTANCE = new GeoPointFieldFormatter();
 
@@ -14,8 +16,7 @@ public final class GeoPointFieldFormatter implements LuceneFieldFormatter<Void> 
 	}
 
 	@Override
-	public Void format(Object value) {
-		// TODO see what we should do here.
-		throw new UnsupportedOperationException( "format() not supported for GeoPoint" );
+	public GeoPoint format(Object value) {
+		return (GeoPoint) value;
 	}
 }

@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.GeoPointFieldFormatter;
+import org.hibernate.search.backend.lucene.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 
 /**
@@ -32,7 +33,7 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 				getRelativeFieldName(),
 				GeoPointFieldFormatter.INSTANCE,
 				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore() ),
-				null, // for now we don't have a predicate builder factory for GeoPoint
+				GeoPointFieldPredicateBuilderFactory.INSTANCE,
 				null // for now we don't have a sort contributor for GeoPoint
 		);
 

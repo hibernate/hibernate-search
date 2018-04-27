@@ -171,4 +171,10 @@ public interface Log extends BasicLogger {
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
 	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
+
+	@Message(id = 537, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
+	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
+
+	@Message(id = 538, value = "Match predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
+	SearchException matchPredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
 }
