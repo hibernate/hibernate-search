@@ -28,7 +28,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
-	private final Long firstResultIndex;
+	private final long firstResultIndex;
 	private final Long maxResultsCount;
 
 	private final HitExtractor<?> hitExtractor;
@@ -46,7 +46,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.firstResultIndex = firstResultIndex;
+		this.firstResultIndex = firstResultIndex == null ? 0L : firstResultIndex.longValue();
 		this.maxResultsCount = maxResultsCount;
 		this.hitExtractor = hitExtractor;
 		this.searchResultExtractor = searchResultExtractor;
@@ -94,10 +94,10 @@ public class LuceneSearcher<T> implements AutoCloseable {
 
 	private TopDocs getTopDocs(LuceneCollectors luceneCollectors) {
 		if ( maxResultsCount == null ) {
-			return luceneCollectors.getTopDocsCollector().topDocs( firstResultIndex.intValue() );
+			return luceneCollectors.getTopDocsCollector().topDocs( (int) firstResultIndex );
 		}
 		else {
-			return luceneCollectors.getTopDocsCollector().topDocs( firstResultIndex.intValue(), maxResultsCount.intValue() );
+			return luceneCollectors.getTopDocsCollector().topDocs( (int) firstResultIndex, maxResultsCount.intValue() );
 		}
 	}
 }
