@@ -328,8 +328,8 @@
         <version.shade.plugin>3.1.0</version.shade.plugin>
         <version.site.plugin>3.6</version.site.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
-        <!-- Surefire versions are a minefield of bugs, so depending on context we need to choose a different one -->
-        <version.surefire.plugin>2.20.1</version.surefire.plugin>
+        <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
+        <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
@@ -1942,9 +1942,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <additionalRuntimeArgLineForWildFlyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFlyTests>
                 <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests} --illegal-access=deny</additionalRuntimeArgLine>
-                <!-- For JDK10 we need to override this to: 2.18.1 See https://issues.apache.org/jira/browse/SUREFIRE-1439 -->
-                <version.surefire.plugin>2.18.1</version.surefire.plugin>
-                <version.failsafe.plugin>2.18.1</version.failsafe.plugin>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
