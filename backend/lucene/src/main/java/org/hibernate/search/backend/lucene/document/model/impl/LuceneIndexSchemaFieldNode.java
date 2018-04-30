@@ -72,13 +72,10 @@ public class LuceneIndexSchemaFieldNode<T> {
 	}
 
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
-		if ( !Objects.equals( formatter, other.formatter )
-				|| !Objects.equals( codec, other.codec )
-				|| !Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory )
-				|| !Objects.equals( sortContributor, other.sortContributor ) ) {
-			return false;
-		}
-		return true;
+		return Objects.equals( formatter, other.formatter )
+				&& Objects.equals( codec, other.codec )
+				&& Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory )
+				&& Objects.equals( sortContributor, other.sortContributor );
 	}
 
 	@Override
