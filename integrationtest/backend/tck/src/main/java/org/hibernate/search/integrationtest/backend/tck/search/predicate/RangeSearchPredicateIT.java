@@ -471,6 +471,69 @@ public class RangeSearchPredicateIT {
 		}
 	}
 
+	@Test
+	public void unknown_field() {
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( "unknown_field" ).above( STRING_1 )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onFields( "string", "unknown_field" ).above( STRING_1 )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( "string" ).orField( "unknown_field" ).above( STRING_1 )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( "string" ).orFields( "unknown_field" ).above( STRING_1 )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {

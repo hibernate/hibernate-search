@@ -245,6 +245,69 @@ public class MatchSearchPredicateIT {
 				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
 	}
 
+	@Test
+	public void unknown_field() {
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().match().onField( "unknown_field" ).matching( MATCHING_STRING )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().match().onFields( "string", "unknown_field" ).matching( MATCHING_STRING )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().match().onField( "string" ).orField( "unknown_field" ).matching( MATCHING_STRING )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+
+		try {
+			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+			searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().match().onField( "string" ).orFields( "unknown_field" ).matching( MATCHING_STRING )
+					.build();
+		}
+		catch (Exception e) {
+			assertThat( e )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unknown field" )
+					.hasMessageContaining( "'unknown_field'" );
+		}
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( MATCHING_ID ), document -> {
