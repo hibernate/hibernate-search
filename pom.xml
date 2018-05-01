@@ -1615,6 +1615,15 @@
                                      <signatures>
 org.hibernate.SharedSessionContract#getTransaction()
                                      </signatures>
+                                     <signaturesArtifacts>
+                                         <signaturesArtifact>
+                                             <groupId>org.hibernate</groupId>
+                                             <artifactId>hibernate-search-build-config</artifactId>
+                                             <version>${project.version}</version>
+                                             <type>jar</type>
+                                             <path>forbidden-runtime.txt</path>
+                                         </signaturesArtifact>
+                                     </signaturesArtifacts>
                                  </configuration>
                              <phase>compile</phase>
                              <goals>
@@ -1646,6 +1655,15 @@ org.hibernate.SharedSessionContract#getTransaction()
                                  <signatures>
 org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                                  </signatures>
+                                 <signaturesArtifacts>
+                                     <signaturesArtifact>
+                                         <groupId>org.hibernate</groupId>
+                                         <artifactId>hibernate-search-build-config</artifactId>
+                                         <version>${project.version}</version>
+                                         <type>jar</type>
+                                         <path>forbidden-tests.txt</path>
+                                     </signaturesArtifact>
+                                 </signaturesArtifacts>
                              </configuration>
                              <phase>test-compile</phase>
                              <goals>
