@@ -1588,43 +1588,43 @@
                     <executions>
                         <execution>
                             <id>verify-forbidden-apis</id>
-                                <configuration>
-                                     <targetVersion>${maven.compiler.argument.target}</targetVersion>
-                                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                     <excludes>
-                                         <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
-                                         <exclude>**/*_$logger.class</exclude>
-                                         <!-- JBoss message bundles format messages -->
-                                         <exclude>**/*_$bundle.class</exclude>
-                                     </excludes>
-                                     <bundledSignatures>
-                                         <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                         <bundledSignature>jdk-unsafe</bundledSignature>
-                                         <bundledSignature>jdk-deprecated</bundledSignature>
-                                         <bundledSignature>jdk-system-out</bundledSignature>
-                                         <bundledSignature>jdk-non-portable</bundledSignature>
-                                         <bundledSignature>jdk-internal</bundledSignature>
-                                     </bundledSignatures>
-                                     <failOnMissingClasses>false</failOnMissingClasses>
-                                     <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-                                     <!--
-                                     The method SharedSessionContract#getTransaction() should never be used
-                                     as it is only reliable in certain configurations.
-                                      -->
-                                     <signatures>
+                            <configuration>
+                                 <targetVersion>${maven.compiler.argument.target}</targetVersion>
+                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                 <excludes>
+                                     <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
+                                     <exclude>**/*_$logger.class</exclude>
+                                     <!-- JBoss message bundles format messages -->
+                                     <exclude>**/*_$bundle.class</exclude>
+                                 </excludes>
+                                 <bundledSignatures>
+                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                     <bundledSignature>jdk-unsafe</bundledSignature>
+                                     <bundledSignature>jdk-deprecated</bundledSignature>
+                                     <bundledSignature>jdk-system-out</bundledSignature>
+                                     <bundledSignature>jdk-non-portable</bundledSignature>
+                                     <bundledSignature>jdk-internal</bundledSignature>
+                                 </bundledSignatures>
+                                 <failOnMissingClasses>false</failOnMissingClasses>
+                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                 <!--
+                                 The method SharedSessionContract#getTransaction() should never be used
+                                 as it is only reliable in certain configurations.
+                                  -->
+                                 <signatures>
 org.hibernate.SharedSessionContract#getTransaction()
-                                     </signatures>
-                                     <signaturesArtifacts>
-                                         <signaturesArtifact>
-                                             <groupId>org.hibernate</groupId>
-                                             <artifactId>hibernate-search-build-config</artifactId>
-                                             <version>${project.version}</version>
-                                             <type>jar</type>
-                                             <path>forbidden-runtime.txt</path>
-                                         </signaturesArtifact>
-                                     </signaturesArtifacts>
-                                 </configuration>
+                                 </signatures>
+                                 <signaturesArtifacts>
+                                     <signaturesArtifact>
+                                         <groupId>org.hibernate</groupId>
+                                         <artifactId>hibernate-search-build-config</artifactId>
+                                         <version>${project.version}</version>
+                                         <type>jar</type>
+                                         <path>forbidden-runtime.txt</path>
+                                     </signaturesArtifact>
+                                 </signaturesArtifacts>
+                             </configuration>
                              <phase>compile</phase>
                              <goals>
                                  <goal>check</goal>
