@@ -8,8 +8,6 @@ package org.hibernate.search.testsupport.concurrency;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * A utility allowing to re-execute a piece of code in the current thread until it "works".
  * <p>
@@ -90,7 +88,7 @@ public final class Poller {
 	}
 
 	private AssertionError newAssertionPollingError(AssertionError lastAssertionError, int nbOfFailedAttempts, long timeSpentNanos) {
-		AssertionError error = new AssertionFailedError(
+		AssertionError error = new AssertionError(
 				"Assertion failed even after " + nbOfFailedAttempts + " attempts in " + timeSpentNanos + "ns : "
 				+ lastAssertionError.getMessage()
 				);

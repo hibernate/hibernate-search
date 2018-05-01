@@ -8,8 +8,6 @@ package org.hibernate.search.test.directoryProvider;
 
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
 import org.apache.lucene.util.Version;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -17,13 +15,16 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.search.testsupport.TestConstants;
 
+import org.junit.After;
+import org.junit.Before;
+
 /**
  * Build multiple session factories from the same set of classes
  * The configuration can be altered overriding {@link #configure}.
  *
  * @author Emmanuel Bernard
  */
-public abstract class MultipleSFTestCase extends TestCase {
+public abstract class MultipleSFTestCase {
 
 	private static SessionFactory[] sessionFactories;
 	private static Configuration[] cfgs;
@@ -74,14 +75,14 @@ public abstract class MultipleSFTestCase extends TestCase {
 		}
 	}
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		buildSessionFactories( getAnnotatedClasses(), getAnnotatedPackages(), getXmlFiles() );
 		lastTestClass = getClass();
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		for ( SessionFactory sf : getSessionFactories() ) {
 			sf.close();
 		}

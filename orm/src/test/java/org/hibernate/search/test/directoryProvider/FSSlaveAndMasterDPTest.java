@@ -26,7 +26,14 @@ import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test case for master/slave directories.
@@ -66,6 +73,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testProperCopy() throws Exception {
 
 		// assert that the slave index is empty
@@ -176,13 +184,15 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	}
 
 	@Override
-	protected void setUp() throws Exception {
-		this.root = prepareDirectories( getClass().getSimpleName() + "." + this.getName() );
+	@Before
+	public void setUp() throws Exception {
+		this.root = prepareDirectories( getClass().getSimpleName() );
 		super.setUp();
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		super.tearDown();
 		cleanupDirectories( root );
 	}
@@ -204,6 +214,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		};
 	}
 
+	@Test
 	public void testSourceNotReady() throws Exception {
 		int retries = 1;
 		Configuration cfg = new Configuration();
