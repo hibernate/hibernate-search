@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -35,11 +35,10 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private final SearchBackendContext searchBackendContext;
 
 	private final String normalizedIndexName;
+	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder();
 
 	private final BuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
-
-	private final LuceneRootIndexSchemaCollectorImpl collector = new LuceneRootIndexSchemaCollectorImpl();
 
 	public LuceneDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
@@ -53,13 +52,13 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	}
 
 	@Override
-	public IndexSchemaCollector getSchemaCollector() {
-		return collector;
+	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+		return schemaRootNodeBuilder;
 	}
 
 	@Override
 	public LuceneDirectoryIndexManager build() {
-		LuceneIndexModel model = new LuceneIndexModel( normalizedIndexName, collector );
+		LuceneIndexModel model = new LuceneIndexModel( normalizedIndexName, schemaRootNodeBuilder );
 
 		return new LuceneDirectoryIndexManager(
 				indexingBackendContext, searchBackendContext, normalizedIndexName, model, createIndexWriter( model )

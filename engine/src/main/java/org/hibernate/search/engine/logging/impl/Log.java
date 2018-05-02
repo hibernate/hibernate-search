@@ -67,4 +67,13 @@ public interface Log extends BasicLogger {
 			+ " As a result, mapping an abstract type to an index does not make sense,"
 			+ " since the index would always be empty.")
 	SearchException cannotMapAbstractTypeToIndex(MappableTypeModel typeModel, String indexName);
+
+	@Message(id = 14, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
+	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName);
+
+	@Message(id = 15, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
+			+ " Remove the dot from your field name,"
+			+ " or if you are declaring the field in a bridge and want a tree of fields,"
+			+ " declare an object field using the objectField() method." )
+	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
 }

@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchRootIndexSchemaCollectorImpl;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -25,28 +25,28 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final SearchBackendContext searchBackendContext;
 
 	private final String indexName;
-	private final ElasticsearchRootIndexSchemaCollectorImpl schemaCollector;
+	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private final BuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
-			String indexName, ElasticsearchRootIndexSchemaCollectorImpl schemaCollector,
+			String indexName, ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			BuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
 		this.indexName = indexName;
-		this.schemaCollector = schemaCollector;
+		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 	}
 
 	@Override
-	public IndexSchemaCollector getSchemaCollector() {
-		return schemaCollector;
+	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+		return schemaRootNodeBuilder;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
 		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
 
-		ElasticsearchIndexModel model = new ElasticsearchIndexModel( encodedIndexName, schemaCollector );
+		ElasticsearchIndexModel model = new ElasticsearchIndexModel( encodedIndexName, schemaRootNodeBuilder );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
 		indexingBackendContext.initializeIndex( encodedIndexName, encodedTypeName, model )

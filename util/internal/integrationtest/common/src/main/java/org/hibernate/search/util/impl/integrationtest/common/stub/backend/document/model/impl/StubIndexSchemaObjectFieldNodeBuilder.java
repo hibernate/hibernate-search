@@ -7,23 +7,22 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaNestingContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaObjectField extends StubIndexSchemaElement implements IndexSchemaObjectField {
+class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBuilder
+		implements IndexSchemaObjectFieldNodeBuilder {
 
 	private final boolean included;
 	private IndexObjectFieldAccessor accessor;
 
-	StubIndexSchemaObjectField(StubIndexSchemaNode.Builder builder,
-			IndexSchemaNestingContext context, boolean included) {
-		super( builder, context );
+	StubIndexSchemaObjectFieldNodeBuilder(StubIndexSchemaNode.Builder builder, boolean included) {
+		super( builder );
 		this.included = included;
 	}
 
 	@Override
-	public IndexObjectFieldAccessor createAccessor() {
+	public IndexObjectFieldAccessor getAccessor() {
 		if ( accessor == null ) {
 			if ( included ) {
 				accessor = new StubIncludedIndexObjectFieldAccessor(

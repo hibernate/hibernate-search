@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-/**
- * @author Yoann Rodiere
- */
-public interface ObjectFieldIndexSchemaCollector extends IndexSchemaCollector {
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 
-	@Override
-	IndexSchemaObjectField withContext(IndexSchemaNestingContext context);
+public interface IndexSchemaObjectFieldNodeBuilder extends IndexSchemaObjectNodeBuilder {
+
+	IndexObjectFieldAccessor getAccessor();
 
 }

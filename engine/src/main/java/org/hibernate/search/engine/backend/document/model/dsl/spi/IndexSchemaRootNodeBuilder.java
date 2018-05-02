@@ -6,17 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-
-/**
- * @author Yoann Rodiere
- */
-public interface IndexSchemaCollector {
-
-	ObjectFieldIndexSchemaCollector objectField(String relativeFieldName, ObjectFieldStorage storage);
-
-	IndexSchemaElement withContext(IndexSchemaNestingContext context);
+public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
 	/**
 	 * Inform the model collector that documents will always be provided along

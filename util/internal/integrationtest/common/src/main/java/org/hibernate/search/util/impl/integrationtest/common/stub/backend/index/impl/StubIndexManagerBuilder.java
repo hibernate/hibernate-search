@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubRootIndexSchemaCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
 
 public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocumentElement> {
 
 	private final StubBackend backend;
 	private final String name;
-	private final StubRootIndexSchemaCollector schemaCollector = new StubRootIndexSchemaCollector();
+	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder();
 
 	public StubIndexManagerBuilder(StubBackend backend, String name) {
 		this.backend = backend;
@@ -24,12 +24,12 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 	}
 
 	@Override
-	public IndexSchemaCollector getSchemaCollector() {
-		return schemaCollector;
+	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+		return schemaRootNodeBuilder;
 	}
 
 	@Override
 	public IndexManager<StubDocumentElement> build() {
-		return new StubIndexManager( backend, name, schemaCollector.build() );
+		return new StubIndexManager( backend, name, schemaRootNodeBuilder.build() );
 	}
 }

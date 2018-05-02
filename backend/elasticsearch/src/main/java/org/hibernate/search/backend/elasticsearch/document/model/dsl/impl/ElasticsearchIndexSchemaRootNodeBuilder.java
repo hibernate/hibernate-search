@@ -6,38 +6,34 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 
-class IndexSchemaRootTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder {
+public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
+		implements IndexSchemaRootNodeBuilder, ElasticsearchRootIndexSchemaContributor {
 
 	private MultiTenancyStrategy multiTenancyStrategy;
 
 	private RoutingType routing = null;
 
-	IndexSchemaRootTypeNodeBuilder(MultiTenancyStrategy multiTenancyStrategy) {
+	public ElasticsearchIndexSchemaRootNodeBuilder(MultiTenancyStrategy multiTenancyStrategy) {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
-	public void setRouting(RoutingType routing) {
-		this.routing = routing;
+	@Override
+	public void explicitRouting() {
+		this.routing = RoutingType.REQUIRED;
 	}
 
 	@Override
-	public String getAbsolutePath() {
-		return null;
-	}
-
-	protected RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
+	public RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
 		ElasticsearchIndexSchemaObjectNode node = ElasticsearchIndexSchemaObjectNode.root();
-
-		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( JsonAccessor.root(), node ) );
 
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {
@@ -52,5 +48,10 @@ class IndexSchemaRootTypeNodeBuilder extends AbstractIndexSchemaObjectNodeBuilde
 		contributeChildren( mapping, node, collector );
 
 		return mapping;
+	}
+
+	@Override
+	String getAbsolutePath() {
+		return null;
 	}
 }

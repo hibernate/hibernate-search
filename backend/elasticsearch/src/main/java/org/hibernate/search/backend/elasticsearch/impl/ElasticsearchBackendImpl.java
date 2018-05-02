@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchRootIndexSchemaCollectorImpl;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -96,11 +96,12 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			throw log.multiTenancyRequiredButNotSupportedByBackend( name, normalizedIndexName );
 		}
 
-		ElasticsearchRootIndexSchemaCollectorImpl schemaCollector =
-				new ElasticsearchRootIndexSchemaCollectorImpl( multiTenancyStrategy );
+		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
+				new ElasticsearchIndexSchemaRootNodeBuilder( multiTenancyStrategy );
 
 		return new ElasticsearchIndexManagerBuilder(
-				indexingContext, searchContext, normalizedIndexName, schemaCollector, buildContext, propertySource
+				indexingContext, searchContext,
+				normalizedIndexName, indexSchemaRootNodeBuilder, buildContext, propertySource
 		);
 	}
 

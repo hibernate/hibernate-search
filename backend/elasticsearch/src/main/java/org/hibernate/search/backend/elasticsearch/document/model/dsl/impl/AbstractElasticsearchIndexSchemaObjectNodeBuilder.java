@@ -10,8 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
@@ -20,14 +22,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-/**
- * A schema node builder.
- */
-abstract class AbstractIndexSchemaObjectNodeBuilder {
+abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	protected final DeferredInitializationIndexObjectFieldAccessor accessor =
-			new DeferredInitializationIndexObjectFieldAccessor();
 
 	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> content = new HashMap<>();
 
@@ -35,22 +31,35 @@ abstract class AbstractIndexSchemaObjectNodeBuilder {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( ",absolutePath=" ).append( getAbsolutePath() )
+				.append( "absolutePath=" ).append( getAbsolutePath() )
 				.append( "]" )
 				.toString();
 	}
 
-	public IndexObjectFieldAccessor getAccessor() {
-		return accessor;
+	@Override
+	public IndexSchemaFieldContext addField(String relativeFieldName) {
+		ElasticsearchIndexSchemaFieldContextImpl fieldContext =
+				new ElasticsearchIndexSchemaFieldContextImpl( relativeFieldName );
+		putProperty( relativeFieldName, fieldContext );
+		return fieldContext;
 	}
 
-	public abstract String getAbsolutePath();
+	@Override
+	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
+		return new ElasticsearchIndexSchemaFieldContextImpl( relativeFieldName );
+	}
 
-	public void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
-		Object previous = content.putIfAbsent( name, contributor );
-		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name);
-		}
+	@Override
+	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
+		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
+				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
+		putProperty( relativeFieldName, objectFieldBuilder );
+		return objectFieldBuilder;
+	}
+
+	@Override
+	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
+		return new ElasticsearchIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
@@ -60,6 +69,15 @@ abstract class AbstractIndexSchemaObjectNodeBuilder {
 			ElasticsearchIndexSchemaNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
 			PropertyMapping propertyMapping = propertyContributor.contribute( collector, node );
 			mapping.addProperty( propertyName, propertyMapping );
+		}
+	}
+
+	abstract String getAbsolutePath();
+
+	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
+		Object previous = content.putIfAbsent( name, contributor );
+		if ( previous != null ) {
+			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name);
 		}
 	}
 

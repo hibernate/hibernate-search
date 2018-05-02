@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
@@ -17,33 +20,34 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 
-class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNodeBuilder
-		implements ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
+		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
+	private final ObjectFieldStorage storage;
 
-	private ObjectFieldStorage storage = ObjectFieldStorage.DEFAULT;
+	private final DeferredInitializationIndexObjectFieldAccessor accessor =
+			new DeferredInitializationIndexObjectFieldAccessor();
 
-	IndexSchemaObjectPropertyNodeBuilder(String parentPath, String relativeFieldName) {
+	ElasticsearchIndexSchemaObjectFieldNodeBuilder(String parentPath, String relativeFieldName,
+			ObjectFieldStorage storage) {
 		this.absoluteFieldPath = parentPath == null ? relativeFieldName : parentPath + "." + relativeFieldName;
 		this.relativeFieldName = relativeFieldName;
+		this.storage = storage;
 	}
 
 	@Override
-	public String getAbsolutePath() {
-		return absoluteFieldPath;
-	}
-
-	public void setStorage(ObjectFieldStorage storage) {
-		this.storage = storage;
+	public IndexObjectFieldAccessor getAccessor() {
+		return accessor;
 	}
 
 	@Override
 	public PropertyMapping contribute(
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
-		ElasticsearchIndexSchemaObjectNode node = new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
+		ElasticsearchIndexSchemaObjectNode node =
+				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
 		collector.collect( absoluteFieldPath, node );
 
 		JsonObjectAccessor jsonAccessor = JsonAccessor.root().property( relativeFieldName ).asObject();
@@ -70,5 +74,10 @@ class IndexSchemaObjectPropertyNodeBuilder extends AbstractIndexSchemaObjectNode
 		contributeChildren( mapping, node, collector );
 
 		return mapping;
+	}
+
+	@Override
+	String getAbsolutePath() {
+		return absoluteFieldPath;
 	}
 }

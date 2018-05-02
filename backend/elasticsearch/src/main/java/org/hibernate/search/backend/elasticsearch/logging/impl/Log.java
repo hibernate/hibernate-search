@@ -135,15 +135,6 @@ public interface Log extends BasicLogger {
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
 	SearchException indexSchemaNodeNameConflict(String absolutePath, String name);
 
-	@Message(id = 521, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
-	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName);
-
-	@Message(id = 522, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
-			+ " Remove the dot from your field name,"
-			+ " or if you are declaring the field in a bridge and want a tree of fields,"
-			+ " declare an object field using the objectField() method." )
-	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
-
 	@Message(id = 523, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
 

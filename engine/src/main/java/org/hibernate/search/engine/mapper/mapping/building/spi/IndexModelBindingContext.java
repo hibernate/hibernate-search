@@ -20,10 +20,7 @@ public interface IndexModelBindingContext {
 
 	Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
 
-	default IndexSchemaElement getSchemaElement() {
-		// Get a schema element without any listener
-		return getSchemaElement( () -> { } );
-	}
+	IndexSchemaElement getSchemaElement();
 
 	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
 
