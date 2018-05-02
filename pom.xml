@@ -1612,9 +1612,6 @@
                                  The method SharedSessionContract#getTransaction() should never be used
                                  as it is only reliable in certain configurations.
                                   -->
-                                 <signatures>
-org.hibernate.SharedSessionContract#getTransaction()
-                                 </signatures>
                                  <signaturesArtifacts>
                                      <signaturesArtifact>
                                          <groupId>org.hibernate</groupId>
@@ -1652,9 +1649,6 @@ org.hibernate.SharedSessionContract#getTransaction()
                                      <bundledSignature>jdk-non-portable</bundledSignature>
                                      <bundledSignature>jdk-internal</bundledSignature>
                                  </bundledSignatures>
-                                 <signatures>
-org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
-                                 </signatures>
                                  <signaturesArtifacts>
                                      <signaturesArtifact>
                                          <groupId>org.hibernate</groupId>

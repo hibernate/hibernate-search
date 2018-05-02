@@ -23,5 +23,9 @@ org.assertj.core.api.Assertions#fail()
 
 ################################################################################################################
 # Probably meant the other Objects:
-
 org.jboss.logging.processor.util.Objects
+
+################################################################################################################
+# Various, from our own code.
+# This one needs to be handled with special care to avoid tests breaking out of their isolation (see exclusions):
+org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()

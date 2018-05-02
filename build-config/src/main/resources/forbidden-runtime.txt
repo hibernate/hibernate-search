@@ -29,3 +29,8 @@ java.lang.StringBuffer
 # Probably meant the other Objects:
 
 org.jboss.logging.processor.util.Objects
+
+################################################################################################################
+# Methods from Hibernate ORM :
+# This one is only safe to use with specific configurations:
+org.hibernate.SharedSessionContract#getTransaction()
