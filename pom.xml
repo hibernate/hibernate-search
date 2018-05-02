@@ -1589,7 +1589,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                             <configuration>
-                                 <targetVersion>${maven.compiler.argument.target}</targetVersion>
+                                 <targetVersion>10</targetVersion>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                  <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                  <excludes>
