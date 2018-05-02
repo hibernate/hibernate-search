@@ -89,7 +89,7 @@ public class Human {
 	}
 
 	@OneToMany
-	@IndexedEmbedded(depth = 2, includePaths = { "parents.parents.name" })
+	@IndexedEmbedded(depth = 2, includePaths = { "name", "parents.name", "parents.parents.name" })
 	public Set<Human> getParents() {
 		return parents;
 	}
