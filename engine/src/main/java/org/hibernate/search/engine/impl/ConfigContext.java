@@ -35,6 +35,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -157,12 +158,9 @@ public final class ConfigContext {
 			return filterDef;
 		}
 		try {
-			filterDef.getImpl().newInstance();
+			ClassLoaderHelper.untypedInstanceFromClass( filterDef.getImpl(), "filter definition" );
 		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
-		}
-		catch (InstantiationException e) {
+		catch (RuntimeException e) {
 			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
 		}
 		for ( Method method : filterDef.getImpl().getMethods() ) {

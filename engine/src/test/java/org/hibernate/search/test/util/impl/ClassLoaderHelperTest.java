@@ -62,8 +62,8 @@ public class ClassLoaderHelperTest {
 				Similarity.class, DirectoryBasedIndexManager.class, "default similarity"
 		);
 		wrappingTestFromClass(
-				"Unable to instantiate default similarity class: org.apache.lucene.search.similarities.Similarity. " +
-						"Verify it has a no-args public constructor and is not abstract.",
+				"Unable to instantiate default similarity class: 'org.apache.lucene.search.similarities.Similarity'. " +
+						"Class or constructor is not accessible.",
 				Similarity.class, Similarity.class, "default similarity"
 		);
 	}

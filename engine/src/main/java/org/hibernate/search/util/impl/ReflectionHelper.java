@@ -195,16 +195,7 @@ public abstract class ReflectionHelper {
 	 */
 	public static Object createInstance(Class<?> clazz, boolean checkForFactoryAnnotation) {
 		// create the instance
-		Object instance;
-		try {
-			instance = clazz.newInstance();
-		}
-		catch (InstantiationException e) {
-			throw LOG.noPublicNoArgConstructor( clazz.getName() );
-		}
-		catch (IllegalAccessException e) {
-			throw LOG.unableToAccessClass( clazz.getName() );
-		}
+		Object instance = ClassLoaderHelper.untypedInstanceFromClass( clazz, null );
 
 		if ( !checkForFactoryAnnotation ) {
 			return instance;

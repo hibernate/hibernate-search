@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import com.google.gson.JsonElement;
 
@@ -34,13 +34,7 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 
 	@Override
 	public D create(Map<String,String> parameters) {
-		D result;
-		try {
-			result = targetClass.newInstance();
-		}
-		catch (InstantiationException | IllegalAccessException e) {
-			throw new AssertionFailure( "Unexpected failure while instantiating a definition", e );
-		}
+		D result = ClassLoaderHelper.untypedInstanceFromClass( targetClass, "analysis definition" );
 		result.setType( type );
 
 		Map<String, JsonElement> elasticsearchParameterMap = new LinkedHashMap<>();

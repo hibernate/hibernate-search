@@ -15,6 +15,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -81,7 +82,7 @@ public class SearchMappingHelper {
 		SearchMapping mapping;
 		try {
 			LOG.debugf( "invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName() );
-			Object instance = clazz.newInstance();
+			final Object instance = ClassLoaderHelper.untypedInstanceFromClass( clazz, "SearchMapping provider" );
 			mapping = (SearchMapping) method.invoke( instance );
 		}
 		catch (Exception e) {

@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
@@ -43,13 +43,7 @@ class JsonPassThroughAnalysisDefinitionFactory<D extends AnalysisDefinition> imp
 
 	@Override
 	public D create(Map<String,String> parameters) {
-		D result;
-		try {
-			result = targetClass.newInstance();
-		}
-		catch (InstantiationException | IllegalAccessException e) {
-			throw new AssertionFailure( "Unexpected failure while instanciating a definition", e );
-		}
+		D result = ClassLoaderHelper.untypedInstanceFromClass( targetClass, "analysis definition" );
 
 		Map<String, JsonElement> parameterMap = new LinkedHashMap<>();
 

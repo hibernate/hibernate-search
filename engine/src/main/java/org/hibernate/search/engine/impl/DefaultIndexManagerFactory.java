@@ -12,7 +12,6 @@ import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -103,13 +102,10 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 		// TODO HSEARCH-2115 Remove once generic alias resolver contribution scheme is implemented
 		else if ( "elasticsearch".equals( alias ) ) {
 			ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+
 			Class<?> imType = classLoaderService.classForName( ES_INDEX_MANAGER );
-			try {
-				return (IndexManager) imType.newInstance();
-			}
-			catch (InstantiationException | IllegalAccessException e) {
-				throw new SearchException( "Could not instantiate Elasticsearch index manager", e );
-			}
+
+			return ClassLoaderHelper.instanceFromClass( IndexManager.class, imType, "Elasticsearch index manager" );
 		}
 		return null;
 	}

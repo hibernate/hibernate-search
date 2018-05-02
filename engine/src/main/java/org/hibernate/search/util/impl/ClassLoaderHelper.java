@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -17,6 +18,9 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,
@@ -29,6 +33,8 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  * @author Ales Justin
  */
 public class ClassLoaderHelper {
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ClassLoaderHelper() {
 	}
@@ -69,28 +75,42 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 * missing proper constructor, wrong type, security errors.
+	 * missing proper constructor, wrong type, securitymanager errors.
 	 */
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
 		checkClassType( classToLoad, componentDescription );
-		checkHasNoArgConstructor( classToLoad, componentDescription );
-		Object instance;
-		try {
-			instance = classToLoad.newInstance();
-		}
-		catch (IllegalAccessException e) {
-			throw new SearchException(
-					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
-							". Class or constructor is not accessible.", e
-			);
-		}
-		catch (InstantiationException e) {
-			throw new SearchException(
-					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
-							". Verify it has a no-args public constructor and is not abstract.", e
-			);
-		}
+		final Object instance = untypedInstanceFromClass( classToLoad, componentDescription );
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
+	}
+
+	/**
+	 * Creates an instance of target class. Similar to {@link #instanceFromClass(Class, Class, String)} but not checking
+	 * the created instance will be of any specific type: using {@link #instanceFromClass(Class, Class, String)} should
+	 * be preferred whenever possible.
+	 *
+	 * @param <T> the type of targetSuperType: defines the return type
+	 * @param classToLoad the class to be instantiated
+	 * @param componentDescription a role name/description to contextualize error messages. Ideally should be provided, but it can handle null.
+	 *
+	 * @return a new instance of classToLoad
+	 *
+	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
+	 * missing proper constructor, securitymanager errors.
+	 */
+	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad, final String componentDescription) {
+		checkClassType( classToLoad, componentDescription );
+		Constructor<?> constructor = getNoArgConstructor( classToLoad, componentDescription );
+		try {
+			return (T) constructor.newInstance();
+		}
+		catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			if ( StringHelper.isEmpty( componentDescription ) ) {
+				throw new SearchException( "Unable to instantiate class: '" + classToLoad.getName() + "'. Class or constructor is not accessible." );
+			}
+			else {
+				throw new SearchException( "Unable to instantiate " + componentDescription + " class: '" + classToLoad.getName() + "'. Class or constructor is not accessible." );
+			}
+		}
 	}
 
 	/**
@@ -226,14 +246,13 @@ public class ClassLoaderHelper {
 	/**
 	 * Verifies if target class has a no-args constructor, and that it is
 	 * accessible in current security manager.
-	 *
+	 * If checks are succesfull, return the constructor; otherwise appropriate exceptions are thrown.
 	 * @param classToLoad the class type to check
-	 * @param componentDescription adds a meaningful description to the type to describe in the
-	 * exception message
+	 * @param componentDescription adds a meaningful description to the type to describe in the error messsage
 	 */
-	private static void checkHasNoArgConstructor(Class<?> classToLoad, String componentDescription) {
+	private static <T> Constructor<T> getNoArgConstructor(Class<T> classToLoad, String componentDescription) {
 		try {
-			classToLoad.getConstructor();
+			return classToLoad.getConstructor();
 		}
 		catch (SecurityException e) {
 			throw new SearchException(
@@ -242,10 +261,7 @@ public class ClassLoaderHelper {
 			);
 		}
 		catch (NoSuchMethodException e) {
-			throw new SearchException(
-					classToLoad.getName() + " defined for component " + componentDescription
-							+ " is missing a public no-arguments constructor"
-			);
+			throw log.noPublicNoArgConstructor( componentDescription, classToLoad );
 		}
 	}
 

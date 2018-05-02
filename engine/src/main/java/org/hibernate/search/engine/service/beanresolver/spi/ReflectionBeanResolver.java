@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -32,16 +33,7 @@ public class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {
-		Object instance;
-		try {
-			instance = classOrFactoryClass.newInstance();
-		}
-		catch (InstantiationException e) {
-			throw log.noPublicNoArgConstructor( classOrFactoryClass.getName() );
-		}
-		catch (IllegalAccessException e) {
-			throw log.unableToAccessClass( classOrFactoryClass.getName() );
-		}
+		Object instance = ClassLoaderHelper.untypedInstanceFromClass( classOrFactoryClass, "bean resolver" );
 
 		// check for a factory annotation
 		int numberOfFactoryMethodsFound = 0;
