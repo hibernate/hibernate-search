@@ -310,20 +310,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		//The return type of this method could be "<T extends Annotation> T"
 		//but that would fail to compile on some JVMs: see HSEARCH-1106.
 
-		//This is a filthy workaround for the Annotations proxy generation,
-		//which is using the ContextClassLoader to define the proxy classes
-		//(not working fine in modular environments when Search is used by
-		//other services such as CapeDwarf).
-		//See HSEARCH-1084
-
-		//use annotation's own classloader
-		try {
-			return AnnotationFactory.create( annotation, annotation.type().getClassLoader() );
-		}
-		catch (Exception e) {
-			//first try, but we have another trick
-		}
-		//Use TCCL
 		return org.hibernate.annotations.common.annotationfactory.AnnotationFactory.create( annotation );
 	}
 
