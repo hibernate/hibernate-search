@@ -149,7 +149,7 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APITypesMayNotExtendSPITypes">
+    <constraint id="my-rules:APITypesMayNotExtendSPITypes" severity="minor">
         <requiresConcept refId="my-rules:ApiTypes" />
         <requiresConcept refId="my-rules:SpiTypes" />
         <description>API types must not extend/implement SPI types.</description>
@@ -161,7 +161,7 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APIMethodsMayNotExposeSPITypes">
+    <constraint id="my-rules:APIMethodsMayNotExposeSPITypes" severity="minor">
         <requiresConcept refId="my-rules:ApiTypes" />
         <requiresConcept refId="my-rules:SpiTypes" />
         <description>API methods must not expose SPI types.</description>
@@ -185,7 +185,7 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APIFieldsMayNotExposeSPITypes">
+    <constraint id="my-rules:APIFieldsMayNotExposeSPITypes" severity="minor">
         <requiresConcept refId="my-rules:ApiTypes" />
         <requiresConcept refId="my-rules:SpiTypes" />
         <description>API fields must not expose SPI types.</description>
