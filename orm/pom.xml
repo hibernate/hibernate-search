@@ -170,6 +170,9 @@
                         <configuration>
                             <archive>
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>org.hibernate.search.orm</Automatic-Module-Name>
+                                </manifestEntries>
                             </archive>
                         </configuration>
                     </execution>
