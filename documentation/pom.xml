@@ -172,6 +172,7 @@
                         <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
                         <hibernateShortVersion>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</hibernateShortVersion>
+                        <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <infinispanVersion>${version.org.infinispan}</infinispanVersion>
                         <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>

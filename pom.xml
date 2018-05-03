@@ -1197,6 +1197,16 @@
                             <versionString>${version.uk.co.lucasweb.aws-v4-signer-java}</versionString>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>parse-jpa-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.javax.persistence</propertyPrefix>
+                            <versionString>${version.javax.persistence}</versionString>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

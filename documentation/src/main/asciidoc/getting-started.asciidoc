@@ -19,7 +19,7 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
 |Hibernate ORM|You will need
             `hibernate-core-{hibernateVersion}.jar` and its
             dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate-orm/[distribution bundle] or the maven repository).
-|JPA 2.1|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
+|JPA {jpaVersion}|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
             entity configuration (`@Entity`, `@Id`, `@OneToMany`,...).
 |===============
 
