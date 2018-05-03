@@ -4,7 +4,7 @@
 === Overview
 
 Hibernate Search consists of an indexing component as well as an index search component. Both are
-backed by Apache Lucene.
+backed by Apache Lucene by default, alternatively Elasticsearch can be used.
 
 Each time an entity is inserted, updated or removed in/from the database, Hibernate Search keeps
 track of this event (through the Hibernate event system) and schedules an index update. All these
@@ -33,10 +33,13 @@ Hibernate and Hibernate Search. As a matter of fact, the `FullTextSession` is bu
 Hibernate Session so that the application code can use the unified org.hibernate.Query or
 javax.persistence.Query APIs exactly the same way a HQL, JPA-QL or native query would do.
 
-To be more efficient Hibernate Search batches the write interactions with the Lucene index. This
-batching is the responsibility of the Worker. There are currently two types of batching. Outside a
-transaction, the index update operation is executed right after the actual database operation. This
-is really a no batching setup. In the case of an ongoing transaction, the index update operation is
+To be more efficient Hibernate Search batches the write interactions with the Lucene index.
+There are currently two types of batching.
+
+Outside a transaction, the index update operation is executed right after the actual database operation. This
+is really a no batching setup.
+
+In the case of an ongoing transaction, the index update operation is
 scheduled for the transaction commit phase and discarded in case of transaction rollback. The
 batching scope is the transaction. There are two immediate benefits:
 
@@ -127,9 +130,11 @@ can be used as an alternative to JMS when response time is critical, but i.e. JN
 not available.
 
 Note that while JMS can usually be configured to use persistent queues, JGroups talks directly to
-other nodes over network. Message delivery to other reachable nodes is guaranteed, but if no master
-node is available, index operations are silently discarded. This backend can be configured to use
-asynchronous messages, or to wait for each indexing operation to be completed on the remote node
+other nodes over the network.
+Message delivery to other reachable nodes is guaranteed by the protocol, but if no master
+node is available, index operations are silently discarded.
+Also if the sending node crashes before the delivery is performed, the events might be lost.
+This backend can be configured to use asynchronous messages, or to wait for each indexing operation to be completed on the remote node
 before returning.
 
 The JGroups backend can be configured with static master or slave roles, or can be setup to perform

@@ -10,7 +10,7 @@ Let's start with the most basic configuration question - how do I enable Hiberna
 ==== Enabling Hibernate Search
 
 The good news is that Hibernate Search is enabled out of the box when detected on the classpath by
-Hibernate ORM. If, for some reason you need to disable it, set
+Hibernate ORM. If for some reason you need to disable it set
 `hibernate.search.autoregister_listeners` to false. Note that there is no performance penalty
 when the listeners are enabled but no entities are annotated as indexed.
 
@@ -74,7 +74,7 @@ Real Time) features for extreme low latency index writes. As a trade-off it requ
 and non-shared index. In other words, it will ignore configuration settings for alternative back
 ends other than `lucene` and will acquire exclusive write locks on the Directory.
 
-To achieve this low latency writes, the IndexWriter will not flush every change to disk. Queries
+To achieve these low latency writes, the IndexWriter will not flush every change to disk. Queries
 will be allowed to read updated state from the unflushed index writer buffers; the downside of this
 strategy is that if the application crashes or the IndexWriter is otherwise killed you'll have to
 rebuild the indexes as some updates might be lost.
@@ -298,7 +298,7 @@ additional properties to configure your custom implementation using the prefix `
 ==== Infinispan Directory configuration
 
 Infinispan is a distributed, scalable, cloud friendly data grid platform, which
-Hibernate Search can use to store the Lucene index. Your application can benefits in this case
+Hibernate Search can use to store the Lucene index. Your application can benefit
 from Infinispan's distribution capabilities making index updates available on all nodes with short
 latency.
 
@@ -975,7 +975,7 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
 
 public class ExampleOfSerializationProvider implements SerializationProvider {
 
-   @Override
+    @Override
     public Serializer getSerializer() {
         Serializer serializer = ...
         return serializer;
@@ -1381,8 +1381,10 @@ Hibernate Search, make sure to apply the same value too.
 
 After looking at all these different configuration options, it is time to have a look at an API
 which allows you to programmatically access parts of the configuration. Via the metadata API you can
-determine the indexed types and also how they are mapped (see <<search-mapping>>) to the index
-structure. The entry point into this API is the SearchFactory. It offers two methods, namely
+determine the indexed types and also verify how they are mapped (see <<search-mapping>>) to the index
+structure.
+
+The entry point into this API is the SearchFactory. It offers two methods, namely
 `getIndexedTypes()` and `getIndexedTypeDescriptor(Class<?>)`. The former returns a set of all
 indexed type, where as the latter allows to retrieve a so called IndexedTypeDescriptorfor a given
 type. This descriptor allows you determine whether the type is indexed at all and, if so, whether

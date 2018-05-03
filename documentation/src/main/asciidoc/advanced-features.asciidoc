@@ -477,7 +477,7 @@ Isolating information (data, customizations, etc) pertaining to the various tena
 challenge in these systems.
 This includes the data owned by each tenant stored in the database.
 You will find more details on how to enable multi-tenancy with Hibernate in the
-link:$$http://docs.jboss.org/hibernate/orm/4.3/devguide/en-US/html/ch16.html$$[Hibernate ORM developer's guide].
+link:$$http://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#multitenacy$$[Hibernate ORM developer's guide].
 
 ==== Using a tenant-aware `FullTextSession`
 
