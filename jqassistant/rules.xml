@@ -56,6 +56,46 @@
         ]]></cypher>
     </concept>
 
+    <concept id="my-rules:NonTestArtifacts">
+        <description>
+            Contributes the :NonTest label to :Maven:Artifact nodes that are not supposed to contain any test type.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (artifact:Maven:Artifact)
+            WHERE
+               NOT artifact.type = "test-jar"
+               AND NOT artifact.name =~ "hibernate-search-integrationtest-.*"
+            SET
+                artifact:NonTest
+            RETURN
+                artifact
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:PublicArtifacts">
+        <description>
+            Contributes the :Public label to :Maven:Artifact nodes that may be publicly exposed.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (artifact:Maven:Artifact)
+            WHERE
+                NOT (
+                   artifact.name =~ "hibernate-search-.*"
+                   AND (
+                       artifact.type = "test-jar"
+                       OR artifact.name =~ ".*-integrationtest-.*"
+                       OR artifact.name =~ ".*-internal-.*"
+                   )
+                )
+            SET
+                artifact:Public
+            RETURN
+                artifact
+        ]]></cypher>
+    </concept>
+
     <constraint id="my-rules:PublicTypesMayNotExtendInternalTypes">
         <requiresConcept refId="my-rules:ApiTypes" />
         <requiresConcept refId="my-rules:SpiTypes" />
@@ -159,6 +199,27 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules">
+        <requiresConcept refId="my-rules:NonTestArtifacts" />
+        <requiresConcept refId="my-rules:PublicArtifacts" />
+        <requiresConcept refId="my-rules:ImplTypes" />
+        <description>
+            Types must not depend on implementation types from other modules.
+            SPIs must be used for such dependencies.
+            Exceptions are allowed only when the dependency type is in a non-public module,
+            or the depending type is in a test module.
+        </description>
+        <cypher><![CDATA[
+            MATCH (artifact1:Maven:Artifact:NonTest)-[:CONTAINS]->(type1:Type)
+                -[:DEPENDS_ON]->
+                (type2:Type:Impl)<-[:CONTAINS]-(artifact2:Maven:Artifact:Public)
+            WHERE
+                artifact1 <> artifact2
+            RETURN
+                artifact1, type1, artifact2, type2
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -166,6 +227,7 @@
         <includeConstraint refId="my-rules:APITypesMayNotExtendSPITypes" />
         <includeConstraint refId="my-rules:APIMethodsMayNotExposeSPITypes" />
         <includeConstraint refId="my-rules:APIFieldsMayNotExposeSPITypes" />
+        <includeConstraint refId="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules" />
     </group>
 
 </jqa:jqassistant-rules>
