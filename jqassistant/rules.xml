@@ -7,62 +7,103 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
 
+    <concept id="my-rules:ApiTypes">
+        <description>
+            Contributes the :Api and :Public labels to API types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                NOT (type.fqn =~ ".*\\.impl\\..*")
+                AND NOT (type.fqn =~ ".*\\.spi\\..*")
+            SET
+                type:Api, type:Public
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:SpiTypes">
+        <description>
+            Contributes the :Spi and :Public labels to SPI types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                type.fqn =~ ".*\\.spi\\..*"
+            SET
+                type:Spi, type:Public
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:ImplTypes">
+        <description>
+            Contributes the :Impl label to implementation types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                type.fqn =~ ".*\\.impl\\..*"
+            SET
+                type:Impl
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
     <constraint id="my-rules:PublicTypesMayNotExtendInternalTypes">
+        <requiresConcept refId="my-rules:ApiTypes" />
+        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:ImplTypes" />
         <description>API/SPI types must not extend/implement internal types.</description>
         <cypher><![CDATA[
             MATCH
-                (class)-[:`EXTENDS`]->(supertype)
-            WHERE
-                NOT (class.fqn =~ ".*\\.impl\\..*")
-                AND supertype.fqn =~ ".*\\.impl\\..*"
+                (type:Type:Public)-[:EXTENDS|:IMPLEMENTS]->(supertype:Type:Impl)
             RETURN
-                class
-            UNION ALL
-            MATCH
-                (class)-[:`IMPLEMENTS`]->(supertype)
-            WHERE
-                NOT (class.fqn =~ ".*\\.impl\\..*")
-                AND supertype.fqn =~ ".*\\.impl\\..*"
-            RETURN
-                class
+                type
         ]]></cypher>
     </constraint>
 
     <constraint id="my-rules:PublicMethodsMayNotExposeInternalTypes">
+        <requiresConcept refId="my-rules:ApiTypes" />
+        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:ImplTypes" />
         <description>API/SPI methods must not expose internal types.</description>
         <cypher><![CDATA[
             // return values
             MATCH
-                (class)-[:`DECLARES`]->(method)-[:`RETURNS`]->(returntype)
+                (type:Type:Public)-[:DECLARES]->(method)-[:RETURNS]->(returntype:Type:Impl)
             WHERE
-                NOT (class.fqn =~ ".*\\.impl\\..*")
-                AND (method.visibility="public" OR method.visibility="protected")
-                AND returntype.fqn =~ ".*\\.impl\\..*"
+                (method.visibility="public" OR method.visibility="protected")
             RETURN
                 method
 
             // parameters
             UNION ALL
             MATCH
-                (class)-[:`DECLARES`]->(method)-[:`HAS`]->(parameter)-[:`OF_TYPE`]->(parametertype)
+                (type:Type:Public)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parametertype:Type:Impl)
             WHERE
-                NOT (class.fqn =~ ".*\\.impl\\..*")
-                AND (method.visibility="public" OR method.visibility="protected")
-                AND parametertype.fqn =~ ".*\\.impl\\..*"
+                (method.visibility="public" OR method.visibility="protected")
             RETURN
                 method
         ]]></cypher>
     </constraint>
 
     <constraint id="my-rules:PublicFieldsMayNotExposeInternalTypes">
+        <requiresConcept refId="my-rules:ApiTypes" />
+        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:ImplTypes" />
         <description>API/SPI fields must not expose internal types.</description>
         <cypher><![CDATA[
             MATCH
-                (class)-[:`DECLARES`]->(field)-[:`OF_TYPE`]->(fieldtype)
+                (type:Type:Public)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldtype:Type:Impl)
             WHERE
-                NOT (class.fqn =~ ".*\\.impl\\..*")
-                AND (field.visibility="public" OR field.visibility="protected")
-                AND fieldtype.fqn =~ ".*\\.impl\\..*"
+                (field.visibility="public" OR field.visibility="protected")
             RETURN
                 field
         ]]></cypher>
