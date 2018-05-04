@@ -13,9 +13,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
-import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -43,16 +41,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 7, value = "Cannot add multiple predicates to the query root; use an explicit boolean predicate instead.")
 	SearchException cannotAddMultiplePredicatesToQueryRoot();
 
-	@Message(id = 8, value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
-	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
-
 	@Message(id = 9, value = "Cannot add multiple predicates to a nested predicate; use an explicit boolean predicate instead.")
 	SearchException cannotAddMultiplePredicatesToNestedPredicate();
-
-	@LogMessage(level = Logger.Level.INFO)
-	@Message(id = 10, value = "Cannot access the value of containing annotation '%1$s'."
-			+ " Ignoring annotation.")
-	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
 
 	@Message(id = 11, value = "Invalid value: the value to match in match predicates must be non-null." +
 			" Null value was passed to match predicate on fields %1$s")

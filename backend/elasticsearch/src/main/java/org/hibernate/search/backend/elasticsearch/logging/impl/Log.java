@@ -140,4 +140,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 524, value = "Match predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException matchPredicatesNotSupportedByGeoPoint(String absoluteFieldPath);
+
+	@Message(id = 525, value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
+	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
 }

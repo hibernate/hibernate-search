@@ -148,4 +148,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 24, value = "Found an infinite embedded recursion involving path '%2$s' on type '%1$s'")
 	SearchException infiniteRecursionForAssociationEmbeddeds(PojoRawTypeModel<?> typeModel,
 			PojoModelPathValueNode path);
+
+	@LogMessage(level = Logger.Level.INFO)
+	@Message(id = 25, value = "Cannot access the value of containing annotation '%1$s'."
+			+ " Ignoring annotation.")
+	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
 }

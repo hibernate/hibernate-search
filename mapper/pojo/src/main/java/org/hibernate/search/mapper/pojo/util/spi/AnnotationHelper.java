@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public final class AnnotationHelper {
