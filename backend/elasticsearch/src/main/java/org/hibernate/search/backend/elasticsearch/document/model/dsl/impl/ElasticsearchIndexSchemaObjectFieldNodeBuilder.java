@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.impl.DeferredInitializationIndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
