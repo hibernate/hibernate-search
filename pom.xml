@@ -188,7 +188,7 @@
         <version.org.apache.tika>1.4</version.org.apache.tika>
         <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
 
-        <version.org.infinispan>9.0.1.Final</version.org.infinispan>
+        <version.org.infinispan>9.2.2.Final</version.org.infinispan>
 
         <version.net.bytebuddy>1.8.0</version.net.bytebuddy>
 
