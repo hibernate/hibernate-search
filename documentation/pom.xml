@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Search Documentation</name>
-    <description>The Hibernate Search reference documentation</description>
+    <description>Hibernate Search reference documentation</description>
 
     <properties>
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>

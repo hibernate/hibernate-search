@@ -9,6 +9,9 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-orm</artifactId>
 
+    <name>Hibernate Search Integration Tests - ORM</name>
+    <description>Hibernate Search integration tests for the Hibernate ORM integration</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

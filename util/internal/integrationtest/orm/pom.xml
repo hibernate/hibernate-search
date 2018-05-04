@@ -16,6 +16,9 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
 
+    <name>Hibernate Search Utils - Internal - Integration Tests - ORM</name>
+    <description>Hibernate Search integration testing utilities for tests involving Hibernate ORM</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

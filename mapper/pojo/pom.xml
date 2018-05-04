@@ -16,6 +16,9 @@
     </parent>
     <artifactId>hibernate-search-mapper-pojo</artifactId>
 
+    <name>Hibernate Search Mapper - POJO</name>
+    <description>Abstract base and common implementations for Hibernate Search Mappers for POJOs</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

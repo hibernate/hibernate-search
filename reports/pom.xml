@@ -14,6 +14,9 @@
     </parent>
     <artifactId>hibernate-search-reports</artifactId>
 
+    <name>Hibernate Search Reports</name>
+    <description>Hibernate Search build reports</description>
+
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>

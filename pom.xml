@@ -14,8 +14,8 @@
     <version>6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search 6 POC</name>
-    <description>Proof of concept for some of the heavy refactorings planned for Hibernate Search 6.0</description>
+    <name>Hibernate Search 6 POC Parent POM</name>
+    <description>Parent POM of a proof of concept for some of the heavy refactorings planned for Hibernate Search 6.0</description>
 
     <licenses>
         <license>

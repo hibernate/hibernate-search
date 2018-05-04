@@ -9,6 +9,9 @@
     <artifactId>hibernate-search-integrationtest</artifactId>
     <packaging>pom</packaging>
 
+    <name>Hibernate Search Integration Tests - Parent POM</name>
+    <description>Parent POM of Hibernate Search integration tests</description>
+
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>

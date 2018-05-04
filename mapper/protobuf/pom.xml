@@ -16,6 +16,9 @@
     </parent>
     <artifactId>hibernate-search-mapper-protobuf</artifactId>
 
+    <name>Hibernate Search Mapper - Protobuf</name>
+    <description>Hibernate Search Mapper for Protobuf objects</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

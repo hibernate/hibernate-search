@@ -11,6 +11,9 @@
     </parent>
     <artifactId>hibernate-search-backend-lucene</artifactId>
 
+    <name>Hibernate Search Backend - Lucene</name>
+    <description>Hibernate Search Backend relying on embedded instances of Lucene</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

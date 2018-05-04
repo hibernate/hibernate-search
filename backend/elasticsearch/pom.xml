@@ -16,6 +16,9 @@
     </parent>
     <artifactId>hibernate-search-backend-elasticsearch</artifactId>
 
+    <name>Hibernate Search Backend - Elasticsearch</name>
+    <description>Hibernate Search Backend relying on remote Elasticsearch clusters</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

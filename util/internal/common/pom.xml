@@ -9,6 +9,9 @@
     </parent>
     <artifactId>hibernate-search-util-internal-common</artifactId>
 
+    <name>Hibernate Search Utils - Internal - Common</name>
+    <description>Hibernate Search common internal utilities</description>
+
     <dependencies>
         <dependency>
             <groupId>org.jboss.logging</groupId>

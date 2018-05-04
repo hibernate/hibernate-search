@@ -16,6 +16,9 @@
     </parent>
     <artifactId>hibernate-search-mapper-javabean</artifactId>
 
+    <name>Hibernate Search Mapper - JavaBean</name>
+    <description>Hibernate Search Mapper for POJOs following the JavaBean conventions</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

@@ -14,6 +14,9 @@
     </parent>
     <artifactId>hibernate-search-build-config</artifactId>
 
+    <name>Hibernate Search Build Config</name>
+    <description>Hibernate Search common build configuration files</description>
+
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>

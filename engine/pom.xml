@@ -8,6 +8,9 @@
     </parent>
     <artifactId>hibernate-search-engine</artifactId>
 
+    <name>Hibernate Search Engine</name>
+    <description>Hibernate Search engine, always required</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

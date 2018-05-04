@@ -11,6 +11,9 @@
     </parent>
     <artifactId>hibernate-search-orm</artifactId>
 
+    <name>Hibernate Search ORM Integration</name>
+    <description>Hibernate Search integration to Hibernate ORM</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
