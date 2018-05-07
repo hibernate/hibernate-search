@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -63,12 +62,15 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();
 		}
-		Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers = targetedTypes.stream()
-				.flatMap( t -> indexedTypeManagers.getAllBySuperClass( t )
-						.orElseThrow( () -> new SearchException( "Type " + t + " is not indexed and hasn't any indexed supertype." ) )
-						.stream()
-				)
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+
+		Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers = new LinkedHashSet<>();
+		for ( Class<? extends T> targetedType : targetedTypes ) {
+			targetedTypeManagers.addAll(
+					indexedTypeManagers.getAllBySuperClass( targetedType )
+							.orElseThrow( () -> new SearchException( "Type " + targetedType + " is not indexed and hasn't any indexed supertype." ) )
+			);
+		}
+
 		return new PojoSearchTargetDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
 	}
 
