@@ -27,10 +27,12 @@ public class SearchResultAssert<T> extends AbstractSearchResultAssert<SearchResu
 		super( actual );
 	}
 
+	@SuppressWarnings("unchecked")
 	public SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
 		return hasHitsExactOrder( (T[]) hits.toArray() );
 	}
 
+	@SuppressWarnings("unchecked")
 	public SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
 		return hasHitsAnyOrder( (T[]) hits.toArray() );
 	}

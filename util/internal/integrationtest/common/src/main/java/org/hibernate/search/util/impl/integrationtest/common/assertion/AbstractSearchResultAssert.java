@@ -39,6 +39,7 @@ public abstract class AbstractSearchResultAssert<S, T> {
 		return thisAsSelfType();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected final S thisAsSelfType() {
 		return (S) this;
 	}

@@ -19,9 +19,6 @@ import org.junit.Assert;
 
 public class StubIndexWorkAssert {
 
-	private static final String NEWLINE = "\n\t";
-	private static final String INDENT = "\t";
-
 	public static StubIndexWorkAssert assertThat(StubIndexWork work) {
 		return new StubIndexWorkAssert( work );
 	}

@@ -37,17 +37,13 @@ public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 
 	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsExactOrder(String indexName, String... ids) {
 		return hasReferencesHitsExactOrder( ctx -> {
-			for ( String id : ids ) {
-				ctx = ctx.doc( indexName, id );
-			}
+			ctx = ctx.doc( indexName, ids );
 		} );
 	}
 
 	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsAnyOrder(String indexName, String... ids) {
 		return hasReferencesHitsAnyOrder( ctx -> {
-			for ( String id : ids ) {
-				ctx = ctx.doc( indexName, id );
-			}
+			ctx = ctx.doc( indexName, ids );
 		} );
 	}
 
@@ -82,8 +78,10 @@ public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 		private ReferencesHitsBuilder() {
 		}
 
-		public ReferencesHitsBuilder doc(String indexName, String id) {
-			expectedHits.add( NormalizationUtils.reference( indexName, id ) );
+		public ReferencesHitsBuilder doc(String indexName, String... ids) {
+			for ( String id : ids ) {
+				expectedHits.add( NormalizationUtils.reference( indexName, id ) );
+			}
 			return this;
 		}
 
