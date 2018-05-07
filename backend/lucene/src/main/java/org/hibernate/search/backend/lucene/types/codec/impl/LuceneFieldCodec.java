@@ -24,4 +24,10 @@ public interface LuceneFieldCodec<T> {
 	}
 
 	T decode(Document document, String absoluteFieldPath);
+
+	// equals()/hashCode() needs to be implemented if the codec is not a singleton
+
+	boolean equals(Object obj);
+
+	int hashCode();
 }

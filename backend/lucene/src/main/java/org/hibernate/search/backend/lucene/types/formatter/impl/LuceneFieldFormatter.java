@@ -12,4 +12,10 @@ package org.hibernate.search.backend.lucene.types.formatter.impl;
 public interface LuceneFieldFormatter<T> {
 
 	T format(Object value);
+
+	// equals()/hashCode() needs to be implemented if the formatter is not a singleton
+
+	boolean equals(Object obj);
+
+	int hashCode();
 }

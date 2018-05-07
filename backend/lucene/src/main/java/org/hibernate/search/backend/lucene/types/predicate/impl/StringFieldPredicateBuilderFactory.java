@@ -43,7 +43,7 @@ public class StringFieldPredicateBuilderFactory implements LuceneFieldPredicateB
 		if ( obj == null ) {
 			return false;
 		}
-		if ( StringFieldFormatter.class != obj.getClass() ) {
+		if ( StringFieldPredicateBuilderFactory.class != obj.getClass() ) {
 			return false;
 		}
 

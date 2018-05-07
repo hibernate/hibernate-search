@@ -18,4 +18,10 @@ public interface LuceneFieldPredicateBuilderFactory {
 	MatchPredicateBuilder<LuceneSearchPredicateCollector> createMatchPredicateBuilder(String absoluteFieldPath);
 
 	RangePredicateBuilder<LuceneSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath);
+
+	// equals()/hashCode() needs to be implemented if the predicate factory is not a singleton
+
+	boolean equals(Object obj);
+
+	int hashCode();
 }

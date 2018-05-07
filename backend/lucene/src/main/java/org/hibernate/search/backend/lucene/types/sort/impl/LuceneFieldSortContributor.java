@@ -12,4 +12,10 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 public interface LuceneFieldSortContributor {
 
 	void contribute(LuceneSearchSortCollector collector, String absoluteFieldPath, SortOrder order, Object missingValue);
+
+	// equals()/hashCode() needs to be implemented if the sort contributor is not a singleton
+
+	boolean equals(Object obj);
+
+	int hashCode();
 }

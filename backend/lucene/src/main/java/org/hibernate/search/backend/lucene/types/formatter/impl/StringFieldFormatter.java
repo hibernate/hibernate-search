@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.formatter.impl;
 
+import java.util.Objects;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
@@ -32,5 +34,27 @@ public final class StringFieldFormatter implements LuceneFieldFormatter<String> 
 		}
 
 		return AnalyzerUtils.normalize( analyzerOrNormalizer, absoluteFieldPath, value );
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( StringFieldFormatter.class != obj.getClass() ) {
+			return false;
+		}
+
+		StringFieldFormatter other = (StringFieldFormatter) obj;
+
+		return Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( analyzerOrNormalizer );
 	}
 }
