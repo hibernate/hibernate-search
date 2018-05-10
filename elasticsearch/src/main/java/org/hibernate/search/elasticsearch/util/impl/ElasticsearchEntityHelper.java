@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.util.impl;
 
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -30,6 +31,21 @@ public final class ElasticsearchEntityHelper {
 	public static boolean isAnyMappedToElasticsearch(ExtendedSearchIntegrator integrator, IndexedTypeSet entityTypes) {
 		IndexedTypeSet entityTypesWithSubTypes = integrator.getIndexedTypesPolymorphic( entityTypes );
 		return hasElasticsearchIndexManager( integrator, entityTypesWithSubTypes );
+	}
+
+	/**
+	 * Get Indexed Type name to be user by elasticsearch See HSEARCH-3158
+	 * @param typeIdentifier Indexed Entity Type Identifier
+	 * @return Indexed Entity Type Name
+	 */
+	public static String getIndexedTypeName(IndexedTypeIdentifier typeIdentifier) {
+		Indexed indexAnn = typeIdentifier.getPojoType().getAnnotation( Indexed.class );
+		if ( indexAnn != null ) {
+			if ( indexAnn.type().length() != 0 ) {
+				return indexAnn.type();
+			}
+		}
+		return typeIdentifier.getPojoType().getSimpleName();
 	}
 
 	private static boolean hasElasticsearchIndexManager(ExtendedSearchIntegrator integrator, IndexedTypeSet entityTypes) {

@@ -32,6 +32,7 @@ import org.hibernate.search.elasticsearch.gson.impl.UnexpectedJsonElementTypeExc
 import org.hibernate.search.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
@@ -118,7 +119,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		 * Deleting only the given type.
 		 * Inheritance trees are handled at a higher level by creating multiple purge works.
 		 */
-		builder.type( URLEncodedString.fromString( work.getEntityType().getName() ) );
+		builder.type( URLEncodedString.fromString( ElasticsearchEntityHelper.getIndexedTypeName( work.getEntityType() ) ) );
 		return builder.build();
 	}
 
@@ -145,7 +146,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				searchIntegrator.getIndexBinding( work.getEntityType() ).getDocumentBuilder(),
 				work.getDeletionQuery()
 		);
-		URLEncodedString typeName = URLEncodedString.fromString( work.getEntityType().getName() );
+		URLEncodedString typeName = URLEncodedString.fromString(
+				ElasticsearchEntityHelper.getIndexedTypeName( work.getEntityType() ) );
 
 		JsonObject payload = createDeleteByQueryPayload( convertedQuery, work.getTenantId() );
 
@@ -182,7 +184,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	private IndexWorkBuilder indexDocument(URLEncodedString id, Document document, IndexedTypeIdentifier entityType) {
 		JsonObject source = convertDocumentToJson( document, entityType );
-		URLEncodedString typeName = URLEncodedString.fromString( entityType.getName() );
+		URLEncodedString typeName = URLEncodedString.fromString( ElasticsearchEntityHelper.getIndexedTypeName( entityType ) );
 		return workFactory.index( indexName, typeName, id, source );
 	}
 
@@ -366,7 +368,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	}
 
 	private static URLEncodedString entityName(LuceneWork work) {
-		return URLEncodedString.fromString( work.getEntityType().getName() );
+		return URLEncodedString.fromString( ElasticsearchEntityHelper.getIndexedTypeName( work.getEntityType() ) );
 	}
 
 }

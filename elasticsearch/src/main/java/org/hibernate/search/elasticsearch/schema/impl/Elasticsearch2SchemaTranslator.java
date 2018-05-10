@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
+
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
@@ -31,6 +32,7 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
@@ -72,7 +74,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		ElasticsearchIndexSettingsBuilder settingsBuilder = new ElasticsearchIndexSettingsBuilder();
 		for ( EntityIndexBinding descriptor : descriptors ) {
-			String typeName = descriptor.getDocumentBuilder().getTypeIdentifier().getName();
+			String typeName = ElasticsearchEntityHelper.getIndexedTypeName( descriptor.getDocumentBuilder().getTypeIdentifier() );
 
 			TypeMapping mapping = translate( descriptor, settingsBuilder, executionOptions );
 
