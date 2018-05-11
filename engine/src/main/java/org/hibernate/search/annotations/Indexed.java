@@ -27,7 +27,7 @@ public @interface Indexed {
 	String index() default "";
 
 	/**
-	 * @apiNote Used by hibernate-search-elasticsearch only See HSEARCH-3158
+	 * Used by hibernate-search-elasticsearch only See HSEARCH-3158
 	 * @return The type of the entity. Default to empty string
 	 */
 	String type() default "";
