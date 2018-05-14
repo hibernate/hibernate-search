@@ -65,6 +65,7 @@
 
         <!-- Maven plugins versions -->
 
+        <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>2.17</version.checkstyle.plugin>
         <version.clean.plugin>3.0.0</version.clean.plugin>
         <version.compiler.plugin>3.7.0</version.compiler.plugin>
@@ -120,6 +121,25 @@
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
+        <!--
+            The path to the root project directory.
+            This property is set by the build-helper plugin.
+            We initialize it to some crude, potentially wrong value,
+            because the Sonar Maven plugin uses this property indirectly,
+            but ignores any change made by other plugins.
+            This default value is the best we can do without the help of a Maven plugin.
+
+            Useful resources:
+             - https://www.mojohaus.org/build-helper-maven-plugin/rootlocation-mojo.html
+         -->
+        <rootProject.directory>${user.dir}</rootProject.directory>
+
+        <!--
+            The path to a single merged JaCoCo coverage file including all of the coverage data for all modules.
+            This file is mainly necessary for Sonar, see Sonar configuration below for an explanation.
+         -->
+        <jacoco.mergedExecFilePath>${rootProject.directory}/target/jacoco-merged.exec</jacoco.mergedExecFilePath>
+
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
         <maven.min.version>3.2.3</maven.min.version>
@@ -130,6 +150,41 @@
         <!-- Eclipse plugin options -->
 
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+
+        <!-- Sonar options -->
+        <!--
+            We want to take into account coverage data from integration tests from other projects as well.
+            This requires to use a single destination file for ITs, because:
+             - Integration tests cover code from other modules.
+             - The Sonar plugin computes coverage when inspecting each module,
+               and by default only takes into account JaCoCo coverage files from the inspected module.
+               Thus it ignores some relevant ITs by default.
+             - Even when configured, the Sonar plugin only accept an *explicit* list of JaCoCo coverage files
+               (no wildcards).
+               Thus we cannot easily configure the Sonar plugin to inspect JaCoCo coverage files from other modules,
+               unless we somehow aggregate all of the coverage data into a single, shared JaCoCo coverage file.
+            The chosen solution was to make the "reports" module invoke jacoco's "merge" goal
+            to merge the coverage files into a single file, and configure sonar to only inspect that file.
+
+            Useful resources to understand what is going on (caution, not everything is up-to-date):
+             - https://docs.sonarqube.org/display/SONAR/Analysis+Parameters
+             - https://docs.sonarqube.org/display/PLUG/Usage+of+JaCoCo+with+Java+Plugin
+             - https://www.devcon5.ch/en/blog/2015/05/29/multi-module-integration-test-coverage-sonar-jacoco/
+             - http://javamemento.blogspot.fr/2016/02/sonar-jacoco-maven-multi-module.html
+             - https://github.com/SonarSource/sonar-scanning-examples/blob/master/sonarqube-scanner-maven/pom.xml
+             - https://stackoverflow.com/a/49528226/6692043
+             - https://www.eclemma.org/jacoco/trunk/doc/merge-mojo.html
+         -->
+        <sonar.jacoco.reportPaths>${jacoco.mergedExecFilePath}</sonar.jacoco.reportPaths>
+        <!--
+            Exclude build code and integration tests defined in the main source (utils, Backend TCK)
+            from coverage computation.
+         -->
+        <sonar.coverage.exclusions>
+            **/org/hibernate/checkstyle/**,
+            **/org/hibernate/search/util/impl/integrationtest/**,
+            **/org/hibernate/search/integrationtest/**
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -324,6 +379,21 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>set-root-location-property</id>
+                        <goals>
+                            <goal>rootlocation</goal>
+                        </goals>
+                        <configuration>
+                            <rootLocationProperty>rootProject.directory</rootLocationProperty>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
@@ -391,6 +461,11 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
                     <version>${version.compiler.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${version.buildhelper.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
