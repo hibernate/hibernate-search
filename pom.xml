@@ -466,7 +466,7 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
-                        <argLine>${surefireCoverageArgLine}</argLine>
+                        <argLine>${surefire.jacoco.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -478,7 +478,7 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
-                        <argLine>${failsafeCoverageArgLine}</argLine>
+                        <argLine>${failsafe.jacoco.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -730,8 +730,8 @@
                     As a result, this profile will not work in IntelliJ,
                     but we don't need JaCoCo in IntelliJ anyway.
                  -->
-                <surefireCoverageArgLine>@{surefireJacocoArgLine}</surefireCoverageArgLine>
-                <failsafeCoverageArgLine>@{failsafeJacocoArgLine}</failsafeCoverageArgLine>
+                <surefire.jacoco.args>@{surefire.jacoco.args.lateEval}</surefire.jacoco.args>
+                <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
             </properties>
             <build>
                 <plugins>
@@ -750,7 +750,7 @@
                                     <goal>prepare-agent</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>surefireJacocoArgLine</propertyName>
+                                    <propertyName>surefire.jacoco.args.lateEval</propertyName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -759,7 +759,7 @@
                                     <goal>prepare-agent-integration</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>failsafeJacocoArgLine</propertyName>
+                                    <propertyName>failsafe.jacoco.args.lateEval</propertyName>
                                 </configuration>
                             </execution>
                         </executions>
