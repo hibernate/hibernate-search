@@ -104,12 +104,36 @@ public class WorkPlan {
 	 * @param entityClass The entity class for which to retrieve the work
 	 *
 	 * @return returns (and creates if needed) the {@code PerClassWork} from the {@link #byClass} map.
+	 * @throws SearchException if the specified type is not @Indexed nor hosts any @ContainedIn
 	 */
 	private PerClassWork getClassWork(String tenantId, Class<?> entityClass) {
+		PerClassWork classWork = getClassWorkIfConfigured( tenantId, entityClass );
+		if ( classWork == null ) {
+			throw new SearchException(
+					"Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass
+			);
+		}
+		return classWork;
+	}
+
+	/**
+	 * @param tenantId the tenant identifier
+	 * @param entityClass The entity class for which to retrieve the work
+	 *
+	 * @return the {@code PerClassWork} from the {@link #byClass} map, creating it if necessary and if possible
+	 * (if the type is configured). Otherwise, return null.
+	 */
+	private PerClassWork getClassWorkIfConfigured(String tenantId, Class<?> entityClass) {
 		PerClassWork classWork = byClass.get( entityClass );
 		if ( classWork == null ) {
-			classWork = new PerClassWork( tenantId, entityClass );
-			byClass.put( entityClass, classWork );
+			AbstractDocumentBuilder documentBuilder = getDocumentBuilderIfConfigured( extendedIntegrator, entityClass );
+			if ( documentBuilder == null ) {
+				return null;
+			}
+			else {
+				classWork = new PerClassWork( tenantId, entityClass, documentBuilder );
+				byClass.put( entityClass, classWork );
+			}
 		}
 		return classWork;
 	}
@@ -141,8 +165,11 @@ public class WorkPlan {
 	 */
 	public <T> void recurseContainedIn(T value, ContainedInRecursionContext context, String tenantId) {
 		Class<T> entityClass = instanceInitializer.getClass( value );
-		PerClassWork classWork = getClassWork( tenantId, entityClass );
-		classWork.recurseContainedIn( value, context );
+		//TODO separate the ContainedIn processing in its own registry of types
+		PerClassWork classWork = getClassWorkIfConfigured( tenantId, entityClass );
+		if ( classWork != null ) {
+			classWork.recurseContainedIn( value, context );
+		}
 	}
 
 	/**
@@ -196,11 +223,13 @@ public class WorkPlan {
 		private final boolean containedInOnly;
 
 		/**
+		 * @param tenantId the tenant ID
 		 * @param clazz The type of entities being managed by this instance
+		 * @param documentBuilder The document builder to use for entities managed by this instance
 		 */
-		PerClassWork(String tenantId, Class<?> clazz) {
+		PerClassWork(String tenantId, Class<?> clazz, AbstractDocumentBuilder documentBuilder) {
 			this.entityClass = clazz;
-			this.documentBuilder = getEntityBuilder( extendedIntegrator, clazz );
+			this.documentBuilder = documentBuilder;
 			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
 			this.tenantId = tenantId;
 		}
@@ -545,25 +574,27 @@ public class WorkPlan {
 	}
 
 	/**
-	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
-	 * we can fetch it once.
+	 * Get the DocumentBuilder for this type.
 	 *
 	 * @param extendedIntegrator the search factory (implementor)
 	 * @param entityClass the entity type for which to retrieve the document builder
 	 *
 	 * @return the DocumentBuilder for this type
 	 */
-	private static AbstractDocumentBuilder getEntityBuilder(ExtendedSearchIntegrator extendedIntegrator, Class<?> entityClass) {
+	private static AbstractDocumentBuilder getDocumentBuilderIfConfigured(ExtendedSearchIntegrator extendedIntegrator,
+			Class<?> entityClass) {
 		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( entityClass );
 		if ( entityIndexBinding == null ) {
 			DocumentBuilderContainedEntity entityBuilder = extendedIntegrator.getDocumentBuilderContainedEntity(
 					entityClass
 			);
 			if ( entityBuilder == null ) {
-				// should never happen but better be safe than sorry
-				throw new SearchException(
-						"Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass
-				);
+				/*
+				 * May happen when @ContainedIn targets a non-configured type (not @Indexed nor with any @ContainedIn),
+				 * which is a legitimate use case when this type has a configured subtype.
+				 * Just return null.
+				 */
+				return null;
 			}
 			else {
 				return entityBuilder;
