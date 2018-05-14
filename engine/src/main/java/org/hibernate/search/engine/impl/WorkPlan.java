@@ -111,12 +111,36 @@ public class WorkPlan {
 	 * @param typeIdentifier The entity class for which to retrieve the work
 	 *
 	 * @return returns (and creates if needed) the {@code PerClassWork} from the {@link #byClass} map.
+	 * @throws SearchException if the specified type is not @Indexed nor hosts any @ContainedIn
 	 */
 	private PerClassWork getClassWork(String tenantId, IndexedTypeIdentifier typeIdentifier) {
+		PerClassWork classWork = getClassWorkIfConfigured( tenantId, typeIdentifier );
+		if ( classWork == null ) {
+			throw new SearchException(
+					"Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + typeIdentifier
+			);
+		}
+		return classWork;
+	}
+
+	/**
+	 * @param tenantId the tenant identifier
+	 * @param typeIdentifier The entity class for which to retrieve the work
+	 *
+	 * @return the {@code PerClassWork} from the {@link #byClass} map, creating it if necessary and if possible
+	 * (if the type is configured). Otherwise, return null.
+	 */
+	private PerClassWork getClassWorkIfConfigured(String tenantId, IndexedTypeIdentifier typeIdentifier) {
 		PerClassWork classWork = byClass.get( typeIdentifier );
 		if ( classWork == null ) {
-			classWork = new PerClassWork( tenantId, typeIdentifier );
-			byClass.put( typeIdentifier, classWork );
+			AbstractDocumentBuilder documentBuilder = getDocumentBuilderIfConfigured( extendedIntegrator, typeIdentifier );
+			if ( documentBuilder == null ) {
+				return null;
+			}
+			else {
+				classWork = new PerClassWork( tenantId, typeIdentifier, documentBuilder );
+				byClass.put( typeIdentifier, classWork );
+			}
 		}
 		return classWork;
 	}
@@ -149,8 +173,10 @@ public class WorkPlan {
 	public <T> void recurseContainedIn(T value, ContainedInRecursionContext context, String tenantId) {
 		Class<T> entityClass = instanceInitializer.getClass( value );
 		//TODO separate the ContainedIn processing in its own registry of types
-		PerClassWork classWork = getClassWork( tenantId, new PojoIndexedTypeIdentifier( entityClass ) );
-		classWork.recurseContainedIn( value, context );
+		PerClassWork classWork = getClassWorkIfConfigured( tenantId, new PojoIndexedTypeIdentifier( entityClass ) );
+		if ( classWork != null ) {
+			classWork.recurseContainedIn( value, context );
+		}
 	}
 
 	/**
@@ -203,16 +229,18 @@ public class WorkPlan {
 		private final AbstractDocumentBuilder documentBuilder;
 
 		/**
-		 * The entity {@link #entityClass} does not have its own index, but is only used in contained scenarios
+		 * The entity {@link #typeIdentifier} does not have its own index, but is only used in contained scenarios
 		 */
 		private final boolean containedInOnly;
 
 		/**
+		 * @param tenantId the tenant ID
 		 * @param typeIdentifier The type of entities being managed by this instance
+		 * @param documentBuilder The document builder to use for entities managed by this instance
 		 */
-		PerClassWork(String tenantId, IndexedTypeIdentifier typeIdentifier) {
+		PerClassWork(String tenantId, IndexedTypeIdentifier typeIdentifier, AbstractDocumentBuilder documentBuilder) {
 			this.typeIdentifier = typeIdentifier;
-			this.documentBuilder = getEntityBuilder( extendedIntegrator, typeIdentifier );
+			this.documentBuilder = documentBuilder;
 			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
 			this.tenantId = tenantId;
 		}
@@ -557,25 +585,27 @@ public class WorkPlan {
 	}
 
 	/**
-	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
-	 * we can fetch it once.
+	 * Get the DocumentBuilder for this type.
 	 *
 	 * @param extendedIntegrator the search factory (implementor)
 	 * @param typeIdentifier the entity type for which to retrieve the document builder
 	 *
 	 * @return the DocumentBuilder for this type
 	 */
-	private static AbstractDocumentBuilder getEntityBuilder(ExtendedSearchIntegrator extendedIntegrator, IndexedTypeIdentifier typeIdentifier) {
+	private static AbstractDocumentBuilder getDocumentBuilderIfConfigured(ExtendedSearchIntegrator extendedIntegrator,
+			IndexedTypeIdentifier typeIdentifier) {
 		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( typeIdentifier );
 		if ( entityIndexBinding == null ) {
 			DocumentBuilderContainedEntity entityBuilder = extendedIntegrator.getDocumentBuilderContainedEntity(
 					typeIdentifier
 			);
 			if ( entityBuilder == null ) {
-				// should never happen but better be safe than sorry
-				throw new SearchException(
-						"Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + typeIdentifier
-				);
+				/*
+				 * May happen when @ContainedIn targets a non-configured type (not @Indexed nor with any @ContainedIn),
+				 * which is a legitimate use case when this type has a configured subtype.
+				 * Just return null.
+				 */
+				return null;
 			}
 			else {
 				return entityBuilder;
