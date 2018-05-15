@@ -125,14 +125,14 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );
@@ -147,7 +147,7 @@ public class MultiTenancyIT {
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_2 );
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
@@ -155,7 +155,7 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -168,7 +168,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( checkQuery )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -267,7 +267,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -366,7 +366,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -470,14 +470,14 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_1 );
@@ -486,14 +486,14 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );

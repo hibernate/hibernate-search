@@ -96,7 +96,7 @@ public class SearchResultIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );
@@ -108,7 +108,7 @@ public class SearchResultIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asObjects()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );
@@ -120,7 +120,7 @@ public class SearchResultIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
 				.asProjections( "string", "string_analyzed", "integer", "localDate", "geoPoint" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE );
@@ -130,7 +130,7 @@ public class SearchResultIT {
 		// Project twice on the same field
 		query = searchTarget.query( sessionContext )
 				.asProjections( "string", "integer", "string" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( STRING_VALUE, INTEGER_VALUE, STRING_VALUE );
@@ -142,7 +142,7 @@ public class SearchResultIT {
 		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
 		query = searchTarget.query( sessionContext )
 				.asProjections( ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( mainReference, mainReference, mainReference );
@@ -161,7 +161,7 @@ public class SearchResultIT {
 
 		searchTarget.query( sessionContext )
 				.asProjections( "unknownField" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 	}
 
@@ -176,7 +176,7 @@ public class SearchResultIT {
 
 		searchTarget.query( sessionContext )
 				.asProjections( "nestedObject" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 	}
 
@@ -191,7 +191,7 @@ public class SearchResultIT {
 
 		searchTarget.query( sessionContext )
 				.asProjections( "flattenedObject" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 	}
 
@@ -205,7 +205,7 @@ public class SearchResultIT {
 		// Project on fields within a flattened object
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
 				.asProjections( "flattenedObject.string", "flattenedObject.integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( FLATTENED_OBJECT_STRING_VALUE, FLATTENED_OBJECT_INTEGER_VALUE );
@@ -215,7 +215,7 @@ public class SearchResultIT {
 		// Project on fields within a nested object
 		query = searchTarget.query( sessionContext )
 				.asProjections( "nestedObject.string", "nestedObject.integer" )
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( NESTED_OBJECT_STRING_VALUE, NESTED_OBJECT_INTEGER_VALUE );
@@ -253,7 +253,7 @@ public class SearchResultIT {
 				sessionContext, referenceTransformerMock, objectLoaderMock
 		)
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -284,7 +284,7 @@ public class SearchResultIT {
 		SearchQuery<StubLoadedObject> objectsQuery =
 				searchTarget.query( sessionContext, referenceTransformerMock, objectLoaderMock )
 						.asObjects()
-						.predicate().all().end()
+						.predicate().matchAll().end()
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -325,7 +325,7 @@ public class SearchResultIT {
 								"string", ProjectionConstants.DOCUMENT_REFERENCE,
 								ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT
 						)
-						.predicate().all().end()
+						.predicate().matchAll().end()
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -367,7 +367,7 @@ public class SearchResultIT {
 						ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.DOCUMENT_REFERENCE,
 						ProjectionConstants.OBJECT
 				)
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 
 		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
@@ -411,7 +411,7 @@ public class SearchResultIT {
 								"string", ProjectionConstants.DOCUMENT_REFERENCE,
 								ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT
 						)
-						.predicate().all().end()
+						.predicate().matchAll().end()
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -468,7 +468,7 @@ public class SearchResultIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );

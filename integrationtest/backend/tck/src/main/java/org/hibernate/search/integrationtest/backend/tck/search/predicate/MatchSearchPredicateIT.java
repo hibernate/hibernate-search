@@ -339,7 +339,7 @@ public class MatchSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( indexName, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID, ADDITIONAL_MATCHING_ID );
 	}

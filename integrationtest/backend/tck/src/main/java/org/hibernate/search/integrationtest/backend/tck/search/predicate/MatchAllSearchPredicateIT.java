@@ -66,7 +66,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -79,7 +79,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().except().match().onField( "string" ).matching( STRING_1 ).end()
+				.predicate().matchAll().except().match().onField( "string" ).matching( STRING_1 ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -87,7 +87,7 @@ public class MatchAllSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().except( c -> c.match().onField( "string" ).matching( STRING_2 ) ).end()
+				.predicate().matchAll().except( c -> c.match().onField( "string" ).matching( STRING_2 ) ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -97,7 +97,7 @@ public class MatchAllSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().except( searchPredicate ).end()
+				.predicate().matchAll().except( searchPredicate ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -122,7 +122,7 @@ public class MatchAllSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

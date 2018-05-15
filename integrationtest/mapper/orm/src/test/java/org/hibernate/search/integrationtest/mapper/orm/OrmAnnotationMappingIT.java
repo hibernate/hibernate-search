@@ -381,7 +381,7 @@ public class OrmAnnotationMappingIT {
 					)
 					.query()
 					.asEntities()
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );
@@ -425,7 +425,7 @@ public class OrmAnnotationMappingIT {
 							ProjectionConstants.OBJECT,
 							"customBridgeOnClass.text"
 					)
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );

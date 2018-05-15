@@ -100,7 +100,7 @@ public class LuceneSearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().byField( "additionalField" ).asc().onMissingValue().sortLast().end()
 				.build();
 
@@ -111,7 +111,7 @@ public class LuceneSearchMultiIndexIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().byField( "additionalField" ).desc().onMissingValue().sortLast().end()
 				.build();
 
@@ -140,7 +140,7 @@ public class LuceneSearchMultiIndexIT {
 		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
@@ -157,7 +157,7 @@ public class LuceneSearchMultiIndexIT {
 		searchTarget = indexManager_1_2.createSearchTarget().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_2, DOCUMENT_1_2_1 );
 	}

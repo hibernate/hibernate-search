@@ -33,7 +33,7 @@ public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicat
 	}
 
 	@Override
-	public MatchAllPredicateContext<N> all() {
+	public MatchAllPredicateContext<N> matchAll() {
 		MatchAllPredicateContextImpl<N, C> child = new MatchAllPredicateContextImpl<>( factory, dslContext::getNextContext );
 		dslContext.addContributor( child );
 		return child;

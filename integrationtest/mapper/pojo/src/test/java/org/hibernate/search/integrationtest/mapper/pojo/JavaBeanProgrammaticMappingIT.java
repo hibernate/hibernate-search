@@ -441,7 +441,7 @@ public class JavaBeanProgrammaticMappingIT {
 			)
 					.query()
 					.asReferences()
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -482,7 +482,7 @@ public class JavaBeanProgrammaticMappingIT {
 							ProjectionConstants.DOCUMENT_REFERENCE,
 							"customBridgeOnClass.text"
 					)
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );

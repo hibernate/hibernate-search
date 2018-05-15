@@ -30,8 +30,8 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
-	public MatchAllPredicateContext<N> all() {
-		return delegate.all();
+	public MatchAllPredicateContext<N> matchAll() {
+		return delegate.matchAll();
 	}
 
 	@Override

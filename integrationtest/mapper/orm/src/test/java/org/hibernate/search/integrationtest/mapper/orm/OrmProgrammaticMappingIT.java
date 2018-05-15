@@ -376,7 +376,7 @@ public class OrmProgrammaticMappingIT {
 					)
 					.query()
 					.asEntities()
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );
@@ -420,7 +420,7 @@ public class OrmProgrammaticMappingIT {
 							ProjectionConstants.OBJECT,
 							"customBridgeOnClass.text"
 					)
-					.predicate().all().end()
+					.predicate().matchAll().end()
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );

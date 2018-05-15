@@ -343,7 +343,7 @@ public class SmokeIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( indexName, "1", "2", "3", "neverMatching", "empty" );

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateConta
  */
 public interface SearchPredicateContainerContext<N> {
 
-	MatchAllPredicateContext<N> all();
+	MatchAllPredicateContext<N> matchAll();
 
 	/*
 	 * Fully fluid syntax, without lambdas but requiring an .end()

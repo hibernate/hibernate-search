@@ -135,7 +135,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort( c -> c
 						.withExtensionOptional(
 								LuceneExtension.get(),
@@ -157,7 +157,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort( c -> c
 						.withExtensionOptional(
 								LuceneExtension.get(),
@@ -199,7 +199,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).end()
 				.build();
 		assertThat( query )
@@ -219,7 +219,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().by( sort ).end()
 				.build();
 		assertThat( query )
@@ -271,7 +271,7 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder(
 				indexName,

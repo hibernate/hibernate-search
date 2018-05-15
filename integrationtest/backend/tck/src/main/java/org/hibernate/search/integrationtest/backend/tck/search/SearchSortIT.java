@@ -83,7 +83,7 @@ public class SearchSortIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort( sortContributor )
 				.build();
 	}
@@ -220,7 +220,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort( sort )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -228,7 +228,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().by( sort ).end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -240,7 +240,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort( sort )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -248,7 +248,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().by( sort ).end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -275,7 +275,7 @@ public class SearchSortIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().byField( "unknownField" ).end()
 				.build();
 	}
@@ -294,7 +294,7 @@ public class SearchSortIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().byField( "nestedObject" ).end()
 				.build();
 	}
@@ -313,7 +313,7 @@ public class SearchSortIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.sort().byField( "flattenedObject" ).end()
 				.build();
 	}
@@ -392,7 +392,7 @@ public class SearchSortIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().all().end()
+				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
