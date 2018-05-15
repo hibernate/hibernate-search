@@ -23,14 +23,27 @@ cache:
   directories:
     - $HOME/.m2
     - $HOME/.sonar/cache
+before_install:
+  # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
+  - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
+  # First run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
+  # We want to start as many plugins as possible (so that their dependencies are downloaded),
+  # but we want the plugins to be skipped if they are not essential,
+  # because they will be re-executed later and we don't want to waste time.
+  - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc coveralls:report sonar:sonar
+    -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Djqassistant.skip=true
+    -Dcoveralls.skip=true -Dsonar.skip=true
 script:
-  - ./mvnw -Pcoverage -Pjqassistant clean install javadoc:javadoc sonar:sonar
+  # We run checks first to fail fast if there is a styling error, then we run the actual build.
+  # Note sonar must be ran in the "script:" section in order to benefit from Travis caching.
+  - ./mvnw $BUILD_OPTIONS checkstyle:check
+    && ./mvnw $BUILD_OPTIONS install javadoc:javadoc sonar:sonar -Dcheckstyle.skip
 after_success:
-  - ./mvnw coveralls:report
+  - ./mvnw $BUILD_OPTIONS coveralls:report
 before_cache:
   # Do not put the artifacts we just built into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/search/
