@@ -18,7 +18,8 @@ addons:
   sonarcloud:
     organization: "hibernate"
     token:
-      secure: "iiKx4XPJTJAL/++XVVCxmVKdu+0RYh2FaZtSyzMFdWK/RQ3J+4XaEn4yIe4o+znBJ5KWqK7uaKJHmnsaj9Diac2FujCkRC6O+iInPGDIhKyWqqDm8sM4BikXZZnLS4p6Pu8KUHggY9whJTq1SW8JG3yL1Y8p3Efa+PyniWtDj4U2f5FOeqBw4/wdPl6K7K9fYwbgXauvkYiZK0G4KRGCWnamKiREcJ39F6kcqWUARCSUIKcRkkPcUIkzTgXqEAJRzpNpQ0eNNzsnqKkVOT4SX6QRlTQfmq9rC4E2ADYYHWLSt9P+afU2HPwCe8gDpjbH+6UMVohQHxLW+WZx35RwAfWSjQPqmjKUXACcgjb1bJ8fsodMriAa25h5EQDW/UDRy+ppLOKBGzAdAqg/lWNGpiO8g/6kZwR+iRlxlnUka858HP4OQkAM4ix28S+GRPCxc9l/06AdF+1lIoPopi6aGrVzX6FyFMahtSxE9bhGg7vU0t3aljW1wbwzGB+UoBpD5Mpff6Kd8pGAGtGzKDPnVBah8M4s5IpYYwdui4i4gKSK7kQdytijzvoy0htcP5XKWtAW2ZQdN9xJJi4+BQPERgz607aUKcuLyEIGh/LQCzhKlqybNHYim8C72IUwRd+d5Ep23BHm91wVXR5a6GGvwL6lR6XbEfh3+u6TguO6ZdM="
+      # SONAR_TOKEN should be defined in the Travis project; do not define it to skip Sonar.
+      secure: $SONAR_TOKEN
 cache:
   directories:
     - $HOME/.m2
@@ -26,6 +27,8 @@ cache:
 before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
+  # Skip Sonar if no token is defined
+  - if [[ -z "$SONAR_TOKEN" ]]; then BUILD_OPTIONS+=' -Dsonar.skip=true'; fi
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
