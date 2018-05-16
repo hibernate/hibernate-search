@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 
 public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession {
 
-	private HibernateOrmSearchManager searchManager = null;
+	private transient HibernateOrmSearchManager searchManager = null;
 
 	public FullTextSessionImpl(SessionImplementor delegate) {
 		super( delegate );
