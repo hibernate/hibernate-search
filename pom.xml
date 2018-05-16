@@ -178,7 +178,7 @@
          -->
         <sonar.jacoco.reportPaths>${jacoco.mergedExecFilePath}</sonar.jacoco.reportPaths>
         <!--
-            Exclude build code and integration tests defined in the main source (utils, Backend TCK)
+            Exclude build code and integration tests defined in the main source (utils, Showcases, Backend TCK)
             from coverage computation.
          -->
         <sonar.coverage.exclusions>
@@ -187,6 +187,14 @@
             **/org/hibernate/search/util/impl/integrationtest/**,
             **/org/hibernate/search/integrationtest/**
         </sonar.coverage.exclusions>
+        <!--
+            Exclude build code, unit tests and integration tests from duplication analysis.
+         -->
+        <sonar.cpd.exclusions>
+            **/org/hibernate/checkstyle/**,
+            **/src/test/java/**,
+            **/org/hibernate/search/integrationtest/**
+        </sonar.cpd.exclusions>
     </properties>
 
     <dependencyManagement>
