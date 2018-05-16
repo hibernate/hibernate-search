@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 abstract class AbstractDocumentReferenceHitExtractor<C> implements HitExtractor<C> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 
@@ -29,7 +34,7 @@ abstract class AbstractDocumentReferenceHitExtractor<C> implements HitExtractor<
 	}
 
 	protected DocumentReference extractDocumentReference(JsonObject hit) {
-		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).get();
+		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		String id = multiTenancyStrategy.extractTenantScopedDocumentId( hit );
 		return new ElasticsearchDocumentReference( indexName, id );
 	}

@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -20,6 +23,8 @@ import com.google.gson.JsonObject;
  * depending on the index.
  */
 class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root()
 			.property( "_index" )
 			.asString();
@@ -39,7 +44,7 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 
 	@Override
 	public void extract(C collector, JsonObject responseBody, JsonObject hit) {
-		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).get();
+		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		HitExtractor<? super C> delegate = extractorByIndex.get( indexName );
 		delegate.extract( collector, responseBody, hit );
 	}

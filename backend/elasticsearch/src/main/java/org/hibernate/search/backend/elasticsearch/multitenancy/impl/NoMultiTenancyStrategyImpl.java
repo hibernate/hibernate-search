@@ -51,7 +51,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	@Override
 	public String extractTenantScopedDocumentId(JsonObject hit) {
-		return HIT_ID_ACCESSOR.get( hit ).get();
+		return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 	}
 
 	@Override

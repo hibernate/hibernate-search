@@ -6,16 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	// Must be a singleton so that equals() works as required by the interface
 	public static final GeoPointFieldCodec INSTANCE = new GeoPointFieldCodec();
 
@@ -45,8 +51,8 @@ public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
 			return null;
 		}
 		JsonObject object = JsonElementType.OBJECT.fromElement( element );
-		double latitude = LATITUDE_ACCESSOR.get( object ).get();
-		double longitude = LONGITUDE_ACCESSOR.get( object ).get();
+		double latitude = LATITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
+		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		return new ImmutableGeoPoint( latitude, longitude );
 	}
 }

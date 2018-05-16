@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
@@ -17,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrate
 
 	@Override
 	public String extractTenantScopedDocumentId(JsonObject hit) {
-		return HIT_ID_ACCESSOR.get( hit ).get();
+		return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 	}
 
 	@Override

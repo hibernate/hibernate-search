@@ -227,8 +227,10 @@ public class ContainerValueExtractorBinder {
 	private ExtractorContributor createExtractorContributorForClass(
 			Class<? extends ContainerValueExtractor> extractorClass) {
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
-		Type typeToMatch = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 0 ).get();
-		Type resultType = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 1 ).get();
+		Type typeToMatch = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 0 )
+				.orElseThrow( () -> log.couldNotInferContainerValueExtractorClassTypePattern( extractorClass ) );
+		Type resultType = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 1 )
+				.orElseThrow( () -> log.couldNotInferContainerValueExtractorClassTypePattern( extractorClass ) );
 		TypePatternMatcher typePatternMatcher;
 		try {
 			typePatternMatcher = typePatternMatcherFactory.create( typeToMatch, resultType );
