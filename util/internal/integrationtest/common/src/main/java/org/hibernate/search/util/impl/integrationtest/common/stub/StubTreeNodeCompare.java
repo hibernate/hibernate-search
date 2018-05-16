@@ -53,6 +53,7 @@ public final class StubTreeNodeCompare {
 			// One is null, the other is not
 			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedNode, actualNode );
 			mismatchesByPath.put( path, mismatch );
+			return;
 		}
 		Set<String> attributeKeys = new LinkedHashSet<>( expectedNode.getAttributes().keySet() );
 		attributeKeys.addAll( actualNode.getAttributes().keySet() );
