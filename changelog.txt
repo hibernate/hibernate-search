@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.0.Final (16-05-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3156 @ContainedIn fails at runtime when targeting a class for which only some subclasses are configured in Search
+
+** Task
+    * HSEARCH-3161 Clarify which LGPL version exactly in the POM file
+    * HSEARCH-3159 Upgrade to Hibernate ORM 5.3.0.Final
+
 5.10.0.CR1 (04-05-2018)
 -------------------------
 
