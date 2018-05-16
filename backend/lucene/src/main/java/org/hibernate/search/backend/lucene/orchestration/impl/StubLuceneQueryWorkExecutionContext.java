@@ -13,6 +13,4 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWorkExecutionCon
  */
 public class StubLuceneQueryWorkExecutionContext implements LuceneQueryWorkExecutionContext {
 
-	public StubLuceneQueryWorkExecutionContext() {
-	}
 }

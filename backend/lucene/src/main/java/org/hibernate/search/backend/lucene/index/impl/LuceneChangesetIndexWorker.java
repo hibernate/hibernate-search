@@ -41,6 +41,7 @@ class LuceneChangesetIndexWorker extends LuceneIndexWorker implements ChangesetI
 
 	@Override
 	public void prepare() {
+		// Nothing to do: we only have to send the works to the orchestrator
 	}
 
 	@Override

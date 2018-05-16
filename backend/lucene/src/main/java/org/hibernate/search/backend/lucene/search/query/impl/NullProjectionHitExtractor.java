@@ -31,10 +31,12 @@ class NullProjectionHitExtractor implements HitExtractor<ProjectionHitCollector>
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+		// Nothing to do, we don't care about the document content
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
+		// Nothing to do, we don't care about the document content
 	}
 
 	@Override

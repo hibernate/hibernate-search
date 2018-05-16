@@ -155,6 +155,7 @@ public class ExpectedLog4jLog implements TestRule {
 
 		@Override
 		public void close() {
+			// Nothing to clean up
 		}
 
 		@Override

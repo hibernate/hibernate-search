@@ -124,6 +124,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		// Nothing to do, Hibernate Search shuts down automatically when the SessionFactory is closed
 	}
 
 	private void registerHibernateSearchEventListener(FullTextIndexEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {

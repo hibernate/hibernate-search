@@ -29,6 +29,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToMapping(RootTypeMapping rootTypeMapping) {
+		// No need to add anything to documents, Elasticsearch metadata is enough
 	}
 
 	@Override
@@ -38,6 +39,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToIndexedDocument(JsonObject document, String tenantId, String id) {
+		// No need to add anything to documents, Elasticsearch metadata is enough
 	}
 
 	@Override
@@ -47,6 +49,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToSearchRequest(JsonObject requestBody) {
+		// No need to request any additional information, Elasticsearch metadata is enough
 	}
 
 	@Override

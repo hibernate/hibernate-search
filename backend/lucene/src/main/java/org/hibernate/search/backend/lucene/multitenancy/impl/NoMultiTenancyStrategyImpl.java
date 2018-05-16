@@ -28,6 +28,7 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
+		// No need to add anything to documents, the ID field (already added elsewhere) is enough
 	}
 
 	@Override

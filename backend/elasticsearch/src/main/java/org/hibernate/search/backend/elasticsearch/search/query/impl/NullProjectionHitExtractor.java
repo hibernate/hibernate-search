@@ -30,7 +30,7 @@ class NullProjectionHitExtractor implements HitExtractor<ProjectionHitCollector>
 
 	@Override
 	public void contributeRequest(JsonObject requestBody) {
-		// Nothing to do
+		// Nothing to do, we don't care about the document content
 	}
 
 	@Override

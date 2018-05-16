@@ -27,9 +27,6 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		private String fieldName;
 		private Pattern separatorPattern = Pattern.compile( SEPARATOR_PATTERN_DEFAULT );
 
-		public Builder() {
-		}
-
 		@Override
 		public void initialize(org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge annotation) {
 			fieldName( annotation.fieldName() );

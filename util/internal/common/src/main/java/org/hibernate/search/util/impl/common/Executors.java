@@ -104,12 +104,6 @@ public final class Executors {
 	public static class BlockPolicy implements RejectedExecutionHandler {
 
 		/**
-		 * Creates a <tt>BlockPolicy</tt>.
-		 */
-		public BlockPolicy() {
-		}
-
-		/**
 		 * Puts the Runnable to the blocking queue, effectively blocking the delegating thread until space is available.
 		 *
 		 * @param r the runnable task requested to be executed
