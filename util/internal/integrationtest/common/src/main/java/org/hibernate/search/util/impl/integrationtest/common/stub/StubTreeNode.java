@@ -21,7 +21,7 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 	private final Map<String, List<Object>> attributes;
 	private final Map<String, List<N>> children;
 
-	protected StubTreeNode(Builder<N> builder) {
+	protected StubTreeNode(AbstractBuilder<N> builder) {
 		this.attributes = Collections.unmodifiableMap(
 				builder.attributes.entrySet().stream()
 						.collect( Collectors.toMap(
@@ -87,16 +87,16 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 		return children;
 	}
 
-	public abstract static class Builder<N> {
+	public abstract static class AbstractBuilder<N> {
 
-		private final Builder<?> parent;
+		private final AbstractBuilder<?> parent;
 		private final String relativeFieldName;
 		private final String absolutePath;
 
 		private final Map<String, List<Object>> attributes = new LinkedHashMap<>();
-		private final Map<String, List<Builder<N>>> children = new LinkedHashMap<>();
+		private final Map<String, List<AbstractBuilder<N>>> children = new LinkedHashMap<>();
 
-		protected Builder(Builder<?> parent, String relativeFieldName) {
+		protected AbstractBuilder(AbstractBuilder<?> parent, String relativeFieldName) {
 			this.parent = parent;
 			this.relativeFieldName = relativeFieldName;
 			if ( parent == null ) {
@@ -128,7 +128,7 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 					.add( null );
 		}
 
-		protected void child(Builder<N> nodeBuilder) {
+		protected void child(AbstractBuilder<N> nodeBuilder) {
 			children.computeIfAbsent( nodeBuilder.relativeFieldName, ignored -> new ArrayList<>() )
 					.add( nodeBuilder );
 		}

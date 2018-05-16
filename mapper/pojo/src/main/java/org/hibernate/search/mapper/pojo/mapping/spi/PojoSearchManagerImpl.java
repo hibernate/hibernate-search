@@ -28,7 +28,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	private ChangesetPojoWorker changesetWorker;
 	private StreamPojoWorker streamWorker;
 
-	protected PojoSearchManagerImpl(Builder<? extends PojoSearchManager> builder) {
+	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManager> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
 		this.sessionContext = new PojoSessionContextImpl( builder.getRuntimeIntrospector(), builder.getTenantId() );
 	}
@@ -80,12 +80,12 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 		return sessionContext;
 	}
 
-	protected abstract static class Builder<T extends PojoSearchManager>
+	protected abstract static class AbstractBuilder<T extends PojoSearchManager>
 			implements PojoSearchManagerBuilder<T> {
 
 		private final PojoMappingDelegate mappingDelegate;
 
-		public Builder(PojoMappingDelegate mappingDelegate) {
+		public AbstractBuilder(PojoMappingDelegate mappingDelegate) {
 			this.mappingDelegate = mappingDelegate;
 		}
 

@@ -27,7 +27,7 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		super( builder );
 	}
 
-	public static class Builder extends StubTreeNode.Builder<StubDocumentNode> {
+	public static class Builder extends AbstractBuilder<StubDocumentNode> {
 
 		private Builder(Builder parent, String relativeFieldName) {
 			super( parent, relativeFieldName );
@@ -64,7 +64,7 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		}
 
 		@Override
-		public void child(StubTreeNode.Builder<StubDocumentNode> nodeBuilder) {
+		public void child(AbstractBuilder<StubDocumentNode> nodeBuilder) {
 			super.child( nodeBuilder );
 		}
 

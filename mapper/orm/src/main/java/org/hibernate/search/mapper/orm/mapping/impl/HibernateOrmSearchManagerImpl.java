@@ -35,7 +35,7 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
-	static class Builder extends PojoSearchManagerImpl.Builder<HibernateOrmSearchManager>
+	static class Builder extends AbstractBuilder<HibernateOrmSearchManager>
 			implements HibernateOrmSearchManagerBuilder {
 		private final SessionImplementor sessionImplementor;
 

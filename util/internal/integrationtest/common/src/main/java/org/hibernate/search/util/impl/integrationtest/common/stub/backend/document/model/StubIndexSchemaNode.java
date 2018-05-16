@@ -39,7 +39,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		super( builder );
 	}
 
-	public static class Builder extends StubTreeNode.Builder<StubIndexSchemaNode> {
+	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> {
 
 		private Builder(Builder parent, String relativeFieldName, Type type) {
 			super( parent, relativeFieldName );
@@ -71,7 +71,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		@Override
-		public void child(StubTreeNode.Builder<StubIndexSchemaNode> nodeBuilder) {
+		public void child(AbstractBuilder<StubIndexSchemaNode> nodeBuilder) {
 			super.child( nodeBuilder );
 		}
 

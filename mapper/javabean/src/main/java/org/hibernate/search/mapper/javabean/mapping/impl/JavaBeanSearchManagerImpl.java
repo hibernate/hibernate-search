@@ -25,7 +25,7 @@ class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 		return getMappingDelegate().createPojoSearchTarget( targetedTypes, getSessionContext() );
 	}
 
-	static class Builder extends PojoSearchManagerImpl.Builder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {
+	static class Builder extends AbstractBuilder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {
 		private String tenantId;
 
 		public Builder(PojoMappingDelegate mappingDelegate) {
