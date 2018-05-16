@@ -22,9 +22,14 @@ import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
 import org.hibernate.search.util.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GenericTypeContextTest {
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void simple() {
@@ -70,6 +75,19 @@ public class GenericTypeContextTest {
 				.resolveTypeArgumentToEmpty( List.class, 0 )
 				.resolveTypeArgumentTo( String.class, Map.class, 0 )
 				.resolveTypeArgumentTo( CustomType.class, Map.class, 1 );
+	}
+
+	@Test
+	public void nullType() {
+		thrown.expect( NullPointerException.class );
+		new GenericTypeContext( null );
+	}
+
+	@Test
+	public void nullType_nonNullContext() {
+		thrown.expect( NullPointerException.class );
+		GenericTypeContext declaringContext = new GenericTypeContext( Object.class );
+		new GenericTypeContext( declaringContext, null );
 	}
 
 	@Test

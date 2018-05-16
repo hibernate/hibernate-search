@@ -14,6 +14,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -68,6 +69,7 @@ public final class GenericTypeContext {
 	}
 
 	public GenericTypeContext(GenericTypeContext declaringContext, Type type) {
+		Objects.requireNonNull( type );
 		if ( declaringContext != null ) {
 			this.resolvedType = declaringContext.resolveType( type );
 		}
