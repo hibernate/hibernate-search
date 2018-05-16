@@ -209,45 +209,66 @@ public final class PojoAssociationPathInverter {
 						bindExtractors( inverseSidePathPropertyNode, inverseSideExtractorPath );
 				PojoValueAdditionalMetadata inverseSideValueAdditionalMetadata = valueEntry.getValue();
 
-				Optional<PojoModelPathValueNode> candidatePathOptional =
-						inverseSideValueAdditionalMetadata.getInverseSidePath();
-
-				PojoRawTypeModel<?> rawExtractedTypeModel =
-						inverseSidePathValueNode.type().getTypeModel().getRawType();
-
-				if ( candidatePathOptional.isPresent()
-						&& associationPathsToMatch.contains( candidatePathOptional.get() ) ) {
-					PojoModelPathValueNode inverseAssociationPath = inverseSidePathValueNode.toUnboundPath();
-					/*
-					 * In order to match, the inverse path, when applied to the inverse entity type,
-					 * must also result in a supertype of the entity type holding the association to invert.
-					 * This is to handle cases where an entity holds inverse associations of multiple associations
-					 * from multiple different entities: in that case, the "original" associations may have
-					 * the same name and extractors.
-					 */
-					if ( originalSideEntityType.isSubTypeOf( rawExtractedTypeModel ) ) {
-						return Optional.of( inverseAssociationPath );
-					}
-				}
-
-				if ( inverseSideValueAdditionalMetadata.isAssociationEmbedded() ) {
-					if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
-						throw log.infiniteRecursionForAssociationEmbeddeds(
-								inverseSidePathValueNode.getRootType().getRawType(),
-								inverseSidePathValueNode.toUnboundPath()
+				Optional<PojoModelPathValueNode> inverseSidePathOptional =
+						findInverseSidePathFromInverseSideValueRecursive(
+								originalSideEntityType, associationPathsToMatch,
+								inverseSidePathValueNode, inverseSideValueAdditionalMetadata,
+								encounteredAssociationHoldingTypes
 						);
-					}
 
-					encounteredAssociationHoldingTypes.add( rawExtractedTypeModel );
-					candidatePathOptional = findInverseSidePathFromInverseSideRecursive(
-							inverseSidePathValueNode.type(), originalSideEntityType, associationPathsToMatch,
-							encounteredAssociationHoldingTypes
-					);
-					encounteredAssociationHoldingTypes.remove( rawExtractedTypeModel );
-					if ( candidatePathOptional.isPresent() ) {
-						return candidatePathOptional;
-					}
+				if ( inverseSidePathOptional.isPresent() ) {
+					return inverseSidePathOptional;
 				}
+				// else: continue the loop, maybe we'll find the inverse path elsewhere.
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	private Optional<PojoModelPathValueNode> findInverseSidePathFromInverseSideValueRecursive(
+			PojoRawTypeModel<?> originalSideEntityType,
+			List<PojoModelPathValueNode> associationPathsToMatch,
+			BoundPojoModelPathValueNode<?, ?, ?> inverseSidePathValueNode,
+			PojoValueAdditionalMetadata inverseSideValueAdditionalMetadata,
+			Set<PojoRawTypeModel<?>> encounteredAssociationHoldingTypes) {
+		Optional<PojoModelPathValueNode> candidatePathOptional =
+				inverseSideValueAdditionalMetadata.getInverseSidePath();
+
+		PojoRawTypeModel<?> rawExtractedTypeModel =
+				inverseSidePathValueNode.type().getTypeModel().getRawType();
+
+		if ( candidatePathOptional.isPresent()
+				&& associationPathsToMatch.contains( candidatePathOptional.get() ) ) {
+			PojoModelPathValueNode inverseAssociationPath = inverseSidePathValueNode.toUnboundPath();
+			/*
+			 * In order to match, the inverse path, when applied to the inverse entity type,
+			 * must also result in a supertype of the entity type holding the association to invert.
+			 * This is to handle cases where an entity holds inverse associations of multiple associations
+			 * from multiple different entities: in that case, the "original" associations may have
+			 * the same name and extractors.
+			 */
+			if ( originalSideEntityType.isSubTypeOf( rawExtractedTypeModel ) ) {
+				return Optional.of( inverseAssociationPath );
+			}
+		}
+
+		if ( inverseSideValueAdditionalMetadata.isAssociationEmbedded() ) {
+			if ( encounteredAssociationHoldingTypes.contains( rawExtractedTypeModel ) ) {
+				throw log.infiniteRecursionForAssociationEmbeddeds(
+						inverseSidePathValueNode.getRootType().getRawType(),
+						inverseSidePathValueNode.toUnboundPath()
+				);
+			}
+
+			encounteredAssociationHoldingTypes.add( rawExtractedTypeModel );
+			candidatePathOptional = findInverseSidePathFromInverseSideRecursive(
+					inverseSidePathValueNode.type(), originalSideEntityType, associationPathsToMatch,
+					encounteredAssociationHoldingTypes
+			);
+			encounteredAssociationHoldingTypes.remove( rawExtractedTypeModel );
+			if ( candidatePathOptional.isPresent() ) {
+				return candidatePathOptional;
 			}
 		}
 

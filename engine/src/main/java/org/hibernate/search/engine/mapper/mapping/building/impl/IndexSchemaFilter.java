@@ -183,6 +183,18 @@ class IndexSchemaFilter {
 			composedRemainingDepth = nestedRemainingDepth;
 		}
 
+		Set<String> composedFilterExplicitlyIncludedPaths = composeExplicitlyIncludedPaths(
+				relativePrefix, nullSafeIncludePaths, currentRemainingDepth, nestedRemainingDepth
+		);
+
+		return new IndexSchemaFilter(
+				this, parentTypeModel, relativePrefix,
+				composedRemainingDepth, composedFilterExplicitlyIncludedPaths
+		);
+	}
+
+	private Set<String> composeExplicitlyIncludedPaths(String relativePrefix, Set<String> nullSafeIncludePaths,
+			Integer currentRemainingDepth, Integer nestedRemainingDepth) {
 		Set<String> composedFilterExplicitlyIncludedPaths = new HashSet<>();
 		/*
 		 * Add the nested filter's explicitly included paths to the composed filter's "explicitlyIncludedPaths",
@@ -215,11 +227,7 @@ class IndexSchemaFilter {
 				}
 			}
 		}
-
-		return new IndexSchemaFilter(
-				this, parentTypeModel, relativePrefix,
-				composedRemainingDepth, composedFilterExplicitlyIncludedPaths
-		);
+		return composedFilterExplicitlyIncludedPaths;
 	}
 
 	private static boolean isPathIncluded(Integer remainingDepth, Set<String> explicitlyIncludedPaths, String relativePath) {

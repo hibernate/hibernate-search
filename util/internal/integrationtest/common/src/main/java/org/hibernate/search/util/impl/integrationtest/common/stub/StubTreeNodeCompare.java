@@ -71,32 +71,38 @@ public final class StubTreeNodeCompare {
 		for ( String key : childKeys ) {
 			List<N> expectedChildren = expectedNode.getChildren().get( key );
 			List<N> actualChildren = actualNode.getChildren().get( key );
-			int expectedChildrenSize = expectedChildren == null ? 0 : expectedChildren.size();
-			int actualChildrenSize = actualChildren == null ? 0 : actualChildren.size();
-			int minSize = Integer.min( expectedChildrenSize, actualChildrenSize );
-			int maxSize = Integer.max( expectedChildrenSize, actualChildrenSize );
-			for ( int i = 0; i < minSize; ++i ) {
-				String childPath = childPath( path, key, i, maxSize );
-				N expectedChild = expectedChildren.get( i );
-				N actualChild = actualChildren.get( i );
-				addMismatchesRecursively( mismatchesByPath, childPath, expectedChild, actualChild );
-			}
-			/*
-			 * The remaining indexes contain mismatches: they can only exist
-			 * if there is a different number of children in each node.
-			 */
-			for ( int i = minSize; i < expectedChildrenSize; ++i ) {
-				String childPath = childPath( path, key, i, maxSize );
-				Object expectedChild = expectedChildren.get( i );
-				StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedChild, NO_VALUE );
-				mismatchesByPath.put( childPath, mismatch );
-			}
-			for ( int i = minSize; i < actualChildrenSize; ++i ) {
-				String childPath = childPath( path, key, i, maxSize );
-				Object actualChild = actualChildren.get( i );
-				StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( NO_VALUE, actualChild );
-				mismatchesByPath.put( childPath, mismatch );
-			}
+			addChildrenMismatchesRecursively( mismatchesByPath, path, key, expectedChildren, actualChildren );
+		}
+	}
+
+	private static <N extends StubTreeNode<N>> void addChildrenMismatchesRecursively(
+			Map<String, StubTreeNodeMismatch> mismatchesByPath,
+			String path, String childrenKey, List<N> expectedChildren, List<N> actualChildren) {
+		int expectedChildrenSize = expectedChildren == null ? 0 : expectedChildren.size();
+		int actualChildrenSize = actualChildren == null ? 0 : actualChildren.size();
+		int minSize = Integer.min( expectedChildrenSize, actualChildrenSize );
+		int maxSize = Integer.max( expectedChildrenSize, actualChildrenSize );
+		for ( int i = 0; i < minSize; ++i ) {
+			String childPath = childPath( path, childrenKey, i, maxSize );
+			N expectedChild = expectedChildren.get( i );
+			N actualChild = actualChildren.get( i );
+			addMismatchesRecursively( mismatchesByPath, childPath, expectedChild, actualChild );
+		}
+		/*
+		 * The remaining indexes contain mismatches: they can only exist
+		 * if there is a different number of children in each node.
+		 */
+		for ( int i = minSize; i < expectedChildrenSize; ++i ) {
+			String childPath = childPath( path, childrenKey, i, maxSize );
+			Object expectedChild = expectedChildren.get( i );
+			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedChild, NO_VALUE );
+			mismatchesByPath.put( childPath, mismatch );
+		}
+		for ( int i = minSize; i < actualChildrenSize; ++i ) {
+			String childPath = childPath( path, childrenKey, i, maxSize );
+			Object actualChild = actualChildren.get( i );
+			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( NO_VALUE, actualChild );
+			mismatchesByPath.put( childPath, mismatch );
 		}
 	}
 

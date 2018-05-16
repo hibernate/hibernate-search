@@ -100,24 +100,16 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			 * in the Hibernate ORM metadata.
 			 */
 			Value element = collectionValue.getElement();
-			String referencedEntityName = null;
-			if ( element instanceof OneToMany ) {
-				referencedEntityName = ( (OneToMany) element ).getReferencedEntityName();
-			}
-			else if ( element instanceof ToOne ) {
-				referencedEntityName = ( (ToOne) element ).getReferencedEntityName();
-			}
-			if ( referencedEntityName != null ) {
-				String mappedByPath = collectionValue.getMappedByProperty();
-				if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
-					collector.collect(
-							javaClass,
-							new HibernateOrmAssociationInverseSideMetadataContributor(
-									property.getName(), getExtractorPath( collectionValue ),
-									resolveMappedByPath( referencedEntityName, mappedByPath )
-							)
-					);
-				}
+			String referencedEntityName = getReferencedEntityName( element );
+			String mappedByPath = collectionValue.getMappedByProperty();
+			if ( referencedEntityName != null && mappedByPath != null && !mappedByPath.isEmpty() ) {
+				collector.collect(
+						javaClass,
+						new HibernateOrmAssociationInverseSideMetadataContributor(
+								property.getName(), getExtractorPath( collectionValue ),
+								resolveMappedByPath( referencedEntityName, mappedByPath )
+						)
+				);
 			}
 		}
 		else if ( value instanceof ToOne ) {
@@ -158,6 +150,18 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			if ( !collector.hasSeen( componentClass ) ) {
 				collectPropertyDelegates( collector, componentClass, componentValue.getPropertyIterator() );
 			}
+		}
+	}
+
+	private String getReferencedEntityName(Value element) {
+		if ( element instanceof OneToMany ) {
+			return ( (OneToMany) element ).getReferencedEntityName();
+		}
+		else if ( element instanceof ToOne ) {
+			return ( (ToOne) element ).getReferencedEntityName();
+		}
+		else {
+			return null;
 		}
 	}
 
