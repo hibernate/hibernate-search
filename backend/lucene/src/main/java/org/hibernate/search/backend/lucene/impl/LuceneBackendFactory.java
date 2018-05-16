@@ -39,9 +39,10 @@ public class LuceneBackendFactory implements BackendFactory {
 					.asString()
 					.build();
 
-	private static final ConfigurationProperty<Optional<Path>> ROOT_DIRECTORY =
+	private static final ConfigurationProperty<Path> ROOT_DIRECTORY =
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_ROOT_DIRECTORY )
 					.as( Path.class, Paths::get )
+					.withDefault( () -> Paths.get( "." ) )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
@@ -63,7 +64,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		if ( "local_directory".equals( directoryProvider ) ) {
 			// TODO GSM: implement the checks properly
-			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).get().toAbsolutePath();
+			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
 
