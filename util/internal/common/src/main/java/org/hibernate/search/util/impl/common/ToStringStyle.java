@@ -7,8 +7,8 @@
 package org.hibernate.search.util.impl.common;
 
 public class ToStringStyle {
-	public static ToStringStyle INLINE = new ToStringStyle( " ", "", "," );
-	public static ToStringStyle MULTILINE = new ToStringStyle( "\n", "\t", "" );
+	public static final ToStringStyle INLINE = new ToStringStyle( " ", "", "," );
+	public static final ToStringStyle MULTILINE = new ToStringStyle( "\n", "\t", "" );
 
 	final String newline;
 	final String indent;
