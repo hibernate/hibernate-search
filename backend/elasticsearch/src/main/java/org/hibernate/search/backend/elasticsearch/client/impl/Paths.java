@@ -11,26 +11,30 @@ import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 /**
  * Useful paths to compose Elasticsearch URLs.
  */
-public interface Paths {
+public final class Paths {
 
-	URLEncodedString _EXPLAIN = URLEncodedString.fromString( "_explain" );
-	URLEncodedString _QUERY = URLEncodedString.fromString( "_query" );
-	URLEncodedString _FLUSH = URLEncodedString.fromString( "_flush" );
-	URLEncodedString _OPTIMIZE = URLEncodedString.fromString( "_optimize" );
-	URLEncodedString _DELETE_BY_QUERY = URLEncodedString.fromString( "_delete_by_query" );
-	URLEncodedString _FORCEMERGE = URLEncodedString.fromString( "_forcemerge" );
-	URLEncodedString _COUNT = URLEncodedString.fromString( "_count" );
-	URLEncodedString _CLOSE = URLEncodedString.fromString( "_close" );
-	URLEncodedString _SETTINGS = URLEncodedString.fromString( "_settings" );
-	URLEncodedString _OPEN = URLEncodedString.fromString( "_open" );
-	URLEncodedString _MAPPING = URLEncodedString.fromString( "_mapping" );
-	URLEncodedString _REFRESH = URLEncodedString.fromString( "_refresh" );
-	URLEncodedString _SEARCH = URLEncodedString.fromString( "_search" );
-	URLEncodedString _TEMPLATE = URLEncodedString.fromString( "_template" );
-	URLEncodedString _CLUSTER = URLEncodedString.fromString( "_cluster" );
-	URLEncodedString _BULK = URLEncodedString.fromString( "_bulk" );
+	private Paths() {
+		// Private constructor, do not use.
+	}
 
-	URLEncodedString SCROLL = URLEncodedString.fromString( "scroll" );
-	URLEncodedString HEALTH = URLEncodedString.fromString( "health" );
+	public static final URLEncodedString _EXPLAIN = URLEncodedString.fromString( "_explain" );
+	public static final URLEncodedString _QUERY = URLEncodedString.fromString( "_query" );
+	public static final URLEncodedString _FLUSH = URLEncodedString.fromString( "_flush" );
+	public static final URLEncodedString _OPTIMIZE = URLEncodedString.fromString( "_optimize" );
+	public static final URLEncodedString _DELETE_BY_QUERY = URLEncodedString.fromString( "_delete_by_query" );
+	public static final URLEncodedString _FORCEMERGE = URLEncodedString.fromString( "_forcemerge" );
+	public static final URLEncodedString _COUNT = URLEncodedString.fromString( "_count" );
+	public static final URLEncodedString _CLOSE = URLEncodedString.fromString( "_close" );
+	public static final URLEncodedString _SETTINGS = URLEncodedString.fromString( "_settings" );
+	public static final URLEncodedString _OPEN = URLEncodedString.fromString( "_open" );
+	public static final URLEncodedString _MAPPING = URLEncodedString.fromString( "_mapping" );
+	public static final URLEncodedString _REFRESH = URLEncodedString.fromString( "_refresh" );
+	public static final URLEncodedString _SEARCH = URLEncodedString.fromString( "_search" );
+	public static final URLEncodedString _TEMPLATE = URLEncodedString.fromString( "_template" );
+	public static final URLEncodedString _CLUSTER = URLEncodedString.fromString( "_cluster" );
+	public static final URLEncodedString _BULK = URLEncodedString.fromString( "_bulk" );
+
+	public static final URLEncodedString SCROLL = URLEncodedString.fromString( "scroll" );
+	public static final URLEncodedString HEALTH = URLEncodedString.fromString( "health" );
 
 }
