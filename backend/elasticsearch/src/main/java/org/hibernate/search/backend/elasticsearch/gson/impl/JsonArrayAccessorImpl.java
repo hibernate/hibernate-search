@@ -23,7 +23,7 @@ public class JsonArrayAccessorImpl extends TypingJsonAccessor<JsonArray>
 
 	@Override
 	protected JsonElementType<JsonArray> getExpectedElementType() {
-		return JsonElementType.ARRAY;
+		return JsonElementTypes.ARRAY;
 	}
 
 	@Override

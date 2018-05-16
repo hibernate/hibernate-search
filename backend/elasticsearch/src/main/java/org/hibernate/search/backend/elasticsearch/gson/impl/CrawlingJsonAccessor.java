@@ -66,8 +66,8 @@ abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAc
 		if ( currentValue == null ) { // Do not overwrite JsonNull, because it might be there on purpose
 			doSet( parent, newValue );
 		}
-		else if ( JsonElementType.ARRAY.isInstance( currentValue ) ) {
-			JsonElementType.ARRAY.fromElement( currentValue ).add( newValue );
+		else if ( JsonElementTypes.ARRAY.isInstance( currentValue ) ) {
+			JsonElementTypes.ARRAY.fromElement( currentValue ).add( newValue );
 		}
 		else {
 			JsonArray array = new JsonArray();

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -37,7 +37,7 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		String stringValue = JsonElementType.STRING.fromElement( element );
+		String stringValue = JsonElementTypes.STRING.fromElement( element );
 		return LocalDate.parse( stringValue, delegate );
 	}
 

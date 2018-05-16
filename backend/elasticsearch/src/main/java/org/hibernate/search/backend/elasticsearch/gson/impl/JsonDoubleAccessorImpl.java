@@ -19,7 +19,7 @@ public class JsonDoubleAccessorImpl extends TypingJsonAccessor<Double> {
 
 	@Override
 	protected JsonElementType<Double> getExpectedElementType() {
-		return JsonElementType.DOUBLE;
+		return JsonElementTypes.DOUBLE;
 	}
 
 }

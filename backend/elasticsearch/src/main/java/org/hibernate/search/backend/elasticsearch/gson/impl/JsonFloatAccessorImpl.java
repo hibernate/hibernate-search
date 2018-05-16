@@ -19,7 +19,7 @@ public class JsonFloatAccessorImpl extends TypingJsonAccessor<Float> {
 
 	@Override
 	protected JsonElementType<Float> getExpectedElementType() {
-		return JsonElementType.FLOAT;
+		return JsonElementTypes.FLOAT;
 	}
 
 }

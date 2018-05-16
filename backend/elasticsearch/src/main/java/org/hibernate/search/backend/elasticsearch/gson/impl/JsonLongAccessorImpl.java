@@ -19,7 +19,7 @@ public class JsonLongAccessorImpl extends TypingJsonAccessor<Long> {
 
 	@Override
 	protected JsonElementType<Long> getExpectedElementType() {
-		return JsonElementType.LONG;
+		return JsonElementTypes.LONG;
 	}
 
 }

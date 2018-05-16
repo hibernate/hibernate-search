@@ -19,7 +19,7 @@ public class JsonStringAccessorImpl extends TypingJsonAccessor<String> {
 
 	@Override
 	protected JsonElementType<String> getExpectedElementType() {
-		return JsonElementType.STRING;
+		return JsonElementTypes.STRING;
 	}
 
 }

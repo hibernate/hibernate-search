@@ -19,7 +19,7 @@ public class JsonBooleanAccessorImpl extends TypingJsonAccessor<Boolean> {
 
 	@Override
 	protected JsonElementType<Boolean> getExpectedElementType() {
-		return JsonElementType.BOOLEAN;
+		return JsonElementTypes.BOOLEAN;
 	}
 
 }

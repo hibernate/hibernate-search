@@ -24,7 +24,7 @@ public class JsonObjectAccessorImpl extends TypingJsonAccessor<JsonObject>
 
 	@Override
 	protected JsonElementType<JsonObject> getExpectedElementType() {
-		return JsonElementType.OBJECT;
+		return JsonElementTypes.OBJECT;
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class JsonIntegerAccessorImpl extends TypingJsonAccessor<Integer> {
 
 	@Override
 	protected JsonElementType<Integer> getExpectedElementType() {
-		return JsonElementType.INTEGER;
+		return JsonElementTypes.INTEGER;
 	}
 
 }

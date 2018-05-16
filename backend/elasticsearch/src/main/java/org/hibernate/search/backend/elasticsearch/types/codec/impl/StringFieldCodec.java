@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -33,6 +33,6 @@ public class StringFieldCodec implements ElasticsearchFieldCodec {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		return JsonElementType.STRING.fromElement( element );
+		return JsonElementTypes.STRING.fromElement( element );
 	}
 }

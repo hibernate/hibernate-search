@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementType;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
@@ -50,7 +50,7 @@ public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		JsonObject object = JsonElementType.OBJECT.fromElement( element );
+		JsonObject object = JsonElementTypes.OBJECT.fromElement( element );
 		double latitude = LATITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		return new ImmutableGeoPoint( latitude, longitude );
