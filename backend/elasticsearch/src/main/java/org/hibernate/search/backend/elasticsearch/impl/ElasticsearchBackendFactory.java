@@ -30,6 +30,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 import com.google.gson.GsonBuilder;
 
@@ -59,16 +60,22 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
 		ElasticsearchClientImplementor client = clientFactory.create( propertySource, initialGsonProvider );
+		try {
+			// TODO implement and detect dialects
+			// Assume ES5 for now
+			GsonProvider dialectSpecificGsonProvider =
+					DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
+			client.init( dialectSpecificGsonProvider );
 
-		// TODO implement and detect dialects
-		// Assume ES5 for now
-		GsonProvider dialectSpecificGsonProvider =
-				DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
-		client.init( dialectSpecificGsonProvider );
+			ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory( dialectSpecificGsonProvider );
 
-		ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory( dialectSpecificGsonProvider );
-
-		return new ElasticsearchBackendImpl( client, name, workFactory, getMultiTenancyStrategy( name, propertySource ) );
+			return new ElasticsearchBackendImpl(
+					client, name, workFactory, getMultiTenancyStrategy( name, propertySource ) );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( ElasticsearchClientImplementor::close, client );
+			throw e;
+		}
 	}
 
 	private GsonBuilder createES5GsonBuilderBase() {

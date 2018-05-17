@@ -43,6 +43,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
 
@@ -97,26 +98,37 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			propertySource = mainPropertySource;
 		}
 
-		IndexManagerBuildingStateHolder indexManagerBuildingStateProvider =
+		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder =
 				new IndexManagerBuildingStateHolder( buildContext, propertySource );
-		// TODO close the holder (which will close the backends) if anything fails after this
-
-		MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
-		contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
-
-		Map<MappingKey<?>, Mapper<?>> mappers =
-				metadataCollector.createMappers( buildContext, propertySource, indexManagerBuildingStateProvider );
-
+		// Use a LinkedHashMap for deterministic iteration
+		Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
-		// TODO close the mappings created so far if anything fails after this
-		mappers.forEach( (mappingKey, mapper) -> {
-			MappingImplementor<?> mapping = mapper.build();
-			mappings.put( mappingKey, mapping );
-		} );
+		try {
+			MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
+			contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
 
-		builtResult = new SearchMappingRepositoryImpl(
-				mappings, indexManagerBuildingStateProvider.getBackendsByName()
-		);
+			metadataCollector.createMappers(
+					mappers, buildContext, propertySource, indexManagerBuildingStateHolder
+			);
+			mappers.forEach( (mappingKey, mapper) -> {
+				MappingImplementor<?> mapping = mapper.build();
+				mappings.put( mappingKey, mapping );
+			} );
+
+			builtResult = new SearchMappingRepositoryImpl(
+					mappings, indexManagerBuildingStateHolder.getBackendsByName()
+			);
+		}
+		catch (RuntimeException e) {
+			// Close the mappers and mappings created so far before aborting (they should close their index manager)
+			SuppressingCloser closer = new SuppressingCloser( e );
+			closer.pushAll( MappingImplementor::close, mappings.values() );
+			closer.pushAll( Mapper::closeOnFailure, mappers.values() );
+			// Close the resources contained in the index manager building state before aborting
+			indexManagerBuildingStateHolder.closeOnFailure( closer );
+			throw e;
+		}
+
 		return builtResult;
 	}
 
@@ -150,17 +162,21 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			getOrCreateContribution( mapperFactory ).collectDiscoverer( metadataDiscoverer );
 		}
 
-		Map<MappingKey<?>, Mapper<?>> createMappers(
+		/*
+		 * Note that the mapper map is passed as a parameter, not returned,
+		 * so that even in case of failure, the caller can access the mappers built so far.
+		 * Then the caller can close all mappers as necessary.
+		 */
+		void createMappers(Map<MappingKey<?>, Mapper<?>> mappers,
 				BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			frozen = true;
-			// Use a LinkedHashMap for deterministic iteration
-			Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
 			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
-				Mapper<?> mapper = contribution.preBuild( buildContext, propertySource, indexManagerBuildingStateProvider );
+				Mapper<?> mapper = contribution.preBuild(
+						buildContext, propertySource, indexManagerBuildingStateProvider
+				);
 				mappers.put( mappingKey, mapper );
 			} );
-			return mappers;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -219,16 +235,25 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			ContributorProvider contributorProvider = new ContributorProvider();
 			Mapper<M> mapper = mapperFactory.createMapper( buildContext, propertySource, contributorProvider );
 
-			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>( contributionByType.keySet() );
-			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
-				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
-				String indexName = contribution.getIndexName();
-				if ( indexName != null ) {
-					mapper.addIndexed(
-							typeModel,
-							indexManagerBuildingStateHolder.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
-					);
+			try {
+				Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
+						contributionByType.keySet() );
+				for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
+					TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
+					String indexName = contribution.getIndexName();
+					if ( indexName != null ) {
+						mapper.addIndexed(
+								typeModel,
+								indexManagerBuildingStateHolder
+										.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
+						);
+					}
 				}
+			}
+			catch (RuntimeException e) {
+				// Close the mapper before aborting (it should close its index managers)
+				new SuppressingCloser( e ).push( mapper::closeOnFailure );
+				throw e;
 			}
 
 			return mapper;

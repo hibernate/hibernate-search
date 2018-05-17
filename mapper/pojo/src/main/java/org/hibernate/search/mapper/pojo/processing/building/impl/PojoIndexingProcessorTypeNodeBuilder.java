@@ -30,6 +30,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorTypeNode;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * A builder of {@link PojoIndexingProcessorTypeNode}.
@@ -92,6 +94,14 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 		return modelPath;
 	}
 
+	@Override
+	public void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( boundBridge -> boundBridge.getBridge().close(), boundBridges );
+			closer.pushAll( PojoIndexingProcessorPropertyNodeBuilder::closeOnFailure, propertyNodeBuilders.values() );
+		}
+	}
+
 	public Optional<PojoIndexingProcessor<T>> build(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		Collection<IndexObjectFieldAccessor> parentIndexObjectAccessors = bindingContext.getParentIndexObjectAccessors();
 
@@ -99,32 +109,40 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			boundRoutingKeyBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
 		}
 
-		Collection<TypeBridge> immutableBridges = boundBridges.isEmpty() ? Collections.emptyList() : new ArrayList<>();
-		for ( BoundTypeBridge<T> boundBridge : boundBridges ) {
-			immutableBridges.add( boundBridge.getBridge() );
-			boundBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
-		}
-
 		Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> immutablePropertyNodes =
 				propertyNodeBuilders.isEmpty() ? Collections.emptyList()
 						: new ArrayList<>( propertyNodeBuilders.size() );
-		propertyNodeBuilders.values().stream()
-				.map( builder -> builder.build( dependencyCollector ) )
-				.filter( Optional::isPresent )
-				.map( Optional::get )
-				.forEach( immutablePropertyNodes::add );
+		try {
+			Collection<TypeBridge> immutableBridges = boundBridges.isEmpty()
+					? Collections.emptyList() : new ArrayList<>();
+			for ( BoundTypeBridge<T> boundBridge : boundBridges ) {
+				immutableBridges.add( boundBridge.getBridge() );
+				boundBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
+			}
+			propertyNodeBuilders.values().stream()
+					.map( builder -> builder.build( dependencyCollector ) )
+					.filter( Optional::isPresent )
+					.map( Optional::get )
+					.forEach( immutablePropertyNodes::add );
 
-		if ( parentIndexObjectAccessors.isEmpty() && immutableBridges.isEmpty() && immutablePropertyNodes.isEmpty() ) {
-			/*
-			 * If this node doesn't create any object in the document, and it doesn't have any bridge,
-			 * nor any property node, then it is useless and we don't need to build it.
-			 */
-			return Optional.empty();
+			if ( parentIndexObjectAccessors.isEmpty() && immutableBridges.isEmpty() && immutablePropertyNodes
+					.isEmpty() ) {
+				/*
+				 * If this node doesn't create any object in the document, and it doesn't have any bridge,
+				 * nor any property node, then it is useless and we don't need to build it.
+				 */
+				return Optional.empty();
+			}
+			else {
+				return Optional.of( new PojoIndexingProcessorTypeNode<>(
+						parentIndexObjectAccessors, immutableBridges, immutablePropertyNodes
+				) );
+			}
 		}
-		else {
-			return Optional.of( new PojoIndexingProcessorTypeNode<>(
-					parentIndexObjectAccessors, immutableBridges, immutablePropertyNodes
-			) );
+		catch (RuntimeException e) {
+			// Close the nested processors created so far before aborting
+			new SuppressingCloser( e ).pushAll( PojoIndexingProcessor::close, immutablePropertyNodes );
+			throw e;
 		}
 	}
 

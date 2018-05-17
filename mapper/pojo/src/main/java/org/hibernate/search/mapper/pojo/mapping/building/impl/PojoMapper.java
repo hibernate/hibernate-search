@@ -41,7 +41,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 class PojoMapper<M> implements Mapper<M> {
 
@@ -60,6 +62,8 @@ class PojoMapper<M> implements Mapper<M> {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
+
+	private boolean closed = false;
 
 	PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
@@ -87,6 +91,16 @@ class PojoMapper<M> implements Mapper<M> {
 	}
 
 	@Override
+	public void closeOnFailure() {
+		if ( !closed ) {
+			closed = true;
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.pushAll( PojoIndexedTypeManagerBuilder::closeOnFailure, indexedTypeManagerBuilders.values() );
+			}
+		}
+	}
+
+	@Override
 	public boolean isMultiTenancyEnabled() {
 		return multiTenancyEnabled;
 	}
@@ -104,12 +118,14 @@ class PojoMapper<M> implements Mapper<M> {
 		PojoIndexedTypeManagerBuilder<?, ?> builder = new PojoIndexedTypeManagerBuilder<>(
 				entityTypeModel, mappingHelper, indexManagerBuildingState,
 				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
+		// Put the builder in the map before anything else, so it will be closed on error
+		indexedTypeManagerBuilders.put( entityTypeModel, builder );
+
 		PojoMappingCollectorTypeNode collector = builder.asCollector();
 		contributorProvider.forEach(
 				entityTypeModel,
 				c -> c.contributeMapping( collector )
 		);
-		indexedTypeManagerBuilders.put( entityTypeModel, builder );
 	}
 
 	@Override
@@ -133,25 +149,49 @@ class PojoMapper<M> implements Mapper<M> {
 		for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
 			pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
 		}
-		// Second phase: build the indexed type managers and their reindexing resolvers
-		for ( PojoIndexedTypeManagerBuilder<?, ?> b : indexedTypeManagerBuilders.values() ) {
-			b.buildAndAddTo( indexedTypeManagerContainerBuilder, reindexingResolverBuildingHelper );
-		}
-		// Third phase: build the non-indexed, contained type managers and their reindexing resolvers
-		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
-			// Ignore abstract classes: we create one manager per concrete subclass, which is enough
-			if ( !entityType.isAbstract() && !indexedTypeManagerBuilders.containsKey( entityType ) ) {
-				buildAndAddContainedTypeManagerTo(
-						containedTypeManagerContainerBuilder, reindexingResolverBuildingHelper, entityType
-				);
-			}
-		}
 
-		PojoMappingDelegate mappingImplementor = new PojoMappingDelegateImpl(
-				indexedTypeManagerContainerBuilder.build(),
-				containedTypeManagerContainerBuilder.build()
-		);
-		return wrapperFactory.apply( propertySource, mappingImplementor );
+		PojoMappingDelegate mappingImplementor = null;
+		try {
+			// Second phase: build the indexed type managers and their reindexing resolvers
+			for ( PojoIndexedTypeManagerBuilder<?, ?> b : indexedTypeManagerBuilders.values() ) {
+				b.buildAndAddTo( indexedTypeManagerContainerBuilder, reindexingResolverBuildingHelper );
+			}
+			// Third phase: build the non-indexed, contained type managers and their reindexing resolvers
+			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
+				// Ignore abstract classes: we create one manager per concrete subclass, which is enough
+				if ( !entityType.isAbstract() && !indexedTypeManagerBuilders.containsKey( entityType ) ) {
+					buildAndAddContainedTypeManagerTo(
+							containedTypeManagerContainerBuilder, reindexingResolverBuildingHelper, entityType
+					);
+				}
+			}
+
+			mappingImplementor = new PojoMappingDelegateImpl(
+					indexedTypeManagerContainerBuilder.build(),
+					containedTypeManagerContainerBuilder.build()
+			);
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push(
+							PojoIndexedTypeManagerContainer.Builder::closeOnFailure,
+							indexedTypeManagerContainerBuilder
+					)
+					.push(
+							PojoContainedTypeManagerContainer.Builder::closeOnFailure,
+							containedTypeManagerContainerBuilder
+					);
+			throw e;
+		}
+		closed = true;
+
+		try {
+			return wrapperFactory.apply( propertySource, mappingImplementor );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( mappingImplementor );
+			throw e;
+		}
 	}
 
 	private <T> void buildAndAddContainedTypeManagerTo(

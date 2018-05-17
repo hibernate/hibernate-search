@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.impl.common.Closer;
 
 public class PojoIndexedTypeManagerContainer {
 
@@ -72,6 +73,12 @@ public class PojoIndexedTypeManagerContainer {
 							bySuperClass.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 									.add( typeManager )
 					);
+		}
+
+		public void closeOnFailure() {
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.pushAll( PojoIndexedTypeManager::close, byExactClass.values() );
+			}
 		}
 
 		public PojoIndexedTypeManagerContainer build() {

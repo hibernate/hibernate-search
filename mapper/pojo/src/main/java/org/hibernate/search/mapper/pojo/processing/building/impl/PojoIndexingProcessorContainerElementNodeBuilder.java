@@ -54,6 +54,11 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 		return modelPath;
 	}
 
+	@Override
+	void closeOnFailure() {
+		valueNodeProcessorCollectionBuilder.closeOnFailure();
+	}
+
 	Optional<PojoIndexingProcessorContainerElementNode<C, V>> build(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		Collection<PojoIndexingProcessor<? super V>> immutableNestedProcessors =

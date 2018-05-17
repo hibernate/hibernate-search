@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 
 /**
@@ -42,7 +43,7 @@ class IndexManagerBuildingStateHolder {
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
 	private final Map<String, BackendImplementor<?>> backendsByName = new HashMap<>();
-	private final Map<String, IndexManagerBuildingState<?>> indexManagerBuildingStateByName = new HashMap<>();
+	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	IndexManagerBuildingStateHolder(BuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
@@ -59,7 +60,7 @@ class IndexManagerBuildingStateHolder {
 		BackendImplementor<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
 		String normalizedIndexName = backend.normalizeIndexName( rawIndexName );
 
-		IndexManagerBuildingState<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
+		IndexMappingBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
 		if ( state == null ) {
 			state = createIndexManagerBuildingState( backend, normalizedIndexName, multiTenancyEnabled, indexPropertySource );
 			indexManagerBuildingStateByName.put( normalizedIndexName, state );
@@ -67,11 +68,16 @@ class IndexManagerBuildingStateHolder {
 		return state;
 	}
 
-	public Map<String, BackendImplementor<?>> getBackendsByName() {
+	Map<String, BackendImplementor<?>> getBackendsByName() {
 		return backendsByName;
 	}
 
-	private <D extends DocumentElement> IndexManagerBuildingState<D> createIndexManagerBuildingState(
+	void closeOnFailure(SuppressingCloser closer) {
+		closer.pushAll( state -> state.closeOnFailure( closer ), indexManagerBuildingStateByName.values() );
+		closer.pushAll( BackendImplementor::close, backendsByName.values() );
+	}
+
+	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
 			BackendImplementor<D> backend, String normalizedIndexName, boolean multiTenancyEnabled,
 			ConfigurationPropertySource indexPropertySource) {
 		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, multiTenancyEnabled, buildContext, indexPropertySource );
@@ -96,12 +102,16 @@ class IndexManagerBuildingStateHolder {
 		private final IndexManagerBuilder<D> builder;
 		private final IndexModelBindingContext bindingContext;
 
-		public IndexMappingBuildingStateImpl(String indexName,
+		IndexMappingBuildingStateImpl(String indexName,
 				IndexManagerBuilder<D> builder,
 				IndexModelBindingContext bindingContext) {
 			this.indexName = indexName;
 			this.builder = builder;
 			this.bindingContext = bindingContext;
+		}
+
+		void closeOnFailure(SuppressingCloser closer) {
+			closer.push( IndexManagerBuilder::closeOnFailure, builder );
 		}
 
 		@Override

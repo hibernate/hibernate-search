@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.impl.common.Closer;
 
 public class PojoContainedTypeManagerContainer {
 
@@ -49,6 +50,12 @@ public class PojoContainedTypeManagerContainer {
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<E> typeManager) {
 			byExactClass.put( typeModel.getJavaClass(), typeManager );
+		}
+
+		public void closeOnFailure() {
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.pushAll( PojoContainedTypeManager::close, byExactClass.values() );
+			}
 		}
 
 		public PojoContainedTypeManagerContainer build() {

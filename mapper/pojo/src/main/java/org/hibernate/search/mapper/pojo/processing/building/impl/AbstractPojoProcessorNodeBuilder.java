@@ -27,4 +27,6 @@ abstract class AbstractPojoProcessorNodeBuilder<T> {
 	}
 
 	abstract BoundPojoModelPath getModelPath();
+
+	abstract void closeOnFailure();
 }

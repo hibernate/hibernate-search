@@ -33,9 +33,10 @@ import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingPro
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
+class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	private static Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
@@ -45,6 +46,8 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
 
 	private PojoIndexingProcessor<E> preBuiltIndexingProcessor;
+
+	private boolean closed = false;
 
 	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
@@ -61,11 +64,24 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		);
 	}
 
-	public PojoMappingCollectorTypeNode asCollector() {
+	void closeOnFailure() {
+		if ( closed ) {
+			return;
+		}
+
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( PojoIndexingProcessorTypeNodeBuilder::closeOnFailure, processorBuilder );
+			closer.push( PojoIdentityMappingCollectorImpl::closeOnFailure, identityMappingCollector );
+			closer.push( PojoIndexingProcessor::close, preBuiltIndexingProcessor );
+			closed = true;
+		}
+	}
+
+	PojoMappingCollectorTypeNode asCollector() {
 		return processorBuilder;
 	}
 
-	public void preBuild(PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
+	void preBuild(PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
 		if ( preBuiltIndexingProcessor != null ) {
 			throw new AssertionFailure( "Internal error - preBuild should be called only once" );
 		}
@@ -76,7 +92,7 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				.orElseGet( PojoIndexingProcessor::noOp );
 	}
 
-	public void buildAndAddTo(PojoIndexedTypeManagerContainer.Builder typeManagersBuilder,
+	void buildAndAddTo(PojoIndexedTypeManagerContainer.Builder typeManagersBuilder,
 			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
 		if ( preBuiltIndexingProcessor == null ) {
 			throw new AssertionFailure( "Internal error - preBuild should be called before addTo" );
@@ -109,6 +125,8 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		log.createdPojoIndexedTypeManager( typeManager );
 
 		typeManagersBuilder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );
+
+		closed = true;
 	}
 
 	private class PojoIdentityMappingCollectorImpl implements PojoIdentityMappingCollector {
@@ -117,6 +135,13 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		PojoIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
 			this.identifierMapping = identifierMapping;
+		}
+
+		void closeOnFailure() {
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.push( IdentifierMapping::close, identifierMapping );
+				closer.push( RoutingKeyBridge::close, routingKeyBridge );
+			}
 		}
 
 		@Override

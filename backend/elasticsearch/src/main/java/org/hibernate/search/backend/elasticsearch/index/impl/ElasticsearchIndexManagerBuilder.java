@@ -45,6 +45,11 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	}
 
 	@Override
+	public void closeOnFailure() {
+		// Nothing to do
+	}
+
+	@Override
 	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
 		return schemaRootNodeBuilder;
 	}

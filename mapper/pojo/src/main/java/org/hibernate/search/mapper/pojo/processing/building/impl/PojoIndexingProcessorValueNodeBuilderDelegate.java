@@ -26,6 +26,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
+import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * A delegate to be used by {@link PojoIndexingProcessorPropertyNodeBuilder}
@@ -106,6 +108,13 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 		return modelPath;
 	}
 
+	void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( boundBridge -> boundBridge.getBridge().close(), boundBridges );
+			closer.pushAll( PojoIndexingProcessorTypeNodeBuilder::closeOnFailure, typeNodeBuilders );
+		}
+	}
+
 	Collection<PojoIndexingProcessor<? super V>> build(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		PojoIndexingDependencyCollectorValueNode<P, V> valueDependencyCollector =
@@ -115,20 +124,27 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 				boundBridges.isEmpty() && typeNodeBuilders.isEmpty()
 						? Collections.emptyList()
 						: new ArrayList<>( boundBridges.size() + typeNodeBuilders.size() );
-		for ( BoundValueBridge<? super V, ?> boundBridge : boundBridges ) {
-			immutableNestedNodes.add( createValueBridgeNode( boundBridge ) );
-		}
-		typeNodeBuilders.stream()
-				.map( builder -> builder.build( valueDependencyCollector.type() ) )
-				.filter( Optional::isPresent )
-				.map( Optional::get )
-				.forEach( immutableNestedNodes::add );
+		try {
+			for ( BoundValueBridge<? super V, ?> boundBridge : boundBridges ) {
+				immutableNestedNodes.add( createValueBridgeNode( boundBridge ) );
+			}
+			typeNodeBuilders.stream()
+					.map( builder -> builder.build( valueDependencyCollector.type() ) )
+					.filter( Optional::isPresent )
+					.map( Optional::get )
+					.forEach( immutableNestedNodes::add );
 
-		if ( !immutableNestedNodes.isEmpty() ) {
-			valueDependencyCollector.collectDependency();
-		}
+			if ( !immutableNestedNodes.isEmpty() ) {
+				valueDependencyCollector.collectDependency();
+			}
 
-		return immutableNestedNodes;
+			return immutableNestedNodes;
+		}
+		catch (RuntimeException e) {
+			// Close the nested processors created so far before aborting
+			new SuppressingCloser( e ).pushAll( PojoIndexingProcessor::close, immutableNestedNodes );
+			throw e;
+		}
 	}
 
 	private static <T, R> PojoIndexingProcessor<T> createValueBridgeNode(BoundValueBridge<T, R> boundBridge) {
