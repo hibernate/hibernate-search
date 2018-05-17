@@ -183,7 +183,7 @@ public final class Closer<E extends Exception> implements AutoCloseable {
 					else if ( firstThrowable instanceof Error ) {
 						throw (Error) firstThrowable;
 					}
-					else if ( firstThrowable != null ) {
+					else {
 						/*
 						 * At this point we know that throwable is an instance of E,
 						 * because that's the only checked exception that the source
