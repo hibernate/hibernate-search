@@ -22,4 +22,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
 
+	@Message(id = 18, value = "'%1$s' must not be null.")
+	IllegalArgumentException mustNotBeNull(String objectDescription);
 }
