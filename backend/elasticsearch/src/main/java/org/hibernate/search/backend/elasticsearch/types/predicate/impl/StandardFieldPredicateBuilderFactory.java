@@ -6,15 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchFieldCodec codec;
 
@@ -30,5 +37,10 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath) {
 		return new RangePredicateBuilderImpl( absoluteFieldPath, codec );
+	}
+
+	@Override
+	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
+		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}
 }

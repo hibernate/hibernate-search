@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 
 public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQueryElementCollector> {
 
@@ -46,6 +47,11 @@ public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQu
 
 	@Override
 	public RangePredicateBuilder<StubQueryElementCollector> range(String absoluteFieldPath) {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public SpatialWithinCirclePredicateBuilder<StubQueryElementCollector> spatialWithinCircle(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 

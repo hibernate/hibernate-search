@@ -10,16 +10,20 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
 
+	public static final GeoPointFieldPredicateBuilderFactory INSTANCE = new GeoPointFieldPredicateBuilderFactory();
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final GeoPointFieldPredicateBuilderFactory INSTANCE = new GeoPointFieldPredicateBuilderFactory();
+	private static final GeoPointFieldCodec CODEC = GeoPointFieldCodec.INSTANCE;
 
 	private GeoPointFieldPredicateBuilderFactory() {
 	}
@@ -32,5 +36,10 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
+		return new GeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
 	}
 }

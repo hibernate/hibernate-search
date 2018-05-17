@@ -11,7 +11,7 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
 
-public class StringFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
+public class StringFieldPredicateBuilderFactory extends AbstractStandardLuceneFieldPredicateBuilderFactory {
 
 	private final StringFieldFormatter formatter;
 

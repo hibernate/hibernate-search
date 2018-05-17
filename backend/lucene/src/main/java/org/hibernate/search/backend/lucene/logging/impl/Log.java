@@ -171,4 +171,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 539, value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
 	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
+
+	@Message(id = 540, value = "Spatial predicates are not supported by the type of field '%1$s'.")
+	SearchException spatialPredicatesNotSupportedByFieldType(String absoluteFieldPath);
 }

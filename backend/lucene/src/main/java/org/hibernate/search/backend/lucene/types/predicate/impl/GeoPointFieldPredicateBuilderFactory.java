@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
@@ -31,5 +32,10 @@ public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPr
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
+		return new GeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 }

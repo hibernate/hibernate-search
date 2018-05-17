@@ -40,6 +40,8 @@ public interface SearchPredicateContainerContext<N> {
 
 	NestedPredicateContext<N> nested();
 
+	SpatialPredicateContext<N> spatial();
+
 	N predicate(SearchPredicate predicate);
 
 	// TODO ids query (Type + list of IDs? Just IDs? See https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-ids-query.html)

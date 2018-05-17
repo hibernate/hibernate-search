@@ -33,4 +33,6 @@ public interface SearchPredicateFactory<C> {
 
 	NestedPredicateBuilder<C> nested(String absoluteFieldPath);
 
+	SpatialWithinCirclePredicateBuilder<C> spatialWithinCircle(String absoluteFieldPath);
+
 }

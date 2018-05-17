@@ -10,12 +10,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
@@ -70,6 +71,13 @@ public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicat
 	@Override
 	public NestedPredicateContext<N> nested() {
 		NestedPredicateContextImpl<N, C> child = new NestedPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addContributor( child );
+		return child;
+	}
+
+	@Override
+	public SpatialPredicateContext<N> spatial() {
+		SpatialPredicateContextImpl<N, C> child = new SpatialPredicateContextImpl<>( factory, dslContext::getNextContext );
 		dslContext.addContributor( child );
 		return child;
 	}

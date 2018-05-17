@@ -147,4 +147,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 526, value = "Expected data was missing in the Elasticsearch response.")
 	AssertionFailure elasticsearchResponseMissingData();
+
+	@Message(id = 527, value = "Spatial predicates are not supported by the type of field '%1$s'.")
+	SearchException spatialPredicatesNotSupportedByFieldType(String absoluteFieldPath);
 }

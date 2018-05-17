@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -70,6 +71,11 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	}
 
 	@Override
+	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateCollector> spatialWithinCircle(String absoluteFieldPath) {
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
 	public NestedPredicateBuilder<LuceneSearchPredicateCollector> nested(String absoluteFieldPath) {
 		searchTargetModel.checkNestedField( absoluteFieldPath );
 		return new NestedPredicateBuilderImpl( absoluteFieldPath );
@@ -79,4 +85,5 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	public SearchPredicateContributor<LuceneSearchPredicateCollector> fromLuceneQuery(Query query) {
 		return new UserProvidedLuceneQueryPredicateContributor( query );
 	}
+
 }
