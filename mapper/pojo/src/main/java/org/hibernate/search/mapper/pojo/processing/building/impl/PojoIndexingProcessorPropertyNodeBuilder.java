@@ -46,7 +46,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 
-	private final PojoIdentityMappingCollector identityMappingCollector;
+	private final Optional<PojoIdentityMappingCollector> identityMappingCollector;
 
 	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
@@ -56,7 +56,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	PojoIndexingProcessorPropertyNodeBuilder(
 			BoundPojoModelPathPropertyNode<T, P> modelPath,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
-			PojoIdentityMappingCollector identityMappingCollector) {
+			Optional<PojoIdentityMappingCollector> identityMappingCollector) {
 		super( mappingHelper, bindingContext );
 
 		this.modelPath = modelPath;
@@ -78,9 +78,12 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@Override
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
-		PojoGenericTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().getTypeModel();
-		IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge( modelPath, builder );
-		identityMappingCollector.identifierBridge( propertyTypeModel, modelPath.getPropertyHandle(), bridge );
+		if ( identityMappingCollector.isPresent() ) {
+			PojoGenericTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().getTypeModel();
+			IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge(
+					modelPath, builder );
+			identityMappingCollector.get().identifierBridge( propertyTypeModel, modelPath.getPropertyHandle(), bridge );
+		}
 	}
 
 	@Override

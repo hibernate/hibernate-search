@@ -41,7 +41,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 
-	private final PojoIdentityMappingCollector identityMappingCollector;
+	private final Optional<PojoIdentityMappingCollector> identityMappingCollector;
 
 	private BoundRoutingKeyBridge<T> boundRoutingKeyBridge;
 	private final Collection<BoundTypeBridge<T>> boundBridges = new ArrayList<>();
@@ -51,7 +51,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	public PojoIndexingProcessorTypeNodeBuilder(
 			BoundPojoModelPathTypeNode<T> modelPath,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
-			PojoIdentityMappingCollector identityMappingCollector) {
+			Optional<PojoIdentityMappingCollector> identityMappingCollector) {
 		super( mappingHelper, bindingContext );
 
 		this.modelPath = modelPath;
@@ -67,9 +67,11 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	@Override
 	public void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
-				.addRoutingKeyBridge( bindingContext, modelPath, builder );
-		identityMappingCollector.routingKeyBridge( boundRoutingKeyBridge.getBridge() );
+		if ( identityMappingCollector.isPresent() ) {
+			boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
+					.addRoutingKeyBridge( bindingContext, modelPath, builder );
+			identityMappingCollector.get().routingKeyBridge( boundRoutingKeyBridge.getBridge() );
+		}
 	}
 
 	@Override

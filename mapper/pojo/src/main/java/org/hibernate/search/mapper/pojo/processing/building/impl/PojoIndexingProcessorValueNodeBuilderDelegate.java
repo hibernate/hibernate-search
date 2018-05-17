@@ -20,7 +20,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundValueBridge;
-import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -93,7 +92,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 			PojoIndexingProcessorTypeNodeBuilder<V> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 					embeddedTypeModelPath, mappingHelper, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-					PojoIdentityMappingCollector.noOp()
+					Optional.empty()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 			mappingHelper.getContributorProvider().forEach(

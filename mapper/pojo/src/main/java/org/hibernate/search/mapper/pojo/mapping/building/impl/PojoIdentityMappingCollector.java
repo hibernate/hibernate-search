@@ -16,8 +16,4 @@ public interface PojoIdentityMappingCollector {
 	<T> void identifierBridge(PojoTypeModel<T> propertyTypeModel, PropertyHandle handle, IdentifierBridge<T> bridge);
 
 	void routingKeyBridge(RoutingKeyBridge bridge);
-
-	static PojoIdentityMappingCollector noOp() {
-		return NoOpPojoIdentityMappingCollector.INSTANCE;
-	}
 }

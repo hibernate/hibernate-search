@@ -56,7 +56,8 @@ public class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
-				mappingHelper, bindingContext, identityMappingCollector
+				mappingHelper, bindingContext,
+				Optional.of( identityMappingCollector )
 		);
 	}
 
