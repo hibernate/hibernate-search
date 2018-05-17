@@ -10,7 +10,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class StringFieldSortContributor extends AbstractScalarLuceneFieldSortContributor {
+public class StringFieldSortContributor extends AbstractStandardLuceneFieldSortContributor {
 
 	public static final StringFieldSortContributor INSTANCE = new StringFieldSortContributor();
 
