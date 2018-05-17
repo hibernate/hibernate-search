@@ -26,6 +26,14 @@ public class CloserTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
+	public void nullCloseable() throws IOException {
+		// Should not do anything, in particular should not throw any NPE
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( Closeable::close, null );
+		}
+	}
+
+	@Test
 	public void javaIOCloseable() throws IOException {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -44,8 +52,8 @@ public class CloserTest {
 		);
 
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( closeable::close );
-			closer.push( () -> { throw exception2; } );
+			closer.push( Closeable::close, closeable );
+			closer.push( ignored -> { throw exception2; }, new Object() );
 		}
 	}
 
@@ -68,8 +76,8 @@ public class CloserTest {
 		);
 
 		try ( Closer<Exception> closer = new Closer<>() ) {
-			closer.push( closeable::close );
-			closer.push( () -> { throw exception2; } );
+			closer.push( AutoCloseable::close, closeable );
+			closer.push( ignored -> { throw exception2; }, new Object() );
 		}
 	}
 
@@ -87,9 +95,9 @@ public class CloserTest {
 		);
 
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( () -> { throw exception1; } );
-			closer.push( () -> { throw exception2; } );
-			closer.push( () -> { throw exception3; } );
+			closer.push( ignored -> { throw exception1; }, new Object() );
+			closer.push( ignored -> { throw exception2; }, new Object() );
+			closer.push( ignored -> { throw exception3; }, new Object() );
 		}
 	}
 
@@ -107,12 +115,12 @@ public class CloserTest {
 		);
 
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( () -> { /* Do not fail */ } );
-			closer.push( () -> { throw exception1; } );
-			closer.push( () -> { throw exception2; } );
-			closer.push( () -> { /* Do not fail */ } );
-			closer.push( () -> { throw exception3; } );
-			closer.push( () -> { /* Do not fail */ } );
+			closer.push( ignored -> { /* Do not fail */ }, new Object() );
+			closer.push( ignored -> { throw exception1; }, new Object() );
+			closer.push( ignored -> { throw exception2; }, new Object() );
+			closer.push( ignored -> { /* Do not fail */ }, new Object() );
+			closer.push( ignored -> { throw exception3; }, new Object() );
+			closer.push( ignored -> { /* Do not fail */ }, new Object() );
 		}
 	}
 
@@ -135,8 +143,8 @@ public class CloserTest {
 		);
 
 		try ( Closer<MyException1> closer = new Closer<>() ) {
-			closer.push( closeable::close );
-			closer.push( () -> { throw exception2; } );
+			closer.push( MyException1Closeable::close, closeable );
+			closer.push( ignored -> { throw exception2; }, new Object() );
 		}
 	}
 
@@ -188,9 +196,9 @@ public class CloserTest {
 			 * closer in the resource list, this exception should be
 			 * the one that is rethrown.
 			 */
-			closer2.push( () -> { throw exception1; } );
-			closer3.push( () -> { throw exception2; } );
-			closer1.push( () -> { throw exception3; } );
+			closer2.push( ignored -> { throw exception1; }, new Object() );
+			closer3.push( ignored -> { throw exception2; }, new Object() );
+			closer1.push( ignored -> { throw exception3; }, new Object() );
 		}
 	}
 
@@ -217,9 +225,9 @@ public class CloserTest {
 			 * closer in the resource list, this exception should be
 			 * the one that is rethrown.
 			 */
-			closer2.push( () -> { throw exception1; } );
-			closer3.push( () -> { throw exception2; } );
-			closer1.push( () -> { throw exception3; } );
+			closer2.push( ignored -> { throw exception1; }, new Object() );
+			closer3.push( ignored -> { throw exception2; }, new Object() );
+			closer1.push( ignored -> { throw exception3; }, new Object() );
 		}
 	}
 

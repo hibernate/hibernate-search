@@ -97,7 +97,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( queryOrchestrator::close );
+			closer.push( LuceneQueryWorkOrchestrator::close, queryOrchestrator );
 		}
 	}
 

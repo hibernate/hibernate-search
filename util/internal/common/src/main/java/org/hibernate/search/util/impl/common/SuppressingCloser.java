@@ -30,6 +30,51 @@ public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, E
 		state.addThrowable( this, mainThrowable );
 	}
 
+	/**
+	 * Close the given {@code closeable} <strong>immediately</strong>,
+	 * swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
+	 *<p>
+	 * See also {@link #push(ClosingOperator, Object)}
+	 * for when the object to close does not implement {@link AutoCloseable}.
+	 *
+	 * @param closeable An {@link AutoCloseable} to close.
+	 * @return {@code this}, for method chaining.
+	 */
+	public SuppressingCloser push(AutoCloseable closeable) {
+		return push( AutoCloseable::close, closeable );
+	}
+
+	/**
+	 * Close the given {@code closeables} <strong>immediately</strong>,
+	 * swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
+	 *<p>
+	 * See also {@link #pushAll(ClosingOperator, Object[])}
+	 * for when the objects to close do not implement {@link AutoCloseable}.
+	 *
+	 * @param closeables An array of {@link AutoCloseable}s to close.
+	 * @return {@code this}, for method chaining.
+	 */
+	public SuppressingCloser pushAll(AutoCloseable ... closeables) {
+		return pushAll( AutoCloseable::close, closeables );
+	}
+
+	/**
+	 * Close the given {@code closeables} <strong>immediately</strong>,
+	 * swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
+	 *<p>
+	 * See also {@link #pushAll(ClosingOperator, Object[])}
+	 * for when the objects to close do not implement {@link AutoCloseable}.
+	 *
+	 * @param closeables An iterable of {@link AutoCloseable}s to close.
+	 * @return {@code this}, for method chaining.
+	 */
+	public SuppressingCloser pushAll(Iterable<? extends AutoCloseable> closeables) {
+		return pushAll( AutoCloseable::close, closeables );
+	}
+
 	@Override
 	State getState() {
 		return state;

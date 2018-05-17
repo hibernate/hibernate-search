@@ -112,11 +112,11 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( changesetOrchestrator::close );
-			closer.push( streamOrchestrator::close );
+			closer.push( LuceneIndexWorkOrchestrator::close, changesetOrchestrator );
+			closer.push( LuceneIndexWorkOrchestrator::close, streamOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( indexWriter::close );
-			closer.push( model::close );
+			closer.push( IndexWriter::close, indexWriter );
+			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Lucene index manager", e );

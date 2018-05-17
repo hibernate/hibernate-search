@@ -60,10 +60,10 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( identifierMapping::close );
-			closer.push( routingKeyProvider::close );
-			closer.push( processor::close );
-			closer.push( indexManager::close );
+			closer.push( IdentifierMapping::close, identifierMapping );
+			closer.push( RoutingKeyProvider::close, routingKeyProvider );
+			closer.push( PojoIndexingProcessor::close, processor );
+			closer.push( IndexManager::close, indexManager );
 		}
 	}
 

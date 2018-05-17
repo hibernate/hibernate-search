@@ -108,10 +108,10 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( streamOrchestrator::close );
-			closer.push( queryOrchestrator::close );
+			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
+			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( client::close );
+			closer.push( ElasticsearchClient::close, client );
 		}
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Elasticsearch backend", e );

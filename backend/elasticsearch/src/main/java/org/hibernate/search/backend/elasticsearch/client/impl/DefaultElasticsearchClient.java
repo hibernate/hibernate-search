@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -203,11 +204,9 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 			 * all timeouts and expect the RestClient to cancel all
 			 * currently running requests when closing.
 			 */
-			closer.push( this.timeoutExecutorService::shutdownNow );
-			if ( this.sniffer != null ) {
-				closer.push( this.sniffer::close );
-			}
-			closer.push( this.restClient::close );
+			closer.push( ExecutorService::shutdownNow, this.timeoutExecutorService );
+			closer.push( Sniffer::close, this.sniffer );
+			closer.push( RestClient::close, this.restClient );
 		}
 	}
 

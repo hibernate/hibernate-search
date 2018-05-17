@@ -16,8 +16,9 @@ package org.hibernate.search.util.impl.common;
 public abstract class AbstractCloser<S, E extends Exception> {
 
 	/**
-	 * Execute the given close {@code operator} <strong>immediately</strong> on
-	 * the given {@code objectToClose}, swallowing any throwable in order to
+	 * If the given {@code objectToClose} is non-null,
+	 * execute the given close {@code operator} <strong>immediately</strong> on {@code objectToClose},
+	 * swallowing any throwable in order to
 	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to a previously caught throwable,
 	 * or to re-throw it later.
 	 * @param operator An operator to close {@code objectToClose}. Accepts lambdas
@@ -27,26 +28,13 @@ public abstract class AbstractCloser<S, E extends Exception> {
 	 */
 	public <T> S push(ClosingOperator<T, ? extends E> operator, T objectToClose) {
 		try {
-			operator.close( objectToClose );
+			if ( objectToClose != null ) {
+				operator.close( objectToClose );
+			}
 		}
 		catch (Throwable t) {
 			getState().addThrowable( this, t );
 		}
-		return getSelf();
-	}
-
-	/**
-	 * Close the given {@code closeable} <strong>immediately</strong>,
-	 * swallowing any throwable in order to
-	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to a previously caught throwable,
-	 * or to re-throw it later.
-	 *
-	 * @param closeable A {@link GenericCloseable} to close. Accepts lambdas
-	 * such as {@code myObject::close}.
-	 * @return {@code this}, for method chaining.
-	 */
-	public S push(GenericCloseable<? extends E> closeable) {
-		push( GenericCloseable::close, closeable );
 		return getSelf();
 	}
 

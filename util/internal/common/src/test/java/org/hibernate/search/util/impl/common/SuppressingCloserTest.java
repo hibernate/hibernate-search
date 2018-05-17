@@ -21,6 +21,19 @@ import org.junit.Test;
 public class SuppressingCloserTest {
 
 	@Test
+	public void nullCloseable() {
+		Throwable mainException = new Exception();
+
+		// Should not do anything, in particular should not throw any NPE
+		new SuppressingCloser( mainException ).push( null );
+		new SuppressingCloser( mainException ).pushAll( new Closeable[] { null } );
+		new SuppressingCloser( mainException ).pushAll( Arrays.asList( (Closeable) null ) );
+
+		assertThat( mainException )
+				.hasNoSuppressedExceptions();
+	}
+
+	@Test
 	public void javaIOCloseable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
@@ -34,8 +47,8 @@ public class SuppressingCloserTest {
 		};
 
 		new SuppressingCloser( mainException )
-				.push( closeable::close )
-				.push( () -> { throw exception2; } );
+				.push( closeable )
+				.push( ignored -> { throw exception2; }, new Object() );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -56,8 +69,8 @@ public class SuppressingCloserTest {
 		};
 
 		new SuppressingCloser( mainException )
-				.push( closeable::close )
-				.push( () -> { throw exception2; } );
+				.push( closeable )
+				.push( ignored -> { throw exception2; }, new Object() );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -72,9 +85,9 @@ public class SuppressingCloserTest {
 		RuntimeException exception3 = new UnsupportedOperationException();
 
 		new SuppressingCloser( mainException )
-				.push( () -> { throw exception1; } )
-				.push( () -> { throw exception2; } )
-				.push( () -> { throw exception3; } );
+				.push( ignored -> { throw exception1; }, new Object() )
+				.push( ignored -> { throw exception2; }, new Object() )
+				.push( ignored -> { throw exception3; }, new Object() );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -91,11 +104,11 @@ public class SuppressingCloserTest {
 
 		new SuppressingCloser( mainException )
 				.push( () -> { /* Do not fail */ } )
-				.push( () -> { throw exception1; } )
-				.push( () -> { throw exception2; } )
+				.push( ignored -> { throw exception1; }, new Object() )
+				.push( ignored -> { throw exception2; }, new Object() )
 				.push( () -> { /* Do not fail */ } )
 				.push( () -> { /* Do not fail */ } )
-				.push( () -> { throw exception3; } )
+				.push( ignored -> { throw exception3; }, new Object() )
 				.push( () -> { /* Do not fail */ } );
 
 		assertThat( mainException )
@@ -130,8 +143,8 @@ public class SuppressingCloserTest {
 		};
 
 		new SuppressingCloser( mainException )
-				.push( closeable::close )
-				.push( () -> { throw exception2; } );
+				.push( closeable )
+				.push( ignored -> { throw exception2; }, new Object() );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 );
@@ -152,7 +165,7 @@ public class SuppressingCloserTest {
 		);
 
 		new SuppressingCloser( mainException )
-				.pushAll( Closeable::close, closeables );
+				.pushAll( closeables );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
