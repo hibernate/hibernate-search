@@ -142,7 +142,7 @@ public final class Closer<E extends Exception> implements AutoCloseable {
 	 * @see <a href="#splitting">splitting</a>
 	 */
 	public <E2 extends Exception> Closer<E2> split() {
-		return new Closer<>();
+		return new Closer<>( state );
 	}
 
 	/**

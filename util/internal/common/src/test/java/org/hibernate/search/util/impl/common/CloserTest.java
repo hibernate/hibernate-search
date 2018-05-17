@@ -168,8 +168,8 @@ public class CloserTest {
 
 	@Test
 	public void split() throws IOException, MyException1, MyException2 {
-		MyException2 exception1 = new MyException2();
-		MyException1 exception2 = new MyException1();
+		MyException1 exception1 = new MyException1();
+		MyException2 exception2 = new MyException2();
 		IOException exception3 = new IOException();
 
 		thrown.expect(
@@ -183,21 +183,21 @@ public class CloserTest {
 				Closer<MyException1> closer2 = closer1.split();
 				Closer<MyException2> closer3 = closer1.split() ) {
 			/*
-			 * The first exception is caught by closer3,
-			 * but regardless of the fact that closer3 is the third
+			 * The first exception is caught by closer2,
+			 * so regardless of the fact that closer2 is the second
 			 * closer in the resource list, this exception should be
 			 * the one that is rethrown.
 			 */
-			closer3.push( () -> { throw exception1; } );
-			closer2.push( () -> { throw exception2; } );
+			closer2.push( () -> { throw exception1; } );
+			closer3.push( () -> { throw exception2; } );
 			closer1.push( () -> { throw exception3; } );
 		}
 	}
 
 	@Test
 	public void split_transitive() throws IOException, MyException1, MyException2 {
-		MyException2 exception1 = new MyException2();
-		MyException1 exception2 = new MyException1();
+		MyException1 exception1 = new MyException1();
+		MyException2 exception2 = new MyException2();
 		IOException exception3 = new IOException();
 
 		thrown.expect(
@@ -212,13 +212,13 @@ public class CloserTest {
 				// splitting on closer2 should be the same as splitting on closer1
 				Closer<MyException2> closer3 = closer2.split() ) {
 			/*
-			 * The first exception is caught by closer3,
-			 * but regardless of the fact that closer3 is the third
+			 * The first exception is caught by closer2,
+			 * so regardless of the fact that closer2 is the second
 			 * closer in the resource list, this exception should be
 			 * the one that is rethrown.
 			 */
-			closer3.push( () -> { throw exception1; } );
-			closer2.push( () -> { throw exception2; } );
+			closer2.push( () -> { throw exception1; } );
+			closer3.push( () -> { throw exception2; } );
 			closer1.push( () -> { throw exception3; } );
 		}
 	}
