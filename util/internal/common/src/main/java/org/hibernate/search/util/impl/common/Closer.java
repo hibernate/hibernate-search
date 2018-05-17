@@ -18,6 +18,9 @@ package org.hibernate.search.util.impl.common;
  * When creating then closing resources in the scope of a single method call,
  * try-with-resource blocks should be favored.
  * <p>
+ * See the {@link AbstractCloser} superclass for a list of methods
+ * allowing to close objects while catching exceptions.
+ * <p>
  * <strong>Warning:</strong> In order not to ignore exceptions,
  * you should <strong>always</strong> call {@link Closer#close()}
  * once you closed all of your resources. The most straightforward way
@@ -62,78 +65,21 @@ package org.hibernate.search.util.impl.common;
  * <strong>Be careful though, you will have to close every single closer.</strong>
  * Closing just the original one will not be enough.
  *
- * @param E The supertype of exceptions this closer can catch and re-throw,
+ * @param <E> The supertype of exceptions this closer can catch and re-throw,
  * besides {@link RuntimeException} and {@link Error}.
  *
  * @author Yoann Rodiere
  */
-public final class Closer<E extends Exception> implements AutoCloseable {
+public final class Closer<E extends Exception> extends AbstractCloser<Closer<E>, E> implements AutoCloseable {
 
-	private final State state;
+	private final CloseableState state;
 
 	public Closer() {
-		this( new State() );
+		this( new CloseableState() );
 	}
 
-	private Closer(State state) {
+	private Closer(CloseableState state) {
 		this.state = state;
-	}
-
-	/**
-	 * Execute the given close {@code operator} <strong>immediately</strong> on
-	 * the given {@code objectToClose}, swallowing any throwable in order to
-	 * throw it {@link #close() later}.
-	 * @param operator An operator to close {@code objectToClose}. Accepts lambdas
-	 * such as {@code MyType::close}.
-	 * @param objectToClose An object to close
-	 */
-	public <T> void push(ClosingOperator<T, ? extends E> operator, T objectToClose) {
-		try {
-			operator.close( objectToClose );
-		}
-		catch (Throwable t) {
-			state.addThrowable( this, t );
-		}
-	}
-
-	/**
-	 * Close the given {@code closeable} <strong>immediately</strong>,
-	 * swallowing any throwable in order to throw it {@link #close() later}.
-	 *
-	 * @param closeable A {@link GenericCloseable} to close. Accepts lambdas
-	 * such as {@code myObject::close}.
-	 */
-	public void push(GenericCloseable<? extends E> closeable) {
-		push( GenericCloseable::close, closeable );
-	}
-
-	/**
-	 * Execute the given close {@code operator} <strong>immediately</strong> on
-	 * each element of the given iterable, swallowing any throwable in order to
-	 * throw them {@link #close() later}.
-	 * @param operator An operator to close each element in {@code objectsToClose}. Accepts lambdas
-	 * such as {@code MyType::close}.
-	 * @param objectsToClose An iterable of objects to close
-	 */
-	public <T> void pushAll(ClosingOperator<T, ? extends E> operator, Iterable<T> objectsToClose) {
-		for ( T objectToClose : objectsToClose ) {
-			push( operator, objectToClose );
-		}
-	}
-
-	/**
-	 * Execute the given close {@code operator} <strong>immediately</strong> on
-	 * each element of the given array, swallowing any throwable in order to
-	 * throw them {@link #close() later}.
-	 * @param operator An operator to close each element in {@code objectsToClose}. Accepts lambdas
-	 * such as {@code MyType::close}.
-	 * @param objectsToClose An array of objects to close
-	 */
-	@SafeVarargs
-	public final <T> void pushAll(ClosingOperator<T, ? extends E> operator, T ... objectsToClose) {
-		for ( T objectToClose : objectsToClose ) {
-			push( operator, objectToClose );
-		}
 	}
 
 	/**
@@ -155,26 +101,20 @@ public final class Closer<E extends Exception> implements AutoCloseable {
 		state.close( this );
 	}
 
-	/**
-	 * This is implemented in a separate class so that multiple closers
-	 * can share the same state, allowing them to elect a single "first throwable".
-	 */
-	private static class State {
-		private Closer<?> firstThrower;
-		private Throwable firstThrowable;
+	@Override
+	CloseableState getState() {
+		return state;
+	}
 
-		public void addThrowable(Closer<?> source, Throwable throwable) {
-			if ( firstThrowable == null ) {
-				firstThrowable = throwable;
-				firstThrower = source;
-			}
-			else {
-				firstThrowable.addSuppressed( throwable );
-			}
-		}
+	@Override
+	Closer<E> getSelf() {
+		return this;
+	}
+
+	static class CloseableState extends State {
 
 		@SuppressWarnings("unchecked")
-		public <E extends Exception> void close(Closer<E> source) throws E {
+		<E extends Exception> void close(Closer<E> source) throws E {
 			if ( firstThrowable != null && source == firstThrower ) {
 				try {
 					if ( firstThrowable instanceof RuntimeException ) {
@@ -200,5 +140,4 @@ public final class Closer<E extends Exception> implements AutoCloseable {
 			}
 		}
 	}
-
 }
