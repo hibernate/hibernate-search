@@ -43,6 +43,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
+			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
 		}
 	}
 
