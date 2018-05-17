@@ -350,8 +350,8 @@ public class RangeSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-				.should().range().onField( "string" ).boostedTo( 42 ).above( STRING_3 )
-				.should().range().onField( "string" ).below( STRING_1 )
+						.should().range().onField( "string" ).boostedTo( 42 ).above( STRING_3 )
+						.should().range().onField( "string" ).below( STRING_1 )
 				.end()
 				.sort().byScore().end()
 				.build();

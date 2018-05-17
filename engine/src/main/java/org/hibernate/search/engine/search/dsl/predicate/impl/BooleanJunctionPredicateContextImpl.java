@@ -146,12 +146,6 @@ class BooleanJunctionPredicateContextImpl<N, C>
 			children.add( child );
 		}
 
-		public void addPredicate(SearchPredicate child) {
-			SearchPredicateContributor<C> contributor =
-					BooleanJunctionPredicateContextImpl.this.factory.toContributor( child );
-			addContributor( contributor );
-		}
-
 		@Override
 		public BooleanJunctionPredicateContext<N> getNextContext() {
 			return BooleanJunctionPredicateContextImpl.this;

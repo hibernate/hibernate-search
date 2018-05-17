@@ -86,7 +86,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 				.append( ", formatter=" ).append( formatter )
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
-				.append( ", sortContributor" ).append( sortContributor )
+				.append( ", sortContributor=" ).append( sortContributor )
 				.append( "]" );
 		return sb.toString();
 	}

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * The context used when defining a match predicate,
+ * The context used when defining a range predicate,
  * after the lower bound was provided but before the upper bound was provided.
  *
  * @param <N> The type of the next context (returned by {@link #to(Object)} for example).

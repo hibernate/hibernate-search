@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
@@ -20,6 +21,8 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
+
+	private static final JsonObjectAccessor MATCH = JsonAccessor.root().property( "match" ).asObject();
 
 	private final String absoluteFieldPath;
 
@@ -40,7 +43,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, getInnerObject() );
-		outerObject.add( "match", middleObject );
+		MATCH.set( outerObject, middleObject );
 		collector.collectPredicate( outerObject );
 	}
 

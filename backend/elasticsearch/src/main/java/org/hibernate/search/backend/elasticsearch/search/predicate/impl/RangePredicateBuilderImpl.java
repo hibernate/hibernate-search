@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
@@ -18,6 +19,8 @@ import com.google.gson.JsonObject;
  */
 public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateCollector> {
+
+	private static final JsonObjectAccessor RANGE = JsonAccessor.root().property( "range" ).asObject();
 
 	private static final JsonAccessor<JsonElement> GT = JsonAccessor.root().property( "gt" );
 	private static final JsonAccessor<JsonElement> GTE = JsonAccessor.root().property( "gte" );
@@ -74,7 +77,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
-		outerObject.add( "range", middleObject );
+		RANGE.set( outerObject, middleObject );
 
 		collector.collectPredicate( outerObject );
 	}

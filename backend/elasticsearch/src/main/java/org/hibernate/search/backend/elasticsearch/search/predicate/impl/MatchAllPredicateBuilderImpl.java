@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import com.google.gson.JsonObject;
@@ -16,10 +18,12 @@ import com.google.gson.JsonObject;
 class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateCollector> {
 
+	private static final JsonObjectAccessor MATCH_ALL = JsonAccessor.root().property( "match_all" ).asObject();
+
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
-		outerObject.add( "match_all", getInnerObject() );
+		MATCH_ALL.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );
 	}
 

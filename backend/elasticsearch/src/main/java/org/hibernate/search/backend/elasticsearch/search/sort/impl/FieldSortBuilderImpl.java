@@ -22,7 +22,7 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
 	private final String absoluteFieldPath;
-	private ElasticsearchFieldCodec fieldCodec;
+	private final ElasticsearchFieldCodec fieldCodec;
 
 	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec fieldCodec) {
 		this.absoluteFieldPath = absoluteFieldPath;

@@ -29,7 +29,7 @@ public final class Executors {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Executors() {
-		//now allowed
+		//not allowed
 	}
 
 	/**
