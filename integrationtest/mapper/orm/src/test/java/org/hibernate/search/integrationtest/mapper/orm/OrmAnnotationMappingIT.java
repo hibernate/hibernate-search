@@ -57,7 +57,7 @@ import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomT
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;

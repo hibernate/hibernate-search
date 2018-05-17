@@ -28,6 +28,7 @@
     <modules>
         <module>build-config</module>
         <module>util/internal/common</module>
+        <module>util/internal/test</module>
         <module>engine</module>
         <module>backend/elasticsearch</module>
         <module>backend/lucene</module>
@@ -182,6 +183,7 @@
          -->
         <sonar.coverage.exclusions>
             **/org/hibernate/checkstyle/**,
+            **/org/hibernate/search/util/impl/test/**,
             **/org/hibernate/search/util/impl/integrationtest/**,
             **/org/hibernate/search/integrationtest/**
         </sonar.coverage.exclusions>
@@ -192,6 +194,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-util-internal-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-search-util-internal-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomPropertyBridgeAnnotation;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public final class CustomPropertyBridge implements PropertyBridge {
 
