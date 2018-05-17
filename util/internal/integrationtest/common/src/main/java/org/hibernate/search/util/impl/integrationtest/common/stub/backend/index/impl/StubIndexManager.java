@@ -27,6 +27,8 @@ public class StubIndexManager implements IndexManager<StubDocumentElement> {
 	private final StubBackend backend;
 	private final String name;
 
+	private boolean closed = false;
+
 	StubIndexManager(StubBackend backend, String name, StubIndexSchemaNode rootSchemaNode) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
@@ -36,7 +38,16 @@ public class StubIndexManager implements IndexManager<StubDocumentElement> {
 
 	@Override
 	public void close() {
+
+		/*
+		 * This is important so that multiple calls to close on a single index manager
+		 * won't be interpreted as closing multiple objects in test assertions.
+		 */
+		if ( closed ) {
+			return;
+		}
 		StaticCounters.get().increment( CLOSE_COUNTER_KEY );
+		closed = true;
 	}
 
 	@Override

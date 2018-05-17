@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm;
 
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
-import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,26 +42,23 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
 import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
+import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
-import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -173,34 +169,6 @@ public class OrmAnnotationMappingIT {
 		if ( sessionFactory != null ) {
 			sessionFactory.close();
 		}
-	}
-
-	@Test
-	public void lifecycle() {
-		// More bridges may have been instantiated, but only the below number should be active
-		// (the others should have been dropped because they were completely filtered out)
-		assertEquals( 4, counters.get( CustomTypeBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 3, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 1, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 3, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
-		sessionFactory.close();
-		sessionFactory = null;
-		// All instantiated resources should have been closed
-		assertEquals( 0, counters.get( CustomTypeBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( CustomTypeBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( CustomPropertyBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( CustomPropertyBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( IntegerAsStringValueBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( IntegerAsStringValueBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( OptionalIntAsStringValueBridge.INSTANCE_COUNTER_KEY )
-				- counters.get( OptionalIntAsStringValueBridge.CLOSE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
 
 	@Test

@@ -82,6 +82,13 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
+	public BackendMock expectAnySchema(String indexName) {
+		String normalizedIndexName = StubBackendUtils.normalizeIndexName( indexName );
+		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( normalizedIndexName );
+		callQueue.expect( new PushSchemaCall( normalizedIndexName, null ) );
+		return this;
+	}
+
 	public WorkCallListContext expectWorks(String indexName) {
 		String normalizedIndexName = StubBackendUtils.normalizeIndexName( indexName );
 		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( normalizedIndexName );

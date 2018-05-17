@@ -7,16 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.pojo.bridge;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public final class IntegerAsStringValueBridge implements ValueBridge<Integer, String> {
-
-	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
-	public static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
-
-	public IntegerAsStringValueBridge() {
-		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
-	}
 
 	@Override
 	public String toIndexedValue(Integer value) {
@@ -25,6 +17,6 @@ public final class IntegerAsStringValueBridge implements ValueBridge<Integer, St
 
 	@Override
 	public void close() {
-		StaticCounters.get().increment( CLOSE_COUNTER_KEY );
+		// Nothing to do
 	}
 }

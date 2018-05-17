@@ -141,7 +141,8 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 		}
 		catch (RuntimeException e) {
 			// Close the nested processors created so far before aborting
-			new SuppressingCloser( e ).pushAll( PojoIndexingProcessor::close, immutablePropertyNodes );
+			new SuppressingCloser( e )
+					.pushAll( PojoIndexingProcessor::close, immutablePropertyNodes );
 			throw e;
 		}
 	}

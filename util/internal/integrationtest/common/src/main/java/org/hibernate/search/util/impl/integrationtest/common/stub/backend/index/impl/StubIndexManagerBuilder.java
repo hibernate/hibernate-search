@@ -9,18 +9,40 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocumentElement> {
+
+	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
+	public static final StaticCounters.Key CLOSE_ON_FAILURE_COUNTER_KEY = StaticCounters.createKey();
+	public static final StaticCounters.Key BUILD_COUNTER_KEY = StaticCounters.createKey();
 
 	private final StubBackend backend;
 	private final String name;
 	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder();
 
+	private boolean closed = false;
+
 	public StubIndexManagerBuilder(StubBackend backend, String name) {
+		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+	}
+
+	@Override
+	public void closeOnFailure() {
+		/*
+		 * This is important so that multiple calls to close on a single index manager builder
+		 * won't be interpreted as closing multiple objects in test assertions.
+		 */
+		if ( closed ) {
+			return;
+		}
+		StaticCounters.get().increment( CLOSE_ON_FAILURE_COUNTER_KEY );
+		closed = true;
 	}
 
 	@Override
@@ -30,6 +52,11 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 
 	@Override
 	public IndexManager<StubDocumentElement> build() {
+		if ( closed ) {
+			throw new AssertionFailure( "Unexpected call to build after a call to build() or to closeOnFailure()" );
+		}
+		StaticCounters.get().increment( BUILD_COUNTER_KEY );
+		closed = true;
 		return new StubIndexManager( backend, name, schemaRootNodeBuilder.build() );
 	}
 }

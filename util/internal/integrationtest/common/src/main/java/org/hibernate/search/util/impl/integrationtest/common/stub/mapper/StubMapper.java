@@ -30,6 +30,11 @@ class StubMapper implements Mapper<StubMapping> {
 	}
 
 	@Override
+	public void closeOnFailure() {
+		// Nothing to do
+	}
+
+	@Override
 	public boolean isMultiTenancyEnabled() {
 		return multiTenancyEnabled;
 	}

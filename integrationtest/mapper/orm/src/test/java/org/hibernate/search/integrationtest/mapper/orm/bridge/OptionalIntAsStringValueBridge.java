@@ -9,16 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.bridge;
 import java.util.OptionalInt;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public final class OptionalIntAsStringValueBridge implements ValueBridge<OptionalInt, String> {
-
-	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
-	public static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
-
-	public OptionalIntAsStringValueBridge() {
-		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
-	}
 
 	@Override
 	public String toIndexedValue(OptionalInt value) {
@@ -29,6 +21,6 @@ public final class OptionalIntAsStringValueBridge implements ValueBridge<Optiona
 
 	@Override
 	public void close() {
-		StaticCounters.get().increment( CLOSE_COUNTER_KEY );
+		// Nothing to do
 	}
 }

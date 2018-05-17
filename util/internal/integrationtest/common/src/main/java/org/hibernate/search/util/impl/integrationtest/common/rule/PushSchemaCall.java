@@ -20,9 +20,11 @@ class PushSchemaCall {
 	}
 
 	public Void verify(PushSchemaCall actualCall) {
-		StubTreeNodeAssert.assertThat( actualCall.schemaNode )
-				.as( "Schema for index '" + indexName + "' did not match:\n" )
-				.matches( schemaNode );
+		if ( schemaNode != null ) {
+			StubTreeNodeAssert.assertThat( actualCall.schemaNode )
+					.as( "Schema for index '" + indexName + "' did not match:\n" )
+					.matches( schemaNode );
+		}
 		return null;
 	}
 
