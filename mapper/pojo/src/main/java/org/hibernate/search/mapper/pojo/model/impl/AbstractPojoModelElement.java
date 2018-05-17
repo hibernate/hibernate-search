@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -29,7 +29,8 @@ import org.hibernate.search.util.SearchException;
 abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
-	private final Map<String, PojoModelNestedElement<V, ?>> properties = new HashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<String, PojoModelNestedElement<V, ?>> properties = new LinkedHashMap<>();
 	private PojoTypeAdditionalMetadata typeAdditionalMetadata;
 	private boolean propertiesInitialized = false;
 

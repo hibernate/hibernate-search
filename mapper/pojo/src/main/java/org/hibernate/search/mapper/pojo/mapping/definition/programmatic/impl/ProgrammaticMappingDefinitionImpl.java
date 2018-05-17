@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -24,7 +24,8 @@ public class ProgrammaticMappingDefinitionImpl implements ProgrammaticMappingDef
 
 	private final PojoBootstrapIntrospector introspector;
 
-	private final Map<Class<?>, TypeMappingContextImpl> entities = new HashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<Class<?>, TypeMappingContextImpl> entities = new LinkedHashMap<>();
 
 	public ProgrammaticMappingDefinitionImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory,
 			PojoBootstrapIntrospector introspector) {

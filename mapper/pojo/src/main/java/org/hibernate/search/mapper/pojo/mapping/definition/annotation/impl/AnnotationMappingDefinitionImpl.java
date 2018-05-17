@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,7 +28,8 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 
 	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
 	private final PojoBootstrapIntrospector introspector;
-	private final Set<Class<?>> annotatedTypes = new HashSet<>();
+	// Use a LinkedHashSet for deterministic iteration
+	private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
 	private final boolean annotatedTypeDiscoveryEnabled;
 
 	public AnnotationMappingDefinitionImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory,

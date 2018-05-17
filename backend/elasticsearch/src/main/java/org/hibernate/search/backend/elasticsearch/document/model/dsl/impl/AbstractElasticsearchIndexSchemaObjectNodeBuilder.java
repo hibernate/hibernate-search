@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
@@ -25,7 +25,8 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> content = new HashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> content = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {

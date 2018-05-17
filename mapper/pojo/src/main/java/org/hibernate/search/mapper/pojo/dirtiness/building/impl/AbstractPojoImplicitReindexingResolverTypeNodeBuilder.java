@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,8 +23,9 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder {
 
 	private final BoundPojoModelPathTypeNode<U> modelPath;
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
-			new HashMap<>();
+			new LinkedHashMap<>();
 
 	private boolean shouldMarkForReindexing = false;
 

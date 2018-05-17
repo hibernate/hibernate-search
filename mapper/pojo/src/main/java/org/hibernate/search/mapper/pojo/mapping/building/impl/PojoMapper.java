@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +57,7 @@ class PojoMapper<M> implements Mapper<M> {
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
 
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
 
@@ -169,7 +170,8 @@ class PojoMapper<M> implements Mapper<M> {
 	}
 
 	private Set<PojoRawTypeModel<?>> computeEntityTypes() {
-		Set<PojoRawTypeModel<?>> entityTypes = new HashSet<>();
+		// Use a LinkedHashSet for deterministic iteration
+		Set<PojoRawTypeModel<?>> entityTypes = new LinkedHashSet<>();
 		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.getTypesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			PojoRawTypeModel<?> pojoRawTypeModel = (PojoRawTypeModel<?>) mappableTypeModel;

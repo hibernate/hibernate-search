@@ -80,6 +80,7 @@ public class SearchSetupHelper implements TestRule {
 	public class SetupContext {
 
 		private final ConfigurationPropertySource propertySource;
+		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;

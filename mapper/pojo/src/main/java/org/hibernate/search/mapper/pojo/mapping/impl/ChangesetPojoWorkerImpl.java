@@ -23,7 +23,7 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 	private final PojoSessionContext sessionContext;
-	// Use a LinkedHashMap for stable ordering across JVMs
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Class<?>, ChangesetPojoIndexedTypeWorker<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, ChangesetPojoContainedTypeWorker<?>> containedTypeDelegates = new HashMap<>();
 

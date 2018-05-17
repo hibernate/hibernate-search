@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.building.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,8 +50,9 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
+	// Use a LinkedHashMap for deterministic iteration
 	private Map<ContainerValueExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
-			containerElementNodeBuilders = new HashMap<>();
+			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoIndexingProcessorPropertyNodeBuilder(
 			BoundPojoModelPathPropertyNode<T, P> modelPath,

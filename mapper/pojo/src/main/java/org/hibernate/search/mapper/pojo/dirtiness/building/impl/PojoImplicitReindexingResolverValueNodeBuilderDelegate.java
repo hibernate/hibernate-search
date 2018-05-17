@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,8 +24,9 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 	private final PojoImplicitReindexingResolverBuildingHelper buildingHelper;
 
 	private PojoImplicitReindexingResolverOriginalTypeNodeBuilder<V> typeNodeBuilder;
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ?>>
-			castedTypeNodeBuilders = new HashMap<>();
+			castedTypeNodeBuilders = new LinkedHashMap<>();
 
 	PojoImplicitReindexingResolverValueNodeBuilderDelegate(BoundPojoModelPathValueNode<?, ?, V> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {

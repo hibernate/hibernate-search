@@ -126,7 +126,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	private static class MetadataCollectorImpl implements MetadataCollector {
-		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new HashMap<>();
+		// Use a LinkedHashMap for deterministic iteration
+		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new LinkedHashMap<>();
 		private boolean frozen = false;
 
 		@Override
@@ -153,7 +154,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				BuildContext buildContext, ConfigurationPropertySource propertySource,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
 			frozen = true;
-			Map<MappingKey<?>, Mapper<?>> mappers = new HashMap<>();
+			// Use a LinkedHashMap for deterministic iteration
+			Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
 			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
 				Mapper<?> mapper = contribution.preBuild( buildContext, propertySource, indexManagerBuildingStateProvider );
 				mappers.put( mappingKey, mapper );
@@ -188,6 +190,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private static class MapperContribution<C, M> {
 
 		private final MapperFactory<C, M> mapperFactory;
+		// Use a LinkedHashMap for deterministic iteration
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
 		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
@@ -268,7 +271,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 			@Override
 			public Set<? extends MappableTypeModel> getTypesContributedTo() {
-				return Collections.unmodifiableSet( new HashSet<>( contributionByType.keySet() ) );
+				// Use a LinkedHashSet for deterministic iteration
+				return Collections.unmodifiableSet( new LinkedHashSet<>( contributionByType.keySet() ) );
 			}
 		}
 	}

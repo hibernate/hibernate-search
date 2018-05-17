@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -16,7 +17,8 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
 	private boolean entity;
-	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new HashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
 	@Override
 	public void markAsEntity() {
@@ -32,7 +34,6 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		Map<String, PojoPropertyAdditionalMetadata> properties = new HashMap<>();
 		for ( Map.Entry<String, PojoPropertyAdditionalMetadataBuilder> entry : propertyBuilders.entrySet() ) {
 			properties.put( entry.getKey(), entry.getValue().build() );
-
 		}
 		return new PojoTypeAdditionalMetadata( entity, properties );
 	}

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -118,7 +119,8 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				PojoTypeModel<?> originalSideEntityType = lastEntityNode.getTypeModel();
 				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.getRawType();
 
-				result = new HashMap<>();
+				// Use a LinkedHashMap for deterministic iteration
+				result = new LinkedHashMap<>();
 
 				for ( PojoRawTypeModel<?> concreteEntityType :
 						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {

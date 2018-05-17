@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,8 +16,8 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
@@ -26,8 +26,9 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 	private final PojoImplicitReindexingResolverValueNodeBuilderDelegate<P> valueWithoutExtractorsBuilderDelegate;
+	// Use a LinkedHashMap for deterministic iteration
 	private Map<ContainerValueExtractorPath, PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?>>
-			containerElementNodeBuilders = new HashMap<>();
+			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoImplicitReindexingResolverPropertyNodeBuilder(BoundPojoModelPathPropertyNode<T, P> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {

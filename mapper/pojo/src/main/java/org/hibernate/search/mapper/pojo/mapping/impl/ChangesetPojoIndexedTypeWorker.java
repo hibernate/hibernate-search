@@ -27,7 +27,7 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final ChangesetIndexWorker<D> delegate;
 
-	// Use a LinkedHashMap for stable ordering across JVMs
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, WorkPlanPerDocument> workPlansPerId = new LinkedHashMap<>();
 
 	ChangesetPojoIndexedTypeWorker(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,

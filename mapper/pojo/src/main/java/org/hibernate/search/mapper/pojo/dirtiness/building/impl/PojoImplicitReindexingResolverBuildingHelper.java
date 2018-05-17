@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -48,7 +48,11 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			if ( !entityType.isAbstract() ) {
 				entityType.getAscendingSuperTypes().forEach(
 						superType ->
-								concreteEntitySubTypesByEntitySuperType.computeIfAbsent( superType, ignored -> new HashSet<>() )
+								concreteEntitySubTypesByEntitySuperType.computeIfAbsent(
+										superType,
+										// Use a LinkedHashSet for deterministic iteration
+										ignored -> new LinkedHashSet<>()
+								)
 										.add( entityType )
 				);
 			}

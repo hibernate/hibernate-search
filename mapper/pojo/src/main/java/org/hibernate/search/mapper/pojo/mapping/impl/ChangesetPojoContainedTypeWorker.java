@@ -20,7 +20,7 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 
 	private final PojoContainedTypeManager<E> typeManager;
 
-	// Use a LinkedHashMap for stable ordering across JVMs
+	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Object, WorkPlanPerDocument> workPlansPerId = new LinkedHashMap<>();
 
 	ChangesetPojoContainedTypeWorker(PojoContainedTypeManager<E> typeManager, PojoSessionContext sessionContext) {

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,8 @@ public class PojoContainedTypeManagerContainer {
 
 	public static class Builder {
 
-		private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass = new HashMap<>();
+		// Use a LinkedHashMap for deterministic iteration
+		private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass = new LinkedHashMap<>();
 
 		private Builder() {
 		}
