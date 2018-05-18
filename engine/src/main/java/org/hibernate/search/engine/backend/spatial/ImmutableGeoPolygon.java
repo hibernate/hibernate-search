@@ -10,15 +10,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.util.impl.common.Contracts;
+
 public class ImmutableGeoPolygon implements GeoPolygon {
 
 	private List<GeoPoint> points = new ArrayList<>();
 
 	public ImmutableGeoPolygon(List<GeoPoint> points) {
+		Contracts.assertNotNull( points, "points" );
+
 		this.points.addAll( points );
 	}
 
 	public ImmutableGeoPolygon(GeoPoint firstPoint, GeoPoint secondPoint, GeoPoint thirdPoint, GeoPoint fourthPoint, GeoPoint... additionalPoints) {
+		Contracts.assertNotNull( firstPoint, "firstPoint" );
+		Contracts.assertNotNull( secondPoint, "secondPoint" );
+		Contracts.assertNotNull( thirdPoint, "thirdPoint" );
+		Contracts.assertNotNull( fourthPoint, "fourthPoint" );
+
 		points.add( firstPoint );
 		points.add( secondPoint );
 		points.add( thirdPoint );

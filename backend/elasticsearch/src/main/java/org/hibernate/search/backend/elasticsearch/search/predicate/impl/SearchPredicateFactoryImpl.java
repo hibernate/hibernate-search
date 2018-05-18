@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -84,7 +85,14 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> spatialWithinPolygon(String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
+				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateCollector> spatialWithinBoundingBox(String absoluteFieldPath) {
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
+				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

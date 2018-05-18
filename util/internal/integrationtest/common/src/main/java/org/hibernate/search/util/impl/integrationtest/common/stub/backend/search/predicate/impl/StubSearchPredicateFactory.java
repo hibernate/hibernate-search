@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 
@@ -58,6 +59,11 @@ public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQu
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<StubQueryElementCollector> spatialWithinPolygon(String absoluteFieldPath) {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public SpatialWithinBoundingBoxPredicateBuilder<StubQueryElementCollector> spatialWithinBoundingBox(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 

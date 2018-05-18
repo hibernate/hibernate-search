@@ -37,4 +37,6 @@ public interface SearchPredicateFactory<C> {
 
 	SpatialWithinPolygonPredicateBuilder<C> spatialWithinPolygon(String absoluteFieldPath);
 
+	SpatialWithinBoundingBoxPredicateBuilder<C> spatialWithinBoundingBox(String absoluteFieldPath);
+
 }

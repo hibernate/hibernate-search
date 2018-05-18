@@ -12,13 +12,16 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.backend.spatial.GeoPolygon;
+import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinBoundingBoxPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinCirclePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPolygonPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -70,6 +73,13 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 	}
 
 	@Override
+	public SpatialWithinBoundingBoxPredicateContext<N> boundingBox(GeoBoundingBox boundingBox) {
+		Contracts.assertNotNull( boundingBox, "boundingBox" );
+
+		return commonState.boundingBox( boundingBox );
+	}
+
+	@Override
 	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector) {
 		queryBuilders.forEach( collector );
 	}
@@ -89,6 +99,17 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinPolygonPredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
 			predicateBuilder.polygon( polygon );
+			if ( boost != null ) {
+				predicateBuilder.boost( boost );
+			}
+			queryBuilders.add( predicateBuilder );
+		}
+	}
+
+	private void generateWithinBoundingBoxQueryBuilders(GeoBoundingBox boundingBox) {
+		for ( String absoluteFieldPath : absoluteFieldPaths ) {
+			SpatialWithinBoundingBoxPredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
+			predicateBuilder.boundingBox( boundingBox );
 			if ( boost != null ) {
 				predicateBuilder.boost( boost );
 			}
@@ -117,5 +138,14 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 
 			return new SpatialWithinPolygonPredicateContextImpl<N>( getNextContextProvider() );
 		}
+
+		public SpatialWithinBoundingBoxPredicateContext<N> boundingBox(GeoBoundingBox boundingBox) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<N, C> fieldSetContext : getFieldSetContexts() ) {
+				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
+			}
+
+			return new SpatialWithinBoundingBoxPredicateContextImpl<N>( getNextContextProvider() );
+		}
 	}
+
 }

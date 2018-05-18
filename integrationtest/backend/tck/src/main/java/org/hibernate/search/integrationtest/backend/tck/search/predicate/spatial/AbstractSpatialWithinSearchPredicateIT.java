@@ -44,7 +44,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	protected IndexAccessors indexAccessors;
 	protected IndexManager<?> indexManager;
 	protected String indexName;
 	protected SessionContext sessionContext = new StubSessionContext();
@@ -65,7 +65,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		initData();
 	}
 
-	private void initData() {
+	protected void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			indexAccessors.string.write( document, OURSON_QUI_BOIT_STRING );
@@ -104,7 +104,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		assertThat( query ).hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
 	}
 
-	private static class IndexAccessors {
+	protected static class IndexAccessors {
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 		final IndexFieldAccessor<GeoPoint> geoPoint_1;
 		final IndexFieldAccessor<GeoPoint> geoPoint_2;
