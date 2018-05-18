@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 abstract class AbstractStandardLuceneFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
@@ -22,4 +23,8 @@ abstract class AbstractStandardLuceneFieldPredicateBuilderFactory implements Luc
 		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}
 
+	@Override
+	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
+		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
+	}
 }

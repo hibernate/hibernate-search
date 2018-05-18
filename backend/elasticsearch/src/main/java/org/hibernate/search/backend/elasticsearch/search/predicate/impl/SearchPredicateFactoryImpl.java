@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -79,6 +80,11 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> spatialWithinCircle(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> spatialWithinPolygon(String absoluteFieldPath) {
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -41,6 +42,11 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
+		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
 		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}
 }

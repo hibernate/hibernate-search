@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 
 public interface ElasticsearchFieldPredicateBuilderFactory {
 
@@ -18,4 +19,6 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	RangePredicateBuilder<ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath);
+
+	SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath);
 }

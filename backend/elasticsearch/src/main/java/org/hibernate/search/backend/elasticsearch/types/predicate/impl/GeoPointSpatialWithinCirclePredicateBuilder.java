@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -17,6 +18,8 @@ import com.google.gson.JsonObject;
 
 class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicateBuilder
 		implements SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> {
+
+	private static final JsonObjectAccessor GEO_DISTANCE = JsonAccessor.root().property( "geo_distance" ).asObject();
 
 	private static final JsonAccessor<Double> DISTANCE = JsonAccessor.root().property( "distance" ).asDouble();
 
@@ -38,7 +41,7 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicat
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
-		outerObject.add( "geo_distance", getInnerObject() );
+		GEO_DISTANCE.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );
 	}
 

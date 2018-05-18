@@ -35,4 +35,6 @@ public interface SearchPredicateFactory<C> {
 
 	SpatialWithinCirclePredicateBuilder<C> spatialWithinCircle(String absoluteFieldPath);
 
+	SpatialWithinPolygonPredicateBuilder<C> spatialWithinPolygon(String absoluteFieldPath);
+
 }

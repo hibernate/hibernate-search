@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -73,6 +74,11 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateCollector> spatialWithinCircle(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateCollector> spatialWithinPolygon(String absoluteFieldPath) {
+		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
