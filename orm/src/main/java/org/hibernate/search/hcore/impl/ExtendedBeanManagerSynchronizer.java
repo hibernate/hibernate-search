@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.List;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.hibernate.jpa.event.spi.jpa.ExtendedBeanManager;
@@ -18,27 +19,30 @@ import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 class ExtendedBeanManagerSynchronizer
 		implements EnvironmentSynchronizer, ExtendedBeanManager.LifecycleListener {
 
-	private final CompletableFuture<Void> environmentInitialized = new CompletableFuture<>();
-
-	private final CompletableFuture<Void> environmentDestroying = new CompletableFuture<>();
+	private final List<Runnable> environmentInitializedActions = new ArrayList<>();
+	private final List<Runnable> environmentDestroyingActions = new ArrayList<>();
 
 	@Override
-	public void whenEnvironmentReady(Runnable runnable) {
-		environmentInitialized.thenRun( runnable );
+	public void whenEnvironmentReady(Runnable action) {
+		environmentInitializedActions.add( action );
 	}
 
 	@Override
-	public void whenEnvironmentDestroying(Runnable runnable) {
-		environmentDestroying.thenRun( runnable );
+	public void whenEnvironmentDestroying(Runnable action) {
+		environmentDestroyingActions.add( action );
 	}
 
 	@Override
 	public void beanManagerInitialized(BeanManager beanManager) {
-		environmentInitialized.complete( null );
+		for ( Runnable action : environmentInitializedActions ) {
+			action.run();
+		}
 	}
 
 	@Override
 	public void beforeBeanManagerDestroyed(BeanManager beanManager) {
-		environmentDestroying.complete( null );
+		for ( Runnable action : environmentDestroyingActions ) {
+			action.run();
+		}
 	}
 }
