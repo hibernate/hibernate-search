@@ -118,7 +118,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( extendedSearchIntegratorFuture.isDone() ) {
 			return;
 		}
-		boolean failedBoot = true;
 		try {
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
@@ -136,18 +135,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
 			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
-
-			failedBoot = false;
 		}
 		catch (Throwable t) {
 			extendedSearchIntegratorFuture.completeExceptionally( t );
 			// This will make the SessionFactory abort and close itself
 			throw t;
-		}
-		finally {
-			if ( failedBoot ) {
-				factory.close();
-			}
 		}
 	}
 
