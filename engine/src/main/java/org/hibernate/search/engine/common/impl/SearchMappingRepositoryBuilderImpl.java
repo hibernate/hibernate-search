@@ -116,11 +116,13 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			} );
 
 			builtResult = new SearchMappingRepositoryImpl(
-					mappings, indexManagerBuildingStateHolder.getBackendsByName()
+					mappings,
+					indexManagerBuildingStateHolder.getBackendsByName(),
+					indexManagerBuildingStateHolder.getIndexManagersByName()
 			);
 		}
 		catch (RuntimeException e) {
-			// Close the mappers and mappings created so far before aborting (they should close their index manager)
+			// Close the mappers and mappings created so far before aborting
 			SuppressingCloser closer = new SuppressingCloser( e );
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( Mapper::closeOnFailure, mappers.values() );
@@ -251,7 +253,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				}
 			}
 			catch (RuntimeException e) {
-				// Close the mapper before aborting (it should close its index managers)
+				// Close the mapper before aborting
 				new SuppressingCloser( e ).push( mapper::closeOnFailure );
 				throw e;
 			}

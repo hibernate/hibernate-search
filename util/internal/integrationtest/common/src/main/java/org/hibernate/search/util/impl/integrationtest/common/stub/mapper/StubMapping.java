@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.util.impl.common.Closer;
 
 public class StubMapping implements MappingImplementor<StubMapping> {
 
@@ -38,8 +37,6 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 
 	@Override
 	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( IndexManager::close, indexManagersByTypeIdentifier.values() );
-		}
+		// Nothing to do
 	}
 }

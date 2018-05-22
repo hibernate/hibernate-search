@@ -7,8 +7,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
@@ -51,7 +51,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 	}
 
 	@Override
-	public IndexManager<StubDocumentElement> build() {
+	public IndexManagerImplementor<StubDocumentElement> build() {
 		if ( closed ) {
 			throw new AssertionFailure( "Unexpected call to build after a call to build() or to closeOnFailure()" );
 		}

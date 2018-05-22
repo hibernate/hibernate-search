@@ -8,14 +8,14 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexManager implements IndexManager<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexManager implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

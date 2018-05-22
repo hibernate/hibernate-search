@@ -10,12 +10,11 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.common.spi.SessionContext;
 
 /**
- * @author Yoann Rodiere
+ * The object responsible for applying works and searches to a full-text index.
+ * <p>
+ * This is the interface provided to mappers to access the index manager.
  */
-public interface IndexManager<D extends DocumentElement> extends AutoCloseable {
-
-	@Override
-	void close();
+public interface IndexManager<D extends DocumentElement> {
 
 	ChangesetIndexWorker<D> createWorker(SessionContext sessionContext);
 

@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 
@@ -72,6 +74,14 @@ class IndexManagerBuildingStateHolder {
 		return backendsByName;
 	}
 
+	Map<String, IndexManagerImplementor<?>> getIndexManagersByName() {
+		Map<String, IndexManagerImplementor<?>> indexManagersByName = new HashMap<>();
+		for ( Map.Entry<String, IndexMappingBuildingStateImpl<?>> entry : indexManagerBuildingStateByName.entrySet() ) {
+			indexManagersByName.put( entry.getKey(), entry.getValue().getBuilt() );
+		}
+		return indexManagersByName;
+	}
+
 	void closeOnFailure(SuppressingCloser closer) {
 		closer.pushAll( state -> state.closeOnFailure( closer ), indexManagerBuildingStateByName.values() );
 		closer.pushAll( BackendImplementor::close, backendsByName.values() );
@@ -96,11 +106,13 @@ class IndexManagerBuildingStateHolder {
 		return backendFactory.create( backendName, buildContext, backendPropertySource );
 	}
 
-	private static class IndexMappingBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
+	private class IndexMappingBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
 		private final IndexModelBindingContext bindingContext;
+
+		private IndexManagerImplementor<D> built;
 
 		IndexMappingBuildingStateImpl(String indexName,
 				IndexManagerBuilder<D> builder,
@@ -111,7 +123,12 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		void closeOnFailure(SuppressingCloser closer) {
-			closer.push( IndexManagerBuilder::closeOnFailure, builder );
+			if ( built != null ) {
+				closer.push( IndexManagerImplementor::close, built );
+			}
+			else {
+				closer.push( IndexManagerBuilder::closeOnFailure, builder );
+			}
 		}
 
 		@Override
@@ -126,7 +143,24 @@ class IndexManagerBuildingStateHolder {
 
 		@Override
 		public IndexManager<D> build() {
-			return builder.build();
+			if ( built != null ) {
+				throw new AssertionFailure(
+						"Trying to build index manager " + indexName + " twice."
+						+ " There is probably a bug in the mapper implementation."
+				);
+			}
+			built = builder.build();
+			return built;
+		}
+
+		public IndexManagerImplementor<D> getBuilt() {
+			if ( built == null ) {
+				throw new AssertionFailure(
+						"Index manager " + indexName + " was not built by the mapper as expected."
+						+ " There is probably a bug in the mapper implementation."
+				);
+			}
+			return built;
 		}
 	}
 

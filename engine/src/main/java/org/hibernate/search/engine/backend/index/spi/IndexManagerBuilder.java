@@ -36,6 +36,6 @@ public interface IndexManagerBuilder<D extends DocumentElement> {
 	 *
 	 * @return The index manager.
 	 */
-	IndexManager<D> build();
+	IndexManagerImplementor<D> build();
 
 }
