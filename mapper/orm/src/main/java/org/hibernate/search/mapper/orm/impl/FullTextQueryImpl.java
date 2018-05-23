@@ -247,7 +247,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
-	@Override // No generics, see unwrap() (same issue)
+	@Override
 	public <T> T getParameterValue(Parameter<T> param) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
