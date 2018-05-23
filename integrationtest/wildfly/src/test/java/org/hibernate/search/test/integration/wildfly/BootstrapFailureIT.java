@@ -32,7 +32,6 @@ import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
@@ -56,16 +55,14 @@ public class BootstrapFailureIT {
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Deployment(name = FAILING_DEPLOYMENT, managed = false)
+	@Deployment(name = FAILING_DEPLOYMENT, managed = false, testable = false)
 	public static Archive<?> createFailingArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, BootstrapFailureIT.class.getSimpleName() + ".war" )
 				// No need to add the test class, we just want a failing deployment
 				// ... but we still need an indexed entity
 				.addClass( Member.class )
-				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsResource( persistenceXml(), "META-INF/persistence.xml" );
 	}
 
 	private static Asset persistenceXml() {
