@@ -53,7 +53,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private final Properties overriddenProperties = new Properties();
 	private final Collection<MetadataContributor> contributors = new ArrayList<>();
 
-	private BeanResolver beanResolver = new ReflectionBeanResolver();
+	private BeanResolver beanResolver;
 	private SearchMappingRepository builtResult;
 
 	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
@@ -86,24 +86,29 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 	@Override
 	public SearchMappingRepository build() {
-		ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
-		BuildContext buildContext = new BuildContextImpl( serviceManager );
-
-		ConfigurationPropertySource propertySource;
-		if ( !overriddenProperties.isEmpty() ) {
-			propertySource = ConfigurationPropertySource.fromProperties( overriddenProperties )
-					.withFallback( mainPropertySource );
-		}
-		else {
-			propertySource = mainPropertySource;
-		}
-
-		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder =
-				new IndexManagerBuildingStateHolder( buildContext, propertySource );
+		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
 		Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
+
 		try {
+			if ( beanResolver == null ) {
+				beanResolver = new ReflectionBeanResolver();
+			}
+			ServiceManager serviceManager = new ServiceManagerImpl( beanResolver );
+			BuildContext buildContext = new BuildContextImpl( serviceManager );
+
+			ConfigurationPropertySource propertySource;
+			if ( !overriddenProperties.isEmpty() ) {
+				propertySource = ConfigurationPropertySource.fromProperties( overriddenProperties )
+						.withFallback( mainPropertySource );
+			}
+			else {
+				propertySource = mainPropertySource;
+			}
+
+			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( buildContext, propertySource );
+
 			MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
 			contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
 
@@ -116,18 +121,21 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			} );
 
 			builtResult = new SearchMappingRepositoryImpl(
+					beanResolver,
 					mappings,
 					indexManagerBuildingStateHolder.getBackendsByName(),
 					indexManagerBuildingStateHolder.getIndexManagersByName()
 			);
 		}
 		catch (RuntimeException e) {
-			// Close the mappers and mappings created so far before aborting
 			SuppressingCloser closer = new SuppressingCloser( e );
+			// Close the mappers and mappings created so far before aborting
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( Mapper::closeOnFailure, mappers.values() );
 			// Close the resources contained in the index manager building state before aborting
-			indexManagerBuildingStateHolder.closeOnFailure( closer );
+			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
+			// Close the bean resolver before aborting
+			closer.pushAll( BeanResolver::close, beanResolver );
 			throw e;
 		}
 

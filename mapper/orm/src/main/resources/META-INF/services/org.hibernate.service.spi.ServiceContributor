@@ -1,1 +1,2 @@
 org.hibernate.search.mapper.orm.impl.HibernateSearchContextServiceContributor
+org.hibernate.search.mapper.orm.bootstrap.impl.ExtendedBeanManagerSynchronizerContributor

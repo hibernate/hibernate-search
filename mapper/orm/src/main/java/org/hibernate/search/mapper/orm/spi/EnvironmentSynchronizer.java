@@ -9,13 +9,10 @@ package org.hibernate.search.mapper.orm.spi;
 import org.hibernate.service.Service;
 
 /**
- * A service allowing to postpone Hibernate initialization works
+ * A service allowing to postpone Hibernate Search initialization works
  * to a later time, when the environment (e.g. provided services
- * such as {@link BeanResolver}) will be ready to accept requests.
- *
- * @hsearch.experimental This type is under active development.
- *    You should be prepared for incompatible changes in future releases.
- * @since 5.8
+ * such as {@link org.hibernate.resource.beans.spi.ManagedBeanRegistry})
+ * will be ready to accept requests.
  */
 public interface EnvironmentSynchronizer extends Service {
 
@@ -31,4 +28,15 @@ public interface EnvironmentSynchronizer extends Service {
 	 */
 	void whenEnvironmentReady(Runnable runnable);
 
+	/**
+	 * Run the given work just before the environment is
+	 * destroyed (exactly what "destroyed" means is
+	 * implementation-dependent).
+	 * <p>
+	 * If the environment is already "destroyed", run the
+	 * work now, synchronously.
+	 *
+	 * @param runnable
+	 */
+	void whenEnvironmentDestroying(Runnable runnable);
 }

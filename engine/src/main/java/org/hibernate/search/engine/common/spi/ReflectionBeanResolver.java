@@ -15,6 +15,11 @@ import org.hibernate.search.util.SearchException;
 public final class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
+	public void close() {
+		// Nothing to do
+	}
+
+	@Override
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {
 		Object instance;
 		try {
@@ -37,29 +42,6 @@ public final class ReflectionBeanResolver implements BeanResolver {
 		}
 		catch (ClassNotFoundException e) {
 			throw new SearchException( "Error while resolving bean", e );
-		}
-	}
-
-	@Override
-	public <T> T resolve(BeanReference reference, Class<T> expectedClass) {
-		String implementationName = reference.getName();
-		Class<?> implementationType = reference.getType();
-		boolean nameProvided = implementationName != null && !implementationName.isEmpty();
-		boolean typeProvided = implementationType != null;
-
-		if ( nameProvided && typeProvided ) {
-			throw new SearchException( "The default, reflection-based bean resolver does not support"
-					+ " bean references using both a name and a type."
-					+ " Got both '" + implementationName + "' and '" + implementationType + "' in the same reference" );
-		}
-		else if ( nameProvided ) {
-			return resolve( implementationName, expectedClass );
-		}
-		else if ( typeProvided ) {
-			return resolve( implementationType, expectedClass );
-		}
-		else {
-			throw new SearchException( "Got an empty bean reference (no name, no type)" );
 		}
 	}
 

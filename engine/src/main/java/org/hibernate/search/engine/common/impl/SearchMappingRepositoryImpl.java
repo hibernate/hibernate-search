@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.util.SearchException;
@@ -19,13 +20,17 @@ import org.hibernate.search.util.impl.common.Closer;
 
 public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 
+	private final BeanResolver beanResolver;
+
 	private final Map<MappingKey<?>, MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
-	SearchMappingRepositoryImpl(Map<MappingKey<?>, MappingImplementor<?>> mappings,
+	SearchMappingRepositoryImpl(BeanResolver beanResolver,
+			Map<MappingKey<?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
+		this.beanResolver = beanResolver;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -57,6 +62,7 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
 			closer.pushAll( BackendImplementor::close, backends.values() );
+			closer.pushAll( BeanResolver::close, beanResolver );
 		}
 	}
 }
