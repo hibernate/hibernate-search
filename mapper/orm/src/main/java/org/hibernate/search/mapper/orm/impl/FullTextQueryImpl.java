@@ -25,8 +25,10 @@ import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
+import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
+import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.search.impl.MutableObjectLoadingOptions;
@@ -218,27 +220,32 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
+	protected QueryParameterBindings getQueryParameterBindings() {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
 	public FullTextQueryImpl<R> setParameter(int position, Calendar value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public Parameter<?> getParameter(String name) {
+	public QueryParameter<?> getParameter(String name) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public Parameter<?> getParameter(int position) {
+	public QueryParameter<?> getParameter(int position) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public <T> Parameter<T> getParameter(String name, Class<T> type) {
+	public <T> QueryParameter<T> getParameter(String name, Class<T> type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	@Override
-	public <T> Parameter<T> getParameter(int position, Class<T> type) {
+	public <T> QueryParameter<T> getParameter(int position, Class<T> type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 

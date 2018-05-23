@@ -96,7 +96,15 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			listener.initialize( contextFuture );
 
 			if ( environmentSynchronizer != null ) {
-				environmentSynchronizer.whenEnvironmentReady( () -> boot( sessionFactoryImplementor ) );
+				environmentSynchronizer.whenEnvironmentReady( () -> {
+					try {
+						boot( sessionFactoryImplementor );
+					}
+					catch (RuntimeException e) {
+						sessionFactoryImplementor.close();
+					}
+				} );
+
 			}
 			else {
 				boot( sessionFactoryImplementor );
@@ -126,7 +134,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( contextFuture.isDone() ) {
 			return;
 		}
-		boolean failedBoot = true;
 		try {
 			SearchMappingRepositoryBuilder builder = SearchMappingRepository.builder( propertySource );
 
@@ -186,17 +193,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 					log.configurationPropertyTrackingUnusedProperties( unusedPropertyKeys );
 				}
 			}
-
-			failedBoot = false;
 		}
 		catch (RuntimeException e) {
 			contextFuture.completeExceptionally( e );
+			// This will make the SessionFactory abort and close itself
 			throw e;
-		}
-		finally {
-			if ( failedBoot ) {
-				sessionFactoryImplementor.close();
-			}
 		}
 	}
 

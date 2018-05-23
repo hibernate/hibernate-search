@@ -43,8 +43,10 @@
     </modules>
 
     <properties>
-        <version.org.hibernate>5.2.10.Final</version.org.hibernate>
+        <version.org.hibernate>5.3.1.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.1.Final</version.org.hibernate.commons.annotations>
+        <version.javax.persistence>2.2</version.javax.persistence>
+
         <version.org.elasticsearch.client>5.6.6</version.org.elasticsearch.client>
         <version.com.google.code.gson>2.8.0</version.com.google.code.gson>
         <version.com.google.protobuf>3.0.2</version.com.google.protobuf>
@@ -274,6 +276,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>${version.javax.persistence}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.common</groupId>
