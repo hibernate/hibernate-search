@@ -88,14 +88,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 					// Trigger integrator closing if the integrator actually exists and wasn't already closed
 					extendedSearchIntegratorClosingTrigger.complete( null );
 				} );
-				environmentSynchronizer.whenEnvironmentReady( () -> {
-					try {
-						boot( factory );
-					}
-					catch (RuntimeException e) {
-						factory.close();
-					}
-				} );
+				environmentSynchronizer.whenEnvironmentReady( () -> boot( factory ) );
 			}
 			else {
 				boot( factory );
