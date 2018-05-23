@@ -15,15 +15,12 @@ import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldForma
 
 class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> {
 
-	private final String absoluteFieldPath;
-
 	private final StringFieldFormatter formatter;
 
 	private final QueryBuilder queryBuilder;
 
 	StringMatchPredicateBuilder(String absoluteFieldPath, StringFieldFormatter formatter, QueryBuilder queryBuilder) {
 		super( absoluteFieldPath, formatter );
-		this.absoluteFieldPath = absoluteFieldPath;
 		this.formatter = formatter;
 		this.queryBuilder = queryBuilder;
 	}

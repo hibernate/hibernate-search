@@ -13,11 +13,11 @@ import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldForma
 
 class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> {
 
-	private final StringFieldFormatter formatter;
+	private final StringFieldFormatter stringFormatter;
 
-	StringRangePredicateBuilder(String absoluteFieldPath, StringFieldFormatter formatter) {
-		super( absoluteFieldPath, formatter );
-		this.formatter = formatter;
+	StringRangePredicateBuilder(String absoluteFieldPath, StringFieldFormatter stringFormatter) {
+		super( absoluteFieldPath, stringFormatter );
+		this.stringFormatter = stringFormatter;
 	}
 
 	@Override
@@ -28,8 +28,8 @@ class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> 
 
 		return TermRangeQuery.newStringRange(
 				absoluteFieldPath,
-				formatter.normalize( absoluteFieldPath, lowerLimit ),
-				formatter.normalize( absoluteFieldPath, upperLimit ),
+				stringFormatter.normalize( absoluteFieldPath, lowerLimit ),
+				stringFormatter.normalize( absoluteFieldPath, upperLimit ),
 				// we force the true value if the limit is null because of some Lucene checks down the hill
 				lowerLimit == null ? true : !excludeLowerLimit,
 				upperLimit == null ? true : !excludeUpperLimit
