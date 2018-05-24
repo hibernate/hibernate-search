@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import org.hibernate.search.engine.common.spi.BeanReference;
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
@@ -24,7 +24,7 @@ public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 
 	@Override
 	public T build(BuildContext buildContext) {
-		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
-		return beanResolver.resolve( beanReference, expectedType );
+		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		return beanProvider.getBean( beanReference, expectedType );
 	}
 }

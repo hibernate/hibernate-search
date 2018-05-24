@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
@@ -101,8 +101,8 @@ class IndexManagerBuildingStateHolder {
 		// TODO more checks on the backend type (non-null, non-empty)
 		String backendType = BACKEND_TYPE.get( backendPropertySource ).get();
 
-		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
-		BackendFactory backendFactory = beanResolver.resolve( backendType, BackendFactory.class );
+		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		BackendFactory backendFactory = beanProvider.getBean( backendType, BackendFactory.class );
 		return backendFactory.create( backendName, buildContext, backendPropertySource );
 	}
 

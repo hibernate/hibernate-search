@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
@@ -67,7 +67,7 @@ public class ContainerValueExtractorBinder {
 
 	// TODO add an extension point to override the builtin extractors, or at least to add defaults for other types
 
-	private final BeanResolver beanResolver;
+	private final BeanProvider beanProvider;
 	private final TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory();
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
@@ -76,7 +76,7 @@ public class ContainerValueExtractorBinder {
 			new HashMap<>();
 
 	public ContainerValueExtractorBinder(BuildContext buildContext) {
-		this.beanResolver = buildContext.getServiceManager().getBeanResolver();
+		this.beanProvider = buildContext.getServiceManager().getBeanProvider();
 		addDefaultExtractor( MapValueExtractor.class );
 		addDefaultExtractor( CollectionElementExtractor.class );
 		addDefaultExtractor( IterableElementExtractor.class );
@@ -173,7 +173,7 @@ public class ContainerValueExtractorBinder {
 		for ( Class<? extends ContainerValueExtractor> extractorClass :
 				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
 			ContainerValueExtractor<?, ?> newExtractor =
-					beanResolver.resolve( extractorClass, ContainerValueExtractor.class );
+					beanProvider.getBean( extractorClass, ContainerValueExtractor.class );
 			if ( extractor == null ) {
 				// First extractor: must be able to process type C
 				extractor = (ContainerValueExtractor<? super C, ?>) newExtractor;

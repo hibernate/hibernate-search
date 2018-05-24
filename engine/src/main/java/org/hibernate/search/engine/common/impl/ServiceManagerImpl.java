@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 
 
@@ -15,15 +15,15 @@ import org.hibernate.search.engine.common.spi.ServiceManager;
  */
 public class ServiceManagerImpl implements ServiceManager {
 
-	private final BeanResolver beanResolver;
+	private final BeanProvider beanProvider;
 
-	public ServiceManagerImpl(BeanResolver beanResolver) {
-		this.beanResolver = beanResolver;
+	public ServiceManagerImpl(BeanProvider beanProvider) {
+		this.beanProvider = beanProvider;
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
-		return beanResolver;
+	public BeanProvider getBeanProvider() {
+		return beanProvider;
 	}
 
 }

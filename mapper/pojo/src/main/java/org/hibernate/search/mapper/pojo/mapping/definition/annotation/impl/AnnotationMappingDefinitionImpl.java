@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
@@ -54,7 +54,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 
 	@Override
 	public void contribute(BuildContext buildContext, MetadataCollector collector) {
-		BeanResolver beanResolver = buildContext.getServiceManager().getBeanResolver();
+		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,
@@ -78,7 +78,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 					}
 
 					PojoTypeMetadataContributor contributor =
-							new AnnotationPojoTypeMetadataContributorImpl( beanResolver, typeModel );
+							new AnnotationPojoTypeMetadataContributorImpl( beanProvider, typeModel );
 
 					collector.collectContributor( mapperFactory, typeModel, contributor );
 				} );
@@ -89,7 +89,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 		 */
 		if ( annotatedTypeDiscoveryEnabled ) {
 			AnnotationTypeMetadataDiscoverer discoverer =
-					new AnnotationTypeMetadataDiscoverer( beanResolver, alreadyContributedTypes );
+					new AnnotationTypeMetadataDiscoverer( beanProvider, alreadyContributedTypes );
 			collector.collectDiscoverer( mapperFactory, discoverer );
 		}
 	}
@@ -99,11 +99,11 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	 * for types that were not explicitly requested .
 	 */
 	private static class AnnotationTypeMetadataDiscoverer implements TypeMetadataDiscoverer<PojoTypeMetadataContributor> {
-		private final BeanResolver beanResolver;
+		private final BeanProvider beanProvider;
 		private final Set<PojoRawTypeModel<?>> alreadyContributedTypes;
 
-		AnnotationTypeMetadataDiscoverer(BeanResolver beanResolver, Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
-			this.beanResolver = beanResolver;
+		AnnotationTypeMetadataDiscoverer(BeanProvider beanProvider, Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
+			this.beanProvider = beanProvider;
 			this.alreadyContributedTypes = alreadyContributedTypes;
 		}
 
@@ -117,7 +117,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 			boolean neverContributed = alreadyContributedTypes.add( pojoTypeModel );
 			if ( neverContributed ) {
 				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
-				return Optional.of( new AnnotationPojoTypeMetadataContributorImpl( beanResolver, pojoTypeModel ) );
+				return Optional.of( new AnnotationPojoTypeMetadataContributorImpl( beanProvider, pojoTypeModel ) );
 			}
 			else {
 				return Optional.empty();

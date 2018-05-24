@@ -12,6 +12,6 @@ package org.hibernate.search.engine.common.spi;
  */
 public interface ServiceManager {
 
-	BeanResolver getBeanResolver();
+	BeanProvider getBeanProvider();
 
 }

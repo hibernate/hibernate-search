@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.common.spi.BeanReference;
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -64,11 +64,11 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BeanResolver beanResolver;
+	private final BeanProvider beanProvider;
 	private final PojoRawTypeModel<?> typeModel;
 
-	AnnotationPojoTypeMetadataContributorImpl(BeanResolver beanResolver, PojoRawTypeModel<?> typeModel) {
-		this.beanResolver = beanResolver;
+	AnnotationPojoTypeMetadataContributorImpl(BeanProvider beanProvider, PojoRawTypeModel<?> typeModel) {
+		this.beanProvider = beanProvider;
 		this.typeModel = typeModel;
 	}
 
@@ -236,7 +236,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping( annotation.annotationType() ) );
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		return beanResolver.resolve( markerBuilderReference, AnnotationMarkerBuilder.class );
+		return beanProvider.getBean( markerBuilderReference, AnnotationMarkerBuilder.class );
 	}
 
 	private BridgeBuilder<? extends IdentifierBridge<?>> createIdentifierBridgeBuilder(
@@ -266,7 +266,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanResolver.resolve( bridgeBuilderReference.get(), BridgeBuilder.class );
+			return beanProvider.getBean( bridgeBuilderReference.get(), BridgeBuilder.class );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -287,7 +287,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		return beanResolver.resolve( builderReference, AnnotationBridgeBuilder.class );
+		return beanProvider.getBean( builderReference, AnnotationBridgeBuilder.class );
 	}
 
 	private <A extends Annotation> AnnotationBridgeBuilder<? extends PropertyBridge, A> createPropertyBridgeBuilder(
@@ -303,7 +303,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		return beanResolver.resolve( builderReference, AnnotationBridgeBuilder.class );
+		return beanProvider.getBean( builderReference, AnnotationBridgeBuilder.class );
 	}
 
 	private BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
@@ -333,7 +333,7 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanResolver.resolve( bridgeBuilderReference.get(), BridgeBuilder.class );
+			return beanProvider.getBean( bridgeBuilderReference.get(), BridgeBuilder.class );
 		}
 		else {
 			// The bridge will be auto-detected from the property type

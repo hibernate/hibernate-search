@@ -35,14 +35,21 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(String implementationName, Class<T> expectedClass) {
+	public <T> T resolve(String classOrFactoryClassName, Class<T> expectedClass) {
 		try {
-			Class<?> classOrFactoryClass = getClass().getClassLoader().loadClass( implementationName );
+			Class<?> classOrFactoryClass = getClass().getClassLoader().loadClass( classOrFactoryClassName );
 			return resolve( classOrFactoryClass, expectedClass );
 		}
 		catch (ClassNotFoundException e) {
 			throw new SearchException( "Error while resolving bean", e );
 		}
+	}
+
+	@Override
+	public <T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass) {
+		throw new SearchException( "This bean resolver does not support"
+				+ " bean references using both a name and a type."
+				+ " Got both '" + nameReference + "' and '" + typeReference + "' in the same reference" );
 	}
 
 }
