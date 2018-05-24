@@ -33,7 +33,7 @@
         <test.module-slot.org.hibernate>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</test.module-slot.org.hibernate>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
-        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests}</additionalRuntimeArgLine>
+        <test.jvm.args>${test.wildfly.jvm.args}</test.jvm.args>
     </properties>
 
     <dependencyManagement>
