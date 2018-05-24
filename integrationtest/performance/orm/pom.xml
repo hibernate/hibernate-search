@@ -377,7 +377,7 @@
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -403,7 +403,7 @@
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
