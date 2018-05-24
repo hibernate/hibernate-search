@@ -2159,7 +2159,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-es-plugins</id>
-                                    <phase>pre-integration-test</phase>
+                                    <phase>generate-test-resources</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -2246,7 +2246,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-es-plugins</id>
-                                    <phase>pre-integration-test</phase>
+                                    <phase>generate-test-resources</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>

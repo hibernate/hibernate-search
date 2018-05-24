@@ -222,7 +222,7 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
-                        <phase>process-test-resources</phase>
+                        <phase>generate-test-resources</phase>
                         <configuration>
                             <skip>${skipWildFlyPreparation}</skip>
                             <config-file>server-provisioning.xml</config-file>
@@ -256,6 +256,7 @@
                 <executions>
                     <execution>
                         <id>copy-drivers</id>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy</goal>
@@ -275,6 +276,7 @@
                     </execution>
                     <execution>
                         <id>fetch-jpa-patch</id>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy</goal>

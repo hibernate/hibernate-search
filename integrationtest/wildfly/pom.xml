@@ -289,7 +289,8 @@
                     <!-- Copy the AS configuration files so we can use our custom configurations -->
                     <execution>
                         <id>configure-as-node-node1</id>
-                        <phase>pre-integration-test</phase>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -306,7 +307,8 @@
                     </execution>
                     <execution>
                         <id>configure-as-node-node2</id>
-                        <phase>pre-integration-test</phase>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -359,7 +361,7 @@
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                                <phase>compile</phase>
+                                <phase>generate-test-resources</phase>
                                 <configuration>
                                     <skip>${skipWildFlyPreparation}</skip>
                                     <config-file>server-provisioning.xml</config-file>
@@ -371,7 +373,7 @@
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                                <phase>compile</phase>
+                                <phase>generate-test-resources</phase>
                                 <configuration>
                                     <skip>${skipWildFlyPreparation}</skip>
                                     <config-file>server-provisioning.xml</config-file>
@@ -429,6 +431,7 @@
                         <executions>
                             <execution>
                                 <id>fetch-jpa-patch</id>
+                                <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
                                 <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -458,7 +461,8 @@
                             <!-- Install JPA 2.2 patch on node1 -->
                             <execution>
                                 <id>apply-wildfly-node1-jpa22-patch-file</id>
-                                <phase>pre-integration-test</phase>
+                                <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>execute-commands</goal>
                                 </goals>
@@ -476,7 +480,8 @@
                             <!-- Install JPA 2.2 patch on node2 -->
                             <execution>
                                 <id>apply-wildfly-node2-jpa22-patch-file</id>
-                                <phase>pre-integration-test</phase>
+                                <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>execute-commands</goal>
                                 </goals>
@@ -519,7 +524,8 @@
                         <executions>
                             <execution>
                                 <id>copy-drivers</id>
-                                <phase>pre-integration-test</phase>
+                                <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
