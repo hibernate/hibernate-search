@@ -15,7 +15,6 @@ import org.hibernate.resource.beans.container.spi.ContainedBeanImplementor;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 
 /**
@@ -81,9 +80,9 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass) {
-		throw new SearchException( "This bean resolver does not support"
-				+ " bean references using both a name and a type."
-				+ " Got both '" + nameReference + "' and '" + typeReference + "' in the same reference" );
+		ContainedBean<?> containedBean = beanContainer.getBean( nameReference, typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer );
+		register( containedBean );
+		return expectedClass.cast( containedBean.getBeanInstance() );
 	}
 
 	private void register(ContainedBean<?> containedBean) {
