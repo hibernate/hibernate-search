@@ -387,6 +387,8 @@
         <test.wildfly.jvm.args></test.wildfly.jvm.args>
         <surefire.jacoco.args></surefire.jacoco.args>
         <failsafe.jacoco.args></failsafe.jacoco.args>
+        <surefire.container.jacoco.args></surefire.container.jacoco.args>
+        <failsafe.container.jacoco.args></failsafe.container.jacoco.args>
         <surefire.system.args>${test.jvm.args} ${surefire.jacoco.args}</surefire.system.args>
         <failsafe.system.args>${test.jvm.args} ${failsafe.jacoco.args}</failsafe.system.args>
 
@@ -1415,12 +1417,6 @@
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
-                            <!--
-                                Must be a separate property which is not set in Maven,
-                                so that it will be retrieved by the code launching the container (Arquillian, ...)
-                                at runtime, and will not be replaced at build time by Maven filtering in configuration files.
-                             -->
-                            <container.jacoco.args>${surefire.container.jacoco.args}</container.jacoco.args>
                         </systemPropertyVariables>
                         <argLine>${surefire.system.args}</argLine>
                         <additionalClasspathElements>
@@ -1544,12 +1540,6 @@
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
-                            <!--
-                                Must be a separate property which is not set in Maven,
-                                so that it will be retrieved by the code launching the container (Arquillian, ...)
-                                at runtime, and will not be replaced at build time by Maven filtering in configuration files.
-                             -->
-                            <container.jacoco.args>${failsafe.container.jacoco.args}</container.jacoco.args>
                         </systemPropertyVariables>
                         <argLine>${failsafe.system.args}</argLine>
                         <additionalClasspathElements>
@@ -2442,7 +2432,7 @@
                 <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
                 <!--
                     We don't use @{...} for late property evaluation here,
-                    because these properties are evaluated by surefire/failsafe itself,
+                    because these properties are evaluated by the maven-resource-plugin,
                     which doesn't understand the @{...} syntax but somehow manages to always use late evaluation.
                  -->
                 <surefire.container.jacoco.args>${surefire.jacoco.args.lateEval}</surefire.container.jacoco.args>
@@ -2471,6 +2461,11 @@
                             </execution>
                             <execution>
                                 <id>jacoco-prepare-prepare-agent-integration</id>
+                                <!--
+                                    This is necessary in order for the property to be set before we process resources,
+                                    such as arquillian.xml in WildFly tests or maven.properties in OSGi tests.
+                                 -->
+                                <phase>initialize</phase>
                                 <goals>
                                     <goal>prepare-agent-integration</goal>
                                 </goals>
