@@ -37,9 +37,9 @@
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dremote.maven.repo=${jboss.public.repo.url}
                     -Dmaven.repo.local=${settings.localRepository}
-                    ${container.jacoco.args}
+                    ${failsafe.container.jacoco.args}
                     -Dee8.preview.mode=true
                 </property>
                 <!-- To debug the Arquillian managed application server:
@@ -50,9 +50,9 @@
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dremote.maven.repo=${jboss.public.repo.url}
                     -Dmaven.repo.local=${settings.localRepository}
-                    ${container.jacoco.args}
+                    ${failsafe.container.jacoco.args}
                 </property>
                  -->
             </configuration>
@@ -68,7 +68,7 @@
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${repository.jboss-public.url}
+                    -Dremote.maven.repo=${jboss.public.repo.url}
                     -Dmaven.repo.local=${settings.localRepository}
                     -Dee8.preview.mode=true
                 </property>

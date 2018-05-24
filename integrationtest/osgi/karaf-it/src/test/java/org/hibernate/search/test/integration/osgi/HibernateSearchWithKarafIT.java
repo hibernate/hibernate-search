@@ -130,7 +130,7 @@ public class HibernateSearchWithKarafIT {
 			mavenProperties.load( inputStream );
 		}
 
-		String jacocoVMArgs = System.getProperty( "container.jacoco.args" );
+		String jacocoVMArgs = mavenProperties.getProperty( "failsafe.container.jacoco.args" );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );

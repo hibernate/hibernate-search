@@ -30,7 +30,7 @@
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
-        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests}</additionalRuntimeArgLine>
+        <test.jvm.args>${test.wildfly.jvm.args}</test.jvm.args>
     </properties>
 
     <dependencyManagement>
@@ -222,7 +222,7 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
-                        <phase>process-test-resources</phase>
+                        <phase>generate-test-resources</phase>
                         <configuration>
                             <skip>${skipWildFlyPreparation}</skip>
                             <config-file>server-provisioning.xml</config-file>
@@ -256,6 +256,7 @@
                 <executions>
                     <execution>
                         <id>copy-drivers</id>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy</goal>
@@ -275,6 +276,7 @@
                     </execution>
                     <execution>
                         <id>fetch-jpa-patch</id>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy</goal>
@@ -375,7 +377,7 @@
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -401,7 +403,7 @@
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>${repository.jboss-public.url}</url>
+            <url>${jboss.public.repo.url}</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
