@@ -20,6 +20,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
@@ -49,7 +50,8 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, MetadataCollector collector) {
+	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MetadataCollector collector) {
 		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
 		// Ensure all entities are declared as such and have their inverse associations declared
 		for ( PersistentClass persistentClass : metadata.getEntityBindings() ) {

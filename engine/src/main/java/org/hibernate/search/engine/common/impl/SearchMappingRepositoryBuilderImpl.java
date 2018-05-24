@@ -113,7 +113,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( buildContext, propertySource );
 
 			MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
-			contributors.forEach( c -> c.contribute( buildContext, metadataCollector ) );
+			contributors.forEach( c -> c.contribute( buildContext, propertySource, metadataCollector ) );
 
 			metadataCollector.createMappers(
 					mappers, buildContext, propertySource, indexManagerBuildingStateHolder

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
@@ -34,9 +35,10 @@ public class ProgrammaticMappingDefinitionImpl implements ProgrammaticMappingDef
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, MetadataCollector collector) {
+	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MetadataCollector collector) {
 		for ( TypeMappingContextImpl contextImpl : entities.values() ) {
-			contextImpl.contribute( buildContext, collector );
+			contextImpl.contribute( buildContext, propertySource, collector );
 		}
 	}
 

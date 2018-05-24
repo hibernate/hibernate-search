@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoMappingContributor;
@@ -20,13 +27,15 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.Pro
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 public abstract class PojoMappingContributorImpl<M extends PojoMapping>
-		implements PojoMappingContributor<M> {
+		implements PojoMappingContributor<M>, MetadataContributor {
 
 	private final SearchMappingRepositoryBuilder mappingRepositoryBuilder;
 	private final PojoMapperFactory<M> mapperFactory;
 	private final PojoBootstrapIntrospector introspector;
 
 	private final AnnotationMappingDefinitionImpl annotationMappingDefinition;
+
+	private final List<MetadataContributor> delegates = new ArrayList<>();
 
 	protected PojoMappingContributorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
@@ -40,6 +49,8 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 		);
 		this.introspector = introspector;
 
+		mappingRepositoryBuilder.addMetadataContributor( this );
+
 		/*
 		 * Make sure to create and add the annotation mapping even if the user does not call the
 		 * annotationMapping() method to register annotated types explicitly,
@@ -50,14 +61,14 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 		annotationMappingDefinition = new AnnotationMappingDefinitionImpl(
 				mapperFactory, introspector, annotatedTypeDiscoveryEnabled
 		);
-		mappingRepositoryBuilder.addMetadataContributor( annotationMappingDefinition );
+		addMetadataContributor( annotationMappingDefinition );
 	}
 
 	@Override
 	public ProgrammaticMappingDefinition programmaticMapping() {
 		ProgrammaticMappingDefinitionImpl definition =
 				new ProgrammaticMappingDefinitionImpl( mapperFactory, introspector );
-		mappingRepositoryBuilder.addMetadataContributor( definition );
+		addMetadataContributor( definition );
 		return definition;
 	}
 
@@ -71,7 +82,19 @@ public abstract class PojoMappingContributorImpl<M extends PojoMapping>
 		return mappingRepositoryBuilder.getBuiltResult().getMapping( mapperFactory.getMappingKey() );
 	}
 
+	@Override
+	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MetadataCollector collector) {
+		for ( MetadataContributor delegate : delegates ) {
+			delegate.contribute( buildContext, propertySource, collector );
+		}
+	}
+
 	protected final MapperFactory<PojoTypeMetadataContributor, ?> getMapperFactory() {
 		return mapperFactory;
+	}
+
+	protected final void addMetadataContributor(MetadataContributor contributor) {
+		delegates.add( contributor );
 	}
 }

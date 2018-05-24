@@ -177,17 +177,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 						.forEach( annotationMapping::add );
 			}
 
-			final BeanResolver finalBeanResolver = beanResolver; // Separate, final variable to use it in a lambda
-			ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
-					ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONTRIBUTOR )
-							.as(
-									HibernateOrmSearchMappingContributor.class,
-									reference -> finalBeanResolver.resolve( reference, HibernateOrmSearchMappingContributor.class )
-							)
-							.build();
-			userMappingContributorProperty.get( propertySource )
-					.ifPresent( userContributor -> userContributor.contribute( mappingContributor ) );
-
 			// TODO namingService (JMX)
 			// TODO ClassLoaderService
 

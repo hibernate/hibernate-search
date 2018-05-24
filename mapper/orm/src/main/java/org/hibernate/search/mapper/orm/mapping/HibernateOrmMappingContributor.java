@@ -6,10 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
+import java.util.Optional;
+
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.BeanProvider;
+import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingFactory;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor;
@@ -53,9 +61,26 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 				annotatedTypeDiscoveryEnabled,
 				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
 		);
-		mappingRepositoryBuilder.addMetadataContributor(
+		addMetadataContributor(
 				new HibernateOrmMetatadaContributor( getMapperFactory(), introspector, metadata )
 		);
 	}
 
+	@Override
+	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MetadataCollector collector) {
+		// Apply the user-provided metadata contributor if necessary
+		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
+				ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONTRIBUTOR )
+						.as(
+								HibernateOrmSearchMappingContributor.class,
+								reference -> beanProvider.getBean( reference, HibernateOrmSearchMappingContributor.class )
+						)
+						.build();
+		userMappingContributorProperty.get( propertySource )
+				.ifPresent( userContributor -> userContributor.contribute( this ) );
+
+		super.contribute( buildContext, propertySource, collector );
+	}
 }
