@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -344,8 +344,8 @@ public class JavaBeanCleanupIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
-		ProgrammaticMappingDefinition mappingDefinition = contributor.programmaticMapping();
+		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
+		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
 		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
 				.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )

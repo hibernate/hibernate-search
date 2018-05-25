@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 
 public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalMetadataCollector {
@@ -14,7 +15,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * Mark this type as an entity type.
 	 * <p>
 	 * <strong>WARNING:</strong> entity types must always be defined upfront without relying on
-	 * {@link org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector#collectDiscoverer(org.hibernate.search.v6poc.entity.mapping.building.spi.MapperFactory, org.hibernate.search.v6poc.entity.mapping.building.spi.TypeMetadataDiscoverer) metadata discovery},
+	 * {@link MappingConfigurationCollector#collectDiscoverer(org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer) metadata discovery},
 	 * because Hibernate Search needs to be able to have a complete view of all the possible entity types
 	 * in order to handle automatic reindexing.
 	 * Relying on type discovery for entity detection would mean running the risk of one particular

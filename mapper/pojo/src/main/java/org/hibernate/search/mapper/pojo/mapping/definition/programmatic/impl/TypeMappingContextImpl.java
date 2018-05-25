@@ -13,9 +13,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
@@ -25,14 +23,15 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContrib
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-public class TypeMappingContextImpl implements TypeMappingContext, MetadataContributor, PojoTypeMetadataContributor {
+public class TypeMappingContextImpl
+		implements TypeMappingContext, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
 
-	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
 	private final PojoRawTypeModel<?> typeModel;
 
 	private String indexName;
@@ -41,18 +40,17 @@ public class TypeMappingContextImpl implements TypeMappingContext, MetadataContr
 	private final List<PojoMetadataContributor<? super PojoAdditionalMetadataCollectorTypeNode, ? super PojoMappingCollectorTypeNode>>
 			children = new ArrayList<>();
 
-	TypeMappingContextImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory, PojoRawTypeModel<?> typeModel) {
-		this.mapperFactory = mapperFactory;
+	TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			MetadataCollector collector) {
+	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		if ( indexName != null ) {
-			collector.mapToIndex( mapperFactory, typeModel, indexName );
+			configurationCollector.mapToIndex( typeModel, indexName );
 		}
-		collector.collectContributor( mapperFactory, typeModel, this );
+		configurationCollector.collectContributor( typeModel, this );
 	}
 
 	@Override

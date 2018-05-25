@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,8 +32,7 @@ import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.util.impl.common.Closer;
@@ -151,7 +149,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
 
-			HibernateOrmMappingContributor mappingContributor = HibernateOrmMappingContributor.create(
+			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
 					builder, metadata, sessionFactoryImplementor, enableAnnotationMapping
 			);
 
@@ -169,7 +167,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			builder.setBeanResolver( beanResolver );
 
 			if ( enableAnnotationMapping ) {
-				AnnotationMappingDefinition annotationMapping = mappingContributor.annotationMapping();
+				AnnotationMappingDefinition annotationMapping = mappingInitiator.annotationMapping();
 				metadata.getEntityBindings().stream()
 						.map( PersistentClass::getMappedClass )
 						// getMappedClass() can return null, which should be ignored
@@ -181,7 +179,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			// TODO ClassLoaderService
 
 			SearchMappingRepository mappingRepository = builder.build();
-			HibernateOrmMapping mapping = mappingContributor.getResult();
+			HibernateOrmMapping mapping = mappingInitiator.getResult();
 
 			// TODO JMX
 //			this.jmx = new JMXHook( propertySource );

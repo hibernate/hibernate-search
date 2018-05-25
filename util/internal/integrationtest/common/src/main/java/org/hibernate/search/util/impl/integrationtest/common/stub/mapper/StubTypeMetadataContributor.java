@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 
 class StubTypeMetadataContributor {
 
@@ -24,11 +24,11 @@ class StubTypeMetadataContributor {
 		this.delegate = delegate;
 	}
 
-	final void contribute(StubMapperFactory factory, MetadataCollector collector) {
+	final void contribute(MappingConfigurationCollector<StubTypeMetadataContributor> collector) {
 		if ( indexName != null ) {
-			collector.mapToIndex( factory, typeIdentifier, indexName );
+			collector.mapToIndex( typeIdentifier, indexName );
 		}
-		collector.collectContributor( factory, typeIdentifier, this );
+		collector.collectContributor( typeIdentifier, this );
 	}
 
 	public void contribute(IndexManagerBuildingState<?> indexManagerBuildingState) {

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
- * @param <C> The type of contributors
+ * @param <C> The Java type of type metadata contributors
  */
 public interface TypeMetadataContributorProvider<C> {
 

@@ -8,7 +8,6 @@ package org.hibernate.search.engine.common.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +31,8 @@ import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -52,9 +50,10 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 	private final ConfigurationPropertySource mainPropertySource;
 	private final Properties overriddenProperties = new Properties();
-	private final Collection<MetadataContributor> contributors = new ArrayList<>();
+	private final List<MappingInitiator<?, ?>> mappingInitiators = new ArrayList<>();
 
 	private BeanResolver beanResolver;
+	private boolean frozen = false;
 	private SearchMappingRepository builtResult;
 
 	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
@@ -80,8 +79,15 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder addMetadataContributor(MetadataContributor contributor) {
-		contributors.add( contributor );
+	public SearchMappingRepositoryBuilder addMappingInitiator(MappingInitiator initiator) {
+		if ( frozen ) {
+			throw new AssertionFailure(
+					"Attempt to add a mapping initiator"
+					+ " after Hibernate Search has started to build the mappings."
+					+ " There is a bug in the Hibernate Search integration."
+			);
+		}
+		mappingInitiators.add( initiator );
 		return this;
 	}
 
@@ -93,6 +99,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
 
 		try {
+			frozen = true;
+
 			if ( beanResolver == null ) {
 				beanResolver = new ReflectionBeanResolver();
 			}
@@ -112,12 +120,21 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( buildContext, propertySource );
 
-			MetadataCollectorImpl metadataCollector = new MetadataCollectorImpl();
-			contributors.forEach( c -> c.contribute( buildContext, propertySource, metadataCollector ) );
+			// First phase: collect configuration for all mappings
+			List<MappingConfiguration<?, ?>> mappingConfigurations = new ArrayList<>();
+			for ( MappingInitiator initiator : mappingInitiators ) {
+				MappingConfiguration<?, ?> configuration =
+						new MappingConfiguration<>( buildContext, propertySource, initiator );
+				mappingConfigurations.add( configuration );
+				configuration.collect();
+			}
 
-			metadataCollector.createMappers(
-					mappers, buildContext, propertySource, indexManagerBuildingStateHolder
-			);
+			// Second phase: create mappers and their backing index managers
+			for ( MappingConfiguration<?, ?> configuration : mappingConfigurations ) {
+				configuration.createAndAddMapper( mappers, indexManagerBuildingStateHolder );
+			}
+
+			// Third phase: create mappings
 			mappers.forEach( (mappingKey, mapper) -> {
 				MappingImplementor<?> mapping = mapper.build();
 				mappings.put( mappingKey, mapping );
@@ -150,126 +167,61 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		return builtResult;
 	}
 
-	private static class MetadataCollectorImpl implements MetadataCollector {
-		// Use a LinkedHashMap for deterministic iteration
-		private final Map<MappingKey<?>, MapperContribution<?, ?>> contributionByMappingKey = new LinkedHashMap<>();
-		private boolean frozen = false;
+	private static class MappingConfiguration<C, M> {
+		private final BuildContext buildContext;
+		private final ConfigurationPropertySource propertySource;
 
-		@Override
-		public void mapToIndex(MapperFactory<?, ?> mapperFactory, MappableTypeModel typeModel, String indexName) {
-			checkNotFrozen( mapperFactory, typeModel );
-			getOrCreateContribution( mapperFactory ).mapToIndex( typeModel, indexName );
-		}
+		private final MappingInitiator<C, M> mappingInitiator;
 
-		@Override
-		public <C> void collectContributor(MapperFactory<C, ?> mapperFactory,
-				MappableTypeModel typeModel, C contributor) {
-			checkNotFrozen( mapperFactory, typeModel );
-			getOrCreateContribution( mapperFactory ).collectContributor( typeModel, contributor );
-		}
-
-		@Override
-		public <C> void collectDiscoverer(MapperFactory<C, ?> mapperFactory,
-				TypeMetadataDiscoverer<C> metadataDiscoverer) {
-			checkNotFrozen( mapperFactory, null );
-			getOrCreateContribution( mapperFactory ).collectDiscoverer( metadataDiscoverer );
-		}
-
-		/*
-		 * Note that the mapper map is passed as a parameter, not returned,
-		 * so that even in case of failure, the caller can access the mappers built so far.
-		 * Then the caller can close all mappers as necessary.
-		 */
-		void createMappers(Map<MappingKey<?>, Mapper<?>> mappers,
-				BuildContext buildContext, ConfigurationPropertySource propertySource,
-				IndexManagerBuildingStateHolder indexManagerBuildingStateProvider) {
-			frozen = true;
-			contributionByMappingKey.forEach( (mappingKey, contribution) -> {
-				Mapper<?> mapper = contribution.preBuild(
-						buildContext, propertySource, indexManagerBuildingStateProvider
-				);
-				mappers.put( mappingKey, mapper );
-			} );
-		}
-
-		@SuppressWarnings("unchecked")
-		private <C> MapperContribution<C, ?> getOrCreateContribution(
-				MapperFactory<C, ?> mapperFactory) {
-			return (MapperContribution<C, ?>) contributionByMappingKey.computeIfAbsent(
-					mapperFactory.getMappingKey(), ignored -> new MapperContribution<>( mapperFactory )
-			);
-		}
-
-		private void checkNotFrozen(MapperFactory<?, ?> mapperFactory, MappableTypeModel typeModel) {
-			if ( frozen ) {
-				throw new AssertionFailure(
-						"Attempt to add a mapping contribution"
-						+ " after Hibernate Search has started to build the mappings."
-						+ " There is a bug in the mapper factory implementation."
-						+ " Mapper factory: " + mapperFactory + "."
-						+ (
-								typeModel == null ? ""
-								: " Type model for the unexpected contribution: " + typeModel + "."
-						)
-				);
-			}
-		}
-	}
-
-	private static class MapperContribution<C, M> {
-
-		private final MapperFactory<C, M> mapperFactory;
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
 		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
+
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
-		MapperContribution(MapperFactory<C, M> mapperFactory) {
-			this.mapperFactory = mapperFactory;
+		MappingConfiguration(BuildContext buildContext, ConfigurationPropertySource propertySource,
+				MappingInitiator<C, M> mappingInitiator) {
+			this.buildContext = buildContext;
+			this.propertySource = propertySource;
+			this.mappingInitiator = mappingInitiator;
 		}
 
-		public void mapToIndex(MappableTypeModel typeModel, String indexName) {
-			if ( typeModel.isAbstract() ) {
-				throw log.cannotMapAbstractTypeToIndex( typeModel, indexName );
-			}
-			getOrCreateContribution( typeModel ).mapToIndex( indexName );
+		void collect() {
+			mappingInitiator.configure( buildContext, propertySource, new ConfigurationCollector() );
 		}
 
-		public void collectContributor(MappableTypeModel typeModel, C contributor) {
-			getOrCreateContribution( typeModel ).collectContributor( contributor );
-		}
-
-		public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
-			metadataDiscoverers.add( metadataDiscoverer );
-		}
-
-		public Mapper<M> preBuild(BuildContext buildContext, ConfigurationPropertySource propertySource,
+		/*
+		 * Note that the mapper map is passed as a parameter, instead of returning a mapper,
+		 * so that even in case of failure, the caller can access the mappers built so far.
+		 * Then the caller can close all mappers as necessary.
+		 */
+		void createAndAddMapper(Map<MappingKey<?>, Mapper<?>> mappers,
 				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-			ContributorProvider contributorProvider = new ContributorProvider();
-			Mapper<M> mapper = mapperFactory.createMapper( buildContext, propertySource, contributorProvider );
+			MappingKey<M> mappingKey = mappingInitiator.getMappingKey();
+			if ( mappers.containsKey( mappingKey ) ) {
+				throw new SearchException(
+						"Found two mapping initiators using the same key."
+						+ " There is a bug in the mapper integration."
+				);
+			}
 
-			try {
-				Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
-						contributionByType.keySet() );
-				for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
-					TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
-					String indexName = contribution.getIndexName();
-					if ( indexName != null ) {
-						mapper.addIndexed(
-								typeModel,
-								indexManagerBuildingStateHolder
-										.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
-						);
-					}
+			ContributorProvider contributorProvider = new ContributorProvider();
+			Mapper<M> mapper = mappingInitiator.createMapper( buildContext, propertySource, contributorProvider );
+			mappers.put( mappingInitiator.getMappingKey(), mapper );
+
+			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
+					contributionByType.keySet() );
+			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
+				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
+				String indexName = contribution.getIndexName();
+				if ( indexName != null ) {
+					mapper.addIndexed(
+							typeModel,
+							indexManagerBuildingStateHolder
+									.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
+					);
 				}
 			}
-			catch (RuntimeException e) {
-				// Close the mapper before aborting
-				new SuppressingCloser( e ).push( mapper::closeOnFailure );
-				throw e;
-			}
-
-			return mapper;
 		}
 
 		private TypeMappingContribution<C> getOrCreateContribution(MappableTypeModel typeModel) {
@@ -297,11 +249,31 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			return contributionByType.get( typeModel );
 		}
 
+		private class ConfigurationCollector implements MappingConfigurationCollector<C> {
+			@Override
+			public void mapToIndex(MappableTypeModel typeModel, String indexName) {
+				if ( typeModel.isAbstract() ) {
+					throw log.cannotMapAbstractTypeToIndex( typeModel, indexName );
+				}
+				getOrCreateContribution( typeModel ).mapToIndex( indexName );
+			}
+
+			@Override
+			public void collectContributor(MappableTypeModel typeModel, C contributor) {
+				getOrCreateContribution( typeModel ).collectContributor( contributor );
+			}
+
+			@Override
+			public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
+				metadataDiscoverers.add( metadataDiscoverer );
+			}
+		}
+
 		private class ContributorProvider implements TypeMetadataContributorProvider<C> {
 			@Override
 			public void forEach(MappableTypeModel typeModel, Consumer<C> contributorConsumer) {
 				typeModel.getDescendingSuperTypes()
-						.map( MapperContribution.this::getContributionIncludingAutomaticallyDiscovered )
+						.map( MappingConfiguration.this::getContributionIncludingAutomaticallyDiscovered )
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
 						.forEach( contributorConsumer );

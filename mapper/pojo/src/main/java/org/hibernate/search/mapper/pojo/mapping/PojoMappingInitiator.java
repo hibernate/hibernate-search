@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 /**
  * @author Yoann Rodiere
  */
-public interface PojoMappingContributor<M> {
+public interface PojoMappingInitiator<M> {
 
 	ProgrammaticMappingDefinition programmaticMapping();
 

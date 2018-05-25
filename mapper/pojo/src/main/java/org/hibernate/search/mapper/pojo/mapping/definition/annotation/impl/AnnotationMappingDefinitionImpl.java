@@ -14,29 +14,26 @@ import java.util.Set;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinition, MetadataContributor {
+public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinition,
+		PojoMappingConfigurationContributor {
 
-	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
 	private final PojoBootstrapIntrospector introspector;
 	// Use a LinkedHashSet for deterministic iteration
 	private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
 	private final boolean annotatedTypeDiscoveryEnabled;
 
-	public AnnotationMappingDefinitionImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory,
-			PojoBootstrapIntrospector introspector,
+	public AnnotationMappingDefinitionImpl(PojoBootstrapIntrospector introspector,
 			boolean annotatedTypeDiscoveryEnabled) {
-		this.mapperFactory = mapperFactory;
 		this.introspector = introspector;
 		this.annotatedTypeDiscoveryEnabled = annotatedTypeDiscoveryEnabled;
 	}
@@ -54,8 +51,8 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			MetadataCollector collector) {
+	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 
 		/*
@@ -76,13 +73,13 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 				.forEach( typeModel -> {
 					Optional<Indexed> indexedAnnotation = typeModel.getAnnotationByType( Indexed.class );
 					if ( indexedAnnotation.isPresent() ) {
-						collector.mapToIndex( mapperFactory, typeModel, indexedAnnotation.get().index() );
+						collector.mapToIndex( typeModel, indexedAnnotation.get().index() );
 					}
 
 					PojoTypeMetadataContributor contributor =
 							new AnnotationPojoTypeMetadataContributorImpl( beanProvider, typeModel );
 
-					collector.collectContributor( mapperFactory, typeModel, contributor );
+					collector.collectContributor( typeModel, contributor );
 				} );
 
 		/*
@@ -92,7 +89,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 		if ( annotatedTypeDiscoveryEnabled ) {
 			AnnotationTypeMetadataDiscoverer discoverer =
 					new AnnotationTypeMetadataDiscoverer( beanProvider, alreadyContributedTypes );
-			collector.collectDiscoverer( mapperFactory, discoverer );
+			collector.collectDiscoverer( discoverer );
 		}
 	}
 

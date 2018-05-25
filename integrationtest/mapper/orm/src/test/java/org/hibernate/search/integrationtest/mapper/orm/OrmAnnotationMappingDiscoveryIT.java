@@ -17,7 +17,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -54,8 +54,8 @@ public class OrmAnnotationMappingDiscoveryIT {
 				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
 				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new HibernateOrmSearchMappingContributor() {
 					@Override
-					public void contribute(HibernateOrmMappingContributor contributor) {
-						contributor.programmaticMapping()
+					public void contribute(HibernateOrmMappingInitiator initiator) {
+						initiator.programmaticMapping()
 								.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )
 												.indexedEmbedded();
@@ -109,8 +109,8 @@ public class OrmAnnotationMappingDiscoveryIT {
 				.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
 				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new HibernateOrmSearchMappingContributor() {
 					@Override
-					public void contribute(HibernateOrmMappingContributor contributor) {
-						contributor.programmaticMapping()
+					public void contribute(HibernateOrmMappingInitiator initiator) {
+						initiator.programmaticMapping()
 								.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )
 												.indexedEmbedded();
@@ -120,7 +120,7 @@ public class OrmAnnotationMappingDiscoveryIT {
 						 * We add some of the annotation mapping programmatically,
 						 * just to check that discovery is disabled for nested types.
 						 */
-						contributor.programmaticMapping()
+						initiator.programmaticMapping()
 								.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
 										.property( "id" ).documentId()
 										.property( "annotationMappedEmbedded" )

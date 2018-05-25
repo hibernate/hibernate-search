@@ -45,7 +45,7 @@ import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
-class PojoMapper<M> implements Mapper<M> {
+public class PojoMapper<M> implements Mapper<M> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -65,7 +65,7 @@ class PojoMapper<M> implements Mapper<M> {
 
 	private boolean closed = false;
 
-	PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId, boolean multiTenancyEnabled,

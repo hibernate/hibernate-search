@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
@@ -45,9 +45,9 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
+		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
 
-		AnnotationMappingDefinition mappingDefinition = contributor.annotationMapping();
+		AnnotationMappingDefinition mappingDefinition = initiator.annotationMapping();
 
 		mappingDefinition.add( GeoPointOnTypeEntity.class );
 		mappingDefinition.add( GeoPointOnCoordinatesPropertyEntity.class );
@@ -68,7 +68,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 		);
 
 		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = contributor.getResult();
+		mapping = initiator.getResult();
 		backendMock.verifyExpectationsMet();
 	}
 

@@ -96,13 +96,15 @@ Bootstrap starts by creating at least two components:
 
 * The `SearchMappingRepositoryBuilder`, which allows to setup all the mapper-independent configuration:
 bean resolver, configuration property sources for the backends, ...
-* At least one `MetadataContributor` instance, of a mapper-provided type,
+* At least one `MappingInitiator` instance, of a type provided by the mapper module,
 which will register itself to the `SearchMappingRepositoryBuilder`.
 From the point of view of the engine, it is a callback that will come into play later.
 
-The idea is that the `SearchMappingRepositoryBuilder` will allow one or more contributors to provide metadata
-about various "mappable" types (in short, the types manipulated by the user),
-organize this metadata, check the consistency to some extent, create backends and index manager builders as necessary,
+The idea is that the `SearchMappingRepositoryBuilder` will allow one or more initiators
+to provide configuration about their mapping, in particular metadata
+about various "mappable" types (in short, the types manipulated by the user).
+Then the builder will organize this metadata, check the consistency to some extent,
+create backends and index manager builders as necessary,
 and then provide the (organized) metadata back to the mapper module along with handles to index manager builders
 so that it can start its own bootstrapping.
 
@@ -114,9 +116,9 @@ allowing to start mapper bootstrapping with everything that is necessary:
 * organized metadata (`TypeMetadataContributorProvider`);
 * one handle to the backend layer (`IndexManagerBuildingState`) for each indexed type.
 
-All this is provided to the mapper through the `MapperFactory` and `Mapper` interfaces.
+All this is provided to the mapper through the `MappingInitiator` and `Mapper` interfaces.
 
-Mapper bootstrapping is really up to the mapper,
+Mapper bootstrapping is really up to the mapper module,
 but one thing that won't change is what mappers can do with the handles to the backend layer.
 These handles are instances of `IndexManagerBuildingState` and each one represents an index manager being built.
 As the mapper inspects the metadata, it will infer the required fields in the index,

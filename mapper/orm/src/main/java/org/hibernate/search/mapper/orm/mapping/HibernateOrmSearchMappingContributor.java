@@ -8,6 +8,6 @@ package org.hibernate.search.mapper.orm.mapping;
 
 public interface HibernateOrmSearchMappingContributor {
 
-	void contribute(HibernateOrmMappingContributor contributor);
+	void contribute(HibernateOrmMappingInitiator initiator);
 
 }

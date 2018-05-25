@@ -11,40 +11,36 @@ import java.util.Map;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-public class ProgrammaticMappingDefinitionImpl implements ProgrammaticMappingDefinition, MetadataContributor {
-
-	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
+public class ProgrammaticMappingDefinitionImpl
+		implements ProgrammaticMappingDefinition, PojoMappingConfigurationContributor {
 
 	private final PojoBootstrapIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Class<?>, TypeMappingContextImpl> entities = new LinkedHashMap<>();
 
-	public ProgrammaticMappingDefinitionImpl(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory,
-			PojoBootstrapIntrospector introspector) {
-		this.mapperFactory = mapperFactory;
+	public ProgrammaticMappingDefinitionImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			MetadataCollector collector) {
+	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		for ( TypeMappingContextImpl contextImpl : entities.values() ) {
-			contextImpl.contribute( buildContext, propertySource, collector );
+			contextImpl.configure( buildContext, propertySource, configurationCollector );
 		}
 	}
 
 	@Override
 	public TypeMappingContext type(Class<?> clazz) {
-		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( mapperFactory, introspector.getTypeModel( c ) ) );
+		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( introspector.getTypeModel( c ) ) );
 	}
 
 }

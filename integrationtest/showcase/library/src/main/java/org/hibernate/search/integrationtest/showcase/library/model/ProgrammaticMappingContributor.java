@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
@@ -28,8 +28,8 @@ import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumB
  */
 public class ProgrammaticMappingContributor implements HibernateOrmSearchMappingContributor {
 	@Override
-	public void contribute(HibernateOrmMappingContributor contributor) {
-		ProgrammaticMappingDefinition mapping = contributor.programmaticMapping();
+	public void contribute(HibernateOrmMappingInitiator initiator) {
+		ProgrammaticMappingDefinition mapping = initiator.programmaticMapping();
 
 		mapping.type( Library.class ).indexed( Library.INDEX )
 				.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )

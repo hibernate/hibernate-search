@@ -24,7 +24,7 @@ import java.util.Set;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingContributor;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -73,14 +73,14 @@ public class JavaBeanAnnotationMappingIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingContributor contributor = new JavaBeanMappingContributor( mappingRepositoryBuilder );
+		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
 
-		contributor.annotationMapping().add( IndexedEntity.class );
+		initiator.annotationMapping().add( IndexedEntity.class );
 
 		Set<Class<?>> classSet = new HashSet<>();
 		classSet.add( OtherIndexedEntity.class );
 		classSet.add( YetAnotherIndexedEntity.class );
-		contributor.annotationMapping().add( classSet );
+		initiator.annotationMapping().add( classSet );
 
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
@@ -154,7 +154,7 @@ public class JavaBeanAnnotationMappingIT {
 		);
 
 		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = contributor.getResult();
+		mapping = initiator.getResult();
 		backendMock.verifyExpectationsMet();
 	}
 

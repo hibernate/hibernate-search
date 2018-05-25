@@ -16,13 +16,14 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingFactory;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
 
 /*
  * TODO create a Hibernate ORM specific mapper, with the following additions:
@@ -33,23 +34,23 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
  *  5. And more?
  */
-public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<HibernateOrmMapping> {
+public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping> {
 
-	public static HibernateOrmMappingContributor create(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	public static HibernateOrmMappingInitiator create(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			Metadata metadata,
 			SessionFactoryImplementor sessionFactoryImplementor,
 			boolean annotatedTypeDiscoveryEnabled) {
 		HibernateOrmBootstrapIntrospector introspector =
 				new HibernateOrmBootstrapIntrospector( metadata, sessionFactoryImplementor );
 
-		return new HibernateOrmMappingContributor(
+		return new HibernateOrmMappingInitiator(
 				mappingRepositoryBuilder, metadata,
 				introspector, sessionFactoryImplementor,
 				annotatedTypeDiscoveryEnabled
 		);
 	}
 
-	private HibernateOrmMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	private HibernateOrmMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			Metadata metadata,
 			HibernateOrmBootstrapIntrospector introspector,
 			SessionFactoryImplementor sessionFactoryImplementor,
@@ -61,14 +62,14 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 				annotatedTypeDiscoveryEnabled,
 				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
 		);
-		addMetadataContributor(
-				new HibernateOrmMetatadaContributor( getMapperFactory(), introspector, metadata )
+		addConfigurationContributor(
+				new HibernateOrmMetatadaContributor( introspector, metadata )
 		);
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			MetadataCollector collector) {
+	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		// Apply the user-provided metadata contributor if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 		ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
@@ -81,6 +82,6 @@ public class HibernateOrmMappingContributor extends PojoMappingContributorImpl<H
 		userMappingContributorProperty.get( propertySource )
 				.ifPresent( userContributor -> userContributor.contribute( this ) );
 
-		super.contribute( buildContext, propertySource, collector );
+		super.configure( buildContext, propertySource, configurationCollector );
 	}
 }

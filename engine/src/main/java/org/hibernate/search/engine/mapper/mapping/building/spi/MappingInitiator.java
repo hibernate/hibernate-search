@@ -10,9 +10,19 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
-public interface MapperFactory<C, M> {
+/**
+ * An object responsible for initiating a mapping by contributing its basic configuration (indexed types, type metadata),
+ * then creating the mapper based on the configuration processed by the engine.
+ *
+ * @param <C> The Java type of type metadata contributors
+ * @param <M> The Java type of the produced mapping
+ */
+public interface MappingInitiator<C, M> {
 
 	MappingKey<M> getMappingKey();
+
+	void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<C> configurationCollector);
 
 	Mapper<M> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<C> contributorProvider);

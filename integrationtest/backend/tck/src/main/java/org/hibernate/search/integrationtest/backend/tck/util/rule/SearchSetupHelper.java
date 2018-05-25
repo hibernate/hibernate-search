@@ -19,7 +19,7 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMetadataContributor;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
 import org.hibernate.search.util.impl.common.Closer;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -112,13 +112,13 @@ public class SearchSetupHelper implements TestRule {
 				mappingRepositoryBuilder = mappingRepositoryBuilder.setProperty( entry.getKey(), entry.getValue() );
 			}
 
-			StubMetadataContributor contributor = new StubMetadataContributor( mappingRepositoryBuilder, multiTenancyEnabled );
-			indexDefinitions.forEach( d -> d.beforeBuild( contributor ) );
+			StubMappingInitiator initiator = new StubMappingInitiator( mappingRepositoryBuilder, multiTenancyEnabled );
+			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
 			SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();
 			mappingRepositories.add( mappingRepository );
 
-			StubMapping mapping = contributor.getResult();
+			StubMapping mapping = initiator.getResult();
 			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
 
 			return mappingRepository;
@@ -146,7 +146,7 @@ public class SearchSetupHelper implements TestRule {
 			this.listener = listener;
 		}
 
-		void beforeBuild(StubMetadataContributor stubMetadataContributor) {
+		void beforeBuild(StubMappingInitiator stubMetadataContributor) {
 			stubMetadataContributor.add( typeName, rawIndexName, mappingContributor );
 		}
 

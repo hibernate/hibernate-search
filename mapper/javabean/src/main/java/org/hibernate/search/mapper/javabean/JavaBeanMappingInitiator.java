@@ -12,30 +12,30 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingFactory;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingContributorImpl;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
 
-public final class JavaBeanMappingContributor extends PojoMappingContributorImpl<JavaBeanMapping> {
+public final class JavaBeanMappingInitiator extends PojoMappingInitiatorImpl<JavaBeanMapping> {
 
-	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder) {
+	public JavaBeanMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder) {
 		this( mappingRepositoryBuilder, true );
 	}
 
-	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	public JavaBeanMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			boolean annotatedTypeDiscoveryEnabled) {
 		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled, false );
 	}
 
-	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	public JavaBeanMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
 		this( mappingRepositoryBuilder, MethodHandles.publicLookup(), annotatedTypeDiscoveryEnabled, multiTenancyEnabled );
 	}
 
-	public JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	public JavaBeanMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			MethodHandles.Lookup lookup, boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
 		this( mappingRepositoryBuilder, new JavaBeanBootstrapIntrospector( lookup ), annotatedTypeDiscoveryEnabled, multiTenancyEnabled );
 	}
 
-	private JavaBeanMappingContributor(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
+	private JavaBeanMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			JavaBeanBootstrapIntrospector introspector, boolean annotatedTypeDiscoveryEnabled, boolean multiTenancyEnabled) {
 		super(
 				mappingRepositoryBuilder, new JavaBeanMappingKey(),

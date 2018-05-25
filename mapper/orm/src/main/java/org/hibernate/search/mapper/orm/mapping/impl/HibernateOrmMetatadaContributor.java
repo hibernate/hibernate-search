@@ -22,9 +22,7 @@ import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MapperFactory;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MetadataContributor;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
@@ -32,26 +30,24 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public final class HibernateOrmMetatadaContributor implements MetadataContributor {
-	private final MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory;
+public final class HibernateOrmMetatadaContributor implements PojoMappingConfigurationContributor {
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final Metadata metadata;
 
-	public HibernateOrmMetatadaContributor(MapperFactory<PojoTypeMetadataContributor, ?> mapperFactory,
-			HibernateOrmBootstrapIntrospector introspector, Metadata metadata) {
-		this.mapperFactory = mapperFactory;
+	public HibernateOrmMetatadaContributor(HibernateOrmBootstrapIntrospector introspector, Metadata metadata) {
 		this.introspector = introspector;
 		this.metadata = metadata;
 	}
 
 	@Override
-	public void contribute(BuildContext buildContext, ConfigurationPropertySource propertySource,
-			MetadataCollector collector) {
+	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
 		// Ensure all entities are declared as such and have their inverse associations declared
 		for ( PersistentClass persistentClass : metadata.getEntityBindings() ) {
@@ -60,8 +56,8 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			if ( clazz != null ) {
 				PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
 				collectPropertyDelegates( delegatesCollector, clazz, persistentClass.getPropertyIterator() );
-				collector.collectContributor(
-						mapperFactory, typeModel,
+				configurationCollector.collectContributor(
+						typeModel,
 						new HibernateOrmEntityTypeMetadataContributor( delegatesCollector.buildAndRemove( clazz ) )
 				);
 			}
@@ -72,8 +68,8 @@ public final class HibernateOrmMetatadaContributor implements MetadataContributo
 			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( entry.getKey() );
 			List<PojoTypeMetadataContributor> delegates = entry.getValue();
 			if ( !delegates.isEmpty() ) {
-				collector.collectContributor(
-						mapperFactory, typeModel,
+				configurationCollector.collectContributor(
+						typeModel,
 						new HibernateOrmComponentTypeMetadataContributor( delegates )
 				);
 			}

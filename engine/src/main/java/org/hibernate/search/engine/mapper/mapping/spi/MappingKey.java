@@ -12,7 +12,7 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
  * Tagging interface for objects used as a key to retrieve mappings in
  * {@link SearchMappingRepository#getMapping(MappingKey)}.
  *
- * @author Yoann Rodiere
+ * @param <M> The Java type of the mapping
  */
 public interface MappingKey<M> {
 
