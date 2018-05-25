@@ -42,6 +42,4 @@ public interface Mapper<M> {
 	 */
 	MappingImplementor<M> build();
 
-	boolean isMultiTenancyEnabled();
-
 }

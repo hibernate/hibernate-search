@@ -45,6 +45,9 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 	@Override
 	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<StubTypeMetadataContributor> configurationCollector) {
+		if ( multiTenancyEnabled ) {
+			configurationCollector.enableMultiTenancy();
+		}
 		for ( StubTypeMetadataContributor mappingContributor : mappingContributors ) {
 			mappingContributor.contribute( configurationCollector );
 		}
@@ -53,7 +56,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 	@Override
 	public Mapper<StubMapping> createMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
-		return new StubMapper( contributorProvider, multiTenancyEnabled );
+		return new StubMapper( contributorProvider );
 	}
 
 	public StubMapping getResult() {

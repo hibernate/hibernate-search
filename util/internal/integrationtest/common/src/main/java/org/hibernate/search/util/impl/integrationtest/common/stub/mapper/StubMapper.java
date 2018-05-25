@@ -18,25 +18,17 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 class StubMapper implements Mapper<StubMapping> {
 
-	private final boolean multiTenancyEnabled;
-
 	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
 
 	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
 
-	StubMapper(TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider, boolean multiTenancyEnabled) {
+	StubMapper(TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
 		this.contributorProvider = contributorProvider;
-		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
 	@Override
 	public void closeOnFailure() {
 		// Nothing to do
-	}
-
-	@Override
-	public boolean isMultiTenancyEnabled() {
-		return multiTenancyEnabled;
 	}
 
 	@Override

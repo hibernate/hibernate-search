@@ -176,6 +176,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
 		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
+		private boolean multiTenancyEnabled;
 
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
@@ -218,7 +219,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 					mapper.addIndexed(
 							typeModel,
 							indexManagerBuildingStateHolder
-									.startBuilding( indexName, mapper.isMultiTenancyEnabled() )
+									.startBuilding( indexName, multiTenancyEnabled )
 					);
 				}
 			}
@@ -266,6 +267,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			@Override
 			public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
 				metadataDiscoverers.add( metadataDiscoverer );
+			}
+
+			@Override
+			public void enableMultiTenancy() {
+				multiTenancyEnabled = true;
 			}
 		}
 

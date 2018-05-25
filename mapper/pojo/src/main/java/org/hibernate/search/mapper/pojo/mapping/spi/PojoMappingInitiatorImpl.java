@@ -94,6 +94,9 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 	@Override
 	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		if ( multiTenancyEnabled ) {
+			configurationCollector.enableMultiTenancy();
+		}
 		for ( PojoMappingConfigurationContributor delegate : delegates ) {
 			delegate.configure( buildContext, propertySource, configurationCollector );
 		}
@@ -104,7 +107,7 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
 				buildContext, propertySource, contributorProvider,
-				introspector, implicitProvidedId, multiTenancyEnabled, mappingFactory::createMapping
+				introspector, implicitProvidedId, mappingFactory::createMapping
 		);
 	}
 

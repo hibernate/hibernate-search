@@ -19,4 +19,6 @@ public interface MappingConfigurationCollector<C> {
 
 	void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer);
 
+	void enableMultiTenancy();
+
 }

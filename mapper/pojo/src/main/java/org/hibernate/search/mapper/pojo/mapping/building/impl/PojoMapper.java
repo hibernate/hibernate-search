@@ -53,7 +53,6 @@ public class PojoMapper<M> implements Mapper<M> {
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
-	private final boolean multiTenancyEnabled;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerValueExtractorBinder extractorBinder;
@@ -68,13 +67,12 @@ public class PojoMapper<M> implements Mapper<M> {
 	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
-			boolean implicitProvidedId, boolean multiTenancyEnabled,
+			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
-		this.multiTenancyEnabled = multiTenancyEnabled;
 		this.wrapperFactory = wrapperFactory;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider( contributorProvider );
@@ -98,11 +96,6 @@ public class PojoMapper<M> implements Mapper<M> {
 				closer.pushAll( PojoIndexedTypeManagerBuilder::closeOnFailure, indexedTypeManagerBuilders.values() );
 			}
 		}
-	}
-
-	@Override
-	public boolean isMultiTenancyEnabled() {
-		return multiTenancyEnabled;
 	}
 
 	@Override
