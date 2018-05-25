@@ -45,7 +45,7 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
+		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
 		AnnotationMappingDefinition mappingDefinition = initiator.annotationMapping();
 

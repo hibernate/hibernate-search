@@ -40,7 +40,7 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
+		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
 		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
 		initiator.annotationMapping().add( IndexedEntity.class );
@@ -81,7 +81,7 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator(
+		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
 				mappingRepositoryBuilder, false
 		);
 

@@ -44,7 +44,7 @@ public class JavaBeanGenericPropertyIT {
 				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.setProperty( "index.default.backend", "stubBackend" );
 
-		JavaBeanMappingInitiator initiator = new JavaBeanMappingInitiator( mappingRepositoryBuilder );
+		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
 		initiator.annotationMapping().add( IndexedEntity.class ).add( GenericEntity.class );
 
