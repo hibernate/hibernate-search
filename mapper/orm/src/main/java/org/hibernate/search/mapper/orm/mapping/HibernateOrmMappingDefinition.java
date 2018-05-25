@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
-public interface HibernateOrmSearchMappingContributor {
+import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinition;
 
-	void contribute(HibernateOrmMappingDefinition definition);
-
+public interface HibernateOrmMappingDefinition extends PojoMappingDefinition {
 }

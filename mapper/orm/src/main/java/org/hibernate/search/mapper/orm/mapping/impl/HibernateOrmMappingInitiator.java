@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.mapping;
+package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.Optional;
 
@@ -18,9 +18,9 @@ import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingFactory;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
@@ -32,7 +32,8 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
  *  3. And more?
  */
-public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping> {
+public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping>
+		implements HibernateOrmMappingDefinition {
 
 	public static HibernateOrmMappingInitiator create(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			Metadata metadata,

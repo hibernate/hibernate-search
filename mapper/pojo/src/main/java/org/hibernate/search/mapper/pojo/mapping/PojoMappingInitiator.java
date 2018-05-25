@@ -6,17 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-
 /**
  * @author Yoann Rodiere
  */
-public interface PojoMappingInitiator<M> {
-
-	ProgrammaticMappingDefinition programmaticMapping();
-
-	AnnotationMappingDefinition annotationMapping();
+public interface PojoMappingInitiator<M> extends PojoMappingDefinition {
 
 	M getResult();
 
