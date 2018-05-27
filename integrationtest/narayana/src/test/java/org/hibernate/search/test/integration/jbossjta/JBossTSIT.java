@@ -22,12 +22,12 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.engine.transaction.jta.platform.internal.JBossStandAloneJtaPlatform;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
+import org.hibernate.search.test.integration.jbossjta.infra.NarayanaStandaloneJtaPlatform;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -72,7 +72,7 @@ public class JBossTSIT {
 				.setJtaDataSource( ds )
 				.setPersistenceProviderClassName( HibernatePersistenceProvider.class.getName() )
 				.setPersistenceUnitName( "jbossjta" )
-				.setPersistenceXMLSchemaVersion( "2.0" )
+				.setPersistenceXMLSchemaVersion( "2.2" )
 				.setSharedCacheMode( SharedCacheMode.NONE )
 				.setValidationMode( ValidationMode.NONE )
 				.setTransactionType( PersistenceUnitTransactionType.JTA )
@@ -80,7 +80,7 @@ public class JBossTSIT {
 				.addProperty( "hibernate.dialect", H2Dialect.class.getName() )
 				.addProperty( Environment.HBM2DDL_AUTO, "create-drop" )
 				.addProperty( Environment.SHOW_SQL, "true" )
-				.addProperty( Environment.JTA_PLATFORM, JBossStandAloneJtaPlatform.class.getName() )
+				.addProperty( Environment.JTA_PLATFORM, NarayanaStandaloneJtaPlatform.class.getName() )
 						//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
 				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
 				.addProperty( "hibernate.search.default.directory_provider", "local-heap" )
