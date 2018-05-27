@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.1.Final (27-05-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3163 On bootstrap failure the SessionFactory is closed without propagating the root cause
+
+** Improvement
+    * HSEARCH-3168 JBoss Modules should not use the deprecated module of Hibernate ORM
+
+** Task
+    * HSEARCH-3173 Upgrade to Hibernate ORM 5.3.1
+    * HSEARCH-2933 Upgrade integration tests to a version of the MariaDB driver not affected by CONJ-541
+
 5.10.0.Final (16-05-2018)
 -------------------------
 
