@@ -173,24 +173,24 @@
 
     <files>
         <file>
-            <source>../README.md</source>
+            <source>../../README.md</source>
             <outputDirectory></outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>../CONTRIBUTING.md</source>
+            <source>../../CONTRIBUTING.md</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../lgpl.txt</source>
+            <source>../../lgpl.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../changelog.txt</source>
+            <source>../../changelog.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../copyright.txt</source>
+            <source>../../copyright.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
