@@ -1,6 +1,12 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.5.Final (28-05-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3156 @ContainedIn fails at runtime when targeting a class for which only some subclasses are configured in Search
+
 5.6.4.Final (25-10-2017)
 -------------------------
 
