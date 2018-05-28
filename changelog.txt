@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+5.9.2.Final (28-05-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3156 @ContainedIn fails at runtime when targeting a class for which only some subclasses are configured in Search
+    * HSEARCH-3134 Error message in MassIndexerImpl#toRootEntities mentions "a subclass of an indexed entity" but should mention "supertype" instead
+    * HSEARCH-3132 Normalizers are not closed on shutdown
+    * HSEARCH-3039 Register a pass through analyzer for the @DocumentId field
+
 5.9.1.Final (13-03-2018)
 -------------------------
 
