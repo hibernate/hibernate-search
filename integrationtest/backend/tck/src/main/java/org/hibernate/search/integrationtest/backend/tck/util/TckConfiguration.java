@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -36,7 +37,8 @@ public final class TckConfiguration {
 	private final String startupTimestamp;
 
 	private TckConfiguration() {
-		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS" ).format( new Date() );
+		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
+				.format( new Date() );
 	}
 
 	public ConfigurationPropertySource getBackendProperties(String testId) {

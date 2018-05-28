@@ -28,7 +28,7 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 								Map.Entry::getKey,
 								e -> Collections.unmodifiableList( new ArrayList<>( e.getValue() ) ),
 								(u, v) -> {
-									throw new IllegalStateException( String.format( "Duplicate key %s", u ) );
+									throw new IllegalStateException( "Duplicate key " + u );
 								},
 								LinkedHashMap::new
 						) )
@@ -43,7 +43,7 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 												.collect( Collectors.toList() )
 								),
 								(u, v) -> {
-									throw new IllegalStateException( String.format( "Duplicate key %s", u ) );
+									throw new IllegalStateException( "Duplicate key " + u );
 								},
 								LinkedHashMap::new
 						) )

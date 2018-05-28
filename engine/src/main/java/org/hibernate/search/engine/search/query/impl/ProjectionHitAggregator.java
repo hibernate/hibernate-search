@@ -79,7 +79,7 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 
 		// TODO avoid creating this list when the transformer is the identity; maybe tranform in-place?
 		// (if we transform in-place, make sure to reset the "hits" reference during init)
-		return hits.stream().map( hitTransformer ).collect( Collectors.toList());
+		return hits.stream().map( hitTransformer ).collect( Collectors.toList() );
 	}
 
 	private class HitCollectorImpl implements ProjectionHitCollector {

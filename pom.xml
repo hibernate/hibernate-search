@@ -541,6 +541,8 @@
                                     <exclude>**/*_$logger.class</exclude>
                                     <!-- JBoss message bundles format messages -->
                                     <exclude>**/*_$bundle.class</exclude>
+                                    <!-- Easymock uses StringBuffer, we can't do anything about that -->
+                                    <exclude>**/EasyMockUtils*.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->

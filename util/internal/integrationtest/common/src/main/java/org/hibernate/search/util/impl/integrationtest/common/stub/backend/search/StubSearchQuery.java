@@ -40,7 +40,7 @@ final class StubSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public String getQueryString() {
-		return getClass().getName() + "@" + Integer.toHexString(hashCode());
+		return getClass().getName() + "@" + Integer.toHexString( hashCode() );
 	}
 
 	@Override

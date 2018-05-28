@@ -78,7 +78,7 @@ abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements Inde
 	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name);
+			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name );
 		}
 	}
 

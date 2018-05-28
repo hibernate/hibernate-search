@@ -55,7 +55,7 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	public IndexManagerBuildingState<?> startBuilding(String rawIndexName, boolean multiTenancyEnabled) {
-		ConfigurationPropertySource indexPropertySource = propertySource.withMask("index." + rawIndexName )
+		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "index." + rawIndexName )
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();

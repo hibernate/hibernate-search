@@ -163,7 +163,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	}
 
 	public void addField(String name, PropertyMapping mapping) {
-		getInitializedFields().put(name, mapping);
+		getInitializedFields().put( name, mapping );
 	}
 
 	public void removeField(String name) {

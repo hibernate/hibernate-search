@@ -123,7 +123,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "name=" ).append( name )
-				.append( "]")
+				.append( "]" )
 				.toString();
 	}
 }

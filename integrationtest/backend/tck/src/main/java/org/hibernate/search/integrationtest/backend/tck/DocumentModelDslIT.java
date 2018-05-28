@@ -108,7 +108,7 @@ public class DocumentModelDslIT {
 					.as( "Exception triggered by field name containing a dot" )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Field name 'foo.bar' is invalid: field names cannot contain a dot ('.')." )
-					.hasMessageContaining(" Remove the dot from your field name" )
+					.hasMessageContaining( " Remove the dot from your field name" )
 					.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 							+ " declare an object field using the objectField() method." );
 		}
@@ -125,7 +125,7 @@ public class DocumentModelDslIT {
 					.as( "Exception triggered by object field name containing a dot" )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Field name 'foo.bar' is invalid: field names cannot contain a dot ('.')." )
-					.hasMessageContaining(" Remove the dot from your field name" )
+					.hasMessageContaining( " Remove the dot from your field name" )
 					.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 							+ " declare an object field using the objectField() method." );
 		}

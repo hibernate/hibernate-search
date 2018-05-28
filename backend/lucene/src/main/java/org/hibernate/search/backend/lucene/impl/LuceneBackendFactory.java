@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.impl;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
@@ -83,8 +84,10 @@ public class LuceneBackendFactory implements BackendFactory {
 			case DISCRIMINATOR:
 				return new DiscriminatorMultiTenancyStrategyImpl();
 			default:
-				throw new AssertionFailure( String.format( "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'", backendName,
-						multiTenancyStrategyConfiguration ) );
+				throw new AssertionFailure( String.format(
+						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",
+						backendName, multiTenancyStrategyConfiguration
+				) );
 		}
 	}
 }

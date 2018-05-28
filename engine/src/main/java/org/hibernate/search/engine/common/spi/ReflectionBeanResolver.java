@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.common.spi;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.hibernate.search.util.SearchException;
 
 
@@ -23,9 +26,11 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {
 		Object instance;
 		try {
-			instance = classOrFactoryClass.newInstance();
+			// TODO use ClassLoaderHelper from Search 5
+			Constructor<?> constructor = classOrFactoryClass.getConstructor();
+			instance = constructor.newInstance();
 		}
-		catch (InstantiationException | IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new SearchException( "Error while resolving bean", e );
 		}
 

@@ -93,7 +93,7 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "name=" ).append( name.original )
-				.append( "]")
+				.append( "]" )
 				.toString();
 	}
 

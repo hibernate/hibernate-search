@@ -147,7 +147,7 @@ public class SearchResultIT {
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( mainReference, mainReference, mainReference );
 			b.projection( emptyReference, emptyReference, emptyReference );
-		});
+		} );
 	}
 
 	@Test

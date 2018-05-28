@@ -34,7 +34,7 @@ public class ToStringTreeBuilderTest {
 		assertThat( new ToStringTreeBuilder( ToStringStyle.MULTILINE ).toString() ).isEqualTo( "" );
 		assertThat( new ToStringTreeBuilder( ToStringStyle.MULTILINE ).startObject( "" ).endObject().toString() )
 				.isEqualTo( "{\n}" );
-		assertThat( toString( ToStringStyle.MULTILINE) )
+		assertThat( toString( ToStringStyle.MULTILINE ) )
 				.isEqualTo(
 						"foo=value\n"
 						+ "children={\n"

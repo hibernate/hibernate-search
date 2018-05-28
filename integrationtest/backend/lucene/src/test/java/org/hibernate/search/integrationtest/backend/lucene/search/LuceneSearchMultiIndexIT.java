@@ -107,7 +107,7 @@ public class LuceneSearchMultiIndexIT {
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
 			c.doc( indexName_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
-		});
+		} );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -118,7 +118,7 @@ public class LuceneSearchMultiIndexIT {
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
 			c.doc( indexName_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
 			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
-		});
+		} );
 	}
 
 	private void initData() {

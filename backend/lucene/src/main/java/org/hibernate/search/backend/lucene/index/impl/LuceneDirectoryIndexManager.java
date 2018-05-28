@@ -105,7 +105,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "name=" ).append( indexName )
-				.append( "]")
+				.append( "]" )
 				.toString();
 	}
 

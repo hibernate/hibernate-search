@@ -64,7 +64,7 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 				.append( "[" )
 				.append( "searchBackendContext=" ).append( searchBackendContext )
 				.append( ", indexManagers=" ).append( indexManagers )
-				.append( "]")
+				.append( "]" )
 				.toString();
 	}
 

@@ -137,7 +137,7 @@ public class SearchMultiIndexIT {
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( c -> {
 			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
 			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
-		});
+		} );
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class SearchMultiIndexIT {
 			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
 			c.doc( indexName_1_1, DOCUMENT_1_1_2 );
 			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
-		});
+		} );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -168,7 +168,7 @@ public class SearchMultiIndexIT {
 			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
 			c.doc( indexName_1_1, DOCUMENT_1_1_2 );
 			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
-		});
+		} );
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class SearchMultiIndexIT {
 			c.projection( SORT_FIELD_1_1_1 );
 			c.projection( SORT_FIELD_1_1_2 );
 			c.projection( SORT_FIELD_1_2_1 );
-		});
+		} );
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class SearchMultiIndexIT {
 			c.projection( ADDITIONAL_FIELD_1_1_1 );
 			c.projection( ADDITIONAL_FIELD_1_1_2 );
 			c.projection( (Object) null );
-		});
+		} );
 	}
 
 	@Test

@@ -35,7 +35,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "indexNames=" ).append( searchTargetModel.getIndexNames() )
-				.append( "]")
+				.append( "]" )
 				.toString();
 	}
 
