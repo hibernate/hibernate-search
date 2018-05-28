@@ -24,7 +24,6 @@
     <inceptionYear>2006</inceptionYear>
 
     <modules>
-        <module>build-config</module>
         <module>sharedtestresources</module>
         <module>legacy</module>
         <module>engine</module>
@@ -177,9 +176,6 @@
     </mailingLists>
 
     <properties>
-        <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.10.2.Final</previous.stable>
-
         <!-- Dependencies versions -->
 
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
@@ -299,97 +295,6 @@
         <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
         <osgi.version-range.org.apache.avro>[${version.org.apache.avro},1.8.0)</osgi.version-range.org.apache.avro>
 
-        <!-- Elasticsearch tests properties -->
-
-        <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
-        <test.elasticsearch.host.username></test.elasticsearch.host.username>
-        <test.elasticsearch.host.password></test.elasticsearch.host.password>
-
-        <!-- Maven plugins versions -->
-
-        <version.assembly.plugin>3.1.0</version.assembly.plugin>
-        <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
-        <version.bundle.plugin>3.3.0</version.bundle.plugin>
-        <version.checkstyle.plugin>2.17</version.checkstyle.plugin>
-        <version.clean.plugin>3.0.0</version.clean.plugin>
-        <version.copy.plugin>0.0.5</version.copy.plugin>
-        <version.compiler.plugin>3.7.0</version.compiler.plugin>
-        <version.dependency.plugin>3.0.2</version.dependency.plugin>
-        <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>3.1.1</version.dependency-check.plugin>
-        <version.dependencypath.plugin>1.1.1</version.dependencypath.plugin>
-        <version.depends.plugin>1.3.1</version.depends.plugin>
-        <version.deploy.plugin>2.8.2</version.deploy.plugin>
-        <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
-        <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
-        <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
-        <version.help.plugin>2.2</version.help.plugin>
-        <version.install.plugin>2.5.2</version.install.plugin>
-        <version.japicmp.plugin>0.9.3</version.japicmp.plugin>
-        <version.jar.plugin>3.0.2</version.jar.plugin>
-        <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
-        <version.jdeps.plugin>0.4.0</version.jdeps.plugin>
-        <version.nexus.plugin>2.1</version.nexus.plugin>
-        <version.processor.plugin>3.2.0</version.processor.plugin>
-        <version.project-info.plugin>2.9</version.project-info.plugin>
-        <version.release.plugin>2.5.3</version.release.plugin>
-        <version.resources.plugin>3.0.2</version.resources.plugin>
-        <version.shade.plugin>3.1.0</version.shade.plugin>
-        <version.site.plugin>3.6</version.site.plugin>
-        <version.source.plugin>3.0.1</version.source.plugin>
-        <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>2.21.0</version.surefire.plugin>
-        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
-        <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
-        <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
-        <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
-
-        <!--
-            Please don't change the name of this property, it may be used and
-            overridden by a CI job of the Checkstyle project so that they can
-            check for regressions. Which is obviously good for us, too.
-         -->
-        <puppycrawl.checkstyle.version>8.8</puppycrawl.checkstyle.version>
-
-        <!-- Asciidoctor -->
-
-        <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
-        <version.org.jruby>9.1.15.0</version.org.jruby>
-        <version.org.asciidoctor.asciidoctorj>1.5.6</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.16</version.org.asciidoctor.asciidoctorj-pdf>
-
-        <!-- JBoss public repository -->
-
-        <jboss.public.repo.id>jboss-public-repository-group</jboss.public.repo.id>
-        <jboss.public.repo.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
-
-        <!-- Repository Deployment URLs -->
-
-        <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
-        <jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
-        <jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
-        <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
-
-        <!-- Build settings -->
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
-        <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
-        <!--
-                Options to override the compiler arguments directly on the compiler argument line to separate between what
-                the IDE understands as the source level and what the Maven compiler actually use.
-        -->
-        <maven.compiler.argument.target>${maven.compiler.target}</maven.compiler.argument.target>
-        <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
-        <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
-        <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
-
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <!--
@@ -421,17 +326,6 @@
 
         <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
         <pax-exam.jvm.args>${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
-
-        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
-        <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
-        <maven.min.version>3.2.3</maven.min.version>
-
-        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
-        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
-
-        <!-- Eclipse plugin options -->
-
-        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     </properties>
 
     <dependencyManagement>
@@ -807,7 +701,7 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
@@ -1144,36 +1038,7 @@
     </dependencyManagement>
 
     <build>
-        <defaultGoal>install</defaultGoal>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <showWarnings>true</showWarnings>
-                    <source>${maven.compiler.argument.source}</source>
-                    <target>${maven.compiler.argument.target}</target>
-                    <testSource>${maven.compiler.argument.testSource}</testSource>
-                    <testTarget>${maven.compiler.argument.testTarget}</testTarget>
-                    <encoding>UTF-8</encoding>
-                    <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
-                    <proc>none</proc>
-                </configuration>
-            </plugin>
-            <plugin>
-               <groupId>com.github.marschall</groupId>
-               <artifactId>jdeps-maven-plugin</artifactId>
-               <!--
-                   Not enabling automatic executions; run:
-                    > mvn jdeps:jdeps
-                    to get a report.
-               -->
-               <configuration>
-                  <!-- Allows to see which JRE profiles will be needed -->
-                  <profile>true</profile>
-                  <failOnWarning>true</failOnWarning>
-               </configuration>
-            </plugin>
             <plugin>
                 <!-- This defines the properties 'parsedVersion.majorVersion'
                     and 'parsedVersion.minorVersion' to be in synch with the current project version -->
@@ -1253,26 +1118,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-maven-plugin</artifactId>
-                <configuration>
-                    <nexusUrl>https://repository.jboss.org/nexus</nexusUrl>
-                    <automatic>true</automatic>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Implementation-Title>${project.name}</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-Vendor>hibernate.org</Implementation-Vendor>
-                            <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
-                            <Implementation-URL>http://search.hibernate.org</Implementation-URL>
-                        </manifestEntries>
-                    </archive>
+                <configuration >
                     <skipIfEmpty>true</skipIfEmpty>
                 </configuration>
                 <executions>
@@ -1297,145 +1145,9 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>enforce-common-rules</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <!-- require JDK 1.8 to run the build -->
-                                    <version>[${jdk.min.version},)</version>
-                                </requireJavaVersion>
-                                <requireMavenVersion>
-                                    <version>${maven.min.version}</version>
-                                </requireMavenVersion>
-                                <banDuplicatePomDependencyVersions />
-                            </rules>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>enforce-dependency-convergence</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${enforcer.dependencyconvergence.skip}</skip>
-                            <rules>
-                                <DependencyConvergence />
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy</goals>
-                    <arguments>-DskipTests</arguments>
-                    <pushChanges>false</pushChanges>
-                    <localCheckout>true</localCheckout>
-                    <preparationGoals>clean install</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>de.thetaphi</groupId>
-                <artifactId>forbiddenapis</artifactId>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.wildfly.build</groupId>
-                    <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
-                    <version>${version.org.wildfly.build-tools}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.wildfly.build</groupId>
-                    <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                    <version>${version.org.wildfly.build-tools}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.marschall</groupId>
-                    <artifactId>jdeps-maven-plugin</artifactId>
-                    <version>${version.jdeps.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>${version.clean.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>${version.install.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${version.resources.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>${version.site.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${version.jar.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
-                    <version>${version.compiler.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.bsc.maven</groupId>
-                    <artifactId>maven-processor-plugin</artifactId>
-                    <version>${version.processor.plugin}</version>
-                    <executions>
-                        <!-- Run annotation processors on src/main/java sources -->
-                        <execution>
-                            <id>process</id>
-                            <goals>
-                                <goal>process</goal>
-                            </goals>
-                            <phase>generate-sources</phase>
-                            <configuration>
-                                <processors>
-                                    <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
-                                </processors>
-                                <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
-                                <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
-                                <compilerArguments>-source ${maven.compiler.argument.source} -target ${maven.compiler.argument.target} -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
-                            </configuration>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging-processor</artifactId>
-                            <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                            <scope>compile</scope>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-maven-plugin</artifactId>
-                    <version>${version.nexus.plugin}</version>
-                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -1460,104 +1172,6 @@
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
                         </additionalClasspathElements>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.asciidoctor</groupId>
-                    <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>${version.asciidoctor.plugin}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.jruby</groupId>
-                            <artifactId>jruby-complete</artifactId>
-                            <version>${version.org.jruby}</version>
-                        </dependency>
-                         <dependency>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoctorj</artifactId>
-                            <version>${version.org.asciidoctor.asciidoctorj}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoctorj-pdf</artifactId>
-                            <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>ch.mfrey.maven.plugin</groupId>
-                    <artifactId>copy-maven-plugin</artifactId>
-                    <version>${version.copy.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${version.assembly.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>${version.release.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${version.javadoc.plugin}</version>
-                    <configuration>
-                        <!-- Fail on error alternative -->
-                        <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
-                        <quiet>true</quiet>
-                        <verbose>false</verbose>
-                        <failOnError>${failOnJavaDocError}</failOnError>
-                        <!-- Exclude implementation classes from the javadoc -->
-                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
-                        <links>
-                            <link>http://download.oracle.com/javase/8/docs/api/</link>
-                            <link>http://docs.jboss.org/hibernate/orm/5.3/javadocs/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/core/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/analyzers-common/</link>
-                            <link>http://lucene.apache.org/core/5_5_4/queryparser/</link>
-                            <link>http://jgroups.org/javadoc/</link>
-                            <!-- for javax.batch in the JSR 352 modules -->
-                            <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
-                        </links>
-                        <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
-                        </bottom>
-                        <additionalDependencies>
-                            <additionalDependency>
-                                <groupId>org.jboss.logging</groupId>
-                                <artifactId>jboss-logging-annotations</artifactId>
-                                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                            </additionalDependency>
-                        </additionalDependencies>
-                        <tags>
-                            <tag>
-                                <name>hsearch.experimental</name>
-                                <placement>a</placement>
-                                <head>Experimental</head>
-                            </tag>
-                        </tags>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${version.source.plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${version.deploy.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1608,207 +1222,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-help-plugin</artifactId>
-                    <version>${version.help.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>${version.enforcer.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>de.thetaphi</groupId>
-                    <artifactId>forbiddenapis</artifactId>
-                    <version>${version.forbiddenapis.plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>verify-forbidden-apis</id>
-                            <configuration>
-                                 <targetVersion>10</targetVersion>
-                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                 <excludes>
-                                     <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
-                                     <exclude>**/*_$logger.class</exclude>
-                                     <!-- JBoss message bundles format messages -->
-                                     <exclude>**/*_$bundle.class</exclude>
-                                 </excludes>
-                                 <bundledSignatures>
-                                     <!-- These signatures on the top are not specific to any JDK version -->
-                                     <bundledSignature>jdk-system-out</bundledSignature>
-                                     <bundledSignature>jdk-non-portable</bundledSignature>
-                                     <!-- The jdk-reflection is not yet something we can avoid -->
-                                     <!--<bundledSignature>jdk-reflection</bundledSignature>-->
-
-                                     <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                     <bundledSignature>jdk-unsafe-1.8</bundledSignature>
-                                     <bundledSignature>jdk-unsafe-9</bundledSignature>
-                                     <bundledSignature>jdk-unsafe-10</bundledSignature>
-
-                                     <bundledSignature>jdk-deprecated-1.8</bundledSignature>
-                                     <bundledSignature>jdk-deprecated-9</bundledSignature>
-                                     <bundledSignature>jdk-deprecated-10</bundledSignature>
-
-                                     <bundledSignature>jdk-internal-1.8</bundledSignature>
-                                     <bundledSignature>jdk-internal-9</bundledSignature>
-                                     <bundledSignature>jdk-internal-10</bundledSignature>
-                                 </bundledSignatures>
-                                 <failOnMissingClasses>false</failOnMissingClasses>
-                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-                                 <!--
-                                 The method SharedSessionContract#getTransaction() should never be used
-                                 as it is only reliable in certain configurations.
-                                  -->
-                                 <signaturesArtifacts>
-                                     <signaturesArtifact>
-                                         <groupId>org.hibernate</groupId>
-                                         <artifactId>hibernate-search-build-config</artifactId>
-                                         <version>${project.version}</version>
-                                         <type>jar</type>
-                                         <path>forbidden-runtime.txt</path>
-                                     </signaturesArtifact>
-                                 </signaturesArtifacts>
-                             </configuration>
-                             <phase>compile</phase>
-                             <goals>
-                                 <goal>check</goal>
-                             </goals>
-                         </execution>
-                         <execution>
-                             <id>verify-forbidden-test-apis</id>
-                             <configuration>
-                                 <targetVersion>${maven.compiler.argument.testTarget}</targetVersion>
-                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-                                 <excludes>
-                                 <!--
-                                     Only those two classes are allowed to build search integrators,
-                                     because they do it right (with guaranteed calls to close at the end of the test).
-                                 -->
-                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchFactoryHolder.class</exclude>
-                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchIntegratorResource.class</exclude>
-                                 </excludes>
-                                 <bundledSignatures>
-                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                     <bundledSignature>jdk-unsafe</bundledSignature>
-                                     <bundledSignature>jdk-deprecated</bundledSignature>
-                                     <bundledSignature>jdk-non-portable</bundledSignature>
-                                     <bundledSignature>jdk-internal</bundledSignature>
-                                 </bundledSignatures>
-                                 <signaturesArtifacts>
-                                     <signaturesArtifact>
-                                         <groupId>org.hibernate</groupId>
-                                         <artifactId>hibernate-search-build-config</artifactId>
-                                         <version>${project.version}</version>
-                                         <type>jar</type>
-                                         <path>forbidden-tests.txt</path>
-                                     </signaturesArtifact>
-                                 </signaturesArtifacts>
-                             </configuration>
-                             <phase>test-compile</phase>
-                             <goals>
-                                 <goal>testCheck</goal>
-                             </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${version.checkstyle.plugin}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.hibernate</groupId>
-                            <artifactId>hibernate-search-build-config</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                        <!--
-                             force SLF4J dependency to align
-                             Maven internals and CheckStyle's
-                             see https://github.com/jcgay/maven-color/wiki/Problems
-                             If that causes problem, that can be removed
-                             but maven-color won't work -->
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>${puppycrawl.checkstyle.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>jcl-over-slf4j</artifactId>
-                            <version>1.7.22</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-jdk14</artifactId>
-                            <version>1.7.22</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <!-- Location is relative to the classpath -->
-                        <configLocation>checkstyle.xml</configLocation>
-                        <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
-                        <violationSeverity>error</violationSeverity>
-                        <includeTestResources>true</includeTestResources>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
-                        <!-- generated respectively copied code -->
-                        <excludes>
-                            **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
-                            **/Log_$logger.java
-                        </excludes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-style</id>
-                            <phase>verify</phase>
-                            <!-- not using checkstyle:checkstyle here, as for
-                                some reason checkstyle:check finds more errors -->
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <extensions>true</extensions>
-                    <version>${version.bundle.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${version.shade.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${version.buildhelper.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.servicemix.tooling</groupId>
-                    <artifactId>depends-maven-plugin</artifactId>
-                    <version>${version.depends.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>${version.elasticsearch.plugin}</version>
-                    <configuration>
-                        <clusterName>hsearchEsTestCluster</clusterName>
-                        <httpPort>9200</httpPort>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.bitstrings.maven.plugins</groupId>
-                    <artifactId>dependencypath-maven-plugin</artifactId>
-                    <version>${version.dependencypath.plugin}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${version.jacoco.plugin}</version>
@@ -1823,89 +1236,9 @@
                         </relativeReportDirs>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.jboss.bridger</groupId>
-                    <artifactId>bridger</artifactId>
-                    <version>${version.org.jboss.bridger.plugin}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>${jboss.releases.repo.id}</id>
-            <name>JBoss Releases Repository</name>
-            <url>${jboss.releases.repo.url}</url>
-        </repository>
-        <snapshotRepository>
-            <id>${jboss.snapshots.repo.id}</id>
-            <name>JBoss Snapshots Repository</name>
-            <url>${jboss.snapshots.repo.url}</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>${version.project-info.plugin}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>com.github.siom79.japicmp</groupId>
-                <artifactId>japicmp-maven-plugin</artifactId>
-                <version>${version.japicmp.plugin}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>cmp-report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-                <configuration>
-                    <skip>true</skip>
-                    <oldVersion>
-                        <dependency>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <version>${previous.stable}</version>
-                            <type>${project.packaging}</type>
-                        </dependency>
-                    </oldVersion>
-                    <newVersion>
-                        <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
-                        </file>
-                    </newVersion>
-                    <parameter>
-                        <onlyModified>true</onlyModified>
-                        <excludes>
-                            <exclude>org.hibernate.search.*.impl</exclude>
-                        </excludes>
-                        <accessModifier>public</accessModifier>
-                        <!--
-                            The next two should make sure that this report is not run for this POM-packaged parent module itself
-                            That's not working, though, resulting a build failure. I'm thus setting skip to "true" below, which
-                            needs to be overridden within those modules for which this report should be created
-                        -->
-                        <skipPomModules>true</skipPomModules>
-                        <packagingSupporteds>
-                            <packagingSupported>jar</packagingSupported>
-                        </packagingSupporteds>
-                    </parameter>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <profiles>
 
@@ -2224,13 +1557,13 @@
         <!--
              Different profiles are needed to handle the environment setup (which is handled in Maven,
              on contrary to the various database profiles).
-             
+
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
-             
+
                  mvn clean test -Pelasticsearch-2.0 -Dtest.elasticsearch.version=2.1.0
           -->
-        
+
         <!-- Elasticsearch [2.0,2.2) test environment -->
         <profile>
             <id>elasticsearch-2.0</id>
@@ -2317,7 +1650,7 @@
                 </pluginManagement>
             </build>
         </profile>
-        
+
         <!-- Elasticsearch 2.2+ test environment -->
         <profile>
             <id>elasticsearch-2.2</id>
@@ -2447,7 +1780,7 @@
                 </pluginManagement>
             </build>
         </profile>
-        
+
         <!-- Elasticsearch 5.2+ test environment (default) -->
         <profile>
             <id>elasticsearch-5.2</id>
@@ -2828,24 +2161,5 @@
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
-        <profile>
-         <id>owasp</id>
-            <build>
-               <plugins>
-                  <plugin>
-                     <groupId>org.owasp</groupId>
-                     <artifactId>dependency-check-maven</artifactId>
-                     <version>${version.dependency-check.plugin}</version>
-                     <executions>
-                        <execution>
-                           <goals>
-                              <goal>aggregate</goal>
-                           </goals>
-                        </execution>
-                    </executions>
-                  </plugin>
-               </plugins>
-             </build>
-      </profile>
     </profiles>
 </project>
