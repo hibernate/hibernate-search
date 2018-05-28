@@ -13,7 +13,7 @@ node ('Performance') {
 		unstash 'benchmarks-lucene'
 		sh 'mkdir output'
 		sh "java " +
-				" -jar integrationtest/performance/engine-lucene/target/benchmarks.jar" +
+				" -jar legacy/integrationtest/performance/engine-lucene/target/benchmarks.jar" +
 				" -wi 1 -i 10" +
 				" -rff output/lucene-benchmark-results.csv" +
 				" -p directorytype=fs -p indexsize=100 -p maxResults=10"

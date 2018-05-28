@@ -16,7 +16,7 @@ node ('Performance') {
 			sh "java " +
 					" -Dhost=${env.ES_ENDPOINT} -Daws.access-key=${AWS_ACCESS_KEY_ID}" +
 					" -Daws.secret-key=${AWS_SECRET_ACCESS_KEY} -Daws.region=${env.AWS_REGION}" +
-					" -jar integrationtest/performance/engine-elasticsearch/target/benchmarks.jar " +
+					" -jar legacy/integrationtest/performance/engine-elasticsearch/target/benchmarks.jar " +
 					" -wi 1 -i 10" +
 					" -rff output/elasticsearch-benchmark-results.csv" +
 					" -p indexSize=1000 -p maxResults=100 -p changesetsPerFlush=50 -p streamedAddsPerFlush=5000"

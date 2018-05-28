@@ -34,5 +34,5 @@ node ('Performance') {
 					" -Dscenario=${scenario}"
 		}
 	}
-	archiveArtifacts artifacts: 'integrationtest/performance/orm/target/report-*.txt'
+	archiveArtifacts artifacts: 'legacy/integrationtest/performance/orm/target/report-*.txt'
 }
