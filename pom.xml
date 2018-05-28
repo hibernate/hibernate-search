@@ -77,7 +77,7 @@
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
-        <version.forbiddenapis.plugin>2.4.1</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
         <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
@@ -456,6 +456,10 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -520,6 +524,91 @@
                             </tag>
                         </tags>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>de.thetaphi</groupId>
+                    <artifactId>forbiddenapis</artifactId>
+                    <version>${version.forbiddenapis.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>verify-forbidden-apis</id>
+                            <configuration>
+                                <targetVersion>10</targetVersion>
+                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                <excludes>
+                                    <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
+                                    <exclude>**/*_$logger.class</exclude>
+                                    <!-- JBoss message bundles format messages -->
+                                    <exclude>**/*_$bundle.class</exclude>
+                                </excludes>
+                                <bundledSignatures>
+                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <bundledSignature>jdk-system-out</bundledSignature>
+                                    <bundledSignature>jdk-non-portable</bundledSignature>
+                                    <bundledSignature>jdk-internal</bundledSignature>
+                                </bundledSignatures>
+                                <failOnMissingClasses>false</failOnMissingClasses>
+                                <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                <!--
+                                The method SharedSessionContract#getTransaction() should never be used
+                                as it is only reliable in certain configurations.
+                                 -->
+                                <signaturesArtifacts>
+                                    <signaturesArtifact>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <artifactId>hibernate-search-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <path>forbidden-runtime.txt</path>
+                                    </signaturesArtifact>
+                                </signaturesArtifacts>
+                            </configuration>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify-forbidden-test-apis</id>
+                            <configuration>
+                                <targetVersion>${maven.compiler.argument.testTarget}</targetVersion>
+                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                <excludes>
+                                    <!--
+                                        Only those two classes are allowed to build search integrators,
+                                        because they do it right (with guaranteed calls to close at the end of the test).
+                                    -->
+                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchFactoryHolder.class</exclude>
+                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchIntegratorResource.class</exclude>
+                                </excludes>
+                                <bundledSignatures>
+                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <bundledSignature>jdk-non-portable</bundledSignature>
+                                    <bundledSignature>jdk-internal</bundledSignature>
+                                </bundledSignatures>
+                                <signaturesArtifacts>
+                                    <signaturesArtifact>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <artifactId>hibernate-search-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <path>forbidden-tests.txt</path>
+                                    </signaturesArtifact>
+                                </signaturesArtifacts>
+                            </configuration>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCheck</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

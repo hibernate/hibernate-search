@@ -1,0 +1,36 @@
+# Hibernate Search, full-text search for your domain model
+#
+# License: GNU Lesser General Public License (LGPL), version 2.1 or later
+# See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+
+# This file contains forbidden API signatures common to all modules
+
+@ignoreUnresolvable
+@defaultMessage Should not be used
+
+################################################################################################################
+# Some packages that should not be used
+java.awt.**
+sun.**
+org.slf4j.**
+junit.framework.**
+
+################################################################################################################
+# org.testng.Assert#fail() should be used instead of:
+org.assertj.core.api.Fail#fail()
+org.testng.FileAssert#fail()
+org.assertj.core.api.Assertions#fail()
+
+################################################################################################################
+# Nobody should be using StringBuffer anymore
+java.lang.StringBuffer
+
+################################################################################################################
+# Probably meant the other Objects:
+
+org.jboss.logging.processor.util.Objects
+
+################################################################################################################
+# Methods from Hibernate ORM :
+# This one is only safe to use with specific configurations:
+org.hibernate.SharedSessionContract#getTransaction()
