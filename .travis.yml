@@ -3,7 +3,7 @@
 # therefore deactivated. Activating Travis for your own fork is as easy as
 # activating it in the travis site of your fork.
 
-sudo: required
+sudo: false
 dist: trusty
 language: java
 jdk:
@@ -12,6 +12,15 @@ git:
   # Required in order for Sonar to retrieve blame information
   depth: false
 addons:
+  # for now, let's test only with H2
+  #postgresql: '9.4'
+  #mariadb: '10.0'
+# might be useful to push reports to an S3 bucket
+#  artifacts:
+#    paths:
+#      - $(find $HOME -name surefire-reports | tr "\n" ":")
+#      - $(find $HOME -name failsafe-reports | tr "\n" ":")
+#  s3_region: 'us-west-2'
   sonarcloud:
     organization: "hibernate"
     token:
@@ -28,11 +37,30 @@ env:
     - _JAVA_OPTIONS=
     # Ensure Maven doesn't eat up too much memory
     - MAVEN_OPTS=-Xmx756m
+  matrix:
+    #- DB=h2 ELASTICSEARCH=2.0
+    - DB=h2 ELASTICSEARCH=2.2
+    - DB=h2 ELASTICSEARCH=5.0
+    - DB=h2 ELASTICSEARCH=5.2
+    # for now, let's test only with H2
+    #- DB=pgsql
+    #- DB=mariadb
 before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
   # Skip Sonar if no token is defined
   - if [[ -z "$SONAR_TOKEN" ]]; then BUILD_OPTIONS+=' -Dsonar.skip=true'; fi
+  - case $DB in
+    "h2") ;;
+    "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
+    "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
+    esac
+  - case $ELASTICSEARCH in
+    2.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.0' ;;
+    2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.2' ;;
+    5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
+    5.2) ;;
+    esac
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
@@ -44,6 +72,12 @@ install:
   - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc coveralls:report sonar:sonar
     -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
     -Dcoveralls.skip=true -Dsonar.skip=true
+before_script:
+  - case $DB in
+    "h2") ;;
+    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
+    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
+    esac
 script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
   # Note sonar must be ran in the "script:" section in order to benefit from Travis caching.
@@ -54,3 +88,4 @@ after_success:
 before_cache:
   # Do not put the artifacts we just built into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/search/
+  - rm -r $HOME/.m2/repository/org/hibernate/hibernate-search*
