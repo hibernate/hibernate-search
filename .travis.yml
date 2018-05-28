@@ -38,7 +38,7 @@ install:
   # but we want the plugins to be skipped if they are not essential,
   # because they will be re-executed later and we don't want to waste time.
   - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc coveralls:report sonar:sonar
-    -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Djqassistant.skip=true
+    -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
     -Dcoveralls.skip=true -Dsonar.skip=true
 script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
