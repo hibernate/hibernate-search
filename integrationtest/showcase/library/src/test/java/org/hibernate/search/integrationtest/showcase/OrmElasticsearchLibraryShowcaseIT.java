@@ -241,9 +241,6 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Test
 	public void searchAroundMe_spatial() {
-		// TODO spatial queries
-		assumeTrue( "Spatial queries not implemented yet", false );
-
 		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
 
 		withinTransaction( sessionFactory, this::initData );

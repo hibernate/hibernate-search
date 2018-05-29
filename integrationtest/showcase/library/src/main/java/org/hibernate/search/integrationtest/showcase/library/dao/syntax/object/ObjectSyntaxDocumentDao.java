@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.engine.backend.spatial.DistanceUnit;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
@@ -112,18 +113,16 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 		}
 
 		// Spatial query
-		// TODO spatial query
 
-		/*
 		if ( myLocation != null && maxDistanceInKilometers != null ) {
 			booleanBuilder.must(
-					target.predicate().spatial()
-					.onField( "copies.library.location" )
-					.within( maxDistanceInKilometers, DistanceUnit.KM )
-					.of( myLocation )
+					target.predicate().nested().onObjectField( "copies" ).spatial()
+							.within()
+							.onField( "copies.library.location" )
+							.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
+							.end()
 			);
 		}
-		*/
 
 		// Nested query + must loop
 		if ( libraryServices != null && !libraryServices.isEmpty() ) {
