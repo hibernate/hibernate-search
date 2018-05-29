@@ -24,8 +24,11 @@ public final class JavaBeanMappingInitiatorImpl extends PojoMappingInitiatorImpl
 				mappingRepositoryBuilder, new JavaBeanMappingKey(),
 				new JavaBeanMappingFactory(),
 				introspector, false,
-				annotatedTypeDiscoveryEnabled, multiTenancyEnabled
+				multiTenancyEnabled
 		);
+		if ( annotatedTypeDiscoveryEnabled ) {
+			enableAnnotatedTypeDiscovery();
+		}
 	}
 
 }

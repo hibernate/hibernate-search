@@ -30,12 +30,15 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	private final PojoBootstrapIntrospector introspector;
 	// Use a LinkedHashSet for deterministic iteration
 	private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
-	private final boolean annotatedTypeDiscoveryEnabled;
 
-	public AnnotationMappingDefinitionImpl(PojoBootstrapIntrospector introspector,
-			boolean annotatedTypeDiscoveryEnabled) {
+	private boolean annotatedTypeDiscoveryEnabled = false;
+
+	public AnnotationMappingDefinitionImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
-		this.annotatedTypeDiscoveryEnabled = annotatedTypeDiscoveryEnabled;
+	}
+
+	public void enableAnnotatedTypeDiscovery() {
+		this.annotatedTypeDiscoveryEnabled = true;
 	}
 
 	@Override

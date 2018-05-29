@@ -45,7 +45,6 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
-			boolean annotatedTypeDiscoveryEnabled,
 			boolean multiTenancyEnabled) {
 		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
 		this.mappingKey = mappingKey;
@@ -63,9 +62,7 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 		 * Also, make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
 		 * which would lead to duplicate field definitions.
 		 */
-		annotationMappingDefinition = new AnnotationMappingDefinitionImpl(
-				introspector, annotatedTypeDiscoveryEnabled
-		);
+		annotationMappingDefinition = new AnnotationMappingDefinitionImpl( introspector );
 		addConfigurationContributor( annotationMappingDefinition );
 	}
 
@@ -109,6 +106,10 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 				buildContext, propertySource, contributorProvider,
 				introspector, implicitProvidedId, mappingFactory::createMapping
 		);
+	}
+
+	protected final void enableAnnotatedTypeDiscovery() {
+		annotationMappingDefinition.enableAnnotatedTypeDiscovery();
 	}
 
 	protected final void addConfigurationContributor(PojoMappingConfigurationContributor contributor) {
