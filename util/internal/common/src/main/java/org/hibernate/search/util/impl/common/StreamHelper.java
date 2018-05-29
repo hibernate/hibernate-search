@@ -6,9 +6,15 @@
  */
 package org.hibernate.search.util.impl.common;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import org.hibernate.search.util.AssertionFailure;
 
 /**
  * @author Yoann Rodiere
@@ -48,6 +54,16 @@ public final class StreamHelper {
 					// Restore null values
 					return holder[0].orElse( null );
 				} );
+	}
+
+	public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toMap(
+			Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper,
+			Supplier<M> mapSupplier) {
+		return Collectors.toMap( keyMapper, valueMapper, throwingMerger(), mapSupplier );
+	}
+
+	private static <T> BinaryOperator<T> throwingMerger() {
+		return (u,v) -> { throw new AssertionFailure( "Unexpected duplicate key: " + u ); };
 	}
 
 }

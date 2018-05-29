@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.util.impl.common.StreamHelper;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
@@ -24,27 +25,21 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 	protected StubTreeNode(AbstractBuilder<N> builder) {
 		this.attributes = Collections.unmodifiableMap(
 				builder.attributes.entrySet().stream()
-						.collect( Collectors.toMap(
+						.collect( StreamHelper.toMap(
 								Map.Entry::getKey,
 								e -> Collections.unmodifiableList( new ArrayList<>( e.getValue() ) ),
-								(u, v) -> {
-									throw new IllegalStateException( "Duplicate key " + u );
-								},
 								LinkedHashMap::new
 						) )
 		);
 		this.children = Collections.unmodifiableMap(
 				builder.children.entrySet().stream()
-						.collect( Collectors.toMap(
+						.collect( StreamHelper.toMap(
 								Map.Entry::getKey,
 								e -> Collections.unmodifiableList(
 										e.getValue().stream()
 												.map( b -> b == null ? null : b.build() )
 												.collect( Collectors.toList() )
 								),
-								(u, v) -> {
-									throw new IllegalStateException( "Duplicate key " + u );
-								},
 								LinkedHashMap::new
 						) )
 		);
