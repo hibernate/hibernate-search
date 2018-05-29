@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
 public class StubSortBuilder implements ScoreSortBuilder<StubQueryElementCollector>,
-		FieldSortBuilder<StubQueryElementCollector> {
+		FieldSortBuilder<StubQueryElementCollector>, DistanceSortBuilder<StubQueryElementCollector> {
 
 	@Override
 	public void missingFirst() {

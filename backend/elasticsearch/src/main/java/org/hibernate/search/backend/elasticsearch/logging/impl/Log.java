@@ -150,4 +150,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 527, value = "Spatial predicates are not supported by the type of field '%1$s'.")
 	SearchException spatialPredicatesNotSupportedByFieldType(String absoluteFieldPath);
+
+	@Message(id = 528, value = "Distance related operations are not supported by the type of field '%1$s'.")
+	SearchException distanceOperationsNotSupportedByFieldType(String absoluteFieldPath);
 }

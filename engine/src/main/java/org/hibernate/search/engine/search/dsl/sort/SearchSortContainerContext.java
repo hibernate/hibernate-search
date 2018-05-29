@@ -8,6 +8,8 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContainerContextExtension;
 import org.hibernate.search.util.SearchException;
@@ -45,7 +47,34 @@ public interface SearchSortContainerContext<N> {
 	 */
 	FieldSortContext<N> byField(String absoluteFieldPath);
 
-	// TODO other sorts (spatial, ...)
+	/**
+	 * Order elements by the distance from the location stored in the specified field to the location specified.
+	 *
+	 * <p>The default order is <strong>ascending</strong>.
+	 *
+	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
+	 * @param location The location to which we want to compute the distance.
+	 * @throws SearchException If the field type does not constitute a valid location.
+	 */
+	DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location);
+
+	/**
+	 * Order elements by the distance from the location stored in the specified field to the location specified.
+	 *
+	 * <p>
+	 * The default order is <strong>ascending</strong>.
+	 *
+	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
+	 * @param latitude The latitude of the location to which we want to compute the distance.
+	 * @param longitude The longitude of the location to which we want to compute the distance.
+	 * @throws SearchException If the field type does not constitute a valid location.
+	 */
+	default DistanceSortContext<N> byDistance(String absoluteFieldPath, double latitude, double longitude) {
+		return byDistance( absoluteFieldPath, new ImmutableGeoPoint( latitude, longitude ) );
+	}
+
+	// TODO other sorts
+
 
 	/**
 	 * Order by the given sort.

@@ -13,9 +13,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
@@ -28,14 +30,16 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 	private static final String LONGITUDE = "longitude";
 
 	private final Store store;
+	private final Sortable sortable;
 
 	private final String latitudeAbsoluteFieldPath;
 	private final String longitudeAbsoluteFieldPath;
 
 	private final Set<String> storedFields;
 
-	public GeoPointFieldCodec(String absoluteFieldPath, Store store) {
+	public GeoPointFieldCodec(String absoluteFieldPath, Store store, Sortable sortable) {
 		this.store = store;
+		this.sortable = sortable;
 
 		if ( Store.YES.equals( store ) ) {
 			latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
@@ -58,6 +62,9 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 		if ( Store.YES.equals( store ) ) {
 			documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
 			documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
+		}
+		if ( Sortable.YES.equals( sortable ) ) {
+			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 		}
 
 		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
@@ -95,12 +102,13 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 		GeoPointFieldCodec other = (GeoPointFieldCodec) obj;
 
 		return Objects.equals( store, other.store ) &&
+				Objects.equals( sortable, other.sortable ) &&
 				Objects.equals( latitudeAbsoluteFieldPath, other.latitudeAbsoluteFieldPath ) &&
 				Objects.equals( longitudeAbsoluteFieldPath, other.longitudeAbsoluteFieldPath );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( store, latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
+		return Objects.hash( store, sortable, latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
 	}
 }

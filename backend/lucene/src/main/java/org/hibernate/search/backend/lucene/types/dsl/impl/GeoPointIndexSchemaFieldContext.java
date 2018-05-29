@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
@@ -14,6 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.GeoPointFieldFormatter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.GeoPointFieldSortContributor;
 import org.hibernate.search.engine.backend.spatial.GeoPoint;
 
 /**
@@ -21,8 +23,16 @@ import org.hibernate.search.engine.backend.spatial.GeoPoint;
  */
 public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<GeoPoint> {
 
+	private Sortable sortable;
+
 	public GeoPointIndexSchemaFieldContext(String relativeFieldName) {
 		super( relativeFieldName );
+	}
+
+	@Override
+	public GeoPointIndexSchemaFieldContext sortable(Sortable sortable) {
+		this.sortable = sortable;
+		return this;
 	}
 
 	@Override
@@ -32,9 +42,9 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 				parentNode,
 				getRelativeFieldName(),
 				GeoPointFieldFormatter.INSTANCE,
-				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore() ),
+				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore(), sortable ),
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				null // for now we don't have a sort contributor for GeoPoint
+				GeoPointFieldSortContributor.INSTANCE
 		);
 
 		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

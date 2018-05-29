@@ -174,4 +174,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 540, value = "Spatial predicates are not supported by the type of field '%1$s'.")
 	SearchException spatialPredicatesNotSupportedByFieldType(String absoluteFieldPath);
+
+	@Message(id = 541, value = "Distance related operations are not supported by the type of field '%1$s'.")
+	SearchException distanceOperationsNotSupportedByFieldType(String absoluteFieldPath);
+
+	@Message(id = 542, value = "Traditional sorting operations are not supported by the GeoPoint type of field '%1$s', use distance sorting instead.")
+	SearchException traditionalSortNotSupportedByGeoPoint(String absoluteFieldPath);
+
+	@Message(id = 543, value = "Descending order is not supported by distance sort for field '%1$s'.")
+	SearchException descendingOrderNotSupportedByDistanceSort(String absoluteFieldPath);
 }

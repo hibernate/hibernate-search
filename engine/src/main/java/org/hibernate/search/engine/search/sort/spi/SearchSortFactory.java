@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
 
 /**
@@ -26,6 +27,8 @@ public interface SearchSortFactory<C> {
 	ScoreSortBuilder<C> score();
 
 	FieldSortBuilder<C> field(String absoluteFieldPath);
+
+	DistanceSortBuilder<C> distance(String absoluteFieldPath, GeoPoint location);
 
 	SearchSortContributor<C> indexOrder();
 

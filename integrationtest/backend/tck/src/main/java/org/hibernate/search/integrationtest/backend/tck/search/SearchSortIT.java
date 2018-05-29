@@ -18,17 +18,16 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -36,7 +35,9 @@ import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.SearchException;
-
+import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -256,6 +257,22 @@ public class SearchSortIT {
 	}
 
 	@Test
+	public void byDistance() {
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ) );
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( indexName, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ) );
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( indexName, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+
+		// we don't test the descending order here as it's currently not supported by Lucene
+		// see the additional tests in the specific backend tests
+	}
+
+	@Test
 	public void byField_error_unsortable() {
 		Assume.assumeTrue( "Errors on attempt to sort on unsortable fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on unsortable fields
@@ -326,6 +343,7 @@ public class SearchSortIT {
 			indexAccessors.string_analyzed.write( document, "George" );
 			indexAccessors.integer.write( document, 2 );
 			indexAccessors.localDate.write( document, LocalDate.of( 2018, 2, 2 ) );
+			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7705687,4.835233 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray" );
 			indexAccessors.unsortable.write( document, "george" );
@@ -347,6 +365,7 @@ public class SearchSortIT {
 			indexAccessors.string_analyzed.write( document, "Aaron" );
 			indexAccessors.integer.write( document, 1 );
 			indexAccessors.localDate.write( document, LocalDate.of( 2018, 2, 1 ) );
+			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7541719, 4.8386221 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray Hooray" );
 			indexAccessors.unsortable.write( document, "aaron" );
@@ -368,6 +387,7 @@ public class SearchSortIT {
 			indexAccessors.string_analyzed.write( document, "Zach" );
 			indexAccessors.integer.write( document, 3 );
 			indexAccessors.localDate.write( document, LocalDate.of( 2019, 1, 2 ) );
+			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7530374, 4.8510299 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray" );
 			indexAccessors.unsortable.write( document, "zach" );
@@ -402,6 +422,7 @@ public class SearchSortIT {
 		final IndexFieldAccessor<String> string_analyzed;
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<LocalDate> localDate;
+		final IndexFieldAccessor<GeoPoint> geoPoint;
 
 		final IndexFieldAccessor<String> string_analyzed_forScore;
 		final IndexFieldAccessor<String> unsortable;
@@ -417,6 +438,7 @@ public class SearchSortIT {
 					.analyzer( "default" ).sortable( Sortable.YES ).createAccessor();
 			integer = root.field( "integer" ).asInteger().sortable( Sortable.YES ).createAccessor();
 			localDate = root.field( "localDate" ).asLocalDate().sortable( Sortable.YES ).createAccessor();
+			geoPoint = root.field( "geoPoint" ).asGeoPoint().sortable( Sortable.YES ).createAccessor();
 
 			string_analyzed_forScore = root.field( "string_analyzed_forScore" ).asString()
 					.analyzer( "default" ).createAccessor();

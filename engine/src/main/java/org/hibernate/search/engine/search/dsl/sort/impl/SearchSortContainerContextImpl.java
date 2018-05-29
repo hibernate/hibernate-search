@@ -9,7 +9,9 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
@@ -62,6 +64,15 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 	public FieldSortContext<N> byField(String absoluteFieldPath) {
 		FieldSortContextImpl<N, C> child = new FieldSortContextImpl<>(
 				this, factory, dslContext::getNextContext, absoluteFieldPath
+		);
+		dslContext.addContributor( child );
+		return child;
+	}
+
+	@Override
+	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
+		DistanceSortContextImpl<N, C> child = new DistanceSortContextImpl<>(
+				this, factory, dslContext::getNextContext, absoluteFieldPath, location
 		);
 		dslContext.addContributor( child );
 		return child;

@@ -55,4 +55,9 @@ public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
 		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		return new ImmutableGeoPoint( latitude, longitude );
 	}
+
+	@Override
+	public boolean supportsSortingByDistance() {
+		return true;
+	}
 }

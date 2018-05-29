@@ -7,7 +7,9 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
@@ -38,5 +40,10 @@ public class StubSearchSortFactory implements SearchSortFactory<StubQueryElement
 	@Override
 	public SearchSortContributor<StubQueryElementCollector> indexOrder() {
 		return new StubSearchSort();
+	}
+
+	@Override
+	public DistanceSortBuilder<StubQueryElementCollector> distance(String absoluteFieldPath, GeoPoint location) {
+		return new StubSortBuilder();
 	}
 }

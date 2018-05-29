@@ -8,7 +8,9 @@ package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
@@ -40,6 +42,16 @@ public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortCo
 	@Override
 	public FieldSortContext<N> byField(String absoluteFieldPath) {
 		return delegate.byField( absoluteFieldPath );
+	}
+
+	@Override
+	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
+		return delegate.byDistance( absoluteFieldPath, location );
+	}
+
+	@Override
+	public DistanceSortContext<N> byDistance(String absoluteFieldPath, double latitude, double longitude) {
+		return delegate.byDistance( absoluteFieldPath, latitude, longitude );
 	}
 
 	@Override
