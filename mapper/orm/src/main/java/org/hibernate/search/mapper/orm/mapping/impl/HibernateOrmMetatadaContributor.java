@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,8 +79,15 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	private void collectPropertyDelegates(PropertyDelegatesCollector collector,
 			Class<?> javaClass, Iterator propertyIterator) {
 		collector.markAsSeen( javaClass );
+
+		// Sort the properties before processing for deterministic iteration
+		List<Property> properties = new ArrayList<>();
 		while ( propertyIterator.hasNext() ) {
-			Property property = (Property) propertyIterator.next();
+			properties.add( (Property) propertyIterator.next() );
+		}
+		properties.sort( Comparator.comparing( Property::getName ) );
+
+		for ( Property property : properties ) {
 			collectPropertyMetadataContributors( collector, javaClass, property );
 		}
 	}

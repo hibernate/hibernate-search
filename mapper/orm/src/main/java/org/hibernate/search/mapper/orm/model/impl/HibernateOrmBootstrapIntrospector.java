@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.ManagedType;
@@ -48,6 +48,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
+import org.hibernate.search.util.impl.common.StreamHelper;
 
 /**
  * @author Yoann Rodiere
@@ -128,12 +129,18 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	Map<String, XProperty> getFieldAccessPropertiesByName(XClass xClass) {
 		return xClass.getDeclaredProperties( XClass.ACCESS_FIELD ).stream()
-				.collect( Collectors.toMap( XProperty::getName, Function.identity() ) );
+				.collect( StreamHelper.toMap(
+						XProperty::getName, Function.identity(),
+						TreeMap::new // Sort properties by name for deterministic iteration
+				) );
 	}
 
 	Map<String, XProperty> getMethodAccessPropertiesByName(XClass xClass) {
 		return xClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
-				.collect( Collectors.toMap( XProperty::getName, Function.identity() ) );
+				.collect( StreamHelper.toMap(
+						XProperty::getName, Function.identity(),
+						TreeMap::new // Sort properties by name for deterministic iteration
+				) );
 	}
 
 	<A extends Annotation> Optional<A> getAnnotationByType(XAnnotatedElement xAnnotated, Class<A> annotationType) {
