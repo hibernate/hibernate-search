@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.Metadata;
@@ -27,6 +29,7 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospec
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
+import org.hibernate.search.util.impl.common.StreamHelper;
 
 /*
  * TODO make the following additions to the Hibernate ORM specific mapping:
@@ -57,6 +60,7 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 	}
 
 	private final Metadata metadata;
+	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
 			Metadata metadata,
@@ -70,26 +74,38 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 		);
 
 		this.metadata = metadata;
-
-		addConfigurationContributor(
-				new HibernateOrmMetatadaContributor( introspector, metadata )
-		);
+		this.introspector = introspector;
 	}
 
 	@Override
 	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
+				// getMappedClass() can return null, which should be ignored
+				.filter( persistentClass -> persistentClass.getMappedClass() != null )
+				.collect( StreamHelper.toMap(
+						PersistentClass::getEntityName,
+						Function.identity(),
+						/*
+						 * The entity bindings are stored in a HashMap whose order is not well defined.
+						 * Copy them to a sorted map before processing for deterministic iteration.
+						 */
+						TreeMap::new
+				) );
+
+		addConfigurationContributor(
+				new HibernateOrmMetatadaContributor( introspector, persistentClasses )
+		);
+
 		// Enable annotation mapping if necessary
 		boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
 		if ( enableAnnotationMapping ) {
 			enableAnnotatedTypeDiscovery();
 
 			AnnotationMappingDefinition annotationMapping = annotationMapping();
-			metadata.getEntityBindings().stream()
-					.map( PersistentClass::getMappedClass )
-					// getMappedClass() can return null, which should be ignored
-					.filter( Objects::nonNull )
-					.forEach( annotationMapping::add );
+			for ( PersistentClass persistentClass : persistentClasses.values() ) {
+				annotationMapping.add( persistentClass.getMappedClass() );
+			}
 		}
 
 		// Apply the user-provided metadata contributor if necessary
