@@ -16,6 +16,7 @@
     </parent>
 
     <artifactId>hibernate-search</artifactId>
+    <packaging>pom</packaging>
 
     <name>Hibernate Search [Deprecated Module]</name>
     <description>Hibernate Search [Deprecated Module]</description>
@@ -32,14 +33,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <!-- We need an empty JAR, otherwise the build will fail -->
-                    <skipIfEmpty>false</skipIfEmpty>
-                </configuration>
             </plugin>
         </plugins>
     </build>
