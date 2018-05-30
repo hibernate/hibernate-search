@@ -7,20 +7,20 @@
 package org.hibernate.search.engine.spatial;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
 
 public class ImmutableGeoPolygon implements GeoPolygon {
 
-	private List<GeoPoint> points = new ArrayList<>();
+	private List<GeoPoint> points;
 
 	public ImmutableGeoPolygon(List<GeoPoint> points) {
 		Contracts.assertNotNull( points, "points" );
 
-		this.points.addAll( points );
+		this.points = CollectionHelper.toImmutableList( new ArrayList<>( points ) );
 	}
 
 	public ImmutableGeoPolygon(GeoPoint firstPoint, GeoPoint secondPoint, GeoPoint thirdPoint, GeoPoint fourthPoint, GeoPoint... additionalPoints) {
@@ -29,11 +29,14 @@ public class ImmutableGeoPolygon implements GeoPolygon {
 		Contracts.assertNotNull( thirdPoint, "thirdPoint" );
 		Contracts.assertNotNull( fourthPoint, "fourthPoint" );
 
+		List<GeoPoint> points = new ArrayList<>();
 		points.add( firstPoint );
 		points.add( secondPoint );
 		points.add( thirdPoint );
 		points.add( fourthPoint );
 		Collections.addAll( points, additionalPoints );
+
+		this.points = CollectionHelper.toImmutableList( points );
 	}
 
 	@Override
