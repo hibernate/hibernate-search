@@ -46,31 +46,4 @@
         -->
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <configuration>
-                        <rules>
-                            <requireJavaVersion>
-                                <!-- require JDK 1.8 to run the build -->
-                                <version>[${minJdkVersion},)</version>
-                            </requireJavaVersion>
-                            <requireMavenVersion>
-                                <version>${minMavenVersion}</version>
-                            </requireMavenVersion>
-                            <banDuplicatePomDependencyVersions />
-                            <!-- Disable the dependency convergence rule, because the dependencies of WildFly artifacts
-                                 do not converge
-                            <DependencyConvergence />
-                             -->
-                        </rules>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>
