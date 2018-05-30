@@ -21,6 +21,7 @@ import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestSuccessAssessor;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
@@ -63,7 +64,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 		try ( ServiceReference<ElasticsearchService> esService =
 				serviceManager.requestReference( ElasticsearchService.class ) ) {
 			CountWork work = new CountWork.Builder( indexNames )
-					.type( URLEncodedString.fromString( entityType.getName() ) )
+					.type( URLEncodedString.fromString( ElasticsearchEntityHelper.getIndexedTypeName( entityType ) ) )
 					.build();
 			return esService.get().getWorkProcessor().executeSyncUnsafe( work );
 		}

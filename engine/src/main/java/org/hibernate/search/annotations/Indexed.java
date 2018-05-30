@@ -27,6 +27,12 @@ public @interface Indexed {
 	String index() default "";
 
 	/**
+	 * Used by hibernate-search-elasticsearch only See HSEARCH-3158
+	 * @return The type of the entity. Default to empty string
+	 */
+	String type() default "";
+
+	/**
 	 * Custom converter to change operations upon indexing
 	 * Useful for soft deletes and similar patterns
 	 *

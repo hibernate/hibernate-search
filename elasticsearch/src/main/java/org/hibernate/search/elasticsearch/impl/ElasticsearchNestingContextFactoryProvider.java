@@ -53,12 +53,13 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 
 		@Override
 		public NestingContext createNestingContext(IndexedTypeIdentifier indexedEntityType) {
-			ContextCreationStrategy strategy = strategies.get( indexedEntityType.getName() );
+			String typeName = ElasticsearchEntityHelper.getIndexedTypeName( indexedEntityType );
+			ContextCreationStrategy strategy = strategies.get( typeName );
 
 			if ( strategy == null ) {
 				strategy = ElasticsearchEntityHelper.isMappedToElasticsearch( searchIntegrator, indexedEntityType )
 						? ContextCreationStrategy.ES : ContextCreationStrategy.NO_OP;
-				strategies.putIfAbsent( indexedEntityType.getName(), strategy );
+				strategies.putIfAbsent( typeName, strategy );
 			}
 
 			return strategy.create();
