@@ -388,6 +388,16 @@
         <surefire.jacoco.args></surefire.jacoco.args>
         <failsafe.jacoco.args></failsafe.jacoco.args>
         <test.container.jacoco.args></test.container.jacoco.args>
+        <!--
+          The arguments below are JBoss modules settings taken from
+          https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
+          - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
+          - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
+         -->
+        <test.container.jbossmodules.args>
+            -Dremote.maven.repo=${jboss.public.repo.url}
+            -Dmaven.repo.local=${settings.localRepository}
+        </test.container.jbossmodules.args>
         <surefire.system.args>${test.jvm.args} ${surefire.jacoco.args}</surefire.system.args>
         <failsafe.system.args>${test.jvm.args} ${failsafe.jacoco.args}</failsafe.system.args>
 

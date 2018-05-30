@@ -314,6 +314,7 @@
                             <skip>${skipWildFlyPreparation}</skip>
                             <offline>true</offline>
                             <jbossHome>${jbosshome}</jbossHome>
+                            <javaOpts>${test.container.jbossmodules.args}</javaOpts>
                             <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                             <fail-on-error>false</fail-on-error>
                             <commands>
