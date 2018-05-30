@@ -17,12 +17,17 @@
     <name>Hibernate Search Build Configuration</name>
     <description>Configuration for the build of Hibernate Search</description>
 
+    <properties>
+        <!--
+            This module generates the rules used in the Checkstyle and ForbiddenAPIs plugins,
+            so obviously we cannot use those rules while building this module.
+         -->
+        <checkstyle.skip>true</checkstyle.skip>
+        <forbiddenapis.skip>true</forbiddenapis.skip>
+    </properties>
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
