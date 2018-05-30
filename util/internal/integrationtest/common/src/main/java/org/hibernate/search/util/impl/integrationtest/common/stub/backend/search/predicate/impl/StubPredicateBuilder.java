@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import org.hibernate.search.engine.backend.spatial.GeoBoundingBox;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.engine.backend.spatial.GeoPolygon;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -17,6 +14,9 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.spatial.GeoBoundingBox;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
 public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubQueryElementCollector>,

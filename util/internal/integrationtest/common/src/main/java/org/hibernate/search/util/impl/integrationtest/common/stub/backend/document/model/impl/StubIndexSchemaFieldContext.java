@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {

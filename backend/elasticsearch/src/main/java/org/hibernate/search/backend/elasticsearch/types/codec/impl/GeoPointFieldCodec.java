@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;

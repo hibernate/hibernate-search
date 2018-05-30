@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.hibernate.search.engine.backend.spatial.DistanceUnit;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
@@ -22,6 +20,8 @@ import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.engine.spatial.DistanceUnit;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 class ObjectSyntaxDocumentDao extends DocumentDao {
 	ObjectSyntaxDocumentDao(EntityManager entityManager) {

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.FieldModelExtension;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 
 /**

@@ -8,13 +8,13 @@ package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A delegating {@link SearchSortContainerContext}.

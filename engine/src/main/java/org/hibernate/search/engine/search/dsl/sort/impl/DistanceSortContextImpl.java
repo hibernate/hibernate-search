@@ -8,13 +8,13 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 class DistanceSortContextImpl<N, C> implements DistanceSortContext<N>, SearchSortContributor<C> {
 

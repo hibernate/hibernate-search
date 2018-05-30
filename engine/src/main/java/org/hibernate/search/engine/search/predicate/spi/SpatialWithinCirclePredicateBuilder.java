@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface SpatialWithinCirclePredicateBuilder<C> extends SearchPredicateBuilder<C> {
 

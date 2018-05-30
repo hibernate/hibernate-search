@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.impl.IntegerIndexSch
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
 

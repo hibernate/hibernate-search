@@ -20,8 +20,8 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
-import org.hibernate.search.engine.backend.spatial.ImmutableGeoPoint;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
 public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {

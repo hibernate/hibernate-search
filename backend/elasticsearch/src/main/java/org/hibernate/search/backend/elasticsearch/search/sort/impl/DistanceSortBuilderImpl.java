@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
 

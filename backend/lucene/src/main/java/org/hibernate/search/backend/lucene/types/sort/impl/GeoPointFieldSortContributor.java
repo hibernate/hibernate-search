@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.apache.lucene.document.LatLonDocValuesField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.engine.backend.spatial.GeoPoint;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class GeoPointFieldSortContributor implements LuceneFieldSortContributor {
