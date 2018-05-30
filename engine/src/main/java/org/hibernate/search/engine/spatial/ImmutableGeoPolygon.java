@@ -8,6 +8,7 @@ package org.hibernate.search.engine.spatial;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.util.impl.common.Contracts;
@@ -32,7 +33,7 @@ public class ImmutableGeoPolygon implements GeoPolygon {
 		points.add( secondPoint );
 		points.add( thirdPoint );
 		points.add( fourthPoint );
-		points.addAll( Arrays.asList( additionalPoints ) );
+		Collections.addAll( points, additionalPoints );
 	}
 
 	@Override
