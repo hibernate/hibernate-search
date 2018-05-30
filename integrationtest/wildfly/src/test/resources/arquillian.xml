@@ -25,20 +25,13 @@
                 <property name="jbossHome">${jbossHome.node1}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full.xml</property>
-                <!--
-                  Some arguments below are JBoss modules settings taken from
-                  https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
-                  - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
-                  - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
-                 -->
                 <property name="javaVmArguments">
                     -javaagent:${byteman.agent.path}=${byteman.agent.options}
                     -Djboss.modules.system.pkgs=org.jboss.byteman
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${jboss.public.repo.url}
-                    -Dmaven.repo.local=${settings.localRepository}
+                    ${test.container.jbossmodules.args}
                     ${test.container.jacoco.args}
                     -Dee8.preview.mode=true
                 </property>
@@ -50,8 +43,7 @@
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${jboss.public.repo.url}
-                    -Dmaven.repo.local=${settings.localRepository}
+                    ${test.container.jbossmodules.args}
                     ${test.container.jacoco.args}
                 </property>
                  -->
@@ -68,8 +60,7 @@
                     -Xmx512m
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
-                    -Dremote.maven.repo=${jboss.public.repo.url}
-                    -Dmaven.repo.local=${settings.localRepository}
+                    ${test.container.jbossmodules.args}
                     -Dee8.preview.mode=true
                 </property>
                 <property name="managementPort">19990</property>

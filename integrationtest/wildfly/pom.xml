@@ -469,6 +469,7 @@
                                     <skip>${skipWildFlyPreparation}</skip>
                                     <offline>true</offline>
                                     <jbossHome>${jbossHome.node1}</jbossHome>
+                                    <javaOpts>${test.container.jbossmodules.args}</javaOpts>
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
@@ -488,6 +489,7 @@
                                     <skip>${skipWildFlyPreparation}</skip>
                                     <offline>true</offline>
                                     <jbossHome>${jbossHome.node2}</jbossHome>
+                                    <javaOpts>${test.container.jbossmodules.args}</javaOpts>
                                     <!-- The CLI script below will fail if the patch was already applied in a previous build -->
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
