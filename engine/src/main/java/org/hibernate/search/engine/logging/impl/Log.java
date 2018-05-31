@@ -10,8 +10,8 @@ package org.hibernate.search.engine.logging.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
@@ -66,4 +66,7 @@ public interface Log extends BasicLogger {
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
 	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
+
+	@Message(id = 16, value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
+	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
 }

@@ -6,19 +6,30 @@
  */
 package org.hibernate.search.engine.spatial;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ImmutableGeoPolygon implements GeoPolygon {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private List<GeoPoint> points;
 
 	public ImmutableGeoPolygon(List<GeoPoint> points) {
 		Contracts.assertNotNull( points, "points" );
+
+		GeoPoint firstPoint = points.get( 0 );
+		GeoPoint lastPoint = points.get( points.size() - 1 );
+		if ( !firstPoint.equals( lastPoint ) ) {
+			throw log.invalidGeoPolygonFirstPointNotIdenticalToLastPoint( firstPoint, lastPoint );
+		}
 
 		this.points = CollectionHelper.toImmutableList( new ArrayList<>( points ) );
 	}
@@ -35,6 +46,11 @@ public class ImmutableGeoPolygon implements GeoPolygon {
 		points.add( thirdPoint );
 		points.add( fourthPoint );
 		Collections.addAll( points, additionalPoints );
+
+		GeoPoint lastPoint = points.get( points.size() - 1 );
+		if ( !firstPoint.equals( lastPoint ) ) {
+			throw log.invalidGeoPolygonFirstPointNotIdenticalToLastPoint( firstPoint, lastPoint );
+		}
 
 		this.points = CollectionHelper.toImmutableList( points );
 	}
