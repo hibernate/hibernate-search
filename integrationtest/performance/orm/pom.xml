@@ -300,54 +300,6 @@
                             </artifactItems>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>fetch-jpa-patch</id>
-                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <artifactItems>
-                                <artifactItem>
-                                   <groupId>org.hibernate.javax.persistence</groupId>
-                                   <artifactId>hibernate-jpa-api-2.2-wildflymodules</artifactId>
-                                   <classifier>wildfly-${version.wildfly}-patch</classifier>
-                                   <version>${version.jpa22.wildfly-patch}</version>
-                                   <type>zip</type>
-                                   <outputDirectory>${project.build.directory}</outputDirectory>
-                                   <overWrite>true</overWrite>
-                                   <destFileName>${test.jpa22.wildfly-patch.filename}</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <executions>
-                    <!-- Install JPA 2.2 patch -->
-                    <execution>
-                        <id>apply-wildfly-patch-file</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>execute-commands</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <offline>true</offline>
-                            <jbossHome>${jbosshome}</jbossHome>
-                            <javaOpts>${test.container.jbossmodules.args}</javaOpts>
-                            <!-- The CLI script below will fail if the patch was already applied in a previous build -->
-                            <fail-on-error>false</fail-on-error>
-                            <commands>
-                                <command>patch apply --override-all ${project.build.directory}/${test.jpa22.wildfly-patch.filename}</command>
-                            </commands>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
