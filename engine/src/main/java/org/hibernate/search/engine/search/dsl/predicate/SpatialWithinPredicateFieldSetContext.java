@@ -12,7 +12,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.engine.spatial.ImmutableGeoBoundingBox;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
-import org.hibernate.search.util.impl.common.Contracts;
 
 /**
  * The context used when defining a spatial predicate, after at least one field was mentioned.
@@ -21,24 +20,18 @@ import org.hibernate.search.util.impl.common.Contracts;
  */
 public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<SpatialWithinPredicateFieldSetContext<N>> {
 
-	SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radiusInMeters);
+	SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radiusInMeters, DistanceUnit unit);
 
-	default SpatialWithinCirclePredicateContext<N> circle(double latitude, double longitude, double radiusInMeters) {
-		return circle( new ImmutableGeoPoint( latitude, longitude ), radiusInMeters );
+	default SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius) {
+		return circle( center, radius, DistanceUnit.METERS );
 	}
 
-	default SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
-		Contracts.assertNotNull( radius, "radius" );
-		Contracts.assertNotNull( unit, "unit" );
-
-		return circle( center, unit.toMeters( radius ) );
+	default SpatialWithinCirclePredicateContext<N> circle(double latitude, double longitude, double radiusInMeters) {
+		return circle( new ImmutableGeoPoint( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
 	}
 
 	default SpatialWithinCirclePredicateContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
-		Contracts.assertNotNull( radius, "radius" );
-		Contracts.assertNotNull( unit, "unit" );
-
-		return circle( new ImmutableGeoPoint( latitude, longitude ), unit.toMeters( radius ) );
+		return circle( new ImmutableGeoPoint( latitude, longitude ), radius, unit );
 	}
 
 	SpatialWithinPolygonPredicateContext<N> polygon(GeoPolygon polygon);

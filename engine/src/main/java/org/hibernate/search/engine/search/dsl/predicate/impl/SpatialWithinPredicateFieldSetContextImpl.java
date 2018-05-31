@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
@@ -58,11 +59,12 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radiusInMeters) {
+	public SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
 		Contracts.assertNotNull( center, "center" );
-		Contracts.assertNotNull( radiusInMeters, "radius" );
+		Contracts.assertNotNull( radius, "radius" );
+		Contracts.assertNotNull( unit, "unit" );
 
-		return commonState.circle( center, radiusInMeters );
+		return commonState.circle( center, radius, unit );
 	}
 
 	@Override
@@ -84,10 +86,10 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 		queryBuilders.forEach( collector );
 	}
 
-	private void generateWithinCircleQueryBuilders(GeoPoint center, double radiusInMeters) {
+	private void generateWithinCircleQueryBuilders(GeoPoint center, double radius, DistanceUnit unit) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinCirclePredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
-			predicateBuilder.circle( center, radiusInMeters );
+			predicateBuilder.circle( center, radius, unit );
 			if ( boost != null ) {
 				predicateBuilder.boost( boost );
 			}
@@ -123,9 +125,9 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 			super( factory, nextContextProvider );
 		}
 
-		public SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radiusInMeters) {
+		public SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<N, C> fieldSetContext : getFieldSetContexts() ) {
-				fieldSetContext.generateWithinCircleQueryBuilders( center, radiusInMeters );
+				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
 			}
 
 			return new SpatialWithinCirclePredicateContextImpl<N>( getNextContextProvider() );

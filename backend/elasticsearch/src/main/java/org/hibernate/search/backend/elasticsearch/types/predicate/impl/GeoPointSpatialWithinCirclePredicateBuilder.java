@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Abstract
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
@@ -33,8 +34,8 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicat
 	}
 
 	@Override
-	public void circle(GeoPoint center, double radiusInMeters) {
-		DISTANCE.set( getInnerObject(), radiusInMeters );
+	public void circle(GeoPoint center, double radius, DistanceUnit unit) {
+		DISTANCE.set( getInnerObject(), unit.toMeters( radius ) );
 		getInnerObject().add( absoluteFieldPath, codec.encode( center ) );
 	}
 

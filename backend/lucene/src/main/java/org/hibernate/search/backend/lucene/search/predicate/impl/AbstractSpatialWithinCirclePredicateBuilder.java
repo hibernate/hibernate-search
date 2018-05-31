@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
@@ -24,8 +25,8 @@ public abstract class AbstractSpatialWithinCirclePredicateBuilder<T> extends Abs
 	}
 
 	@Override
-	public void circle(GeoPoint center, double radiusInMeters) {
+	public void circle(GeoPoint center, double radius, DistanceUnit unit) {
 		this.center = center;
-		this.radiusInMeters = radiusInMeters;
+		this.radiusInMeters = unit.toMeters( radius );
 	}
 }
