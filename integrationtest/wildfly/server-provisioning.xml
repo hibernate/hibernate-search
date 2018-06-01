@@ -1,4 +1,4 @@
-<server-provisioning xmlns="urn:wildfly:server-provisioning:1.1">
+<server-provisioning xmlns="urn:wildfly:server-provisioning:1.2">
     <feature-packs>
 
         <feature-pack
@@ -25,4 +25,9 @@
         <feature-pack groupId="org.wildfly" artifactId="wildfly-feature-pack" version="${version.wildfly}" />
 
     </feature-packs>
+
+    <version-overrides>
+        <!-- Override the version ORM depends on -->
+        <version-override groupId="org.wildfly" artifactId="wildfly-feature-pack" version="${version.wildfly}" />
+    </version-overrides>
 </server-provisioning>
