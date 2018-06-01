@@ -152,7 +152,6 @@
         <module>backend/lucene</module>
         <module>mapper/pojo</module>
         <module>mapper/javabean</module>
-        <module>mapper/protobuf</module>
         <module>mapper/orm</module>
         <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
@@ -186,9 +185,6 @@
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
-
-        <!-- >>> Protobuf -->
-        <version.com.google.protobuf>3.0.2</version.com.google.protobuf>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the ORM integration and various tests -->
@@ -476,11 +472,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-search-mapper-protobuf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -705,11 +696,6 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${version.com.google.code.gson}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${version.com.google.protobuf}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>

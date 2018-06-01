@@ -63,10 +63,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-mapper-protobuf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
