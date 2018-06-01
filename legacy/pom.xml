@@ -175,6 +175,9 @@
     </mailingLists>
 
     <properties>
+        <!-- Skip plugin executions that are not relevant for legacy code -->
+        <jqassistant.skip>true</jqassistant.skip>
+
         <!-- Dependencies versions -->
 
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
