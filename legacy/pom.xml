@@ -19,9 +19,6 @@
 
     <name>Hibernate Search Legacy Modules Parent POM</name>
     <description>Hibernate Search Legacy Modules Parent POM</description>
-    <url>http://search.hibernate.org</url>
-
-    <inceptionYear>2006</inceptionYear>
 
     <modules>
         <module>sharedtestresources</module>
@@ -51,128 +48,6 @@
         <module>integrationtest/performance/engine-elasticsearch</module>
         <module>documentation</module>
     </modules>
-
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://hibernate.atlassian.net/browse/HSEARCH</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
-        <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
-        <url>http://github.com/hibernate/hibernate-search</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <organization>
-        <name>Hibernate</name>
-        <url>http://www.hibernate.org</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License v2.1 or later</name>
-            <url>http://www.opensource.org/licenses/LGPL-2.1</url>
-            <comments>See also: http://hibernate.org/license</comments>
-        </license>
-    </licenses>
-
-    <ciManagement>
-        <system>Jenkins</system>
-        <url>http://ci.hibernate.org/view/Search/job/hibernate-search-master/</url>
-    </ciManagement>
-
-    <developers>
-        <developer>
-            <id>epbernard</id>
-            <name>Emmanuel Bernard</name>
-            <email>emmanuel@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/emmanuel-bernard/</url>
-        </developer>
-        <developer>
-            <id>hardy.ferentschik</id>
-            <name>Hardy Ferentschik</name>
-            <email>hferents@redhat.com</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/hardy-ferentschik/</url>
-        </developer>
-        <developer>
-            <id>sannegrinovero</id>
-            <name>Sanne Grinovero</name>
-            <email>sanne@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/sanne-grinovero/</url>
-        </developer>
-        <developer>
-            <id>gunnar.morling</id>
-            <name>Gunnar Morling</name>
-            <email>gunnar@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/gunnar-morling/</url>
-        </developer>
-        <developer>
-            <id>davide.dalto</id>
-            <name>Davide D'Alto</name>
-            <email>davide@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/davide-dalto/</url>
-        </developer>
-        <developer>
-            <id>guillaume.smet</id>
-            <name>Guillaume Smet</name>
-            <email>guillaume@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/guillaume-smet/</url>
-        </developer>
-        <developer>
-            <id>yoann.rodiere</id>
-            <name>Yoann Rodière</name>
-            <email>yoann@hibernate.org</email>
-            <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/yoann-rodiere/</url>
-        </developer>
-        <developer>
-            <id>mincong-h</id>
-            <name>Mincong Huang</name>
-            <email>mincong.h@gmail.com</email>
-            <url>http://mincong-h.github.io</url>
-        </developer>
-    </developers>
-
-    <mailingLists>
-        <mailingList>
-            <name>Hibernate Announcements</name>
-            <post>hibernate-announce@lists.jboss.org</post>
-            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</subscribe>
-            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</unsubscribe>
-            <archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
-        </mailingList>
-        <mailingList>
-            <name>Hibernate Commit Notifications</name>
-            <post>hibernate-commits@lists.jboss.org</post>
-            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</subscribe>
-            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</unsubscribe>
-            <archive>http://lists.jboss.org/pipermail/hibernate-commits/</archive>
-        </mailingList>
-        <mailingList>
-            <name>Hibernate Developers</name>
-            <post>hibernate-dev@lists.jboss.org</post>
-            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</subscribe>
-            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</unsubscribe>
-            <archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
-            <otherArchives>
-                <otherArchive>http://www.mail-archive.com/hibernate-dev%40lists.jboss.org/index.html</otherArchive>
-            </otherArchives>
-        </mailingList>
-        <mailingList>
-            <name>Hibernate Issue Notifications</name>
-            <post>hibernate-issues@lists.jboss.org</post>
-            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</subscribe>
-            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</unsubscribe>
-            <archive>http://lists.jboss.org/pipermail/hibernate-issues/</archive>
-        </mailingList>
-    </mailingLists>
 
     <properties>
         <!-- Skip plugin executions that are not relevant for legacy code -->
