@@ -1159,6 +1159,15 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>com.github.alexcojocaru</groupId>
+                    <artifactId>elasticsearch-maven-plugin</artifactId>
+                    <version>${version.elasticsearch.plugin}</version>
+                    <configuration>
+                        <clusterName>hsearchEsTestCluster</clusterName>
+                        <httpPort>9200</httpPort>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
                     <version>${version.org.wildfly.build-tools}</version>
@@ -1633,7 +1642,7 @@
         <profile>
             <id>elasticsearch-2.0</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>2.2</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -1644,7 +1653,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-es-plugins</id>
-                                    <phase>pre-integration-test</phase>
+                                    <phase>generate-test-resources</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -1668,7 +1677,7 @@
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <clusterName>hsearchEsTestCluster</clusterName>
@@ -1722,7 +1731,7 @@
         <profile>
             <id>elasticsearch-2.2</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>2.2</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>2.4.6</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -1733,7 +1742,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-es-plugins</id>
-                                    <phase>pre-integration-test</phase>
+                                    <phase>generate-test-resources</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -1766,7 +1775,7 @@
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <clusterName>hsearchEsTestCluster</clusterName>
@@ -1809,9 +1818,8 @@
         <profile>
             <id>elasticsearch-5.0</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
-                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1819,7 +1827,7 @@
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
@@ -1862,8 +1870,8 @@
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.6.7</test.elasticsearch.host.version>
+                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
+                <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -1871,7 +1879,7 @@
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <version>${version.elasticsearch.plugin}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
