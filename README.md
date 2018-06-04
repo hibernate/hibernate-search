@@ -1,7 +1,5 @@
 # Hibernate Search
 
-*Version: 5.10.5.Final - 21-11-2018*
-
 ## Description
 
 Full text search for Java objects
@@ -29,39 +27,24 @@ Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the c
 can be used directly (running embedded in the same JVM) or remotely provided by Elasticsearch
 over its REST API.
 
-## Requirements
+## Getting started
 
-This version of Hibernate Search requires:
+All necessary information is available on the Hibernate Search website:
 
-* Java SE 8
-* Hibernate ORM 5.3.x
-* Apache Lucene 5.5.x
+* [Getting started guide for the latest stable version](http://hibernate.org/search/documentation/getting-started/)
+* [Available versions and compatibility matrix](http://hibernate.org/search/releases/)
+* [Reference documentation for all versions (current and past)](http://hibernate.org/search/documentation/)
 
-## Instructions
+For offline use, distribution bundles downloaded from [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-search/)
+also include the reference documentation for the downloaded version in PDF and HTML format. 
 
-### Maven
-
-Include the following to your dependency list:
-
-    <dependency>
-       <groupId>org.hibernate</groupId>
-       <artifactId>hibernate-search-orm</artifactId>
-       <version>5.10.5.Final</version>
-    </dependency>
-
-### Sourceforge Bundle
-
-Download the distribution bundle from
-[SourceForge](http://sourceforge.net/projects/hibernate/files/hibernate-search) and unzip to
-installation directory. Then read the documentation available in *docs/reference*.
-
-### Building from source
+## Building from source
 
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
     > mvn clean install
 
-#### Build options (profiles and properties)
+### Build options (profiles and properties)
 
 ##### Documentation
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
