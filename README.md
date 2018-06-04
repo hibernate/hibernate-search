@@ -46,7 +46,7 @@ also include the reference documentation for the downloaded version in PDF and H
 
 ### Build options (profiles and properties)
 
-##### Documentation
+#### Documentation
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
 output is enabled; to also generate the PDF output use:
 
@@ -56,13 +56,13 @@ output is enabled; to also generate the PDF output use:
   
     > ./documentation/target/asciidoctor/en-US
 
-##### Distribution
+#### Distribution
 
 To build the distribution bundle run:
 
     > mvn clean install -Pdocumentation-pdf,dist
 
-##### Elasticsearch
+#### Elasticsearch
 
 The Elasticsearch module tests against one single version of Elasticsearch at a time,
 launching an Elasticsearch server automatically on port 9200.
@@ -102,12 +102,12 @@ You will need to execute something along the lines of:
 
     > mvn integration-test -pl elasticsearch -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.access_key=<Your access key> -Dtest.elasticsearch.host.aws.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.region=<Your AWS region ID>
 
-### Contributing
+## Contributing
 
 New contributors are always welcome. We collected some helpful hints on how to get started
 on our website at [Contribute to Hibernate Search](http://hibernate.org/search/contribute/)
 
-### Source code structure
+## Source code structure
 
 The project is split in several Maven modules:
 
