@@ -113,24 +113,32 @@ The project is split in several Maven modules:
 
 * _backends_: Remote backends receiving an indexing job and executing it via different protocols.
 
-* _build-config_: Code related artefacts like checkstyle rules.
+* _build-config_: Code-related artifacts like checkstyle rules.
 
 * _distribution_: Builds the distribution package.
 
 * _documentation_: The project documentation.
 
-* _elasticsearch_: All code relating to the Elasticsearch integration.
+* _elasticsearch_: The core of the Elasticsearch integration.
+
+* _elasticsearch-aws_: Specific bits enabling connection to an AWS-hosted Elasticsearch cluster
 
 * _engine_: The engine of the project. Most of the beef is here.
 
 * _integrationtest_: Integration tests with various technologies like WildFly, Spring and Karaf.
 Also includes performance tests.
 
-* _modules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
+* _jbossmodules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
+
+* _jsr352_: JSR 352 - Batch Applications for the Java Platform integration.
 
 * _orm_: Native integration for [Hibernate ORM](http://hibernate.org/orm/), and also home of most public API code.
 
+* _reports_: Last-built module, producing reports related to test coverage in particular.
+
 * _serialization_: Serialization code used by remote backends.
+
+* _sharedtestresources_: Internal module providing various test resources to our integration tests.
 
 * _testing_: Various helper classes to write tests using Hibernate Search. This module is
 semi private.
