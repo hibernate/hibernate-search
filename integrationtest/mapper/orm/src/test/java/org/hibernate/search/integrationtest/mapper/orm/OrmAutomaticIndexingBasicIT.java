@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -130,7 +131,7 @@ public class OrmAutomaticIndexingBasicIT {
 	}
 
 	@Test
-	public void directValueUpdate_elementCollection() {
+	public void directValueUpdate_indexedElementCollectionField() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -206,6 +207,86 @@ public class OrmAutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that updating a non-indexed basic property
+	 * does not trigger reindexing of the indexed entity owning the property.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directValueUpdate_nonIndexedField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNonIndexedField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNonIndexedField( "updatedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNonIndexedField( null );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating a non-indexed element collection
+	 * does not trigger reindexing of the indexed entity owning the collection.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directValueUpdate_nonIndexedElementCollectionField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getNonIndexedElementCollectionField().add( "secondValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getNonIndexedElementCollectionField().remove( 1 );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity {
@@ -223,6 +304,12 @@ public class OrmAutomaticIndexingBasicIT {
 		@ElementCollection
 		@Field
 		private List<String> indexedElementCollectionField = new ArrayList<>();
+
+		@Basic
+		private String nonIndexedField;
+
+		@ElementCollection
+		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		public Integer getId() {
 			return id;
@@ -246,6 +333,18 @@ public class OrmAutomaticIndexingBasicIT {
 
 		public void setIndexedElementCollectionField(List<String> indexedElementCollectionField) {
 			this.indexedElementCollectionField = indexedElementCollectionField;
+		}
+
+		public String getNonIndexedField() {
+			return nonIndexedField;
+		}
+
+		public void setNonIndexedField(String nonIndexedField) {
+			this.nonIndexedField = nonIndexedField;
+		}
+
+		public List<String> getNonIndexedElementCollectionField() {
+			return nonIndexedElementCollectionField;
 		}
 	}
 

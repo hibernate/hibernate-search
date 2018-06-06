@@ -94,7 +94,7 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 	}
 
 	@Test
-	public void directAssociationUpdate() {
+	public void directAssociationUpdate_indexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -177,7 +177,69 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate() {
+	public void directAssociationUpdate_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> { } )
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			entity1.getContainedNonIndexedEmbeddedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a second value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			entity1.getContainedNonIndexedEmbeddedMapValues().put( "second", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = entity1.getContainedNonIndexedEmbeddedMapValues().get( "first" );
+
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().clear();
+			entity1.getContainedNonIndexedEmbeddedMapValues().values().remove( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_indexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -297,6 +359,76 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 	}
 
 	@Test
+	public void indirectAssociationUpdate_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			containingEntity1.getContainedNonIndexedEmbeddedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			containingEntity1.getContainedNonIndexedEmbeddedMapValues().put( "second", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = containingEntity1.getContainedNonIndexedEmbeddedMapValues().get( "first" );
+
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().clear();
+			containingEntity1.getContainedNonIndexedEmbeddedMapValues().values().remove( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void indirectValueUpdate() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -396,6 +528,16 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedMapValues = new LinkedHashMap<>();
 
+		@ManyToMany
+		@JoinTable(
+				name = "indexed_nonIndexedEmbeddedMapvals",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "key")
+		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<String, ContainedEntity> containedNonIndexedEmbeddedMapValues = new LinkedHashMap<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -423,6 +565,10 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 		public Map<String, ContainedEntity> getContainedMapValues() {
 			return containedMapValues;
 		}
+
+		public Map<String, ContainedEntity> getContainedNonIndexedEmbeddedMapValues() {
+			return containedNonIndexedEmbeddedMapValues;
+		}
 	}
 
 	@Entity(name = "indexed")
@@ -443,6 +589,10 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsMapValues = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedMapValues")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsNonIndexedEmbeddedMapValues = new ArrayList<>();
+
 		@Basic
 		@Field
 		private String indexedField;
@@ -457,6 +607,10 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 
 		public List<ContainingEntity> getContainingAsMapValues() {
 			return containingAsMapValues;
+		}
+
+		public List<ContainingEntity> getContainingAsNonIndexedEmbeddedMapValues() {
+			return containingAsNonIndexedEmbeddedMapValues;
 		}
 
 		public String getIndexedField() {

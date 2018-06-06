@@ -358,6 +358,15 @@ public class OrmAutomaticIndexingEmbeddableIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is not included in the @IndexedEmbedded
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -625,6 +634,15 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							)
 					)
 					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is not included in the @IndexedEmbedded
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
+
+			// Do not expect any work
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -917,6 +935,15 @@ public class OrmAutomaticIndexingEmbeddableIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is not included in the @IndexedEmbedded
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -1057,6 +1084,15 @@ public class OrmAutomaticIndexingEmbeddableIT {
 							)
 					)
 					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is not included in the @IndexedEmbedded
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
+
+			// Do not expect any work
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1308,6 +1344,15 @@ public class OrmAutomaticIndexingEmbeddableIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is not included in the @IndexedEmbedded
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = "containing")
@@ -1500,6 +1545,10 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		@Field
 		private String includedInBidirectionalEmbedded;
 
+		@Basic
+		@Field
+		private String excludedFromAll;
+
 		public Integer getId() {
 			return id;
 		}
@@ -1576,6 +1625,14 @@ public class OrmAutomaticIndexingEmbeddableIT {
 
 		public void setIncludedInBidirectionalEmbedded(String includedInBidirectionalEmbedded) {
 			this.includedInBidirectionalEmbedded = includedInBidirectionalEmbedded;
+		}
+
+		public String getExcludedFromAll() {
+			return excludedFromAll;
+		}
+
+		public void setExcludedFromAll(String excludedFromAll) {
+			this.excludedFromAll = excludedFromAll;
 		}
 	}
 

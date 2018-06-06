@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -90,7 +91,7 @@ public class OrmAutomaticIndexingListAssociationIT {
 	}
 
 	@Test
-	public void directAssociationUpdate() {
+	public void directAssociationUpdate_indexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -172,8 +173,76 @@ public class OrmAutomaticIndexingListAssociationIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that updating a non-IndexedEmbedded association in an entity
+	 * whose other properties are indexed
+	 * does not trigger reindexing of the entity.
+	 */
 	@Test
-	public void indirectAssociationUpdate() {
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directAssociationUpdate_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> { } )
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			entity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a second value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			entity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = entity1.getContainedNonIndexedEmbeddedList().get( 0 );
+
+			containedEntity.getContainingAsNonIndexedEmbeddedList().clear();
+			entity1.getContainedNonIndexedEmbeddedList().remove( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_indexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -292,6 +361,82 @@ public class OrmAutomaticIndexingListAssociationIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that updating a non-IndexedEmbedded association in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does not trigger reindexing of the indexed entity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void indirectAssociationUpdate_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			containingEntity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			containingEntity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = containingEntity1.getContainedNonIndexedEmbeddedList().get( 0 );
+
+			containedEntity.getContainingAsNonIndexedEmbeddedList().clear();
+			containingEntity1.getContainedNonIndexedEmbeddedList().remove( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Test
 	public void indirectValueUpdate() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -386,6 +531,10 @@ public class OrmAutomaticIndexingListAssociationIT {
 		@IndexedEmbedded(includePaths = "indexedField")
 		private List<ContainedEntity> containedList = new ArrayList<>();
 
+		@ManyToMany
+		@JoinTable(name = "indexed_nonIndexedEmbeddedList")
+		private List<ContainedEntity> containedNonIndexedEmbeddedList = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -413,6 +562,10 @@ public class OrmAutomaticIndexingListAssociationIT {
 		public List<ContainedEntity> getContainedList() {
 			return containedList;
 		}
+
+		public List<ContainedEntity> getContainedNonIndexedEmbeddedList() {
+			return containedNonIndexedEmbeddedList;
+		}
 	}
 
 	@Entity(name = "indexed")
@@ -433,6 +586,10 @@ public class OrmAutomaticIndexingListAssociationIT {
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsList = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedNonIndexedEmbeddedList")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsNonIndexedEmbeddedList = new ArrayList<>();
+
 		@Basic
 		@Field
 		private String indexedField;
@@ -447,6 +604,10 @@ public class OrmAutomaticIndexingListAssociationIT {
 
 		public List<ContainingEntity> getContainingAsList() {
 			return containingAsList;
+		}
+
+		public List<ContainingEntity> getContainingAsNonIndexedEmbeddedList() {
+			return containingAsNonIndexedEmbeddedList;
 		}
 
 		public String getIndexedField() {
