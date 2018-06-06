@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.common;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 
 import org.hibernate.search.util.impl.common.logging.Log;
 
@@ -20,6 +21,12 @@ public final class Contracts {
 	public static void assertNotNull(Object object, String objectDescription) {
 		if ( object == null ) {
 			throw log.mustNotBeNull( objectDescription );
+		}
+	}
+
+	public static void assertNotNullNorEmpty(Collection<?> object, String objectDescription) {
+		if ( object == null || object.isEmpty() ) {
+			throw log.mustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 }

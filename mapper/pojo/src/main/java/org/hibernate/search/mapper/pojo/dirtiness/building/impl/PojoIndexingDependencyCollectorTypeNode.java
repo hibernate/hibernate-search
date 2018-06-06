@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -69,18 +70,26 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 		);
 	}
 
-	void collectDependency() {
+	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromContainedEntity) {
 		if ( lastEntityNode != this ) {
 			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
 		}
 		if ( parentNode != null ) {
-			// This node has an entity type: mark the root for reindexing whenever this node is changed.
+			/*
+			 * This node represents an entity (B) referenced from another, indexed entity (A).
+			 * Also, the current method being called means that entity A uses some value
+			 * from entity B when it is indexed.
+			 * The value used during indexing is represented by "dependencyPathFromContainedEntity".
+			 * Thus we must make sure that whenever "dependencyPathFromContainedEntity" changes in entity B,
+			 * entity A gets reindexed.
+			 * This is what the calls below achieve.
+			 */
 			PojoRawTypeModel<? super T> rawType = modelPathFromRootEntityNode.getTypeModel().getRawType();
 			for ( PojoRawTypeModel<?> concreteEntityType :
 					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
 				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType );
-				parentNode.markForReindexing( builder );
+				parentNode.markForReindexing( builder, dependencyPathFromContainedEntity );
 			}
 		}
 	}

@@ -12,17 +12,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
 class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
-		extends AbstractPojoImplicitReindexingResolverNodeBuilder {
+		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 	private final PojoImplicitReindexingResolverValueNodeBuilderDelegate<P> valueWithoutExtractorsBuilderDelegate;
@@ -53,6 +55,7 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 			PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?> containerElementNodeBuilder =
 					containerElementNodeBuilders.get( extractorPath );
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
+				checkNotFrozen();
 				BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
 						buildingHelper.bindExtractorPath(
 								modelPath.getPropertyModel().getTypeModel(), extractorPath
@@ -75,7 +78,24 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 		return valueWithoutExtractorsBuilderDelegate;
 	}
 
-	Optional<PojoImplicitReindexingResolverPropertyNode<T, P>> build() {
+	@Override
+	protected void onFreeze(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexingCollector) {
+		valueWithoutExtractorsBuilderDelegate.freeze( dirtyPathsTriggeringReindexingCollector );
+		for ( PojoImplicitReindexingResolverContainerElementNodeBuilder<?, ?> builder
+				: containerElementNodeBuilders.values() ) {
+			if ( builder != null ) { // May happen if the empty container value extractor path was used
+				builder.freeze();
+				dirtyPathsTriggeringReindexingCollector.addAll(
+						builder.getDirtyPathsTriggeringReindexingIncludingNestedNodes()
+				);
+			}
+		}
+	}
+
+	@Override
+	Optional<PojoImplicitReindexingResolver<T>> doBuild() {
+		checkFrozen();
+
 		Collection<PojoImplicitReindexingResolver<P>> valueWithoutExtractorTypeNodes =
 				valueWithoutExtractorsBuilderDelegate.buildTypeNodes();
 		Collection<PojoImplicitReindexingResolver<? super P>> immutableNestedNodes = new ArrayList<>();

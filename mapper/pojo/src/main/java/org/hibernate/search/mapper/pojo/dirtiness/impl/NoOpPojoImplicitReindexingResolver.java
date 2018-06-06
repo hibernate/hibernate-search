@@ -20,7 +20,7 @@ class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, Object dirty) {
+			PojoRuntimeIntrospector runtimeIntrospector, Object dirty, PojoDirtinessState dirtinessState) {
 		// No-op
 	}
 

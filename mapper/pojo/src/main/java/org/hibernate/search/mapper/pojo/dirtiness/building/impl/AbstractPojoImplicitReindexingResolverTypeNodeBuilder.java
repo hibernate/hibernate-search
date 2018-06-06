@@ -10,24 +10,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
-		extends AbstractPojoImplicitReindexingResolverNodeBuilder {
+		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 
 	private final BoundPojoModelPathTypeNode<U> modelPath;
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
 			new LinkedHashMap<>();
 
-	private boolean shouldMarkForReindexing = false;
+	// Use a LinkedHashSet for deterministic iteration
+	private Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing = new LinkedHashSet<>();
 
 	AbstractPojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
@@ -48,33 +52,58 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		return getOrCreatePropertyBuilder( propertyName );
 	}
 
-	void setShouldMarkForReindexing() {
-		shouldMarkForReindexing = true;
+	void addDirtyPathTriggeringReindexing(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
+		checkNotFrozen();
+		dirtyPathsTriggeringReindexing.add( dirtyPathFromEntityType.toUnboundPath() );
 	}
 
-	abstract Optional<PojoImplicitReindexingResolver<T>> build();
-
-	final boolean isShouldMarkForReindexing() {
-		return shouldMarkForReindexing;
+	@Override
+	void onFreeze(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexingCollector) {
+		dirtyPathsTriggeringReindexingCollector.addAll( dirtyPathsTriggeringReindexing );
+		for ( PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> builder : propertyNodeBuilders.values() ) {
+			builder.freeze();
+			dirtyPathsTriggeringReindexingCollector.addAll(
+					builder.getDirtyPathsTriggeringReindexingIncludingNestedNodes()
+			);
+		}
 	}
 
-	final Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> buildPropertyNodes() {
-		Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> immutablePropertyNodes =
+	@Override
+	final Optional<PojoImplicitReindexingResolver<T>> doBuild() {
+		checkFrozen();
+
+		boolean markForReindexing = !dirtyPathsTriggeringReindexing.isEmpty();
+
+		Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes =
 				propertyNodeBuilders.isEmpty() ? Collections.emptyList() : new ArrayList<>( propertyNodeBuilders.size() );
 		propertyNodeBuilders.values().stream()
 				.map( PojoImplicitReindexingResolverPropertyNodeBuilder::build )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
-				.forEach( immutablePropertyNodes::add );
-		return immutablePropertyNodes;
+				.forEach( immutableNestedNodes::add );
+
+		if ( !markForReindexing && immutableNestedNodes.isEmpty() ) {
+			/*
+			 * If this resolver doesn't resolve to anything,
+			 * then it is useless and we don't need to build it
+			 */
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( doBuild( markForReindexing, immutableNestedNodes ) );
+		}
 	}
+
+	abstract PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
+			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );
 	}
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> createPropertyBuilder(String propertyName) {
-				PropertyHandle handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
+		checkNotFrozen();
+		PropertyHandle handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
 		return new PojoImplicitReindexingResolverPropertyNodeBuilder<>(
 				modelPath.property( handle ), buildingHelper
 		);

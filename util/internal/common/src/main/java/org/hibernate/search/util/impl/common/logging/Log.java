@@ -17,11 +17,21 @@ import org.jboss.logging.annotations.MessageLogger;
 @MessageLogger(projectCode = "HSEARCH-UTIL")
 public interface Log extends BasicLogger {
 
-	// Pre-existing message
+	// -----------------------
+	// Pre-existing messages
+	// -----------------------
+
 	@LogMessage(level = ERROR)
 	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
 
 	@Message(id = 18, value = "'%1$s' must not be null.")
 	IllegalArgumentException mustNotBeNull(String objectDescription);
+
+	// -----------------------
+	// New messages
+	// -----------------------
+
+	@Message(id = 500, value = "'%1$s' must not be null or empty.")
+	IllegalArgumentException mustNotBeNullNorEmpty(String objectDescription);
 }

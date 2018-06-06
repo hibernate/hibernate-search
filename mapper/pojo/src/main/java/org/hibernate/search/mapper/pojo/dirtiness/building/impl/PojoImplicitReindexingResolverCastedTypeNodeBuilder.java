@@ -23,24 +23,10 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	public Optional<PojoImplicitReindexingResolver<T>> build() {
-		Collection<PojoImplicitReindexingResolverPropertyNode<? super U, ?>> immutablePropertyNodes =
-				buildPropertyNodes();
-
-		boolean markForReindexing = isShouldMarkForReindexing();
-
-		if ( !markForReindexing && immutablePropertyNodes.isEmpty() ) {
-			/*
-			 * If this resolver doesn't resolve to anything,
-			 * then it is useless and we don't need to build it
-			 */
-			return Optional.empty();
-		}
-		else {
-			return Optional.of( new PojoImplicitReindexingResolverCastedTypeNode<>(
-					getTypeModel().getRawType().getCaster(), markForReindexing, immutablePropertyNodes
-			) );
-		}
+	PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
+			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes) {
+		return new PojoImplicitReindexingResolverCastedTypeNode<>(
+				getTypeModel().getRawType().getCaster(), markForReindexing, immutableNestedNodes
+		);
 	}
-
 }

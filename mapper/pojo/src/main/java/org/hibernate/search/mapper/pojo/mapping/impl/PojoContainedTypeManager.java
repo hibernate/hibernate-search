@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoDirtinessState;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -51,7 +52,11 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier) {
-		reindexingResolver.resolveEntitiesToReindex( collector, runtimeIntrospector, entitySupplier.get() );
+		// TODO take into account dirty properties to only contribute containing entities
+		// that are affected by the changes in the contained entity
+		reindexingResolver.resolveEntitiesToReindex(
+				collector, runtimeIntrospector, entitySupplier.get(), PojoDirtinessState.allDirty()
+		);
 	}
 
 	ChangesetPojoContainedTypeWorker<E> createWorker(PojoSessionContext sessionContext) {

@@ -22,20 +22,20 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImplicitReindexingResolver<T> {
 
 	private final boolean shouldMarkForReindexing;
-	private final Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> propertyNodes;
+	private final Collection<PojoImplicitReindexingResolver<? super T>> nestedNodes;
 
 	public PojoImplicitReindexingResolverOriginalTypeNode(boolean shouldMarkForReindexing,
-			Collection<PojoImplicitReindexingResolverPropertyNode<? super T, ?>> propertyNodes) {
+			Collection<PojoImplicitReindexingResolver<? super T>> nestedNodes) {
 		this.shouldMarkForReindexing = shouldMarkForReindexing;
-		this.propertyNodes = propertyNodes;
+		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "shouldMarkForReindexing", shouldMarkForReindexing );
-		builder.startList( "propertyNodes" );
-		for ( PojoImplicitReindexingResolverPropertyNode<?, ?> node : propertyNodes ) {
+		builder.startList( "nestedNodes" );
+		for ( PojoImplicitReindexingResolver<?> node : nestedNodes ) {
 			builder.value( node );
 		}
 		builder.endList();
@@ -43,12 +43,12 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImpli
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty) {
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState) {
 		if ( shouldMarkForReindexing ) {
 			collector.markForReindexing( dirty );
 		}
-		for ( PojoImplicitReindexingResolverPropertyNode<? super T, ?> node : propertyNodes ) {
-			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty );
+		for ( PojoImplicitReindexingResolver<? super T> node : nestedNodes ) {
+			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
 	}
 }

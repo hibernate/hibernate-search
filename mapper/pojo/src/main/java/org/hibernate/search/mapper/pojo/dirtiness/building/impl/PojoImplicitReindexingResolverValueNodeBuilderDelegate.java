@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -27,6 +29,8 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ?>>
 			castedTypeNodeBuilders = new LinkedHashMap<>();
+
+	private boolean frozen = false;
 
 	PojoImplicitReindexingResolverValueNodeBuilderDelegate(BoundPojoModelPathValueNode<?, ?, V> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
@@ -65,12 +69,38 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 
 	PojoImplicitReindexingResolverOriginalTypeNodeBuilder<V> type() {
 		if ( typeNodeBuilder == null ) {
+			checkNotFrozen();
 			typeNodeBuilder = new PojoImplicitReindexingResolverOriginalTypeNodeBuilder<>( modelPath.type(), buildingHelper );
 		}
 		return typeNodeBuilder;
 	}
 
+	/**
+	 * Freeze the builder delegate, signaling that no mutating method will be called anymore
+	 * and that derived data can be safely computed.
+	 */
+	void freeze(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexingCollector) {
+		checkNotFrozen();
+		if ( !frozen ) {
+			frozen = true;
+			if ( typeNodeBuilder != null ) {
+				typeNodeBuilder.freeze();
+				dirtyPathsTriggeringReindexingCollector.addAll(
+						typeNodeBuilder.getDirtyPathsTriggeringReindexingIncludingNestedNodes()
+				);
+			}
+			for ( PojoImplicitReindexingResolverCastedTypeNodeBuilder<?, ?> builder : castedTypeNodeBuilders.values() ) {
+				builder.freeze();
+				dirtyPathsTriggeringReindexingCollector.addAll(
+						builder.getDirtyPathsTriggeringReindexingIncludingNestedNodes()
+				);
+			}
+		}
+	}
+
 	Collection<PojoImplicitReindexingResolver<V>> buildTypeNodes() {
+		checkFrozen();
+
 		Collection<PojoImplicitReindexingResolver<V>> immutableTypeNodes = new ArrayList<>();
 		if ( typeNodeBuilder != null ) {
 			typeNodeBuilder.build().ifPresent( immutableTypeNodes::add );
@@ -84,6 +114,24 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		return immutableTypeNodes;
 	}
 
+	private void checkNotFrozen() {
+		if ( frozen ) {
+			throw new AssertionFailure(
+					"A mutating method was called on " + this + " after it was frozen."
+					+ " There is a bug in Hibernate Search, please report it."
+			);
+		}
+	}
+
+	final void checkFrozen() {
+		if ( !frozen ) {
+			throw new AssertionFailure(
+					"A method was called on " + this + " before it was frozen, but a preliminary freeze is required."
+							+ " There is a bug in Hibernate Search, please report it."
+			);
+		}
+	}
+
 	@SuppressWarnings("unchecked") // We know builders have this exact type, by construction
 	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, U> getOrCreateCastedTypeNodeBuilder(
 			PojoRawTypeModel<U> targetTypeModel) {
@@ -93,6 +141,7 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 
 	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, U> createCastedTypeNodeBuilder(
 			PojoRawTypeModel<U> targetTypeModel) {
+		checkNotFrozen();
 		return new PojoImplicitReindexingResolverCastedTypeNodeBuilder<>(
 				modelPath.castedType( targetTypeModel ), buildingHelper
 		);

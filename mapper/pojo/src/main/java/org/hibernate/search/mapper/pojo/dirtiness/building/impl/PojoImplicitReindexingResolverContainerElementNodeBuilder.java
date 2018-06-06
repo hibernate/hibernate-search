@@ -8,14 +8,16 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverContainerElementNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
 class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
-		extends AbstractPojoImplicitReindexingResolverNodeBuilder {
+		extends AbstractPojoImplicitReindexingResolverNodeBuilder<C> {
 
 	private final BoundPojoModelPathValueNode<?, ? extends C, V> modelPath;
 	private final ContainerValueExtractor<C, V> extractor;
@@ -40,7 +42,15 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 		return valueBuilderDelegate;
 	}
 
-	Optional<PojoImplicitReindexingResolverContainerElementNode<C, V>> build() {
+	@Override
+	void onFreeze(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexingCollector) {
+		valueBuilderDelegate.freeze( dirtyPathsTriggeringReindexingCollector );
+	}
+
+	@Override
+	Optional<PojoImplicitReindexingResolver<C>> doBuild() {
+		checkFrozen();
+
 		Collection<PojoImplicitReindexingResolver<V>> valueTypeNodes =
 				valueBuilderDelegate.buildTypeNodes();
 

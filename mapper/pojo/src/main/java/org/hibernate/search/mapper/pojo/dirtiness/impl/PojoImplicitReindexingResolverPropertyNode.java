@@ -48,12 +48,12 @@ public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplic
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty) {
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState) {
 		// TODO add generic type parameters to property handles
 		P propertyValue = (P) handle.get( dirty );
 		if ( propertyValue != null ) {
 			for ( PojoImplicitReindexingResolver<? super P> node : nestedNodes ) {
-				node.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue );
+				node.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );
 			}
 		}
 	}

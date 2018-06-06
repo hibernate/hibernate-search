@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoDirtinessState;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -104,7 +105,9 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 			Supplier<E> entitySupplier) {
 		// TODO take into account dirty properties to only contribute containing entities
 		// that are affected by the changes in the contained entity
-		reindexingResolver.resolveEntitiesToReindex( collector, runtimeIntrospector, entitySupplier.get() );
+		reindexingResolver.resolveEntitiesToReindex(
+				collector, runtimeIntrospector, entitySupplier.get(), PojoDirtinessState.allDirty()
+		);
 	}
 
 	ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {

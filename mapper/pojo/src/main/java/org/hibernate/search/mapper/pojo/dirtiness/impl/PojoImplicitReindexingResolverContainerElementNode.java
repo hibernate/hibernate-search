@@ -49,19 +49,19 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, V> extends Po
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, C dirty) {
+			PojoRuntimeIntrospector runtimeIntrospector, C dirty, PojoDirtinessState dirtinessState) {
 		try ( Stream<V> stream = extractor.extract( dirty ) ) {
 			stream.forEach( containerElement -> resolveEntitiesToReindexForContainerElement(
-					collector, runtimeIntrospector, containerElement
+					collector, runtimeIntrospector, containerElement, dirtinessState
 			) );
 		}
 	}
 
 	private void resolveEntitiesToReindexForContainerElement(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, V containerElement) {
+			PojoRuntimeIntrospector runtimeIntrospector, V containerElement, PojoDirtinessState dirtinessState) {
 		if ( containerElement != null ) {
 			for ( PojoImplicitReindexingResolver<V> node : nestedNodes ) {
-				node.resolveEntitiesToReindex( collector, runtimeIntrospector, containerElement );
+				node.resolveEntitiesToReindex( collector, runtimeIntrospector, containerElement, dirtinessState );
 			}
 		}
 	}
