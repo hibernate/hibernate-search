@@ -39,7 +39,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReferen
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -669,11 +668,9 @@ public class OrmAutomaticIndexingBridgeIT {
 		private List<ContainingEntity> containingAsSingle = new ArrayList<>();
 
 		@Basic
-		@Field
 		private String includedInTypeBridge;
 
 		@Basic
-		@Field
 		private String includedInPropertyBridge;
 
 		public Integer getId() {
