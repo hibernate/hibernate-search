@@ -22,6 +22,10 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 		super( modelPath, buildingHelper );
 	}
 
+	Optional<PojoImplicitReindexingResolver<T>> build() {
+		return build( null );
+	}
+
 	@Override
 	PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
 			Collection<PojoImplicitReindexingResolver<? super T>> immutableNestedNodes) {

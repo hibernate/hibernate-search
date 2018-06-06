@@ -69,7 +69,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	final Optional<PojoImplicitReindexingResolver<T>> doBuild() {
+	final Optional<PojoImplicitReindexingResolver<T>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		boolean markForReindexing = !dirtyPathsTriggeringReindexing.isEmpty();
@@ -77,7 +77,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes =
 				propertyNodeBuilders.isEmpty() ? Collections.emptyList() : new ArrayList<>( propertyNodeBuilders.size() );
 		propertyNodeBuilders.values().stream()
-				.map( PojoImplicitReindexingResolverPropertyNodeBuilder::build )
+				.map( builder -> builder.build( allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );

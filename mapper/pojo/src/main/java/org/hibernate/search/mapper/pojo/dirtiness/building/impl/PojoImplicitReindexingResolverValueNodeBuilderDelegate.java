@@ -98,15 +98,15 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		}
 	}
 
-	Collection<PojoImplicitReindexingResolver<V>> buildTypeNodes() {
+	Collection<PojoImplicitReindexingResolver<V>> buildTypeNodes(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		Collection<PojoImplicitReindexingResolver<V>> immutableTypeNodes = new ArrayList<>();
 		if ( typeNodeBuilder != null ) {
-			typeNodeBuilder.build().ifPresent( immutableTypeNodes::add );
+			typeNodeBuilder.build( allPotentialDirtyPaths ).ifPresent( immutableTypeNodes::add );
 		}
 		castedTypeNodeBuilders.values().stream()
-				.map( PojoImplicitReindexingResolverCastedTypeNodeBuilder::build )
+				.map( builder -> builder.build( allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableTypeNodes::add );

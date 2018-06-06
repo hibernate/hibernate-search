@@ -93,17 +93,17 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	}
 
 	@Override
-	Optional<PojoImplicitReindexingResolver<T>> doBuild() {
+	Optional<PojoImplicitReindexingResolver<T>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		Collection<PojoImplicitReindexingResolver<P>> valueWithoutExtractorTypeNodes =
-				valueWithoutExtractorsBuilderDelegate.buildTypeNodes();
+				valueWithoutExtractorsBuilderDelegate.buildTypeNodes( allPotentialDirtyPaths );
 		Collection<PojoImplicitReindexingResolver<? super P>> immutableNestedNodes = new ArrayList<>();
 		immutableNestedNodes.addAll( valueWithoutExtractorTypeNodes );
 		containerElementNodeBuilders.values().stream()
 				.distinct() // Necessary because the default extractor path has two possible keys with the same value
 				.filter( Objects::nonNull )
-				.map( PojoImplicitReindexingResolverContainerElementNodeBuilder::build )
+				.map( builder -> builder.build( allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );

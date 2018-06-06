@@ -48,11 +48,11 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 	}
 
 	@Override
-	Optional<PojoImplicitReindexingResolver<C>> doBuild() {
+	Optional<PojoImplicitReindexingResolver<C>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		Collection<PojoImplicitReindexingResolver<V>> valueTypeNodes =
-				valueBuilderDelegate.buildTypeNodes();
+				valueBuilderDelegate.buildTypeNodes( allPotentialDirtyPaths );
 
 		if ( valueTypeNodes.isEmpty() ) {
 			/*
