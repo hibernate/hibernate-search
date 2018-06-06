@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +80,10 @@ public class OrmAutomaticIndexingIT {
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "directField", String.class )
+				.field( "directElementCollectionField", String.class )
 				.objectField( "containedSingle", b2 -> b2
 						.field( "includedInSingle", String.class )
+						.field( "elementCollectionIncludedInSingle", String.class )
 				)
 				.objectField( "containedList", b2 -> b2
 						.field( "includedInList", String.class )
@@ -94,6 +97,7 @@ public class OrmAutomaticIndexingIT {
 				.objectField( "child", b3 -> b3
 						.objectField( "containedSingle", b2 -> b2
 								.field( "includedInSingle", String.class )
+								.field( "elementCollectionIncludedInSingle", String.class )
 						)
 						.objectField( "containedList", b2 -> b2
 								.field( "includedInList", String.class )
@@ -124,12 +128,17 @@ public class OrmAutomaticIndexingIT {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setDirectField( "initialValue" );
+			entity1.getDirectElementCollectionField().add( "firstValue" );
 
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 )
+							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -142,6 +151,10 @@ public class OrmAutomaticIndexingIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 )
+							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -160,7 +173,101 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void directAssociationUpdate_single() {
+	public void directValueUpdate_elementCollection() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getDirectElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a simple (single-valued) property
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setDirectField( "updatedValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding an element to an ElementCollection (multi-valued) property
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getDirectElementCollectionField().add( "secondValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 ),
+									entity1.getDirectElementCollectionField().get( 1 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding replacing an ElementCollection (multi-valued) property
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setDirectElementCollectionField( new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 ),
+									entity1.getDirectElementCollectionField().get( 1 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing an element from an ElementCollection (multi-valued) property
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getDirectElementCollectionField().remove( 1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", entity1.getDirectField() )
+							.field(
+									"directElementCollectionField",
+									entity1.getDirectElementCollectionField().get( 0 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void directAssociationUpdate_singleAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -238,7 +345,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void directAssociationUpdate_list() {
+	public void directAssociationUpdate_listAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -322,7 +429,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void directAssociationUpdate_mapValues() {
+	public void directAssociationUpdate_mapValuesAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -406,7 +513,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void directAssociationUpdate_mapKeys() {
+	public void directAssociationUpdate_mapKeysAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -490,7 +597,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_single() {
+	public void indirectAssociationUpdate_singleAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -602,7 +709,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_single() {
+	public void indirectValueUpdate_singleAssociation_singleValue() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -677,7 +784,147 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_list() {
+	public void indirectValueUpdate_singleAssociation_elementCollectionValue() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.getElementCollectionIncludedInSingle().add( "firstValue" );
+			containingEntity1.setContainedSingle( containedEntity1 );
+			containedEntity1.getContainingAsSingle().add( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.getElementCollectionIncludedInSingle().add( "firstOutOfScopeValue" );
+			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
+			containedEntity2.getContainingAsSingle().add( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", null )
+											.field(
+													"elementCollectionIncludedInSingle",
+													"firstValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.getElementCollectionIncludedInSingle().add( "secondValue" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", null )
+											.field(
+													"elementCollectionIncludedInSingle",
+													"firstValue", "secondValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test replacing the values
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setElementCollectionIncludedInSingle( new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", null )
+											.field(
+													"elementCollectionIncludedInSingle",
+													"newFirstValue", "newSecondValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.getElementCollectionIncludedInSingle().remove( 0 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "directField", null )
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "includedInSingle", null )
+											.field(
+													"elementCollectionIncludedInSingle",
+													"newSecondValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.getElementCollectionIncludedInSingle().add( "secondOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test replacing a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.setElementCollectionIncludedInSingle( new ArrayList<>( Arrays.asList(
+					"newFirstOutOfScopeValue", "newSecondOutOfScopeValue"
+			) ) );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectAssociationUpdate_listAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -796,7 +1043,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_list() {
+	public void indirectValueUpdate_listAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -871,7 +1118,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_mapValues() {
+	public void indirectAssociationUpdate_mapValuesAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -990,7 +1237,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_mapValues() {
+	public void indirectValueUpdate_mapValuesAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1065,7 +1312,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_mapKeys() {
+	public void indirectAssociationUpdate_mapKeysAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1184,7 +1431,7 @@ public class OrmAutomaticIndexingIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_mapKeys() {
+	public void indirectValueUpdate_mapKeysAssociation() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1271,6 +1518,7 @@ public class OrmAutomaticIndexingIT {
 		@OneToOne(mappedBy = "parent")
 		@IndexedEmbedded(includePaths = {
 				"containedSingle.includedInSingle",
+				"containedSingle.elementCollectionIncludedInSingle",
 				"containedList.includedInList",
 				"containedMapValues.includedInMapValues",
 				"containedMapKeys.includedInMapKeys",
@@ -1278,7 +1526,7 @@ public class OrmAutomaticIndexingIT {
 		private ContainingEntity child;
 
 		@ManyToOne
-		@IndexedEmbedded(includePaths = "includedInSingle")
+		@IndexedEmbedded(includePaths = { "includedInSingle", "elementCollectionIncludedInSingle" })
 		private ContainedEntity containedSingle;
 
 		@ManyToMany
@@ -1366,12 +1614,24 @@ public class OrmAutomaticIndexingIT {
 		@Field
 		private String directField;
 
+		@ElementCollection
+		@Field
+		private List<String> directElementCollectionField = new ArrayList<>();
+
 		public String getDirectField() {
 			return directField;
 		}
 
 		public void setDirectField(String directField) {
 			this.directField = directField;
+		}
+
+		public List<String> getDirectElementCollectionField() {
+			return directElementCollectionField;
+		}
+
+		public void setDirectElementCollectionField(List<String> directElementCollectionField) {
+			this.directElementCollectionField = directElementCollectionField;
 		}
 	}
 
@@ -1423,6 +1683,10 @@ public class OrmAutomaticIndexingIT {
 		@Basic
 		@Field
 		private String includedInMapKeys;
+
+		@ElementCollection
+		@Field
+		private List<String> elementCollectionIncludedInSingle = new ArrayList<>();
 
 		public Integer getId() {
 			return id;
@@ -1478,6 +1742,14 @@ public class OrmAutomaticIndexingIT {
 
 		public void setIncludedInMapKeys(String includedInMapKeys) {
 			this.includedInMapKeys = includedInMapKeys;
+		}
+
+		public List<String> getElementCollectionIncludedInSingle() {
+			return elementCollectionIncludedInSingle;
+		}
+
+		public void setElementCollectionIncludedInSingle(List<String> elementCollectionIncludedInSingle) {
+			this.elementCollectionIncludedInSingle = elementCollectionIncludedInSingle;
 		}
 	}
 
