@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.util.impl.common.Contracts;
 
 
 class BooleanJunctionPredicateContextImpl<N, C>
@@ -112,6 +113,22 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	@Override
 	public BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
 		clauseContributor.accept( filter() );
+		return this;
+	}
+
+	@Override
+	public BooleanJunctionPredicateContext<N> minimumShouldMatchNumber(int ignoreConstraintCeiling,
+			int matchingClausesNumber) {
+		Contracts.assertPositiveOrZero( ignoreConstraintCeiling, "ignoreConstraintCeiling" );
+		builder.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
+		return this;
+	}
+
+	@Override
+	public BooleanJunctionPredicateContext<N> minimumShouldMatchRatio(int ignoreConstraintCeiling,
+			double matchingClausesRatio) {
+		Contracts.assertPositiveOrZero( ignoreConstraintCeiling, "ignoreConstraintCeiling" );
+		builder.minimumShouldMatchRatio( ignoreConstraintCeiling, matchingClausesRatio );
 		return this;
 	}
 

@@ -183,4 +183,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 543, value = "Descending order is not supported by distance sort for field '%1$s'.")
 	SearchException descendingOrderNotSupportedByDistanceSort(String absoluteFieldPath);
+
+	@Message(id = 544, value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
+			+ " expected a number between 1 and '%1$s', got '%2$s'.")
+	SearchException minimumShouldMatchMinimumOutOfBounds(int minimum, int totalShouldClauseNumber);
+
+	@Message(id = 545, value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
+	SearchException minimumShouldMatchConflictingConstraints(int ignoreConstraintCeiling);
 }

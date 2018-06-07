@@ -29,4 +29,10 @@ public final class Contracts {
 			throw log.mustNotBeNullNorEmpty( objectDescription );
 		}
 	}
+
+	public static void assertPositiveOrZero(int number, String objectDescription) {
+		if ( number < 0 ) {
+			throw log.mustBePositiveOrZero( objectDescription );
+		}
+	}
 }

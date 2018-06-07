@@ -34,4 +34,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 500, value = "'%1$s' must not be null or empty.")
 	IllegalArgumentException mustNotBeNullNorEmpty(String objectDescription);
+
+	@Message(id = 501, value = "'%1$s' must be positive or zero.")
+	IllegalArgumentException mustBePositiveOrZero(String objectDescription);
 }

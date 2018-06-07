@@ -7,11 +7,11 @@
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
@@ -63,8 +63,9 @@ public class ProjectionsSearchResultAssert<T extends List<?>>
 		private ProjectionsHitsBuilder() {
 		}
 
-		public ProjectionsHitsBuilder projection(Object ... projectionItems) {
-			expectedHits.add( NormalizationUtils.normalizeProjection( Arrays.asList( projectionItems ) ) );
+		public ProjectionsHitsBuilder projection(Object firstProjectionItem, Object ... otherProjectionItems) {
+			List<?> projectionItems = CollectionHelper.asList( firstProjectionItem, otherProjectionItems );
+			expectedHits.add( NormalizationUtils.normalizeProjection( projectionItems ) );
 			return this;
 		}
 

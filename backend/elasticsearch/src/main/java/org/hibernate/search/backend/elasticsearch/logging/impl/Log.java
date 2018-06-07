@@ -153,4 +153,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 528, value = "Distance related operations are not supported by the type of field '%1$s'.")
 	SearchException distanceOperationsNotSupportedByFieldType(String absoluteFieldPath);
+
+	@Message(id = 529, value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
+	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
 }

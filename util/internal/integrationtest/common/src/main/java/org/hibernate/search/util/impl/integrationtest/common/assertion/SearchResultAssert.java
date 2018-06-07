@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 
 import org.assertj.core.api.Assertions;
 
@@ -28,28 +29,26 @@ public class SearchResultAssert<T> extends AbstractSearchResultAssert<SearchResu
 	}
 
 	@SuppressWarnings("unchecked")
-	public SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
-		return hasHitsExactOrder( (T[]) hits.toArray() );
+	public SearchResultAssert<T> hasHitsExactOrder(T firstHist, T... otherHits) {
+		return hasHitsExactOrder( CollectionHelper.asList( firstHist, otherHits ) );
 	}
 
 	@SuppressWarnings("unchecked")
-	public SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
-		return hasHitsAnyOrder( (T[]) hits.toArray() );
+	public SearchResultAssert<T> hasHitsAnyOrder(T firstHist, T... otherHits) {
+		return hasHitsAnyOrder( CollectionHelper.asList( firstHist, otherHits ) );
 	}
 
-	@SafeVarargs
-	public final SearchResultAssert<T> hasHitsExactOrder(T... hits) {
+	public final SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
 		Assertions.assertThat( actual.getHits() )
 				.as( "Hits of " + actual )
-				.containsExactly( hits );
+				.containsExactly( (T[]) hits.toArray() );
 		return thisAsSelfType();
 	}
 
-	@SafeVarargs
-	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
+	public final SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
 		Assertions.assertThat( actual.getHits() )
 				.as( "Hits of " + actual )
-				.containsOnly( hits );
+				.containsOnly( (T[]) hits.toArray() );
 		return thisAsSelfType();
 	}
 

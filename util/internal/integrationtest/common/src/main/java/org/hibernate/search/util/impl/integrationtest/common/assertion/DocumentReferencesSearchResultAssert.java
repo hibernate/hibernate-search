@@ -35,15 +35,15 @@ public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 		super( actual );
 	}
 
-	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsExactOrder(String indexName, String... ids) {
+	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsExactOrder(String indexName, String firstId, String... otherIds) {
 		return hasReferencesHitsExactOrder( ctx -> {
-			ctx = ctx.doc( indexName, ids );
+			ctx.doc( indexName, firstId, otherIds );
 		} );
 	}
 
-	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsAnyOrder(String indexName, String... ids) {
+	public DocumentReferencesSearchResultAssert<T> hasReferencesHitsAnyOrder(String indexName, String firstId, String... otherIds) {
 		return hasReferencesHitsAnyOrder( ctx -> {
-			ctx = ctx.doc( indexName, ids );
+			ctx.doc( indexName, firstId, otherIds );
 		} );
 	}
 
@@ -78,8 +78,9 @@ public class DocumentReferencesSearchResultAssert<T extends DocumentReference>
 		private ReferencesHitsBuilder() {
 		}
 
-		public ReferencesHitsBuilder doc(String indexName, String... ids) {
-			for ( String id : ids ) {
+		public ReferencesHitsBuilder doc(String indexName, String firstId, String... otherIds) {
+			expectedHits.add( NormalizationUtils.reference( indexName, firstId ) );
+			for ( String id : otherIds ) {
 				expectedHits.add( NormalizationUtils.reference( indexName, id ) );
 			}
 			return this;
