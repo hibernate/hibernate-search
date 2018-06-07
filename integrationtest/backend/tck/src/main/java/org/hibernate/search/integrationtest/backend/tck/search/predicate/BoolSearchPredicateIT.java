@@ -34,18 +34,21 @@ public class BoolSearchPredicateIT {
 
 	// Document 1
 
-	private static final String STRING_1 = "Irving";
-	private static final Integer INTEGER_1 = 3;
+	private static final String FIELD1_VALUE1 = "Irving";
+	private static final Integer FIELD2_VALUE1 = 3;
+	private static final Integer FIELD3_VALUE1 = 4;
 
 	// Document 2
 
-	private static final String STRING_2 = "Auster";
-	private static final Integer INTEGER_2 = 13;
+	private static final String FIELD1_VALUE2 = "Auster";
+	private static final Integer FIELD2_VALUE2 = 13;
+	private static final Integer FIELD3_VALUE2 = 14;
 
 	// Document 3
 
-	private static final String STRING_3 = "Coe";
-	private static final Integer INTEGER_3 = 25;
+	private static final String FIELD1_VALUE3 = "Coe";
+	private static final Integer FIELD2_VALUE3 = 25;
+	private static final Integer FIELD3_VALUE3 = 42;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -78,7 +81,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must().match().onField( "string" ).matching( STRING_1 )
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 				.end()
 				.build();
 
@@ -88,8 +91,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must().match().onField( "string" ).matching( STRING_1 )
-						.must().match().onField( "integer" ).matching( INTEGER_2 )
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.must().match().onField( "field2" ).matching( FIELD2_VALUE2 )
 				.end()
 				.build();
 
@@ -98,8 +101,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must().match().onField( "string" ).matching( STRING_1 )
-						.must().match().onField( "integer" ).matching( INTEGER_1 )
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.must().match().onField( "field2" ).matching( FIELD2_VALUE1 )
 				.end()
 				.build();
 
@@ -114,7 +117,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must( c -> c.match().onField( "string" ).matching( STRING_1 ) )
+						.must( c -> c.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				.end()
 				.build();
 
@@ -126,7 +129,7 @@ public class BoolSearchPredicateIT {
 	public void must_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 );
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -146,7 +149,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).matching( STRING_1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 				.end()
 				.build();
 
@@ -156,8 +159,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).matching( STRING_1 )
-						.should().match().onField( "string" ).matching( STRING_2 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE2 )
 				.end()
 				.build();
 
@@ -172,8 +175,8 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should( c -> c.match().onField( "string" ).matching( STRING_1 ) )
-						.should( c -> c.match().onField( "string" ).matching( STRING_2 ) )
+						.should( c -> c.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( c -> c.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 				.end()
 				.build();
 
@@ -185,8 +188,8 @@ public class BoolSearchPredicateIT {
 	public void should_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 );
-		SearchPredicate predicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
+		SearchPredicate predicate1 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+		SearchPredicate predicate2 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE3 );
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -207,7 +210,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.mustNot().match().onField( "string" ).matching( STRING_1 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 				.end()
 				.build();
 
@@ -217,8 +220,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.mustNot().match().onField( "string" ).matching( STRING_1 )
-						.mustNot().match().onField( "string" ).matching( STRING_3 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE3 )
 				.end()
 				.build();
 
@@ -233,7 +236,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.mustNot( c -> c.match().onField( "string" ).matching( STRING_1 ) )
+						.mustNot( c -> c.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				.end()
 				.build();
 
@@ -245,7 +248,7 @@ public class BoolSearchPredicateIT {
 	public void mustNot_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 );
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE2 );
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -265,9 +268,9 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).matching( STRING_1 )
-						.should().match().onField( "string" ).matching( STRING_3 )
-						.mustNot().match().onField( "string" ).matching( STRING_1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE3 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 				.end()
 				.build();
 
@@ -282,8 +285,8 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must().match().onField( "string" ).matching( STRING_1 )
-						.mustNot().match().onField( "string" ).matching( STRING_1 )
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 				.end()
 				.build();
 
@@ -292,8 +295,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.must().match().onField( "string" ).matching( STRING_1 )
-						.mustNot().match().onField( "string" ).matching( STRING_2 )
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE2 )
 				.end()
 				.build();
 
@@ -310,8 +313,8 @@ public class BoolSearchPredicateIT {
 				.predicate().bool()
 						.must(
 								c -> c.bool()
-										.should().match().onField( "string" ).matching( STRING_1 )
-										.should().match().onField( "string" ).matching( STRING_3 )
+										.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+										.should().match().onField( "field1" ).matching( FIELD1_VALUE3 )
 						)
 				.end()
 				.build();
@@ -324,10 +327,10 @@ public class BoolSearchPredicateIT {
 				.predicate().bool()
 						.must(
 								c -> c.bool()
-										.should().match().onField( "string" ).matching( STRING_1 )
-										.should().match().onField( "string" ).matching( STRING_3 )
+										.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+										.should().match().onField( "field1" ).matching( FIELD1_VALUE3 )
 						)
-						.mustNot().match().onField( "string" ).matching( STRING_3 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE3 )
 				.end()
 				.build();
 
@@ -335,19 +338,126 @@ public class BoolSearchPredicateIT {
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
 	}
 
+	@Test
+	public void must_should() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// A boolean predicate with must + should clauses:
+		// documents should match regardless of whether should clauses match.
+
+		// Non-matching "should" clauses
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// One matching and one non-matching "should" clause
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field1" ).matching( FIELD1_VALUE2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+	}
+
+	@Test
+	public void filter_should() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// A boolean predicate with filter + should clauses:
+		// documents should match regardless of whether should clauses match.
+
+		// Non-matching "should" clauses
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.filter().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// One matching and one non-matching "should" clause
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.filter().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void mustNot_should() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// A boolean predicate with mustNot + should clauses:
+		// documents should match only if at least one should clause matches
+
+		// Non-matching "should" clauses
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE2 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE3 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasNoHits();
+
+		// One matching and one non-matching "should" clause
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.mustNot().match().onField( "field1" ).matching( FIELD1_VALUE3 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexAccessors.string.write( document, STRING_1 );
-			indexAccessors.integer.write( document, INTEGER_1 );
+			indexAccessors.field1.write( document, FIELD1_VALUE1 );
+			indexAccessors.field2.write( document, FIELD2_VALUE1 );
+			indexAccessors.field3.write( document, FIELD3_VALUE1 );
 		} );
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexAccessors.string.write( document, STRING_2 );
-			indexAccessors.integer.write( document, INTEGER_2 );
+			indexAccessors.field1.write( document, FIELD1_VALUE2 );
+			indexAccessors.field2.write( document, FIELD2_VALUE2 );
+			indexAccessors.field3.write( document, FIELD3_VALUE2 );
 		} );
 		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexAccessors.string.write( document, STRING_3 );
-			indexAccessors.integer.write( document, INTEGER_3 );
+			indexAccessors.field1.write( document, FIELD1_VALUE3 );
+			indexAccessors.field2.write( document, FIELD2_VALUE3 );
+			indexAccessors.field3.write( document, FIELD3_VALUE3 );
 		} );
 
 		worker.execute().join();
@@ -362,12 +472,14 @@ public class BoolSearchPredicateIT {
 	}
 
 	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<Integer> integer;
+		final IndexFieldAccessor<String> field1;
+		final IndexFieldAccessor<Integer> field2;
+		final IndexFieldAccessor<Integer> field3;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
-			integer = root.field( "integer" ).asInteger().createAccessor();
+			field1 = root.field( "field1" ).asString().createAccessor();
+			field2 = root.field( "field2" ).asInteger().createAccessor();
+			field3 = root.field( "field3" ).asInteger().createAccessor();
 		}
 	}
 }
