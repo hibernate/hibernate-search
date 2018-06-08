@@ -23,10 +23,10 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
+	PojoImplicitReindexingResolver<T> doBuild(
 			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
-				getTypeModel().getRawType().getCaster(), markForReindexing, immutableNestedNodes
+				getTypeModel().getRawType().getCaster(), immutableNestedNodes
 		);
 	}
 }

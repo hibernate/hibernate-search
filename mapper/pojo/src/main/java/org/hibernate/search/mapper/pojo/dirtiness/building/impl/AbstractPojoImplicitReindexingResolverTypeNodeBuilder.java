@@ -8,9 +8,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -26,17 +24,18 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 
 	private final BoundPojoModelPathTypeNode<U> modelPath;
+
+	private final PojoImplicitReindexingResolverMarkingNodeBuilder<U> markingNodeBuilder;
+
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
 			new LinkedHashMap<>();
-
-	// Use a LinkedHashSet for deterministic iteration
-	private Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing = new LinkedHashSet<>();
 
 	AbstractPojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.modelPath = modelPath;
+		this.markingNodeBuilder = new PojoImplicitReindexingResolverMarkingNodeBuilder<>( modelPath, buildingHelper );
 	}
 
 	@Override
@@ -54,12 +53,15 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 
 	void addDirtyPathTriggeringReindexing(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
 		checkNotFrozen();
-		dirtyPathsTriggeringReindexing.add( dirtyPathFromEntityType.toUnboundPath() );
+		markingNodeBuilder.addDirtyPathTriggeringReindexing( dirtyPathFromEntityType );
 	}
 
 	@Override
 	void onFreeze(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexingCollector) {
-		dirtyPathsTriggeringReindexingCollector.addAll( dirtyPathsTriggeringReindexing );
+		markingNodeBuilder.freeze();
+		dirtyPathsTriggeringReindexingCollector.addAll(
+				markingNodeBuilder.getDirtyPathsTriggeringReindexingIncludingNestedNodes()
+		);
 		for ( PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> builder : propertyNodeBuilders.values() ) {
 			builder.freeze();
 			dirtyPathsTriggeringReindexingCollector.addAll(
@@ -72,29 +74,28 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	final Optional<PojoImplicitReindexingResolver<T>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		boolean markForReindexing = !dirtyPathsTriggeringReindexing.isEmpty();
-
-		Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes =
-				propertyNodeBuilders.isEmpty() ? Collections.emptyList() : new ArrayList<>( propertyNodeBuilders.size() );
+		Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes = new ArrayList<>();
+		markingNodeBuilder.build( allPotentialDirtyPaths )
+				.ifPresent( immutableNestedNodes::add );
 		propertyNodeBuilders.values().stream()
 				.map( builder -> builder.build( allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );
 
-		if ( !markForReindexing && immutableNestedNodes.isEmpty() ) {
+		if ( immutableNestedNodes.isEmpty() ) {
 			/*
-			 * If this resolver doesn't resolve to anything,
-			 * then it is useless and we don't need to build it
+			 * If this resolver doesn't delegate to anything, it won't resolve to anything,
+			 * thus it is useless and we don't need to build it
 			 */
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( doBuild( markForReindexing, immutableNestedNodes ) );
+			return Optional.of( doBuild( immutableNestedNodes ) );
 		}
 	}
 
-	abstract PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
+	abstract PojoImplicitReindexingResolver<T> doBuild(
 			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {

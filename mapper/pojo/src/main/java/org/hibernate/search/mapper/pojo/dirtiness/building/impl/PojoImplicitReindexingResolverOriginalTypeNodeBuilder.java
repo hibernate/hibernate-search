@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverOriginalTypeNode;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 
 class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
@@ -27,10 +26,10 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 	}
 
 	@Override
-	PojoImplicitReindexingResolver<T> doBuild(boolean markForReindexing,
+	PojoImplicitReindexingResolver<T> doBuild(
 			Collection<PojoImplicitReindexingResolver<? super T>> immutableNestedNodes) {
 		return new PojoImplicitReindexingResolverOriginalTypeNode<>(
-				markForReindexing, immutableNestedNodes
+				immutableNestedNodes
 		);
 	}
 }
