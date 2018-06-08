@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -20,8 +22,12 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,18 +43,24 @@ public class BoolSearchPredicateIT {
 	private static final String FIELD1_VALUE1 = "Irving";
 	private static final Integer FIELD2_VALUE1 = 3;
 	private static final Integer FIELD3_VALUE1 = 4;
+	private static final Integer FIELD4_VALUE1AND2 = 1_000;
+	private static final Integer FIELD5_VALUE1AND2 = 2_000;
 
 	// Document 2
 
 	private static final String FIELD1_VALUE2 = "Auster";
 	private static final Integer FIELD2_VALUE2 = 13;
 	private static final Integer FIELD3_VALUE2 = 14;
+	// Field 4: Same as document 1
+	// Field 5: Same as document 1
 
 	// Document 3
 
 	private static final String FIELD1_VALUE3 = "Coe";
 	private static final Integer FIELD2_VALUE3 = 25;
 	private static final Integer FIELD3_VALUE3 = 42;
+	private static final Integer FIELD4_VALUE3 = 42_000; // Different from document 1
+	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -442,22 +454,440 @@ public class BoolSearchPredicateIT {
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
 	}
 
+	@Test
+	public void minimumShouldMatchNumber_positive() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// Expect default behavior (1 "should" clause has to match)
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchNumber( 1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+
+		// Expect to require 1 "should" clause to match even though there's a "must"
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.minimumShouldMatchNumber( 1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+
+		// Expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchNumber( 2 )
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// Expect to require all "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchNumber( 2 )
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void minimumShouldMatchNumber_negative() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// Expect default behavior (1 "should" clause has to match)
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchNumber( -1 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+
+		// Expect to require 1 "should" clause to match even though there's a "must"
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.minimumShouldMatchNumber( -1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+
+		// Expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchNumber( -1 )
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void minimumShouldMatchRatio_positive() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// Expect default behavior (1 "should" clause has to match)
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchRatio( 0.5 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+
+		// Expect to require 1 "should" clause to match even though there's a "must"
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.minimumShouldMatchRatio( 0.5 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+
+		// Expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchRatio( 0.7 ) // The minimum should be rounded down to 2
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// Expect to require all "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchRatio( 1.0 )
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void minimumShouldMatchRatio_negative() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// Expect default behavior (1 "should" clause has to match)
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchRatio( -0.5 )
+						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+
+		// Expect to require 1 "should" clause to match even though there's a "must"
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.minimumShouldMatchRatio( -0.5 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+
+		// Expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.minimumShouldMatchRatio( -0.4 ) // The minimum should be rounded up to 2
+						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
+						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
+						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
+				.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void minimumShouldMatch_multipleConstraints() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		Consumer<BooleanJunctionPredicateContext<?>> minimumShouldMatchConstraints = b -> {
+			b.minimumShouldMatchNumber( 2, -1 );
+			b.minimumShouldMatchRatio( 4, 0.7 );
+		};
+
+		// 0 "should" clause: expect the constraints to be ignored
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+
+		// 1 "should" clause: expect to require all "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 2 "should" clauses: expect to require all "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 3 "should" clauses: expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 4 "should" clauses: expect to require 3 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE2 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 5 "should" clauses: expect to require 3 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE2 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 6 "should" clauses: expect to require 4 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field5" ).matching( FIELD5_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE2 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+	}
+
+	@Test
+	public void minimumShouldMatch_multipleConstraints_0ceiling() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		Consumer<BooleanJunctionPredicateContext<?>> minimumShouldMatchConstraints = b -> {
+			// Test that we can set the "default" minimum by using a ceiling of 0
+			b.minimumShouldMatchNumber( 0, 1 );
+			b.minimumShouldMatchNumber( 2, -1 );
+			b.minimumShouldMatchRatio( 4, 0.7 );
+		};
+
+		// 1 "should" clause: expect to require 1 "should" clause to match
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// 2 "should" clauses: expect to require 1 "should" clause to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE2 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+
+		// 3 "should" clauses: expect to require 2 "should" clauses to match
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool( b -> {
+					minimumShouldMatchConstraints.accept( b );
+					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
+					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
+					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
+				} )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		// The rest should behave exactly as in the other multiple-constraints test
+	}
+
+	@Test
+	public void minimumShouldMatch_error_negativeCeiling() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException(
+				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
+				() -> searchTarget.predicate().bool().minimumShouldMatchNumber( -1, 1 )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'ignoreConstraintCeiling'" )
+				.hasMessageContaining( "must be positive or zero" );
+
+		SubTest.expectException(
+				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
+				() -> searchTarget.predicate().bool().minimumShouldMatchRatio( -1, 0.5 )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'ignoreConstraintCeiling'" )
+				.hasMessageContaining( "must be positive or zero" );
+	}
+
+	@Test
+	public void minimumShouldMatch_error_multipleConflictingCeilings() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException(
+				"bool() predicate with minimumShouldMatch constraints with multiple conflicting ceilings",
+				() -> searchTarget.predicate().bool()
+						.minimumShouldMatchNumber( 2, -1 )
+						.minimumShouldMatchRatio( 4, 0.7 )
+						.minimumShouldMatchRatio( 4, 0.7 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting minimumShouldMatch constraints for ceiling" )
+				.hasMessageContaining( "'4'" );
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexAccessors.field1.write( document, FIELD1_VALUE1 );
 			indexAccessors.field2.write( document, FIELD2_VALUE1 );
 			indexAccessors.field3.write( document, FIELD3_VALUE1 );
+			indexAccessors.field4.write( document, FIELD4_VALUE1AND2 );
+			indexAccessors.field5.write( document, FIELD5_VALUE1AND2 );
 		} );
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexAccessors.field1.write( document, FIELD1_VALUE2 );
 			indexAccessors.field2.write( document, FIELD2_VALUE2 );
 			indexAccessors.field3.write( document, FIELD3_VALUE2 );
+			indexAccessors.field4.write( document, FIELD4_VALUE1AND2 );
+			indexAccessors.field5.write( document, FIELD5_VALUE1AND2 );
 		} );
 		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexAccessors.field1.write( document, FIELD1_VALUE3 );
 			indexAccessors.field2.write( document, FIELD2_VALUE3 );
 			indexAccessors.field3.write( document, FIELD3_VALUE3 );
+			indexAccessors.field4.write( document, FIELD4_VALUE3 );
+			indexAccessors.field5.write( document, FIELD5_VALUE3 );
 		} );
 
 		worker.execute().join();
@@ -475,11 +905,15 @@ public class BoolSearchPredicateIT {
 		final IndexFieldAccessor<String> field1;
 		final IndexFieldAccessor<Integer> field2;
 		final IndexFieldAccessor<Integer> field3;
+		final IndexFieldAccessor<Integer> field4;
+		final IndexFieldAccessor<Integer> field5;
 
 		IndexAccessors(IndexSchemaElement root) {
 			field1 = root.field( "field1" ).asString().createAccessor();
 			field2 = root.field( "field2" ).asInteger().createAccessor();
 			field3 = root.field( "field3" ).asInteger().createAccessor();
+			field4 = root.field( "field4" ).asInteger().createAccessor();
+			field5 = root.field( "field5" ).asInteger().createAccessor();
 		}
 	}
 }
