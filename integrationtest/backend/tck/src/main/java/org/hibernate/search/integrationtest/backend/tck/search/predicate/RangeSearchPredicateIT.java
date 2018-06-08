@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -31,6 +29,8 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -318,16 +318,14 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = UNSUPPORTED_FIELD_TYPE_PATHS.get( i );
 			Object lowerValueToMatch = UNSUPPORTED_FIELD_TYPE_VALUES.get( i );
 
-			try {
-				searchTarget.predicate().range().onField( absoluteFieldPath ).above( lowerValueToMatch );
-				fail( "Expected range() predicate with unsupported type to throw exception on field " + absoluteFieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Range predicates are not supported by" )
-						.hasMessageContaining( " of field '" + absoluteFieldPath + "'" );
-			}
+			SubTest.expectException(
+					"range() predicate with unsupported type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().range().onField( absoluteFieldPath ).above( lowerValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Range predicates are not supported by" )
+					.hasMessageContaining( " of field '" + absoluteFieldPath + "'" );
 		}
 	}
 
@@ -432,110 +430,81 @@ public class RangeSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( String fieldPath : FIELDS ) {
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).from( null ).to( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid value" )
-						.hasMessageContaining( "at least one bound" )
-						.hasMessageContaining( "must be non-null" )
-						.hasMessageContaining( fieldPath );
-			}
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).above( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid value" )
-						.hasMessageContaining( "at least one bound" )
-						.hasMessageContaining( "must be non-null" )
-						.hasMessageContaining( fieldPath );
-			}
-			try {
-				searchTarget.predicate().range().onField( fieldPath ).below( null );
-				fail( "Expected range() predicate with null bounds to throw exception on field " + fieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid value" )
-						.hasMessageContaining( "at least one bound" )
-						.hasMessageContaining( "must be non-null" )
-						.hasMessageContaining( fieldPath );
-			}
+			SubTest.expectException(
+					"range() predicate with null bounds on field " + fieldPath,
+					() -> searchTarget.predicate().range().onField( fieldPath ).from( null ).to( null )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "at least one bound" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
+
+			SubTest.expectException(
+					"range() predicate with null bounds on field " + fieldPath,
+					() -> searchTarget.predicate().range().onField( fieldPath ).above( null )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "at least one bound" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
+
+
+			SubTest.expectException(
+					"range() predicate with null bounds on field " + fieldPath,
+					() -> searchTarget.predicate().range().onField( fieldPath ).below( null )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "at least one bound" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
 		}
 	}
 
 	@Test
 	public void unknown_field() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().range().onField( "unknown_field" ).above( STRING_1 )
-					.build();
-			fail( "Expected range() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"range() predicate with unknown field",
+				() -> searchTarget.predicate().range().onField( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		SubTest.expectException(
+				"range() predicate with unknown field",
+				() -> searchTarget.predicate().range().onFields( "string", "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().range().onFields( "string", "unknown_field" ).above( STRING_1 )
-					.build();
-			fail( "Expected range() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"range() predicate with unknown field",
+				() -> searchTarget.predicate().range().onField( "string" ).orField( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().range().onField( "string" ).orField( "unknown_field" ).above( STRING_1 )
-					.build();
-			fail( "Expected range() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
-
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().range().onField( "string" ).orFields( "unknown_field" ).above( STRING_1 )
-					.build();
-			fail( "Expected range() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"range() predicate with unknown field",
+				() -> searchTarget.predicate().range().onField( "string" ).orFields( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 	}
 
 	private void initData() {

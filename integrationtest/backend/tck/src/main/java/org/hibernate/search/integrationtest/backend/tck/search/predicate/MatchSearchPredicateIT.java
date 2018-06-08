@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -30,8 +28,8 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -118,16 +116,14 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = UNSUPPORTED_FIELD_TYPE_PATHS.get( i );
 			Object valueToMatch = UNSUPPORTED_FIELD_TYPE_VALUES.get( i );
 
-			try {
-				searchTarget.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch );
-				fail( "Expected match() predicate with unsupported type to throw exception on field " + absoluteFieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Match predicates are not supported by" )
-						.hasMessageContaining( " of field '" + absoluteFieldPath + "'" );
-			}
+			SubTest.expectException(
+					"match() predicate with unsupported type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Match predicates are not supported by" )
+					.hasMessageContaining( " of field '" + absoluteFieldPath + "'" );
 		}
 	}
 
@@ -136,18 +132,16 @@ public class MatchSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( String fieldPath : FIELDS ) {
-			try {
-				searchTarget.predicate().match().onField( fieldPath ).matching( null );
-				fail( "Expected matching() predicate with null value to match to throw exception on field " + fieldPath );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid value" )
-						.hasMessageContaining( "value to match" )
-						.hasMessageContaining( "must be non-null" )
-						.hasMessageContaining( fieldPath );
-			}
+			SubTest.expectException(
+					"matching() predicate with null value to match on field " + fieldPath,
+					() -> searchTarget.predicate().match().onField( fieldPath ).matching( null )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "value to match" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
 		}
 	}
 
@@ -249,69 +243,43 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void unknown_field() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "unknown_field" ).matching( MATCHING_STRING )
-					.build();
-			fail( "Expected match() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"match() predicate with unknown field",
+				() -> searchTarget.predicate().match().onField( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		SubTest.expectException(
+				"match() predicate with unknown field",
+				() -> searchTarget.predicate().match().onFields( "string", "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onFields( "string", "unknown_field" ).matching( MATCHING_STRING )
-					.build();
-			fail( "Expected match() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"match() predicate with unknown field",
+				() -> searchTarget.predicate().match().onField( "string" ).orField( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "string" ).orField( "unknown_field" ).matching( MATCHING_STRING )
-					.build();
-			fail( "Expected match() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
-
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "string" ).orFields( "unknown_field" ).matching( MATCHING_STRING )
-					.build();
-			fail( "Expected match() predicate with unknown field to throw exception" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"match() predicate with unknown field",
+				() -> searchTarget.predicate().match().onField( "string" ).orFields( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 	}
 
 	private void initData() {

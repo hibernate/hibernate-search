@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
@@ -29,6 +28,8 @@ import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -230,86 +231,71 @@ public class SearchMultiIndexIT {
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
-		try {
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "unknownField" ).matching( ADDITIONAL_FIELD_1_1_1 )
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
-					.hasMessageContaining( indexName_1_1 )
-					.hasMessageContaining( indexName_1_2 );
-		}
+		SubTest.expectException(
+				"predicate on unknown field with multiple targeted indexes",
+				() -> searchTarget.predicate().match().onField( "unknownField" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
+				.hasMessageContaining( indexName_1_1 )
+				.hasMessageContaining( indexName_1_2 );
 
 		// Sort
 
-		try {
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().matchAll().end()
-					.sort().byField( "unknownField" ).asc().end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
-					.hasMessageContaining( indexName_1_1 )
-					.hasMessageContaining( indexName_1_2 );
-		}
+		SubTest.expectException(
+				"sort on unknown field with multiple targeted indexes",
+				() -> searchTarget.sort().byField( "unknownField" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
+				.hasMessageContaining( indexName_1_1 )
+				.hasMessageContaining( indexName_1_2 );
 
 		// Projection
 
-		try {
-			searchTarget.query( sessionContext )
-					.asProjections( "unknownField" )
-					.predicate().matchAll().end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown projections [unknownField] in indexes" )
-					.hasMessageContaining( indexName_1_1 )
-					.hasMessageContaining( indexName_1_2 );
-		}
+		SubTest.expectException(
+				"projection on unknown field with multiple targeted indexes",
+				() -> searchTarget.query( sessionContext ).asProjections( "unknownField" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown projections [unknownField] in indexes" )
+				.hasMessageContaining( indexName_1_1 )
+				.hasMessageContaining( indexName_1_2 );
 	}
 
 	@Test
 	public void search_with_incompatible_types_throws_exception() {
-		try {
-			IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
-			indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-			IndexSearchTarget searchTarget = searchTargetBuilder.build();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
+		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "differentTypesField" ).matching( DIFFERENT_TYPES_FIELD_1_1_1 )
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types for field 'differentTypesField'" );
-		}
+		SubTest.expectException(
+				"predicate on field with different type among the targeted indexes",
+				() -> searchTarget.predicate().match().onField( "differentTypesField" )
+						.matching( DIFFERENT_TYPES_FIELD_1_1_1 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types for field 'differentTypesField'" );
 	}
 
 	@Test
 	public void search_across_backends_throws_exception() {
-		try {
-			IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
-			indexManager_2_1.addToSearchTarget( searchTargetBuilder );
-			IndexSearchTarget searchTarget = searchTargetBuilder.build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().match().onField( "string" ).matching( STRING_1 )
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageContaining( "A search query cannot target multiple" )
-					.hasMessageContaining( "backends" );
-		}
+		SubTest.expectException(
+				"search across multiple backends",
+				() -> {
+					IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+					indexManager_2_1.addToSearchTarget( searchTargetBuilder );
+					searchTargetBuilder.build();
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "A search query cannot target multiple" )
+				.hasMessageContaining( "backends" );
 	}
 
 	private void initData() {

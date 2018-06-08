@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate.spatial;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -17,6 +14,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Test;
 
 public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinSearchPredicateIT {
@@ -81,16 +80,14 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void unsupported_field_types() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		try {
-			searchTarget.predicate().spatial().within().onField( "string" ).circle( METRO_GARIBALDI, 400 );
-			fail( "Expected spatial() predicate with unsupported type to throw exception on field string" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Spatial predicates are not supported by" )
-					.hasMessageContaining( " of field 'string'" );
-		}
+		SubTest.expectException(
+				"spatial().within().circle() predicate on field with unsupported type",
+				() -> searchTarget.predicate().spatial().within().onField( "string" ).circle( METRO_GARIBALDI, 400 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Spatial predicates are not supported by" )
+				.hasMessageContaining( " of field 'string'" );
 	}
 
 	@Test
@@ -194,50 +191,39 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void circle_error_null() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().spatial().within().onField( "geoPoint" ).circle( null, 100 ).end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "HSEARCH-UTIL000018" );
-		}
+		SubTest.expectException(
+				"spatial().within().circle() predicate with null center",
+				() -> searchTarget.predicate().spatial().within().onField( "geoPoint" )
+						.circle( null, 100 )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "HSEARCH-UTIL000018" );
 
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().spatial().within().onField( "geoPoint" ).circle( new ImmutableGeoPoint( 45, 4 ), 100, null ).end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "HSEARCH-UTIL000018" );
-		}
+		SubTest.expectException(
+				"spatial().within().circle() predicate with null distance unit",
+				() -> searchTarget.predicate().spatial().within().onField( "geoPoint" )
+						.circle( new ImmutableGeoPoint( 45, 4 ), 100, null )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "HSEARCH-UTIL000018" );
 	}
 
 	@Test
 	public void unknown_field() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().spatial().within().onField( "unknown_field" ).circle( METRO_GARIBALDI, 100 ).end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"spatial().within().circle() predicate on unknown field",
+				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
+						.circle( METRO_GARIBALDI, 100 ).end()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 	}
 }

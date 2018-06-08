@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate.spatial;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.fail;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
@@ -21,6 +19,8 @@ import org.hibernate.search.engine.spatial.ImmutableGeoBoundingBox;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Test;
 
 public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWithinSearchPredicateIT {
@@ -113,16 +113,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void unsupported_field_types() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		try {
-			searchTarget.predicate().spatial().within().onField( "string" ).boundingBox( BOUNDING_BOX_1 );
-			fail( "Expected spatial() predicate with unsupported type to throw exception on field string" );
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Spatial predicates are not supported by" )
-					.hasMessageContaining( " of field 'string'" );
-		}
+		SubTest.expectException(
+				"spatial().within().boundingBox() predicate on field with unsupported type",
+				() -> searchTarget.predicate().spatial().within().onField( "string" ).boundingBox( BOUNDING_BOX_1 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Spatial predicates are not supported by" )
+				.hasMessageContaining( " of field 'string'" );
 	}
 
 	@Test
@@ -226,37 +224,30 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void boundingBox_error_null() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().spatial().within().onField( "geoPoint" ).boundingBox( null ).end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "HSEARCH-UTIL000018" );
-		}
+		SubTest.expectException(
+				"spatial().within().boundingBox() predicate with null bounding box",
+				() -> searchTarget.predicate().spatial().within().onField( "geoPoint" ).boundingBox( null )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "HSEARCH-UTIL000018" );
 	}
 
 	@Test
 	public void unknown_field() {
-		try {
-			IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-			searchTarget.query( sessionContext )
-					.asReferences()
-					.predicate().spatial().within().onField( "unknown_field" ).boundingBox( BOUNDING_BOX_1 ).end()
-					.build();
-		}
-		catch (Exception e) {
-			assertThat( e )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" )
-					.hasMessageContaining( "'unknown_field'" );
-		}
+		SubTest.expectException(
+				"spatial().within().boundingBox() predicate on unknown field",
+				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
+						.boundingBox( BOUNDING_BOX_1 ).end()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 	}
 
 	@Override

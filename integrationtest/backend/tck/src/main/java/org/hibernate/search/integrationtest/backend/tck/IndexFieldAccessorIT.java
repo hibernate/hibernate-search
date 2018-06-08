@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,8 +18,8 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -32,6 +30,7 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubTypeModel;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -168,61 +167,55 @@ public class IndexFieldAccessorIT {
 	@Test
 	public void parentMismatch_flattenedObjectChild() {
 		for ( IndexFieldAccessor<?> accessor : indexAccessors.flattenedObject.getFieldAccessors() ) {
-			try {
-				executeAdd( "1", document -> {
-					accessor.write( document, null );
-				} );
-				fail( "Expected parent mismatch to trigger an exception with accessor " + accessor );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.as( "Exception triggered by parent mismatch with accessor " + accessor )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid parent object for this field accessor" )
-						.hasMessageContaining( "expected path 'flattenedObject'" )
-						.hasMessageContaining( "got 'null'" );
-			}
+			SubTest.expectException(
+					"Parent mismatch with accessor " + accessor,
+					() ->
+							executeAdd( "1", document -> {
+								accessor.write( document, null );
+							} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid parent object for this field accessor" )
+					.hasMessageContaining( "expected path 'flattenedObject'" )
+					.hasMessageContaining( "got 'null'" );
 		}
 	}
 
 	@Test
 	public void parentMismatch_nestedObjectChild() {
 		for ( IndexFieldAccessor<?> accessor : indexAccessors.nestedObject.getFieldAccessors() ) {
-			try {
-				executeAdd( "1", document -> {
-					accessor.write( document, null );
-				} );
-				fail( "Expected parent mismatch to trigger an exception with accessor " + accessor );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.as( "Exception triggered by parent mismatch with accessor " + accessor )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid parent object for this field accessor" )
-						.hasMessageContaining( "expected path 'nestedObject'" )
-						.hasMessageContaining( "got 'null'" );
-			}
+			SubTest.expectException(
+					"Parent mismatch with accessor " + accessor,
+					() ->
+							executeAdd( "1", document -> {
+								accessor.write( document, null );
+							} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid parent object for this field accessor" )
+					.hasMessageContaining( "expected path 'nestedObject'" )
+					.hasMessageContaining( "got 'null'" );
 		}
 	}
 
 	@Test
 	public void parentMismatch_rootChild() {
 		for ( IndexFieldAccessor<?> accessor : indexAccessors.getFieldAccessors() ) {
-			try {
-				executeAdd( "1", document -> {
-					DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-					accessor.write( flattenedObject, null );
-				} );
-				fail( "Expected parent mismatch to trigger an exception with accessor " + accessor );
-			}
-			catch (Exception e) {
-				assertThat( e )
-						.as( "Exception triggered by parent mismatch with accessor " + accessor )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Invalid parent object for this field accessor" )
-						.hasMessageContaining( "expected path 'null'" )
-						.hasMessageContaining( "got 'flattenedObject'" );
-			}
+			SubTest.expectException(
+					"Parent mismatch with accessor " + accessor,
+					() ->
+							executeAdd( "1", document -> {
+								DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
+								accessor.write( flattenedObject, null );
+							} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid parent object for this field accessor" )
+					.hasMessageContaining( "expected path 'null'" )
+					.hasMessageContaining( "got 'flattenedObject'" );
 		}
 	}
 

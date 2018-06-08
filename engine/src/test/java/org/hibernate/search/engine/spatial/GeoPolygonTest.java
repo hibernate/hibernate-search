@@ -10,7 +10,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 
-import org.assertj.core.api.Assertions;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -33,24 +34,28 @@ public class GeoPolygonTest {
 
 	@Test
 	public void invalidPolygon() {
-		try {
-			new ImmutableGeoPolygon( new ImmutableGeoPoint( 26, 23 ), new ImmutableGeoPoint( 26, 26 ), new ImmutableGeoPoint( 24, 26 ),
-					new ImmutableGeoPoint( 24, 23 ) );
-		}
-		catch (Exception e) {
-			Assertions.assertThat( e )
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "HSEARCH000016" );
-		}
+		SubTest.expectException(
+				() -> new ImmutableGeoPolygon(
+						new ImmutableGeoPoint( 26, 23 ),
+						new ImmutableGeoPoint( 26, 26 ),
+						new ImmutableGeoPoint( 24, 26 ),
+						new ImmutableGeoPoint( 24, 23 )
+				)
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "HSEARCH000016" );
 
-		try {
-			new ImmutableGeoPolygon( Arrays.asList( new ImmutableGeoPoint( 26, 23 ), new ImmutableGeoPoint( 26, 26 ), new ImmutableGeoPoint( 24, 26 ),
-					new ImmutableGeoPoint( 24, 23 ) ) );
-		}
-		catch (Exception e) {
-			Assertions.assertThat( e )
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "HSEARCH000016" );
-		}
+		SubTest.expectException(
+				() -> new ImmutableGeoPolygon( Arrays.asList(
+						new ImmutableGeoPoint( 26, 23 ),
+						new ImmutableGeoPoint( 26, 26 ),
+						new ImmutableGeoPoint( 24, 26 ),
+						new ImmutableGeoPoint( 24, 23 )
+				) )
+		)
+				.assertThrown()
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "HSEARCH000016" );
 	}
 }

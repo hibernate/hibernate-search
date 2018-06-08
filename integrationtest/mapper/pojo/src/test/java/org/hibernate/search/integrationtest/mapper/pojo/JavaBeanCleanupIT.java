@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -24,6 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.After;
@@ -327,16 +327,12 @@ public class JavaBeanCleanupIT {
 	}
 
 	private void failingStartup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
-		Exception caughtException = null;
-		try {
-			startup( additionalMappingContributor );
-		}
-		catch (Exception e) {
-			caughtException = e;
-		}
-
-		// TODO Expect some wrapping here
-		assertThat( caughtException ).isInstanceOf( SimulatedFailure.class );
+		SubTest.expectException(
+				() -> startup( additionalMappingContributor )
+		)
+				.assertThrown()
+				// TODO Expect some wrapping here
+				.isInstanceOf( SimulatedFailure.class );
 	}
 
 	private void startup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
