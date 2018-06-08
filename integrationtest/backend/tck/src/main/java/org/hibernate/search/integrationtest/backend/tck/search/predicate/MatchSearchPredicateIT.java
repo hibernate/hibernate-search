@@ -30,6 +30,8 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -254,6 +256,7 @@ public class MatchSearchPredicateIT {
 					.asReferences()
 					.predicate().match().onField( "unknown_field" ).matching( MATCHING_STRING )
 					.build();
+			fail( "Expected match() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -269,6 +272,7 @@ public class MatchSearchPredicateIT {
 					.asReferences()
 					.predicate().match().onFields( "string", "unknown_field" ).matching( MATCHING_STRING )
 					.build();
+			fail( "Expected match() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -284,6 +288,7 @@ public class MatchSearchPredicateIT {
 					.asReferences()
 					.predicate().match().onField( "string" ).orField( "unknown_field" ).matching( MATCHING_STRING )
 					.build();
+			fail( "Expected match() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -299,6 +304,7 @@ public class MatchSearchPredicateIT {
 					.asReferences()
 					.predicate().match().onField( "string" ).orFields( "unknown_field" ).matching( MATCHING_STRING )
 					.build();
+			fail( "Expected match() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )

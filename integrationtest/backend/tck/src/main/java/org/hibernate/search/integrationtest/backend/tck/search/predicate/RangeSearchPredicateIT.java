@@ -480,6 +480,7 @@ public class RangeSearchPredicateIT {
 					.asReferences()
 					.predicate().range().onField( "unknown_field" ).above( STRING_1 )
 					.build();
+			fail( "Expected range() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -495,6 +496,7 @@ public class RangeSearchPredicateIT {
 					.asReferences()
 					.predicate().range().onFields( "string", "unknown_field" ).above( STRING_1 )
 					.build();
+			fail( "Expected range() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -510,6 +512,7 @@ public class RangeSearchPredicateIT {
 					.asReferences()
 					.predicate().range().onField( "string" ).orField( "unknown_field" ).above( STRING_1 )
 					.build();
+			fail( "Expected range() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
@@ -525,6 +528,7 @@ public class RangeSearchPredicateIT {
 					.asReferences()
 					.predicate().range().onField( "string" ).orFields( "unknown_field" ).above( STRING_1 )
 					.build();
+			fail( "Expected range() predicate with unknown field to throw exception" );
 		}
 		catch (Exception e) {
 			assertThat( e )
