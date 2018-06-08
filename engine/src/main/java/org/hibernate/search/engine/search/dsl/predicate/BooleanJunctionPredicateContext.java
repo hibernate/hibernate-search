@@ -75,29 +75,29 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  *
  * <h4 id="minimumshouldmatch-minimum">Definition of the minimum</h4>
  * <p>
- * The minimum may be defined either directly as a positive integer, or indirectly as a negative integer
- * or positive or negative double representing a ratio of the total number of "should" clauses in this boolean predicate.
+ * The minimum may be defined either directly as a positive number, or indirectly as a negative number
+ * or positive or negative percentage representing a ratio of the total number of "should" clauses in this boolean predicate.
  * <p>
  * Here is how each type of input is interpreted:
  * <dl>
- *     <dt>Positive integer</dt>
+ *     <dt>Positive number</dt>
  *     <dd>
  *         The value is interpreted directly as the minimum number of "should" clauses that have to match.
  *     </dd>
- *     <dt>Negative integer</dt>
+ *     <dt>Negative number</dt>
  *     <dd>
  *         The absolute value is interpreted as the maximum number of "should" clauses that may not match:
  *         the absolute value is subtracted from the total number of "should" clauses.
  *     </dd>
- *     <dt>Positive ratio</dt>
+ *     <dt>Positive percentage</dt>
  *     <dd>
- *         The value is interpreted as the minimum ratio of the total number of "should" clauses that have to match:
- *         the value is multiplied by the total number of "should" clauses, then rounded down.
+ *         The value is interpreted as the minimum percentage of the total number of "should" clauses that have to match:
+ *         the percentage is applied to the total number of "should" clauses, then rounded down.
  *     </dd>
- *     <dt>Negative ratio</dt>
+ *     <dt>Negative percentage</dt>
  *     <dd>
- *         The absolute value is interpreted as the maximum ratio of the total number of "should" clauses that may not match:
- *         the absolute value is multiplied by the total number of "should" clauses, then rounded down,
+ *         The absolute value is interpreted as the maximum percentage of the total number of "should" clauses that may not match:
+ *         the absolute value of the percentage is applied to the total number of "should" clauses, then rounded down,
  *         then subtracted from the total number of "should" clauses.
  *     </dd>
  * </dl>
@@ -127,16 +127,16 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  *     // Example 2: at most 2 "should" clauses may not match
  *     booleanContext2.minimumShouldMatchNumber( -2 );
  *     // Example 3: at least 75% of "should" clauses have to match (rounded down)
- *     booleanContext3.minimumShouldMatchRatio( 0.75 );
+ *     booleanContext3.minimumShouldMatchPercent( 75 );
  *     // Example 4: at most 25% of "should" clauses may not match (rounded down)
- *     booleanContext4.minimumShouldMatchRatio( -0.25 );
+ *     booleanContext4.minimumShouldMatchPercent( -25 );
  *     // Example 5: if there are 3 "should" clauses or less, all "should" clauses have to match.
  *     // If there are 4 "should" clauses or more, at least 90% of "should" clauses have to match (rounded down).
- *     booleanContext5.minimumShouldMatchRatio( 3, 0.9 );
+ *     booleanContext5.minimumShouldMatchPercent( 3, 90 );
  *     // Example 6: if there are 4 "should" clauses or less, all "should" clauses have to match.
  *     // If there are 5 to 9 "should" clauses, at most 25% of "should" clauses may not match (rounded down).
  *     // If there are 10 "should" clauses or more, at most 3 "should" clauses may not match.
- *     booleanContext6.minimumShouldMatchRatio( 4, -0.25 )
+ *     booleanContext6.minimumShouldMatchPercent( 4, 25 )
  *             .minimumShouldMatchNumber( 9, -3 );
  * </code></pre>
  *
@@ -280,13 +280,13 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	/**
 	 * Add a default <a href="#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
 	 *
-	 * @param matchingClausesRatio A definition of the number of "should" clauses that have to match, as a ratio.
-	 * If positive, it is the ratio of the total number of "should" clauses that have to match.
+	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
+	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
 	 * See <a href="#minimumshouldmatch-minimum">Definition of the minimum</a> for details and possible values.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanJunctionPredicateContext<N> minimumShouldMatchRatio(double matchingClausesRatio) {
-		return minimumShouldMatchRatio( 0, matchingClausesRatio );
+	default BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int matchingClausesPercent) {
+		return minimumShouldMatchPercent( 0, matchingClausesPercent );
 	}
 
 	/**
@@ -311,14 +311,12 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	 * <p>
 	 * See <a href="#minimumshouldmatch-conditionalconstraints">Conditional constraints</a> for the detailed rules
 	 * defining whether a constraint is applied or not.
-	 *
 	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
 	 * will cease to be ignored.
-	 * @param matchingClausesRatio A definition of the number of "should" clauses that have to match, as a ratio.
-	 * If positive, it is the ratio of the total number of "should" clauses that have to match.
-	 * See <a href="#minimumshouldmatch-minimum">Definition of the minimum</a> for details and possible values.
+	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
+	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> minimumShouldMatchRatio(int ignoreConstraintCeiling, double matchingClausesRatio);
+	BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent);
 
 }

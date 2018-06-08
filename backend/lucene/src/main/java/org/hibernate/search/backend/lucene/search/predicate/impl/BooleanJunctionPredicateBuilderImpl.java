@@ -66,10 +66,10 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void minimumShouldMatchRatio(int ignoreConstraintCeiling, double matchingClausesRatio) {
+	public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
 		addMinimumShouldMatchConstraint(
 				ignoreConstraintCeiling,
-				new MinimumShouldMatchConstraint( null, matchingClausesRatio )
+				new MinimumShouldMatchConstraint( null, matchingClausesPercent )
 		);
 	}
 
@@ -128,11 +128,11 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private static final class MinimumShouldMatchConstraint {
 		private final Integer matchingClausesNumber;
-		private final Double matchingClausesRatio;
+		private final Integer matchingClausesPercent;
 
-		MinimumShouldMatchConstraint(Integer matchingClausesNumber, Double matchingClausesRatio) {
+		MinimumShouldMatchConstraint(Integer matchingClausesNumber, Integer matchingClausesPercent) {
 			this.matchingClausesNumber = matchingClausesNumber;
-			this.matchingClausesRatio = matchingClausesRatio;
+			this.matchingClausesPercent = matchingClausesPercent;
 		}
 
 		int toMinimum(int totalShouldClauseNumber) {
@@ -146,11 +146,11 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 				}
 			}
 			else {
-				if ( matchingClausesRatio >= 0.0 ) {
-					minimum = (int) ( matchingClausesRatio * totalShouldClauseNumber );
+				if ( matchingClausesPercent >= 0 ) {
+					minimum = matchingClausesPercent * totalShouldClauseNumber / 100;
 				}
 				else {
-					minimum = totalShouldClauseNumber + (int) ( matchingClausesRatio * totalShouldClauseNumber );
+					minimum = totalShouldClauseNumber + matchingClausesPercent * totalShouldClauseNumber / 100;
 				}
 			}
 

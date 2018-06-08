@@ -55,7 +55,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubQueryE
 	}
 
 	@Override
-	public void minimumShouldMatchRatio(int ignoreConstraintCeiling, double matchingClausesRatio) {
+	public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
 		// No-op
 	}
 

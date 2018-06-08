@@ -560,14 +560,14 @@ public class BoolSearchPredicateIT {
 	}
 
 	@Test
-	public void minimumShouldMatchRatio_positive() {
+	public void minimumShouldMatchPercent_positive() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.minimumShouldMatchRatio( 0.5 )
+						.minimumShouldMatchPercent( 50 )
 						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
 				.end()
@@ -581,7 +581,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate().bool()
 						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
-						.minimumShouldMatchRatio( 0.5 )
+						.minimumShouldMatchPercent( 50 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
 						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
 				.end()
@@ -594,7 +594,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.minimumShouldMatchRatio( 0.7 ) // The minimum should be rounded down to 2
+						.minimumShouldMatchPercent( 70 ) // The minimum should be rounded down to 2
 						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
 						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
@@ -608,7 +608,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.minimumShouldMatchRatio( 1.0 )
+						.minimumShouldMatchPercent( 100 )
 						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
 				.end()
@@ -619,14 +619,14 @@ public class BoolSearchPredicateIT {
 	}
 
 	@Test
-	public void minimumShouldMatchRatio_negative() {
+	public void minimumShouldMatchPercent_negative() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.minimumShouldMatchRatio( -0.5 )
+						.minimumShouldMatchPercent( -50 )
 						.should().match().onField( "field1" ).matching( FIELD1_VALUE1 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE3 )
 				.end()
@@ -640,7 +640,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate().bool()
 						.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
-						.minimumShouldMatchRatio( -0.5 )
+						.minimumShouldMatchPercent( -50 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE2 )
 						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
 				.end()
@@ -653,7 +653,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.minimumShouldMatchRatio( -0.4 ) // The minimum should be rounded up to 2
+						.minimumShouldMatchPercent( -40 ) // The minimum should be rounded up to 2
 						.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 )
 						.should().match().onField( "field2" ).matching( FIELD2_VALUE1 )
 						.should().match().onField( "field3" ).matching( FIELD3_VALUE3 )
@@ -670,7 +670,7 @@ public class BoolSearchPredicateIT {
 
 		Consumer<BooleanJunctionPredicateContext<?>> minimumShouldMatchConstraints = b -> {
 			b.minimumShouldMatchNumber( 2, -1 );
-			b.minimumShouldMatchRatio( 4, 0.7 );
+			b.minimumShouldMatchPercent( 4, 70 );
 		};
 
 		// 0 "should" clause: expect the constraints to be ignored
@@ -781,7 +781,7 @@ public class BoolSearchPredicateIT {
 			// Test that we can set the "default" minimum by using a ceiling of 0
 			b.minimumShouldMatchNumber( 0, 1 );
 			b.minimumShouldMatchNumber( 2, -1 );
-			b.minimumShouldMatchRatio( 4, 0.7 );
+			b.minimumShouldMatchPercent( 4, 70 );
 		};
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
@@ -841,7 +841,7 @@ public class BoolSearchPredicateIT {
 
 		SubTest.expectException(
 				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
-				() -> searchTarget.predicate().bool().minimumShouldMatchRatio( -1, 0.5 )
+				() -> searchTarget.predicate().bool().minimumShouldMatchPercent( -1, 50 )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
@@ -857,8 +857,8 @@ public class BoolSearchPredicateIT {
 				"bool() predicate with minimumShouldMatch constraints with multiple conflicting ceilings",
 				() -> searchTarget.predicate().bool()
 						.minimumShouldMatchNumber( 2, -1 )
-						.minimumShouldMatchRatio( 4, 0.7 )
-						.minimumShouldMatchRatio( 4, 0.7 )
+						.minimumShouldMatchPercent( 4, 70 )
+						.minimumShouldMatchPercent( 4, 70 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

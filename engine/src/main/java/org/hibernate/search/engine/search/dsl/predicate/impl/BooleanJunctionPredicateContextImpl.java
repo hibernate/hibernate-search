@@ -125,10 +125,10 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> minimumShouldMatchRatio(int ignoreConstraintCeiling,
-			double matchingClausesRatio) {
+	public BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int ignoreConstraintCeiling,
+			int matchingClausesPercent) {
 		Contracts.assertPositiveOrZero( ignoreConstraintCeiling, "ignoreConstraintCeiling" );
-		builder.minimumShouldMatchRatio( ignoreConstraintCeiling, matchingClausesRatio );
+		builder.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
 		return this;
 	}
 
