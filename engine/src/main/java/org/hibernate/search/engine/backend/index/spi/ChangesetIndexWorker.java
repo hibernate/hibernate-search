@@ -28,6 +28,11 @@ public interface ChangesetIndexWorker<D> extends IndexWorker<D> {
 	 */
 	void prepare();
 
+	/**
+	 * Start executing all the works in this changeset, and clear the changeset so that it can be re-used.
+	 *
+	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
+	 */
 	CompletableFuture<?> execute();
 
 }
