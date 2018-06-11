@@ -7,14 +7,15 @@
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class PojoTypeAdditionalMetadata {
-	private final boolean entity;
+	private final Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata;
 	private final Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata;
 
-	public PojoTypeAdditionalMetadata(boolean entity,
+	public PojoTypeAdditionalMetadata(Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata,
 			Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata) {
-		this.entity = entity;
+		this.entityTypeMetadata = entityTypeMetadata;
 		this.propertiesAdditionalMetadata = propertiesAdditionalMetadata;
 	}
 
@@ -31,7 +32,11 @@ public class PojoTypeAdditionalMetadata {
 	 * @return {@code true} if this type is an entity type, {@code false} otherwise.
 	 */
 	public boolean isEntity() {
-		return entity;
+		return entityTypeMetadata.isPresent();
+	}
+
+	public Optional<PojoEntityTypeAdditionalMetadata> getEntityTypeMetadata() {
+		return entityTypeMetadata;
 	}
 
 	public PojoPropertyAdditionalMetadata getPropertyAdditionalMetadata(String name) {

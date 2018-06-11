@@ -16,6 +16,7 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.AssertionFailure;
@@ -98,15 +99,17 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		}
 	}
 
-	Collection<PojoImplicitReindexingResolver<V>> buildTypeNodes(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
+	<S> Collection<PojoImplicitReindexingResolver<V, S>> buildTypeNodes(PojoPathFilterFactory<S> pathFilterFactory,
+			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolver<V>> immutableTypeNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolver<V, S>> immutableTypeNodes = new ArrayList<>();
 		if ( typeNodeBuilder != null ) {
-			typeNodeBuilder.build( allPotentialDirtyPaths ).ifPresent( immutableTypeNodes::add );
+			typeNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
+					.ifPresent( immutableTypeNodes::add );
 		}
 		castedTypeNodeBuilders.values().stream()
-				.map( builder -> builder.build( allPotentialDirtyPaths ) )
+				.map( builder -> builder.build( pathFilterFactory, allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableTypeNodes::add );

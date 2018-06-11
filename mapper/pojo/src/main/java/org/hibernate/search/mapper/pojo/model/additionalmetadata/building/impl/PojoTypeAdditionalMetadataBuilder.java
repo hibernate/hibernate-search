@@ -9,20 +9,24 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
-	private boolean entity;
+	private Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata = Optional.empty();
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
 	@Override
-	public void markAsEntity() {
-		this.entity = true;
+	public void markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
+		this.entityTypeMetadata = Optional.of( new PojoEntityTypeAdditionalMetadata( pathFilterFactory ) );
 	}
 
 	@Override
@@ -35,6 +39,6 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		for ( Map.Entry<String, PojoPropertyAdditionalMetadataBuilder> entry : propertyBuilders.entrySet() ) {
 			properties.put( entry.getKey(), entry.getValue().build() );
 		}
-		return new PojoTypeAdditionalMetadata( entity, properties );
+		return new PojoTypeAdditionalMetadata( entityTypeMetadata, properties );
 	}
 }

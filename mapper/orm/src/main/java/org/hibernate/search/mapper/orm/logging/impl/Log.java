@@ -10,12 +10,16 @@ package org.hibernate.search.mapper.orm.logging.impl;
 import java.util.Collection;
 import java.util.Set;
 
+import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -45,4 +49,18 @@ public interface Log extends BasicLogger {
 			+ " To disable this warning, set '"
 			+ SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING + "' to false.")
 	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys);
+
+	@Message(id = 7, value = "Path '%2$s' on entity type '%1$s' cannot be resolved using Hibernate ORM metadata."
+			+ " Please check that this path points to a persisted value.")
+	SearchException unknownPathForDirtyChecking(Class<?> entityType, PojoModelPath path, @Cause Exception e);
+
+	@Message(id = 8, value = "Path '%2$s' on entity type '%1$s' can be resolved using Hibernate ORM metadata,"
+			+ " but points to value '%3$s' that will never be reported as dirty by Hibernate ORM."
+			+ " Please check that this path points to a persisted value, and in particular not an embedded property.")
+	SearchException unreportedPathForDirtyChecking(Class<?> entityType, PojoModelPath path, Value value);
+
+	@Message(id = 9, value = "Container value extractor of type '%2$s' cannot be applied to"
+			+ " Hibernate ORM metadata node of type '%1$s'.")
+	SearchException invalidContainerValueExtractorForDirtyChecking(Class<?> ormMappingClass,
+			Class<? extends ContainerValueExtractor> extractorClass);
 }

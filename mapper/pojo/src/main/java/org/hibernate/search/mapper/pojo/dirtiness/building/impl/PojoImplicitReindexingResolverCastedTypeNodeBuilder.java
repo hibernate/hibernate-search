@@ -7,11 +7,9 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverCastedTypeNode;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 
 class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
@@ -23,8 +21,8 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	PojoImplicitReindexingResolver<T> doBuild(
-			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes) {
+	<S> PojoImplicitReindexingResolver<T, S> doBuild(
+			Collection<PojoImplicitReindexingResolver<? super U, S>> immutableNestedNodes) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
 				getTypeModel().getRawType().getCaster(), immutableNestedNodes
 		);

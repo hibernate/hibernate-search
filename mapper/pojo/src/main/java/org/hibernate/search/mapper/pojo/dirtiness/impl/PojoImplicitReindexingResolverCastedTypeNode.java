@@ -22,15 +22,16 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * This node will ignore entities that cannot be cast to type {@code U}.
  *
  * @param <T> The type of "dirty" objects received as input.
+ * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <U> The type the input objects will be casted to, if possible.
  */
-public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImplicitReindexingResolver<T> {
+public class PojoImplicitReindexingResolverCastedTypeNode<T, S, U> extends PojoImplicitReindexingResolver<T, S> {
 
 	private final PojoCaster<? super U> caster;
-	private final Collection<PojoImplicitReindexingResolver<? super U>> nestedNodes;
+	private final Collection<PojoImplicitReindexingResolver<? super U, S>> nestedNodes;
 
 	public PojoImplicitReindexingResolverCastedTypeNode(PojoCaster<? super U> caster,
-			Collection<PojoImplicitReindexingResolver<? super U>> nestedNodes) {
+			Collection<PojoImplicitReindexingResolver<? super U, S>> nestedNodes) {
 		this.caster = caster;
 		this.nestedNodes = nestedNodes;
 	}
@@ -40,7 +41,7 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "caster", caster );
 		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolver<?> node : nestedNodes ) {
+		for ( PojoImplicitReindexingResolver<?, ?> node : nestedNodes ) {
 			builder.value( node );
 		}
 		builder.endList();
@@ -49,10 +50,10 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 	@Override
 	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if U is generic we need an unchecked cast
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState) {
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
 		U castedDirty = (U) caster.castOrNull( runtimeIntrospector.unproxy( dirty ) );
 		if ( castedDirty != null ) {
-			for ( PojoImplicitReindexingResolver<? super U> node : nestedNodes ) {
+			for ( PojoImplicitReindexingResolver<? super U, S> node : nestedNodes ) {
 				node.resolveEntitiesToReindex( collector, runtimeIntrospector, castedDirty, dirtinessState );
 			}
 		}

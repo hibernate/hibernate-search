@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalMetadataCollector {
 
@@ -23,8 +26,12 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * which could result in incomplete automatic reindexing.
 	 *
 	 * @see PojoTypeAdditionalMetadata#isEntity()
+	 *
+	 * @param pathFilterFactory The path filter factory for this entity type,
+	 * i.e. the object allowing to create path filters that will be used in particular
+	 * when performing dirty checking during automatic reindexing.
 	 */
-	void markAsEntity();
+	void markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory);
 
 	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
 

@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
-import java.util.Set;
-
-import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -19,33 +17,35 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * This node allows to optimize reindexing by ignoring some changes when they do not affect a given indexed type.
  *
  * @param <T> The type of "dirty" objects received as input and passed to the delegate.
+ * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverDirtinessFilterNode<T> extends PojoImplicitReindexingResolver<T> {
+public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends PojoImplicitReindexingResolver<T, S> {
 
-	private final Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing;
-	private final PojoImplicitReindexingResolver<T> delegate;
+	private final PojoPathFilter<S> dirtyPathFilter;
+	private final PojoImplicitReindexingResolver<T, S> delegate;
 
-	public PojoImplicitReindexingResolverDirtinessFilterNode(Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing,
-			PojoImplicitReindexingResolver<T> delegate) {
-		Contracts.assertNotNullNorEmpty(
-				dirtyPathsTriggeringReindexing, "dirtyPathsTriggeringReindexing"
+	public PojoImplicitReindexingResolverDirtinessFilterNode(PojoPathFilter<S> dirtyPathFilter,
+			PojoImplicitReindexingResolver<T, S> delegate) {
+		Contracts.assertNotNull(
+				dirtyPathFilter, "dirtyPathFilter"
 		);
-		this.dirtyPathsTriggeringReindexing = dirtyPathsTriggeringReindexing;
+		this.dirtyPathFilter = dirtyPathFilter;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "dirtyPathsTriggeringReindexing", dirtyPathsTriggeringReindexing );
+		builder.attribute( "dirtyPathFilter", dirtyPathFilter );
 		builder.attribute( "delegate", delegate );
 	}
 
 	@Override
 	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if U is generic we need an unchecked cast
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState) {
-		if ( dirtinessState.isAnyDirty( dirtyPathsTriggeringReindexing ) ) {
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+		// See method javadoc: null means we must consider all paths as dirty
+		if ( dirtinessState == null || dirtyPathFilter.test( dirtinessState ) ) {
 			delegate.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
 	}

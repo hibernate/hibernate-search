@@ -38,6 +38,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.AssertionFailure;
@@ -146,8 +147,14 @@ public class PojoMapper<M> implements Mapper<M> {
 		PojoMappingDelegate mappingImplementor = null;
 		try {
 			// Second phase: build the indexed type managers and their reindexing resolvers
-			for ( PojoIndexedTypeManagerBuilder<?, ?> b : indexedTypeManagerBuilders.values() ) {
-				b.buildAndAddTo( indexedTypeManagerContainerBuilder, reindexingResolverBuildingHelper );
+			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?, ?>> entry
+					: indexedTypeManagerBuilders.entrySet() ) {
+				PojoRawTypeModel<?> typeModel = entry.getKey();
+				PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder = entry.getValue();
+				pojoIndexedTypeManagerBuilder.buildAndAddTo(
+						indexedTypeManagerContainerBuilder, reindexingResolverBuildingHelper,
+						typeAdditionalMetadataProvider.get( typeModel )
+				);
 			}
 			// Third phase: build the non-indexed, contained type managers and their reindexing resolvers
 			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
@@ -191,8 +198,15 @@ public class PojoMapper<M> implements Mapper<M> {
 			PojoContainedTypeManagerContainer.Builder containedTypeManagerContainerBuilder,
 			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
 			PojoRawTypeModel<T> entityType) {
-		Optional<? extends PojoImplicitReindexingResolver<T>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.build( entityType );
+		/*
+		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
+		 * Note this will require to allow them to define their own worker APIs.
+		 */
+		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadataProvider.get( entityType )
+				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) )
+				.getPathFilterFactory();
+		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
+				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityType.getJavaClass(), entityType.getCaster(), reindexingResolverOptional.get()

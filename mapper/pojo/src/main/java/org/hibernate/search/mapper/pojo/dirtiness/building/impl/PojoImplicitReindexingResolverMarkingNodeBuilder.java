@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 class PojoImplicitReindexingResolverMarkingNodeBuilder<T>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
@@ -47,7 +48,8 @@ class PojoImplicitReindexingResolverMarkingNodeBuilder<T>
 	}
 
 	@Override
-	Optional<PojoImplicitReindexingResolver<T>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
+	<S> Optional<PojoImplicitReindexingResolver<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		boolean markForReindexing = !dirtyPathsTriggeringReindexing.isEmpty();

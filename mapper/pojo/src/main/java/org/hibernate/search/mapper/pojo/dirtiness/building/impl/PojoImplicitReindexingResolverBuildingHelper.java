@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -68,7 +69,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return new PojoIndexingDependencyCollectorTypeNode<>( typeModel, this );
 	}
 
-	public <T> Optional<PojoImplicitReindexingResolver<T>> build(PojoRawTypeModel<T> typeModel) {
+	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoRawTypeModel<T> typeModel,
+			PojoPathFilterFactory<S> pathFilterFactory) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> builder =
 				(PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>) builderByType.get( typeModel );
@@ -76,7 +78,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			return Optional.empty();
 		}
 		else {
-			return builder.build();
+			return builder.build( pathFilterFactory );
 		}
 	}
 
@@ -112,12 +114,12 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return builder;
 	}
 
-	<T> BoundContainerValueExtractorPath<T,?> bindExtractorPath(
+	<T> BoundContainerValueExtractorPath<T, ?> bindExtractorPath(
 			PojoGenericTypeModel<T> typeModel, ContainerValueExtractorPath extractorPath) {
 		return extractorBinder.bindPath( introspector, typeModel, extractorPath );
 	}
 
-	<V, T> ContainerValueExtractor<? super T,V> createExtractors(
+	<V, T> ContainerValueExtractor<? super T, V> createExtractors(
 			BoundContainerValueExtractorPath<T, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}

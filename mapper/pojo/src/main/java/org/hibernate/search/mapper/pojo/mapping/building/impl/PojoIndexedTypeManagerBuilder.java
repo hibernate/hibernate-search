@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
@@ -25,7 +26,9 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerConta
 import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -93,7 +96,8 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	}
 
 	void buildAndAddTo(PojoIndexedTypeManagerContainer.Builder typeManagersBuilder,
-			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper) {
+			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
+			PojoTypeAdditionalMetadata typeAdditionalMetadata) {
 		if ( preBuiltIndexingProcessor == null ) {
 			throw new AssertionFailure( "Internal error - preBuild should be called before addTo" );
 		}
@@ -112,8 +116,15 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( routingKeyBridge );
 		}
 
-		Optional<PojoImplicitReindexingResolver<E>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.build( typeModel );
+		/*
+		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
+		 * Note this will require to allow them to define their own worker APIs.
+		 */
+		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadata
+				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
+				.getPathFilterFactory();
+		Optional<PojoImplicitReindexingResolver<E, Set<String>>> reindexingResolverOptional =
+				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),

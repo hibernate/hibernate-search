@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoDirtinessState;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -36,14 +36,14 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoIndexingProcessor<E> processor;
 	private final IndexManager<D> indexManager;
-	private final PojoImplicitReindexingResolver<E> reindexingResolver;
+	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
 	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
 			PojoCaster<E> caster,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoIndexingProcessor<E> processor, IndexManager<D> indexManager,
-			PojoImplicitReindexingResolver<E> reindexingResolver) {
+			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.indexedJavaClass = indexedJavaClass;
 		this.caster = caster;
 		this.identifierMapping = identifierMapping;
@@ -106,7 +106,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		// TODO take into account dirty properties to only contribute containing entities
 		// that are affected by the changes in the contained entity
 		reindexingResolver.resolveEntitiesToReindex(
-				collector, runtimeIntrospector, entitySupplier.get(), PojoDirtinessState.allDirty()
+				collector, runtimeIntrospector, entitySupplier.get(), null
 		);
 	}
 

@@ -9,18 +9,18 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
-class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<Object> {
+class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<Object, Object> {
 
 	private static NoOpPojoImplicitReindexingResolver INSTANCE = new NoOpPojoImplicitReindexingResolver();
 
-	@SuppressWarnings( "unchecked" ) // This instance works for any T
-	public static <T> PojoImplicitReindexingResolver<T> get() {
-		return (PojoImplicitReindexingResolver<T>) INSTANCE;
+	@SuppressWarnings( "unchecked" ) // This instance works for any T or D
+	public static <T, D> PojoImplicitReindexingResolver<T, D> get() {
+		return (PojoImplicitReindexingResolver<T, D>) INSTANCE;
 	}
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, Object dirty, PojoDirtinessState dirtinessState) {
+			PojoRuntimeIntrospector runtimeIntrospector, Object dirty, Object dirtinessState) {
 		// No-op
 	}
 

@@ -19,13 +19,14 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * {@link PojoImplicitReindexingResolverPropertyNode property nodes} for deeper resolution.
  *
  * @param <T> The type of "dirty" objects received as input.
+ * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImplicitReindexingResolver<T> {
+public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoImplicitReindexingResolver<T, S> {
 
-	private final Collection<PojoImplicitReindexingResolver<? super T>> nestedNodes;
+	private final Collection<PojoImplicitReindexingResolver<? super T, S>> nestedNodes;
 
 	public PojoImplicitReindexingResolverOriginalTypeNode(
-			Collection<PojoImplicitReindexingResolver<? super T>> nestedNodes) {
+			Collection<PojoImplicitReindexingResolver<? super T, S>> nestedNodes) {
 		this.nestedNodes = nestedNodes;
 	}
 
@@ -33,7 +34,7 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImpli
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolver<?> node : nestedNodes ) {
+		for ( PojoImplicitReindexingResolver<?, ?> node : nestedNodes ) {
 			builder.value( node );
 		}
 		builder.endList();
@@ -41,8 +42,8 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImpli
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState) {
-		for ( PojoImplicitReindexingResolver<? super T> node : nestedNodes ) {
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+		for ( PojoImplicitReindexingResolver<? super T, S> node : nestedNodes ) {
 			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
 	}

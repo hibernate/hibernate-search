@@ -50,8 +50,29 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 		return propertyName;
 	}
 
+	/**
+	 * @return a simple string representation of this path taking into account property nodes only,
+	 * in the form "propertyA.propertyB.propertyC".
+	 * <p>
+	 * Completely ignores container value extractors.
+	 */
+	public String toPropertyString() {
+		StringBuilder builder = new StringBuilder();
+		addPropertyPathsRecursively( builder, this );
+		return builder.toString();
+	}
+
 	@Override
 	void appendSelfPath(StringBuilder builder) {
 		builder.append( "." ).append( propertyName );
+	}
+
+	private static void addPropertyPathsRecursively(StringBuilder builder, PojoModelPathPropertyNode propertyNode) {
+		PojoModelPathValueNode parentValueNode = propertyNode.getParent();
+		if ( parentValueNode != null ) {
+			addPropertyPathsRecursively( builder, parentValueNode.getParent() );
+			builder.append( '.' );
+		}
+		builder.append( propertyNode.getPropertyName() );
 	}
 }

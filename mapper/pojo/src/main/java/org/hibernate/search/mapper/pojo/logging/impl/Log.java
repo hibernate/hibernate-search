@@ -160,4 +160,8 @@ public interface Log extends BasicLogger {
 			+ " Only one can be provided.")
 	SearchException conflictingBridgeReferenceInBridgeMapping(Class<? extends Annotation> metaAnnotationType,
 			Class<? extends Annotation> annotationType);
+
+	@Message(id = 27, value = "Type '%1$s' is not marked as an entity type, yet it is indexed or targeted"
+			+ " by an association from an indexed type. Please check your configuration.")
+	SearchException missingEntityTypeMetadata(PojoRawTypeModel<?> typeModel);
 }

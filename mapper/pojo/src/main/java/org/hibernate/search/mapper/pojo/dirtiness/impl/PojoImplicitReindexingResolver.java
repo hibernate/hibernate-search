@@ -14,11 +14,12 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * An object responsible for resolving the set of entities that should be reindexed when a given entity changes.
  *
  * @param <T> The type of "dirty" objects for which this resolver is able to
- * {@link #resolveEntitiesToReindex(PojoReindexingCollector, PojoRuntimeIntrospector, Object, PojoDirtinessState)
+ * {@link #resolveEntitiesToReindex(PojoReindexingCollector, PojoRuntimeIntrospector, Object, Object)
  * resolve entities to reindex}.
  * This type may be an entity type, an embeddable type, a collection type, ...
+ * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public abstract class PojoImplicitReindexingResolver<T> implements ToStringTreeAppendable {
+public abstract class PojoImplicitReindexingResolver<T, S> implements ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
@@ -31,13 +32,14 @@ public abstract class PojoImplicitReindexingResolver<T> implements ToStringTreeA
 	 *
 	 * @param collector A collector for entities that should be reindexed.
 	 * @param dirty A value that is dirty to some extent.
-	 * @param dirtinessState The dirtiness state of the object passed to the root reindexing resolver
+	 * @param dirtinessState The set of dirty paths in the object passed to the root reindexing resolver
 	 * (resolvers may delegate to other resolvers, but they will always pass the same dirtiness state to delegates).
+	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	public abstract void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, PojoDirtinessState dirtinessState);
+			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState);
 
-	public static <T> PojoImplicitReindexingResolver<T> noOp() {
+	public static <T, D> PojoImplicitReindexingResolver<T, D> noOp() {
 		return NoOpPojoImplicitReindexingResolver.get();
 	}
 

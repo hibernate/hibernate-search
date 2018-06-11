@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.common;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +33,10 @@ public final class CollectionHelper {
 
 	public static <T> HashSet<T> newHashSet(int size) {
 		return new HashSet<T>( getInitialCapacityFromExpectedSize( size ) );
+	}
+
+	public static <T> LinkedHashSet<T> newLinkedHashSet(int size) {
+		return new LinkedHashSet<>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	@SafeVarargs

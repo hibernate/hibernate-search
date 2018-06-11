@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingRes
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
@@ -71,14 +72,15 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	final Optional<PojoImplicitReindexingResolver<T>> doBuild(Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
+	final <S> Optional<PojoImplicitReindexingResolver<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes = new ArrayList<>();
-		markingNodeBuilder.build( allPotentialDirtyPaths )
+		Collection<PojoImplicitReindexingResolver<? super U, S>> immutableNestedNodes = new ArrayList<>();
+		markingNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
 				.ifPresent( immutableNestedNodes::add );
 		propertyNodeBuilders.values().stream()
-				.map( builder -> builder.build( allPotentialDirtyPaths ) )
+				.map( builder -> builder.build( pathFilterFactory, allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );
@@ -95,8 +97,8 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		}
 	}
 
-	abstract PojoImplicitReindexingResolver<T> doBuild(
-			Collection<PojoImplicitReindexingResolver<? super U>> immutableNestedNodes);
+	abstract <S> PojoImplicitReindexingResolver<T, S> doBuild(
+			Collection<PojoImplicitReindexingResolver<? super U, S>> immutableNestedNodes);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );
