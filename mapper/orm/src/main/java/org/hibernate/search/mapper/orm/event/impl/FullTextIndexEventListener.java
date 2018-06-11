@@ -29,6 +29,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -101,10 +102,14 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isWorkable( context, entity ) &&
-				( !dirtyCheckingEnabled || true ) ) { // TODO implement dirty checking
-			context.getCurrentWorker( event.getSession() )
-					.update( event.getId(), entity );
+		if ( isWorkable( context, entity ) ) {
+			ChangesetPojoWorker worker = context.getCurrentWorker( event.getSession() );
+			if ( dirtyCheckingEnabled ) {
+				worker.update( event.getId(), entity, getDirtyPropertyNames( event ) );
+			}
+			else {
+				worker.update( event.getId(), entity );
+			}
 		}
 	}
 
@@ -196,19 +201,52 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			//Should log really but we don't know if we're interested in this collection for indexing
 			return;
 		}
-		PersistentCollection persistentCollection = event.getCollection();
-		final String collectionRole;
-		if ( persistentCollection != null ) {
-			collectionRole = persistentCollection.getRole();
+
+		if ( isWorkable( context, entity ) ) {
+			ChangesetPojoWorker worker = context.getCurrentWorker( event.getSession() );
+			if ( dirtyCheckingEnabled ) {
+				PersistentCollection persistentCollection = event.getCollection();
+				String collectionRole = null;
+				if ( persistentCollection != null ) {
+					collectionRole = persistentCollection.getRole();
+				}
+				if ( collectionRole != null ) {
+					/*
+					 * Collection role will only be non-null for PostCollectionUpdateEvents.
+					 * For those events, we can pass the role to the worker
+					 * which can then decide whether to reindex based on whether the collection
+					 * has any impact on indexing.
+					 */
+					worker.update( event.getAffectedOwnerIdOrNull(), entity, collectionRole );
+				}
+				else {
+					/*
+					 * We don't know which collection is being changed,
+					 * so we have to default to reindexing, just in case.
+					 */
+					worker.update( event.getAffectedOwnerIdOrNull(), entity );
+				}
+			}
+			else {
+				worker.update( event.getAffectedOwnerIdOrNull(), entity );
+			}
+		}
+	}
+
+	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+		EntityPersister persister = event.getPersister();
+		final int[] dirtyProperties = event.getDirtyProperties();
+		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
+			String[] propertyNames = persister.getPropertyNames();
+			int length = dirtyProperties.length;
+			String[] dirtyPropertyNames = new String[length];
+			for ( int i = 0; i < length; i++ ) {
+				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
+			}
+			return dirtyPropertyNames;
 		}
 		else {
-			collectionRole = null;
-		}
-
-		if ( isWorkable( context, entity ) &&
-				( !dirtyCheckingEnabled || true ) ) { // TODO implement dirty checking based on the collection role
-			context.getCurrentWorker( event.getSession() )
-					.update( event.getAffectedOwnerIdOrNull(), entity );
+			return null;
 		}
 	}
 

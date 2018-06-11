@@ -99,7 +99,7 @@ public class HibernateSearchContextService implements Service {
 	 * @return The {@link PojoWorker} to use for changes to entities in the given session.
 	 */
 	@SuppressWarnings("unchecked")
-	public PojoWorker getCurrentWorker(SessionImplementor sessionImplementor) {
+	public ChangesetPojoWorker getCurrentWorker(SessionImplementor sessionImplementor) {
 		PojoSearchManager searchManager = getSearchManager( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();

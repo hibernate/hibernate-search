@@ -101,12 +101,14 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return new PojoDocumentContributor<>( processor, entitySupplier );
 	}
 
+	boolean requiresSelfReindexing(Set<String> dirtyPaths) {
+		return reindexingResolver.requiresSelfReindexing( dirtyPaths );
+	}
+
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
-			Supplier<E> entitySupplier) {
-		// TODO take into account dirty properties to only contribute containing entities
-		// that are affected by the changes in the contained entity
+			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		reindexingResolver.resolveEntitiesToReindex(
-				collector, runtimeIntrospector, entitySupplier.get(), null
+				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
 		);
 	}
 

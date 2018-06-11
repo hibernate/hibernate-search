@@ -36,6 +36,18 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	}
 
 	@Override
+	public void update(Object entity, String... dirtyPaths) {
+		update( null, entity, dirtyPaths );
+	}
+
+	@Override
+	public void update(Object id, Object entity, String... dirtyPaths) {
+		Class<?> clazz = getIntrospector().getClass( entity );
+		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		delegate.update( id, entity, dirtyPaths );
+	}
+
+	@Override
 	public void prepare() {
 		for ( ChangesetPojoContainedTypeWorker<?> delegate : containedTypeDelegates.values() ) {
 			delegate.resolveDirty( this::updateBecauseOfContained );
@@ -64,8 +76,8 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	}
 
 	@Override
-	PojoTypeWorker getDelegate(Class<?> clazz) {
-		PojoTypeWorker delegate = indexedTypeDelegates.get( clazz );
+	ChangesetPojoTypeWorker getDelegate(Class<?> clazz) {
+		ChangesetPojoTypeWorker delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( clazz );
 			if ( delegate == null ) {
@@ -75,7 +87,7 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 		return delegate;
 	}
 
-	private PojoTypeWorker createDelegate(Class<?> clazz) {
+	private ChangesetPojoTypeWorker createDelegate(Class<?> clazz) {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {

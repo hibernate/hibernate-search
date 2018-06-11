@@ -21,6 +21,34 @@ import java.util.concurrent.CompletableFuture;
 public interface ChangesetPojoWorker extends PojoWorker {
 
 	/**
+	 * Update an entity in the index, or add it if it's absent from the index,
+	 * but try to avoid reindexing if the given dirty paths
+	 * are known not to impact the indexed form of that entity.
+	 * <p>
+	 * Assumes that the entity may already be present in the index.
+	 * <p>
+	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #update(Object, Object)}.
+	 *
+	 * @param entity The entity to update in the index.
+	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
+	 * ("directEntityProperty.nestedPropery").
+	 */
+	void update(Object entity, String... dirtyPaths);
+
+	/**
+	 * Update an entity in the index, or add it if it's absent from the index,
+	 * but try to avoid reindexing if the given dirty paths
+	 * are known not to impact the indexed form of that entity.
+	 *
+	 * @param id The provided ID for the entity.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param entity The entity to update in the index.
+	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
+	 * ("directEntityProperty.nestedPropery").
+	 */
+	void update(Object id, Object entity, String... dirtyPaths);
+
+	/**
 	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.
 	 * <p>
 	 * In particular, ensure that all data is extracted from the POJOs

@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
@@ -16,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 /**
  * @param <E> The contained entity type.
  */
-class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
+class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
 
 	private final PojoContainedTypeManager<E> typeManager;
 
@@ -29,19 +31,25 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 	}
 
 	@Override
-	public void add(Object providedId, Object entity) {
+	void add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).add( entitySupplier );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity) {
+	void update(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).update( entitySupplier );
 	}
 
 	@Override
-	public void delete(Object providedId, Object entity) {
+	void update(Object providedId, Object entity, String... dirtyPaths) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		getWork( providedId ).update( entitySupplier, dirtyPaths );
+	}
+
+	@Override
+	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).delete( entitySupplier );
 	}
@@ -66,11 +74,13 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 
 		private Boolean createdInThisChangeset;
 
-		private boolean shouldResolveDirty;
+		private boolean shouldResolveToReindex;
+		private boolean considerAllDirty;
+		private Set<String> dirtyPaths;
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			shouldResolveDirty = true;
+			shouldResolveToReindex = true;
 			if ( createdInThisChangeset == null ) {
 				// No update yet, so we actually did create the entity in this changeset
 				createdInThisChangeset = true;
@@ -78,11 +88,19 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 		}
 
 		void update(Supplier<E> entitySupplier) {
-			this.entitySupplier = entitySupplier;
-			this.shouldResolveDirty = true;
-			if ( createdInThisChangeset == null ) {
-				// No add yet, and we're performing an update, so we did not create the entity in this changeset
-				createdInThisChangeset = false;
+			doUpdate( entitySupplier );
+			shouldResolveToReindex = true;
+			considerAllDirty = true;
+			dirtyPaths = null;
+		}
+
+		void update(Supplier<E> entitySupplier, String... dirtyPaths) {
+			doUpdate( entitySupplier );
+			shouldResolveToReindex = true;
+			if ( !considerAllDirty ) {
+				for ( String dirtyPath : dirtyPaths ) {
+					addDirtyPath( dirtyPath );
+				}
 			}
 		}
 
@@ -98,17 +116,36 @@ class ChangesetPojoContainedTypeWorker<E> extends PojoTypeWorker {
 				 * in existing documents.
 				 * Cancel everything.
 				 */
-				shouldResolveDirty = false;
+				shouldResolveToReindex = false;
+				considerAllDirty = false;
+				dirtyPaths = null;
 				createdInThisChangeset = null;
 			}
 		}
 
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-			if ( shouldResolveDirty ) {
-				shouldResolveDirty = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex( containingEntityCollector,
-						sessionContext.getRuntimeIntrospector(), entitySupplier );
+			if ( shouldResolveToReindex ) {
+				shouldResolveToReindex = false; // Avoid infinite looping
+				typeManager.resolveEntitiesToReindex(
+						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
+						considerAllDirty ? null : dirtyPaths
+				);
 			}
+		}
+
+		private void doUpdate(Supplier<E> entitySupplier) {
+			this.entitySupplier = entitySupplier;
+			if ( createdInThisChangeset == null ) {
+				// No add yet, and we're performing an update, so we did not create the entity in this changeset
+				createdInThisChangeset = false;
+			}
+		}
+
+		private void addDirtyPath(String dirtyPath) {
+			if ( dirtyPaths == null ) {
+				dirtyPaths = new HashSet<>();
+			}
+			dirtyPaths.add( dirtyPath );
 		}
 	}
 

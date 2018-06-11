@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -22,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends PojoTypeWorker {
+class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends ChangesetPojoTypeWorker {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final ChangesetIndexWorker<D> delegate;
@@ -52,13 +54,20 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 	}
 
 	@Override
+	void update(Object providedId, Object entity, String... dirtyPaths) {
+		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		getWork( identifier ).update( entitySupplier, dirtyPaths );
+	}
+
+	@Override
 	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).delete( entitySupplier );
 	}
 
-	public void updateBecauseOfContained(Object entity) {
+	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( null, entitySupplier );
 		if ( !workPlansPerId.containsKey( identifier ) ) {
@@ -116,7 +125,9 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 		private boolean delete;
 		private boolean add;
 
-		private boolean shouldResolveDirty;
+		private boolean shouldResolveToReindex;
+		private boolean considerAllDirty;
+		private Set<String> dirtyPaths;
 
 		private WorkPlanPerDocument(I identifier) {
 			this.identifier = identifier;
@@ -124,21 +135,34 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			shouldResolveDirty = true;
+			shouldResolveToReindex = true;
 			add = true;
 		}
 
 		void update(Supplier<E> entitySupplier) {
-			doUpdate( entitySupplier, true );
+			doUpdate( entitySupplier );
+			shouldResolveToReindex = true;
+			considerAllDirty = true;
+			dirtyPaths = null;
+		}
+
+		void update(Supplier<E> entitySupplier, String... dirtyPaths) {
+			doUpdate( entitySupplier );
+			shouldResolveToReindex = true;
+			if ( !considerAllDirty ) {
+				for ( String dirtyPropertyName : dirtyPaths ) {
+					addDirtyPath( dirtyPropertyName );
+				}
+			}
 		}
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
+			doUpdate( entitySupplier );
 			/*
-			 * Make sure that containing entities that haven't been modified will not trigger an update of their
-			 * containing entities, unless those containing entities embed other entities in their index,
-			 * and those entities have been modified.
+			 * We don't want contained entities that haven't been modified to trigger an update of their
+			 * containing entities.
+			 * Thus we don't set 'shouldResolveToReindex' to true here, but leave it as is.
 			 */
-			doUpdate( entitySupplier, false );
 		}
 
 		void delete(Supplier<E> entitySupplier) {
@@ -148,7 +172,9 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 				 * We called add() in the same changeset, so we don't expect the document to be in the index.
 				 * Don't delete, just cancel the addition.
 				 */
-				shouldResolveDirty = false;
+				shouldResolveToReindex = false;
+				considerAllDirty = false;
+				dirtyPaths = null;
 				add = false;
 				delete = false;
 			}
@@ -158,7 +184,35 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 			}
 		}
 
-		void doUpdate(Supplier<E> entitySupplier, boolean shouldResolveDirty) {
+		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
+			if ( shouldResolveToReindex ) {
+				shouldResolveToReindex = false; // Avoid infinite looping
+				typeManager.resolveEntitiesToReindex(
+						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
+						considerAllDirty ? null : dirtyPaths
+				);
+			}
+		}
+
+		void sendWorkToDelegate() {
+			DocumentReferenceProvider referenceProvider =
+					typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
+			if ( add ) {
+				if ( delete ) {
+					if ( considerAllDirty || typeManager.requiresSelfReindexing( dirtyPaths ) ) {
+						delegate.update( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
+					}
+				}
+				else {
+					delegate.add( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
+				}
+			}
+			else if ( delete ) {
+				delegate.delete( referenceProvider );
+			}
+		}
+
+		private void doUpdate(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			/*
 			 * If add is true, either this is already an update (in which case we don't need to change the flags)
@@ -168,33 +222,13 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Po
 				delete = true;
 				add = true;
 			}
-			if ( shouldResolveDirty ) {
-				this.shouldResolveDirty = true;
-			}
 		}
 
-		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-			if ( shouldResolveDirty ) {
-				shouldResolveDirty = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex( containingEntityCollector,
-						sessionContext.getRuntimeIntrospector(), entitySupplier );
+		private void addDirtyPath(String dirtyPath) {
+			if ( dirtyPaths == null ) {
+				dirtyPaths = new HashSet<>();
 			}
-		}
-
-		void sendWorkToDelegate() {
-			DocumentReferenceProvider referenceProvider =
-					typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
-			if ( add ) {
-				if ( delete ) {
-					delegate.update( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
-				}
-				else {
-					delegate.add( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
-				}
-			}
-			else if ( delete ) {
-				delegate.delete( referenceProvider );
-			}
+			dirtyPaths.add( dirtyPath );
 		}
 	}
 
