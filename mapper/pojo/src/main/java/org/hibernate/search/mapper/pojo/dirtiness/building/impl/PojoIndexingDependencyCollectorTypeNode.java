@@ -70,26 +70,48 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 		);
 	}
 
-	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromContainedEntity) {
+	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
 		if ( lastEntityNode != this ) {
 			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
 		}
-		if ( parentNode != null ) {
+		PojoRawTypeModel<? super T> rawType = modelPathFromRootEntityNode.getTypeModel().getRawType();
+		if ( parentNode == null ) {
+			/*
+			 * This node represents an indexed entity (A).
+			 * The current method being called means that entity A uses some value
+			 * that is directly part of entity A (not retrieved through associations) when it is indexed.
+			 * The value used during indexing is represented by "dirtyPathFromEntityType".
+			 * Thus we must make sure that whenever "dirtyPathFromEntityType" changes in entity A,
+			 * entity A gets reindexed.
+			 * This is what the calls below achieve.
+			 */
+			PojoImplicitReindexingResolverBuilder<?> builder =
+					buildingHelper.getOrCreateResolverBuilder( rawType );
+			/*
+			 * Note that, on contrary to the "else" branch, we don't need to loop on the builder corresponding
+			 * to each entity subtype.
+			 * This is because one dependency collectors will be created for each indexed entity type,
+			 * so the current method will already be called for each relevant entity subtype
+			 * (i.e. the entity subtype that are also indexed, which may not be all of then).
+			 */
+			builder.addDirtyPathTriggeringSelfReindexing( dirtyPathFromEntityType );
+		}
+		else {
 			/*
 			 * This node represents an entity (B) referenced from another, indexed entity (A).
 			 * Also, the current method being called means that entity A uses some value
 			 * from entity B when it is indexed.
-			 * The value used during indexing is represented by "dependencyPathFromContainedEntity".
-			 * Thus we must make sure that whenever "dependencyPathFromContainedEntity" changes in entity B,
+			 * The value used during indexing is represented by "dirtyPathFromEntityType".
+			 * Thus we must make sure that whenever "dirtyPathFromEntityType" changes in entity B,
 			 * entity A gets reindexed.
 			 * This is what the calls below achieve.
 			 */
-			PojoRawTypeModel<? super T> rawType = modelPathFromRootEntityNode.getTypeModel().getRawType();
 			for ( PojoRawTypeModel<?> concreteEntityType :
 					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
 				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
-						buildingHelper.getOrCreateResolverBuilder( concreteEntityType );
-				parentNode.markForReindexing( builder, dependencyPathFromContainedEntity );
+						buildingHelper.getOrCreateResolverBuilder( concreteEntityType )
+								.containingEntitiesResolverRoot();
+				parentNode.markForReindexing( builder, dirtyPathFromEntityType );
 			}
 		}
 	}

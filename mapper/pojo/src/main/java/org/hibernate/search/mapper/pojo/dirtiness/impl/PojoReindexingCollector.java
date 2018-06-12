@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 /**
  * A collector of entities to be reindexed.
  * <p>
- * Used by {@link PojoImplicitReindexingResolverNode} to return the resolved entities.
+ * Used by {@link PojoImplicitReindexingResolver} to return the resolved entities.
  */
 public interface PojoReindexingCollector {
 

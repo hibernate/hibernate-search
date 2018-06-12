@@ -13,12 +13,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -32,7 +31,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	private final Set<PojoRawTypeModel<?>> entityTypes;
 	private final Map<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> concreteEntitySubTypesByEntitySuperType =
 			new HashMap<>();
-	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?>> builderByType =
+	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverBuilder<?>> builderByType =
 			new HashMap<>();
 
 	public PojoImplicitReindexingResolverBuildingHelper(
@@ -69,11 +68,11 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return new PojoIndexingDependencyCollectorTypeNode<>( typeModel, this );
 	}
 
-	public <T, S> Optional<PojoImplicitReindexingResolverNode<T, S>> build(PojoRawTypeModel<T> typeModel,
+	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoRawTypeModel<T> typeModel,
 			PojoPathFilterFactory<S> pathFilterFactory) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
-		PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> builder =
-				(PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>) builderByType.get( typeModel );
+		PojoImplicitReindexingResolverBuilder<T> builder =
+				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( typeModel );
 		if ( builder == null ) {
 			return Optional.empty();
 		}
@@ -100,14 +99,14 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return concreteEntitySubTypesByEntitySuperType.computeIfAbsent( superTypeModel, ignored -> Collections.emptySet() );
 	}
 
-	<T> PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> getOrCreateResolverBuilder(
+	<T> PojoImplicitReindexingResolverBuilder<T> getOrCreateResolverBuilder(
 			PojoRawTypeModel<T> rawTypeModel) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
-		PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> builder =
-				(PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>) builderByType.get( rawTypeModel );
+		PojoImplicitReindexingResolverBuilder<T> builder =
+				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( rawTypeModel );
 		if ( builder == null ) {
-			builder = new PojoImplicitReindexingResolverOriginalTypeNodeBuilder<>(
-					BoundPojoModelPath.root( rawTypeModel ), this
+			builder = new PojoImplicitReindexingResolverBuilder<>(
+					rawTypeModel, this
 			);
 			builderByType.put( rawTypeModel, builder );
 		}

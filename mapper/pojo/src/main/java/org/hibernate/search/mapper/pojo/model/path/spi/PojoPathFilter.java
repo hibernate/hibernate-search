@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.spi;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
-
 /**
  * Defines a set of paths that are of importance,
  * so that they can be detected at runtime when given a set of paths.
  * <p>
  * Used in particular in dirty checking,
- * see {@link PojoImplicitReindexingResolverNode}.
+ * see {@link org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver}.
  *
  * @param <S> The expected type of the object representing a set of paths.
  */
@@ -30,5 +28,9 @@ public interface PojoPathFilter<S> {
 	 * {@code false} otherwise.
 	 */
 	boolean test(S paths);
+
+	static <S> PojoPathFilter<S> empty() {
+		return EmptyPojoPathFilter.get();
+	}
 
 }

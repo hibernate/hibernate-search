@@ -7,12 +7,10 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverOriginalTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 		extends AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, T> {
@@ -20,10 +18,6 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 	PojoImplicitReindexingResolverOriginalTypeNodeBuilder(BoundPojoModelPathTypeNode<T> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( modelPath, buildingHelper );
-	}
-
-	<S> Optional<PojoImplicitReindexingResolverNode<T, S>> build(PojoPathFilterFactory<S> pathFilterFactory) {
-		return build( pathFilterFactory, null );
 	}
 
 	@Override

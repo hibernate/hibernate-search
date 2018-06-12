@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
@@ -123,7 +123,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
 				.getPathFilterFactory();
-		Optional<PojoImplicitReindexingResolverNode<E, Set<String>>> reindexingResolverOptional =
+		Optional<PojoImplicitReindexingResolver<E, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
@@ -131,7 +131,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				identifierMapping, routingKeyProvider,
 				preBuiltIndexingProcessor,
 				indexManagerBuildingState.build(),
-				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp )
+				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolver::noOp )
 		);
 		log.createdPojoIndexedTypeManager( typeManager );
 

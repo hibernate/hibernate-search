@@ -11,7 +11,7 @@ import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
- * An object responsible for resolving the set of entities that should be reindexed when a given entity changes.
+ * An node within a {@link PojoImplicitReindexingResolver}.
  *
  * @param <T> The type of "dirty" objects for which this resolver is able to
  * {@link #resolveEntitiesToReindex(PojoReindexingCollector, PojoRuntimeIntrospector, Object, Object)
