@@ -174,6 +174,70 @@ public class OrmAutomaticIndexingListAssociationIT {
 	}
 
 	/**
+	 * Test that replacing an IndexedEmbedded association in an indexed entity
+	 * does trigger reindexing of the entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directAssociationReplace_indexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			entity1.getContainedList().add( containedEntity );
+			containedEntity.getContainingAsList().add( entity1 );
+
+			session.persist( containedEntity );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "containedList", b2 -> b2
+									.field( "indexedField", "firstValue" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			List<ContainedEntity> newAssociation = new ArrayList<>(
+					entity1.getContainedList()
+			);
+			newAssociation.add( containedEntity );
+			entity1.setContainedList( newAssociation );
+			containedEntity.getContainingAsList().add( entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "containedList", b2 -> b2
+									.field( "indexedField", "firstValue" )
+							)
+							.objectField( "containedList", b2 -> b2
+									.field( "indexedField", "secondValue" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
 	 * Test that updating a non-IndexedEmbedded association in an entity
 	 * whose other properties are indexed
 	 * does not trigger reindexing of the entity.
@@ -237,6 +301,61 @@ public class OrmAutomaticIndexingListAssociationIT {
 			entity1.getContainedNonIndexedEmbeddedList().remove( containedEntity );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded association in an entity
+	 * whose other properties are indexed
+	 * does not trigger reindexing of the entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void directAssociationReplace_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+
+			entity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( entity1 );
+
+			session.persist( containedEntity );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> { } )
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			List<ContainedEntity> newAssociation = new ArrayList<>(
+					entity1.getContainedNonIndexedEmbeddedList()
+			);
+			newAssociation.add( containedEntity );
+			entity1.setContainedNonIndexedEmbeddedList( newAssociation );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> { } )
+					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -362,6 +481,80 @@ public class OrmAutomaticIndexingListAssociationIT {
 	}
 
 	/**
+	 * Test that replacing an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void indirectAssociationReplace_indexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "firstValue" );
+			containingEntity1.getContainedList().add( containedEntity );
+			containedEntity.getContainingAsList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "indexedField", "firstValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			List<ContainedEntity> newAssociation = new ArrayList<>(
+					containingEntity1.getContainedList()
+			);
+			newAssociation.add( containedEntity );
+			containingEntity1.setContainedList( newAssociation );
+			containedEntity.getContainingAsList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedList", b3 -> b3
+											.field( "indexedField", "firstValue" )
+									)
+									.objectField( "containedList", b3 -> b3
+											.field( "indexedField", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
 	 * Test that updating a non-IndexedEmbedded association in an entity
 	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
 	 * does not trigger reindexing of the indexed entity.
@@ -433,6 +626,70 @@ public class OrmAutomaticIndexingListAssociationIT {
 			containingEntity1.getContainedNonIndexedEmbeddedList().remove( containedEntity );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded association in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does not trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void indirectAssociationReplace_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "firstValue" );
+			containingEntity1.getContainedNonIndexedEmbeddedList().add( containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			List<ContainedEntity> newAssociation = new ArrayList<>(
+					containingEntity1.getContainedNonIndexedEmbeddedList()
+			);
+			newAssociation.add( containedEntity );
+			containingEntity1.setContainedNonIndexedEmbeddedList( newAssociation );
+			containedEntity.getContainingAsNonIndexedEmbeddedList().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -563,8 +820,16 @@ public class OrmAutomaticIndexingListAssociationIT {
 			return containedList;
 		}
 
+		public void setContainedList(List<ContainedEntity> containedList) {
+			this.containedList = containedList;
+		}
+
 		public List<ContainedEntity> getContainedNonIndexedEmbeddedList() {
 			return containedNonIndexedEmbeddedList;
+		}
+
+		public void setContainedNonIndexedEmbeddedList(List<ContainedEntity> containedNonIndexedEmbeddedList) {
+			this.containedNonIndexedEmbeddedList = containedNonIndexedEmbeddedList;
 		}
 	}
 

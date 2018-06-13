@@ -33,6 +33,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -176,6 +177,69 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that replacing an IndexedEmbedded association in an indexed entity
+	 * does trigger reindexing of the entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directAssociationReplace_indexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+			entity1.getContainedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "containedMapValues", b2 -> b2
+									.field( "indexedField", "firstValue" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			Map<String, ContainedEntity> newAssociation = new LinkedHashMap<>(
+					entity1.getContainedMapValues()
+			);
+			newAssociation.put( "second", containedEntity );
+			entity1.setContainedMapValues( newAssociation );
+			containedEntity.getContainingAsMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "containedMapValues", b2 -> b2
+									.field( "indexedField", "firstValue" )
+							)
+							.objectField( "containedMapValues", b2 -> b2
+									.field( "indexedField", "secondValue" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Test
 	public void directAssociationUpdate_nonIndexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -234,6 +298,60 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 			entity1.getContainedNonIndexedEmbeddedMapValues().values().remove( containedEntity );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded association in an entity
+	 * whose other properties are indexed
+	 * does not trigger reindexing of the entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void directAssociationReplace_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 2 );
+			containedEntity.setIndexedField( "firstValue" );
+			entity1.getContainedNonIndexedEmbeddedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> { } )
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			Map<String, ContainedEntity> newAssociation = new LinkedHashMap<>(
+					entity1.getContainedNonIndexedEmbeddedMapValues()
+			);
+			newAssociation.put( "second", containedEntity );
+			entity1.setContainedNonIndexedEmbeddedMapValues( newAssociation );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( entity1 );
+
+			session.persist( containedEntity );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> { } )
+					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -358,6 +476,80 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that replacing an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void indirectAssociationReplace_indexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "firstValue" );
+			containingEntity1.getContainedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "indexedField", "firstValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			Map<String, ContainedEntity> newAssociation = new LinkedHashMap<>(
+					containingEntity1.getContainedMapValues()
+			);
+			newAssociation.put( "second", containedEntity );
+			containingEntity1.setContainedMapValues( newAssociation );
+			containedEntity.getContainingAsMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "indexedField", "firstValue" )
+									)
+									.objectField( "containedMapValues", b3 -> b3
+											.field( "indexedField", "secondValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Test
 	public void indirectAssociationUpdate_nonIndexedEmbedded() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -424,6 +616,70 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 			containingEntity1.getContainedNonIndexedEmbeddedMapValues().values().remove( containedEntity );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded association in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does not trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void indirectAssociationReplace_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIndexedField( "firstValue" );
+			containingEntity1.getContainedNonIndexedEmbeddedMapValues().put( "first", containedEntity );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setIndexedField( "secondValue" );
+
+			Map<String, ContainedEntity> newAssociation = new LinkedHashMap<>(
+					containingEntity1.getContainedNonIndexedEmbeddedMapValues()
+			);
+			newAssociation.put( "second", containedEntity );
+			containingEntity1.setContainedNonIndexedEmbeddedMapValues( newAssociation );
+			containedEntity.getContainingAsNonIndexedEmbeddedMapValues().add( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -566,8 +822,17 @@ public class OrmAutomaticIndexingMapValuesAssociationIT {
 			return containedMapValues;
 		}
 
+		public void setContainedMapValues(Map<String, ContainedEntity> containedMapValues) {
+			this.containedMapValues = containedMapValues;
+		}
+
 		public Map<String, ContainedEntity> getContainedNonIndexedEmbeddedMapValues() {
 			return containedNonIndexedEmbeddedMapValues;
+		}
+
+		public void setContainedNonIndexedEmbeddedMapValues(
+				Map<String, ContainedEntity> containedNonIndexedEmbeddedMapValues) {
+			this.containedNonIndexedEmbeddedMapValues = containedNonIndexedEmbeddedMapValues;
 		}
 	}
 

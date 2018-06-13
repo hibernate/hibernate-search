@@ -169,7 +169,53 @@ public class OrmAutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test replacing the values
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getIndexedElementCollectionField().remove( 1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "indexedField", null )
+							.field(
+									"indexedElementCollectionField",
+									entity1.getIndexedElementCollectionField().get( 0 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing an indexed element collection
+	 * does trigger reindexing of the indexed entity owning the collection.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void directValueReplace_indexedElementCollectionField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getIndexedElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+							.field(
+									"indexedElementCollectionField",
+									entity1.getIndexedElementCollectionField().get( 0 )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
@@ -183,23 +229,6 @@ public class OrmAutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 ),
 									entity1.getIndexedElementCollectionField().get( 1 )
-							)
-					)
-					.preparedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getIndexedElementCollectionField().remove( 1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
 					.preparedThenExecuted();
@@ -287,6 +316,47 @@ public class OrmAutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that replacing a non-indexed element collection
+	 * does not trigger reindexing of the indexed entity owning the collection.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void directValueReplace_nonIndexedElementCollectionField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "indexedField", null )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity {
@@ -345,6 +415,10 @@ public class OrmAutomaticIndexingBasicIT {
 
 		public List<String> getNonIndexedElementCollectionField() {
 			return nonIndexedElementCollectionField;
+		}
+
+		public void setNonIndexedElementCollectionField(List<String> nonIndexedElementCollectionField) {
+			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
 		}
 	}
 

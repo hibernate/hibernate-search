@@ -613,7 +613,97 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test replacing the values
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.getIndexedElementCollectionField().remove( 0 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"indexedElementCollectionField",
+													"secondValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
+			containedEntity.getIndexedElementCollectionField().add( "secondOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded, ElementCollection property in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void indirectValueReplace_elementCollectionValue_indexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.getIndexedElementCollectionField().add( "firstValue" );
+			containingEntity1.setContainedSingle( containedEntity1 );
+			containedEntity1.setContainingAsSingle( containingEntity1 );
+
+			ContainedEntity containedEntity2 = new ContainedEntity();
+			containedEntity2.setId( 5 );
+			containedEntity2.getIndexedElementCollectionField().add( "firstOutOfScopeValue" );
+			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
+			containedEntity2.setContainingAsSingle( deeplyNestedContainingEntity );
+
+			session.persist( containedEntity1 );
+			session.persist( containedEntity2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"indexedElementCollectionField",
+													"firstValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test replacing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
@@ -633,36 +723,6 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 							)
 					)
 					.preparedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
-			containedEntity.getIndexedElementCollectionField().remove( 0 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
-											.field( "indexedField", null )
-											.field(
-													"indexedElementCollectionField",
-													"newSecondValue"
-											)
-									)
-							)
-					)
-					.preparedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
-			containedEntity.getIndexedElementCollectionField().add( "secondOutOfScopeValue" );
-
-			// Do not expect any work
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -736,6 +796,69 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.getNonIndexedElementCollectionField().remove( 0 );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing a non-IndexedEmbedded, ElementCollection property in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does not trigger reindexing of the indexed entity.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void indirectValueReplace_elementCollectionValue_nonIndexedEmbedded() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainedEntity containedEntity1 = new ContainedEntity();
+			containedEntity1.setId( 4 );
+			containedEntity1.getNonIndexedElementCollectionField().add( "firstValue" );
+			containingEntity1.setContainedSingle( containedEntity1 );
+			containedEntity1.setContainingAsSingle( containingEntity1 );
+
+			session.persist( containedEntity1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "indexedField", null )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test replacing the values
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
+			containedEntity.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedSingle", b3 -> b3
+											.field( "indexedField", null )
+									)
+							)
+					)
+					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -891,6 +1014,11 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 
 		public List<String> getNonIndexedElementCollectionField() {
 			return nonIndexedElementCollectionField;
+		}
+
+		public void setNonIndexedElementCollectionField(
+				List<String> nonIndexedElementCollectionField) {
+			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
 		}
 	}
 
