@@ -13,12 +13,12 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.util.impl.common.Contracts;
 
 
 class BooleanJunctionPredicateContextImpl<N, C>
@@ -29,6 +29,8 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	private final Supplier<N> nextContextProvider;
 
 	private final BooleanJunctionPredicateBuilder<C> builder;
+
+	private final MinimumShouldMatchContextImpl<BooleanJunctionPredicateContext<N>> minimumShouldMatchContext;
 
 	private final OccurContext must;
 	private final OccurContext mustNot;
@@ -44,6 +46,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 		this.mustNot = new OccurContext();
 		this.should = new OccurContext();
 		this.filter = new OccurContext();
+		this.minimumShouldMatchContext = new MinimumShouldMatchContextImpl<>( builder, this );
 	}
 
 	@Override
@@ -117,18 +120,14 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> minimumShouldMatchNumber(int ignoreConstraintCeiling,
-			int matchingClausesNumber) {
-		Contracts.assertPositiveOrZero( ignoreConstraintCeiling, "ignoreConstraintCeiling" );
-		builder.minimumShouldMatchNumber( ignoreConstraintCeiling, matchingClausesNumber );
-		return this;
+	public MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext<N>> minimumShouldMatch() {
+		return minimumShouldMatchContext;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int ignoreConstraintCeiling,
-			int matchingClausesPercent) {
-		Contracts.assertPositiveOrZero( ignoreConstraintCeiling, "ignoreConstraintCeiling" );
-		builder.minimumShouldMatchPercent( ignoreConstraintCeiling, matchingClausesPercent );
+	public BooleanJunctionPredicateContext<N> minimumShouldMatch(
+			Consumer<? super MinimumShouldMatchContext<?>> constraintContributor) {
+		constraintContributor.accept( minimumShouldMatchContext );
 		return this;
 	}
 

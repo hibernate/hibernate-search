@@ -43,102 +43,24 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  * <ul>
  * <li>
  *     When there isn't any "must" clause nor any "filter" clause in the boolean predicate,
- *     and there is no "minimumShouldMatch" constraint (see below),
+ *     and there is no <a href="MinimumShouldMatchContext.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
  *     then at least one "should" clause is required to match.
  *     Simply put, in this case, the "should" clauses
  *     <strong>behave as if there was an "OR" operator between each of them</strong>.
  * </li>
  * <li>
  *     When there is at least one "must" clause or one "filter" clause in the boolean predicate,
- *     and there is no "minimumShouldMatch" constraint (see below),
+ *     and there is no <a href="MinimumShouldMatchContext.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
  *     then the "should" clauses are not required to match,
  *     and are simply used for scoring.
  * </li>
  * <li>
- *     When there is at least one "minimumShouldMatch" constraint (see below),
+ *     When there is at least one <a href="MinimumShouldMatchContext.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
  *     then the "should" clauses are required according to the "minimumShouldMatch" constraints.
  * </li>
  * </ul>
  * <p>
  * Matching "should" clauses are taken into account in score computation.
- *
- * <h3 id="minimumshouldmatch">"minimumShouldMatch" constraints</h3>
- * <p>
- * "minimumShouldMatch" constraints define a minimum number of "should" clauses that have to match
- * in order for the boolean predicate to match.
- * <p>
- * The feature is similar, and will work identically, to
- * <a href="https://lucene.apache.org/solr/7_3_0/solr-core/org/apache/solr/util/doc-files/min-should-match.html">"Min Number Should Match"</a>
- * in Solr or
- * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html">{@code minimum_should_match}</a>
- * in Elasticsearch.
- *
- * <h4 id="minimumshouldmatch-minimum">Definition of the minimum</h4>
- * <p>
- * The minimum may be defined either directly as a positive number, or indirectly as a negative number
- * or positive or negative percentage representing a ratio of the total number of "should" clauses in this boolean predicate.
- * <p>
- * Here is how each type of input is interpreted:
- * <dl>
- *     <dt>Positive number</dt>
- *     <dd>
- *         The value is interpreted directly as the minimum number of "should" clauses that have to match.
- *     </dd>
- *     <dt>Negative number</dt>
- *     <dd>
- *         The absolute value is interpreted as the maximum number of "should" clauses that may not match:
- *         the absolute value is subtracted from the total number of "should" clauses.
- *     </dd>
- *     <dt>Positive percentage</dt>
- *     <dd>
- *         The value is interpreted as the minimum percentage of the total number of "should" clauses that have to match:
- *         the percentage is applied to the total number of "should" clauses, then rounded down.
- *     </dd>
- *     <dt>Negative percentage</dt>
- *     <dd>
- *         The absolute value is interpreted as the maximum percentage of the total number of "should" clauses that may not match:
- *         the absolute value of the percentage is applied to the total number of "should" clauses, then rounded down,
- *         then subtracted from the total number of "should" clauses.
- *     </dd>
- * </dl>
- * <p>
- * In any case, if the computed minimum is 0 or less, or higher than the total number of "should" clauses,
- * behavior is backend-specific (it may throw an exception, or produce unpredictable results,
- * or fall back to some default behavior).
- *
- * <h4 id="minimumshouldmatch-conditionalconstraints">Conditional constraints</h4>
- * <p>
- * Multiple conditional constraints may be defined,
- * only one of them being applied depending on the total number of "should" clauses.
- * <p>
- * Each constraint is attributed a minimum number of "should" clauses
- * that have to match, <strong>and an additional number</strong>.
- * The additional number is unique to each constraint.
- * <p>
- * The additional number will be compared to the total number of "should" clauses,
- * and the one closest while still strictly lower will be picked: its associated constraint will be applied.
- * If no number matches, the minimum number of matching "should" clauses
- * will be set to the total number of "should" clauses.
- * <p>
- * Examples:
- * <pre><code>
- *     // Example 1: at least 3 "should" clauses have to match
- *     booleanContext1.minimumShouldMatchNumber( 3 );
- *     // Example 2: at most 2 "should" clauses may not match
- *     booleanContext2.minimumShouldMatchNumber( -2 );
- *     // Example 3: at least 75% of "should" clauses have to match (rounded down)
- *     booleanContext3.minimumShouldMatchPercent( 75 );
- *     // Example 4: at most 25% of "should" clauses may not match (rounded down)
- *     booleanContext4.minimumShouldMatchPercent( -25 );
- *     // Example 5: if there are 3 "should" clauses or less, all "should" clauses have to match.
- *     // If there are 4 "should" clauses or more, at least 90% of "should" clauses have to match (rounded down).
- *     booleanContext5.minimumShouldMatchPercent( 3, 90 );
- *     // Example 6: if there are 4 "should" clauses or less, all "should" clauses have to match.
- *     // If there are 5 to 9 "should" clauses, at most 25% of "should" clauses may not match (rounded down).
- *     // If there are 10 "should" clauses or more, at most 3 "should" clauses may not match.
- *     booleanContext6.minimumShouldMatchPercent( 4, 25 )
- *             .minimumShouldMatchNumber( 9, -3 );
- * </code></pre>
  *
  * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
  */
@@ -266,57 +188,56 @@ public interface BooleanJunctionPredicateContext<N> extends SearchPredicateConte
 	 */
 
 	/**
-	 * Add a default <a href="#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
+	 * Add a default <a href="MinimumShouldMatchContext.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
 	 *
 	 * @param matchingClausesNumber A definition of the number of "should" clauses that have to match.
 	 * If positive, it is the number of clauses that have to match.
-	 * See <a href="#minimumshouldmatch-minimum">Definition of the minimum</a> for details and possible values.
+	 * See <a href="MinimumShouldMatchContext.html#minimumshouldmatch-minimum">Definition of the minimum</a>
+	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
 	default BooleanJunctionPredicateContext<N> minimumShouldMatchNumber(int matchingClausesNumber) {
-		return minimumShouldMatchNumber( 0, matchingClausesNumber );
+		return minimumShouldMatch()
+				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
+				.end();
 	}
 
 	/**
-	 * Add a default <a href="#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
+	 * Add a default <a href="MinimumShouldMatchContext.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>.
 	 *
 	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
 	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
-	 * See <a href="#minimumshouldmatch-minimum">Definition of the minimum</a> for details and possible values.
+	 * See <a href="MinimumShouldMatchContext.html#minimumshouldmatch-minimum">Definition of the minimum</a>
+	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
 	default BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int matchingClausesPercent) {
-		return minimumShouldMatchPercent( 0, matchingClausesPercent );
+		return minimumShouldMatch()
+				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
+				.end();
 	}
 
 	/**
-	 * Add a <a href="#minimumshouldmatch">"minimumShouldMatch" constraint</a> that will be applied
-	 * if there are strictly more than {@code ignoreConstraintCeiling} "should" clauses.
+	 * Start defining the minimum number of "should" constraints that have to match
+	 * in order for the boolean predicate to match.
 	 * <p>
-	 * See <a href="#minimumshouldmatch-conditionalconstraints">Conditional constraints</a> for the detailed rules
-	 * defining whether a constraint is applied or not.
+	 * See {@link MinimumShouldMatchContext}.
 	 *
-	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
-	 * will cease to be ignored.
-	 * @param matchingClausesNumber A definition of the number of "should" clauses that have to match.
-	 * If positive, it is the number of clauses that have to match.
-	 * See <a href="#minimumshouldmatch-minimum">Definition of the minimum</a> for details and possible values.
-	 * @return {@code this}, for method chaining.
+	 * @return A {@link MinimumShouldMatchContext} allowing to define constraints.
 	 */
-	BooleanJunctionPredicateContext<N> minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber);
+	MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext<N>> minimumShouldMatch();
 
 	/**
-	 * Add a <a href="#minimumshouldmatch">"minimumShouldMatch" constraint</a> that will be applied
-	 * if there are strictly more than {@code ignoreConstraintCeiling} "should" clauses.
+	 * Start defining the minimum number of "should" constraints that have to match
+	 * in order for the boolean predicate to match.
 	 * <p>
-	 * See <a href="#minimumshouldmatch-conditionalconstraints">Conditional constraints</a> for the detailed rules
-	 * defining whether a constraint is applied or not.
-	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
-	 * will cease to be ignored.
-	 * @param matchingClausesPercent A definition of the number of "should" clauses that have to match, as a percentage.
-	 * If positive, it is the percentage of the total number of "should" clauses that have to match.
+	 * See {@link MinimumShouldMatchContext}.
+	 *
+	 * @param constraintContributor A consumer that will add constraints to the context passed in parameter.
+	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent);
+	BooleanJunctionPredicateContext<N> minimumShouldMatch(
+			Consumer<? super MinimumShouldMatchContext<?>> constraintContributor);
 
 }

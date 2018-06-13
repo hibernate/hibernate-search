@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -668,16 +668,15 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_multipleConstraints() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		Consumer<BooleanJunctionPredicateContext<?>> minimumShouldMatchConstraints = b -> {
-			b.minimumShouldMatchNumber( 2, -1 );
-			b.minimumShouldMatchPercent( 4, 70 );
-		};
+		Consumer<MinimumShouldMatchContext<?>> minimumShouldMatchConstraints = b -> b
+				.ifMoreThan( 2 ).thenRequireNumber( -1 )
+				.ifMoreThan( 4 ).thenRequirePercent( 70 );
 
 		// 0 "should" clause: expect the constraints to be ignored
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.must().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 				} )
 				.build();
@@ -689,7 +688,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 				} )
 				.build();
@@ -701,7 +700,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 				} )
@@ -714,7 +713,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
@@ -728,7 +727,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 					b.should().match().onField( "field2" ).matching( FIELD2_VALUE1 );
@@ -743,7 +742,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 					b.should().match().onField( "field2" ).matching( FIELD2_VALUE1 );
@@ -759,7 +758,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field5" ).matching( FIELD5_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
@@ -777,18 +776,17 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_multipleConstraints_0ceiling() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		Consumer<BooleanJunctionPredicateContext<?>> minimumShouldMatchConstraints = b -> {
-			// Test that we can set the "default" minimum by using a ceiling of 0
-			b.minimumShouldMatchNumber( 0, 1 );
-			b.minimumShouldMatchNumber( 2, -1 );
-			b.minimumShouldMatchPercent( 4, 70 );
-		};
+		Consumer<MinimumShouldMatchContext<?>> minimumShouldMatchConstraints = b -> b
+				// Test that we can set the "default" minimum by using a ceiling of 0
+				.ifMoreThan( 0 ).thenRequireNumber( 1 )
+				.ifMoreThan( 2 ).thenRequireNumber( -1 )
+				.ifMoreThan( 4 ).thenRequirePercent( 70 );
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 				} )
 				.build();
@@ -800,7 +798,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 					b.should().match().onField( "field2" ).matching( FIELD2_VALUE2 );
 				} )
@@ -813,7 +811,7 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					minimumShouldMatchConstraints.accept( b );
+					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should().match().onField( "field4" ).matching( FIELD4_VALUE1AND2 );
 					b.should().match().onField( "field1" ).matching( FIELD1_VALUE1 );
 					b.should().match().onField( "field2" ).matching( FIELD2_VALUE3 );
@@ -832,7 +830,8 @@ public class BoolSearchPredicateIT {
 
 		SubTest.expectException(
 				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
-				() -> searchTarget.predicate().bool().minimumShouldMatchNumber( -1, 1 )
+				() -> searchTarget.predicate().bool().minimumShouldMatch()
+						.ifMoreThan( -1 ).thenRequireNumber( 1 )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
@@ -841,7 +840,8 @@ public class BoolSearchPredicateIT {
 
 		SubTest.expectException(
 				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
-				() -> searchTarget.predicate().bool().minimumShouldMatchPercent( -1, 50 )
+				() -> searchTarget.predicate().bool().minimumShouldMatch()
+						.ifMoreThan( -1 ).thenRequirePercent( 50 )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
@@ -855,10 +855,10 @@ public class BoolSearchPredicateIT {
 
 		SubTest.expectException(
 				"bool() predicate with minimumShouldMatch constraints with multiple conflicting ceilings",
-				() -> searchTarget.predicate().bool()
-						.minimumShouldMatchNumber( 2, -1 )
-						.minimumShouldMatchPercent( 4, 70 )
-						.minimumShouldMatchPercent( 4, 70 )
+				() -> searchTarget.predicate().bool().minimumShouldMatch()
+						.ifMoreThan( 2 ).thenRequireNumber( -1 )
+						.ifMoreThan( 4 ).thenRequirePercent( 70 )
+						.ifMoreThan( 4 ).thenRequirePercent( 70 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

@@ -17,7 +17,7 @@ public interface BooleanJunctionPredicateBuilder<C> extends SearchPredicateBuild
 	C getFilterCollector();
 
 	/**
-	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatchNumber(int, int)}.
+	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatch()}.
 	 *
 	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
 	 * will cease to be ignored.
@@ -26,7 +26,7 @@ public interface BooleanJunctionPredicateBuilder<C> extends SearchPredicateBuild
 	void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber);
 
 	/**
-	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatchPercent(int, int)}.
+	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatch()}.
 	 *
 	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
 	 * will cease to be ignored.
