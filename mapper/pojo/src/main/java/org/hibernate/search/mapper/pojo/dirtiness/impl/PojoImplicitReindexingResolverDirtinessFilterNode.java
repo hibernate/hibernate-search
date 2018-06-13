@@ -12,20 +12,20 @@ import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
- * A {@link PojoImplicitReindexingResolver} node applying a filter to decide whether to apply a delegate.
+ * A {@link PojoImplicitReindexingResolverNode} applying a filter to decide whether to apply a delegate.
  * <p>
  * This node allows to optimize reindexing by ignoring some changes when they do not affect a given indexed type.
  *
  * @param <T> The type of "dirty" objects received as input and passed to the delegate.
  * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends PojoImplicitReindexingResolver<T, S> {
+public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
 
 	private final PojoPathFilter<S> dirtyPathFilter;
-	private final PojoImplicitReindexingResolver<T, S> delegate;
+	private final PojoImplicitReindexingResolverNode<T, S> delegate;
 
 	public PojoImplicitReindexingResolverDirtinessFilterNode(PojoPathFilter<S> dirtyPathFilter,
-			PojoImplicitReindexingResolver<T, S> delegate) {
+			PojoImplicitReindexingResolverNode<T, S> delegate) {
 		Contracts.assertNotNull(
 				dirtyPathFilter, "dirtyPathFilter"
 		);

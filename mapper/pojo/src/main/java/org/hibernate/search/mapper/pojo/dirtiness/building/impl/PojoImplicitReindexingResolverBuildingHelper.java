@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
@@ -69,7 +69,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return new PojoIndexingDependencyCollectorTypeNode<>( typeModel, this );
 	}
 
-	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoRawTypeModel<T> typeModel,
+	public <T, S> Optional<PojoImplicitReindexingResolverNode<T, S>> build(PojoRawTypeModel<T> typeModel,
 			PojoPathFilterFactory<S> pathFilterFactory) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> builder =

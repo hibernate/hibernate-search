@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -34,7 +34,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * <p>
  * The role of dependency collectors is to receive the dependencies (paths to values used during indexing)
  * as an input, and use this information to contribute to
- * {@link PojoImplicitReindexingResolver}s.
+ * {@link PojoImplicitReindexingResolverNode}s.
  * This involves in particular:
  * <ul>
  *     <li>Resolving the path from one entity to another, "contained" entity</li>

@@ -9,13 +9,13 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
-class NoOpPojoImplicitReindexingResolver extends PojoImplicitReindexingResolver<Object, Object> {
+class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object, Object> {
 
-	private static NoOpPojoImplicitReindexingResolver INSTANCE = new NoOpPojoImplicitReindexingResolver();
+	private static NoOpPojoImplicitReindexingResolverNode INSTANCE = new NoOpPojoImplicitReindexingResolverNode();
 
 	@SuppressWarnings( "unchecked" ) // This instance works for any T or D
-	public static <T, D> PojoImplicitReindexingResolver<T, D> get() {
-		return (PojoImplicitReindexingResolver<T, D>) INSTANCE;
+	public static <T, D> PojoImplicitReindexingResolverNode<T, D> get() {
+		return (PojoImplicitReindexingResolverNode<T, D>) INSTANCE;
 	}
 
 	@Override

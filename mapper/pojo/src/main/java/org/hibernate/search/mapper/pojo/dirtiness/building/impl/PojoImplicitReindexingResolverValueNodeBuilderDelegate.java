@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -99,11 +99,11 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		}
 	}
 
-	<S> Collection<PojoImplicitReindexingResolver<V, S>> buildTypeNodes(PojoPathFilterFactory<S> pathFilterFactory,
+	<S> Collection<PojoImplicitReindexingResolverNode<V, S>> buildTypeNodes(PojoPathFilterFactory<S> pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolver<V, S>> immutableTypeNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolverNode<V, S>> immutableTypeNodes = new ArrayList<>();
 		if ( typeNodeBuilder != null ) {
 			typeNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
 					.ifPresent( immutableTypeNodes::add );

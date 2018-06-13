@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverOriginalTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -22,13 +22,13 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 		super( modelPath, buildingHelper );
 	}
 
-	<S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoPathFilterFactory<S> pathFilterFactory) {
+	<S> Optional<PojoImplicitReindexingResolverNode<T, S>> build(PojoPathFilterFactory<S> pathFilterFactory) {
 		return build( pathFilterFactory, null );
 	}
 
 	@Override
-	<S> PojoImplicitReindexingResolver<T, S> doBuild(
-			Collection<PojoImplicitReindexingResolver<? super T, S>> immutableNestedNodes) {
+	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(
+			Collection<PojoImplicitReindexingResolverNode<? super T, S>> immutableNestedNodes) {
 		return new PojoImplicitReindexingResolverOriginalTypeNode<>(
 				immutableNestedNodes
 		);

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
- * A {@link PojoImplicitReindexingResolver} node working at the type level, without casting.
+ * A {@link PojoImplicitReindexingResolverNode} working at the type level, without casting.
  * <p>
  * This node may delegate to a {@link PojoImplicitReindexingResolverMarkingNode marking node}
  * to mark the input as "to reindex" as well as delegate  to
@@ -21,12 +21,12 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * @param <T> The type of "dirty" objects received as input.
  * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoImplicitReindexingResolver<T, S> {
+public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
 
-	private final Collection<PojoImplicitReindexingResolver<? super T, S>> nestedNodes;
+	private final Collection<PojoImplicitReindexingResolverNode<? super T, S>> nestedNodes;
 
 	public PojoImplicitReindexingResolverOriginalTypeNode(
-			Collection<PojoImplicitReindexingResolver<? super T, S>> nestedNodes) {
+			Collection<PojoImplicitReindexingResolverNode<? super T, S>> nestedNodes) {
 		this.nestedNodes = nestedNodes;
 	}
 
@@ -34,7 +34,7 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolver<?, ?> node : nestedNodes ) {
+		for ( PojoImplicitReindexingResolverNode<?, ?> node : nestedNodes ) {
 			builder.value( node );
 		}
 		builder.endList();
@@ -43,7 +43,7 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
-		for ( PojoImplicitReindexingResolver<? super T, S> node : nestedNodes ) {
+		for ( PojoImplicitReindexingResolverNode<? super T, S> node : nestedNodes ) {
 			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
 	}

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -72,11 +72,11 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	final <S> Optional<PojoImplicitReindexingResolver<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	final <S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolver<? super U, S>> immutableNestedNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes = new ArrayList<>();
 		markingNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
 				.ifPresent( immutableNestedNodes::add );
 		propertyNodeBuilders.values().stream()
@@ -97,8 +97,8 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		}
 	}
 
-	abstract <S> PojoImplicitReindexingResolver<T, S> doBuild(
-			Collection<PojoImplicitReindexingResolver<? super U, S>> immutableNestedNodes);
+	abstract <S> PojoImplicitReindexingResolverNode<T, S> doBuild(
+			Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );

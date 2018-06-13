@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -24,11 +24,11 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 
 	private final Class<E> javaClass;
 	private final PojoCaster<E> caster;
-	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
+	private final PojoImplicitReindexingResolverNode<E, Set<String>> reindexingResolver;
 
 	public PojoContainedTypeManager(Class<E> javaClass,
 			PojoCaster<E> caster,
-			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+			PojoImplicitReindexingResolverNode<E, Set<String>> reindexingResolver) {
 		this.javaClass = javaClass;
 		this.caster = caster;
 		this.reindexingResolver = reindexingResolver;

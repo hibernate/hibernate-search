@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
@@ -94,13 +94,13 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	}
 
 	@Override
-	<S> Optional<PojoImplicitReindexingResolver<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	<S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolver<P, S>> valueWithoutExtractorTypeNodes =
+		Collection<PojoImplicitReindexingResolverNode<P, S>> valueWithoutExtractorTypeNodes =
 				valueWithoutExtractorsBuilderDelegate.buildTypeNodes( pathFilterFactory, allPotentialDirtyPaths );
-		Collection<PojoImplicitReindexingResolver<? super P, S>> immutableNestedNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolverNode<? super P, S>> immutableNestedNodes = new ArrayList<>();
 		immutableNestedNodes.addAll( valueWithoutExtractorTypeNodes );
 		containerElementNodeBuilders.values().stream()
 				.distinct() // Necessary because the default extractor path has two possible keys with the same value

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -36,14 +36,14 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoIndexingProcessor<E> processor;
 	private final IndexManager<D> indexManager;
-	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
+	private final PojoImplicitReindexingResolverNode<E, Set<String>> reindexingResolver;
 
 	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
 			PojoCaster<E> caster,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoIndexingProcessor<E> processor, IndexManager<D> indexManager,
-			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+			PojoImplicitReindexingResolverNode<E, Set<String>> reindexingResolver) {
 		this.indexedJavaClass = indexedJavaClass;
 		this.caster = caster;
 		this.identifierMapping = identifierMapping;

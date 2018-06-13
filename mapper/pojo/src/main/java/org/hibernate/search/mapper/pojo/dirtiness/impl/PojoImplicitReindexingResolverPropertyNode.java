@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
- * A {@link PojoImplicitReindexingResolver} node dealing with a specific property of a specific type,
+ * A {@link PojoImplicitReindexingResolverNode} dealing with a specific property of a specific type,
  * getting the value from that property then applying nested resolvers to that value.
  * <p>
  * This node will only delegate to nested nodes for deeper resolution,
@@ -25,13 +25,13 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <P> The property type.
  */
-public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolver<T, S> {
+public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolverNode<T, S> {
 
 	private final PropertyHandle handle;
-	private final Collection<PojoImplicitReindexingResolver<? super P, S>> nestedNodes;
+	private final Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes;
 
 	public PojoImplicitReindexingResolverPropertyNode(PropertyHandle handle,
-			Collection<PojoImplicitReindexingResolver<? super P, S>> nestedNodes) {
+			Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes) {
 		this.handle = handle;
 		this.nestedNodes = nestedNodes;
 	}
@@ -41,7 +41,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "handle", handle );
 		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolver<?, ?> nestedNode : nestedNodes ) {
+		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
 		}
 		builder.endList();
@@ -53,7 +53,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 		// TODO add generic type parameters to property handles
 		P propertyValue = (P) handle.get( dirty );
 		if ( propertyValue != null ) {
-			for ( PojoImplicitReindexingResolver<? super P, S> node : nestedNodes ) {
+			for ( PojoImplicitReindexingResolverNode<? super P, S> node : nestedNodes ) {
 				node.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );
 			}
 		}

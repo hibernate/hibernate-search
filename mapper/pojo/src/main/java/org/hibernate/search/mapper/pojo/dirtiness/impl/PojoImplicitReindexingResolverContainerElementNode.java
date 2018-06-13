@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
- * A {@link PojoImplicitReindexingResolver} node dealing with a specific container type,
+ * A {@link PojoImplicitReindexingResolverNode} dealing with a specific container type,
  * extracting values from the container then applying nested resolvers to the values.
  * <p>
  * This node will only delegate to nested nodes for deeper resolution,
@@ -26,13 +26,14 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <V> The extracted value type, for instance {@code MyEntityType}.
  */
-public class PojoImplicitReindexingResolverContainerElementNode<C, S, V> extends PojoImplicitReindexingResolver<C, S> {
+public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
+		extends PojoImplicitReindexingResolverNode<C, S> {
 
 	private final ContainerValueExtractor<C, V> extractor;
-	private final Collection<PojoImplicitReindexingResolver<V, S>> nestedNodes;
+	private final Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes;
 
 	public PojoImplicitReindexingResolverContainerElementNode(ContainerValueExtractor<C, V> extractor,
-			Collection<PojoImplicitReindexingResolver<V, S>> nestedNodes) {
+			Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes) {
 		this.extractor = extractor;
 		this.nestedNodes = nestedNodes;
 	}
@@ -42,7 +43,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V> extends
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "extractor", extractor );
 		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolver<?, ?> nestedNode : nestedNodes ) {
+		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
 		}
 		builder.endList();
@@ -61,7 +62,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V> extends
 	private void resolveEntitiesToReindexForContainerElement(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, V containerElement, S dirtinessState) {
 		if ( containerElement != null ) {
-			for ( PojoImplicitReindexingResolver<V, S> node : nestedNodes ) {
+			for ( PojoImplicitReindexingResolverNode<V, S> node : nestedNodes ) {
 				node.resolveEntitiesToReindex( collector, runtimeIntrospector, containerElement, dirtinessState );
 			}
 		}
