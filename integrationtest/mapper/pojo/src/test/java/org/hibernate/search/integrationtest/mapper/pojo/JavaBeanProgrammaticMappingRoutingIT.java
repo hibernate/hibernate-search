@@ -49,6 +49,8 @@ public class JavaBeanProgrammaticMappingRoutingIT {
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
+		initiator.addEntityType( IndexedEntity.class );
+
 		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
 		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )

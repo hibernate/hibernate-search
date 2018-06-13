@@ -54,6 +54,8 @@ public class JavaBeanAnnotationMappingRoutingIT {
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
+		initiator.addEntityType( IndexedEntity.class );
+
 		initiator.annotationMapping().add( IndexedEntity.class );
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b

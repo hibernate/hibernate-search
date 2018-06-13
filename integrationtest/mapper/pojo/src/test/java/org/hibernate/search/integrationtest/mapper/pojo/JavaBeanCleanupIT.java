@@ -16,8 +16,10 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.StartupStubBridge;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -341,6 +343,10 @@ public class JavaBeanCleanupIT {
 				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+		initiator.addEntityType( IndexedEntity.class );
+		initiator.addEntityType( OtherIndexedEntity.class );
+
 		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
 		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
@@ -351,6 +357,10 @@ public class JavaBeanCleanupIT {
 				.property( "text" )
 						.field().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
 				.property( "embedded" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embedding" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						/*
 						 * This is important so that there are bridges that only contribute fields that are filtered out.
@@ -358,7 +368,12 @@ public class JavaBeanCleanupIT {
 						 * and we test that they are properly closed.
 						 */
 						.indexedEmbedded()
-								.includePaths( "text" );
+								.includePaths( "text" )
+				.property( "otherEmbedded" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "otherEmbedding" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						);
 
 		additionalMappingContributor.accept( mappingDefinition );
 
@@ -375,6 +390,10 @@ public class JavaBeanCleanupIT {
 		private IndexedEntity embedded;
 
 		private IndexedEntity otherEmbedded;
+
+		private IndexedEntity embedding;
+
+		private IndexedEntity otherEmbedding;
 
 		public Integer getId() {
 			return id;
@@ -406,6 +425,23 @@ public class JavaBeanCleanupIT {
 
 		public void setOtherEmbedded(IndexedEntity otherEmbedded) {
 			this.otherEmbedded = otherEmbedded;
+		}
+
+		public IndexedEntity getEmbedding() {
+			return embedding;
+		}
+
+		public void setEmbedding(IndexedEntity embedding) {
+			this.embedding = embedding;
+		}
+
+		public IndexedEntity getOtherEmbedding() {
+			return otherEmbedding;
+		}
+
+		public void setOtherEmbedding(
+				IndexedEntity otherEmbedding) {
+			this.otherEmbedding = otherEmbedding;
 		}
 	}
 

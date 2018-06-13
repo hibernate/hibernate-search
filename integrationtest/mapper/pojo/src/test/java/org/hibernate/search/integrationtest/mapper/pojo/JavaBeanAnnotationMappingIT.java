@@ -28,12 +28,14 @@ import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -43,6 +45,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.Custom
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomTypeBridgeAnnotation;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -74,6 +77,12 @@ public class JavaBeanAnnotationMappingIT {
 				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+		initiator.addEntityTypes( CollectionHelper.asSet(
+				IndexedEntity.class,
+				OtherIndexedEntity.class,
+				YetAnotherIndexedEntity.class
+		) );
 
 		initiator.annotationMapping().add( IndexedEntity.class );
 
@@ -195,16 +204,35 @@ public class JavaBeanAnnotationMappingIT {
 			entity6.setLocalDate( LocalDate.of( 2017, 11, 6 ) );
 
 			entity1.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingle().add( entity1 );
+
 			entity2.setEmbedded( entity3 );
+			entity3.getEmbeddingAsSingle().add( entity2 );
+
 			entity3.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingle().add( entity3 );
+
 			entity5.setEmbeddedIterable( new LinkedHashSet<>( Arrays.asList( entity1, entity2 ) ) );
+			entity1.getEmbeddingAsIterable().add( entity5 );
+			entity2.getEmbeddingAsIterable().add( entity5 );
+
 			entity5.setEmbeddedList( Arrays.asList( entity2, entity3, entity6 ) );
+			entity2.getEmbeddingAsList().add( entity5 );
+			entity3.getEmbeddingAsList().add( entity5 );
+			entity6.getEmbeddingAsList().add( entity5 );
+
 			entity5.setEmbeddedArrayList( new ArrayList<>( Arrays.asList( entity3, entity1 ) ) );
+			entity3.getEmbeddingAsArrayList().add( entity5 );
+			entity1.getEmbeddingAsArrayList().add( entity5 );
+
 			Map<String, List<IndexedEntity>> embeddedMap = new LinkedHashMap<>();
 			embeddedMap.computeIfAbsent( "entity3", ignored -> new ArrayList<>() ).add( entity3 );
 			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity2 );
 			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity3 );
 			entity5.setEmbeddedMap( embeddedMap );
+			entity3.getEmbeddingAsMap().add( entity5 );
+			entity2.getEmbeddingAsMap().add( entity5 );
+			entity3.getEmbeddingAsMap().add( entity5 );
 
 			manager.getMainWorker().add( entity1 );
 			manager.getMainWorker().add( entity2 );
@@ -474,6 +502,9 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@CustomPropertyBridgeAnnotation(objectName = "customBridgeOnProperty")
+		@AssociationInverseSide(
+				inversePath = @PropertyValue( propertyName = "embeddingAsSingle")
+		)
 		public IndexedEntity getEmbedded() {
 			return embedded;
 		}
@@ -493,6 +524,16 @@ public class JavaBeanAnnotationMappingIT {
 		private Integer id;
 
 		private String text;
+
+		private List<ParentIndexedEntity> embeddingAsSingle = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsIterable = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsList = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsArrayList = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsMap = new ArrayList<>();
 
 		@DocumentId
 		public Integer getId() {
@@ -517,6 +558,26 @@ public class JavaBeanAnnotationMappingIT {
 				includePaths = { "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" })
 		public IndexedEntity getEmbedded() {
 			return super.getEmbedded();
+		}
+
+		public List<ParentIndexedEntity> getEmbeddingAsSingle() {
+			return embeddingAsSingle;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsIterable() {
+			return embeddingAsIterable;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsList() {
+			return embeddingAsList;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsArrayList() {
+			return embeddingAsArrayList;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsMap() {
+			return embeddingAsMap;
 		}
 	}
 
@@ -625,6 +686,9 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myTextField")
+		@AssociationInverseSide(
+				inversePath = @PropertyValue( propertyName = "embeddingAsIterable")
+		)
 		public Iterable<IndexedEntity> getEmbeddedIterable() {
 			return embeddedIterable;
 		}
@@ -634,6 +698,9 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(prefix = "embeddedList.otherPrefix_", includePaths = "embedded.prefix_customBridgeOnClass.text")
+		@AssociationInverseSide(
+				inversePath = @PropertyValue( propertyName = "embeddingAsList")
+		)
 		public List<IndexedEntity> getEmbeddedList() {
 			return embeddedList;
 		}
@@ -643,6 +710,9 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_customBridgeOnProperty.text")
+		@AssociationInverseSide(
+				inversePath = @PropertyValue( propertyName = "embeddingAsArrayList")
+		)
 		public ArrayList<IndexedEntity> getEmbeddedArrayList() {
 			return embeddedArrayList;
 		}
@@ -652,6 +722,9 @@ public class JavaBeanAnnotationMappingIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
+		@AssociationInverseSide(
+				inversePath = @PropertyValue( propertyName = "embeddingAsMap")
+		)
 		@Field(
 				name = "embeddedMapKeys",
 				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)

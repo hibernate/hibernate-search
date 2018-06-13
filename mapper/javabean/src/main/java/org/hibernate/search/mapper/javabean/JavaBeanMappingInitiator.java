@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.javabean;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiatorImpl;
@@ -39,4 +40,17 @@ public interface JavaBeanMappingInitiator extends PojoMappingInitiator<JavaBeanM
 				annotatedTypeDiscoveryEnabled, multiTenancyEnabled
 		);
 	}
+
+	/**
+	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
+	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorker}.
+	 */
+	void addEntityType(Class<?> type);
+
+	/**
+	 * @param types The types to be considered as entity types, i.e. types that may be indexed
+	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorker}.
+	 */
+	void addEntityTypes(Set<Class<?>> types);
+
 }

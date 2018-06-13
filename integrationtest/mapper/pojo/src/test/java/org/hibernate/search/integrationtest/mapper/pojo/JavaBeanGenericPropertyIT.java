@@ -11,10 +11,12 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -45,6 +47,9 @@ public class JavaBeanGenericPropertyIT {
 				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+		initiator.addEntityType( IndexedEntity.class );
+		initiator.addEntityType( GenericEntity.class );
 
 		initiator.annotationMapping().add( IndexedEntity.class ).add( GenericEntity.class );
 
@@ -81,6 +86,7 @@ public class JavaBeanGenericPropertyIT {
 			genericEntity.setArrayContent( new String[] { "entry1", "entry2" } );
 
 			entity1.setGenericProperty( genericEntity );
+			genericEntity.setParent( entity1 );
 
 			manager.getMainWorker().add( entity1 );
 
@@ -115,6 +121,7 @@ public class JavaBeanGenericPropertyIT {
 		}
 
 		@IndexedEmbedded
+		@AssociationInverseSide(inversePath = @PropertyValue(propertyName = "parent"))
 		public GenericEntity<String> getGenericProperty() {
 			return genericProperty;
 		}
@@ -126,9 +133,19 @@ public class JavaBeanGenericPropertyIT {
 
 	public static class GenericEntity<T> {
 
+		private IndexedEntity parent;
+
 		private T content;
 
 		private T[] arrayContent;
+
+		public IndexedEntity getParent() {
+			return parent;
+		}
+
+		public void setParent(IndexedEntity parent) {
+			this.parent = parent;
+		}
 
 		@Field
 		public T getContent() {

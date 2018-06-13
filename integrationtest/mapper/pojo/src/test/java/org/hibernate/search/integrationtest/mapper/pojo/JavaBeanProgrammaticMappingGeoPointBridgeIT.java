@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
@@ -46,6 +47,12 @@ public class JavaBeanProgrammaticMappingGeoPointBridgeIT {
 				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+		initiator.addEntityTypes( CollectionHelper.asSet(
+				GeoPointOnTypeEntity.class,
+				GeoPointOnCoordinatesPropertyEntity.class,
+				GeoPointOnCustomCoordinatesPropertyEntity.class
+		) );
 
 		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
 		mappingDefinition.type( GeoPointOnTypeEntity.class )

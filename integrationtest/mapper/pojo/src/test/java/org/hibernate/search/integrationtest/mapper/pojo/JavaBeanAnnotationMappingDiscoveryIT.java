@@ -42,6 +42,8 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
+		initiator.addEntityType( IndexedEntity.class );
+
 		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
 		initiator.annotationMapping().add( IndexedEntity.class );
 
@@ -84,6 +86,8 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
 				mappingRepositoryBuilder, false
 		);
+
+		initiator.addEntityType( IndexedEntity.class );
 
 		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
 		initiator.annotationMapping().add( IndexedEntity.class );

@@ -11,10 +11,12 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -45,6 +47,8 @@ public class JavaBeanPropertyInheritanceIT {
 				.setProperty( "index.default.backend", "stubBackend" );
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+		initiator.addEntityType( IndexedEntity.class );
 
 		initiator.annotationMapping().add( IndexedEntity.class );
 
@@ -83,6 +87,7 @@ public class JavaBeanPropertyInheritanceIT {
 			entity1.setChildDeclaredProperty( "child-declared-2" );
 
 			entity1.setEmbedded( entity2 );
+			entity2.setEmbedding( entity1 );
 
 			manager.getMainWorker().add( entity1 );
 
@@ -113,6 +118,7 @@ public class JavaBeanPropertyInheritanceIT {
 		}
 
 		@IndexedEmbedded(maxDepth = 1)
+		@AssociationInverseSide( inversePath = @PropertyValue( propertyName = "embedding"))
 		public abstract ParentIndexedEntity getEmbedded();
 	}
 
@@ -126,6 +132,8 @@ public class JavaBeanPropertyInheritanceIT {
 		private String childDeclaredProperty;
 
 		private IndexedEntity embedded;
+
+		private ParentIndexedEntity embedding;
 
 		@DocumentId
 		public Integer getId() {
@@ -152,6 +160,15 @@ public class JavaBeanPropertyInheritanceIT {
 
 		public void setEmbedded(IndexedEntity embedded) {
 			this.embedded = embedded;
+		}
+
+		public ParentIndexedEntity getEmbedding() {
+			return embedding;
+		}
+
+		public void setEmbedding(
+				ParentIndexedEntity embedding) {
+			this.embedding = embedding;
 		}
 	}
 

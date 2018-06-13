@@ -24,10 +24,12 @@ import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomTypeBridge;
@@ -35,6 +37,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringVa
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -67,6 +70,12 @@ public class JavaBeanProgrammaticMappingIT {
 
 		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
+		initiator.addEntityTypes( CollectionHelper.asSet(
+				IndexedEntity.class,
+				OtherIndexedEntity.class,
+				YetAnotherIndexedEntity.class
+		) );
+
 		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
 		mappingDefinition.type( IndexedEntity.class )
 				.indexed( IndexedEntity.INDEX )
@@ -89,6 +98,10 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "localDate" )
 						.field( "myLocalDateField" )
 				.property( "embedded" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embeddingAsSingle" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.bridge(
 								new CustomPropertyBridge.Builder()
 								.objectName( "customBridgeOnProperty" )
@@ -116,14 +129,30 @@ public class JavaBeanProgrammaticMappingIT {
 				.property( "numericArray" )
 						.field()
 				.property( "embeddedIterable" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embeddingAsIterable" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
 				.property( "embeddedList" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embeddingAsList" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.indexedEmbedded()
 								.prefix( "embeddedList.otherPrefix_" )
 								.includePaths( "embedded.prefix_customBridgeOnClass.text" )
 				.property( "embeddedArrayList" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embeddingAsArrayList" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
 				.property( "embeddedMap" )
+						.associationInverseSide(
+								PojoModelPath.fromRoot( "embeddingAsMap" )
+										.value( ContainerValueExtractorPath.defaultExtractors() )
+						)
 						.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 						.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 
@@ -239,17 +268,37 @@ public class JavaBeanProgrammaticMappingIT {
 			entity6.setText( "some more text (6)" );
 			entity6.setLocalDate( LocalDate.of( 2017, 11, 6 ) );
 
+
 			entity1.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingle().add( entity1 );
+
 			entity2.setEmbedded( entity3 );
+			entity3.getEmbeddingAsSingle().add( entity2 );
+
 			entity3.setEmbedded( entity2 );
+			entity2.getEmbeddingAsSingle().add( entity3 );
+
 			entity5.setEmbeddedIterable( new LinkedHashSet<>( Arrays.asList( entity1, entity2 ) ) );
+			entity1.getEmbeddingAsIterable().add( entity5 );
+			entity2.getEmbeddingAsIterable().add( entity5 );
+
 			entity5.setEmbeddedList( Arrays.asList( entity2, entity3, entity6 ) );
+			entity2.getEmbeddingAsList().add( entity5 );
+			entity3.getEmbeddingAsList().add( entity5 );
+			entity6.getEmbeddingAsList().add( entity5 );
+
 			entity5.setEmbeddedArrayList( new ArrayList<>( Arrays.asList( entity3, entity1 ) ) );
+			entity3.getEmbeddingAsArrayList().add( entity5 );
+			entity1.getEmbeddingAsArrayList().add( entity5 );
+
 			Map<String, List<IndexedEntity>> embeddedMap = new LinkedHashMap<>();
 			embeddedMap.computeIfAbsent( "entity3", ignored -> new ArrayList<>() ).add( entity3 );
 			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity2 );
 			embeddedMap.computeIfAbsent( "entity2", ignored -> new ArrayList<>() ).add( entity3 );
 			entity5.setEmbeddedMap( embeddedMap );
+			entity3.getEmbeddingAsMap().add( entity5 );
+			entity2.getEmbeddingAsMap().add( entity5 );
+			entity3.getEmbeddingAsMap().add( entity5 );
 
 			manager.getMainWorker().add( entity1 );
 			manager.getMainWorker().add( entity2 );
@@ -536,6 +585,16 @@ public class JavaBeanProgrammaticMappingIT {
 
 		private String text;
 
+		private List<ParentIndexedEntity> embeddingAsSingle = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsIterable = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsList = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsArrayList = new ArrayList<>();
+
+		private List<YetAnotherIndexedEntity> embeddingAsMap = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -552,6 +611,25 @@ public class JavaBeanProgrammaticMappingIT {
 			this.text = text;
 		}
 
+		public List<ParentIndexedEntity> getEmbeddingAsSingle() {
+			return embeddingAsSingle;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsIterable() {
+			return embeddingAsIterable;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsList() {
+			return embeddingAsList;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsArrayList() {
+			return embeddingAsArrayList;
+		}
+
+		public List<YetAnotherIndexedEntity> getEmbeddingAsMap() {
+			return embeddingAsMap;
+		}
 	}
 
 	public static final class OtherIndexedEntity {
