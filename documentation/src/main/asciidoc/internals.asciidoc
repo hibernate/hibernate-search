@@ -345,9 +345,11 @@ As a result, this node will be ignored when creating the indexing processor.
 Reindexing resolvers are the objects responsible for determining, whenever an entity changes,
 which other entities include that changed entity in their indexed form and should thus be reindexed.
 
-Similarly to indexing processors, they are organized as a tree,
-each node being an implementation of `PojoImplicitReindexingResolver`.
-The POJO mapper assigns one tree to each indexed or contained entity type.
+Similarly to indexing processors, the `PojoImplicitReindexingResolver`
+contains nodes organized as a tree,
+each node being an implementation of `PojoImplicitReindexingResolverNode`.
+The POJO mapper assigns one `PojoImplicitReindexingResolver` containing one tree
+to each indexed or contained entity type.
 Indexed entity types are those mapped to an index (using `@Indexed` or similar),
 while "contained" entity types are those being the target of an `@IndexedEmbedded`
 or being manipulated in a bridge using the `PojoModelElement` API.
@@ -360,10 +362,16 @@ to be casted to a supertype or subtype, applying nested nodes only if the cast s
 * `PojoImplicitReindexingResolverPropertyNode`: A node representing a POJO property.
 * `PojoImplicitReindexingResolverContainerElementNode`: A node representing elements in a container
 (`List`, `Optional`, ...).
+* `PojoImplicitReindexingResolverDirtinessFilterNode`: A node representing a filter,
+delegating to its nested nodes only if some precise paths are considered dirty.
+* `PojoImplicitReindexingResolverMarkingNode`: A node representing a value to be marked as "to reindex".
 
-At runtime, the root node will be passed the changed entity and a collector of entities to re-index.
-Then each node will "resolve" entities to reindex according to its input, i.e. perform one (or more) of the following:
+At runtime, the root node will be passed the changed entity, the "dirtiness state" of that entity
+(in short, a list of properties that changed in that entity), and  a collector of entities to re-index.
+Then each node will "resolve" entities to reindex according to its input,
+i.e. perform one (or more) of the following:
 
+* check that the "dirtiness state" contains specific dirty paths that make reindexing relevant for this node
 * extract data from the Java object passed as input: extract the value of a property,
 the elements of a list, try to cast the object to a given type, ...
 * pass the extracted data to the collector
@@ -447,6 +455,9 @@ image::internals-mapper-pojo-reindexingresolver-example1-builder-1.svg[Initial s
 
 From there, the reindexing resolver builder is passed to the next dependency collector value node
 using the `PojoIndexingDependencyCollectorValueNode#markForReindexing` method.
+This method also takes as a parameter the path to the property that is depended on,
+in this case `longField`.
+
 The value node will then use its knowledge of the dependency tree (using its ancestors in the dependency collector tree)
 to build a `BoundPojoModelPath` from the previous entity type to that value.
 In our case, this path is `Type EmbeddedEntityClass => Property "secondLevelEmbedded" => No container value extractor`.
@@ -467,9 +478,17 @@ and the process repeats:
 
 image::internals-mapper-pojo-reindexingresolver-example1-builder-3.svg[State of the reindexing resolver builder after inverting "embedded",align="center"]
 
-Once we reach the dependency collector root, we are done.
+Once we reach the dependency collector root, we are almost done.
 The reindexing resolver builder tree has been populated with every node needed to reindex `IndexedEntityClass`
 whenever a change occurs in the `longField` property of `SecondLevelEmbeddedEntityClass`.
+
+The only thing left to do is register the path that is depended on (in our example, `longField`).
+With this path registered, we will be able to build a `PojoPathFilter`,
+so that whenever `SecondLevelEmbeddedEntityClass` changes,
+we will walk through the tree, but not all the tree:
+if at some point we notice that a node is relevant only if `longField` changed,
+but the "dirtiness state" tells us that `longField` did not change,
+we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing.
 
 The example above was deliberately simple, to give a general idea of how reindexing resolvers are built.
 In the actual algorithm, we have to handle several circumstances that make the whole process significantly more complex:
