@@ -42,6 +42,12 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -66,17 +72,6 @@
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <!-- Inherit execution unpack-shared-test-build-resources -->
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <resources>
-                        <resource>
-                            <directory>src/test/resources</directory>
-                            <filtering>true</filtering>
-                        </resource>
-                    </resources>
-                </configuration>
             </plugin>
         </plugins>
     </build>
