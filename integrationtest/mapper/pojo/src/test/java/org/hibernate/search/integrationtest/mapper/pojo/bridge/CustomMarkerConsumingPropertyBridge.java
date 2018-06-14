@@ -13,33 +13,14 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 
 public final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
 
-	public static final class Builder
-			implements AnnotationBridgeBuilder<PropertyBridge, CustomMarkerConsumingPropertyBridgeAnnotation> {
-		@Override
-		public void initialize(CustomMarkerConsumingPropertyBridgeAnnotation annotation) {
-			// Nothing to do
-		}
-
-		@Override
-		public PropertyBridge build(BuildContext buildContext) {
-			return new CustomMarkerConsumingPropertyBridge();
-		}
-	}
-
 	private List<IndexObjectFieldAccessor> objectFieldAccessors = new ArrayList<>();
-
-	private CustomMarkerConsumingPropertyBridge() {
-	}
 
 	@Override
 	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,

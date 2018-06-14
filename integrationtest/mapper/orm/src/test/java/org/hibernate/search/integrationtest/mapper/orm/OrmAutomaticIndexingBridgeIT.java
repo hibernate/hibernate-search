@@ -30,16 +30,14 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
-import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -709,7 +707,7 @@ public class OrmAutomaticIndexingBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(builder = @TypeBridgeAnnotationBuilderReference(type = ContainingEntityTypeBridge.Builder.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeReference(type = ContainingEntityTypeBridge.class))
 	public @interface ContainingEntityTypeBridgeAnnotation {
 	}
 
@@ -721,19 +719,6 @@ public class OrmAutomaticIndexingBridgeIT {
 		private IndexFieldAccessor<String> directFieldTargetAccessor;
 		private IndexObjectFieldAccessor childObjectFieldAccessor;
 		private IndexFieldAccessor<String> includedInTypeBridgeTargetAccessor;
-
-		public static class Builder
-				implements AnnotationBridgeBuilder<ContainingEntityTypeBridge, ContainingEntityTypeBridgeAnnotation> {
-			@Override
-			public void initialize(ContainingEntityTypeBridgeAnnotation annotation) {
-				// Nothing to do
-			}
-
-			@Override
-			public ContainingEntityTypeBridge build(BuildContext buildContext) {
-				return new ContainingEntityTypeBridge();
-			}
-		}
 
 		@Override
 		public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
@@ -767,7 +752,7 @@ public class OrmAutomaticIndexingBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD })
-	@PropertyBridgeMapping(builder = @PropertyBridgeAnnotationBuilderReference(type = ContainingEntityPropertyBridge.Builder.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(type = ContainingEntityPropertyBridge.class))
 	public @interface ContainingEntityPropertyBridgeAnnotation {
 	}
 
@@ -776,19 +761,6 @@ public class OrmAutomaticIndexingBridgeIT {
 		private PojoModelElementAccessor<String> includedInPropertyBridgeSourceAccessor;
 		private IndexObjectFieldAccessor propertyBridgeObjectFieldAccessor;
 		private IndexFieldAccessor<String> includedInPropertyBridgeTargetAccessor;
-
-		public static class Builder
-				implements AnnotationBridgeBuilder<ContainingEntityPropertyBridge, ContainingEntityPropertyBridgeAnnotation> {
-			@Override
-			public void initialize(ContainingEntityPropertyBridgeAnnotation annotation) {
-				// Nothing to do
-			}
-
-			@Override
-			public ContainingEntityPropertyBridge build(BuildContext buildContext) {
-				return new ContainingEntityPropertyBridge();
-			}
-		}
 
 		@Override
 		public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,

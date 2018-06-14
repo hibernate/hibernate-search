@@ -28,6 +28,23 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public @interface PropertyBridgeMapping {
 
 	/**
+	 * Map a property bridge to an annotation type.
+	 * <p>
+	 * Each time the mapped annotation is encountered, an instance of the property bridge will be created
+	 * and applied to the location where the annotation was found.
+	 * <p>
+	 * Property bridges mapped this way cannot be parameterized:
+	 * any attribute of the mapped annotation will be ignored.
+	 * See {@link #builder()} to take advantage of the annotation attributes.
+	 * <p>
+	 * This attribute cannot be used in the same {@link PropertyBridgeMapping} annotation
+	 * as {@link #builder()}: either a bridge or a bridge builder can be provided, but never both.
+	 *
+	 * @return A reference to the property bridge to use.
+	 */
+	PropertyBridgeReference bridge() default @PropertyBridgeReference;
+
+	/**
 	 * Map a property bridge builder to an annotation type.
 	 * <p>
 	 * Each time the mapped annotation is encountered, an instance of the property bridge builder will be created.
@@ -38,9 +55,12 @@ public @interface PropertyBridgeMapping {
 	 * Property bridges mapped this way can be parameterized:
 	 * the bridge will be able to take any attribute of the mapped annotation into account
 	 * in its {@link AnnotationBridgeBuilder#initialize(Annotation)} method.
+	 * <p>
+	 * This attribute cannot be used in the same {@link PropertyBridgeMapping} annotation
+	 * as {@link #bridge()}: either a bridge or a bridge builder can be provided, but never both.
 	 *
 	 * @return A reference to the builder to use to build the property bridge.
 	 */
-	PropertyBridgeAnnotationBuilderReference builder();
+	PropertyBridgeAnnotationBuilderReference builder() default @PropertyBridgeAnnotationBuilderReference;
 
 }

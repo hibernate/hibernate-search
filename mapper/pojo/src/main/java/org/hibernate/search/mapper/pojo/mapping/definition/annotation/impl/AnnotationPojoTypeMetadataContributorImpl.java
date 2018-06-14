@@ -30,8 +30,10 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
@@ -150,14 +152,12 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 	}
 
 	private <A extends Annotation> void addTypeBridge(PojoMappingCollectorTypeNode collector, A annotation) {
-		AnnotationBridgeBuilder<? extends TypeBridge, A> builder = createTypeBridgeBuilder( annotation );
-		builder.initialize( annotation );
+		BridgeBuilder<? extends TypeBridge> builder = createTypeBridgeBuilder( annotation );
 		collector.bridge( builder );
 	}
 
 	private <A extends Annotation> void addPropertyBridge(PojoMappingCollectorPropertyNode collector, A annotation) {
-		AnnotationBridgeBuilder<? extends PropertyBridge, A> builder = createPropertyBridgeBuilder( annotation );
-		builder.initialize( annotation );
+		BridgeBuilder<? extends PropertyBridge> builder = createPropertyBridgeBuilder( annotation );
 		collector.bridge( builder );
 	}
 
@@ -274,36 +274,44 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		}
 	}
 
-	private <A extends Annotation> AnnotationBridgeBuilder<? extends TypeBridge, A> createTypeBridgeBuilder(
-			A annotation) {
+	private <A extends Annotation> BridgeBuilder<? extends TypeBridge> createTypeBridgeBuilder(A annotation) {
 		TypeBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( TypeBridgeMapping.class );
+		TypeBridgeReference bridgeReferenceAnnotation = bridgeMapping.bridge();
 		TypeBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
-		BeanReference builderReference =
+
+		return createAnnotationMappedBridgeBuilder(
+				TypeBridgeMapping.class, TypeBridge.class, annotation,
+				toBeanReference(
+						bridgeReferenceAnnotation.name(),
+						bridgeReferenceAnnotation.type(),
+						TypeBridgeReference.UndefinedImplementationType.class
+				),
 				toBeanReference(
 						bridgeBuilderReferenceAnnotation.name(),
 						bridgeBuilderReferenceAnnotation.type(),
 						TypeBridgeAnnotationBuilderReference.UndefinedImplementationType.class
 				)
-						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
-
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		return beanProvider.getBean( builderReference, AnnotationBridgeBuilder.class );
+		);
 	}
 
-	private <A extends Annotation> AnnotationBridgeBuilder<? extends PropertyBridge, A> createPropertyBridgeBuilder(
-			A annotation) {
+	private <A extends Annotation> BridgeBuilder<? extends PropertyBridge> createPropertyBridgeBuilder(A annotation) {
 		PropertyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( PropertyBridgeMapping.class );
+		PropertyBridgeReference bridgeReferenceAnnotation = bridgeMapping.bridge();
 		PropertyBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
-		BeanReference builderReference =
+
+		return createAnnotationMappedBridgeBuilder(
+				PropertyBridgeMapping.class, PropertyBridge.class, annotation,
+				toBeanReference(
+						bridgeReferenceAnnotation.name(),
+						bridgeReferenceAnnotation.type(),
+						PropertyBridgeReference.UndefinedImplementationType.class
+				),
 				toBeanReference(
 						bridgeBuilderReferenceAnnotation.name(),
 						bridgeBuilderReferenceAnnotation.type(),
 						PropertyBridgeAnnotationBuilderReference.UndefinedImplementationType.class
 				)
-						.orElseThrow( () -> log.missingBuilderReferenceInBridgeMapping( annotation.annotationType() ) );
-
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		return beanProvider.getBean( builderReference, AnnotationBridgeBuilder.class );
+		);
 	}
 
 	private BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
@@ -338,6 +346,26 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		else {
 			// The bridge will be auto-detected from the property type
 			return null;
+		}
+	}
+
+	private <A extends Annotation, B> BridgeBuilder<B> createAnnotationMappedBridgeBuilder(
+			Class<? extends Annotation> bridgeMappingAnnotation, Class<B> bridgeClass, A annotation,
+			Optional<BeanReference> bridgeReferenceOptional, Optional<BeanReference> builderReferenceOptional) {
+		if ( bridgeReferenceOptional.isPresent() && builderReferenceOptional.isPresent() ) {
+			throw log.conflictingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
+		}
+		else if ( bridgeReferenceOptional.isPresent() ) {
+			return new BeanResolverBridgeBuilder<>( bridgeClass, bridgeReferenceOptional.get() );
+		}
+		else if ( builderReferenceOptional.isPresent() ) {
+			AnnotationBridgeBuilder builder = beanProvider.getBean( builderReferenceOptional.get(), AnnotationBridgeBuilder.class );
+			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
+			builder.initialize( annotation );
+			return builder;
+		}
+		else {
+			throw log.missingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
 		}
 	}
 

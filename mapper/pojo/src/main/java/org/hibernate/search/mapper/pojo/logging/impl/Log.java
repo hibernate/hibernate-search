@@ -39,9 +39,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 2, value = "Unable to find a default value bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultValueBridgeFromSourceType(Class<?> sourceType);
 
-	@Message(id = 3, value = "Annotation type '%1$s' is annotated with @PropertyBridgeMapping,"
-			+ " but the bridge builder reference is empty.")
-	SearchException missingBuilderReferenceInBridgeMapping(Class<? extends Annotation> annotationType);
+	@Message(id = 3, value = "Annotation type '%2$s' is annotated with '%1$s',"
+			+ " but neither a bridge reference nor a bridge builder reference was provided.")
+	SearchException missingBridgeReferenceInBridgeMapping(Class<? extends Annotation> metaAnnotationType,
+			Class<? extends Annotation> annotationType);
 
 	@Message(id = 4, value = "Annotation type '%1$s' is annotated with @MarkerMapping,"
 			+ " but the marker builder reference is empty.")
@@ -153,4 +154,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 25, value = "Cannot access the value of containing annotation '%1$s'."
 			+ " Ignoring annotation.")
 	void cannotAccessRepeateableContainingAnnotationValue(Class<?> containingAnnotationType, @Cause Throwable e);
+
+	@Message(id = 26, value = "Annotation type '%2$s' is annotated with '%1$s',"
+			+ " but both a bridge reference and a bridge builder reference were provided."
+			+ " Only one can be provided.")
+	SearchException conflictingBridgeReferenceInBridgeMapping(Class<? extends Annotation> metaAnnotationType,
+			Class<? extends Annotation> annotationType);
 }
