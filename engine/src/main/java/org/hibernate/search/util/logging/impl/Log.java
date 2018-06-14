@@ -1011,4 +1011,14 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 349, value = "Some of the specified entity types ('%s') are not indexed, nor is any of their subclasses." )
 	IllegalArgumentException someTargetedEntityTypesNotIndexed(String targetedEntities);
+
+	@Message(id = 350, value = "'%1$s' must be positive or zero.")
+	IllegalArgumentException mustBePositiveOrZero(String objectDescription);
+
+	@Message(id = 351, value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
+			+ " expected a number between 1 and '%1$s', got '%2$s'.")
+	SearchException minimumShouldMatchMinimumOutOfBounds(int minimum, int totalShouldClauseNumber);
+
+	@Message(id = 352, value = "Multiple conflicting minimumShouldMatch constraints")
+	SearchException minimumShouldMatchConflictingConstraints();
 }

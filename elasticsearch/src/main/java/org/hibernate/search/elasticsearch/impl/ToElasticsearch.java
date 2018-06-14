@@ -344,6 +344,11 @@ public class ToElasticsearch {
 
 		clauses.append( boostAppender( booleanQuery ) );
 
+		int minimumShouldMatchNumber = booleanQuery.getMinimumNumberShouldMatch();
+		if ( minimumShouldMatchNumber != 0 ) {
+			clauses.addProperty( "minimum_should_match", minimumShouldMatchNumber );
+		}
+
 		JsonObject bool = new JsonObject();
 		bool.add( "bool", clauses.build() );
 		return bool;
