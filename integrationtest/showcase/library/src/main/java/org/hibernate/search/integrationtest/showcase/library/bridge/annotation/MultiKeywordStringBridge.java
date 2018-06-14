@@ -14,10 +14,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 
 @PropertyBridgeMapping(
-		builder = @PropertyBridgeMappingBuilderReference(
+		builder = @PropertyBridgeAnnotationBuilderReference(
 				type = org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.Builder.class
 		)
 )

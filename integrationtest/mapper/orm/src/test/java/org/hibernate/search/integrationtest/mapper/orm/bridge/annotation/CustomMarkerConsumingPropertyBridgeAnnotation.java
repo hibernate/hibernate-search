@@ -12,12 +12,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsumingPropertyBridge;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
-@PropertyBridgeMapping(builder = @PropertyBridgeMappingBuilderReference(type = CustomMarkerConsumingPropertyBridge.Builder.class))
+@PropertyBridgeMapping(builder = @PropertyBridgeAnnotationBuilderReference(type = CustomMarkerConsumingPropertyBridge.Builder.class))
 public @interface CustomMarkerConsumingPropertyBridgeAnnotation {
 
 }

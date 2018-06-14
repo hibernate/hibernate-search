@@ -36,9 +36,9 @@ import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -709,7 +709,7 @@ public class OrmAutomaticIndexingBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(builder = @TypeBridgeMappingBuilderReference(type = ContainingEntityTypeBridge.Builder.class))
+	@TypeBridgeMapping(builder = @TypeBridgeAnnotationBuilderReference(type = ContainingEntityTypeBridge.Builder.class))
 	public @interface ContainingEntityTypeBridgeAnnotation {
 	}
 
@@ -767,7 +767,7 @@ public class OrmAutomaticIndexingBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD })
-	@PropertyBridgeMapping(builder = @PropertyBridgeMappingBuilderReference(type = ContainingEntityPropertyBridge.Builder.class))
+	@PropertyBridgeMapping(builder = @PropertyBridgeAnnotationBuilderReference(type = ContainingEntityPropertyBridge.Builder.class))
 	public @interface ContainingEntityPropertyBridgeAnnotation {
 	}
 

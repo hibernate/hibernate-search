@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TypeBridgeMappingBuilderReference {
+public @interface TypeBridgeAnnotationBuilderReference {
 
 	String name() default "";
 

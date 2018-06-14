@@ -20,6 +20,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TypeBridgeMapping {
 
-	TypeBridgeMappingBuilderReference builder();
+	TypeBridgeAnnotationBuilderReference builder();
 
 }
