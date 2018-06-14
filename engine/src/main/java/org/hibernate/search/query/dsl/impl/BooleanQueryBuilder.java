@@ -33,6 +33,9 @@ class BooleanQueryBuilder implements MustJunction {
 	private final List<BooleanClause> clauses;
 	private BooleanClause lastClause;
 	private final QueryCustomizer queryCustomizer;
+	private MinimumShouldMatchContextImpl minimumShouldMatchContext;
+
+	private int shouldClauseCount = 0;
 
 	BooleanQueryBuilder() {
 		clauses = new ArrayList<BooleanClause>( 5 );
@@ -70,6 +73,7 @@ class BooleanQueryBuilder implements MustJunction {
 		else {
 			lastClause = new BooleanClause( query, BooleanClause.Occur.SHOULD );
 			clauses.add( lastClause );
+			++shouldClauseCount;
 		}
 		return this;
 	}
@@ -124,12 +128,36 @@ class BooleanQueryBuilder implements MustJunction {
 			//in this case we need to add a positive clause to match everything else.
 			builder.add( new MatchAllDocsQuery(), Occur.FILTER );
 		}
+
+		if ( minimumShouldMatchContext != null ) {
+			minimumShouldMatchContext.applyMinimum( builder, shouldClauseCount );
+		}
+
 		return queryCustomizer.setWrappedQuery( builder.build() ).createQuery();
 	}
 
 	@Override
 	public boolean isEmpty() {
 		return clauses.isEmpty();
+	}
+
+	@Override
+	public BooleanJunction minimumShouldMatchNumber(int matchingClausesNumber) {
+		getMinimumShouldMatchContext().requireNumber( matchingClausesNumber );
+		return this;
+	}
+
+	@Override
+	public BooleanJunction minimumShouldMatchPercent(int matchingClausesPercent) {
+		getMinimumShouldMatchContext().requirePercent( matchingClausesPercent );
+		return this;
+	}
+
+	private MinimumShouldMatchContextImpl getMinimumShouldMatchContext() {
+		if ( minimumShouldMatchContext == null ) {
+			minimumShouldMatchContext = new MinimumShouldMatchContextImpl();
+		}
+		return minimumShouldMatchContext;
 	}
 
 }
