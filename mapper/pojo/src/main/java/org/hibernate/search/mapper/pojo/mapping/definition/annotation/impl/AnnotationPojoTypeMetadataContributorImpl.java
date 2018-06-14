@@ -24,6 +24,7 @@ import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
@@ -31,6 +32,9 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeAnnotationBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
@@ -82,8 +86,10 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		// FIXME annotation for routing key bridge
 		// FIXME routing key bridge in programmatic mapping should probably be in the context of .indexed()?
+
+		typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBridgeMapping.class )
+				.forEach( annotation -> addRoutingKeyBridge( collector, annotation ) );
 
 		typeModel.getAnnotationsByMetaAnnotationType( TypeBridgeMapping.class )
 				.forEach( annotation -> addTypeBridge( collector, annotation ) );
@@ -149,6 +155,11 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		BridgeBuilder<? extends IdentifierBridge<?>> builder = createIdentifierBridgeBuilder( annotation, propertyModel );
 
 		collector.identifierBridge( builder );
+	}
+
+	private <A extends Annotation> void addRoutingKeyBridge(PojoMappingCollectorTypeNode collector, A annotation) {
+		BridgeBuilder<? extends RoutingKeyBridge> builder = createRoutingKeyBridgeBuilder( annotation );
+		collector.routingKeyBridge( builder );
 	}
 
 	private <A extends Annotation> void addTypeBridge(PojoMappingCollectorTypeNode collector, A annotation) {
@@ -272,6 +283,25 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 			// The bridge will be auto-detected from the property type
 			return null;
 		}
+	}
+	private <A extends Annotation> BridgeBuilder<? extends RoutingKeyBridge> createRoutingKeyBridgeBuilder(A annotation) {
+		RoutingKeyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBridgeMapping.class );
+		RoutingKeyBridgeReference bridgeReferenceAnnotation = bridgeMapping.bridge();
+		RoutingKeyBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
+
+		return createAnnotationMappedBridgeBuilder(
+				RoutingKeyBridgeMapping.class, RoutingKeyBridge.class, annotation,
+				toBeanReference(
+						bridgeReferenceAnnotation.name(),
+						bridgeReferenceAnnotation.type(),
+						RoutingKeyBridgeReference.UndefinedImplementationType.class
+				),
+				toBeanReference(
+						bridgeBuilderReferenceAnnotation.name(),
+						bridgeBuilderReferenceAnnotation.type(),
+						RoutingKeyBridgeAnnotationBuilderReference.UndefinedImplementationType.class
+				)
+		);
 	}
 
 	private <A extends Annotation> BridgeBuilder<? extends TypeBridge> createTypeBridgeBuilder(A annotation) {
