@@ -6,20 +6,41 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.declaration;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+
 /**
- * @author Yoann Rodiere
+ * Allows to map a property bridge to an annotation type,
+ * so that whenever the annotation is found on a field or method in the domain model,
+ * the property bridge mapped to the annotation will be applied.
  */
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyBridgeMapping {
 
+	/**
+	 * Map a property bridge builder to an annotation type.
+	 * <p>
+	 * Each time the mapped annotation is encountered, an instance of the property bridge builder will be created.
+	 * The builder will be passed the annotation through its
+	 * {@link AnnotationBridgeBuilder#initialize(Annotation)} method,
+	 * and then the bridge will be retrieved by calling {@link BridgeBuilder#build(BuildContext)}.
+	 * <p>
+	 * Property bridges mapped this way can be parameterized:
+	 * the bridge will be able to take any attribute of the mapped annotation into account
+	 * in its {@link AnnotationBridgeBuilder#initialize(Annotation)} method.
+	 *
+	 * @return A reference to the builder to use to build the property bridge.
+	 */
 	PropertyBridgeAnnotationBuilderReference builder();
 
 }
