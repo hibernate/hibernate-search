@@ -36,7 +36,6 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
@@ -226,7 +225,6 @@ public class OrmAutomaticIndexingEmbeddedBridgeIT {
 		static final String INDEX = "IndexedEntity";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToOne(mappedBy = "parent")

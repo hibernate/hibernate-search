@@ -19,7 +19,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -27,8 +26,8 @@ import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsum
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.hibernate.service.ServiceRegistry;
 
 import org.junit.After;
@@ -174,7 +173,6 @@ public class OrmAnnotationMappingDiscoveryIT {
 		public static final String INDEX = "IndexedEntity";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@Embedded

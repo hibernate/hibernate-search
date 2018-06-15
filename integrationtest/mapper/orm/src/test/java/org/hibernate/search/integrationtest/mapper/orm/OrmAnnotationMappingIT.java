@@ -484,7 +484,6 @@ public class OrmAnnotationMappingIT {
 		public static final String INDEX = "IndexedEntity";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@Field(name = "myTextField")
@@ -583,7 +582,6 @@ public class OrmAnnotationMappingIT {
 		public static final String INDEX = "YetAnotherIndexedEntity";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@Field

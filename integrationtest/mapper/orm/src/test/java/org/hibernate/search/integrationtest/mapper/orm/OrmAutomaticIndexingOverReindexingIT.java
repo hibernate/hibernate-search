@@ -29,7 +29,6 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -210,7 +209,6 @@ public class OrmAutomaticIndexingOverReindexingIT {
 		static final String INDEX = "level1";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToOne
@@ -241,7 +239,6 @@ public class OrmAutomaticIndexingOverReindexingIT {
 		static final String INDEX = "level2";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToOne(mappedBy = "level2")

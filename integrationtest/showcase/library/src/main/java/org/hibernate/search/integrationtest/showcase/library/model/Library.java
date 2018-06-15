@@ -20,10 +20,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.integrationtest.showcase.library.bridge.LibraryServiceBridge;
 
 /**
@@ -37,7 +36,6 @@ public class Library {
 	static final String INDEX = "Library";
 
 	@Id
-	@DocumentId
 	private Integer id;
 
 	@Basic

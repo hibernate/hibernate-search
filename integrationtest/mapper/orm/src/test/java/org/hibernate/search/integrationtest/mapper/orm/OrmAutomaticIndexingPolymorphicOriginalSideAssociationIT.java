@@ -24,7 +24,6 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -190,7 +189,6 @@ public class OrmAutomaticIndexingPolymorphicOriginalSideAssociationIT {
 		static final String INDEX = "IndexedEntity";
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToOne(mappedBy = "parent")
@@ -284,7 +282,6 @@ public class OrmAutomaticIndexingPolymorphicOriginalSideAssociationIT {
 	public static class ContainedEntity {
 
 		@Id
-		@DocumentId
 		private Integer id;
 
 		@OneToMany(mappedBy = "containedSingle")
