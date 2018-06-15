@@ -49,6 +49,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
 	private final boolean eventProcessingEnabled;
 	private final boolean dirtyCheckingEnabled;
 
@@ -246,7 +248,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			return dirtyPropertyNames;
 		}
 		else {
-			return null;
+			return EMPTY_STRING_ARRAY;
 		}
 	}
 
