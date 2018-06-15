@@ -14,19 +14,19 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
-	private Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata = Optional.empty();
+	private PojoEntityTypeAdditionalMetadataBuilder entityTypeMetadataBuilder;
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
 	@Override
-	public void markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
-		this.entityTypeMetadata = Optional.of( new PojoEntityTypeAdditionalMetadata( pathFilterFactory ) );
+	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
+		entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder( pathFilterFactory );
+		return entityTypeMetadataBuilder;
 	}
 
 	@Override
@@ -39,6 +39,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		for ( Map.Entry<String, PojoPropertyAdditionalMetadataBuilder> entry : propertyBuilders.entrySet() ) {
 			properties.put( entry.getKey(), entry.getValue().build() );
 		}
-		return new PojoTypeAdditionalMetadata( entityTypeMetadata, properties );
+		return new PojoTypeAdditionalMetadata(
+				entityTypeMetadataBuilder == null ? Optional.empty() : Optional.of( entityTypeMetadataBuilder.build() ),
+				properties
+		);
 	}
 }

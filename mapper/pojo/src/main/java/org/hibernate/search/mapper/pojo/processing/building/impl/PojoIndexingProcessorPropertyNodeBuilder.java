@@ -31,7 +31,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
 import org.hibernate.search.util.impl.common.Closer;
@@ -82,10 +81,10 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		if ( identityMappingCollector.isPresent() ) {
-			PojoGenericTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().getTypeModel();
 			IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge(
-					modelPath, builder );
-			identityMappingCollector.get().identifierBridge( propertyTypeModel, modelPath.getPropertyHandle(), bridge );
+					modelPath, builder
+			);
+			identityMappingCollector.get().identifierBridge( modelPath, bridge );
 		}
 	}
 

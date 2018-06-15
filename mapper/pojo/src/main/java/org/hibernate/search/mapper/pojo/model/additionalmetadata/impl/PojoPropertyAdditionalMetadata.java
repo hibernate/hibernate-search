@@ -42,6 +42,4 @@ public class PojoPropertyAdditionalMetadata {
 		return ( (List<M>) this.markers.getOrDefault( markerType, Collections.emptyList() ) )
 				.stream();
 	}
-
-
 }

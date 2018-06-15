@@ -110,8 +110,12 @@ public class PojoMapper<M> implements Mapper<M> {
 
 		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
 		PojoIndexedTypeManagerBuilder<?, ?> builder = new PojoIndexedTypeManagerBuilder<>(
-				entityTypeModel, mappingHelper, indexManagerBuildingState,
-				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null );
+				entityTypeModel,
+				typeAdditionalMetadataProvider.get( entityTypeModel ),
+				mappingHelper,
+				indexManagerBuildingState,
+				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null
+		);
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( entityTypeModel, builder );
 

@@ -6,15 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 public class PojoEntityTypeAdditionalMetadata {
 	private final PojoPathFilterFactory pathFilterFactory;
+	private final Optional<String> entityIdPropertyName;
 
-	public PojoEntityTypeAdditionalMetadata(PojoPathFilterFactory pathFilterFactory) {
+	public PojoEntityTypeAdditionalMetadata(PojoPathFilterFactory pathFilterFactory,
+			Optional<String> entityIdPropertyName) {
 		this.pathFilterFactory = pathFilterFactory;
+		this.entityIdPropertyName = entityIdPropertyName;
 	}
 
 	/**
@@ -22,5 +26,9 @@ public class PojoEntityTypeAdditionalMetadata {
 	 */
 	public PojoPathFilterFactory<Set<String>> getPathFilterFactory() {
 		return pathFilterFactory;
+	}
+
+	public Optional<String> getEntityIdPropertyName() {
+		return entityIdPropertyName;
 	}
 }

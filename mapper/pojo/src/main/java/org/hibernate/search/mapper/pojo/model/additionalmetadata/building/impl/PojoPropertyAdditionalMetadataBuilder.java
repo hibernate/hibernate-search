@@ -53,7 +53,6 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 		Map<ContainerValueExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
 		for ( Map.Entry<ContainerValueExtractorPath, PojoValueAdditionalMetadataBuilder> entry : valueBuilders.entrySet() ) {
 			values.put( entry.getKey(), entry.getValue().build() );
-
 		}
 		return new PojoPropertyAdditionalMetadata( values, markers );
 	}

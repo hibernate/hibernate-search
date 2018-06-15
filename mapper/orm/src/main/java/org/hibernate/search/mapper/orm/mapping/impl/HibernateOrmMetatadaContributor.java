@@ -56,11 +56,14 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			Class<?> clazz = persistentClass.getMappedClass();
 			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
 			collectPropertyDelegates( delegatesCollector, clazz, persistentClass.getPropertyIterator() );
+
+			String identifierPropertyName = persistentClass.getIdentifierProperty().getName();
+			List<PojoTypeMetadataContributor> delegates = delegatesCollector.buildAndRemove( clazz );
+
 			configurationCollector.collectContributor(
 					typeModel,
 					new HibernateOrmEntityTypeMetadataContributor(
-							persistentClass,
-							delegatesCollector.buildAndRemove( clazz )
+							persistentClass, identifierPropertyName, delegates
 					)
 			);
 		}

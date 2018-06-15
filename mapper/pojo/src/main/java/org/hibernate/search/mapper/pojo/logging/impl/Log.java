@@ -164,4 +164,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 27, value = "Type '%1$s' is not marked as an entity type, yet it is indexed or targeted"
 			+ " by an association from an indexed type. Please check your configuration.")
 	SearchException missingEntityTypeMetadata(PojoRawTypeModel<?> typeModel);
+
+	@Message(id = 28, value = "There isn't any explicit document ID mapping for indexed type '%1$s',"
+			+ " and the entity ID cannot be used as a default because it is unknown.")
+	SearchException missingIdentifierMapping(PojoRawTypeModel<?> typeModel);
 }

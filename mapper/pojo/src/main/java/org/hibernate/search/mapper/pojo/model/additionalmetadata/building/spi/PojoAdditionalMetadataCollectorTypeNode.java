@@ -30,8 +30,10 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * @param pathFilterFactory The path filter factory for this entity type,
 	 * i.e. the object allowing to create path filters that will be used in particular
 	 * when performing dirty checking during automatic reindexing.
+	 * @return A {@link PojoAdditionalMetadataCollectorEntityTypeNode}, allowing to provide optional metadata
+	 * about the entity.
 	 */
-	void markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory);
+	PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory);
 
 	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
 

@@ -15,18 +15,23 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
 final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadataContributor {
+
 	private final PersistentClass persistentClass;
+	private final String idPropertyName;
 	private final List<PojoTypeMetadataContributor> delegates;
 
 	HibernateOrmEntityTypeMetadataContributor(PersistentClass persistentClass,
+			String idPropertyName,
 			List<PojoTypeMetadataContributor> delegates) {
 		this.persistentClass = persistentClass;
+		this.idPropertyName = idPropertyName;
 		this.delegates = delegates;
 	}
 
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
-		collector.markAsEntity( new HibernateOrmPathFilterFactory( persistentClass ) );
+		collector.markAsEntity( new HibernateOrmPathFilterFactory( persistentClass ) )
+				.entityIdPropertyName( idPropertyName );
 		for ( PojoTypeMetadataContributor delegate : delegates ) {
 			delegate.contributeModel( collector );
 		}
