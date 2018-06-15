@@ -99,7 +99,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
 			PojoTypeAdditionalMetadata typeAdditionalMetadata) {
 		if ( preBuiltIndexingProcessor == null ) {
-			throw new AssertionFailure( "Internal error - preBuild should be called before addTo" );
+			throw new AssertionFailure( "Internal error - preBuild should be called before buildAndAddTo" );
 		}
 
 		IdentifierMapping<?, E> identifierMapping = identityMappingCollector.identifierMapping;
