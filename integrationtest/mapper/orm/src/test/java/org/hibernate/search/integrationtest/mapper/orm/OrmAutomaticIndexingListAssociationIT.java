@@ -17,9 +17,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events
@@ -162,6 +164,22 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		}
 
 		@Override
+		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity,
+				List<ContainedEntity> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate(ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedNoReindexOnUpdate();
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -204,7 +222,9 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@OneToOne(mappedBy = "parent")
 		@IndexedEmbedded(includePaths = {
 				"containedIndexedEmbedded.indexedField",
-				"containedIndexedEmbedded.indexedElementCollectionField"
+				"containedIndexedEmbedded.indexedElementCollectionField",
+				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField"
 		})
 		private ContainingEntity child;
 
@@ -216,6 +236,12 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@ManyToMany
 		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
+
+		@ManyToMany
+		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField" })
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		public Integer getId() {
 			return id;
@@ -256,6 +282,15 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		public void setContainedNonIndexedEmbedded(List<ContainedEntity> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
+
+		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
+			return containedIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedNoReindexOnUpdate(
+				List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate) {
+			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
+		}
 	}
 
 	@Entity(name = "indexed")
@@ -279,6 +314,10 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@ManyToMany(mappedBy = "containedNonIndexedEmbedded")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@Basic
 		@Field
@@ -310,6 +349,10 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public String getIndexedField() {

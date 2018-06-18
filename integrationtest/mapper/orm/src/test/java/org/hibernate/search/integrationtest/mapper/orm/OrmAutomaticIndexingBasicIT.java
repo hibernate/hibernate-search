@@ -20,8 +20,10 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -65,7 +67,9 @@ public class OrmAutomaticIndexingBasicIT {
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedField", String.class )
+				.field( "noReindexOnUpdateField", String.class )
 				.field( "indexedElementCollectionField", String.class )
+				.field( "noReindexOnUpdateElementCollectionField", String.class )
 		);
 
 		sessionFactory = sfb.build();
@@ -92,6 +96,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -108,6 +113,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -141,6 +147,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -158,6 +165,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 ),
@@ -176,6 +184,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -206,6 +215,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -224,6 +234,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 ),
@@ -252,6 +263,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
+							.field( "noReindexOnUpdateField", null )
 					)
 					.preparedThenExecuted();
 		} );
@@ -291,6 +303,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 					)
 					.preparedThenExecuted();
 		} );
@@ -335,6 +348,7 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
 					)
 					.preparedThenExecuted();
 		} );
@@ -350,6 +364,138 @@ public class OrmAutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating a indexed basic property configured with reindexOnUpdate = NO
+	 * does not trigger reindexing of the indexed entity owning the property.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public void directValueUpdate_noReindexOnUpdateField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNoReindexOnUpdateField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", entity1.getNoReindexOnUpdateField() )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNoReindexOnUpdateField( "updatedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNoReindexOnUpdateField( null );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an indexed element collection configured with reindexOnUpdate = NO
+	 * does not trigger reindexing of the indexed entity owning the collection.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public void directValueUpdate_noReindexOnUpdateElementCollectionField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getNoReindexOnUpdateElementCollectionField().add( "secondValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.getNoReindexOnUpdateElementCollectionField().remove( 1 );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing an indexed element collection configured with reindexOnUpdate = NO
+	 * does not trigger reindexing of the indexed entity owning the collection.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3204")
+	public void directValueReplace_noReindexOnUpdateElementCollectionField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setNoReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			// TODO HSEARCH-3204: remove the statement below to not expect any work
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "indexedField", null )
+							.field( "noReindexOnUpdateField", null )
+							.field(
+									"noReindexOnUpdateElementCollectionField",
+									"newFirstValue", "newSecondValue"
+							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -379,6 +525,16 @@ public class OrmAutomaticIndexingBasicIT {
 		@ElementCollection
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
+		@Basic
+		@Field
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+		private String noReindexOnUpdateField;
+
+		@ElementCollection
+		@Field
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -393,6 +549,14 @@ public class OrmAutomaticIndexingBasicIT {
 
 		public void setIndexedField(String indexedField) {
 			this.indexedField = indexedField;
+		}
+
+		public String getNoReindexOnUpdateField() {
+			return noReindexOnUpdateField;
+		}
+
+		public void setNoReindexOnUpdateField(String noReindexOnUpdateField) {
+			this.noReindexOnUpdateField = noReindexOnUpdateField;
 		}
 
 		public List<String> getIndexedElementCollectionField() {
@@ -417,6 +581,14 @@ public class OrmAutomaticIndexingBasicIT {
 
 		public void setNonIndexedElementCollectionField(List<String> nonIndexedElementCollectionField) {
 			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
+		}
+
+		public List<String> getNoReindexOnUpdateElementCollectionField() {
+			return noReindexOnUpdateElementCollectionField;
+		}
+
+		public void setNoReindexOnUpdateElementCollectionField(List<String> noReindexOnUpdateElementCollectionField) {
+			this.noReindexOnUpdateElementCollectionField = noReindexOnUpdateElementCollectionField;
 		}
 	}
 

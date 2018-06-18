@@ -74,7 +74,7 @@ import org.junit.Test;
  *      </li>
  *     <li>
  *         the second token defines how the association between TContaining and TContained is indexed:
- *         indexed-embedded, non-indexed-embedded.
+ *         indexed-embedded, non-indexed-embedded, indexed-embbedded with ReindexOnUpdate.NO.
  *     </li>
  *     <li>
  *         the third token (if any) defines which type of value is being updated/replaced:
@@ -125,8 +125,16 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 						.field( "indexedField", String.class )
 						.field( "indexedElementCollectionField", String.class )
 				)
+				.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
+						.field( "indexedField", String.class )
+						.field( "indexedElementCollectionField", String.class )
+				)
 				.objectField( "child", b3 -> b3
 						.objectField( "containedIndexedEmbedded", b2 -> b2
+								.field( "indexedField", String.class )
+								.field( "indexedElementCollectionField", String.class )
+						)
+						.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 								.field( "indexedField", String.class )
 								.field( "indexedElementCollectionField", String.class )
 						)
@@ -356,8 +364,8 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	}
 
 	/**
-	 * Test that replacing a non-indexed, ElementCollection property in an entity
-	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * Test that replacing an indexed ElementCollection property in an entity
+	 * that is IndexedEmbedded in an indexed entity
 	 * does trigger reindexing of the indexed entity.
 	 * <p>
 	 * We need dedicated tests for this because Hibernate ORM does not handle
@@ -559,6 +567,163 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public void indirectValueUpdate_indexedEmbeddedNoReindexOnUpdate_singleValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.setIndexedField( contained1, "initialValue" );
+			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setIndexedField( contained, "updatedValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an indexed ElementCollection property in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does not trigger reindexing of the indexed entity
+	 * if the association is marked with ReindexOnUpdate = NO.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public void indirectValueUpdate_indexedEmbeddedNoReindexOnUpdate_elementCollectionValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
+			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"indexedElementCollectionField",
+													"firstValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.getIndexedElementCollectionField( contained ).add( "secondValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.getIndexedElementCollectionField( contained ).remove( 0 );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing an indexed ElementCollection property in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does not trigger reindexing of the indexed entity
+	 * if the association is marked with ReindexOnUpdate = NO.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public void indirectValueReplace_indexedEmbeddedNoReindexOnUpdate_elementCollectionValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
+			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"indexedElementCollectionField",
+													"firstValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test replacing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+					"newFirstValue", "newSecondValue"
+			) ) );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	interface AssociationModelPrimitives<
 			TIndexed extends TContaining,
 			TContaining,
@@ -585,6 +750,10 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		void setContainedIndexedEmbeddedSingle(TContaining containing, TContained contained);
 
 		void setContainingAsIndexedEmbeddedSingle(TContained contained, TContaining containing);
+
+		void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained);
+
+		void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(TContained contained, TContaining containing);
 
 		void setIndexedField(TContained contained, String value);
 

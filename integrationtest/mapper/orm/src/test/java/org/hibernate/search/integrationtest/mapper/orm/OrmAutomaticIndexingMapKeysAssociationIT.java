@@ -22,12 +22,14 @@ import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
@@ -171,6 +173,22 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		}
 
 		@Override
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity,
+				Map<ContainedEntity, String> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate(ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedNoReindexOnUpdate();
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -213,7 +231,9 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		@OneToOne(mappedBy = "parent")
 		@IndexedEmbedded(includePaths = {
 				"containedIndexedEmbedded.indexedField",
-				"containedIndexedEmbedded.indexedElementCollectionField"
+				"containedIndexedEmbedded.indexedElementCollectionField",
+				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField"
 		})
 		private ContainingEntity child;
 
@@ -240,6 +260,24 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		@Column(name = "value")
 		@OrderBy("key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<ContainedEntity, String> containedNonIndexedEmbedded = new LinkedHashMap<>();
+
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedNoReindexOnUpdate",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "key")
+		@Column(name = "value")
+		@OrderBy("key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@IndexedEmbedded(
+				includePaths = { "indexedField", "indexedElementCollectionField" },
+				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
+		)
+		@IndexingDependency(
+				reindexOnUpdate = ReindexOnUpdate.NO,
+				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
+		)
+		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
 		public Integer getId() {
 			return id;
@@ -277,9 +315,17 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 			return containedNonIndexedEmbedded;
 		}
 
-		public void setContainedNonIndexedEmbedded(
-				Map<ContainedEntity, String> containedNonIndexedEmbedded) {
+		public void setContainedNonIndexedEmbedded(Map<ContainedEntity, String> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
+		}
+
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedNoReindexOnUpdate() {
+			return containedIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedNoReindexOnUpdate(
+				Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate) {
+			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 	}
 
@@ -321,6 +367,20 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
+		@JoinTable(name = "contained_indexedNoReindexOnUpdateMapHolder")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @PropertyValue(
+						propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
+						extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				)
+		)
+		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+
 		@Basic
 		@Field
 		private String indexedField;
@@ -351,6 +411,10 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public String getIndexedField() {
