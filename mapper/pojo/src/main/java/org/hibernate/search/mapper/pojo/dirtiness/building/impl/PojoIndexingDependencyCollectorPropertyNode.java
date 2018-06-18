@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
@@ -18,15 +19,18 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
  */
 public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractPojoIndexingDependencyCollectorNode {
 
+	private final PojoIndexingDependencyCollectorTypeNode<T> parentNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode;
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode;
 
-	PojoIndexingDependencyCollectorPropertyNode(BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode,
+	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parentNode,
+			BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
+		this.parentNode = parentNode;
 		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
@@ -35,6 +39,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractP
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
 			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
 		return new PojoIndexingDependencyCollectorValueNode<>(
+				this,
 				modelPathFromRootEntityNode.value( boundExtractorPath ),
 				lastEntityNode,
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
@@ -42,4 +47,8 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractP
 		);
 	}
 
+	@Override
+	ReindexOnUpdate getReindexOnUpdate() {
+		return parentNode.getReindexOnUpdate();
+	}
 }

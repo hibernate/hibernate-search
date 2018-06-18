@@ -43,4 +43,6 @@ public interface PropertyMappingContext {
 
 	AssociationInverseSideMappingContext associationInverseSide(PojoModelPathValueNode inversePath);
 
+	IndexingDependencyMappingContext indexingDependency();
+
 }

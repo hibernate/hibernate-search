@@ -48,6 +48,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 			createMock( ContainerValueExtractorBinder.class );
 
 	@Test
+	@SuppressWarnings( "unchecked" )
 	public void detectInfiniteRecursion() {
 		String originalSidePropertyName = "originalSideProperty";
 		String inverseSideProperty1Name = "inverseSideProperty1";
@@ -150,10 +151,10 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType2AdditionalMetadataMock, inverseSideProperty3Name );
 
 		// Let's not complicate things any further: assume that none of the paths is the default one
-		EasyMock.expect( extractorBinderMock.tryBindPath(
+		EasyMock.expect( extractorBinderMock.isDefaultExtractorPath(
 				EasyMock.eq( introspectorMock ), EasyMock.anyObject(), EasyMock.anyObject()
 		) )
-				.andStubReturn( Optional.empty() );
+				.andStubReturn( false );
 		// Let's not complicate things any further: assume that all extractor paths are noExtractors() paths
 		EasyMock.expect( extractorBinderMock.bindPath(
 				EasyMock.eq( introspectorMock ), EasyMock.anyObject(),
@@ -186,6 +187,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		}
 	}
 
+	@SuppressWarnings( "unchecked" )
 	private PropertyHandle setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
 		PropertyHandle propertyHandleMock =

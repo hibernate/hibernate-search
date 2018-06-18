@@ -131,13 +131,10 @@ public final class PojoAssociationPathInverter {
 
 	private boolean isDefaultExtractorPath(PojoPropertyModel<?> propertyModel,
 			BoundContainerValueExtractorPath<?, ?> originalSideBoundExtractorPath) {
-		Optional<? extends BoundContainerValueExtractorPath<?, ?>> boundDefaultExtractorPathOptional = extractorBinder
-				.tryBindPath(
-						introspector, propertyModel.getTypeModel(),
-						ContainerValueExtractorPath.defaultExtractors()
-				);
-		return boundDefaultExtractorPathOptional.isPresent() && originalSideBoundExtractorPath.getExtractorPath().equals(
-				boundDefaultExtractorPathOptional.get().getExtractorPath()
+		return extractorBinder.isDefaultExtractorPath(
+				introspector,
+				propertyModel.getTypeModel(),
+				originalSideBoundExtractorPath.getExtractorPath()
 		);
 	}
 

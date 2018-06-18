@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
@@ -59,11 +60,14 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
 
+	private final ReindexOnUpdate reindexOnUpdate;
+
 	// First key: inverse side entity type, second key: original side concrete entity type
 	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
-	PojoIndexingDependencyCollectorValueNode(BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
+	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
+			BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
@@ -71,6 +75,16 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
+
+		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromRootEntityNode;
+		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathValueNode.getParent();
+		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
+		this.reindexOnUpdate = buildingHelper.getReindexOnUpdate(
+				parentNode.getReindexOnUpdate(),
+				modelPathTypeNode.getTypeModel(),
+				modelPathPropertyNode.getPropertyModel().getName(),
+				modelPathValueNode.getExtractorPath()
+		);
 	}
 
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
@@ -80,7 +94,14 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	}
 
 	public void collectDependency() {
-		lastEntityNode.collectDependency( modelPathFromLastEntityNode );
+		if ( ReindexOnUpdate.DEFAULT.equals( reindexOnUpdate ) ) {
+			lastEntityNode.collectDependency( modelPathFromLastEntityNode );
+		}
+	}
+
+	@Override
+	ReindexOnUpdate getReindexOnUpdate() {
+		return reindexOnUpdate;
 	}
 
 	/**

@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
@@ -54,6 +55,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
@@ -104,6 +106,8 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				.forEach( annotation -> addMarker( collector.property( name ), annotation ) );
 		propertyModel.getAnnotationsByType( AssociationInverseSide.class )
 				.forEach( annotation -> addAssociationInverseSide( collector.property( name ), propertyModel, annotation ) );
+		propertyModel.getAnnotationsByType( IndexingDependency.class )
+				.forEach( annotation -> addIndexingDependency( collector.property( name ), annotation ) );
 	}
 
 	private void contributePropertyMapping(PojoMappingCollectorTypeNode collector, PojoPropertyModel<?> propertyModel) {
@@ -149,6 +153,17 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		}
 
 		collector.value( extractorPath ).associationInverseSide( inversePath );
+	}
+
+	private void addIndexingDependency(PojoAdditionalMetadataCollectorPropertyNode collector,
+			IndexingDependency annotation) {
+		ContainerValueExtractorPath extractorPath = getExtractorPath(
+				annotation.extractors(), IndexingDependency.DefaultExtractors.class
+		);
+
+		ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
+
+		collector.value( extractorPath ).indexingDependency( reindexOnUpdate );
 	}
 
 	private void addDocumentId(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel, DocumentId annotation) {

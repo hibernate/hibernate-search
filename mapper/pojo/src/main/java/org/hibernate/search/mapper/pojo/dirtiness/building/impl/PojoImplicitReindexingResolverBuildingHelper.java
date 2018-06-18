@@ -13,20 +13,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
+	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final PojoAssociationPathInverter pathInverter;
 	private final Set<PojoRawTypeModel<?>> entityTypes;
 	private final Map<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> concreteEntitySubTypesByEntitySuperType =
@@ -35,12 +40,14 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			new HashMap<>();
 
 	public PojoImplicitReindexingResolverBuildingHelper(
-			PojoAssociationPathInverter pathInverter,
 			PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder,
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
+			PojoAssociationPathInverter pathInverter,
 			Set<PojoRawTypeModel<?>> entityTypes) {
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
+		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.pathInverter = pathInverter;
 		this.entityTypes = entityTypes;
 
@@ -121,5 +128,33 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	<V, T> ContainerValueExtractor<? super T, V> createExtractors(
 			BoundContainerValueExtractorPath<T, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
+	}
+
+	ReindexOnUpdate getReindexOnUpdate(ReindexOnUpdate parentReindexOnUpdate,
+			PojoTypeModel<?> typeModel, String propertyName, ContainerValueExtractorPath extractorPath) {
+		if ( ReindexOnUpdate.NO.equals( parentReindexOnUpdate ) ) {
+			return ReindexOnUpdate.NO;
+		}
+		else {
+			PojoTypeAdditionalMetadata typeAdditionalMetadata =
+					typeAdditionalMetadataProvider.get( typeModel.getRawType() );
+			Optional<ReindexOnUpdate> reindexOnUpdateOptional =
+					typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+							.getValueAdditionalMetadata( extractorPath )
+							.getReindexOnUpdate();
+			if ( !reindexOnUpdateOptional.isPresent() ) {
+				if ( extractorBinder.isDefaultExtractorPath(
+						introspector,
+						typeModel.getProperty( propertyName ).getTypeModel(),
+						extractorPath
+				) ) {
+					reindexOnUpdateOptional = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+							.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
+							.getReindexOnUpdate();
+				}
+			}
+
+			return reindexOnUpdateOptional.orElse( ReindexOnUpdate.DEFAULT );
+		}
 	}
 }

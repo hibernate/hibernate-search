@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 public interface PojoAdditionalMetadataCollectorValueNode extends PojoAdditionalMetadataCollector {
@@ -13,5 +14,7 @@ public interface PojoAdditionalMetadataCollectorValueNode extends PojoAdditional
 	void associationInverseSide(PojoModelPathValueNode inverseSidePath);
 
 	void associationEmbedded();
+
+	void indexingDependency(ReindexOnUpdate reindexOnUpdate);
 
 }

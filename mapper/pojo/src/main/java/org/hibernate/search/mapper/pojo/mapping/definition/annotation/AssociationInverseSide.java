@@ -36,7 +36,8 @@ public @interface AssociationInverseSide {
 	 * while {@code @AssociationInverseSide(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))}
 	 * would define the inverse side of the association for the map values (of type EntityB).
 	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
+	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...)
+	 * 	 * and use the first one that works.
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
 	ContainerValueExtractorBeanReference[] extractors()

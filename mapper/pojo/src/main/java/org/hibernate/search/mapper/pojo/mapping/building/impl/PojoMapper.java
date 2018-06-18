@@ -140,7 +140,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		);
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
-						pathInverter, introspector, extractorBinder, entityTypes
+						introspector, extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
 				);
 
 		// First phase: build the processors and contribute to the reindexing resolvers

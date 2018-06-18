@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -123,6 +124,13 @@ public class PropertyMappingContextImpl
 		AssociationInverseSideMappingContextImpl child = new AssociationInverseSideMappingContextImpl(
 				this, inversePath
 		);
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public IndexingDependencyMappingContext indexingDependency() {
+		IndexingDependencyMappingContextImpl child = new IndexingDependencyMappingContextImpl( this );
 		children.add( child );
 		return child;
 	}

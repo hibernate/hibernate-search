@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
+import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -63,11 +64,17 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
+				this,
 				modelPathFromRootEntityNode.property( propertyHandle ),
 				lastEntityNode,
 				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyHandle ),
 				buildingHelper
 		);
+	}
+
+	@Override
+	ReindexOnUpdate getReindexOnUpdate() {
+		return parentNode == null ? ReindexOnUpdate.DEFAULT : parentNode.getReindexOnUpdate();
 	}
 
 	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
