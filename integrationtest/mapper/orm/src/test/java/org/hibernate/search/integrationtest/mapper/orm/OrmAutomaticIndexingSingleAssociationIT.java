@@ -67,12 +67,12 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				.objectField( "containedSingle", b2 -> b2
+				.objectField( "containedIndexedEmbedded", b2 -> b2
 						.field( "indexedField", String.class )
 						.field( "indexedElementCollectionField", String.class )
 				)
 				.objectField( "child", b3 -> b3
-						.objectField( "containedSingle", b2 -> b2
+						.objectField( "containedIndexedEmbedded", b2 -> b2
 								.field( "indexedField", String.class )
 								.field( "indexedElementCollectionField", String.class )
 						)
@@ -112,14 +112,14 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 2 );
 			containedEntity.setIndexedField( "initialValue" );
 
-			entity1.setContainedSingle( containedEntity );
-			containedEntity.setContainingAsSingle( entity1 );
+			entity1.setContainedIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsIndexedEmbedded( entity1 );
 
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "containedSingle", b2 -> b2
+							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", "initialValue" )
 							)
 					)
@@ -135,15 +135,15 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 3 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			entity1.getContainedSingle().setContainingAsSingle( null );
-			entity1.setContainedSingle( containedEntity );
-			containedEntity.setContainingAsSingle( entity1 );
+			entity1.getContainedIndexedEmbedded().setContainingAsIndexedEmbedded( null );
+			entity1.setContainedIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsIndexedEmbedded( entity1 );
 
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "containedSingle", b2 -> b2
+							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", "updatedValue" )
 							)
 					)
@@ -155,8 +155,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
-			entity1.getContainedSingle().setContainingAsSingle( null );
-			entity1.setContainedSingle( null );
+			entity1.getContainedIndexedEmbedded().setContainingAsIndexedEmbedded( null );
+			entity1.setContainedIndexedEmbedded( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> { } )
@@ -193,8 +193,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 2 );
 			containedEntity.setNonIndexedField( "initialValue" );
 
-			entity1.setContainedNonIndexedEmbeddedSingle( containedEntity );
-			containedEntity.setContainingAsNonIndexedEmbeddedSingle( entity1 );
+			entity1.setContainedNonIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsNonIndexedEmbedded( entity1 );
 
 			session.persist( containedEntity );
 
@@ -210,9 +210,9 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 3 );
 			containedEntity.setNonIndexedField( "updatedValue" );
 
-			entity1.getContainedNonIndexedEmbeddedSingle().setContainingAsNonIndexedEmbeddedSingle( null );
-			entity1.setContainedNonIndexedEmbeddedSingle( containedEntity );
-			containedEntity.setContainingAsNonIndexedEmbeddedSingle( entity1 );
+			entity1.getContainedNonIndexedEmbedded().setContainingAsNonIndexedEmbedded( null );
+			entity1.setContainedNonIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsNonIndexedEmbedded( entity1 );
 
 			session.persist( containedEntity );
 
@@ -224,8 +224,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
-			entity1.getContainedNonIndexedEmbeddedSingle().setContainingAsNonIndexedEmbeddedSingle( null );
-			entity1.setContainedNonIndexedEmbeddedSingle( null );
+			entity1.getContainedNonIndexedEmbedded().setContainingAsNonIndexedEmbedded( null );
+			entity1.setContainedNonIndexedEmbedded( null );
 
 			// Do not expect any work
 		} );
@@ -268,15 +268,15 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIndexedField( "initialValue" );
 
-			containingEntity1.setContainedSingle( containedEntity );
-			containedEntity.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "initialValue" )
 									)
 							)
@@ -293,16 +293,16 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			containingEntity1.getContainedSingle().setContainingAsSingle( null );
-			containingEntity1.setContainedSingle( containedEntity );
-			containedEntity.setContainingAsSingle( containingEntity1 );
+			containingEntity1.getContainedIndexedEmbedded().setContainingAsIndexedEmbedded( null );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )
 									)
 							)
@@ -319,8 +319,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 6 );
 			containedEntity.setIndexedField( "outOfScopeValue" );
 
-			deeplyNestedContainingEntity1.setContainedSingle( containedEntity );
-			containedEntity.setContainingAsSingle( deeplyNestedContainingEntity1 );
+			deeplyNestedContainingEntity1.setContainedIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsIndexedEmbedded( deeplyNestedContainingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -332,8 +332,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 
-			containingEntity1.getContainedSingle().setContainingAsSingle( null );
-			containingEntity1.setContainedSingle( null );
+			containingEntity1.getContainedIndexedEmbedded().setContainingAsIndexedEmbedded( null );
+			containingEntity1.setContainedIndexedEmbedded( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
@@ -380,8 +380,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 4 );
 			containedEntity.setIndexedField( "initialValue" );
 
-			containingEntity1.setContainedNonIndexedEmbeddedSingle( containedEntity );
-			containedEntity.setContainingAsNonIndexedEmbeddedSingle( containingEntity1 );
+			containingEntity1.setContainedNonIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsNonIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -397,9 +397,9 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			containedEntity.setId( 5 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			containingEntity1.getContainedNonIndexedEmbeddedSingle().setContainingAsNonIndexedEmbeddedSingle( null );
-			containingEntity1.setContainedNonIndexedEmbeddedSingle( containedEntity );
-			containedEntity.setContainingAsNonIndexedEmbeddedSingle( containingEntity1 );
+			containingEntity1.getContainedNonIndexedEmbedded().setContainingAsNonIndexedEmbedded( null );
+			containingEntity1.setContainedNonIndexedEmbedded( containedEntity );
+			containedEntity.setContainingAsNonIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -411,8 +411,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 
-			containingEntity1.getContainedNonIndexedEmbeddedSingle().setContainingAsNonIndexedEmbeddedSingle( null );
-			containingEntity1.setContainedNonIndexedEmbeddedSingle( null );
+			containingEntity1.getContainedNonIndexedEmbedded().setContainingAsNonIndexedEmbedded( null );
+			containingEntity1.setContainedNonIndexedEmbedded( null );
 
 			// Do not expect any work
 		} );
@@ -438,14 +438,14 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.setIndexedField( "initialValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			ContainedEntity containedEntity2 = new ContainedEntity();
 			containedEntity2.setId( 5 );
 			containedEntity2.setIndexedField( "initialOutOfScopeValue" );
-			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
-			containedEntity2.setContainingAsSingle( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setContainedIndexedEmbedded( containedEntity2 );
+			containedEntity2.setContainingAsIndexedEmbedded( deeplyNestedContainingEntity );
 
 			session.persist( containedEntity1 );
 			session.persist( containedEntity2 );
@@ -456,7 +456,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "initialValue" )
 									)
 							)
@@ -473,7 +473,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )
 									)
 							)
@@ -512,8 +512,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.setIndexedField( "initialValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity1 );
 			session.persist( containingEntity1 );
@@ -522,7 +522,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "initialValue" )
 									)
 							)
@@ -560,14 +560,14 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.getIndexedElementCollectionField().add( "firstValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			ContainedEntity containedEntity2 = new ContainedEntity();
 			containedEntity2.setId( 5 );
 			containedEntity2.getIndexedElementCollectionField().add( "firstOutOfScopeValue" );
-			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
-			containedEntity2.setContainingAsSingle( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setContainedIndexedEmbedded( containedEntity2 );
+			containedEntity2.setContainingAsIndexedEmbedded( deeplyNestedContainingEntity );
 
 			session.persist( containedEntity1 );
 			session.persist( containedEntity2 );
@@ -578,7 +578,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -599,7 +599,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -620,7 +620,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -671,14 +671,14 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.getIndexedElementCollectionField().add( "firstValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			ContainedEntity containedEntity2 = new ContainedEntity();
 			containedEntity2.setId( 5 );
 			containedEntity2.getIndexedElementCollectionField().add( "firstOutOfScopeValue" );
-			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
-			containedEntity2.setContainingAsSingle( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setContainedIndexedEmbedded( containedEntity2 );
+			containedEntity2.setContainingAsIndexedEmbedded( deeplyNestedContainingEntity );
 
 			session.persist( containedEntity1 );
 			session.persist( containedEntity2 );
@@ -689,7 +689,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -712,7 +712,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -757,8 +757,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.getIndexedElementCollectionField().add( "firstValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity1 );
 			session.persist( containingEntity1 );
@@ -767,7 +767,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 											.field(
 													"indexedElementCollectionField",
@@ -822,8 +822,8 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
 			containedEntity1.getNonIndexedElementCollectionField().add( "firstValue" );
-			containingEntity1.setContainedSingle( containedEntity1 );
-			containedEntity1.setContainingAsSingle( containingEntity1 );
+			containingEntity1.setContainedIndexedEmbedded( containedEntity1 );
+			containedEntity1.setContainingAsIndexedEmbedded( containingEntity1 );
 
 			session.persist( containedEntity1 );
 			session.persist( containingEntity1 );
@@ -832,7 +832,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 									)
 							)
@@ -852,7 +852,7 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> b2
-									.objectField( "containedSingle", b3 -> b3
+									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
 									)
 							)
@@ -873,17 +873,17 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 
 		@OneToOne(mappedBy = "parent")
 		@IndexedEmbedded(includePaths = {
-				"containedSingle.indexedField",
-				"containedSingle.indexedElementCollectionField"
+				"containedIndexedEmbedded.indexedField",
+				"containedIndexedEmbedded.indexedElementCollectionField"
 		})
 		private ContainingEntity child;
 
 		@OneToOne
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField" })
-		private ContainedEntity containedSingle;
+		private ContainedEntity containedIndexedEmbedded;
 
 		@OneToOne
-		private ContainedEntity containedNonIndexedEmbeddedSingle;
+		private ContainedEntity containedNonIndexedEmbedded;
 
 		public Integer getId() {
 			return id;
@@ -909,20 +909,20 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			this.child = child;
 		}
 
-		public ContainedEntity getContainedSingle() {
-			return containedSingle;
+		public ContainedEntity getContainedIndexedEmbedded() {
+			return containedIndexedEmbedded;
 		}
 
-		public void setContainedSingle(ContainedEntity containedSingle) {
-			this.containedSingle = containedSingle;
+		public void setContainedIndexedEmbedded(ContainedEntity containedIndexedEmbedded) {
+			this.containedIndexedEmbedded = containedIndexedEmbedded;
 		}
 
-		public ContainedEntity getContainedNonIndexedEmbeddedSingle() {
-			return containedNonIndexedEmbeddedSingle;
+		public ContainedEntity getContainedNonIndexedEmbedded() {
+			return containedNonIndexedEmbedded;
 		}
 
-		public void setContainedNonIndexedEmbeddedSingle(ContainedEntity containedNonIndexedEmbeddedSingle) {
-			this.containedNonIndexedEmbeddedSingle = containedNonIndexedEmbeddedSingle;
+		public void setContainedNonIndexedEmbedded(ContainedEntity containedNonIndexedEmbedded) {
+			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 	}
 
@@ -940,11 +940,11 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 		@Id
 		private Integer id;
 
-		@OneToOne(mappedBy = "containedSingle")
-		private ContainingEntity containingAsSingle;
+		@OneToOne(mappedBy = "containedIndexedEmbedded")
+		private ContainingEntity containingAsIndexedEmbedded;
 
-		@OneToOne(mappedBy = "containedNonIndexedEmbeddedSingle")
-		private ContainingEntity containingAsNonIndexedEmbeddedSingle;
+		@OneToOne(mappedBy = "containedNonIndexedEmbedded")
+		private ContainingEntity containingAsNonIndexedEmbedded;
 
 		@Basic
 		@Field
@@ -970,20 +970,20 @@ public class OrmAutomaticIndexingSingleAssociationIT {
 			this.id = id;
 		}
 
-		public ContainingEntity getContainingAsSingle() {
-			return containingAsSingle;
+		public ContainingEntity getContainingAsIndexedEmbedded() {
+			return containingAsIndexedEmbedded;
 		}
 
-		public void setContainingAsSingle(ContainingEntity containingAsSingle) {
-			this.containingAsSingle = containingAsSingle;
+		public void setContainingAsIndexedEmbedded(ContainingEntity containingAsIndexedEmbedded) {
+			this.containingAsIndexedEmbedded = containingAsIndexedEmbedded;
 		}
 
-		public ContainingEntity getContainingAsNonIndexedEmbeddedSingle() {
-			return containingAsNonIndexedEmbeddedSingle;
+		public ContainingEntity getContainingAsNonIndexedEmbedded() {
+			return containingAsNonIndexedEmbedded;
 		}
 
-		public void setContainingAsNonIndexedEmbeddedSingle(ContainingEntity containingAsNonIndexedEmbeddedSingle) {
-			this.containingAsNonIndexedEmbeddedSingle = containingAsNonIndexedEmbeddedSingle;
+		public void setContainingAsNonIndexedEmbedded(ContainingEntity containingAsNonIndexedEmbedded) {
+			this.containingAsNonIndexedEmbedded = containingAsNonIndexedEmbedded;
 		}
 
 		public String getIndexedField() {
