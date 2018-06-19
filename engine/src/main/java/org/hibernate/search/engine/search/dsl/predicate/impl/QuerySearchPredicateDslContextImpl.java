@@ -6,14 +6,11 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A DSL context used when calling {@link SearchQueryResultContext#predicate()} to build the predicate
@@ -22,29 +19,23 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 public final class QuerySearchPredicateDslContextImpl<N, C>
 		implements SearchPredicateDslContext<N, C> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private final SearchPredicateContributorAggregator<C> aggregator;
 
-	private final C collector;
 	private final Supplier<N> nextContextSupplier;
 
-	private SearchPredicateContributor<? super C> singlePredicateContributor;
-
-	public QuerySearchPredicateDslContextImpl(C collector, Supplier<N> nextContextSupplier) {
-		this.collector = collector;
+	public QuerySearchPredicateDslContextImpl(SearchPredicateContributorAggregator<C> aggregator,
+			Supplier<N> nextContextSupplier) {
+		this.aggregator = aggregator;
 		this.nextContextSupplier = nextContextSupplier;
 	}
 
 	@Override
 	public void addContributor(SearchPredicateContributor<? super C> child) {
-		if ( this.singlePredicateContributor != null ) {
-			throw log.cannotAddMultiplePredicatesToQueryRoot();
-		}
-		this.singlePredicateContributor = child;
+		aggregator.add( child );
 	}
 
 	@Override
 	public N getNextContext() {
-		singlePredicateContributor.contribute( collector );
 		return nextContextSupplier.get();
 	}
 }

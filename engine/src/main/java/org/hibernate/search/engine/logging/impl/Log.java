@@ -69,4 +69,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 16, value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
+
+	@Message(id = 17, value = "Cannot add a predicate to this DSL context anymore, because the DSL context was already closed."
+			+ " If you want to re-use predicates, do not re-use the predicate DSL context objects,"
+			+ " but rather build SearchPredicate objects."
+	)
+	SearchException cannotAddPredicateToUsedContext();
+
+	@Message(id = 18, value = "Cannot add a sort to this DSL context anymore, because the DSL context was already closed."
+			+ " If you want to re-use sorts, do not re-use the sort DSL context objects,"
+			+ " but rather build SearchSort objects."
+	)
+	SearchException cannotAddSortToUsedContext();
 }

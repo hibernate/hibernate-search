@@ -6,17 +6,14 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A DSL context used when building a {@link SearchPredicate} object,
@@ -25,13 +22,13 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * (in which case the lambda may retrieve the resulting {@link SearchPredicate} object and cache it).
  */
 public final class BuildingRootSearchPredicateDslContextImpl<C>
-		implements SearchPredicateDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+		implements SearchPredicateDslContext<SearchPredicate, C> {
 
 	private final SearchPredicateFactory<C> factory;
 
-	private SearchPredicateContributor<? super C> singlePredicateContributor;
+	private final SearchPredicateContributorAggregator<C> aggregator = new SearchPredicateContributorAggregator<>();
+
+	private SearchPredicate built;
 
 	public BuildingRootSearchPredicateDslContextImpl(SearchPredicateFactory<C> factory) {
 		this.factory = factory;
@@ -39,19 +36,28 @@ public final class BuildingRootSearchPredicateDslContextImpl<C>
 
 	@Override
 	public void addContributor(SearchPredicateContributor<? super C> child) {
-		if ( this.singlePredicateContributor != null ) {
-			throw log.cannotAddMultiplePredicatesToQueryRoot();
-		}
-		this.singlePredicateContributor = child;
+		aggregator.add( child );
 	}
 
 	@Override
 	public SearchPredicate getNextContext() {
-		return factory.toSearchPredicate( singlePredicateContributor );
+		if ( built == null ) {
+			built = factory.toSearchPredicate( aggregator );
+		}
+		return built;
 	}
 
-	@Override
-	public void contribute(C collector) {
-		singlePredicateContributor.contribute( collector );
+	public SearchPredicateContributor<C> getResultingContributor() {
+		if ( built != null ) {
+			return factory.toContributor( built );
+		}
+		else {
+			/*
+			 * Optimization: we know the user will not be able to request a SearchSort anymore,
+			 * so we don't need to build a SearchSort object in this case,
+			 * we can just use the contributors directly.
+			 */
+			return aggregator;
+		}
 	}
 }

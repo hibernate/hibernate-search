@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
@@ -24,11 +22,13 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
 public final class BuildingRootSearchSortDslContextImpl<C>
-		implements SearchSortDslContext<SearchSort, C>, SearchSortContributor<C> {
+		implements SearchSortDslContext<SearchSort, C> {
 
 	private final SearchSortFactory<C> factory;
 
-	private List<SearchSortContributor<? super C>> sortContributors = new ArrayList<>();
+	private final SearchSortContributorAggregator<C> aggregator = new SearchSortContributorAggregator<>();
+
+	private SearchSort built;
 
 	public BuildingRootSearchSortDslContextImpl(SearchSortFactory<C> factory) {
 		this.factory = factory;
@@ -36,16 +36,28 @@ public final class BuildingRootSearchSortDslContextImpl<C>
 
 	@Override
 	public void addContributor(SearchSortContributor<? super C> child) {
-		sortContributors.add( child );
+		aggregator.add( child );
 	}
 
 	@Override
 	public SearchSort getNextContext() {
-		return factory.toSearchSort( this );
+		if ( built == null ) {
+			built = factory.toSearchSort( aggregator );
+		}
+		return built;
 	}
 
-	@Override
-	public void contribute(C collector) {
-		sortContributors.forEach( c -> c.contribute( collector ) );
+	public SearchSortContributor<C> getResultingContributor() {
+		if ( built != null ) {
+			return factory.toContributor( built );
+		}
+		else {
+			/*
+			 * Optimization: we know the user will not be able to request a SearchSort anymore,
+			 * so we don't need to build a SearchSort object in this case,
+			 * we can just use the contributors directly.
+ 			 */
+			return aggregator;
+		}
 	}
 }

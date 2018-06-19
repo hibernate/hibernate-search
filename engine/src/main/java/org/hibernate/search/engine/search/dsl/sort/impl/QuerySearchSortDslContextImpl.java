@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
@@ -20,24 +17,22 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 public final class QuerySearchSortDslContextImpl<N, C>
 		implements SearchSortDslContext<N, C> {
 
-	private final C collector;
+	private final SearchSortContributorAggregator<C> searchSortContributorAggregator;
 	private final N nextContext;
 
-	private List<SearchSortContributor<? super C>> sortContributors = new ArrayList<>();
-
-	public QuerySearchSortDslContextImpl(C collector, N nextContext) {
-		this.collector = collector;
+	public QuerySearchSortDslContextImpl(SearchSortContributorAggregator<C> searchSortContributorAggregator,
+			N nextContext) {
+		this.searchSortContributorAggregator = searchSortContributorAggregator;
 		this.nextContext = nextContext;
 	}
 
 	@Override
 	public void addContributor(SearchSortContributor<? super C> child) {
-		this.sortContributors.add( child );
+		this.searchSortContributorAggregator.add( child );
 	}
 
 	@Override
 	public N getNextContext() {
-		sortContributors.forEach( c -> c.contribute( collector ) );
 		return nextContext;
 	}
 

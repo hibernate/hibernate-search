@@ -17,8 +17,10 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.BuildingRootSearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.QuerySearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContributorAggregator;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
@@ -32,12 +34,17 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 	private final SearchTargetContext<C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
+	private final SearchPredicateContributor<? super C> searchPredicateContributor;
+	private final SearchSortContributorAggregator<C> searchSortContributorAggregator;
 
-	public SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+	SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchPredicateContributor<? super C> searchPredicateContributor) {
 		this.targetContext = targetContext;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
+		this.searchPredicateContributor = searchPredicateContributor;
+		this.searchSortContributorAggregator = new SearchSortContributorAggregator<>();
 	}
 
 	@Override
@@ -55,36 +62,51 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 	@Override
 	public SearchQueryContext<Q> sort(SearchSort sort) {
 		SearchSortFactory<? super C> factory = targetContext.getSearchSortFactory();
-		factory.toContributor( sort ).contribute( searchQueryBuilder.getQueryElementCollector() );
+		searchSortContributorAggregator.add( factory.toContributor( sort ) );
 		return this;
 	}
 
 	@Override
 	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
-		toContributor( targetContext.getSearchSortFactory(), dslSortContributor )
-				.contribute( searchQueryBuilder.getQueryElementCollector() );
+		searchSortContributorAggregator.add(
+				toContributor( targetContext.getSearchSortFactory(), dslSortContributor )
+		);
 		return this;
 	}
 
 	@Override
 	public SearchSortContainerContext<SearchQueryContext<Q>> sort() {
 		SearchSortDslContext<SearchQueryContext<Q>, C> dslContext =
-				new QuerySearchSortDslContextImpl<>( searchQueryBuilder.getQueryElementCollector(), this );
+				new QuerySearchSortDslContextImpl<>( searchSortContributorAggregator, this );
 		return new SearchSortContainerContextImpl<>( targetContext.getSearchSortFactory(), dslContext );
 	}
 
-	private <SC> SearchSortContributor<SC> toContributor(SearchSortFactory<SC> factory,
+	private <C extends SC, SC> SearchSortContributor<? super C> toContributor(SearchSortFactory<SC> factory,
 			Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
 		BuildingRootSearchSortDslContextImpl<SC> dslContext =
 				new BuildingRootSearchSortDslContextImpl<>( factory );
 		SearchSortContainerContext<SearchSort> containerContext =
 				new SearchSortContainerContextImpl<>( factory, dslContext );
 		dslSortContributor.accept( containerContext );
-		return dslContext;
+		return dslContext.getResultingContributor();
 	}
 
 	@Override
 	public Q build() {
+		/*
+		 * HSEARCH-3207: we must never call a contribution twice.
+		 * Contributions may have side-effects, such as finishing the building of a boolean predicate by adding
+		 * should clauses. Thus it's really not a good idea to execute a contribution twice,
+		 * and delaying the contribution until the very end of the query building prevents that from ever happening.
+		 *
+		 * This means we must delay the contribution to some time when the user cannot use the DSL anymore
+		 * (i.e. when this build() method is called),
+		 * otherwise we'd need to execute the contribution upon some DSL method being called
+		 * (an end() method for example), and this method could be called twice by the user.
+		 */
+		C collector = searchQueryBuilder.getQueryElementCollector();
+		searchPredicateContributor.contribute( collector );
+		searchSortContributorAggregator.contribute( collector );
 		return searchQueryBuilder.build( searchQueryWrapperFactory );
 	}
 
