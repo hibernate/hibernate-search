@@ -7,14 +7,23 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+/**
+ * A DSL context used when building a {@link SearchPredicate} object,
+ * either when calling {@link IndexSearchTarget#predicate()} from a search target
+ * or when calling {@link SearchQueryResultContext#predicate(Consumer)} to build the predicate using a lambda
+ * (in which case the lambda may retrieve the resulting {@link SearchPredicate} object and cache it).
+ */
 public final class BuildingRootSearchPredicateDslContextImpl<C>
 		implements SearchPredicateDslContext<SearchPredicate, C>, SearchPredicateContributor<C> {
 
