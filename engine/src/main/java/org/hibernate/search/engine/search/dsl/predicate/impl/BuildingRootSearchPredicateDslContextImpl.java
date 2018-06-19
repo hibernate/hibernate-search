@@ -22,14 +22,14 @@ public final class BuildingRootSearchPredicateDslContextImpl<C>
 
 	private final SearchPredicateFactory<C> factory;
 
-	private SearchPredicateContributor<C> singlePredicateContributor;
+	private SearchPredicateContributor<? super C> singlePredicateContributor;
 
 	public BuildingRootSearchPredicateDslContextImpl(SearchPredicateFactory<C> factory) {
 		this.factory = factory;
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<C> child) {
+	public void addContributor(SearchPredicateContributor<? super C> child) {
 		if ( this.singlePredicateContributor != null ) {
 			throw log.cannotAddMultiplePredicatesToQueryRoot();
 		}

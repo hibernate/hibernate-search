@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class StubSearchSortFactory implements SearchSortFactory<StubQueryElementCollector> {
 	@Override
-	public SearchSort toSearchSort(SearchSortContributor<StubQueryElementCollector> contributor) {
+	public SearchSort toSearchSort(SearchSortContributor<? super StubQueryElementCollector> contributor) {
 		contributor.contribute( StubQueryElementCollector.get() );
 		return new StubSearchSort();
 	}

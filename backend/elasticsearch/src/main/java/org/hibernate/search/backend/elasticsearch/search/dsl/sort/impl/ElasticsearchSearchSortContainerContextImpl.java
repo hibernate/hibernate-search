@@ -21,11 +21,11 @@ public class ElasticsearchSearchSortContainerContextImpl<N>
 
 	private final ElasticsearchSearchSortFactory factory;
 
-	private final SearchSortDslContext<N, ElasticsearchSearchSortCollector> dslContext;
+	private final SearchSortDslContext<N, ? extends ElasticsearchSearchSortCollector> dslContext;
 
 	public ElasticsearchSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate,
 			ElasticsearchSearchSortFactory factory,
-			SearchSortDslContext<N, ElasticsearchSearchSortCollector> dslContext) {
+			SearchSortDslContext<N, ? extends ElasticsearchSearchSortCollector> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;

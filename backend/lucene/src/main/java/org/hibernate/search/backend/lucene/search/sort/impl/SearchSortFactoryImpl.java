@@ -36,7 +36,7 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public SearchSort toSearchSort(SearchSortContributor<LuceneSearchSortCollector> contributor) {
+	public SearchSort toSearchSort(SearchSortContributor<? super LuceneSearchSortCollector> contributor) {
 		LuceneSearchQueryElementCollector collector = new LuceneSearchQueryElementCollector();
 		contributor.contribute( collector );
 		return new LuceneSearchSort( collector.toLuceneSortFields() );

@@ -27,7 +27,7 @@ public final class QuerySearchPredicateDslContextImpl<N, C>
 	private final C collector;
 	private final Supplier<N> nextContextSupplier;
 
-	private SearchPredicateContributor<C> singlePredicateContributor;
+	private SearchPredicateContributor<? super C> singlePredicateContributor;
 
 	public QuerySearchPredicateDslContextImpl(C collector, Supplier<N> nextContextSupplier) {
 		this.collector = collector;
@@ -35,7 +35,7 @@ public final class QuerySearchPredicateDslContextImpl<N, C>
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<C> child) {
+	public void addContributor(SearchPredicateContributor<? super C> child) {
 		if ( this.singlePredicateContributor != null ) {
 			throw log.cannotAddMultiplePredicatesToQueryRoot();
 		}

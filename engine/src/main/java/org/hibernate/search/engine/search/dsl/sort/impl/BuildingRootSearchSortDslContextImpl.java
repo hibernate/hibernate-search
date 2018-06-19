@@ -19,14 +19,14 @@ public final class BuildingRootSearchSortDslContextImpl<C>
 
 	private final SearchSortFactory<C> factory;
 
-	private List<SearchSortContributor<C>> sortContributors = new ArrayList<>();
+	private List<SearchSortContributor<? super C>> sortContributors = new ArrayList<>();
 
 	public BuildingRootSearchSortDslContextImpl(SearchSortFactory<C> factory) {
 		this.factory = factory;
 	}
 
 	@Override
-	public void addContributor(SearchSortContributor<C> child) {
+	public void addContributor(SearchSortContributor<? super C> child) {
 		sortContributors.add( child );
 	}
 

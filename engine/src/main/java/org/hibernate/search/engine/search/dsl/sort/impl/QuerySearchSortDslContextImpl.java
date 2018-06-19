@@ -23,7 +23,7 @@ public final class QuerySearchSortDslContextImpl<N, C>
 	private final C collector;
 	private final N nextContext;
 
-	private List<SearchSortContributor<C>> sortContributors = new ArrayList<>();
+	private List<SearchSortContributor<? super C>> sortContributors = new ArrayList<>();
 
 	public QuerySearchSortDslContextImpl(C collector, N nextContext) {
 		this.collector = collector;
@@ -31,7 +31,7 @@ public final class QuerySearchSortDslContextImpl<N, C>
 	}
 
 	@Override
-	public void addContributor(SearchSortContributor<C> child) {
+	public void addContributor(SearchSortContributor<? super C> child) {
 		this.sortContributors.add( child );
 	}
 

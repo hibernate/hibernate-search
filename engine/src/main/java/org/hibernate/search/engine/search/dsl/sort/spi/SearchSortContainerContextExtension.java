@@ -37,7 +37,7 @@ public interface SearchSortContainerContextExtension<N, T> {
 	 */
 	<C> T extendOrFail(
 			SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, C> dslContext);
+			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext);
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -51,6 +51,6 @@ public interface SearchSortContainerContextExtension<N, T> {
 	 */
 	<C> Optional<T> extendOptional(
 			SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, C> dslContext);
+			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext);
 
 }

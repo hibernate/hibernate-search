@@ -8,18 +8,17 @@ package org.hibernate.search.engine.search.dsl.query.impl;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.BuildingRootSearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.QuerySearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
@@ -64,33 +63,27 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	@Override
-	public SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> predicateContributor) {
-		toContributor( targetContext.getSearchPredicateFactory(), predicateContributor )
+	public SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> dslPredicateContributor) {
+		toContributor( targetContext.getSearchPredicateFactory(), dslPredicateContributor )
 				.contribute( searchQueryBuilder.getQueryElementCollector() );
 		return getNext();
 	}
 
 	@Override
 	public SearchPredicateContainerContext<SearchQueryContext<Q>> predicate() {
-		return toPredicateContainerContext( targetContext.getSearchPredicateFactory(),
-				searchQueryBuilder.getQueryElementCollector(), this::getNext );
+		SearchPredicateDslContext<SearchQueryContext<Q>, C> dslContext =
+				new QuerySearchPredicateDslContextImpl<>( searchQueryBuilder.getQueryElementCollector(), this::getNext );
+		return new SearchPredicateContainerContextImpl<>( targetContext.getSearchPredicateFactory(), dslContext );
 	}
 
 	private <PC> SearchPredicateContributor<PC> toContributor(SearchPredicateFactory<PC> factory,
-			Consumer<? super SearchPredicateContainerContext<SearchPredicate>> predicateContributor) {
+			Consumer<? super SearchPredicateContainerContext<SearchPredicate>> dslPredicateContributor) {
 		BuildingRootSearchPredicateDslContextImpl<PC> dslContext =
 				new BuildingRootSearchPredicateDslContextImpl<>( factory );
 		SearchPredicateContainerContext<SearchPredicate> containerContext =
 				new SearchPredicateContainerContextImpl<>( factory, dslContext );
-		predicateContributor.accept( containerContext );
+		dslPredicateContributor.accept( containerContext );
 		return dslContext;
-	}
-
-	private <N, PC> SearchPredicateContainerContext<N> toPredicateContainerContext(
-			SearchPredicateFactory<PC> factory, PC collector, Supplier<N> nextContextSupplier) {
-		SearchPredicateDslContext<N, PC> dslContext =
-				new QuerySearchPredicateDslContextImpl<>( collector, nextContextSupplier );
-		return new SearchPredicateContainerContextImpl<>( factory, dslContext );
 	}
 
 	private SearchQueryContext<Q> getNext() {

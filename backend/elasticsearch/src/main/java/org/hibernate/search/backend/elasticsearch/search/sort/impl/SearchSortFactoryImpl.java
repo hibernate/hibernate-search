@@ -40,7 +40,7 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	}
 
 	@Override
-	public SearchSort toSearchSort(SearchSortContributor<ElasticsearchSearchSortCollector> contributor) {
+	public SearchSort toSearchSort(SearchSortContributor<? super ElasticsearchSearchSortCollector> contributor) {
 		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector();
 		contributor.contribute( collector );
 		return new ElasticsearchSearchSort( collector.toJsonSort() );

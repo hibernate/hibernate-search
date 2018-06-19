@@ -36,7 +36,7 @@ public interface SearchPredicateContainerContextExtension<N, T> {
 	 * search target (incompatible technology).
 	 */
 	<C> T extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, C> dslContext);
+			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext);
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -49,6 +49,6 @@ public interface SearchPredicateContainerContextExtension<N, T> {
 	 * of success, or an empty optional otherwise.
 	 */
 	<C> Optional<T> extendOptional(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, C> dslContext);
+			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext);
 
 }

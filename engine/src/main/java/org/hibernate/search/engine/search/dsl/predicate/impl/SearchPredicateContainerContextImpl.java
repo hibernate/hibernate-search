@@ -26,9 +26,10 @@ public class SearchPredicateContainerContextImpl<N, C> implements SearchPredicat
 
 	private final SearchPredicateFactory<C> factory;
 
-	private final SearchPredicateDslContext<N, C> dslContext;
+	private final SearchPredicateDslContext<N, ? extends C> dslContext;
 
-	public SearchPredicateContainerContextImpl(SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, C> dslContext) {
+	public SearchPredicateContainerContextImpl(SearchPredicateFactory<C> factory,
+			SearchPredicateDslContext<N, ? extends C> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}

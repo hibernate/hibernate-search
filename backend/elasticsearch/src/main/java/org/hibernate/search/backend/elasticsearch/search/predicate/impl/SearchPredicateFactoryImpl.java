@@ -44,7 +44,7 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	}
 
 	@Override
-	public SearchPredicate toSearchPredicate(SearchPredicateContributor<ElasticsearchSearchPredicateCollector> contributor) {
+	public SearchPredicate toSearchPredicate(SearchPredicateContributor<? super ElasticsearchSearchPredicateCollector> contributor) {
 		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector();
 		contributor.contribute( collector );
 		return new ElasticsearchSearchPredicate( collector.toJsonPredicate() );

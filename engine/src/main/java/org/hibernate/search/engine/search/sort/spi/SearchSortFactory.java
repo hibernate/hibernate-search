@@ -20,7 +20,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface SearchSortFactory<C> {
 
-	SearchSort toSearchSort(SearchSortContributor<C> contributor);
+	SearchSort toSearchSort(SearchSortContributor<? super C> contributor);
 
 	SearchSortContributor<C> toContributor(SearchSort predicate);
 

@@ -19,7 +19,7 @@ public interface SearchPredicateDslContext<N, C> {
 	 *
 	 * @param child The contributor to add.
 	 */
-	void addContributor(SearchPredicateContributor<C> child);
+	void addContributor(SearchPredicateContributor<? super C> child);
 
 	/**
 	 * @return The context that should be exposed to the user after the current predicate has been fully defined.

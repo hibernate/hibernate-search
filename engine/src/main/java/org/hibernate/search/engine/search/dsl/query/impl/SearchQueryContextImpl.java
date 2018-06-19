@@ -60,32 +60,27 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 	}
 
 	@Override
-	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
-		toContributor( targetContext.getSearchSortFactory(), sortContributor )
+	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
+		toContributor( targetContext.getSearchSortFactory(), dslSortContributor )
 				.contribute( searchQueryBuilder.getQueryElementCollector() );
 		return this;
 	}
 
 	@Override
 	public SearchSortContainerContext<SearchQueryContext<Q>> sort() {
-		return toSortContainerContext( targetContext.getSearchSortFactory(),
-				searchQueryBuilder.getQueryElementCollector(), this );
+		SearchSortDslContext<SearchQueryContext<Q>, C> dslContext =
+				new QuerySearchSortDslContextImpl<>( searchQueryBuilder.getQueryElementCollector(), this );
+		return new SearchSortContainerContextImpl<>( targetContext.getSearchSortFactory(), dslContext );
 	}
 
 	private <SC> SearchSortContributor<SC> toContributor(SearchSortFactory<SC> factory,
-			Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
+			Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
 		BuildingRootSearchSortDslContextImpl<SC> dslContext =
 				new BuildingRootSearchSortDslContextImpl<>( factory );
 		SearchSortContainerContext<SearchSort> containerContext =
 				new SearchSortContainerContextImpl<>( factory, dslContext );
-		sortContributor.accept( containerContext );
+		dslSortContributor.accept( containerContext );
 		return dslContext;
-	}
-
-	private <N, PC> SearchSortContainerContext<N> toSortContainerContext(
-			SearchSortFactory<PC> factory, PC collector, N nextContext) {
-		SearchSortDslContext<N, PC> dslContext = new QuerySearchSortDslContextImpl<>( collector, nextContext );
-		return new SearchSortContainerContextImpl<>( factory, dslContext );
 	}
 
 	@Override

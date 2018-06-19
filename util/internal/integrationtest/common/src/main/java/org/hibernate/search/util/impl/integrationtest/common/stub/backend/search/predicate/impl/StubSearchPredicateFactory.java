@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQueryElementCollector> {
 
 	@Override
-	public SearchPredicate toSearchPredicate(SearchPredicateContributor<StubQueryElementCollector> contributor) {
+	public SearchPredicate toSearchPredicate(SearchPredicateContributor<? super StubQueryElementCollector> contributor) {
 		contributor.contribute( StubQueryElementCollector.get() );
 		return new StubSearchPredicate();
 	}

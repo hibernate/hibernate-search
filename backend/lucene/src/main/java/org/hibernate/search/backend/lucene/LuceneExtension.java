@@ -52,7 +52,7 @@ public final class LuceneExtension<N>
 
 	@Override
 	public <C> LuceneSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, C> dslContext) {
+			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
 			return extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext );
 		}
@@ -64,7 +64,7 @@ public final class LuceneExtension<N>
 	@Override
 	public <C> Optional<LuceneSearchPredicateContainerContext<N>> extendOptional(
 			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C> factory,
-			SearchPredicateDslContext<N, C> dslContext) {
+			SearchPredicateDslContext<N, ? extends C> dslContext) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext ) );
 		}
@@ -75,7 +75,7 @@ public final class LuceneExtension<N>
 
 	@Override
 	public <C> LuceneSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, C> dslContext) {
+			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext) {
 		if ( factory instanceof LuceneSearchSortFactory ) {
 			return extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext );
 		}
@@ -87,7 +87,7 @@ public final class LuceneExtension<N>
 	@Override
 	public <C> Optional<LuceneSearchSortContainerContext<N>> extendOptional(
 			SearchSortContainerContext<N> original, SearchSortFactory<C> factory,
-			SearchSortDslContext<N, C> dslContext) {
+			SearchSortDslContext<N, ? extends C> dslContext) {
 		if ( factory instanceof LuceneSearchSortFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext ) );
 		}
@@ -112,7 +112,7 @@ public final class LuceneExtension<N>
 			SearchPredicateDslContext<N, C> dslContext) {
 		return new LuceneSearchPredicateContainerContextImpl<>(
 				original, factory,
-				(SearchPredicateDslContext<N, LuceneSearchPredicateCollector>) dslContext
+				(SearchPredicateDslContext<N, ? extends LuceneSearchPredicateCollector>) dslContext
 		);
 	}
 
@@ -122,7 +122,7 @@ public final class LuceneExtension<N>
 			SearchSortDslContext<N, C> dslContext) {
 		return new LuceneSearchSortContainerContextImpl<>(
 				original, factory,
-				(SearchSortDslContext<N, LuceneSearchSortCollector>) dslContext
+				(SearchSortDslContext<N, ? extends LuceneSearchSortCollector>) dslContext
 		);
 	}
 }

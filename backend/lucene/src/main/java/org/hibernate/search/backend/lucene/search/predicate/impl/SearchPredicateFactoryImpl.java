@@ -38,7 +38,7 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	}
 
 	@Override
-	public SearchPredicate toSearchPredicate(SearchPredicateContributor<LuceneSearchPredicateCollector> contributor) {
+	public SearchPredicate toSearchPredicate(SearchPredicateContributor<? super LuceneSearchPredicateCollector> contributor) {
 		LuceneSearchQueryElementCollector collector = new LuceneSearchQueryElementCollector();
 		contributor.contribute( collector );
 		return new LuceneSearchPredicate( collector.toLuceneQueryPredicate() );

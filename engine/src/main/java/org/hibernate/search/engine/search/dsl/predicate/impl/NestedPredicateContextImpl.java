@@ -30,7 +30,7 @@ class NestedPredicateContextImpl<N, C>
 	private final SearchPredicateContainerContextImpl<N, C> containerContext;
 
 	private NestedPredicateBuilder<C> builder;
-	private SearchPredicateContributor<C> singlePredicateContributor;
+	private SearchPredicateContributor<? super C> singlePredicateContributor;
 
 	NestedPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
@@ -51,7 +51,7 @@ class NestedPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<C> child) {
+	public void addContributor(SearchPredicateContributor<? super C> child) {
 		if ( this.singlePredicateContributor != null ) {
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}

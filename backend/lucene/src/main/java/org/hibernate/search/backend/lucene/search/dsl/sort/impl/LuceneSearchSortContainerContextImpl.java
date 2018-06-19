@@ -23,11 +23,11 @@ public class LuceneSearchSortContainerContextImpl<N>
 
 	private final LuceneSearchSortFactory factory;
 
-	private final SearchSortDslContext<N, LuceneSearchSortCollector> dslContext;
+	private final SearchSortDslContext<N, ? extends LuceneSearchSortCollector> dslContext;
 
 	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate,
 			LuceneSearchSortFactory factory,
-			SearchSortDslContext<N, LuceneSearchSortCollector> dslContext) {
+			SearchSortDslContext<N, ? extends LuceneSearchSortCollector> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;

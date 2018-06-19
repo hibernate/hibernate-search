@@ -148,7 +148,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 	private class OccurContext implements SearchPredicateDslContext<BooleanJunctionPredicateContext<N>, C>,
 			SearchPredicateContributor<C> {
 
-		private final List<SearchPredicateContributor<C>> children = new ArrayList<>();
+		private final List<SearchPredicateContributor<? super C>> children = new ArrayList<>();
 
 		private final SearchPredicateContainerContextImpl<BooleanJunctionPredicateContext<N>, C> containerContext;
 
@@ -158,7 +158,7 @@ class BooleanJunctionPredicateContextImpl<N, C>
 		}
 
 		@Override
-		public void addContributor(SearchPredicateContributor<C> child) {
+		public void addContributor(SearchPredicateContributor<? super C> child) {
 			children.add( child );
 		}
 

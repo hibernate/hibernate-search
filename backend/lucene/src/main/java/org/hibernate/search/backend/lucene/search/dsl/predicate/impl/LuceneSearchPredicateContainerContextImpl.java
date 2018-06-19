@@ -21,11 +21,11 @@ public class LuceneSearchPredicateContainerContextImpl<N>
 
 	private final LuceneSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, LuceneSearchPredicateCollector> dslContext;
+	private final SearchPredicateDslContext<N, ? extends LuceneSearchPredicateCollector> dslContext;
 
 	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
 			LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, LuceneSearchPredicateCollector> dslContext) {
+			SearchPredicateDslContext<N, ? extends LuceneSearchPredicateCollector> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;

@@ -88,7 +88,7 @@ class MatchAllPredicateContextImpl<N, C>
 	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, C>,
 			SearchPredicateContributor<C> {
 
-		private final List<SearchPredicateContributor<C>> children = new ArrayList<>();
+		private final List<SearchPredicateContributor<? super C>> children = new ArrayList<>();
 
 		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, C> containerContext;
 
@@ -98,7 +98,7 @@ class MatchAllPredicateContextImpl<N, C>
 		}
 
 		@Override
-		public void addContributor(SearchPredicateContributor<C> child) {
+		public void addContributor(SearchPredicateContributor<? super C> child) {
 			children.add( child );
 		}
 

@@ -20,11 +20,11 @@ public class ElasticsearchSearchPredicateContainerContextImpl<N>
 
 	private final ElasticsearchSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, ElasticsearchSearchPredicateCollector> dslContext;
+	private final SearchPredicateDslContext<N, ? extends ElasticsearchSearchPredicateCollector> dslContext;
 
 	public ElasticsearchSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
 			ElasticsearchSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ElasticsearchSearchPredicateCollector> dslContext) {
+			SearchPredicateDslContext<N, ? extends ElasticsearchSearchPredicateCollector> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;

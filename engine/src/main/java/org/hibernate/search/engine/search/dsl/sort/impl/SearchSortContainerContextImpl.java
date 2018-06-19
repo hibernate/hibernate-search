@@ -25,9 +25,9 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 
 	private final SearchSortFactory<C> factory;
 
-	private final SearchSortDslContext<N, C> dslContext;
+	private final SearchSortDslContext<N, ? extends C> dslContext;
 
-	public SearchSortContainerContextImpl(SearchSortFactory<C> factory, SearchSortDslContext<N, C> dslContext) {
+	public SearchSortContainerContextImpl(SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
