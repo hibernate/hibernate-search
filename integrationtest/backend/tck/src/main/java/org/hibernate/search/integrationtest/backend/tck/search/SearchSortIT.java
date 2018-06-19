@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -43,6 +44,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.assertj.core.api.Assertions;
 
 public class SearchSortIT {
 
@@ -80,7 +83,7 @@ public class SearchSortIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext<?>> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()
@@ -254,6 +257,36 @@ public class SearchSortIT {
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+	}
+	@Test
+	public void lambda_caching() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		AtomicReference<SearchSort> cache = new AtomicReference<>();
+
+		Consumer<? super SearchSortContainerContext<SearchSort>> cachingContributor = c -> {
+			if ( cache.get() == null ) {
+				SearchSort result = c.byField( "string" ).onMissingValue().sortLast().end();
+				cache.set( result );
+			}
+			else {
+				c.by( cache.get() );
+			}
+		};
+
+		Assertions.assertThat( cache ).hasValue( null );
+
+		SearchQuery<DocumentReference> query;
+
+		query = simpleQuery( cachingContributor );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		Assertions.assertThat( cache ).doesNotHaveValue( null );
+
+		query = simpleQuery( cachingContributor );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	@Test

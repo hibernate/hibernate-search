@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -20,11 +23,15 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 public class SearchPredicateIT {
 
@@ -95,6 +102,43 @@ public class SearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( c -> c.match().onField( "string" ).matching( MATCHING_STRING ) )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+	}
+
+	@Test
+	public void match_lambda_caching() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
+
+		Consumer<? super SearchPredicateContainerContext<SearchPredicate>> cachingContributor = c -> {
+			if ( cache.get() == null ) {
+				SearchPredicate result = c.match().onField( "string" ).matching( MATCHING_STRING );
+				cache.set( result );
+			}
+			else {
+				c.predicate( cache.get() );
+			}
+		};
+
+		Assertions.assertThat( cache ).hasValue( null );
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( cachingContributor )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+
+		Assertions.assertThat( cache ).doesNotHaveValue( null );
+
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( cachingContributor )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
