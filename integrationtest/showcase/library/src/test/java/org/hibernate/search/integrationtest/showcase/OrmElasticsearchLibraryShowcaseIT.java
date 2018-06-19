@@ -121,6 +121,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
 				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
+				.applySetting( PREFIX + "backend.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
 
 		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
