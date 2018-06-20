@@ -9,6 +9,10 @@ package org.hibernate.search.integrationtest.mapper.orm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -78,7 +82,7 @@ import org.junit.Test;
  *     </li>
  *     <li>
  *         the third token (if any) defines which type of value is being updated/replaced:
- *         singleValue or elementCollectionValue.
+ *         singleValue, elementCollectionValue, containedDerivedValue, or cross-entity derived value
  *     </li>
  *     <li>
  *         the fourth token (if any) defines whether the updated/replaced value is indexed
@@ -124,20 +128,26 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 				.objectField( "containedIndexedEmbedded", b2 -> b2
 						.field( "indexedField", String.class )
 						.field( "indexedElementCollectionField", String.class )
+						.field( "containedDerivedField", String.class )
 				)
 				.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 						.field( "indexedField", String.class )
 						.field( "indexedElementCollectionField", String.class )
+						.field( "containedDerivedField", String.class )
 				)
+				.field( "crossEntityDerivedField", String.class )
 				.objectField( "child", b3 -> b3
 						.objectField( "containedIndexedEmbedded", b2 -> b2
 								.field( "indexedField", String.class )
 								.field( "indexedElementCollectionField", String.class )
+								.field( "containedDerivedField", String.class )
 						)
 						.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 								.field( "indexedField", String.class )
 								.field( "indexedElementCollectionField", String.class )
+								.field( "containedDerivedField", String.class )
 						)
+						.field( "crossEntityDerivedField", String.class )
 				)
 		);
 
@@ -568,6 +578,163 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	}
 
 	@Test
+	public void indirectValueUpdate_indexedEmbedded_containedDerivedValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.setFieldUsedInContainedDerivedField1( contained1, "field1_initialValue" );
+			primitives.setFieldUsedInContainedDerivedField2( contained1, "field2_initialValue" );
+			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+
+											.field(
+													"containedDerivedField",
+													"field1_initialValue field2_initialValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating one value the field depends on
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setFieldUsedInContainedDerivedField1( contained, "field1_updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"containedDerivedField",
+													"field1_updatedValue field2_initialValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the other value the field depends on
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setFieldUsedInContainedDerivedField2( contained, "field2_updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+											.field(
+													"containedDerivedField",
+													"field1_updatedValue field2_updatedValue"
+											)
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void indirectValueUpdate_indexedEmbedded_crossEntityDerivedValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.setFieldUsedInCrossEntityDerivedField1( contained1, "field1_initialValue" );
+			primitives.setFieldUsedInCrossEntityDerivedField2( contained1, "field2_initialValue" );
+			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_initialValue field2_initialValue"
+									)
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating one value the field depends on
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setFieldUsedInCrossEntityDerivedField1( contained, "field1_updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_updatedValue field2_initialValue"
+									)
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the other value the field depends on
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setFieldUsedInCrossEntityDerivedField2( contained, "field2_updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_updatedValue field2_updatedValue"
+									)
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", null )
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectValueUpdate_indexedEmbeddedNoReindexOnUpdate_singleValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -724,6 +891,25 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	/*
+	 * Use the type "Optional<String>" for computed fields instead of just "String" for two reasons:
+	 * 1/ It means the field will not appear in the indexed document produced by the stub backend
+	 * when both "base" fields are null, which is great because it means tests that do not use
+	 * the derived field do not have to expect it to appear with a null value out of nowehere.
+	 * 2/ It allows us to check that transient fields may have a container type that cannot
+	 * be expressed in ORM metadata.
+	 */
+	protected static Optional<String> computeDerived(Stream<String> fieldValues) {
+		String value = fieldValues.filter( Objects::nonNull )
+				.collect( Collectors.joining( " " ) );
+		if ( value.isEmpty() ) {
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( value );
+		}
+	}
+
 	interface AssociationModelPrimitives<
 			TIndexed extends TContaining,
 			TContaining,
@@ -766,6 +952,14 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		List<String> getNonIndexedElementCollectionField(TContained contained);
 
 		void setNonIndexedElementCollectionField(TContained contained, List<String> value);
+
+		void setFieldUsedInContainedDerivedField1(TContained contained, String value);
+
+		void setFieldUsedInContainedDerivedField2(TContained contained, String value);
+
+		void setFieldUsedInCrossEntityDerivedField1(TContained contained, String value);
+
+		void setFieldUsedInCrossEntityDerivedField2(TContained contained, String value);
 	}
 
 }

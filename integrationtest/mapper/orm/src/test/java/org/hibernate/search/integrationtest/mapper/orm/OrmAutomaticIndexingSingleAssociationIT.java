@@ -8,17 +8,22 @@ package org.hibernate.search.integrationtest.mapper.orm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -617,6 +622,26 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 		public void setNonIndexedElementCollectionField(ContainedEntity containedEntity, List<String> value) {
 			containedEntity.setNonIndexedElementCollectionField( value );
 		}
+
+		@Override
+		public void setFieldUsedInContainedDerivedField1(ContainedEntity containedEntity, String value) {
+			containedEntity.setFieldUsedInContainedDerivedField1( value );
+		}
+
+		@Override
+		public void setFieldUsedInContainedDerivedField2(ContainedEntity containedEntity, String value) {
+			containedEntity.setFieldUsedInContainedDerivedField2( value );
+		}
+
+		@Override
+		public void setFieldUsedInCrossEntityDerivedField1(ContainedEntity containedEntity, String value) {
+			containedEntity.setFieldUsedInCrossEntityDerivedField1( value );
+		}
+
+		@Override
+		public void setFieldUsedInCrossEntityDerivedField2(ContainedEntity containedEntity, String value) {
+			containedEntity.setFieldUsedInCrossEntityDerivedField2( value );
+		}
 	}
 
 	@Entity(name = "containing")
@@ -632,20 +657,23 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 		@IndexedEmbedded(includePaths = {
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
+				"containedIndexedEmbedded.containedDerivedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
-				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField"
+				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
+				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
 
 		@OneToOne
-		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField" })
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private ContainedEntity containedIndexedEmbedded;
 
 		@OneToOne
 		private ContainedEntity containedNonIndexedEmbedded;
 
 		@OneToOne
-		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField" })
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
@@ -697,6 +725,27 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 				ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate) {
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
+
+		@Transient
+		@Field
+		@IndexingDependency(derivedFrom = {
+				@ObjectPath({
+						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
+				}),
+				@ObjectPath({
+						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
+				})
+		})
+		public Optional<String> getCrossEntityDerivedField() {
+			return containedIndexedEmbedded == null
+					? Optional.empty()
+					: computeDerived( Stream.of(
+							containedIndexedEmbedded.getFieldUsedInCrossEntityDerivedField1(),
+							containedIndexedEmbedded.getFieldUsedInCrossEntityDerivedField2()
+					) );
+		}
 	}
 
 	@Entity(name = "indexed")
@@ -709,7 +758,6 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 
 	@Entity(name = "contained")
 	public static class ContainedEntity {
-
 		@Id
 		private Integer id;
 
@@ -737,6 +785,18 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 		@ElementCollection
 		@Field // Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
+
+		@Basic // Do not annotate with @Field, this would make the test pointless
+		private String fieldUsedInContainedDerivedField1;
+
+		@Basic // Do not annotate with @Field, this would make the test pointless
+		private String fieldUsedInContainedDerivedField2;
+
+		@Basic // Do not annotate with @Field, this would make the test pointless
+		private String fieldUsedInCrossEntityDerivedField1;
+
+		@Basic // Do not annotate with @Field, this would make the test pointless
+		private String fieldUsedInCrossEntityDerivedField2;
 
 		public Integer getId() {
 			return id;
@@ -801,6 +861,48 @@ public class OrmAutomaticIndexingSingleAssociationIT extends AbstractOrmAutomati
 
 		public void setNonIndexedElementCollectionField(List<String> nonIndexedElementCollectionField) {
 			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
+		}
+
+		public String getFieldUsedInContainedDerivedField1() {
+			return fieldUsedInContainedDerivedField1;
+		}
+
+		public void setFieldUsedInContainedDerivedField1(String fieldUsedInContainedDerivedField1) {
+			this.fieldUsedInContainedDerivedField1 = fieldUsedInContainedDerivedField1;
+		}
+
+		public String getFieldUsedInContainedDerivedField2() {
+			return fieldUsedInContainedDerivedField2;
+		}
+
+		public void setFieldUsedInContainedDerivedField2(String fieldUsedInContainedDerivedField2) {
+			this.fieldUsedInContainedDerivedField2 = fieldUsedInContainedDerivedField2;
+		}
+
+		public String getFieldUsedInCrossEntityDerivedField1() {
+			return fieldUsedInCrossEntityDerivedField1;
+		}
+
+		public void setFieldUsedInCrossEntityDerivedField1(String fieldUsedInCrossEntityDerivedField1) {
+			this.fieldUsedInCrossEntityDerivedField1 = fieldUsedInCrossEntityDerivedField1;
+		}
+
+		public String getFieldUsedInCrossEntityDerivedField2() {
+			return fieldUsedInCrossEntityDerivedField2;
+		}
+
+		public void setFieldUsedInCrossEntityDerivedField2(String fieldUsedInCrossEntityDerivedField2) {
+			this.fieldUsedInCrossEntityDerivedField2 = fieldUsedInCrossEntityDerivedField2;
+		}
+
+		@Transient
+		@Field
+		@IndexingDependency(derivedFrom = {
+				@ObjectPath(@PropertyValue(propertyName = "fieldUsedInContainedDerivedField1")),
+				@ObjectPath(@PropertyValue(propertyName = "fieldUsedInContainedDerivedField2"))
+		})
+		public Optional<String> getContainedDerivedField() {
+			return computeDerived( Stream.of( fieldUsedInContainedDerivedField1, fieldUsedInContainedDerivedField2 ) );
 		}
 	}
 
