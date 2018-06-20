@@ -51,6 +51,40 @@ import org.junit.Test;
  * Most tests defined in this class use a very simple setup when it comes to associations,
  * with one parent TIndexed linked to one child TContaining linked to one TContained.
  * Subclasses define other tests with more advanced setups, with more assumptions as to what the associations allow.
+ * <p>
+ * Tests in this class and subclasses follow these naming conventions:
+ * <ul>
+ *     <li>the test method is a sequence of camel-case tokens separated by underscores</li>
+ *     <li>
+ *         the first token defines what operation we are testing:
+ *         <ul>
+ *             <li>
+ *                 indirectValueUpdate: set the value of a basic field,
+ *                 add/remove elements to/from an element-collection field
+ *             </li>
+ *             <li>
+ *                 indirectValueReplace: replace the entire value of an element-collection field
+ *                 (not clear/add, but really use a different collection)
+ *             </li>
+ *             <li>
+ *                 indirectAssociationReplace: replace the entire value of a collection
+ *                 (not clear/add, but really use a different collection)
+ *             </li>
+ *         </ul>
+ *      </li>
+ *     <li>
+ *         the second token defines how the association between TContaining and TContained is indexed:
+ *         indexed-embedded, non-indexed-embedded.
+ *     </li>
+ *     <li>
+ *         the third token (if any) defines which type of value is being updated/replaced:
+ *         singleValue or elementCollectionValue.
+ *     </li>
+ *     <li>
+ *         the fourth token (if any) defines whether the updated/replaced value is indexed
+ *         (i.e. included in the @IndexedEmbedded.includePath) or not.
+ *     </li>
+ * </ul>
  */
 public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		TIndexed extends TContaining, TContaining, TContained
@@ -111,7 +145,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	}
 
 	@Test
-	public void indirectValueUpdate_singleValue_indexed() {
+	public void indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -185,7 +219,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueUpdate_singleValue_nonIndexed() {
+	public void indirectValueUpdate_indexedEmbedded_singleValue_nonIndexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -225,7 +259,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	}
 
 	@Test
-	public void indirectValueUpdate_elementCollectionValue_indexed() {
+	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -331,7 +365,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueReplace_elementCollectionValue_indexed() {
+	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -417,7 +451,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueUpdate_elementCollectionValue_nonIndexed() {
+	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_nonIndexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -475,7 +509,7 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void indirectValueReplace_elementCollectionValue_nonIndexed() {
+	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_nonIndexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
