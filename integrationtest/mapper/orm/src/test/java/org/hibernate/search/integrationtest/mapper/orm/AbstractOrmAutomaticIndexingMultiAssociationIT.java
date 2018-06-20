@@ -6,90 +6,33 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events
  * and involving a multi-valued association.
  * <p>
- * We use a contrived design based on a {@link ModelPrimitives} class that defines all the factory methods,
- * setters and getters we need,
- * because we want to have separate model classes for every test,
- * in order to avoid introducing exotic situations that would arise
- * when using generics or superclasses in an ORM model.
+ * See {@link AbstractOrmAutomaticIndexingAssociationIT} for more details on how this test is designed.
  */
 public abstract class AbstractOrmAutomaticIndexingMultiAssociationIT<
 		TIndexed extends TContaining, TContaining, TContained,
 		TContainedAssociation, TContainingAssociation
+		>
+		extends AbstractOrmAutomaticIndexingAssociationIT<
+		TIndexed, TContaining, TContained
 		> {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
-	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
-
-	private SessionFactory sessionFactory;
-
-	private final ModelPrimitives<TIndexed, TContaining, TContained,
-				TContainedAssociation, TContainingAssociation> primitives;
+	private final MultiAssociationModelPrimitives<TIndexed, TContaining, TContained,
+			TContainedAssociation, TContainingAssociation> primitives;
 
 	AbstractOrmAutomaticIndexingMultiAssociationIT(
-			ModelPrimitives<TIndexed, TContaining, TContained,
-								TContainedAssociation, TContainingAssociation> primitives) {
+			MultiAssociationModelPrimitives<TIndexed, TContaining, TContained,
+					TContainedAssociation, TContainingAssociation> primitives) {
+		super( primitives );
 		this.primitives = primitives;
-	}
-
-	@Before
-	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( primitives.getIndexedClass() )
-				.addAnnotatedClass( primitives.getContainedClass() );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
-		backendMock.expectSchema( primitives.getIndexName(), b -> b
-				.objectField( "containedIndexedEmbedded", b2 -> b2
-						.field( "indexedField", String.class )
-				)
-				.objectField( "child", b3 -> b3
-						.objectField( "containedIndexedEmbedded", b2 -> b2
-								.field( "indexedField", String.class )
-						)
-				)
-		);
-
-		sessionFactory = sfb.build();
-		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test
@@ -666,100 +609,27 @@ public abstract class AbstractOrmAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void indirectValueUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			TIndexed entity1 = primitives.newIndexed( 1 );
-
-			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
-
-			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
-			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
-			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
-
-			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.addContained( primitives.getContainedIndexedEmbedded( containingEntity1 ), contained1 );
-			primitives.addContaining( primitives.getContainingAsIndexedEmbedded( contained1 ), containingEntity1 );
-
-			TContained contained2 = primitives.newContained( 5 );
-			primitives.setIndexedField( contained2, "initialOutOfScopeValue" );
-			primitives.addContained( primitives.getContainedIndexedEmbedded( deeplyNestedContainingEntity ), contained2 );
-			primitives.addContaining( primitives.getContainingAsIndexedEmbedded( contained2 ), deeplyNestedContainingEntity );
-
-			session.persist( contained1 );
-			session.persist( contained2 );
-			session.persist( deeplyNestedContainingEntity );
-			session.persist( containingEntity1 );
-			session.persist( entity1 );
-
-			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", "initialValue" )
-									)
-							)
-					)
-					.preparedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
-
-			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", "updatedValue" )
-									)
-							)
-					)
-					.preparedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			TContained contained = session.get( primitives.getContainedClass(), 5 );
-			primitives.setIndexedField( contained, "updatedOutOfScopeValue" );
-
-			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	interface ModelPrimitives<
+	interface MultiAssociationModelPrimitives<
 			TIndexed extends TContaining,
 			TContaining,
 			TContained,
 			TContainedAssociation,
 			TContainingAssociation
-			> {
-		String getIndexName();
+			> extends AssociationModelPrimitives<TIndexed, TContaining, TContained> {
 
-		Class<TIndexed> getIndexedClass();
+		@Override
+		default void setContainedIndexedEmbeddedSingle(TContaining containing, TContained contained) {
+			TContainedAssociation containedAssociation = getContainedIndexedEmbedded( containing );
+			clearContained( containedAssociation );
+			addContained( containedAssociation, contained );
+		}
 
-		Class<TContaining> getContainingClass();
-
-		Class<TContained> getContainedClass();
-
-		TIndexed newIndexed(int id);
-
-		TContaining newContaining(int id);
-
-		TContained newContained(int id);
-
-		void setIndexedField(TContained contained, String value);
-
-		void setChild(TContaining parent, TContaining child);
-
-		void setParent(TContaining child, TContaining parent);
+		@Override
+		default void setContainingAsIndexedEmbeddedSingle(TContained contained, TContaining containing) {
+			TContainingAssociation containingAssociation = getContainingAsIndexedEmbedded( contained );
+			clearContaining( containingAssociation );
+			addContaining( containingAssociation, containing );
+		}
 
 		TContainedAssociation newContainedAssociation(TContainedAssociation original);
 
@@ -767,9 +637,13 @@ public abstract class AbstractOrmAutomaticIndexingMultiAssociationIT<
 
 		void removeContained(TContainedAssociation association, TContained contained);
 
+		void clearContained(TContainedAssociation association);
+
 		void addContaining(TContainingAssociation association, TContaining containing);
 
 		void removeContaining(TContainingAssociation association, TContaining containing);
+
+		void clearContaining(TContainingAssociation association);
 
 		TContainedAssociation getContainedIndexedEmbedded(TContaining containing);
 

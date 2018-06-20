@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
@@ -21,10 +22,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
- * Test automatic indexing based on Hibernate ORM entity events.
- *
- * This test only checks updates involving a multi-valued, List association.
- * Other tests in the same package check more basic, direct updates or updates involving different associations.
+ * Test automatic indexing based on Hibernate ORM entity events
+ * when a List association is involved.
+ * <p>
+ * See {@link AbstractOrmAutomaticIndexingAssociationIT} for more details on how this test is designed.
  */
 public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticIndexingMultiAssociationIT<
 		OrmAutomaticIndexingListAssociationIT.IndexedEntity,
@@ -35,12 +36,12 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		> {
 
 	public OrmAutomaticIndexingListAssociationIT() {
-		super( new ListModelPrimitives() );
+		super( new ListAssociationModelPrimitives() );
 	}
 
-	private static class ListModelPrimitives
-			implements ModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-			List<ContainedEntity>, List<ContainingEntity>> {
+	private static class ListAssociationModelPrimitives
+			implements MultiAssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
+						List<ContainedEntity>, List<ContainingEntity>> {
 
 		@Override
 		public String getIndexName() {
@@ -84,11 +85,6 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		}
 
 		@Override
-		public void setIndexedField(ContainedEntity containedEntity, String value) {
-			containedEntity.setIndexedField( value );
-		}
-
-		@Override
 		public void setChild(ContainingEntity parent, ContainingEntity child) {
 			parent.setChild( child );
 		}
@@ -96,7 +92,6 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@Override
 		public void setParent(ContainingEntity child, ContainingEntity parent) {
 			child.setParent( parent );
-
 		}
 
 		@Override
@@ -115,6 +110,11 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		}
 
 		@Override
+		public void clearContained(List<ContainedEntity> containedEntities) {
+			containedEntities.clear();
+		}
+
+		@Override
 		public void addContaining(List<ContainingEntity> containingEntities, ContainingEntity containingEntity) {
 			containingEntities.add( containingEntity );
 		}
@@ -122,6 +122,11 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@Override
 		public void removeContaining(List<ContainingEntity> containingEntities, ContainingEntity containingEntity) {
 			containingEntities.remove( containingEntity );
+		}
+
+		@Override
+		public void clearContaining(List<ContainingEntity> containingEntities) {
+			containingEntities.clear();
 		}
 
 		@Override
@@ -155,6 +160,36 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded(ContainedEntity containedEntity) {
 			return containedEntity.getContainingAsNonIndexedEmbedded();
 		}
+
+		@Override
+		public void setIndexedField(ContainedEntity containedEntity, String value) {
+			containedEntity.setIndexedField( value );
+		}
+
+		@Override
+		public void setNonIndexedField(ContainedEntity containedEntity, String value) {
+			containedEntity.setNonIndexedField( value );
+		}
+
+		@Override
+		public List<String> getIndexedElementCollectionField(ContainedEntity containedEntity) {
+			return containedEntity.getIndexedElementCollectionField();
+		}
+
+		@Override
+		public void setIndexedElementCollectionField(ContainedEntity containedEntity, List<String> value) {
+			containedEntity.setIndexedElementCollectionField( value );
+		}
+
+		@Override
+		public List<String> getNonIndexedElementCollectionField(ContainedEntity containedEntity) {
+			return containedEntity.getNonIndexedElementCollectionField();
+		}
+
+		@Override
+		public void setNonIndexedElementCollectionField(ContainedEntity containedEntity, List<String> value) {
+			containedEntity.setNonIndexedElementCollectionField( value );
+		}
 	}
 
 	@Entity(name = "containing")
@@ -168,13 +203,14 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 
 		@OneToOne(mappedBy = "parent")
 		@IndexedEmbedded(includePaths = {
-				"containedIndexedEmbedded.indexedField"
+				"containedIndexedEmbedded.indexedField",
+				"containedIndexedEmbedded.indexedElementCollectionField"
 		})
 		private ContainingEntity child;
 
 		@ManyToMany
 		@JoinTable(name = "indexed_containedIndexedEmbedded")
-		@IndexedEmbedded(includePaths = "indexedField")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
@@ -248,6 +284,18 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 		@Field
 		private String indexedField;
 
+		@ElementCollection
+		@Field
+		private List<String> indexedElementCollectionField = new ArrayList<>();
+
+		@Basic
+		@Field // Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
+		private String nonIndexedField;
+
+		@ElementCollection
+		@Field // Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
+		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -270,6 +318,30 @@ public class OrmAutomaticIndexingListAssociationIT extends AbstractOrmAutomaticI
 
 		public void setIndexedField(String indexedField) {
 			this.indexedField = indexedField;
+		}
+
+		public List<String> getIndexedElementCollectionField() {
+			return indexedElementCollectionField;
+		}
+
+		public void setIndexedElementCollectionField(List<String> indexedElementCollectionField) {
+			this.indexedElementCollectionField = indexedElementCollectionField;
+		}
+
+		public String getNonIndexedField() {
+			return nonIndexedField;
+		}
+
+		public void setNonIndexedField(String nonIndexedField) {
+			this.nonIndexedField = nonIndexedField;
+		}
+
+		public List<String> getNonIndexedElementCollectionField() {
+			return nonIndexedElementCollectionField;
+		}
+
+		public void setNonIndexedElementCollectionField(List<String> nonIndexedElementCollectionField) {
+			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
 		}
 
 	}
