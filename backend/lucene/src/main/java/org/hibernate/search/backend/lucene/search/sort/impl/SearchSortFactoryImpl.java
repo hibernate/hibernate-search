@@ -43,11 +43,11 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> toContributor(SearchSort predicate) {
-		if ( !( predicate instanceof LuceneSearchSort ) ) {
-			throw log.cannotMixLuceneSearchSortWithOtherSorts( predicate );
+	public SearchSortContributor<LuceneSearchSortCollector> toContributor(SearchSort sort) {
+		if ( !( sort instanceof LuceneSearchSort ) ) {
+			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
-		return (LuceneSearchSort) predicate;
+		return (LuceneSearchSort) sort;
 	}
 
 	@Override
