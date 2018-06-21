@@ -34,6 +34,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Associatio
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -1510,10 +1511,10 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		@JoinTable(name = "contained_containingAsElementCollection")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
-				inversePath = {
+				inversePath = @ObjectPath({
 						@PropertyValue(propertyName = "containedElementCollection"),
 						@PropertyValue(propertyName = "containedSingle")
-				}
+				})
 		)
 		private List<ContainingEntity> containingAsElementCollection = new ArrayList<>();
 
@@ -1692,7 +1693,11 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		 * so there should be no problem, but this test should prevent any regression.
 		 */
 		@OneToOne
-		@AssociationInverseSide(inversePath = @PropertyValue(propertyName = "containedSingleWithInverseSideEmbedded"))
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(propertyName = "containedSingleWithInverseSideEmbedded")
+				)
+		)
 		private ContainingEntity containingAsSingle;
 
 		public InverseSideEmbeddable() {

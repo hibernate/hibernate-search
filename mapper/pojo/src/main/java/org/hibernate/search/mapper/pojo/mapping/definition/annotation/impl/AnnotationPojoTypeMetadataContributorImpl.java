@@ -56,6 +56,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Identifier
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
@@ -134,25 +135,12 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				annotation.extractors(), AssociationInverseSide.DefaultExtractors.class
 		);
 
-		PropertyValue[] inversePathElements = annotation.inversePath();
-		if ( inversePathElements.length == 0 ) {
+		Optional<PojoModelPathValueNode> inversePathOptional = getPojoModelPathValueNode( annotation.inversePath() );
+		if ( !inversePathOptional.isPresent() ) {
 			throw log.missingInversePathInAssociationInverseSideMapping( typeModel, propertyModel.getName() );
 		}
-		PojoModelPathValueNode inversePath = null;
-		for ( PropertyValue element : inversePathElements ) {
-			String inversePropertyName = element.propertyName();
-			ContainerValueExtractorPath inverseExtractorPath = getExtractorPath(
-					element.extractors(), PropertyValue.DefaultExtractors.class
-			);
-			if ( inversePath == null ) {
-				inversePath = PojoModelPath.fromRoot( inversePropertyName ).value( inverseExtractorPath );
-			}
-			else {
-				inversePath = inversePath.property( inversePropertyName ).value( inverseExtractorPath );
-			}
-		}
 
-		collector.value( extractorPath ).associationInverseSide( inversePath );
+		collector.value( extractorPath ).associationInverseSide( inversePathOptional.get() );
 	}
 
 	private void addIndexingDependency(PojoAdditionalMetadataCollectorPropertyNode collector,
@@ -231,6 +219,24 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 				.indexedEmbedded(
 						cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths
 				);
+	}
+
+	private Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {
+		PropertyValue[] inversePathElements = objectPath.value();
+		PojoModelPathValueNode inversePath = null;
+		for ( PropertyValue element : inversePathElements ) {
+			String inversePropertyName = element.propertyName();
+			ContainerValueExtractorPath inverseExtractorPath = getExtractorPath(
+					element.extractors(), PropertyValue.DefaultExtractors.class
+			);
+			if ( inversePath == null ) {
+				inversePath = PojoModelPath.fromRoot( inversePropertyName ).value( inverseExtractorPath );
+			}
+			else {
+				inversePath = inversePath.property( inversePropertyName ).value( inverseExtractorPath );
+			}
+		}
+		return Optional.ofNullable( inversePath );
 	}
 
 	private ContainerValueExtractorPath getExtractorPath(

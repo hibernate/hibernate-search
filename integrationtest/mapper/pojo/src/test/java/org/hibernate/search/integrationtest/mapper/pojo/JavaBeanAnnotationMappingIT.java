@@ -35,6 +35,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -503,7 +504,9 @@ public class JavaBeanAnnotationMappingIT {
 
 		@CustomPropertyBridgeAnnotation(objectName = "customBridgeOnProperty")
 		@AssociationInverseSide(
-				inversePath = @PropertyValue( propertyName = "embeddingAsSingle")
+				inversePath = @ObjectPath(
+						@PropertyValue( propertyName = "embeddingAsSingle")
+				)
 		)
 		public IndexedEntity getEmbedded() {
 			return embedded;
@@ -687,7 +690,9 @@ public class JavaBeanAnnotationMappingIT {
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myTextField")
 		@AssociationInverseSide(
-				inversePath = @PropertyValue( propertyName = "embeddingAsIterable")
+				inversePath = @ObjectPath(
+						@PropertyValue( propertyName = "embeddingAsIterable")
+				)
 		)
 		public Iterable<IndexedEntity> getEmbeddedIterable() {
 			return embeddedIterable;
@@ -699,7 +704,9 @@ public class JavaBeanAnnotationMappingIT {
 
 		@IndexedEmbedded(prefix = "embeddedList.otherPrefix_", includePaths = "embedded.prefix_customBridgeOnClass.text")
 		@AssociationInverseSide(
-				inversePath = @PropertyValue( propertyName = "embeddingAsList")
+				inversePath = @ObjectPath(
+						@PropertyValue( propertyName = "embeddingAsList")
+				)
 		)
 		public List<IndexedEntity> getEmbeddedList() {
 			return embeddedList;
@@ -711,7 +718,9 @@ public class JavaBeanAnnotationMappingIT {
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_customBridgeOnProperty.text")
 		@AssociationInverseSide(
-				inversePath = @PropertyValue( propertyName = "embeddingAsArrayList")
+				inversePath = @ObjectPath(
+						@PropertyValue( propertyName = "embeddingAsArrayList")
+				)
 		)
 		public ArrayList<IndexedEntity> getEmbeddedArrayList() {
 			return embeddedArrayList;
@@ -723,7 +732,9 @@ public class JavaBeanAnnotationMappingIT {
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
 		@AssociationInverseSide(
-				inversePath = @PropertyValue( propertyName = "embeddingAsMap")
+				inversePath = @ObjectPath(
+						@PropertyValue( propertyName = "embeddingAsMap")
+				)
 		)
 		@Field(
 				name = "embeddedMapKeys",

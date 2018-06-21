@@ -46,7 +46,7 @@ public @interface AssociationInverseSide {
 	/**
 	 * @return The path to the targeted entity on the inverse side of the association.
 	 */
-	PropertyValue[] inversePath();
+	ObjectPath inversePath();
 
 	/**
 	 * Class used as a marker for the default value of the {@link #extractors()} attribute.

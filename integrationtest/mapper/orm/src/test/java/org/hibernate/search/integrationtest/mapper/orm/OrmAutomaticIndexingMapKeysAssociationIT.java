@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
@@ -352,9 +353,11 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		@JoinTable(name = "contained_mapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
-				inversePath = @PropertyValue(
-						propertyName = "containedIndexedEmbedded",
-						extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbedded",
+								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+						)
 				)
 		)
 		private List<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
@@ -374,9 +377,11 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 		@JoinTable(name = "contained_indexedNoReindexOnUpdateMapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
-				inversePath = @PropertyValue(
-						propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
-						extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
+								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+						)
 				)
 		)
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
