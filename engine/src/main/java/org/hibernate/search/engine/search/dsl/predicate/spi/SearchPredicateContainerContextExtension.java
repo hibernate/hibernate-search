@@ -30,13 +30,14 @@ public interface SearchPredicateContainerContextExtension<N, T> {
 	 * @param original The original, non-extended {@link SearchPredicateContainerContext}.
 	 * @param factory A {@link SearchPredicateFactory}.
 	 * @param dslContext A {@link SearchPredicateDslContext}.
+	 * @param <CTX> The type of the context passed to the contribution method of the contributors.
 	 * @param <C> The type of collector expected by search predicate contributors for the given search target.
 	 * @return An extended search predicate container context ({@link T})
 	 * @throws org.hibernate.search.util.SearchException If the current extension does not support the given
 	 * search target (incompatible technology).
 	 */
-	<C> T extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext);
+	<CTX, C> T extendOrFail(SearchPredicateContainerContext<N> original,
+			SearchPredicateFactory<CTX, C> factory, SearchPredicateDslContext<N, CTX, ? extends C> dslContext);
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -44,11 +45,12 @@ public interface SearchPredicateContainerContextExtension<N, T> {
 	 * @param original The original, non-extended {@link SearchPredicateContainerContext}.
 	 * @param factory A {@link SearchPredicateFactory}.
 	 * @param dslContext A {@link SearchPredicateDslContext}.
+	 * @param <CTX> The type of the context passed to the contribution method of the contributors.
 	 * @param <C> The type of collector expected by search predicate contributors for the given search target.
 	 * @return An optional containing the extended search predicate container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	<C> Optional<T> extendOptional(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext);
+	<CTX, C> Optional<T> extendOptional(SearchPredicateContainerContext<N> original,
+			SearchPredicateFactory<CTX, C> factory, SearchPredicateDslContext<N, CTX, ? extends C> dslContext);
 
 }

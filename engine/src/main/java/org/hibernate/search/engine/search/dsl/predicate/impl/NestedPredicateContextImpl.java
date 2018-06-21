@@ -19,20 +19,20 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class NestedPredicateContextImpl<N, C>
-		implements NestedPredicateContext<N>, SearchPredicateContributor<C>, SearchPredicateDslContext<N, C> {
+class NestedPredicateContextImpl<N, CTX, C>
+		implements NestedPredicateContext<N>, SearchPredicateContributor<CTX, C>, SearchPredicateDslContext<N, CTX, C> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateFactory<C> factory;
+	private final SearchPredicateFactory<CTX, C> factory;
 	private final Supplier<N> nextContextProvider;
 
-	private final SearchPredicateContainerContextImpl<N, C> containerContext;
+	private final SearchPredicateContainerContextImpl<N, CTX, C> containerContext;
 
-	private NestedPredicateBuilder<C> builder;
-	private SearchPredicateContributor<? super C> singlePredicateContributor;
+	private NestedPredicateBuilder<CTX, C> builder;
+	private SearchPredicateContributor<CTX, ? super C> singlePredicateContributor;
 
-	NestedPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	NestedPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 		this.containerContext = new SearchPredicateContainerContextImpl<>( factory, this );
@@ -45,13 +45,13 @@ class NestedPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public void contribute(C collector) {
-		singlePredicateContributor.contribute( builder.getNestedCollector() );
-		builder.contribute( collector );
+	public void contribute(CTX context, C collector) {
+		singlePredicateContributor.contribute( context, builder.getNestedCollector() );
+		builder.contribute( context, collector );
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<? super C> child) {
+	public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
 		if ( this.singlePredicateContributor != null ) {
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}

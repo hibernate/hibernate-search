@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements NestedPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements NestedPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<String> PATH = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY = JsonAccessor.root().property( "query" ).asObject();
@@ -37,7 +37,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject innerObject = getInnerObject();
 		PATH.set( innerObject, absoluteFieldPath );

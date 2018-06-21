@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
-public interface SpatialWithinPolygonPredicateBuilder<C> extends SearchPredicateBuilder<C> {
+public interface SpatialWithinPolygonPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
 	void polygon(GeoPolygon polygon);
 

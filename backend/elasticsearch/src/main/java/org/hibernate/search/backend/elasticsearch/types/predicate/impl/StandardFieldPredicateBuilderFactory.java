@@ -20,7 +20,6 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-
 public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -32,27 +31,31 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	}
 
 	@Override
-	public MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> createMatchPredicateBuilder(String absoluteFieldPath) {
+	public MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createMatchPredicateBuilder(
+			String absoluteFieldPath) {
 		return new MatchPredicateBuilderImpl( absoluteFieldPath, codec );
 	}
 
 	@Override
-	public RangePredicateBuilder<ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath) {
+	public RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(
+			String absoluteFieldPath) {
 		return new RangePredicateBuilderImpl( absoluteFieldPath, codec );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
+	public SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(
+			String absoluteFieldPath) {
 		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
+	public SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(
+			String absoluteFieldPath) {
 		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
+	public SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
 	}

@@ -10,8 +10,8 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-public interface LuceneSearchPredicateFactory extends SearchPredicateFactory<LuceneSearchPredicateCollector> {
+public interface LuceneSearchPredicateFactory extends SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
-	SearchPredicateContributor<LuceneSearchPredicateCollector> fromLuceneQuery(Query luceneQuery);
+	SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> fromLuceneQuery(Query luceneQuery);
 
 }

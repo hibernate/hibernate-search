@@ -10,7 +10,8 @@ import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldForma
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 
-public abstract class AbstractMatchPredicateBuilder<T> extends AbstractSearchPredicateBuilder implements MatchPredicateBuilder<LuceneSearchPredicateCollector> {
+public abstract class AbstractMatchPredicateBuilder<T> extends AbstractSearchPredicateBuilder
+		implements MatchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	protected final String absoluteFieldPath;
 

@@ -29,18 +29,18 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
-class SpatialWithinPredicateFieldSetContextImpl<N, C>
-		implements SpatialWithinPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
+class SpatialWithinPredicateFieldSetContextImpl<N, CTX, C>
+		implements SpatialWithinPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<CTX, C> {
 
-	private final CommonState<N, C> commonState;
+	private final CommonState<N, CTX, C> commonState;
 
 	private final List<String> absoluteFieldPaths;
 
-	private final List<SearchPredicateBuilder<C>> queryBuilders;
+	private final List<SearchPredicateBuilder<CTX, C>> queryBuilders;
 
 	private Float boost;
 
-	SpatialWithinPredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> absoluteFieldPaths) {
+	SpatialWithinPredicateFieldSetContextImpl(CommonState<N, CTX, C> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = CollectionHelper.toImmutableList( absoluteFieldPaths );
@@ -82,13 +82,13 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector) {
+	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<CTX, ? super C>> collector) {
 		queryBuilders.forEach( collector );
 	}
 
 	private void generateWithinCircleQueryBuilders(GeoPoint center, double radius, DistanceUnit unit) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinCirclePredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
+			SpatialWithinCirclePredicateBuilder<CTX, C> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
 			predicateBuilder.circle( center, radius, unit );
 			if ( boost != null ) {
 				predicateBuilder.boost( boost );
@@ -99,7 +99,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 
 	private void generateWithinPolygonQueryBuilders(GeoPolygon polygon) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinPolygonPredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
+			SpatialWithinPolygonPredicateBuilder<CTX, C> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
 			predicateBuilder.polygon( polygon );
 			if ( boost != null ) {
 				predicateBuilder.boost( boost );
@@ -110,7 +110,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 
 	private void generateWithinBoundingBoxQueryBuilders(GeoBoundingBox boundingBox) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinBoundingBoxPredicateBuilder<C> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
+			SpatialWithinBoundingBoxPredicateBuilder<CTX, C> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
 			predicateBuilder.boundingBox( boundingBox );
 			if ( boost != null ) {
 				predicateBuilder.boost( boost );
@@ -119,14 +119,14 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 		}
 	}
 
-	static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, SpatialWithinPredicateFieldSetContextImpl<N, C>> {
+	static class CommonState<N, CTX, C> extends MultiFieldPredicateCommonState<N, CTX, C, SpatialWithinPredicateFieldSetContextImpl<N, CTX, C>> {
 
-		CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		CommonState(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
 		public SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, C> fieldSetContext : getFieldSetContexts() ) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<N, CTX, C> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
 			}
 
@@ -134,7 +134,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 		}
 
 		public SpatialWithinPolygonPredicateContext<N> polygon(GeoPolygon polygon) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, C> fieldSetContext : getFieldSetContexts() ) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<N, CTX, C> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinPolygonQueryBuilders( polygon );
 			}
 
@@ -142,7 +142,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, C>
 		}
 
 		public SpatialWithinBoundingBoxPredicateContext<N> boundingBox(GeoBoundingBox boundingBox) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, C> fieldSetContext : getFieldSetContexts() ) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<N, CTX, C> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
 			}
 

@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements BooleanJunctionPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -102,7 +102,7 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject innerObject = getInnerObject();
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH.set(

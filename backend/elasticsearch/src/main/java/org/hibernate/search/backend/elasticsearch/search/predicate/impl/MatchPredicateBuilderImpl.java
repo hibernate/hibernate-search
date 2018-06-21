@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements MatchPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
 
@@ -39,7 +39,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, getInnerObject() );

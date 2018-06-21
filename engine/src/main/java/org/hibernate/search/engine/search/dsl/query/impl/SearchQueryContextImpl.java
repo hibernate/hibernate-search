@@ -29,17 +29,17 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 /**
  * @author Yoann Rodiere
  */
-public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
+public final class SearchQueryContextImpl<T, Q, CTX, C> implements SearchQueryContext<Q> {
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchTargetContext<CTX, C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
-	private final SearchPredicateContributor<? super C> searchPredicateContributor;
+	private final SearchPredicateContributor<CTX, ? super C> searchPredicateContributor;
 	private final SearchSortContributorAggregator<C> searchSortContributorAggregator;
 
-	SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+	public SearchQueryContextImpl(SearchTargetContext<CTX, C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchPredicateContributor<? super C> searchPredicateContributor) {
+			SearchPredicateContributor<CTX, ? super C> searchPredicateContributor) {
 		this.targetContext = targetContext;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
@@ -105,7 +105,7 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 		 * (an end() method for example), and this method could be called twice by the user.
 		 */
 		C collector = searchQueryBuilder.getQueryElementCollector();
-		searchPredicateContributor.contribute( collector );
+		searchPredicateContributor.contribute( targetContext.getSearchPredicateFactory().createRootContext(), collector );
 		searchSortContributorAggregator.contribute( collector );
 		return searchQueryBuilder.build( searchQueryWrapperFactory );
 	}

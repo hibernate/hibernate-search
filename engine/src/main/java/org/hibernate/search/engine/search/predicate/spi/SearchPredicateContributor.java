@@ -9,16 +9,18 @@ package org.hibernate.search.engine.search.predicate.spi;
 /**
  * A search predicate contributor, i.e. an object that will push search predicates to a collector.
  *
+ * @param <CTX> The type of the context passed to the {@link #contribute(Object, Object)} method.
  * @param <C> The type of predicate collector this contributor will contribute to.
- * This type is backend-specific.
+ * These types are backend-specific.
  */
-public interface SearchPredicateContributor<C> {
+public interface SearchPredicateContributor<CTX, C> {
 
 	/**
 	 * Add zero or more predicates to the given collector.
 	 *
+	 * @param context The context in which the predicates are registered.
 	 * @param collector The collector to push search predicates to.
 	 */
-	void contribute(C collector);
+	void contribute(CTX context, C collector);
 
 }

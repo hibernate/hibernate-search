@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements RangePredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonObjectAccessor RANGE = JsonAccessor.root().property( "range" ).asObject();
 
@@ -62,7 +62,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject innerObject = getInnerObject();
 		JsonAccessor<JsonElement> accessor;
 		if ( lowerLimit != null ) {

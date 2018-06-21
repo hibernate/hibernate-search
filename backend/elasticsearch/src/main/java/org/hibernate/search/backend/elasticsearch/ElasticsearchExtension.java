@@ -51,8 +51,8 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <C> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C> factory, SearchPredicateDslContext<N, ? extends C> dslContext) {
+	public <CTX, C> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
+			SearchPredicateFactory<CTX, C> factory, SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
 		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
 			return extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext );
 		}
@@ -62,9 +62,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <C> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
-			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C> factory,
-			SearchPredicateDslContext<N, ? extends C> dslContext) {
+	public <CTX, C> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
+			SearchPredicateContainerContext<N> original, SearchPredicateFactory<CTX, C> factory,
+			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
 		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
 			return Optional.of( extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext ) );
 		}
@@ -107,12 +107,12 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchPredicateCollector
-	private <C> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
+	private <CTX, C> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
 			SearchPredicateContainerContext<N> original, ElasticsearchSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ? extends C> dslContext) {
+			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
 		return new ElasticsearchSearchPredicateContainerContextImpl<>(
 				original, factory,
-				(SearchPredicateDslContext<N, ? extends ElasticsearchSearchPredicateCollector>) dslContext
+				(SearchPredicateDslContext<N, Void, ? extends ElasticsearchSearchPredicateCollector>) dslContext
 		);
 	}
 

@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface SearchPredicateBuilder<C> extends SearchPredicateContributor<C> {
+public interface SearchPredicateBuilder<CTX, C> extends SearchPredicateContributor<CTX, C> {
 
 	void boost(float boost);
 
 	/**
 	 * Contribute exactly one predicate to the collector (no more, no less).
+	 *
+	 * @param context The context in which the predicates are registered.
 	 * @param collector A collector to contribute to.
 	 */
 	@Override
-	void contribute(C collector);
+	void contribute(CTX context, C collector);
 }

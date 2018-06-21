@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 /**
  * @author Guillaume Smet
  */
-abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateCollector> {
+abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	private Float boost;
 
@@ -26,7 +26,7 @@ abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<
 	protected abstract Query buildQuery();
 
 	@Override
-	public void contribute(LuceneSearchPredicateCollector collector) {
+	public void contribute(LuceneSearchPredicateContext context, LuceneSearchPredicateCollector collector) {
 		if ( boost != null ) {
 			collector.collectPredicate( new BoostQuery( buildQuery(), boost ) );
 		}

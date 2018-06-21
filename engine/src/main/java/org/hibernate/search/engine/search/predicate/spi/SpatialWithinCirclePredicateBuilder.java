@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public interface SpatialWithinCirclePredicateBuilder<C> extends SearchPredicateBuilder<C> {
+public interface SpatialWithinCirclePredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
 	void circle(GeoPoint center, double radius, DistanceUnit unit);
 

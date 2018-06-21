@@ -9,9 +9,9 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-public final class SearchTargetPredicateRootContext<C> extends SearchPredicateContainerContextImpl<SearchPredicate, C> {
+public final class SearchTargetPredicateRootContext<CTX, C> extends SearchPredicateContainerContextImpl<SearchPredicate, CTX, C> {
 
-	public SearchTargetPredicateRootContext(SearchPredicateFactory<C> factory) {
+	public SearchTargetPredicateRootContext(SearchPredicateFactory<CTX, C> factory) {
 		super( factory, new BuildingRootSearchPredicateDslContextImpl<>( factory ) );
 	}
 

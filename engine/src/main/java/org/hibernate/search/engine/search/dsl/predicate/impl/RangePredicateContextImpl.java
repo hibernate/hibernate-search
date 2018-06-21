@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, SearchPredicateContributor<C> {
+class RangePredicateContextImpl<N, CTX, C> implements RangePredicateContext<N>, SearchPredicateContributor<CTX, C> {
 
-	private final RangePredicateFieldSetContextImpl.CommonState<N, C> commonState;
+	private final RangePredicateFieldSetContextImpl.CommonState<N, CTX, C> commonState;
 
-	RangePredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	RangePredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
@@ -29,7 +29,7 @@ class RangePredicateContextImpl<N, C> implements RangePredicateContext<N>, Searc
 	}
 
 	@Override
-	public void contribute(C collector) {
-		commonState.contribute( collector );
+	public void contribute(CTX context, C collector) {
+		commonState.contribute( context, collector );
 	}
 }

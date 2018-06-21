@@ -16,21 +16,21 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonState.FieldSetContext<C>>
-		implements SearchPredicateContributor<C> {
+class MultiFieldPredicateCommonState<N, CTX, C, F extends MultiFieldPredicateCommonState.FieldSetContext<CTX, C>>
+		implements SearchPredicateContributor<CTX, C> {
 
-	private final SearchPredicateFactory<C> factory;
+	private final SearchPredicateFactory<CTX, C> factory;
 
 	private final Supplier<N> nextContextProvider;
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	MultiFieldPredicateCommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	MultiFieldPredicateCommonState(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
 
-	public SearchPredicateFactory<C> getFactory() {
+	public SearchPredicateFactory<CTX, C> getFactory() {
 		return factory;
 	}
 
@@ -47,23 +47,23 @@ class MultiFieldPredicateCommonState<N, C, F extends MultiFieldPredicateCommonSt
 	}
 
 	@Override
-	public void contribute(C collector) {
-		List<SearchPredicateBuilder<? super C>> predicateBuilders = new ArrayList<>();
+	public void contribute(CTX context, C collector) {
+		List<SearchPredicateBuilder<CTX, ? super C>> predicateBuilders = new ArrayList<>();
 		for ( F fieldSetContext : fieldSetContexts ) {
 			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
-			BooleanJunctionPredicateBuilder<C> boolBuilder = factory.bool();
+			BooleanJunctionPredicateBuilder<CTX, C> boolBuilder = factory.bool();
 			C shouldCollector = boolBuilder.getShouldCollector();
-			predicateBuilders.forEach( b -> b.contribute( shouldCollector ) );
-			boolBuilder.contribute( collector );
+			predicateBuilders.forEach( b -> b.contribute( context, shouldCollector ) );
+			boolBuilder.contribute( context, collector );
 		}
 		else {
-			predicateBuilders.get( 0 ).contribute( collector );
+			predicateBuilders.get( 0 ).contribute( context, collector );
 		}
 	}
 
-	public interface FieldSetContext<C> {
-		void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector);
+	public interface FieldSetContext<CTX, C> {
+		void contributePredicateBuilders(Consumer<SearchPredicateBuilder<CTX, ? super C>> collector);
 	}
 }

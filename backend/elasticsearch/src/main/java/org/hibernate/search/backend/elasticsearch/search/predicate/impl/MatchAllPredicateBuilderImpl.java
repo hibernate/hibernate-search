@@ -16,12 +16,12 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements MatchAllPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonObjectAccessor MATCH_ALL = JsonAccessor.root().property( "match_all" ).asObject();
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		MATCH_ALL.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );

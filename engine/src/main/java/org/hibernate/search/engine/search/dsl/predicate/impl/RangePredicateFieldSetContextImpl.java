@@ -25,21 +25,21 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class RangePredicateFieldSetContextImpl<N, C>
-		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<C> {
+class RangePredicateFieldSetContextImpl<N, CTX, C>
+		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<CTX, C> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<N, C> commonState;
+	private final CommonState<N, CTX, C> commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<RangePredicateBuilder<C>> queryBuilders = new ArrayList<>();
+	private final List<RangePredicateBuilder<CTX, C>> queryBuilders = new ArrayList<>();
 
-	RangePredicateFieldSetContextImpl(CommonState<N, C> commonState, List<String> absoluteFieldPaths) {
+	RangePredicateFieldSetContextImpl(CommonState<N, CTX, C> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateFactory<C> predicateFactory = commonState.getFactory();
+		SearchPredicateFactory<CTX, C> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			queryBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
@@ -72,23 +72,23 @@ class RangePredicateFieldSetContextImpl<N, C>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<? super C>> collector) {
+	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<CTX, ? super C>> collector) {
 		queryBuilders.forEach( collector );
 	}
 
-	static class CommonState<N, C> extends MultiFieldPredicateCommonState<N, C, RangePredicateFieldSetContextImpl<N, C>> {
+	static class CommonState<N, CTX, C> extends MultiFieldPredicateCommonState<N, CTX, C, RangePredicateFieldSetContextImpl<N, CTX, C>> {
 
 		private boolean hasNonNullBound = false;
 
-		CommonState(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+		CommonState(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
 		@Override
-		public void contribute(C collector) {
+		public void contribute(CTX context, C collector) {
 			// Just in case from() was called, but not to()
 			checkHasNonNullBound();
-			super.contribute( collector );
+			super.contribute( context, collector );
 		}
 
 		RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
@@ -154,7 +154,7 @@ class RangePredicateFieldSetContextImpl<N, C>
 			}
 		}
 
-		private Stream<RangePredicateBuilder<C>> getQueryBuilders() {
+		private Stream<RangePredicateBuilder<CTX, C>> getQueryBuilders() {
 			return getFieldSetContexts().stream().flatMap( f -> f.queryBuilders.stream() );
 		}
 

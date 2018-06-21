@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
  * @author Guillaume Smet
  */
 class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements MatchAllPredicateBuilder<LuceneSearchPredicateCollector> {
+		implements MatchAllPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	@Override
 	protected Query buildQuery() {

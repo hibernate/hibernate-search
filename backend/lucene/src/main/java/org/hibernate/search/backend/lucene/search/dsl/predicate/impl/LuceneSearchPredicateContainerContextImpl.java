@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateContainerContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
@@ -21,11 +22,11 @@ public class LuceneSearchPredicateContainerContextImpl<N>
 
 	private final LuceneSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, ? extends LuceneSearchPredicateCollector> dslContext;
+	private final SearchPredicateDslContext<N, LuceneSearchPredicateContext, ? extends LuceneSearchPredicateCollector> dslContext;
 
 	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
 			LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ? extends LuceneSearchPredicateCollector> dslContext) {
+			SearchPredicateDslContext<N, LuceneSearchPredicateContext, ? extends LuceneSearchPredicateCollector> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;

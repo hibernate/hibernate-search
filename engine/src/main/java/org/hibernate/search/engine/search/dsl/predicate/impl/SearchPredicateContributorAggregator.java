@@ -22,16 +22,16 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *     (the other constraints already prevent that, but we need a specific error message in this case)</li>
  * </ul>
  */
-public final class SearchPredicateContributorAggregator<C>
-		implements SearchPredicateContributor<C> {
+public final class SearchPredicateContributorAggregator<CTX, C>
+		implements SearchPredicateContributor<CTX, C> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private SearchPredicateContributor<? super C> singlePredicateContributor;
+	private SearchPredicateContributor<CTX, ? super C> singlePredicateContributor;
 
 	private boolean contributed = false;
 
-	public void add(SearchPredicateContributor<? super C> child) {
+	public void add(SearchPredicateContributor<CTX, ? super C> child) {
 		if ( contributed ) {
 			throw log.cannotAddPredicateToUsedContext();
 		}
@@ -42,7 +42,7 @@ public final class SearchPredicateContributorAggregator<C>
 	}
 
 	@Override
-	public void contribute(C collector) {
+	public void contribute(CTX context, C collector) {
 		if ( contributed ) {
 			// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
 			throw new AssertionFailure(
@@ -50,6 +50,6 @@ public final class SearchPredicateContributorAggregator<C>
 			);
 		}
 		contributed = true;
-		singlePredicateContributor.contribute( collector );
+		singlePredicateContributor.contribute( context, collector );
 	}
 }

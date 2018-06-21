@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class SpatialWithinPredicateContextImpl<N, C> implements SpatialWithinPredicateContext<N>, SearchPredicateContributor<C> {
+class SpatialWithinPredicateContextImpl<N, CTX, C> implements SpatialWithinPredicateContext<N>, SearchPredicateContributor<CTX, C> {
 
-	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<N, C> commonState;
+	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<N, CTX, C> commonState;
 
-	SpatialWithinPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	SpatialWithinPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
@@ -29,7 +29,7 @@ class SpatialWithinPredicateContextImpl<N, C> implements SpatialWithinPredicateC
 	}
 
 	@Override
-	public void contribute(C collector) {
-		commonState.contribute( collector );
+	public void contribute(CTX context, C collector) {
+		commonState.contribute( context, collector );
 	}
 }

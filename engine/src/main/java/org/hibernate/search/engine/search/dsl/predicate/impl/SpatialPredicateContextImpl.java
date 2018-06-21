@@ -13,28 +13,28 @@ import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateCo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class SpatialPredicateContextImpl<N, C> implements SpatialPredicateContext<N>, SearchPredicateContributor<C> {
+class SpatialPredicateContextImpl<N, CTX, C> implements SpatialPredicateContext<N>, SearchPredicateContributor<CTX, C> {
 
-	private final SearchPredicateFactory<C> factory;
+	private final SearchPredicateFactory<CTX, C> factory;
 
 	private final Supplier<N> nextContextProvider;
 
-	private SearchPredicateContributor<C> child;
+	private SearchPredicateContributor<CTX, C> child;
 
-	SpatialPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	SpatialPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
 
 	@Override
 	public SpatialWithinPredicateContext<N> within() {
-		SpatialWithinPredicateContextImpl<N, C> child = new SpatialWithinPredicateContextImpl<>( factory, nextContextProvider );
+		SpatialWithinPredicateContextImpl<N, CTX, C> child = new SpatialWithinPredicateContextImpl<>( factory, nextContextProvider );
 		this.child = child;
 		return child;
 	}
 
 	@Override
-	public void contribute(C collector) {
-		child.contribute( collector );
+	public void contribute(CTX context, C collector) {
+		child.contribute( context, collector );
 	}
 }

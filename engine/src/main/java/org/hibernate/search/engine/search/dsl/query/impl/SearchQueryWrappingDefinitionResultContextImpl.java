@@ -26,18 +26,18 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
-public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
+public final class SearchQueryWrappingDefinitionResultContextImpl<T, CTX, C, Q>
 		implements SearchQueryResultContext<Q>, SearchQueryWrappingDefinitionResultContext<Q> {
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchTargetContext<CTX, C> targetContext;
 
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
 
-	private final SearchPredicateContributorAggregator<C> searchPredicateContributorAggregator;
+	private final SearchPredicateContributorAggregator<CTX, C> searchPredicateContributorAggregator;
 
-	public SearchQueryWrappingDefinitionResultContextImpl(SearchTargetContext<C> targetContext,
+	public SearchQueryWrappingDefinitionResultContextImpl(SearchTargetContext<CTX, C> targetContext,
 			SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.targetContext = targetContext;
@@ -47,7 +47,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	public SearchQueryWrappingDefinitionResultContextImpl(
-			SearchQueryWrappingDefinitionResultContextImpl<T, C, ?> original,
+			SearchQueryWrappingDefinitionResultContextImpl<T, CTX, C, ?> original,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this( original.targetContext, original.searchQueryBuilder, searchQueryWrapperFactory );
 	}
@@ -60,15 +60,15 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 
 	@Override
 	public SearchQueryContext<Q> predicate(SearchPredicate predicate) {
-		SearchPredicateFactory<? super C> factory = targetContext.getSearchPredicateFactory();
-		SearchPredicateContributor<? super C> contributor = factory.toContributor( predicate );
+		SearchPredicateFactory<CTX, ? super C> factory = targetContext.getSearchPredicateFactory();
+		SearchPredicateContributor<CTX, ? super C> contributor = factory.toContributor( predicate );
 		searchPredicateContributorAggregator.add( contributor );
 		return getNext();
 	}
 
 	@Override
 	public SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> dslPredicateContributor) {
-		SearchPredicateContributor<? super C> contributor = toContributor(
+		SearchPredicateContributor<CTX, ? super C> contributor = toContributor(
 				targetContext.getSearchPredicateFactory(), dslPredicateContributor
 		);
 		searchPredicateContributorAggregator.add( contributor );
@@ -77,15 +77,15 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 
 	@Override
 	public SearchPredicateContainerContext<SearchQueryContext<Q>> predicate() {
-		SearchPredicateDslContext<SearchQueryContext<Q>, C> dslContext = new QuerySearchPredicateDslContextImpl<>(
+		SearchPredicateDslContext<SearchQueryContext<Q>, CTX, C> dslContext = new QuerySearchPredicateDslContextImpl<>(
 				searchPredicateContributorAggregator, this::getNext
 		);
 		return new SearchPredicateContainerContextImpl<>( targetContext.getSearchPredicateFactory(), dslContext );
 	}
 
-	private <PC> SearchPredicateContributor<PC> toContributor(SearchPredicateFactory<PC> factory,
+	private <PCTX, PC> SearchPredicateContributor<PCTX, PC> toContributor(SearchPredicateFactory<PCTX, PC> factory,
 			Consumer<? super SearchPredicateContainerContext<SearchPredicate>> dslPredicateContributor) {
-		BuildingRootSearchPredicateDslContextImpl<PC> dslContext =
+		BuildingRootSearchPredicateDslContextImpl<PCTX, PC> dslContext =
 				new BuildingRootSearchPredicateDslContextImpl<>( factory );
 		SearchPredicateContainerContext<SearchPredicate> containerContext =
 				new SearchPredicateContainerContextImpl<>( factory, dslContext );
@@ -94,7 +94,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	private SearchQueryContext<Q> getNext() {
-		return new SearchQueryContextImpl<>(
+		return new SearchQueryContextImpl<T, Q, CTX, C>(
 				targetContext, searchQueryBuilder, searchQueryWrapperFactory,
 				searchPredicateContributorAggregator
 		);

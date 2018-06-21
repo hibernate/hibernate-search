@@ -11,12 +11,12 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainer
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
-class NestedPredicateFieldContextImpl<N, C> extends DelegatingSearchPredicateContainerContextImpl<N>
+class NestedPredicateFieldContextImpl<N, CTX, C> extends DelegatingSearchPredicateContainerContextImpl<N>
 		implements NestedPredicateFieldContext<N> {
 
-	private final NestedPredicateBuilder<C> builder;
+	private final NestedPredicateBuilder<CTX, C> builder;
 
-	NestedPredicateFieldContextImpl(SearchPredicateContainerContext<N> containerContext, NestedPredicateBuilder<C> builder) {
+	NestedPredicateFieldContextImpl(SearchPredicateContainerContext<N> containerContext, NestedPredicateBuilder<CTX, C> builder) {
 		super( containerContext );
 		this.builder = builder;
 	}

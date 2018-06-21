@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * @author Guillaume Smet
  */
 class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder<LuceneSearchPredicateCollector> {
+		implements BooleanJunctionPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

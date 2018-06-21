@@ -14,29 +14,32 @@ import org.hibernate.search.engine.search.SearchPredicate;
  * This is the main entry point for the engine
  * to ask the backend to build search predicates.
  *
+ * @param <CTX> The type of the context passed to the contribution method.
  * @param <C> The type of predicate collector the builders contributor will contribute to.
- * This type is backend-specific. See {@link SearchPredicateBuilder#contribute(Object)}
+ * This type is backend-specific. See {@link SearchPredicateBuilder#contribute(Object, Object)}
  */
-public interface SearchPredicateFactory<C> {
+public interface SearchPredicateFactory<CTX, C> {
 
-	SearchPredicate toSearchPredicate(SearchPredicateContributor<? super C> contributor);
+	CTX createRootContext();
 
-	SearchPredicateContributor<C> toContributor(SearchPredicate predicate);
+	SearchPredicate toSearchPredicate(SearchPredicateContributor<CTX, ? super C> contributor);
 
-	MatchAllPredicateBuilder<C> matchAll();
+	SearchPredicateContributor<CTX, C> toContributor(SearchPredicate predicate);
 
-	BooleanJunctionPredicateBuilder<C> bool();
+	MatchAllPredicateBuilder<CTX, C> matchAll();
 
-	MatchPredicateBuilder<C> match(String absoluteFieldPath);
+	BooleanJunctionPredicateBuilder<CTX, C> bool();
 
-	RangePredicateBuilder<C> range(String absoluteFieldPath);
+	MatchPredicateBuilder<CTX, C> match(String absoluteFieldPath);
 
-	NestedPredicateBuilder<C> nested(String absoluteFieldPath);
+	RangePredicateBuilder<CTX, C> range(String absoluteFieldPath);
 
-	SpatialWithinCirclePredicateBuilder<C> spatialWithinCircle(String absoluteFieldPath);
+	NestedPredicateBuilder<CTX, C> nested(String absoluteFieldPath);
 
-	SpatialWithinPolygonPredicateBuilder<C> spatialWithinPolygon(String absoluteFieldPath);
+	SpatialWithinCirclePredicateBuilder<CTX, C> spatialWithinCircle(String absoluteFieldPath);
 
-	SpatialWithinBoundingBoxPredicateBuilder<C> spatialWithinBoundingBox(String absoluteFieldPath);
+	SpatialWithinPolygonPredicateBuilder<CTX, C> spatialWithinPolygon(String absoluteFieldPath);
+
+	SpatialWithinBoundingBoxPredicateBuilder<CTX, C> spatialWithinBoundingBox(String absoluteFieldPath);
 
 }

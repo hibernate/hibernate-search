@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortFactoryImpl;
@@ -21,9 +22,9 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
  * @author Guillaume Smet
  */
 public class LuceneSearchTargetContext
-		implements SearchTargetContext<LuceneSearchQueryElementCollector> {
+		implements SearchTargetContext<LuceneSearchPredicateContext, LuceneSearchQueryElementCollector> {
 
-	private final SearchPredicateFactory<LuceneSearchPredicateCollector> searchPredicateFactory;
+	private final SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> searchPredicateFactory;
 	private final SearchSortFactory<LuceneSearchSortCollector> searchSortFactory;
 	private final SearchQueryFactory<LuceneSearchQueryElementCollector> searchQueryFactory;
 
@@ -34,7 +35,7 @@ public class LuceneSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateFactory<LuceneSearchPredicateCollector> getSearchPredicateFactory() {
+	public SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> getSearchPredicateFactory() {
 		return searchPredicateFactory;
 	}
 

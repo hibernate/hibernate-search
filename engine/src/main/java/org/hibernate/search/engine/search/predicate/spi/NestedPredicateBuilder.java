@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface NestedPredicateBuilder<C> extends SearchPredicateBuilder<C> {
+public interface NestedPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
 	C getNestedCollector();
 

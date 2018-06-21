@@ -15,11 +15,11 @@ import org.hibernate.search.util.impl.common.Contracts;
 final class MinimumShouldMatchContextImpl<N> implements MinimumShouldMatchContext<N>,
 		MinimumShouldMatchConditionContext<N>, MinimumShouldMatchNonEmptyContext<N> {
 
-	private final BooleanJunctionPredicateBuilder<?> builder;
+	private final BooleanJunctionPredicateBuilder<?, ?> builder;
 	private final N nextContext;
 	private int ignoreConstraintCeiling = 0;
 
-	MinimumShouldMatchContextImpl(BooleanJunctionPredicateBuilder<?> builder, N nextContext) {
+	MinimumShouldMatchContextImpl(BooleanJunctionPredicateBuilder<?, ?> builder, N nextContext) {
 		this.builder = builder;
 		this.nextContext = nextContext;
 	}

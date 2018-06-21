@@ -20,14 +20,14 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
-public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubQueryElementCollector>,
-		BooleanJunctionPredicateBuilder<StubQueryElementCollector>,
-		MatchPredicateBuilder<StubQueryElementCollector>,
-		RangePredicateBuilder<StubQueryElementCollector>,
-		NestedPredicateBuilder<StubQueryElementCollector>,
-		SpatialWithinCirclePredicateBuilder<StubQueryElementCollector>,
-		SpatialWithinPolygonPredicateBuilder<StubQueryElementCollector>,
-		SpatialWithinBoundingBoxPredicateBuilder<StubQueryElementCollector> {
+public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, StubQueryElementCollector>,
+		BooleanJunctionPredicateBuilder<Void, StubQueryElementCollector>,
+		MatchPredicateBuilder<Void, StubQueryElementCollector>,
+		RangePredicateBuilder<Void, StubQueryElementCollector>,
+		NestedPredicateBuilder<Void, StubQueryElementCollector>,
+		SpatialWithinCirclePredicateBuilder<Void, StubQueryElementCollector>,
+		SpatialWithinPolygonPredicateBuilder<Void, StubQueryElementCollector>,
+		SpatialWithinBoundingBoxPredicateBuilder<Void, StubQueryElementCollector> {
 
 	@Override
 	public StubQueryElementCollector getMustCollector() {
@@ -110,7 +110,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubQueryE
 	}
 
 	@Override
-	public void contribute(StubQueryElementCollector collector) {
+	public void contribute(Void context, StubQueryElementCollector collector) {
 		collector.simulateCollectCall();
 	}
 }

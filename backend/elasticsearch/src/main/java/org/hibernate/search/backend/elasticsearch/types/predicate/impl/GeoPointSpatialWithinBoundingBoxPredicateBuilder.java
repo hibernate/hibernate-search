@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import com.google.gson.JsonObject;
 
 class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPredicateBuilder
-		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
 
@@ -40,7 +40,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPre
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		GEO_BOUNDING_BOX.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );

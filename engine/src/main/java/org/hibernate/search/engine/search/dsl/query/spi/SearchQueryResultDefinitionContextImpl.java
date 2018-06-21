@@ -20,18 +20,18 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
 import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryWrappingDefinitionResultContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ProjectionHitAggregator;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.impl.ReferenceHitAggregator;
+import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements SearchQueryResultDefinitionContext<R, O> {
 
-	private final SearchTargetContext<C> targetContext;
+	private final SearchTargetContext<?, C> targetContext;
 
 	private final SessionContext sessionContext;
 
@@ -39,7 +39,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	private final ObjectLoader<R, O> objectLoader;
 
-	public SearchQueryResultDefinitionContextImpl(SearchTargetContext<C> targetContext,
+	public SearchQueryResultDefinitionContextImpl(SearchTargetContext<?, C> targetContext,
 			SessionContext sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {

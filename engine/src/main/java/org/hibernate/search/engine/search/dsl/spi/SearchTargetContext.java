@@ -13,11 +13,12 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 /**
  * The target context during a search, aware of the targeted indexes and of the underlying technology (backend).
  *
+ * @param <CTX> The type of the context passed to the contribution method of the predicate contributors.
  * @param <C> The type of query element collector
  */
-public interface SearchTargetContext<C> {
+public interface SearchTargetContext<CTX, C> {
 
-	SearchPredicateFactory<? super C> getSearchPredicateFactory();
+	SearchPredicateFactory<CTX, ? super C> getSearchPredicateFactory();
 
 	SearchSortFactory<? super C> getSearchSortFactory();
 

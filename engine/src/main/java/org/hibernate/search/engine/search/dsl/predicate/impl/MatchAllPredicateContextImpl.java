@@ -21,16 +21,16 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class MatchAllPredicateContextImpl<N, C>
-		implements MatchAllPredicateContext<N>, SearchPredicateContributor<C> {
+class MatchAllPredicateContextImpl<N, CTX, C>
+		implements MatchAllPredicateContext<N>, SearchPredicateContributor<CTX, C> {
 
-	private final SearchPredicateFactory<C> factory;
+	private final SearchPredicateFactory<CTX, C> factory;
 	private final Supplier<N> nextContextProvider;
 
-	private final MatchAllPredicateBuilder<C> builder;
+	private final MatchAllPredicateBuilder<CTX, C> builder;
 	private MatchAllExceptContext exceptContext;
 
-	MatchAllPredicateContextImpl(SearchPredicateFactory<C> factory,
+	MatchAllPredicateContextImpl(SearchPredicateFactory<CTX, C> factory,
 			Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
@@ -61,15 +61,15 @@ class MatchAllPredicateContextImpl<N, C>
 	}
 
 	@Override
-	public void contribute(C collector) {
+	public void contribute(CTX context, C collector) {
 		if ( exceptContext != null ) {
-			BooleanJunctionPredicateBuilder<C> booleanBuilder = factory.bool();
-			builder.contribute( booleanBuilder.getMustCollector() );
-			exceptContext.contribute( booleanBuilder.getMustNotCollector() );
-			booleanBuilder.contribute( collector );
+			BooleanJunctionPredicateBuilder<CTX, C> booleanBuilder = factory.bool();
+			builder.contribute( context, booleanBuilder.getMustCollector() );
+			exceptContext.contribute( context, booleanBuilder.getMustNotCollector() );
+			booleanBuilder.contribute( context, collector );
 		}
 		else {
-			builder.contribute( collector );
+			builder.contribute( context, collector );
 		}
 	}
 
@@ -85,12 +85,12 @@ class MatchAllPredicateContextImpl<N, C>
 		return exceptContext;
 	}
 
-	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, C>,
-			SearchPredicateContributor<C> {
+	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, CTX, C>,
+			SearchPredicateContributor<CTX, C> {
 
-		private final List<SearchPredicateContributor<? super C>> children = new ArrayList<>();
+		private final List<SearchPredicateContributor<CTX, ? super C>> children = new ArrayList<>();
 
-		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, C> containerContext;
+		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, CTX, C> containerContext;
 
 		MatchAllExceptContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
@@ -98,7 +98,7 @@ class MatchAllPredicateContextImpl<N, C>
 		}
 
 		@Override
-		public void addContributor(SearchPredicateContributor<? super C> child) {
+		public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
 			children.add( child );
 		}
 
@@ -108,8 +108,8 @@ class MatchAllPredicateContextImpl<N, C>
 		}
 
 		@Override
-		public void contribute(C collector) {
-			children.forEach( c -> c.contribute( collector ) );
+		public void contribute(CTX context, C collector) {
+			children.forEach( c -> c.contribute( context, collector ) );
 		}
 
 	}

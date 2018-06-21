@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface RangePredicateBuilder<C> extends SearchPredicateBuilder<C> {
+public interface RangePredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
 	void lowerLimit(Object value);
 

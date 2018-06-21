@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 class LuceneSearchPredicate
-		implements SearchPredicate, SearchPredicateContributor<LuceneSearchPredicateCollector> {
+		implements SearchPredicate, SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	private final Query luceneQuery;
 
@@ -20,7 +20,7 @@ class LuceneSearchPredicate
 	}
 
 	@Override
-	public void contribute(LuceneSearchPredicateCollector collector) {
+	public void contribute(LuceneSearchPredicateContext context, LuceneSearchPredicateCollector collector) {
 		collector.collectPredicate( luceneQuery );
 	}
 

@@ -16,21 +16,21 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
  * A DSL context used when calling {@link SearchQueryResultContext#predicate()} to build the predicate
  * in a fluid way (in the same call chain as the query).
  */
-public final class QuerySearchPredicateDslContextImpl<N, C>
-		implements SearchPredicateDslContext<N, C> {
+public final class QuerySearchPredicateDslContextImpl<N, CTX, C>
+		implements SearchPredicateDslContext<N, CTX, C> {
 
-	private final SearchPredicateContributorAggregator<C> aggregator;
+	private final SearchPredicateContributorAggregator<CTX, C> aggregator;
 
 	private final Supplier<N> nextContextSupplier;
 
-	public QuerySearchPredicateDslContextImpl(SearchPredicateContributorAggregator<C> aggregator,
+	public QuerySearchPredicateDslContextImpl(SearchPredicateContributorAggregator<CTX, C> aggregator,
 			Supplier<N> nextContextSupplier) {
 		this.aggregator = aggregator;
 		this.nextContextSupplier = nextContextSupplier;
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<? super C> child) {
+	public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
 		aggregator.add( child );
 	}
 

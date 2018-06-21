@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
 import com.google.gson.JsonObject;
 
 class ElasticsearchSearchPredicate
-		implements SearchPredicate, SearchPredicateContributor<ElasticsearchSearchPredicateCollector> {
+		implements SearchPredicate, SearchPredicateContributor<Void, ElasticsearchSearchPredicateCollector> {
 
 	private final JsonObject jsonObject;
 
@@ -21,7 +21,7 @@ class ElasticsearchSearchPredicate
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		collector.collectPredicate( jsonObject );
 	}
 

@@ -21,21 +21,21 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
  * or when calling {@link SearchQueryResultContext#predicate(Consumer)} to build the predicate using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchPredicate} object and cache it).
  */
-public final class BuildingRootSearchPredicateDslContextImpl<C>
-		implements SearchPredicateDslContext<SearchPredicate, C> {
+public final class BuildingRootSearchPredicateDslContextImpl<CTX, C>
+		implements SearchPredicateDslContext<SearchPredicate, CTX, C> {
 
-	private final SearchPredicateFactory<C> factory;
+	private final SearchPredicateFactory<CTX, C> factory;
 
-	private final SearchPredicateContributorAggregator<C> aggregator = new SearchPredicateContributorAggregator<>();
+	private final SearchPredicateContributorAggregator<CTX, C> aggregator = new SearchPredicateContributorAggregator<>();
 
 	private SearchPredicate built;
 
-	public BuildingRootSearchPredicateDslContextImpl(SearchPredicateFactory<C> factory) {
+	public BuildingRootSearchPredicateDslContextImpl(SearchPredicateFactory<CTX, C> factory) {
 		this.factory = factory;
 	}
 
 	@Override
-	public void addContributor(SearchPredicateContributor<? super C> child) {
+	public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
 		aggregator.add( child );
 	}
 
@@ -47,7 +47,7 @@ public final class BuildingRootSearchPredicateDslContextImpl<C>
 		return built;
 	}
 
-	public SearchPredicateContributor<C> getResultingContributor() {
+	public SearchPredicateContributor<CTX, C> getResultingContributor() {
 		if ( built != null ) {
 			return factory.toContributor( built );
 		}

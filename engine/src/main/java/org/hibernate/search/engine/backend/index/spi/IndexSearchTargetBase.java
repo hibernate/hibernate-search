@@ -26,6 +26,6 @@ public abstract class IndexSearchTargetBase implements IndexSearchTarget {
 		return new SearchTargetSortRootContext<>( getSearchTargetContext().getSearchSortFactory() );
 	}
 
-	protected abstract SearchTargetContext<?> getSearchTargetContext();
+	protected abstract SearchTargetContext<?, ?> getSearchTargetContext();
 
 }

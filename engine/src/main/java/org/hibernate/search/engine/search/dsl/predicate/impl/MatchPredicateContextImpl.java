@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, SearchPredicateContributor<C> {
+class MatchPredicateContextImpl<N, CTX, C> implements MatchPredicateContext<N>, SearchPredicateContributor<CTX, C> {
 
-	private final MatchPredicateFieldSetContextImpl.CommonState<N, C> commonState;
+	private final MatchPredicateFieldSetContextImpl.CommonState<N, CTX, C> commonState;
 
-	MatchPredicateContextImpl(SearchPredicateFactory<C> factory, Supplier<N> nextContextProvider) {
+	MatchPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
@@ -29,8 +29,8 @@ class MatchPredicateContextImpl<N, C> implements MatchPredicateContext<N>, Searc
 	}
 
 	@Override
-	public void contribute(C collector) {
-		commonState.contribute( collector );
+	public void contribute(CTX context, C collector) {
+		commonState.contribute( context, collector );
 	}
 
 }

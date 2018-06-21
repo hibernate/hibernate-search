@@ -12,14 +12,14 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContribut
  * Represents the current context in the search DSL,
  * i.e. the current position in the predicate tree.
  */
-public interface SearchPredicateDslContext<N, C> {
+public interface SearchPredicateDslContext<N, CTX, C> {
 
 	/**
 	 * Add a predicate contributor at the current position in the predicate tree.
 	 *
 	 * @param child The contributor to add.
 	 */
-	void addContributor(SearchPredicateContributor<? super C> child);
+	void addContributor(SearchPredicateContributor<CTX, ? super C> child);
 
 	/**
 	 * @return The context that should be exposed to the user after the current predicate has been fully defined.

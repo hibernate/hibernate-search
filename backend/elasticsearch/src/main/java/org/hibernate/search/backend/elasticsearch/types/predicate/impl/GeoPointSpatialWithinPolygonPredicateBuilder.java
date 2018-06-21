@@ -18,7 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSearchPredicateBuilder
-		implements SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateCollector> {
+		implements SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
 
 	private static final JsonObjectAccessor GEO_POLYGON = JsonAccessor.root().property( "geo_polygon" ).asObject();
 
@@ -36,7 +36,7 @@ class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSearchPredica
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector) {
+	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		GEO_POLYGON.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );

@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
 public class ElasticsearchSearchTargetContext
-		implements SearchTargetContext<ElasticsearchSearchQueryElementCollector> {
+		implements SearchTargetContext<Void, ElasticsearchSearchQueryElementCollector> {
 
-	private final SearchPredicateFactory<ElasticsearchSearchPredicateCollector> searchPredicateFactory;
+	private final SearchPredicateFactory<Void, ElasticsearchSearchPredicateCollector> searchPredicateFactory;
 	private final SearchSortFactory<ElasticsearchSearchSortCollector> searchSortFactory;
 	private final SearchQueryFactory<ElasticsearchSearchQueryElementCollector> searchQueryFactory;
 
@@ -32,7 +32,7 @@ public class ElasticsearchSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateFactory<ElasticsearchSearchPredicateCollector> getSearchPredicateFactory() {
+	public SearchPredicateFactory<Void, ElasticsearchSearchPredicateCollector> getSearchPredicateFactory() {
 		return searchPredicateFactory;
 	}
 

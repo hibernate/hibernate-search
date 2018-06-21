@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface BooleanJunctionPredicateBuilder<C> extends SearchPredicateBuilder<C> {
+public interface BooleanJunctionPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
 	C getMustCollector();
 
