@@ -168,4 +168,18 @@ public interface Log extends BasicLogger {
 	@Message(id = 28, value = "There isn't any explicit document ID mapping for indexed type '%1$s',"
 			+ " and the entity ID cannot be used as a default because it is unknown.")
 	SearchException missingIdentifierMapping(PojoRawTypeModel<?> typeModel);
+
+	@Message(id = 29, value = "Property '%2$s' from type '%1$s' is annotated with @IndexingDependency,"
+			+ " but 'derivedFrom' contains an empty path.")
+	SearchException missingPathInIndexingDependencyDerivedFrom(PojoRawTypeModel<?> typeModel, String propertyName);
+
+	@Message(id = 30, value = "Found a cyclic dependency between derived properties involving path '%2$s' on type '%1$s'."
+			+ " Derived properties cannot be marked as derived from themselves, even indirectly through other "
+			+ " derived properties."
+			+ " If your model actually contains such cyclic dependency, "
+			+ " you should consider disabling automatic reindexing, at least partially "
+			+ " using @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO) on one of the properties in the cycle."
+	)
+	SearchException infiniteRecursionForDerivedFrom(PojoRawTypeModel<?> typeModel,
+			PojoModelPathValueNode path);
 }

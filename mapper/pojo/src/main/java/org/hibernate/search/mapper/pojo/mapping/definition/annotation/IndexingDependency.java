@@ -67,7 +67,9 @@ public @interface IndexingDependency {
 	 * This setting is only effective for values that are actually used when indexing
 	 * (values used in field definitions, in bridges, ...).
 	 */
-	ReindexOnUpdate reindexOnUpdate();
+	ReindexOnUpdate reindexOnUpdate() default ReindexOnUpdate.DEFAULT;
+
+	ObjectPath[] derivedFrom() default {};
 
 	/**
 	 * @return An array of references to container value extractor implementation classes,

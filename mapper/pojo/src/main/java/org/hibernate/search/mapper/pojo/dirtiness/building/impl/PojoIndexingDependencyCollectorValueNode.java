@@ -56,27 +56,36 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode;
+	private final PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode;
+	private final PojoModelPathValueNode unboundModelPathFromLastTypeNode;
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
+	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode;
 
 	private final ReindexOnUpdate reindexOnUpdate;
+	private final Set<PojoModelPathValueNode> derivedFrom;
 
 	// First key: inverse side entity type, second key: original side concrete entity type
 	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
 	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
+			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
+			BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
+		this.parentNode = parentNode;
+		this.modelPathFromLastTypeNode = modelPathFromLastTypeNode;
+		// The path is used for comparisons (equals), so we need it unbound
+		this.unboundModelPathFromLastTypeNode = modelPathFromLastTypeNode.toUnboundPath();
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
+		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 
-		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromRootEntityNode;
+		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
 		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathValueNode.getParent();
 		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
 		this.reindexOnUpdate = buildingHelper.getReindexOnUpdate(
@@ -85,17 +94,72 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				modelPathPropertyNode.getPropertyModel().getName(),
 				modelPathValueNode.getExtractorPath()
 		);
+		this.derivedFrom = buildingHelper.getDerivedFrom(
+				modelPathTypeNode.getTypeModel(),
+				modelPathPropertyNode.getPropertyModel().getName(),
+				modelPathValueNode.getExtractorPath()
+		);
 	}
 
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
-				this, modelPathFromRootEntityNode.type(), lastEntityNode, modelPathFromLastEntityNode.type(), buildingHelper
+				this,
+				lastEntityNode, modelPathFromLastEntityNode.type(),
+				modelPathFromRootEntityNode.type(),
+				buildingHelper
 		);
 	}
 
 	public void collectDependency() {
+		doCollectDependency( null );
+	}
+
+	private void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
+		if ( initialNodeCollectingDependency != null ) {
+			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals( unboundModelPathFromLastTypeNode ) ) {
+				/*
+				 * We found a cycle in the derived from dependencies.
+				 * This can happen for example if:
+				 * - property "foo" on type A is marked as derived from itself
+				 * - property "foo" on type A is marked as derived from property "bar" on type B,
+				 *   which is marked as derived from property "foo" on type "A".
+				 * Even if such a dependency might work in practice at runtime,
+				 * for example because the link A => B never leads to a B that refers to the same A,
+				 * even indirectly,
+				 * we cannot support it here because we need to model dependencies as a static tree,
+				 * which in such case would have an infinite depth.
+ 				 */
+				throw log.infiniteRecursionForDerivedFrom(
+						modelPathFromLastTypeNode.getRootType().getRawType(),
+						modelPathFromLastTypeNode.toUnboundPath()
+				);
+			}
+		}
+		else {
+			initialNodeCollectingDependency = this;
+		}
+
 		if ( ReindexOnUpdate.DEFAULT.equals( reindexOnUpdate ) ) {
-			lastEntityNode.collectDependency( modelPathFromLastEntityNode );
+			if ( derivedFrom.isEmpty() ) {
+				lastEntityNode.collectDependency( this.modelPathFromLastEntityNode );
+			}
+			else {
+				/*
+				 * The value represented by this node is derived from other, base values.
+				 * If we rely on the value represented by this node when indexing,
+				 * then we indirectly rely on these base values.
+				 *
+				 * We don't just call lastEntityNode.collectDependency() for each path to the base values,
+				 * because the paths may cross the entity boundaries, meaning they may have a prefix
+				 * leading to a different entity, and a suffix leading to the value we rely on.
+				 * This means we must go through the dependency collector tree to properly resolve
+				 * the entities that should trigger reindexing of our root entity when they change.
+				 */
+				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.getParentNode();
+				for ( PojoModelPathValueNode path : derivedFrom ) {
+					applyPath( lastTypeNode, path ).doCollectDependency( initialNodeCollectingDependency );
+				}
+			}
 		}
 	}
 
@@ -259,23 +323,47 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			PojoModelPathValueNode unboundPath) {
 		PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNodeBuilder =
 				applyPath( builder, unboundPath.getParent() );
-		ContainerValueExtractorPath inverseExtractorPath = unboundPath.getExtractorPath();
-		return propertyNodeBuilder.value( inverseExtractorPath );
+		ContainerValueExtractorPath extractorPath = unboundPath.getExtractorPath();
+		return propertyNodeBuilder.value( extractorPath );
 	}
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> applyPath(
-			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
+			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> rootBuilder,
 			PojoModelPathPropertyNode unboundPath) {
 		PojoModelPathValueNode parent = unboundPath.getParent();
 		AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> parentBuilder;
 		if ( parent != null ) {
-			parentBuilder = applyPath( builder, parent ).type();
+			parentBuilder = applyPath( rootBuilder, parent ).type();
 		}
 		else {
-			parentBuilder = builder;
+			parentBuilder = rootBuilder;
 		}
-		String inversePropertyName = unboundPath.getPropertyName();
-		return parentBuilder.property( inversePropertyName );
+		String propertyName = unboundPath.getPropertyName();
+		return parentBuilder.property( propertyName );
+	}
+
+	private PojoIndexingDependencyCollectorValueNode<?, ?> applyPath(
+			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
+			PojoModelPathValueNode unboundPath) {
+		PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyCollectorNode =
+				applyPath( rootCollectorTypeNode, unboundPath.getParent() );
+		ContainerValueExtractorPath extractorPath = unboundPath.getExtractorPath();
+		return propertyCollectorNode.value( extractorPath );
+	}
+
+	private PojoIndexingDependencyCollectorPropertyNode<?, ?> applyPath(
+			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
+			PojoModelPathPropertyNode unboundPath) {
+		PojoModelPathValueNode parent = unboundPath.getParent();
+		PojoIndexingDependencyCollectorTypeNode<?> parentCollectorNode;
+		if ( parent != null ) {
+			parentCollectorNode = applyPath( rootCollectorTypeNode, parent ).type();
+		}
+		else {
+			parentCollectorNode = rootCollectorTypeNode;
+		}
+		String propertyName = unboundPath.getPropertyName();
+		return parentCollectorNode.property( propertyName );
 	}
 
 	private BoundPojoModelPathValueNode<?, ?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,

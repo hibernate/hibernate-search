@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import java.util.Set;
+
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
@@ -15,6 +17,8 @@ public interface PojoAdditionalMetadataCollectorValueNode extends PojoAdditional
 
 	void associationEmbedded();
 
-	void indexingDependency(ReindexOnUpdate reindexOnUpdate);
+	void reindexOnUpdate(ReindexOnUpdate reindexOnUpdate);
+
+	void derivedFrom(Set<PojoModelPathValueNode> path);
 
 }

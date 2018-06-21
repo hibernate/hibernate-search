@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
@@ -20,35 +21,53 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractPojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorTypeNode<T> parentNode;
-	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode;
+	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode;
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode;
+	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parentNode,
-			BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode,
+			BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode,
+			BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
+		this.modelPathFromParentNode = modelPathFromParentNode;
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
+		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 	}
 
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
 			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
 		return new PojoIndexingDependencyCollectorValueNode<>(
 				this,
-				modelPathFromRootEntityNode.value( boundExtractorPath ),
+				modelPathFromParentNode.value( boundExtractorPath ),
 				lastEntityNode,
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
+				modelPathFromRootEntityNode.value( boundExtractorPath ),
 				buildingHelper
 		);
+	}
+
+	PojoIndexingDependencyCollectorValueNode<P, ?> value(
+			ContainerValueExtractorPath extractorPath) {
+		BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+				buildingHelper.bindExtractorPath(
+						modelPathFromRootEntityNode.getPropertyModel().getTypeModel(),
+						extractorPath
+				);
+		return value( boundExtractorPath );
 	}
 
 	@Override
 	ReindexOnUpdate getReindexOnUpdate() {
 		return parentNode.getReindexOnUpdate();
+	}
+
+	PojoIndexingDependencyCollectorTypeNode<T> getParentNode() {
+		return parentNode;
 	}
 }

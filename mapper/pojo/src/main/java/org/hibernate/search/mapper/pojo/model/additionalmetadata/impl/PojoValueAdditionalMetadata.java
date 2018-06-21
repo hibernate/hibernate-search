@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -14,18 +16,20 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public class PojoValueAdditionalMetadata {
 
 	public static final PojoValueAdditionalMetadata EMPTY = new PojoValueAdditionalMetadata(
-			null, false, Optional.empty()
+			null, false, Optional.empty(), Collections.emptySet()
 	);
 
 	private final PojoModelPathValueNode inverseSidePath;
 	private final boolean associationEmbedded;
 	private final Optional<ReindexOnUpdate> reindexOnUpdate;
+	private final Set<PojoModelPathValueNode> derivedFrom;
 
 	public PojoValueAdditionalMetadata(PojoModelPathValueNode inverseSidePath, boolean associationEmbedded,
-			Optional<ReindexOnUpdate> reindexOnUpdate) {
+			Optional<ReindexOnUpdate> reindexOnUpdate, Set<PojoModelPathValueNode> derivedFrom) {
 		this.inverseSidePath = inverseSidePath;
 		this.associationEmbedded = associationEmbedded;
 		this.reindexOnUpdate = reindexOnUpdate;
+		this.derivedFrom = derivedFrom;
 	}
 
 	public Optional<PojoModelPathValueNode> getInverseSidePath() {
@@ -38,5 +42,9 @@ public class PojoValueAdditionalMetadata {
 
 	public Optional<ReindexOnUpdate> getReindexOnUpdate() {
 		return reindexOnUpdate;
+	}
+
+	public Set<PojoModelPathValueNode> getDerivedFrom() {
+		return derivedFrom;
 	}
 }

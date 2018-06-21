@@ -11,6 +11,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -26,50 +27,61 @@ import org.hibernate.search.util.AssertionFailure;
 public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorValueNode<?, T> parentNode;
-	private final BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode;
+	private final BoundPojoModelPathTypeNode<T> modelPathFromCurrentNode;
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode;
+	private final BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = null;
-		this.modelPathFromRootEntityNode = BoundPojoModelPath.root( typeModel );
+		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
 		this.lastEntityNode = this;
-		this.modelPathFromLastEntityNode = modelPathFromRootEntityNode;
+		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
+		this.modelPathFromRootEntityNode = modelPathFromCurrentNode;
 	}
 
 	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parentNode,
-			BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
+			BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
-		if ( buildingHelper.isEntity( modelPathFromRootEntityNode.getTypeModel().getRawType() ) ) {
+		PojoTypeModel<T> typeModel = modelPathFromRootEntityNode.getTypeModel();
+		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
+		if ( buildingHelper.isEntity( typeModel.getRawType() ) ) {
 			this.lastEntityNode = this;
-			this.modelPathFromLastEntityNode = BoundPojoModelPath.root( modelPathFromRootEntityNode.getTypeModel() );
+			this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
 		}
 		else {
 			this.lastEntityNode = lastEntityNode;
 			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
+		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 	}
 
 	/*
-	 * modelPathFromRootEntityNode and modelPathFromLastEntityNode reference the same type, just from a different root.
+	 * modelPathFromCurrentNode, modelPathFromRootEntityNode and modelPathFromLastEntityNode
+	 * reference the same type, just from a different root.
 	 * Thus applying the same property handle results in the same property type.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
 				this,
-				modelPathFromRootEntityNode.property( propertyHandle ),
+				modelPathFromCurrentNode.property( propertyHandle ),
 				lastEntityNode,
 				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyHandle ),
+				(BoundPojoModelPathPropertyNode) modelPathFromRootEntityNode.property( propertyHandle ),
 				buildingHelper
 		);
+	}
+
+	PojoIndexingDependencyCollectorPropertyNode<T, ?> property(String propertyName) {
+		PojoPropertyModel<?> propertyModel = getTypeModel().getProperty( propertyName );
+		return property( propertyModel.getHandle() );
 	}
 
 	@Override

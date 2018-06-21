@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtrac
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -156,5 +157,28 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 			return reindexOnUpdateOptional.orElse( ReindexOnUpdate.DEFAULT );
 		}
+	}
+
+	Set<PojoModelPathValueNode> getDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,
+			ContainerValueExtractorPath extractorPath) {
+		PojoTypeAdditionalMetadata typeAdditionalMetadata =
+				typeAdditionalMetadataProvider.get( typeModel.getRawType() );
+		Set<PojoModelPathValueNode> derivedFrom =
+				typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+						.getValueAdditionalMetadata( extractorPath )
+						.getDerivedFrom();
+		if ( derivedFrom.isEmpty() ) {
+			if ( extractorBinder.isDefaultExtractorPath(
+					introspector,
+					typeModel.getProperty( propertyName ).getTypeModel(),
+					extractorPath
+			) ) {
+				derivedFrom = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+						.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
+						.getDerivedFrom();
+			}
+		}
+
+		return derivedFrom;
 	}
 }
