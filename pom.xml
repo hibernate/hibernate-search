@@ -174,7 +174,7 @@
 
     <properties>
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.9.0.Final</previous.stable>
+        <previous.stable>5.10.5.Final</previous.stable>
 
         <!-- Dependencies versions -->
 
