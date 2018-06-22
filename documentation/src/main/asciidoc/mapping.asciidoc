@@ -622,7 +622,7 @@ public class Address {
 Be careful. Because the data is de-normalized in the Lucene index when using the `@IndexedEmbedded`
 technique, Hibernate Search needs to be aware of any change in the `Place` object and any change in
 the `Address` object to keep the index up to date. To make sure the `Place` Lucene document is updated
-when it's `Address` changes, you need to mark the other side of the bidirectional relationship with
+when its `Address` changes, you need to mark the other side of the bidirectional relationship with
 `@ContainedIn`.
 
 [TIP]
@@ -883,7 +883,7 @@ public class Human {
 ----
 ====
 
-In <<indexedembedded-includePathsAndDepth>>, every human will have it's name and surname attributes
+In <<indexedembedded-includePathsAndDepth>>, every human will have their name and surname attributes
 indexed. The name and surname of parents will be indexed too, recursively up to second line because
 of the `depth` attribute. It will be possible to search by name or surname, of the person directly,
 his parents or of his grand parents. Beyond the second level, we will in addition index one more
@@ -1386,7 +1386,7 @@ group: says which pattern group to extract into tokens|`lucene-analyzers-common`
                 words|`words`: points to a resource file containing the stop words
 
 `ignoreCase`: true if `case` should be ignore when comparing stop words, `false` otherwise |`lucene-analyzers-common`
-|`SnowballPorterFilterFactory`|Reduces a word to it's root in a given language. (eg.
+|`SnowballPorterFilterFactory`|Reduces a word to its root in a given language. (eg.
                 protect, protects, protection share the same root). Using such
                 a filter allows searches matching related words.|`language`: Danish, Dutch, English,
                 Finnish, French, German, Italian, Norwegian, Portuguese,
