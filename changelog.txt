@@ -1,6 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.2.Final (22-06-2018)
+-------------------------
+
+** Improvement
+    * HSEARCH-3197 Allow to set the minimum number of should clauses required to match for boolean predicates in the DSL
+
+** Task
+    * HSEARCH-3188 Fix the phase for plugin executions generating integration test environment
+    * HSEARCH-3187 Use POM packaging for relocation artifacts
+    * HSEARCH-3186 Forward maven settings to JBoss Modules when applying patches to WildFly nodes
+    * HSEARCH-3185 Build-config module should not attempt to apply checkstyle or forbiddenapi rules
+    * HSEARCH-3184 Fix invalid references to repository.jboss-public.url in the build configuration
+    * HSEARCH-3183 Remove obsolete and invalid Maven configuration in hibernate-search-jbossmodules-parent
+    * HSEARCH-3172 Avoid JaCoCo-related properties not being translated correctly and failing ITs in IDEA
+
 5.10.1.Final (27-05-2018)
 -------------------------
 
