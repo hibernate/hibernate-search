@@ -54,8 +54,10 @@ class MultiFieldPredicateCommonState<N, CTX, C, F extends MultiFieldPredicateCom
 		}
 		if ( predicateBuilders.size() > 1 ) {
 			BooleanJunctionPredicateBuilder<CTX, C> boolBuilder = factory.bool();
-			C shouldCollector = boolBuilder.getShouldCollector();
-			predicateBuilders.forEach( b -> b.contribute( context, shouldCollector ) );
+			Consumer<SearchPredicateContributor<CTX, ? super C>> shouldCollector = boolBuilder.getShouldCollector();
+			for ( SearchPredicateBuilder<CTX, ? super C> predicateBuilder : predicateBuilders ) {
+				shouldCollector.accept( predicateBuilder );
+			}
 			boolBuilder.contribute( context, collector );
 		}
 		else {

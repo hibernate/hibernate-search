@@ -11,6 +11,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
 
 class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> {
@@ -26,7 +27,7 @@ class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> 
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
 			return queryBuilder.createBooleanQuery( absoluteFieldPath, value );
 		}

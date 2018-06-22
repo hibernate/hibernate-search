@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 
 /**
@@ -23,15 +24,22 @@ abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<
 		this.boost = boost;
 	}
 
-	protected abstract Query buildQuery();
+	protected abstract Query buildQuery(LuceneSearchPredicateContext context);
 
 	@Override
 	public void contribute(LuceneSearchPredicateContext context, LuceneSearchPredicateCollector collector) {
 		if ( boost != null ) {
-			collector.collectPredicate( new BoostQuery( buildQuery(), boost ) );
+			collector.collectPredicate( new BoostQuery( buildQuery( context ), boost ) );
 		}
 		else {
-			collector.collectPredicate( buildQuery() );
+			collector.collectPredicate( buildQuery( context ) );
 		}
+	}
+
+	protected Query getQueryFromContributor(LuceneSearchPredicateContext context,
+			SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		LuceneSearchPredicateQueryBuilder queryBuilder = new LuceneSearchPredicateQueryBuilder();
+		contributor.contribute( context, queryBuilder );
+		return queryBuilder.build();
 	}
 }

@@ -6,22 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 class LuceneSearchPredicate
 		implements SearchPredicate, SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
-	private final Query luceneQuery;
+	private final SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor;
 
-	LuceneSearchPredicate(Query luceneQuery) {
-		this.luceneQuery = luceneQuery;
+	LuceneSearchPredicate(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		this.contributor = contributor;
 	}
 
 	@Override
 	public void contribute(LuceneSearchPredicateContext context, LuceneSearchPredicateCollector collector) {
-		collector.collectPredicate( luceneQuery );
+		LuceneSearchPredicateQueryBuilder predicateQueryBuilder = new LuceneSearchPredicateQueryBuilder();
+		contributor.contribute( context, predicateQueryBuilder );
+		collector.collectPredicate( predicateQueryBuilder.build() );
 	}
 
 }

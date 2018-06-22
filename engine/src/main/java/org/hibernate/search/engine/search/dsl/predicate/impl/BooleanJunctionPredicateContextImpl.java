@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -42,10 +40,10 @@ class BooleanJunctionPredicateContextImpl<N, CTX, C>
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 		this.builder = factory.bool();
-		this.must = new OccurContext();
-		this.mustNot = new OccurContext();
-		this.should = new OccurContext();
-		this.filter = new OccurContext();
+		this.must = new OccurContext( builder.getMustCollector() );
+		this.mustNot = new OccurContext( builder.getMustNotCollector() );
+		this.should = new OccurContext( builder.getShouldCollector() );
+		this.filter = new OccurContext( builder.getFilterCollector() );
 		this.minimumShouldMatchContext = new MinimumShouldMatchContextImpl<>( builder, this );
 	}
 
@@ -133,10 +131,6 @@ class BooleanJunctionPredicateContextImpl<N, CTX, C>
 
 	@Override
 	public void contribute(CTX context, C collector) {
-		must.contribute( context, builder.getMustCollector() );
-		mustNot.contribute( context, builder.getMustNotCollector() );
-		should.contribute( context, builder.getShouldCollector() );
-		filter.contribute( context, builder.getFilterCollector() );
 		builder.contribute( context, collector );
 	}
 
@@ -145,33 +139,27 @@ class BooleanJunctionPredicateContextImpl<N, CTX, C>
 		return nextContextProvider.get();
 	}
 
-	private class OccurContext implements SearchPredicateDslContext<BooleanJunctionPredicateContext<N>, CTX, C>,
-			SearchPredicateContributor<CTX, C> {
+	private class OccurContext implements SearchPredicateDslContext<BooleanJunctionPredicateContext<N>, CTX, C> {
 
-		private final List<SearchPredicateContributor<CTX, ? super C>> children = new ArrayList<>();
+		private final Consumer<SearchPredicateContributor<CTX, ? super C>> contributorConsumer;
 
 		private final SearchPredicateContainerContextImpl<BooleanJunctionPredicateContext<N>, CTX, C> containerContext;
 
-		OccurContext() {
+		OccurContext(Consumer<SearchPredicateContributor<CTX, ? super C>> contributorConsumer) {
+			this.contributorConsumer = contributorConsumer;
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
 					BooleanJunctionPredicateContextImpl.this.factory, this );
 		}
 
 		@Override
 		public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
-			children.add( child );
+			contributorConsumer.accept( child );
 		}
 
 		@Override
 		public BooleanJunctionPredicateContext<N> getNextContext() {
 			return BooleanJunctionPredicateContextImpl.this;
 		}
-
-		@Override
-		public void contribute(CTX context, C collector) {
-			children.forEach( c -> c.contribute( context, collector ) );
-		}
-
 	}
 
 }

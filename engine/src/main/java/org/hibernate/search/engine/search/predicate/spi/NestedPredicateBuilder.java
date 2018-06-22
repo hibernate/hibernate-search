@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import java.util.function.Consumer;
+
 public interface NestedPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
-	C getNestedCollector();
+	Consumer<SearchPredicateContributor<CTX, ? super C>> getNestedCollector();
 
 }

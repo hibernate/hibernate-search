@@ -7,17 +7,20 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -29,31 +32,30 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
-
-	private boolean hasMustNot = false;
-	private boolean hasOnlyMustNot = true;
-	private int shouldClauseCount = 0;
+	private List<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> mustContributors;
+	private List<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> mustNotContributors;
+	private List<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> shouldContributors;
+	private List<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> filterContributors;
 
 	private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	@Override
-	public LuceneSearchPredicateCollector getMustCollector() {
+	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getMustCollector() {
 		return this::must;
 	}
 
 	@Override
-	public LuceneSearchPredicateCollector getMustNotCollector() {
+	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getMustNotCollector() {
 		return this::mustNot;
 	}
 
 	@Override
-	public LuceneSearchPredicateCollector getShouldCollector() {
+	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getShouldCollector() {
 		return this::should;
 	}
 
 	@Override
-	public LuceneSearchPredicateCollector getFilterCollector() {
+	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getFilterCollector() {
 		return this::filter;
 	}
 
@@ -85,45 +87,90 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		}
 	}
 
-	private void must(Query luceneQuery) {
-		booleanQueryBuilder.add( luceneQuery, Occur.MUST );
-		hasOnlyMustNot = false;
+	private void must(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( mustContributors == null ) {
+			mustContributors = new ArrayList<>();
+		}
+		mustContributors.add( contributor );
 	}
 
-	private void mustNot(Query luceneQuery) {
-		booleanQueryBuilder.add( luceneQuery, Occur.MUST_NOT );
-		hasMustNot = true;
+	private void mustNot(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( mustNotContributors == null ) {
+			mustNotContributors = new ArrayList<>();
+		}
+		mustNotContributors.add( contributor );
 	}
 
-	private void should(Query luceneQuery) {
-		booleanQueryBuilder.add( luceneQuery, Occur.SHOULD );
-		++shouldClauseCount;
-		hasOnlyMustNot = false;
+	private void should(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( shouldContributors == null ) {
+			shouldContributors = new ArrayList<>();
+		}
+		shouldContributors.add( contributor );
 	}
 
-	private void filter(Query luceneQuery) {
-		booleanQueryBuilder.add( luceneQuery, Occur.FILTER );
-		hasOnlyMustNot = false;
+	private void filter(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( filterContributors == null ) {
+			filterContributors = new ArrayList<>();
+		}
+		filterContributors.add( contributor );
 	}
 
 	@Override
-	protected Query buildQuery() {
-		if ( hasMustNot && hasOnlyMustNot ) {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
+
+		contributeQueries( context, booleanQueryBuilder, mustContributors, Occur.MUST );
+		contributeQueries( context, booleanQueryBuilder, mustNotContributors, Occur.MUST_NOT );
+		contributeQueries( context, booleanQueryBuilder, shouldContributors, Occur.SHOULD );
+		contributeQueries( context, booleanQueryBuilder, filterContributors, Occur.FILTER );
+
+		if ( isOnlyMustNot() ) {
 			booleanQueryBuilder.add( new MatchAllDocsQuery(), Occur.FILTER );
 		}
-		if ( minimumShouldMatchConstraints != null ) {
+
+		if ( minimumShouldMatchConstraints != null && shouldContributors != null ) {
 			int minimumShouldMatch;
 			Map.Entry<Integer, MinimumShouldMatchConstraint> entry =
-					minimumShouldMatchConstraints.lowerEntry( shouldClauseCount );
+					minimumShouldMatchConstraints.lowerEntry( shouldContributors.size() );
 			if ( entry != null ) {
-				minimumShouldMatch = entry.getValue().toMinimum( shouldClauseCount );
+				minimumShouldMatch = entry.getValue().toMinimum( shouldContributors.size() );
 			}
 			else {
-				minimumShouldMatch = shouldClauseCount;
+				minimumShouldMatch = shouldContributors.size();
 			}
 			booleanQueryBuilder.setMinimumNumberShouldMatch( minimumShouldMatch );
 		}
+
 		return booleanQueryBuilder.build();
+	}
+
+	private void contributeQueries(LuceneSearchPredicateContext context,
+			BooleanQuery.Builder booleanQueryBuilder,
+			List<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> contributors,
+			Occur occur) {
+		if ( contributors == null ) {
+			return;
+		}
+
+		for ( SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor : contributors ) {
+			booleanQueryBuilder.add( getQueryFromContributor( context, contributor ), occur );
+		}
+	}
+
+	private boolean isOnlyMustNot() {
+		if ( mustNotContributors == null || mustNotContributors.isEmpty() ) {
+			return false;
+		}
+		if ( mustContributors != null && !mustContributors.isEmpty() ) {
+			return false;
+		}
+		if ( shouldContributors != null && !shouldContributors.isEmpty() ) {
+			return false;
+		}
+		if ( filterContributors != null && !filterContributors.isEmpty() ) {
+			return false;
+		}
+		return true;
 	}
 
 	private static final class MinimumShouldMatchConstraint {

@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -51,9 +50,9 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	@Override
 	public SearchPredicate toSearchPredicate(
 			SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector();
-		contributor.contribute( null, collector );
-		return new ElasticsearchSearchPredicate( collector.toJsonPredicate() );
+		ElasticsearchSearchPredicateQueryBuilder builder = new ElasticsearchSearchPredicateQueryBuilder();
+		contributor.contribute( null, builder );
+		return new ElasticsearchSearchPredicate( builder.build() );
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 import com.google.gson.JsonObject;
 
@@ -35,6 +36,12 @@ public abstract class AbstractSearchPredicateBuilder
 
 	protected JsonObject getOuterObject() {
 		return outerObject;
+	}
+
+	protected JsonObject getQueryFromContributor(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> queryContributor) {
+		ElasticsearchSearchPredicateQueryBuilder queryBuilder = new ElasticsearchSearchPredicateQueryBuilder();
+		queryContributor.contribute( null, queryBuilder );
+		return queryBuilder.build();
 	}
 
 	@Override

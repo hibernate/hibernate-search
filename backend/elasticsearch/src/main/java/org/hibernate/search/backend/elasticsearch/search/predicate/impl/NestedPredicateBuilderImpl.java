@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 import com.google.gson.JsonObject;
 
@@ -23,17 +26,19 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
+	private SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor;
+
 	NestedPredicateBuilderImpl(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateCollector getNestedCollector() {
+	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getNestedCollector() {
 		return this::nested;
 	}
 
-	private void nested(JsonObject query) {
-		QUERY.set( getInnerObject(), query );
+	private void nested(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor) {
+		this.nestedContributor = nestedContributor;
 	}
 
 	@Override
@@ -41,6 +46,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		JsonObject outerObject = getOuterObject();
 		JsonObject innerObject = getInnerObject();
 		PATH.set( innerObject, absoluteFieldPath );
+		QUERY.set( innerObject, getQueryFromContributor( nestedContributor ) );
 		outerObject.add( "nested", getInnerObject() );
 		collector.collectPredicate( outerObject );
 	}

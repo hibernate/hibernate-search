@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
 
 class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> {
@@ -21,7 +22,7 @@ class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> 
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		// Note that a range query only makes sense if only one token is returned by the analyzer
 		// and we should even consider forcing having a normalizer here, instead of supporting
 		// range queries on analyzed fields.

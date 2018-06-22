@@ -6,15 +6,17 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import java.util.function.Consumer;
+
 public interface BooleanJunctionPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
 
-	C getMustCollector();
+	Consumer<SearchPredicateContributor<CTX, ? super C>> getMustCollector();
 
-	C getMustNotCollector();
+	Consumer<SearchPredicateContributor<CTX, ? super C>> getMustNotCollector();
 
-	C getShouldCollector();
+	Consumer<SearchPredicateContributor<CTX, ? super C>> getShouldCollector();
 
-	C getFilterCollector();
+	Consumer<SearchPredicateContributor<CTX, ? super C>> getFilterCollector();
 
 	/**
 	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatch()}.

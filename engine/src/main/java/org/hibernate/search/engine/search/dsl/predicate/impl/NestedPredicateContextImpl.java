@@ -46,7 +46,7 @@ class NestedPredicateContextImpl<N, CTX, C>
 
 	@Override
 	public void contribute(CTX context, C collector) {
-		singlePredicateContributor.contribute( context, builder.getNestedCollector() );
+		builder.getNestedCollector().accept( singlePredicateContributor );
 		builder.contribute( context, collector );
 	}
 

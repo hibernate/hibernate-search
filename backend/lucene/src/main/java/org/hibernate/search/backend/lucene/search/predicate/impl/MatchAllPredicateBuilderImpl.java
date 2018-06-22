@@ -17,7 +17,7 @@ class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchAllPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		return new MatchAllDocsQuery();
 	}
 }

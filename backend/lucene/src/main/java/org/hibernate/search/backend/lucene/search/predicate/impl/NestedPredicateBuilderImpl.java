@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.function.Consumer;
+
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -14,6 +16,7 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 
 /**
@@ -24,31 +27,37 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
-	private Query nestedQuery;
+	private SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor;
 
 	NestedPredicateBuilderImpl(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
-	public LuceneSearchPredicateCollector getNestedCollector() {
+	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getNestedCollector() {
 		return this::nested;
 	}
 
-	private void nested(Query query) {
-		this.nestedQuery = query;
+	private void nested(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor) {
+		this.nestedPredicateContributor = nestedPredicateContributor;
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		BooleanQuery.Builder childQueryBuilder = new BooleanQuery.Builder();
 		childQueryBuilder.add( LuceneQueries.childDocumentQuery(), Occur.FILTER );
 		childQueryBuilder.add( LuceneQueries.nestedDocumentPathQuery( absoluteFieldPath ), Occur.FILTER );
-		childQueryBuilder.add( nestedQuery, Occur.MUST );
+		childQueryBuilder.add( getQueryFromContributor( new LuceneSearchPredicateContext( absoluteFieldPath ), nestedPredicateContributor ), Occur.MUST );
 
-		// TODO we should probably also filter the parent documents on the tenantId but we don't have the SessionContext at hand for now
+		Query parentQuery;
+		if ( context.getNestedPath() == null ) {
+			parentQuery = LuceneQueries.mainDocumentQuery();
+		}
+		else {
+			parentQuery = LuceneQueries.nestedDocumentPathQuery( context.getNestedPath() );
+		}
 
 		// TODO at some point we should have a parameter for the score mode
-		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( LuceneQueries.mainDocumentQuery() ), ScoreMode.Avg );
+		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( parentQuery ), ScoreMode.Avg );
 	}
 }

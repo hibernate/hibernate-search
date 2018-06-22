@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -30,23 +33,23 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 		SpatialWithinBoundingBoxPredicateBuilder<Void, StubQueryElementCollector> {
 
 	@Override
-	public StubQueryElementCollector getMustCollector() {
-		return StubQueryElementCollector.get();
+	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getMustCollector() {
+		return this::consumeBooleanContributor;
 	}
 
 	@Override
-	public StubQueryElementCollector getMustNotCollector() {
-		return StubQueryElementCollector.get();
+	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getMustNotCollector() {
+		return this::consumeBooleanContributor;
 	}
 
 	@Override
-	public StubQueryElementCollector getShouldCollector() {
-		return StubQueryElementCollector.get();
+	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getShouldCollector() {
+		return this::consumeBooleanContributor;
 	}
 
 	@Override
-	public StubQueryElementCollector getFilterCollector() {
-		return StubQueryElementCollector.get();
+	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getFilterCollector() {
+		return this::consumeBooleanContributor;
 	}
 
 	@Override
@@ -105,12 +108,18 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 	}
 
 	@Override
-	public StubQueryElementCollector getNestedCollector() {
-		return StubQueryElementCollector.get();
+	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getNestedCollector() {
+		return this::consumeNestedContributor;
 	}
 
 	@Override
 	public void contribute(Void context, StubQueryElementCollector collector) {
 		collector.simulateCollectCall();
+	}
+
+	private void consumeNestedContributor(SearchPredicateContributor<Void, ? super StubQueryElementCollector> nestedContributor) {
+	}
+
+	private void consumeBooleanContributor(SearchPredicateContributor<Void, ? super StubQueryElementCollector> booleanContributor) {
 	}
 }

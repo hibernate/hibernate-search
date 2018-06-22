@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.formatter.impl.IntegerFieldFormatter;
 
 class IntegerMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Integer> {
@@ -18,7 +19,7 @@ class IntegerMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Integer
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		return IntPoint.newExactQuery( absoluteFieldPath, value );
 	}
 }

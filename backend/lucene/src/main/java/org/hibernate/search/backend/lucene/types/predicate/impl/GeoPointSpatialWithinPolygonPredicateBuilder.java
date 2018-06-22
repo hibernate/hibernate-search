@@ -12,6 +12,7 @@ import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.geo.Polygon;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractSpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSpatialWithinPolygonPredicateBuilder<GeoPoint> {
@@ -21,7 +22,7 @@ class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSpatialWithin
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		List<GeoPoint> points = polygon.getPoints();
 
 		double[] polyLats = new double[points.size()];

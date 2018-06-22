@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
 
 class LocalDateMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Long> {
@@ -18,7 +19,7 @@ class LocalDateMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Long>
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		return LongPoint.newExactQuery( absoluteFieldPath, value );
 	}
 }

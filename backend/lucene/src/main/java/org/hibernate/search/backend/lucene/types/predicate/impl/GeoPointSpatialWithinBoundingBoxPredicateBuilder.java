@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractSpatialWithinBoundingBoxPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSpatialWithinBoundingBoxPredicateBuilder<GeoPoint> {
@@ -18,7 +19,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSpatialWi
 	}
 
 	@Override
-	protected Query buildQuery() {
+	protected Query buildQuery(LuceneSearchPredicateContext context) {
 		return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.getBottomRight().getLatitude(), boundingBox.getTopLeft().getLatitude(),
 				boundingBox.getTopLeft().getLongitude(), boundingBox.getBottomRight().getLongitude() );
 	}

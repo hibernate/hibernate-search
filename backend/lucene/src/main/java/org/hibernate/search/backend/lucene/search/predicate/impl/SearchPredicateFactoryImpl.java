@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -44,10 +43,7 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 
 	@Override
 	public SearchPredicate toSearchPredicate(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		// XXX this will be changed in a follow-up commit, passing null for now as the context
-		LuceneSearchQueryElementCollector collector = new LuceneSearchQueryElementCollector();
-		contributor.contribute( null, collector );
-		return new LuceneSearchPredicate( collector.toLuceneQueryPredicate() );
+		return new LuceneSearchPredicate( contributor );
 	}
 
 	@Override
