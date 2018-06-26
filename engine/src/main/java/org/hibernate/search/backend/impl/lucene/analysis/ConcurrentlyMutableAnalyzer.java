@@ -84,6 +84,6 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 				throw new AssertionFailure( "This ReuseStrategy should only be applied to a ConcurrentlyMutableAnalyzer " );
 			}
 		}
-	};
+	}
 
 }
