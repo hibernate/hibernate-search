@@ -661,5 +661,5 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 			return new javax.persistence.QueryTimeoutException( message, null, FullTextQueryImpl.this );
 		}
 
-	};
+	}
 }
