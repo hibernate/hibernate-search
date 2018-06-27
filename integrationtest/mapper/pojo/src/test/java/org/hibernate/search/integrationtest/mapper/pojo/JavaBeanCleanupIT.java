@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
@@ -474,7 +474,7 @@ public class JavaBeanCleanupIT {
 
 	private static class FailingBridgeBuilder implements BridgeBuilder<StartupStubBridge> {
 		@Override
-		public StartupStubBridge build(BuildContext buildContext) {
+		public StartupStubBridge build(BridgeBuildContext buildContext) {
 			throw new SimulatedFailure();
 		}
 	}
@@ -487,7 +487,7 @@ public class JavaBeanCleanupIT {
 		}
 
 		@Override
-		public StartupStubBridge build(BuildContext buildContext) {
+		public StartupStubBridge build(BridgeBuildContext buildContext) {
 			return new StartupStubBridge( counterKeys );
 		}
 	}

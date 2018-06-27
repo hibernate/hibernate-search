@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
@@ -48,7 +49,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BuildContext buildContext;
+	private final BridgeBuildContext bridgeBuildContext;
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final BridgeResolver bridgeResolver;
@@ -57,7 +58,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	PojoIndexModelBinderImpl(BuildContext buildContext, PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		this.buildContext = buildContext;
+		this.bridgeBuildContext = new BridgeBuildContextImpl( buildContext );
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;
@@ -100,7 +101,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		 * TODO check that the bridge is suitable for the given typeModel
 		 * (use introspection, similarly to what we do to detect the value bridge's field type?)
 		 */
-		IdentifierBridge<?> bridge = defaultedBuilder.build( buildContext );
+		IdentifierBridge<?> bridge = defaultedBuilder.build( bridgeBuildContext );
 
 		return (IdentifierBridge<P>) bridge;
 	}
@@ -108,7 +109,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		RoutingKeyBridge bridge = builder.build( buildContext );
+		RoutingKeyBridge bridge = builder.build( bridgeBuildContext );
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
@@ -122,7 +123,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
-		TypeBridge bridge = builder.build( buildContext );
+		TypeBridge bridge = builder.build( bridgeBuildContext );
 
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
@@ -145,7 +146,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
-		PropertyBridge bridge = builder.build( buildContext );
+		PropertyBridge bridge = builder.build( bridgeBuildContext );
 
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
@@ -176,7 +177,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( typeModel );
 		}
 
-		ValueBridge<?, ?> bridge = defaultedBuilder.build( buildContext );
+		ValueBridge<?, ?> bridge = defaultedBuilder.build( bridgeBuildContext );
 
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
 

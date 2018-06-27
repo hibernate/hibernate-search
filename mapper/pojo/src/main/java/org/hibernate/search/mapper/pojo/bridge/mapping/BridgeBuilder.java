@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
-import org.hibernate.search.engine.common.spi.BuildContext;
-
 public interface BridgeBuilder<B> {
 
 	/**
@@ -15,8 +13,9 @@ public interface BridgeBuilder<B> {
 	 * <p>
 	 * <strong>Warning:</strong> this method can be called multiple times and must return a new instance to each call.
 	 *
+	 * @param buildContext A object providing access to other components involved in the build process.
 	 * @return A new bridge instance.
 	 */
-	B build(BuildContext buildContext);
+	B build(BridgeBuildContext buildContext);
 
 }

@@ -13,7 +13,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
@@ -50,7 +49,7 @@ public @interface TypeBridgeMapping {
 	 * Each time the mapped annotation is encountered, an instance of the type bridge builder will be created.
 	 * The builder will be passed the annotation through its
 	 * {@link AnnotationBridgeBuilder#initialize(Annotation)} method,
-	 * and then the bridge will be retrieved by calling {@link BridgeBuilder#build(BuildContext)}.
+	 * and then the bridge will be retrieved by calling {@link BridgeBuilder#build(org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext)}.
 	 * <p>
 	 * Type bridges mapped this way can be parameterized:
 	 * the bridge will be able to take any attribute of the mapped annotation into account

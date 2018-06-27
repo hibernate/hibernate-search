@@ -13,10 +13,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
@@ -45,7 +45,7 @@ public final class CustomPropertyBridge implements PropertyBridge {
 		}
 
 		@Override
-		public PropertyBridge build(BuildContext buildContext) {
+		public PropertyBridge build(BridgeBuildContext buildContext) {
 			return new CustomPropertyBridge( objectName );
 		}
 	}
