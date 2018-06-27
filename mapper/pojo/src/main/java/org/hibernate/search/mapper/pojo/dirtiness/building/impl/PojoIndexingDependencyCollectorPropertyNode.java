@@ -21,9 +21,20 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractPojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorTypeNode<T> parentNode;
+	/**
+	 * The path to this node from the parent node, i.e. from the node representing the type holding this property.
+	 */
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode;
+	/**
+	 * The last entity node among the ancestor nodes,
+	 * i.e. the closest type node representing an entity type.
+	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode;
+	/**
+	 * The path to this node from the root node,
+	 * i.e. from the node representing the type for which dependencies are being collected.
+	 */
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parentNode,

@@ -27,9 +27,20 @@ import org.hibernate.search.util.AssertionFailure;
 public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorValueNode<?, T> parentNode;
+	/**
+	 * The path to this node from this node, i.e. a root to be used to build model paths for child nodes.
+	 */
 	private final BoundPojoModelPathTypeNode<T> modelPathFromCurrentNode;
+	/**
+	 * The last entity node among the ancestor nodes,
+	 * i.e. the closest type node representing an entity type.
+	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode;
+	/**
+	 * The path to this node from the root node,
+	 * i.e. from the node representing the type for which dependencies are being collected.
+	 */
 	private final BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,

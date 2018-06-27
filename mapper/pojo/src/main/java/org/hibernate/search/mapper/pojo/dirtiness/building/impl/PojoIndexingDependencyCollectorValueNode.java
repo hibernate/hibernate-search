@@ -57,10 +57,25 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode;
+	/**
+	 * The path to this node from the last type node, i.e. from the node
+	 * representing the type holding the property from which this value is extracted.
+	 */
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode;
 	private final PojoModelPathValueNode unboundModelPathFromLastTypeNode;
+	/**
+	 * The last entity node among the ancestor nodes.
+	 * The "last entity node" might be the same as the last type node (see {@link #modelPathFromLastTypeNode})
+	 * if the last type node represents an entity type.
+	 * If not (e.g. if the parent type is an embeddable type),
+	 * then the "last entity node" will be the closest ancestor type node representing an entity type.
+	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
+	/**
+	 * The path to this node from the root node,
+	 * i.e. from the node representing the type for which dependencies are being collected.
+	 */
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode;
 
 	private final ReindexOnUpdate reindexOnUpdate;
