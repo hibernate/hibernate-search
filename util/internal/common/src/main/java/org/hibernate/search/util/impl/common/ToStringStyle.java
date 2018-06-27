@@ -7,16 +7,45 @@
 package org.hibernate.search.util.impl.common;
 
 public class ToStringStyle {
-	public static final ToStringStyle INLINE = new ToStringStyle( " ", "", "," );
-	public static final ToStringStyle MULTILINE = new ToStringStyle( "\n", "\t", "" );
+	private static final ToStringStyle INLINE = new ToStringStyle(
+			" ", "", ",", "=",
+			"{", "}",
+			"[", "]"
+	);
+
+	private static final ToStringStyle MULTILINE = new ToStringStyle(
+			"\n", "\t", "", "=",
+			"{", "}",
+			"[", "]"
+	);
+
+	public static ToStringStyle inline() {
+		return INLINE;
+	}
+
+	public static ToStringStyle multiline() {
+		return MULTILINE;
+	}
 
 	final String newline;
 	final String indent;
-	final String separator;
+	final String entrySeparator;
+	final String nameValueSeparator;
+	final String startObject;
+	final String endObject;
+	final String startList;
+	final String endList;
 
-	private ToStringStyle(String newline, String indent, String separator) {
+	private ToStringStyle(String newline, String indent, String entrySeparator, String nameValueSeparator,
+			String startObject, String endObject,
+			String startList, String endList) {
 		this.newline = newline;
 		this.indent = indent;
-		this.separator = separator;
+		this.entrySeparator = entrySeparator;
+		this.nameValueSeparator = nameValueSeparator;
+		this.startObject = startObject;
+		this.endObject = endObject;
+		this.startList = startList;
+		this.endList = endList;
 	}
 }

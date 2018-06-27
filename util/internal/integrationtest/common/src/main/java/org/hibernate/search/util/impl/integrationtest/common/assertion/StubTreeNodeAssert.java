@@ -38,7 +38,7 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 	public StubTreeNodeAssert<T> matches(T expected) {
 		Map<String, StubTreeNodeMismatch> mismatchesByPath = StubTreeNodeCompare.compare( expected, actual );
 		if ( !mismatchesByPath.isEmpty() ) {
-			ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.MULTILINE );
+			ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.multiline() );
 			builder.startObject();
 			StubTreeNodeCompare.appendTo( builder, mismatchesByPath );
 			builder.endObject();

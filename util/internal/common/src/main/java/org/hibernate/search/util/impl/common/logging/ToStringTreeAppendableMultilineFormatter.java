@@ -19,7 +19,7 @@ public class ToStringTreeAppendableMultilineFormatter {
 	private final String stringRepresentation;
 
 	public ToStringTreeAppendableMultilineFormatter(ToStringTreeAppendable appendable) {
-		this.stringRepresentation = new ToStringTreeBuilder( ToStringStyle.MULTILINE ).value( appendable ).toString();
+		this.stringRepresentation = new ToStringTreeBuilder( ToStringStyle.multiline() ).value( appendable ).toString();
 	}
 
 	@Override

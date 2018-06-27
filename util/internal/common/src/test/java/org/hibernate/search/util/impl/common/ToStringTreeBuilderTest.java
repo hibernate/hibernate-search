@@ -17,7 +17,7 @@ public class ToStringTreeBuilderTest {
 		assertThat( new ToStringTreeBuilder().toString() ).isEqualTo( "" );
 		assertThat( new ToStringTreeBuilder().startObject( "" ).endObject().toString() )
 				.isEqualTo( "{ }" );
-		assertThat( toString( ToStringStyle.INLINE ) )
+		assertThat( toString( ToStringStyle.inline() ) )
 				.isEqualTo(
 						"foo=value, children={"
 						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ] }, emptyChild={ },"
@@ -31,10 +31,10 @@ public class ToStringTreeBuilderTest {
 
 	@Test
 	public void multiLineStyle() {
-		assertThat( new ToStringTreeBuilder( ToStringStyle.MULTILINE ).toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder( ToStringStyle.MULTILINE ).startObject( "" ).endObject().toString() )
+		assertThat( new ToStringTreeBuilder( ToStringStyle.multiline() ).toString() ).isEqualTo( "" );
+		assertThat( new ToStringTreeBuilder( ToStringStyle.multiline() ).startObject( "" ).endObject().toString() )
 				.isEqualTo( "{\n}" );
-		assertThat( toString( ToStringStyle.MULTILINE ) )
+		assertThat( toString( ToStringStyle.multiline() ) )
 				.isEqualTo(
 						"foo=value\n"
 						+ "children={\n"

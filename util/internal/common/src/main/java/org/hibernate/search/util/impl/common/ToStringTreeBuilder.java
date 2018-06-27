@@ -17,7 +17,7 @@ public class ToStringTreeBuilder {
 	private int depth = 0;
 
 	public ToStringTreeBuilder() {
-		this( ToStringStyle.INLINE );
+		this( ToStringStyle.inline() );
 	}
 
 	public ToStringTreeBuilder(ToStringStyle style) {
@@ -64,7 +64,7 @@ public class ToStringTreeBuilder {
 	public ToStringTreeBuilder startObject(String name) {
 		beforeElement();
 		name( name );
-		builder.append( "{" );
+		builder.append( style.startObject );
 		++depth;
 		first = true;
 		appendNewline();
@@ -81,7 +81,7 @@ public class ToStringTreeBuilder {
 		}
 		first = false;
 		appendIndent();
-		builder.append( "}" );
+		builder.append( style.endObject );
 		return this;
 	}
 
@@ -92,7 +92,7 @@ public class ToStringTreeBuilder {
 	public ToStringTreeBuilder startList(String name) {
 		beforeElement();
 		name( name );
-		builder.append( "[" );
+		builder.append( style.startList );
 		++depth;
 		first = true;
 		appendNewline();
@@ -109,7 +109,7 @@ public class ToStringTreeBuilder {
 		}
 		first = false;
 		appendIndent();
-		builder.append( "]" );
+		builder.append( style.endList );
 		return this;
 	}
 
@@ -119,7 +119,7 @@ public class ToStringTreeBuilder {
 			appendIndent();
 		}
 		else {
-			builder.append( style.separator );
+			builder.append( style.entrySeparator );
 			appendNewline();
 			appendIndent();
 		}
@@ -128,7 +128,7 @@ public class ToStringTreeBuilder {
 	private void name(String name) {
 		if ( name != null && !name.isEmpty() ) {
 			builder.append( name );
-			builder.append( "=" );
+			builder.append( style.nameValueSeparator );
 		}
 	}
 

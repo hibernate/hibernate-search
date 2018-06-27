@@ -37,7 +37,7 @@ public class StubIndexWorkAssert {
 	}
 
 	public StubIndexWorkAssert matches(StubIndexWork expected) {
-		ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.MULTILINE );
+		ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.multiline() );
 
 		builder.startObject();
 
