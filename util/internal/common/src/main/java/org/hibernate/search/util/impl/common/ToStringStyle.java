@@ -7,45 +7,72 @@
 package org.hibernate.search.util.impl.common;
 
 public class ToStringStyle {
-	private static final ToStringStyle INLINE = new ToStringStyle(
-			" ", "", ",", "=",
-			"{", "}",
-			"[", "]"
+	private static final ToStringStyle INLINE_DELIMITER_STRUCTURE = new ToStringStyle(
+			" ", ",", "=",
+			"{", "}", "",
+			"[", "]", "", "", false
 	);
 
-	private static final ToStringStyle MULTILINE = new ToStringStyle(
-			"\n", "\t", "", "=",
-			"{", "}",
-			"[", "]"
+	private static final ToStringStyle MULTILINE_DELIMITER_STRUCTURE = new ToStringStyle(
+			"\n", "", "=",
+			"{", "}", "\t",
+			"[", "]", "\t", "\t", false
 	);
 
-	public static ToStringStyle inline() {
-		return INLINE;
+	/**
+	 * @return A single-line format relying on delimiters to display the structure (JSON-style).
+	 */
+	public static ToStringStyle inlineDelimiterStructure() {
+		return INLINE_DELIMITER_STRUCTURE;
 	}
 
-	public static ToStringStyle multiline() {
-		return MULTILINE;
+	/**
+	 * @return A multi-line format relying on delimiters to display the structure (JSON-style).
+	 */
+	public static ToStringStyle multilineDelimiterStructure() {
+		return MULTILINE_DELIMITER_STRUCTURE;
+	}
+
+	/**
+	 * @return A multi-line format relying on indenting and bullet points to display the structure (YAML-style).
+	 * Object and array delimiters are not shown.
+	 */
+	public static ToStringStyle multilineIndentStructure(String nameValueSeparator, String indentInObject,
+			String indentInListBulletPoint, String indentInListNoBulletPoint) {
+		return new ToStringStyle(
+				"\n", "", nameValueSeparator,
+				"", "", indentInObject,
+				"", "",
+				indentInListBulletPoint, indentInListNoBulletPoint, true
+		);
 	}
 
 	final String newline;
-	final String indent;
 	final String entrySeparator;
 	final String nameValueSeparator;
 	final String startObject;
 	final String endObject;
+	final String indentInObject;
 	final String startList;
 	final String endList;
+	final String indentInListBulletPoint;
+	final String indentInListNoBulletPoint;
+	final boolean squeezeObjectsInList;
 
-	private ToStringStyle(String newline, String indent, String entrySeparator, String nameValueSeparator,
-			String startObject, String endObject,
-			String startList, String endList) {
+	private ToStringStyle(String newline, String entrySeparator, String nameValueSeparator,
+			String startObject, String endObject, String indentInObject,
+			String startList, String endList,
+			String indentInListBulletPoint, String indentInListNoBulletPoint, boolean squeezeObjectsInList) {
 		this.newline = newline;
-		this.indent = indent;
 		this.entrySeparator = entrySeparator;
 		this.nameValueSeparator = nameValueSeparator;
 		this.startObject = startObject;
 		this.endObject = endObject;
+		this.indentInObject = indentInObject;
 		this.startList = startList;
 		this.endList = endList;
+		this.indentInListBulletPoint = indentInListBulletPoint;
+		this.indentInListNoBulletPoint = indentInListNoBulletPoint;
+		this.squeezeObjectsInList = squeezeObjectsInList;
 	}
 }

@@ -14,27 +14,24 @@ public class ToStringTreeBuilderTest {
 
 	@Test
 	public void inlineStyle() {
-		assertThat( new ToStringTreeBuilder().toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder().startObject( "" ).endObject().toString() )
-				.isEqualTo( "{ }" );
-		assertThat( toString( ToStringStyle.inline() ) )
+		assertThat( toString( ToStringStyle.inlineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value, children={"
 						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ] }, emptyChild={ },"
 						+ " appendable={ attr=val, nested={ attr=val2 } },"
 						+ " appendableAsObject={ attr=val, nested={ attr=val2 } },"
 						+ " nullAppendable=null,"
-						+ " list=[ { name=foo }, { name=bar } ]"
+						+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar } ]"
 						+ " }, bar=value"
 				);
+		assertThat( new ToStringTreeBuilder().toString() ).isEqualTo( "" );
+		assertThat( new ToStringTreeBuilder().startObject( "" ).endObject().toString() )
+				.isEqualTo( "{ }" );
 	}
 
 	@Test
 	public void multiLineStyle() {
-		assertThat( new ToStringTreeBuilder( ToStringStyle.multiline() ).toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder( ToStringStyle.multiline() ).startObject( "" ).endObject().toString() )
-				.isEqualTo( "{\n}" );
-		assertThat( toString( ToStringStyle.multiline() ) )
+		assertThat( toString( ToStringStyle.multilineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value\n"
 						+ "children={\n"
@@ -65,13 +62,64 @@ public class ToStringTreeBuilderTest {
 						+ "\t\t{\n"
 						+ "\t\t\tname=foo\n"
 						+ "\t\t}\n"
+						+ "\t\tobject={\n"
+						+ "\t\t\tname=foo\n"
+						+ "\t\t\tattr=bar\n"
+						+ "\t\t}\n"
 						+ "\t\t{\n"
+						+ "\t\t\tnestedList=[\n"
+						+ "\t\t\t\tfirst\n"
+						+ "\t\t\t\tsecond\n"
+						+ "\t\t\t]\n"
 						+ "\t\t\tname=bar\n"
 						+ "\t\t}\n"
 						+ "\t]\n"
 						+ "}\n"
 						+ "bar=value"
 				);
+		assertThat( new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).toString() ).isEqualTo( "" );
+		assertThat( new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).startObject( "" ).endObject().toString() )
+				.isEqualTo( "{\n}" );
+	}
+
+	@Test
+	public void multiLineLightStyle() {
+		ToStringStyle style = ToStringStyle.multilineIndentStructure(
+				": ", "    ", "  - ", "    "
+		);
+		assertThat( toString( style ) )
+				.isEqualTo(
+						"foo: value\n"
+						+ "children: \n"
+						+ "    childrenFoo: 23\n"
+						+ "    child1: \n"
+						+ "        child1Foo: customToString\n"
+						+ "          - foo\n"
+						+ "          - 42\n"
+						+ "    emptyChild: \n"
+						+ "    appendable: \n"
+						+ "        attr: val\n"
+						+ "        nested: \n"
+						+ "            attr: val2\n"
+						+ "    appendableAsObject: \n"
+						+ "        attr: val\n"
+						+ "        nested: \n"
+						+ "            attr: val2\n"
+						+ "    nullAppendable: null\n"
+						+ "    list: \n"
+						+ "      - name: foo\n"
+						+ "      - object: \n"
+						+ "            name: foo\n"
+						+ "            attr: bar\n"
+						+ "      - nestedList: \n"
+						+ "          - first\n"
+						+ "          - second\n"
+						+ "        name: bar\n"
+						+ "bar: value"
+				);
+		assertThat( new ToStringTreeBuilder( style ).toString() ).isEqualTo( "" );
+		assertThat( new ToStringTreeBuilder( style ).startObject( "" ).endObject().toString() )
+				.isEqualTo( "" );
 	}
 
 	private static String toString(ToStringStyle style) {
@@ -100,7 +148,15 @@ public class ToStringTreeBuilderTest {
 						.startObject()
 							.attribute( "name", "foo" )
 							.endObject()
+						.startObject( "object" )
+								.attribute( "name", "foo" )
+								.attribute( "attr", "bar" )
+								.endObject()
 						.startObject()
+							.startList( "nestedList" )
+								.value( "first" )
+								.value( "second" )
+								.endList()
 							.attribute( "name", "bar" )
 							.endObject()
 						.endList()

@@ -6,18 +6,22 @@
  */
 package org.hibernate.search.util.impl.common;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+
 import org.hibernate.search.util.AssertionFailure;
 
 public class ToStringTreeBuilder {
 
-	private final StringBuilder builder = new StringBuilder();
 	private final ToStringStyle style;
+	private final StringBuilder builder = new StringBuilder();
 
+	private final Deque<StructureType> structureTypeStack = new ArrayDeque<>();
 	private boolean first = true;
-	private int depth = 0;
 
 	public ToStringTreeBuilder() {
-		this( ToStringStyle.inline() );
+		this( ToStringStyle.inlineDelimiterStructure() );
 	}
 
 	public ToStringTreeBuilder(ToStringStyle style) {
@@ -31,24 +35,17 @@ public class ToStringTreeBuilder {
 
 	public ToStringTreeBuilder attribute(String name, Object value) {
 		if ( value instanceof ToStringTreeAppendable ) {
-			attribute( name, (ToStringTreeAppendable) value );
+			ToStringTreeAppendable appendable = ( (ToStringTreeAppendable) value );
+			startEntry( name, StructureType.OBJECT );
+			startStructure( StructureType.OBJECT, style.startObject );
+			appendable.appendTo( this );
+			endStructure( StructureType.OBJECT, style.endObject );
+			endEntry();
 		}
 		else {
-			beforeElement();
-			name( name );
+			startEntry( name, null );
 			builder.append( value );
-		}
-		return this;
-	}
-
-	public ToStringTreeBuilder attribute(String name, ToStringTreeAppendable value) {
-		if ( value != null ) {
-			startObject( name );
-			value.appendTo( this );
-			endObject();
-		}
-		else {
-			attribute( name, (Object) null );
+			endEntry();
 		}
 		return this;
 	}
@@ -62,26 +59,14 @@ public class ToStringTreeBuilder {
 	}
 
 	public ToStringTreeBuilder startObject(String name) {
-		beforeElement();
-		name( name );
-		builder.append( style.startObject );
-		++depth;
-		first = true;
-		appendNewline();
+		startEntry( name, StructureType.OBJECT );
+		startStructure( StructureType.OBJECT, style.startObject );
 		return this;
 	}
 
 	public ToStringTreeBuilder endObject() {
-		if ( depth == 0 ) {
-			throw new AssertionFailure( "Cannot pop, already at root" );
-		}
-		--depth;
-		if ( !first ) {
-			appendNewline();
-		}
-		first = false;
-		appendIndent();
-		builder.append( style.endObject );
+		endStructure( StructureType.OBJECT, style.endObject );
+		endEntry();
 		return this;
 	}
 
@@ -90,46 +75,93 @@ public class ToStringTreeBuilder {
 	}
 
 	public ToStringTreeBuilder startList(String name) {
-		beforeElement();
-		name( name );
-		builder.append( style.startList );
-		++depth;
-		first = true;
-		appendNewline();
+		startEntry( name, StructureType.LIST );
+		startStructure( StructureType.LIST, style.startList );
 		return this;
 	}
 
 	public ToStringTreeBuilder endList() {
-		if ( depth == 0 ) {
-			throw new AssertionFailure( "Cannot pop, already at root" );
-		}
-		--depth;
-		if ( !first ) {
-			appendNewline();
-		}
-		first = false;
-		appendIndent();
-		builder.append( style.endList );
+		endStructure( StructureType.LIST, style.endList );
+		endEntry();
 		return this;
 	}
 
-	private void beforeElement() {
-		if ( first ) {
-			first = false;
-			appendIndent();
-		}
-		else {
+	private void startEntry(String name, StructureType containedStructureType) {
+		if ( !first ) {
 			builder.append( style.entrySeparator );
+		}
+
+		StructureType entryType =
+				StringHelper.isEmpty( name ) ? StructureType.UNNAMED_ENTRY : StructureType.NAMED_ENTRY;
+
+		// Add a new line
+		if (
+				// ... except for the very first element at the root
+				!( first && structureTypeStack.isEmpty() )
+				// ... or for entries containing a squeezed structure
+				&& !shouldSqueeze( containedStructureType, entryType, structureTypeStack.peek() )
+				// ... or for structures without a name nor a start delimiter
+				&& !(
+						StructureType.UNNAMED_ENTRY.equals( entryType )
+						&& StructureType.OBJECT.equals( containedStructureType )
+						&& StringHelper.isEmpty( style.startObject )
+				)
+				&& !(
+						StructureType.UNNAMED_ENTRY.equals( entryType )
+						&& StructureType.LIST.equals( containedStructureType )
+						&& StringHelper.isEmpty( style.startList )
+				)
+		) {
 			appendNewline();
 			appendIndent();
 		}
-	}
 
-	private void name(String name) {
-		if ( name != null && !name.isEmpty() ) {
+		if ( StringHelper.isNotEmpty( name ) ) {
 			builder.append( name );
 			builder.append( style.nameValueSeparator );
 		}
+
+		structureTypeStack.push( entryType );
+	}
+
+	private void endEntry() {
+		StructureType lastType = structureTypeStack.peek();
+		if ( lastType == null ) {
+			throw new AssertionFailure( "Cannot pop, already at root" );
+		}
+		else if ( !StructureType.UNNAMED_ENTRY.equals( lastType )
+				&& !StructureType.NAMED_ENTRY.equals( lastType ) ) {
+			throw new AssertionFailure( "Cannot pop, not inside an entry" );
+		}
+		structureTypeStack.pop();
+		first = false;
+	}
+
+	private void startStructure(StructureType structureType, String startDelimiter) {
+		if ( StringHelper.isNotEmpty( startDelimiter ) ) {
+			builder.append( startDelimiter );
+		}
+
+		structureTypeStack.push( structureType );
+		first = true;
+	}
+
+	private void endStructure(StructureType structureType, String endDelimiter) {
+		StructureType lastType = structureTypeStack.peek();
+		if ( lastType == null ) {
+			throw new AssertionFailure( "Cannot pop, already at root" );
+		}
+		else if ( lastType != structureType ) {
+			throw new AssertionFailure( "Cannot pop, not inside a " + structureType );
+		}
+		structureTypeStack.pop();
+
+		if ( StringHelper.isNotEmpty( endDelimiter ) ) {
+			appendNewline();
+			appendIndent();
+			builder.append( endDelimiter );
+		}
+		first = false;
 	}
 
 	private void appendNewline() {
@@ -137,11 +169,67 @@ public class ToStringTreeBuilder {
 	}
 
 	private void appendIndent() {
-		if ( !style.indent.isEmpty() ) {
-			for ( int i = 0; i < depth; ++i ) {
-				builder.append( style.indent );
-			}
+		if ( structureTypeStack.isEmpty() ) {
+			return;
 		}
+
+		Iterator<StructureType> iterator = structureTypeStack.descendingIterator();
+		StructureType grandParent = null;
+		StructureType parent = null;
+		StructureType current = iterator.next();
+		StructureType child = iterator.hasNext() ? iterator.next() : null;
+		StructureType grandChild;
+		while ( current != null ) {
+			grandChild = iterator.hasNext() ? iterator.next() : null;
+			if ( !shouldSqueeze( current, parent, grandParent ) ) {
+				switch ( current ) {
+					case OBJECT:
+						builder.append( style.indentInObject );
+						break;
+					case LIST:
+						// Display a bullet point if:
+						if (
+								// We are adding a element directly to the list
+								child == null
+								// OR we are adding the first element to a squeezed element in the list
+								|| shouldSqueeze( grandChild, child, current ) && !iterator.hasNext() && first
+						) {
+							builder.append( style.indentInListBulletPoint );
+						}
+						else {
+							builder.append( style.indentInListNoBulletPoint );
+						}
+						break;
+				}
+			}
+			grandParent = parent;
+			parent = current;
+			current = child;
+			child = grandChild;
+		}
+	}
+
+	/**
+	 * @param structureType The type of the potentially squeezed structure
+	 * @param parentStructureType The type of the closest containing structure
+	 * @param grandParentStructureType The type of the second closest containing structure
+	 * @return {@code true} if the child structure should be squeezed,
+	 * i.e. displayed on the same line as its parent if it's the first element,
+	 * and have its indenting ignored.
+	 */
+	private boolean shouldSqueeze(StructureType structureType, StructureType parentStructureType,
+			StructureType grandParentStructureType) {
+		return style.squeezeObjectsInList
+				&& StructureType.LIST.equals( grandParentStructureType )
+				&& StructureType.UNNAMED_ENTRY.equals( parentStructureType )
+				&& StructureType.OBJECT.equals( structureType );
+	}
+
+	private enum StructureType {
+		OBJECT,
+		LIST,
+		NAMED_ENTRY,
+		UNNAMED_ENTRY
 	}
 
 }
