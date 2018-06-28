@@ -1947,7 +1947,7 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</test.wildfly.jvm.args>
+                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind</test.wildfly.jvm.args>
                 <test.jvm.args>${test.wildfly.jvm.args} --illegal-access=deny</test.jvm.args>
             </properties>
             <modules>
@@ -1961,7 +1961,7 @@
                 <jdk>10</jdk>
             </activation>
             <properties>
-                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</test.wildfly.jvm.args>
+                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind</test.wildfly.jvm.args>
                 <test.jvm.args>${test.wildfly.jvm.args} --illegal-access=deny</test.jvm.args>
             </properties>
             <modules>
