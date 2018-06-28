@@ -1609,12 +1609,24 @@
                                      <exclude>**/*_$bundle.class</exclude>
                                  </excludes>
                                  <bundledSignatures>
-                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                     <bundledSignature>jdk-unsafe</bundledSignature>
-                                     <bundledSignature>jdk-deprecated</bundledSignature>
+                                     <!-- These signatures on the top are not specific to any JDK version -->
                                      <bundledSignature>jdk-system-out</bundledSignature>
                                      <bundledSignature>jdk-non-portable</bundledSignature>
-                                     <bundledSignature>jdk-internal</bundledSignature>
+                                     <!-- The jdk-reflection is not yet something we can avoid -->
+                                     <!--<bundledSignature>jdk-reflection</bundledSignature>-->
+
+                                     <!-- All following signatures should be replicated for each target JDK version we intend to support -->
+                                     <bundledSignature>jdk-unsafe-1.8</bundledSignature>
+                                     <bundledSignature>jdk-unsafe-9</bundledSignature>
+                                     <bundledSignature>jdk-unsafe-10</bundledSignature>
+
+                                     <bundledSignature>jdk-deprecated-1.8</bundledSignature>
+                                     <bundledSignature>jdk-deprecated-9</bundledSignature>
+                                     <bundledSignature>jdk-deprecated-10</bundledSignature>
+
+                                     <bundledSignature>jdk-internal-1.8</bundledSignature>
+                                     <bundledSignature>jdk-internal-9</bundledSignature>
+                                     <bundledSignature>jdk-internal-10</bundledSignature>
                                  </bundledSignatures>
                                  <failOnMissingClasses>false</failOnMissingClasses>
                                  <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
