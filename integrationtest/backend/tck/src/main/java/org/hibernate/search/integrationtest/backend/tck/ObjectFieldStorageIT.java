@@ -40,19 +40,11 @@ public class ObjectFieldStorageIT {
 	private static final String MATCHING_STRING_ANALYZED = "analyzedMatchingWord otherAnalyzedMatchingWord";
 	private static final Integer MATCHING_INTEGER = 42;
 	private static final LocalDate MATCHING_LOCAL_DATE = LocalDate.of( 2018, 2, 1 );
-	private static final String MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 = "firstMatchingWord";
-	private static final String MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 = "firstMatchingWord";
-	private static final String MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 = "secondMatchingWord";
-	private static final String MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondMatchingWord";
 
 	private static final String NON_MATCHING_STRING = "nonMatchingWord";
 	private static final String NON_MATCHING_STRING_ANALYZED = "analyzedNonMatchingWord otherAnalyzedNonMatchingWord";
 	private static final Integer NON_MATCHING_INTEGER = 442;
 	private static final LocalDate NON_MATCHING_LOCAL_DATE = LocalDate.of( 2018, 2, 15 );
-	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 = "firstNonMatchingWord";
-	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 = "firstNonMatchingWord";
-	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 = "secondNonMatchingWord";
-	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondNonMatchingWord";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -193,58 +185,6 @@ public class ObjectFieldStorageIT {
 				.hasHitCount( 1 );
 	}
 
-	// FIXME this test is ignored for now as the Lucene backend does not support several levels of nested
-	@Test
-	public void search_nestedOnTwoLevels() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
-				.asReferences()
-				.predicate().bool( b -> {
-					// This is referred to as "condition 1" in the data initialization method
-					b.must().nested().onObjectField( "flattenedObject.nestedObject" ).bool( b2 -> {
-						b2.must().match().onField( "flattenedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-						b2.must().match().onField( "flattenedObject.nestedObject.field2" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-					} );
-					// This is referred to as "condition 2" in the data initialization method
-					b.must().nested().onObjectField( "flattenedObject.nestedObject" ).bool( b2 -> {
-						b2.must().match().onField( "flattenedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-						b2.must().match().onField( "flattenedObject.nestedObject.field2" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-					} );
-				} )
-				.build();
-		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NON_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
-
-		query = searchTarget.query( sessionContext )
-				.asReferences()
-				.predicate().nested().onObjectField( "nestedObject" ).bool( b -> {
-					// This is referred to as "condition 1" in the data initialization method
-					b.must().nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must().match().onField( "nestedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-						b2.must().match().onField( "nestedObject.nestedObject.field2" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-					} );
-					// This is referred to as "condition 2" in the data initialization method
-					b.must().nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must().match().onField( "nestedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-						b2.must().match().onField( "nestedObject.nestedObject.field2" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-					} );
-				} )
-				.build();
-		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
-	}
-
 	@Test
 	public void search_error_nonNestedField() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
@@ -279,9 +219,7 @@ public class ObjectFieldStorageIT {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectAccessors accessors;
-			SecondLevelObjectAccessors secondLevelAccessors;
 			DocumentElement object;
-			DocumentElement secondLevelObject;
 
 			// ----------------
 			// Flattened object
@@ -293,15 +231,9 @@ public class ObjectFieldStorageIT {
 			// Nested object
 			// Content specially crafted to match in nested queries.
 			accessors = indexAccessors.nestedObject;
-			secondLevelAccessors = accessors.nestedObject;
 
 			object = accessors.self.add( document );
 			accessors.integer.write( object, NON_MATCHING_INTEGER );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
 			// This object will trigger the match; others should not
 			object = accessors.self.add( document );
@@ -310,23 +242,9 @@ public class ObjectFieldStorageIT {
 			accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
 			accessors.integer.write( object, MATCHING_INTEGER );
 			accessors.localDate.write( object, MATCHING_LOCAL_DATE );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 1
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 2
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
 			object = accessors.self.add( document );
 			accessors.localDate.write( object, NON_MATCHING_LOCAL_DATE );
-			secondLevelAccessors.self.addMissing( object );
 		} );
 
 		worker.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
@@ -342,34 +260,18 @@ public class ObjectFieldStorageIT {
 			for ( ObjectAccessors accessors :
 					Arrays.asList( indexAccessors.flattenedObject, indexAccessors.nestedObject ) ) {
 				DocumentElement object = accessors.self.add( document );
-				SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
 				accessors.integer.write( object, NON_MATCHING_INTEGER );
-				DocumentElement secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
 				object = accessors.self.add( document );
 				accessors.string.write( object, NON_MATCHING_STRING );
 				accessors.integer.write( object, MATCHING_INTEGER );
 				accessors.integer.write( object, NON_MATCHING_INTEGER );
-				secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 1
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.string.write( object, MATCHING_STRING );
-				secondLevelAccessors.self.addMissing( object );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
-				secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 2
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.localDate.write( object, MATCHING_LOCAL_DATE );
@@ -385,48 +287,22 @@ public class ObjectFieldStorageIT {
 			 */
 			for ( ObjectAccessors accessors :
 					Arrays.asList( indexAccessors.flattenedObject, indexAccessors.nestedObject ) ) {
-				SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
-
 				DocumentElement object = accessors.self.add( document );
 				accessors.integer.write( object, NON_MATCHING_INTEGER );
-				DocumentElement secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
 				object = accessors.self.add( document );
 				accessors.string.write( object, NON_MATCHING_STRING );
 				accessors.integer.write( object, NON_MATCHING_INTEGER );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-				secondLevelAccessors.self.addMissing( object );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.string.write( object, MATCHING_STRING );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
 				object = accessors.self.add( document );
 				accessors.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
 				accessors.localDate.write( object, MATCHING_LOCAL_DATE );
-				secondLevelObject = secondLevelAccessors.self.add( object );
-				secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-				secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 			}
 		} );
 
@@ -467,7 +343,6 @@ public class ObjectFieldStorageIT {
 		final IndexFieldAccessor<String> string_analyzed;
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<LocalDate> localDate;
-		final SecondLevelObjectAccessors nestedObject;
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
@@ -476,24 +351,6 @@ public class ObjectFieldStorageIT {
 					.analyzer( "default" ).createAccessor();
 			integer = objectField.field( "integer" ).asInteger().createAccessor();
 			localDate = objectField.field( "localDate" ).asLocalDate().createAccessor();
-			IndexSchemaObjectField nestedObjectField = objectField.objectField(
-					"nestedObject",
-					ObjectFieldStorage.NESTED
-			);
-			nestedObject = new SecondLevelObjectAccessors( nestedObjectField );
 		}
 	}
-
-	private static class SecondLevelObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<String> field1;
-		final IndexFieldAccessor<String> field2;
-
-		SecondLevelObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
-			field1 = objectField.field( "field1" ).asString().createAccessor();
-			field2 = objectField.field( "field2" ).asString().createAccessor();
-		}
-	}
-
 }
