@@ -44,6 +44,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentBuilder {
 
 		multiTenancyStrategy.contributeToIndexedDocument( rootDocument, tenantId );
 
+		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();
 		contribute( indexName, multiTenancyStrategy, tenantId, id, rootDocument, documents );
 		documents.add( rootDocument );

@@ -42,8 +42,8 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 
 		multiTenancyStrategy.contributeToIndexedDocument( nestedDocument, tenantId );
 
-		nestedDocuments.add( nestedDocument );
-
+		// all the ancestors of a subdocument must be added after it
 		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocument, nestedDocuments );
+		nestedDocuments.add( nestedDocument );
 	}
 }
