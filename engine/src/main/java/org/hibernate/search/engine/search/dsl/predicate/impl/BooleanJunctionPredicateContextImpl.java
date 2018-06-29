@@ -40,10 +40,10 @@ class BooleanJunctionPredicateContextImpl<N, CTX, C>
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 		this.builder = factory.bool();
-		this.must = new OccurContext( builder.getMustCollector() );
-		this.mustNot = new OccurContext( builder.getMustNotCollector() );
-		this.should = new OccurContext( builder.getShouldCollector() );
-		this.filter = new OccurContext( builder.getFilterCollector() );
+		this.must = new OccurContext( builder::must );
+		this.mustNot = new OccurContext( builder::mustNot );
+		this.should = new OccurContext( builder::should );
+		this.filter = new OccurContext( builder::filter );
 		this.minimumShouldMatchContext = new MinimumShouldMatchContextImpl<>( builder, this );
 	}
 

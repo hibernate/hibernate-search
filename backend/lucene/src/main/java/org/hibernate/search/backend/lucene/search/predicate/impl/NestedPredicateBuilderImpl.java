@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.function.Consumer;
-
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -34,11 +32,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getNestedCollector() {
-		return this::nested;
-	}
-
-	private void nested(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor) {
+	public void nested(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor) {
 		this.nestedPredicateContributor = nestedPredicateContributor;
 	}
 

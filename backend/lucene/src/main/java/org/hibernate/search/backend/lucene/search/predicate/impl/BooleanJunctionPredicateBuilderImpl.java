@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -40,23 +39,35 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	@Override
-	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getMustCollector() {
-		return this::must;
+	public void must(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( mustContributors == null ) {
+			mustContributors = new ArrayList<>();
+		}
+		mustContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getMustNotCollector() {
-		return this::mustNot;
+	public void mustNot(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( mustNotContributors == null ) {
+			mustNotContributors = new ArrayList<>();
+		}
+		mustNotContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getShouldCollector() {
-		return this::should;
+	public void should(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( shouldContributors == null ) {
+			shouldContributors = new ArrayList<>();
+		}
+		shouldContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector>> getFilterCollector() {
-		return this::filter;
+	public void filter(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
+		if ( filterContributors == null ) {
+			filterContributors = new ArrayList<>();
+		}
+		filterContributors.add( contributor );
 	}
 
 	@Override
@@ -85,34 +96,6 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		if ( previous != null ) {
 			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
 		}
-	}
-
-	private void must(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		if ( mustContributors == null ) {
-			mustContributors = new ArrayList<>();
-		}
-		mustContributors.add( contributor );
-	}
-
-	private void mustNot(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		if ( mustNotContributors == null ) {
-			mustNotContributors = new ArrayList<>();
-		}
-		mustNotContributors.add( contributor );
-	}
-
-	private void should(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		if ( shouldContributors == null ) {
-			shouldContributors = new ArrayList<>();
-		}
-		shouldContributors.add( contributor );
-	}
-
-	private void filter(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		if ( filterContributors == null ) {
-			filterContributors = new ArrayList<>();
-		}
-		filterContributors.add( contributor );
 	}
 
 	@Override

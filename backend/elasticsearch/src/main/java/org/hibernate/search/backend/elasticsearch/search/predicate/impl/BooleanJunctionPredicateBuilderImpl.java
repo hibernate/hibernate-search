@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -47,23 +46,35 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getMustCollector() {
-		return this::must;
+	public void must(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
+		if ( mustContributors == null ) {
+			mustContributors = new ArrayList<>();
+		}
+		mustContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getMustNotCollector() {
-		return this::mustNot;
+	public void mustNot(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
+		if ( mustNotContributors == null ) {
+			mustNotContributors = new ArrayList<>();
+		}
+		mustNotContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getShouldCollector() {
-		return this::should;
+	public void should(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
+		if ( shouldContributors == null ) {
+			shouldContributors = new ArrayList<>();
+		}
+		shouldContributors.add( contributor );
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getFilterCollector() {
-		return this::filter;
+	public void filter(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
+		if ( filterContributors == null ) {
+			filterContributors = new ArrayList<>();
+		}
+		filterContributors.add( contributor );
 	}
 
 	@Override
@@ -92,34 +103,6 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		if ( previous != null ) {
 			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
 		}
-	}
-
-	private void must(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( mustContributors == null ) {
-			mustContributors = new ArrayList<>();
-		}
-		mustContributors.add( contributor );
-	}
-
-	private void mustNot(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( mustNotContributors == null ) {
-			mustNotContributors = new ArrayList<>();
-		}
-		mustNotContributors.add( contributor );
-	}
-
-	private void should(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( shouldContributors == null ) {
-			shouldContributors = new ArrayList<>();
-		}
-		shouldContributors.add( contributor );
-	}
-
-	private void filter(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( filterContributors == null ) {
-			filterContributors = new ArrayList<>();
-		}
-		filterContributors.add( contributor );
 	}
 
 	@Override

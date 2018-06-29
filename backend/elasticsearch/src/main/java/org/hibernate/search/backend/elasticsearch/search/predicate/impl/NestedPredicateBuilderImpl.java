@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
@@ -33,11 +31,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> getNestedCollector() {
-		return this::nested;
-	}
-
-	private void nested(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor) {
+	public void nested(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor) {
 		this.nestedContributor = nestedContributor;
 	}
 

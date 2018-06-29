@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -33,23 +31,24 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 		SpatialWithinBoundingBoxPredicateBuilder<Void, StubQueryElementCollector> {
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getMustCollector() {
-		return this::consumeBooleanContributor;
+	public void must(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+		// No-op
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getMustNotCollector() {
-		return this::consumeBooleanContributor;
+	public void mustNot(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+		// No-op
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getShouldCollector() {
-		return this::consumeBooleanContributor;
+	public void should(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+		// No-op
+
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getFilterCollector() {
-		return this::consumeBooleanContributor;
+	public void filter(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+		// No-op
 	}
 
 	@Override
@@ -108,8 +107,8 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 	}
 
 	@Override
-	public Consumer<SearchPredicateContributor<Void, ? super StubQueryElementCollector>> getNestedCollector() {
-		return this::consumeNestedContributor;
+	public void nested(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+		// No-op
 	}
 
 	@Override
@@ -117,9 +116,4 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 		collector.simulateCollectCall();
 	}
 
-	private void consumeNestedContributor(SearchPredicateContributor<Void, ? super StubQueryElementCollector> nestedContributor) {
-	}
-
-	private void consumeBooleanContributor(SearchPredicateContributor<Void, ? super StubQueryElementCollector> booleanContributor) {
-	}
 }

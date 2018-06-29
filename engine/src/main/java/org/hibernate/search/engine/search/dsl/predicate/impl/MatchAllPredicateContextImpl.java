@@ -62,8 +62,8 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 	public void contribute(CTX context, C collector) {
 		if ( exceptContext != null ) {
 			BooleanJunctionPredicateBuilder<CTX, C> booleanBuilder = factory.bool();
-			booleanBuilder.getMustCollector().accept( builder );
-			booleanBuilder.getMustNotCollector().accept( exceptContext.child );
+			booleanBuilder.must( builder );
+			booleanBuilder.mustNot( exceptContext.child );
 			booleanBuilder.contribute( context, collector );
 		}
 		else {
