@@ -104,6 +104,44 @@ public class MatchAllSearchPredicateIT {
 				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
 	}
 
+	@Test
+	public void matchAll_multipleExcepts() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll()
+						.except().match().onField( "string" ).matching( STRING_1 )
+						.except().match().onField( "string" ).matching( STRING_2 )
+						.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll()
+						.except( c -> c.match().onField( "string" ).matching( STRING_2 ) )
+						.except( c -> c.match().onField( "string" ).matching( STRING_3 ) )
+						.end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+
+		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
+		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 );
+
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll().except( searchPredicate1 ).except( searchPredicate2 ).end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
