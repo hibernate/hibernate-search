@@ -141,19 +141,10 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	private boolean isOnlyMustNot() {
-		if ( mustNotContributors == null || mustNotContributors.isEmpty() ) {
-			return false;
-		}
-		if ( mustContributors != null && !mustContributors.isEmpty() ) {
-			return false;
-		}
-		if ( shouldContributors != null && !shouldContributors.isEmpty() ) {
-			return false;
-		}
-		if ( filterContributors != null && !filterContributors.isEmpty() ) {
-			return false;
-		}
-		return true;
+		return mustNotContributors != null && !mustNotContributors.isEmpty()
+				&& ( mustContributors == null || mustContributors.isEmpty() )
+				&& ( shouldContributors == null || shouldContributors.isEmpty() )
+				&& ( filterContributors == null || filterContributors.isEmpty() );
 	}
 
 	private static final class MinimumShouldMatchConstraint {
