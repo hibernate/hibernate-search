@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -63,7 +65,9 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 		if ( exceptContext != null ) {
 			BooleanJunctionPredicateBuilder<CTX, C> booleanBuilder = factory.bool();
 			booleanBuilder.must( builder );
-			booleanBuilder.mustNot( exceptContext.child );
+			for ( SearchPredicateContributor<CTX, ? super C> child : exceptContext.children ) {
+				booleanBuilder.mustNot( child );
+			}
 			booleanBuilder.contribute( context, collector );
 		}
 		else {
@@ -87,7 +91,7 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 
 		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, CTX, C> containerContext;
 
-		private SearchPredicateContributor<CTX, ? super C> child;
+		private List<SearchPredicateContributor<CTX, ? super C>> children = new ArrayList<>();
 
 		MatchAllExceptContext() {
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
@@ -96,7 +100,7 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 
 		@Override
 		public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
-			this.child = child;
+			children.add( child );
 		}
 
 		@Override
