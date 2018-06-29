@@ -46,7 +46,6 @@ class NestedPredicateContextImpl<N, CTX, C>
 
 	@Override
 	public void contribute(CTX context, C collector) {
-		builder.nested( singlePredicateContributor );
 		builder.contribute( context, collector );
 	}
 
@@ -56,6 +55,7 @@ class NestedPredicateContextImpl<N, CTX, C>
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}
 		this.singlePredicateContributor = child;
+		builder.nested( child );
 	}
 
 	@Override
