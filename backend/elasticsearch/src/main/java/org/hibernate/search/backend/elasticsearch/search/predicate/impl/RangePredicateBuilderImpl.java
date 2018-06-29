@@ -62,7 +62,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject innerObject = getInnerObject();
 		JsonAccessor<JsonElement> accessor;
 		if ( lowerLimit != null ) {

@@ -40,7 +40,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPre
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		GEO_BOUNDING_BOX.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );

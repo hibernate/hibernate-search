@@ -39,7 +39,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, getInnerObject() );

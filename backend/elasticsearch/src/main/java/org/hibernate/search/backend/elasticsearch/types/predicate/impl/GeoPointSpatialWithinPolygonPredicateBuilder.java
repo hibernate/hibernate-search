@@ -36,7 +36,7 @@ class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSearchPredica
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		GEO_POLYGON.set( outerObject, getInnerObject() );
 		collector.collectPredicate( outerObject );

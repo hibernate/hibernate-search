@@ -36,7 +36,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
 		JsonObject outerObject = getOuterObject();
 		JsonObject innerObject = getInnerObject();
 		PATH.set( innerObject, absoluteFieldPath );
