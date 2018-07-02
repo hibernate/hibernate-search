@@ -58,6 +58,9 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 
+		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
+				new AnnotationPojoTypeMetadataContributorFactory( beanProvider );
+
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,
 		 * map the types to indexes if necessary, and add a metadata contributor.
@@ -79,8 +82,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 						collector.mapToIndex( typeModel, indexedAnnotation.get().index() );
 					}
 
-					PojoTypeMetadataContributor contributor =
-							new AnnotationPojoTypeMetadataContributorImpl( beanProvider, typeModel );
+					PojoTypeMetadataContributor contributor = contributorFactory.create( typeModel );
 
 					collector.collectContributor( typeModel, contributor );
 				} );
@@ -91,7 +93,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 		 */
 		if ( annotatedTypeDiscoveryEnabled ) {
 			AnnotationTypeMetadataDiscoverer discoverer =
-					new AnnotationTypeMetadataDiscoverer( beanProvider, alreadyContributedTypes );
+					new AnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
 			collector.collectDiscoverer( discoverer );
 		}
 	}
@@ -101,11 +103,12 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	 * for types that were not explicitly requested .
 	 */
 	private static class AnnotationTypeMetadataDiscoverer implements TypeMetadataDiscoverer<PojoTypeMetadataContributor> {
-		private final BeanProvider beanProvider;
+		private final AnnotationPojoTypeMetadataContributorFactory contributorFactory;
 		private final Set<PojoRawTypeModel<?>> alreadyContributedTypes;
 
-		AnnotationTypeMetadataDiscoverer(BeanProvider beanProvider, Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
-			this.beanProvider = beanProvider;
+		AnnotationTypeMetadataDiscoverer(AnnotationPojoTypeMetadataContributorFactory contributorFactory,
+				Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
+			this.contributorFactory = contributorFactory;
 			this.alreadyContributedTypes = alreadyContributedTypes;
 		}
 
@@ -119,7 +122,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 			boolean neverContributed = alreadyContributedTypes.add( pojoTypeModel );
 			if ( neverContributed ) {
 				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
-				return Optional.of( new AnnotationPojoTypeMetadataContributorImpl( beanProvider, pojoTypeModel ) );
+				return Optional.of( contributorFactory.create( pojoTypeModel ) );
 			}
 			else {
 				return Optional.empty();

@@ -38,7 +38,7 @@ public class TypeMappingContextImpl
 
 	private final List<PojoTypeMetadataContributor> children = new ArrayList<>();
 
-	TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
+	public TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
 	}
 

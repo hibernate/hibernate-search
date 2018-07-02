@@ -15,13 +15,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -45,8 +43,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
@@ -60,79 +56,79 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingContextImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContributor {
+class AnnotationPojoTypeMetadataContributorFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanProvider beanProvider;
-	private final PojoRawTypeModel<?> typeModel;
 
-	AnnotationPojoTypeMetadataContributorImpl(BeanProvider beanProvider, PojoRawTypeModel<?> typeModel) {
+	AnnotationPojoTypeMetadataContributorFactory(BeanProvider beanProvider) {
 		this.beanProvider = beanProvider;
-		this.typeModel = typeModel;
 	}
 
-	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public PojoTypeMetadataContributor create(PojoRawTypeModel<?> typeModel) {
+		// Create a programmatic type mapping object
+		TypeMappingContextImpl typeMappingContext = new TypeMappingContextImpl( typeModel );
+
+		// Process annotations and add metadata to the type mapping
+		processTypeLevelAnnotations( typeMappingContext, typeModel );
 		typeModel.getDeclaredProperties()
-				.forEach( property -> contributePropertyModel( collector, property ) );
+				.forEach( propertyModel -> processPropertyLevelAnnotations( typeMappingContext, typeModel, propertyModel ) );
+
+		// Return the resulting mapping, which includes all the metadata extracted from annotations
+		return typeMappingContext;
 	}
 
-	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		// FIXME routing key bridge in programmatic mapping should probably be in the context of .indexed()?
-
+	private void processTypeLevelAnnotations(TypeMappingContextImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
 		typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBridgeMapping.class )
-				.forEach( annotation -> addRoutingKeyBridge( collector, annotation ) );
-
+				.forEach( annotation -> addRoutingKeyBridge( typeMappingContext, annotation ) );
 		typeModel.getAnnotationsByMetaAnnotationType( TypeBridgeMapping.class )
-				.forEach( annotation -> addTypeBridge( collector, annotation ) );
-
-		typeModel.getDeclaredProperties()
-				.forEach( property -> contributePropertyMapping( collector, property ) );
+				.forEach( annotation -> addTypeBridge( typeMappingContext, annotation ) );
 	}
 
-	private void contributePropertyModel(PojoAdditionalMetadataCollectorTypeNode collector, PojoPropertyModel<?> propertyModel) {
-		String name = propertyModel.getName();
+	private void processPropertyLevelAnnotations(TypeMappingContextImpl typeMappingContext,
+			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
+		String propertyName = propertyModel.getName();
+		PropertyMappingContext mappingContext = typeMappingContext.property( propertyName );
+
+		// Model contributions
 		propertyModel.getAnnotationsByMetaAnnotationType( MarkerMapping.class )
-				.forEach( annotation -> addMarker( collector.property( name ), annotation ) );
+				.forEach( annotation -> addMarker( mappingContext, annotation ) );
 		propertyModel.getAnnotationsByType( AssociationInverseSide.class )
-				.forEach( annotation -> addAssociationInverseSide( collector.property( name ), propertyModel, annotation ) );
+				.forEach( annotation -> addAssociationInverseSide( mappingContext, typeModel, propertyModel, annotation ) );
 		propertyModel.getAnnotationsByType( IndexingDependency.class )
-				.forEach( annotation -> addIndexingDependency( collector.property( name ), propertyModel, annotation ) );
-	}
+				.forEach( annotation -> addIndexingDependency( mappingContext, typeModel, propertyModel, annotation ) );
 
-	private void contributePropertyMapping(PojoMappingCollectorTypeNode collector, PojoPropertyModel<?> propertyModel) {
-		PropertyHandle handle = propertyModel.getHandle();
+		// Mapping contributions
 		propertyModel.getAnnotationsByType( DocumentId.class )
-				.forEach( annotation -> addDocumentId( collector.property( handle ), propertyModel, annotation ) );
+				.forEach( annotation -> addDocumentId( mappingContext, propertyModel, annotation ) );
 		propertyModel.getAnnotationsByMetaAnnotationType( PropertyBridgeMapping.class )
-				.forEach( annotation -> addPropertyBridge( collector.property( handle ), annotation ) );
+				.forEach( annotation -> addPropertyBridge( mappingContext, annotation ) );
 		propertyModel.getAnnotationsByType( Field.class )
-				.forEach( annotation -> addField( collector.property( handle ), propertyModel, annotation ) );
+				.forEach( annotation -> addField( mappingContext, propertyModel, annotation ) );
 		propertyModel.getAnnotationsByType( IndexedEmbedded.class )
-				.forEach( annotation -> addIndexedEmbedded( collector.property( handle ), propertyModel, annotation ) );
+				.forEach( annotation -> addIndexedEmbedded( mappingContext, propertyModel, annotation ) );
 	}
 
-	private <A extends Annotation> void addMarker(PojoAdditionalMetadataCollectorPropertyNode collector, A annotation) {
+	private <A extends Annotation> void addMarker(PropertyMappingContext mappingContext, A annotation) {
 		AnnotationMarkerBuilder<A> builder = createMarkerBuilder( annotation );
 		builder.initialize( annotation );
-		collector.marker( builder );
+		mappingContext.marker( builder );
 	}
 
-	private void addAssociationInverseSide(PojoAdditionalMetadataCollectorPropertyNode collector,
-			PojoPropertyModel<?> propertyModel, AssociationInverseSide annotation) {
+	private void addAssociationInverseSide(PropertyMappingContext mappingContext,
+			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, AssociationInverseSide annotation) {
 		ContainerValueExtractorPath extractorPath = getExtractorPath(
 				annotation.extractors(), AssociationInverseSide.DefaultExtractors.class
 		);
@@ -142,58 +138,56 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 			throw log.missingInversePathInAssociationInverseSideMapping( typeModel, propertyModel.getName() );
 		}
 
-		collector.value( extractorPath ).associationInverseSide( inversePathOptional.get() );
+		mappingContext.associationInverseSide( inversePathOptional.get() )
+				.withExtractors( extractorPath );
 	}
 
-	private void addIndexingDependency(PojoAdditionalMetadataCollectorPropertyNode collector,
-			PojoPropertyModel<?> propertyModel, IndexingDependency annotation) {
+	private void addIndexingDependency(PropertyMappingContext mappingContext,
+			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, IndexingDependency annotation) {
 		ContainerValueExtractorPath extractorPath = getExtractorPath(
 				annotation.extractors(), IndexingDependency.DefaultExtractors.class
 		);
 
 		ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
-		PojoAdditionalMetadataCollectorValueNode collectorValueNode = collector.value( extractorPath );
+		IndexingDependencyMappingContext indexingDependencyContext = mappingContext.indexingDependency()
+				.withExtractors( extractorPath );
 
-		collectorValueNode.reindexOnUpdate( reindexOnUpdate );
+		indexingDependencyContext.reindexOnUpdate( reindexOnUpdate );
 
 		ObjectPath[] derivedFromAnnotations = annotation.derivedFrom();
 		if ( derivedFromAnnotations.length > 0 ) {
-			// Use a LinkedHashSet for deterministic iteration
-			Set<PojoModelPathValueNode> derivedFrom = CollectionHelper.newLinkedHashSet( derivedFromAnnotations.length );
 			for ( ObjectPath objectPath : annotation.derivedFrom() ) {
 				Optional<PojoModelPathValueNode> pojoModelPathOptional = getPojoModelPathValueNode( objectPath );
 				if ( !pojoModelPathOptional.isPresent() ) {
 					throw log.missingPathInIndexingDependencyDerivedFrom( typeModel, propertyModel.getName() );
 				}
-				derivedFrom.add( pojoModelPathOptional.get() );
+				indexingDependencyContext.derivedFrom( pojoModelPathOptional.get() );
 			}
-			collectorValueNode.derivedFrom( derivedFrom );
 		}
 	}
 
-	private void addDocumentId(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel, DocumentId annotation) {
+	private void addDocumentId(PropertyMappingContext mappingContext, PojoPropertyModel<?> propertyModel, DocumentId annotation) {
 		BridgeBuilder<? extends IdentifierBridge<?>> builder = createIdentifierBridgeBuilder( annotation, propertyModel );
-
-		collector.identifierBridge( builder );
+		mappingContext.documentId().identifierBridge( builder );
 	}
 
-	private <A extends Annotation> void addRoutingKeyBridge(PojoMappingCollectorTypeNode collector, A annotation) {
+	private <A extends Annotation> void addRoutingKeyBridge(TypeMappingContext mappingContext, A annotation) {
 		BridgeBuilder<? extends RoutingKeyBridge> builder = createRoutingKeyBridgeBuilder( annotation );
-		collector.routingKeyBridge( builder );
+		mappingContext.routingKeyBridge( builder );
 	}
 
-	private <A extends Annotation> void addTypeBridge(PojoMappingCollectorTypeNode collector, A annotation) {
+	private <A extends Annotation> void addTypeBridge(TypeMappingContext mappingContext, A annotation) {
 		BridgeBuilder<? extends TypeBridge> builder = createTypeBridgeBuilder( annotation );
-		collector.bridge( builder );
+		mappingContext.bridge( builder );
 	}
 
-	private <A extends Annotation> void addPropertyBridge(PojoMappingCollectorPropertyNode collector, A annotation) {
+	private <A extends Annotation> void addPropertyBridge(PropertyMappingContext mappingContext, A annotation) {
 		BridgeBuilder<? extends PropertyBridge> builder = createPropertyBridgeBuilder( annotation );
-		collector.bridge( builder );
+		mappingContext.bridge( builder );
 	}
 
-	private void addField(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel, Field annotation) {
+	private void addField(PropertyMappingContext mappingContext, PojoPropertyModel<?> propertyModel, Field annotation) {
 		String cleanedUpRelativeFieldName = annotation.name();
 		if ( cleanedUpRelativeFieldName.isEmpty() ) {
 			cleanedUpRelativeFieldName = null;
@@ -204,11 +198,26 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		ContainerValueExtractorPath extractorPath =
 				getExtractorPath( annotation.extractors(), Field.DefaultExtractors.class );
 
-		collector.value( extractorPath )
-				.valueBridge( builder, cleanedUpRelativeFieldName, new AnnotationFieldModelContributor( annotation ) );
+		PropertyFieldMappingContext fieldContext = mappingContext
+				.field( cleanedUpRelativeFieldName )
+				.withExtractors( extractorPath )
+				.valueBridge( builder );
+
+		if ( !Store.DEFAULT.equals( annotation.store() ) ) {
+			fieldContext.store( annotation.store() );
+		}
+		if ( !Sortable.DEFAULT.equals( annotation.sortable() ) ) {
+			fieldContext.sortable( annotation.sortable() );
+		}
+		if ( !annotation.analyzer().isEmpty() ) {
+			fieldContext.analyzer( annotation.analyzer() );
+		}
+		if ( !annotation.normalizer().isEmpty() ) {
+			fieldContext.normalizer( annotation.normalizer() );
+		}
 	}
 
-	private void addIndexedEmbedded(PojoMappingCollectorPropertyNode collector, PojoPropertyModel<?> propertyModel,
+	private void addIndexedEmbedded(PropertyMappingContext mappingContext, PojoPropertyModel<?> propertyModel,
 			IndexedEmbedded annotation) {
 		String cleanedUpPrefix = annotation.prefix();
 		if ( cleanedUpPrefix.isEmpty() ) {
@@ -233,10 +242,12 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		ContainerValueExtractorPath extractorPath =
 				getExtractorPath( annotation.extractors(), IndexedEmbedded.DefaultExtractors.class );
 
-		collector.value( extractorPath )
-				.indexedEmbedded(
-						cleanedUpPrefix, annotation.storage(), cleanedUpMaxDepth, cleanedUpIncludePaths
-				);
+		mappingContext.indexedEmbedded()
+				.withExtractors( extractorPath )
+				.prefix( cleanedUpPrefix )
+				.storage( annotation.storage() )
+				.maxDepth( cleanedUpMaxDepth )
+				.includePaths( cleanedUpIncludePaths );
 	}
 
 	private Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {
@@ -446,31 +457,6 @@ class AnnotationPojoTypeMetadataContributorImpl implements PojoTypeMetadataContr
 		}
 		else {
 			return Optional.of( new ImmutableBeanReference( cleanedUpName, cleanedUpType ) );
-		}
-	}
-
-	private static class AnnotationFieldModelContributor implements FieldModelContributor {
-
-		private final Field annotation;
-
-		private AnnotationFieldModelContributor(Field annotation) {
-			this.annotation = annotation;
-		}
-
-		@Override
-		public void contribute(IndexSchemaFieldTypedContext<?> context) {
-			if ( !Store.DEFAULT.equals( annotation.store() ) ) {
-				context.store( annotation.store() );
-			}
-			if ( !Sortable.DEFAULT.equals( annotation.sortable() ) ) {
-				context.sortable( annotation.sortable() );
-			}
-			if ( !annotation.analyzer().isEmpty() ) {
-				context.analyzer( annotation.analyzer() );
-			}
-			if ( !annotation.normalizer().isEmpty() ) {
-				context.normalizer( annotation.normalizer() );
-			}
 		}
 	}
 }
