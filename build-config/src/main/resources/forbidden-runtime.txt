@@ -28,3 +28,9 @@ org.jboss.logging.processor.util.Objects
 # Methods from Hibernate ORM :
 # This one is only safe to use with specific configurations:
 org.hibernate.SharedSessionContract#getTransaction()
+
+################################################################################################################
+# Use our Contracts class instead
+com.google.common.base.Preconditions @ Use our Contracts class instead
+java.util.Objects#requireNonNull(java.lang.Object) @ Use our Contracts class instead
+java.util.Objects#requireNonNull(java.lang.Object, java.lang.String) @ Use our Contracts class instead
