@@ -57,9 +57,10 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-
+		AnnotationProcessorProvider annotationProcessorProvider =
+				new AnnotationProcessorProvider( beanProvider );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
-				new AnnotationPojoTypeMetadataContributorFactory( beanProvider );
+				new AnnotationPojoTypeMetadataContributorFactory( annotationProcessorProvider );
 
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,
