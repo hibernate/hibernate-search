@@ -14,12 +14,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 
-import org.hibernate.search.util.SearchException;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -28,6 +23,11 @@ import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.entity.HttpAsyncContentProducer;
 import org.apache.http.protocol.HTTP;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.Contracts;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * Optimised adapter to encode GSON objects into HttpEntity instances.
@@ -122,8 +122,8 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 			new ProgressiveCharBufferWriter( CHARSET, CHAR_BUFFER_SIZE, BYTE_BUFFER_PAGE_SIZE );
 
 	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) {
-		Objects.requireNonNull( gson );
-		Objects.requireNonNull( bodyParts );
+		Contracts.assertNotNull( gson, "gson" );
+		Contracts.assertNotNull( bodyParts, "bodyParts" );
 		this.gson = gson;
 		this.bodyParts = bodyParts;
 		this.contentLength = -1;
@@ -254,7 +254,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	@Override
 	public void produceContent(ContentEncoder encoder, IOControl ioctrl) throws IOException {
-		Objects.requireNonNull( encoder );
+		Contracts.assertNotNull( encoder, "encoder" );
 		// Warning: this method is possibly invoked multiple times, depending on the output buffers
 		// to have available space !
 		// Production of data is expected to complete only after we invoke ContentEncoder#complete.

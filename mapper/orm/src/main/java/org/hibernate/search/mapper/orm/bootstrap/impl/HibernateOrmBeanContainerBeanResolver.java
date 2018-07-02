@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.resource.beans.container.spi.BeanContainer;
@@ -16,6 +15,7 @@ import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.Contracts;
 
 /**
  * A {@link BeanResolver} relying on a Hibernate ORM {@link BeanContainer} to resolve beans.
@@ -53,7 +53,7 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 	};
 
 	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer) {
-		Objects.requireNonNull( beanContainer );
+		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
 	}
 

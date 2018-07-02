@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import java.util.Objects;
-
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
+import org.hibernate.search.util.impl.common.Contracts;
 
 /**
  * The implementation of EventsHibernateSearchState used at runtime,
@@ -22,7 +21,7 @@ final class OptimalEventsHibernateSearchState implements EventsHibernateSearchSt
 	private final HibernateSearchContextService context;
 
 	public OptimalEventsHibernateSearchState(HibernateSearchContextService context) {
-		Objects.requireNonNull( context );
+		Contracts.assertNotNull( context, "context" );
 		this.context = context;
 	}
 

@@ -6,19 +6,21 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.impl.common.Contracts;
 
 public class PrefixedConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource propertiesToPrefix;
 	private final String radix;
 	private final int radixLength;
 
-	public PrefixedConfigurationPropertySource(ConfigurationPropertySource toPrefix, String mask) {
-		this.propertiesToPrefix = Objects.requireNonNull( toPrefix );
-		this.radix = Objects.requireNonNull( mask ) + ".";
+	public PrefixedConfigurationPropertySource(ConfigurationPropertySource propertiesToPrefix, String prefix) {
+		Contracts.assertNotNull( propertiesToPrefix, "propertiesToPrefix" );
+		Contracts.assertNotNull( prefix, "prefix" );
+		this.propertiesToPrefix = propertiesToPrefix;
+		this.radix = prefix + ".";
 		this.radixLength = radix.length();
 	}
 

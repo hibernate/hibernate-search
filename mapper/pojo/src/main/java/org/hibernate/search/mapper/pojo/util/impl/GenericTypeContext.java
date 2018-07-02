@@ -14,11 +14,11 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -69,7 +69,7 @@ public final class GenericTypeContext {
 	}
 
 	public GenericTypeContext(GenericTypeContext declaringContext, Type type) {
-		Objects.requireNonNull( type );
+		Contracts.assertNotNull( type, "type" );
 		if ( declaringContext != null ) {
 			this.resolvedType = declaringContext.resolveType( type );
 		}

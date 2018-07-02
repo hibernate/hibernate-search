@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.util.impl;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Contracts;
 
 import com.google.gson.JsonElement;
 
@@ -68,12 +68,12 @@ public final class URLEncodedString {
 	}
 
 	public static URLEncodedString fromString(String string) {
-		Objects.requireNonNull( string );
+		Contracts.assertNotNull( string, "string" );
 		return new URLEncodedString( string );
 	}
 
 	public static URLEncodedString fromJSon(JsonElement jsonElement) {
-		Objects.requireNonNull( jsonElement );
+		Contracts.assertNotNull( jsonElement, "jsonElement" );
 		return fromString( jsonElement.getAsString() );
 	}
 

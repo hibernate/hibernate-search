@@ -6,18 +6,20 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.impl.common.Contracts;
 
 public class MaskedConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource propertiesToMask;
 	private final String radix;
 
-	public MaskedConfigurationPropertySource(ConfigurationPropertySource toMask, String mask) {
-		this.propertiesToMask = Objects.requireNonNull( toMask );
-		this.radix = Objects.requireNonNull( mask ) + ".";
+	public MaskedConfigurationPropertySource(ConfigurationPropertySource propertiesToMask, String mask) {
+		Contracts.assertNotNull( propertiesToMask, "propertiesToMask" );
+		Contracts.assertNotNull( mask, "mask" );
+		this.propertiesToMask = propertiesToMask;
+		this.radix = mask + ".";
 	}
 
 	@Override
