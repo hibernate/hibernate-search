@@ -554,10 +554,6 @@
                                 </bundledSignatures>
                                 <failOnMissingClasses>false</failOnMissingClasses>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-                                <!--
-                                The method SharedSessionContract#getTransaction() should never be used
-                                as it is only reliable in certain configurations.
-                                 -->
                                 <signaturesArtifacts>
                                     <signaturesArtifact>
                                         <groupId>org.hibernate.search</groupId>

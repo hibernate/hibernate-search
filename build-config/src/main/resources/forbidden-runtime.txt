@@ -13,21 +13,21 @@
 java.awt.**
 sun.**
 org.slf4j.**
-junit.framework.**
+junit.framework.** @ Use the classes from org.junit, junit.framework is deprecated
 
 ################################################################################################################
 # Nobody should be using StringBuffer anymore
-java.lang.StringBuffer
+java.lang.StringBuffer @ Do not use StringBuffer: use StringBuilder
 
 ################################################################################################################
 # Probably meant the other Objects:
 
-org.jboss.logging.processor.util.Objects
+org.jboss.logging.processor.util.Objects @ Bad import, use java.util.Objects
 
 ################################################################################################################
 # Methods from Hibernate ORM :
 # This one is only safe to use with specific configurations:
-org.hibernate.SharedSessionContract#getTransaction()
+org.hibernate.SharedSessionContract#getTransaction() @ Using this method is often unsafe
 
 ################################################################################################################
 # Use our Contracts class instead
