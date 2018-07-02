@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -25,8 +25,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
  */
 public class IndexingDependencyMappingContextImpl
 		extends DelegatingPropertyMappingContext
-		implements IndexingDependencyMappingContext,
-		PojoMetadataContributor<PojoAdditionalMetadataCollectorPropertyNode, PojoMappingCollector> {
+		implements IndexingDependencyMappingContext, PojoPropertyMetadataContributor {
 
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 	private ReindexOnUpdate reindexOnUpdate = ReindexOnUpdate.DEFAULT;
@@ -49,7 +48,7 @@ public class IndexingDependencyMappingContextImpl
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollector collector) {
+	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 

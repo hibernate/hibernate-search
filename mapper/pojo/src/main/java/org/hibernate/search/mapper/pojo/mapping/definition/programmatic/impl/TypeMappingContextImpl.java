@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -37,8 +36,7 @@ public class TypeMappingContextImpl
 	private String indexName;
 	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
 
-	private final List<PojoMetadataContributor<? super PojoAdditionalMetadataCollectorTypeNode, ? super PojoMappingCollectorTypeNode>>
-			children = new ArrayList<>();
+	private final List<PojoTypeMetadataContributor> children = new ArrayList<>();
 
 	TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
