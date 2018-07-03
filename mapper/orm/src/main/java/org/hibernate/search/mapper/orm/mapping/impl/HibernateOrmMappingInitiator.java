@@ -33,10 +33,9 @@ import org.hibernate.search.util.impl.common.StreamHelper;
 
 /*
  * TODO make the following additions to the Hibernate ORM specific mapping:
- *  1. During mapping creation, use the Hibernate ORM identifier as a fallback when no document ID was found
- *  2. When the @DocumentId is the @Id, use the provided ID in priority and only if it's missing, unproxy the entity and get the ID;
+ *  1. When the @DocumentId is the @Id, use the provided ID in priority and only if it's missing, unproxy the entity and get the ID;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
- *  3. And more?
+ *  2. And more?
  */
 public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping>
 		implements HibernateOrmMappingDefinition {

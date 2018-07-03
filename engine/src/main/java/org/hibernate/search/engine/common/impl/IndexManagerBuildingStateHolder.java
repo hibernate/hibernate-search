@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
 /**
  * @author Yoann Rodiere
  */
-// TODO close every backend built so far (which should close index managers) in case of failure
 class IndexManagerBuildingStateHolder {
 
 	private static final ConfigurationProperty<Optional<String>> INDEX_BACKEND_NAME =

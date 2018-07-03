@@ -42,9 +42,5 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 		for ( PojoTypeMetadataContributor delegate : delegates ) {
 			delegate.contributeMapping( collector );
 		}
-		/*
-		 * TODO register the default identifier mapping? We would need new APIs in the collector, though,
-		 * or to allow identifier mapping overrides.
-		 */
 	}
 }
