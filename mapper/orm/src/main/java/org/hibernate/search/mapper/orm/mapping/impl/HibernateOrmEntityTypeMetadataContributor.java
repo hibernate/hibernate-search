@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.util.List;
-
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathFilterFactory;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -18,29 +16,20 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 
 	private final PersistentClass persistentClass;
 	private final String idPropertyName;
-	private final List<PojoTypeMetadataContributor> delegates;
 
-	HibernateOrmEntityTypeMetadataContributor(PersistentClass persistentClass,
-			String idPropertyName,
-			List<PojoTypeMetadataContributor> delegates) {
+	HibernateOrmEntityTypeMetadataContributor(PersistentClass persistentClass, String idPropertyName) {
 		this.persistentClass = persistentClass;
 		this.idPropertyName = idPropertyName;
-		this.delegates = delegates;
 	}
 
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
 		collector.markAsEntity( new HibernateOrmPathFilterFactory( persistentClass ) )
 				.entityIdPropertyName( idPropertyName );
-		for ( PojoTypeMetadataContributor delegate : delegates ) {
-			delegate.contributeModel( collector );
-		}
 	}
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		for ( PojoTypeMetadataContributor delegate : delegates ) {
-			delegate.contributeMapping( collector );
-		}
+		// Nothing to do
 	}
 }

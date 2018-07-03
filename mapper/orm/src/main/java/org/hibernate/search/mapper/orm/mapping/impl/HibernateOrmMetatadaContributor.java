@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.DelegatingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -62,9 +63,11 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 
 			configurationCollector.collectContributor(
 					typeModel,
-					new HibernateOrmEntityTypeMetadataContributor(
-							persistentClass, identifierPropertyName, delegates
-					)
+					new DelegatingPojoTypeMetadataContributor()
+							.add( new HibernateOrmEntityTypeMetadataContributor(
+									persistentClass, identifierPropertyName
+							) )
+							.addAll( delegates )
 			);
 		}
 
@@ -75,7 +78,8 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			if ( !delegates.isEmpty() ) {
 				configurationCollector.collectContributor(
 						typeModel,
-						new HibernateOrmComponentTypeMetadataContributor( delegates )
+						new DelegatingPojoTypeMetadataContributor()
+								.addAll( delegates )
 				);
 			}
 		}

@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BeanReference;
 import org.hibernate.search.engine.common.spi.BuildContext;
@@ -18,6 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.DelegatingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -34,9 +32,8 @@ public class TypeMappingContextImpl
 	private final PojoRawTypeModel<?> typeModel;
 
 	private String indexName;
-	private BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
 
-	private final List<PojoTypeMetadataContributor> children = new ArrayList<>();
+	private final DelegatingPojoTypeMetadataContributor children = new DelegatingPojoTypeMetadataContributor();
 
 	public TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
@@ -53,15 +50,12 @@ public class TypeMappingContextImpl
 
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
-		children.forEach( c -> c.contributeModel( collector ) );
+		children.contributeModel( collector );
 	}
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		if ( routingKeyBridgeBuilder != null ) {
-			collector.routingKeyBridge( routingKeyBridgeBuilder );
-		}
-		children.forEach( c -> c.contributeMapping( collector ) );
+		children.contributeMapping( collector );
 	}
 
 	@Override
@@ -96,7 +90,7 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		this.routingKeyBridgeBuilder = builder;
+		children.add( new RoutingKeyBridgeMappingContributor( builder ) );
 		return this;
 	}
 
