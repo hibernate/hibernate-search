@@ -42,7 +42,7 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  * @param <T> The property holder type
  * @param <P> The property type
  */
-class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcessorNodeBuilder<T>
+class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcessorNodeBuilder
 		implements PojoMappingCollectorPropertyNode {
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
@@ -153,6 +153,17 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	Optional<PojoIndexingProcessorPropertyNode<T, P>> build(
+			PojoIndexingDependencyCollectorTypeNode<T> parentDependencyCollector) {
+		try {
+			return doBuild( parentDependencyCollector );
+		}
+		catch (RuntimeException e) {
+			getFailureCollector().add( e );
+			return Optional.empty();
+		}
+	}
+
+	private Optional<PojoIndexingProcessorPropertyNode<T, P>> doBuild(
 			PojoIndexingDependencyCollectorTypeNode<T> parentDependencyCollector) {
 		@SuppressWarnings("unchecked") // We know from the property model that this handle returns a result of type P
 		PojoIndexingDependencyCollectorPropertyNode<T, P> propertyDependencyCollector =

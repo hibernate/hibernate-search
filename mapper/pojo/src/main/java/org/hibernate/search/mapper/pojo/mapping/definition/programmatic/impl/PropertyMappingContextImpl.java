@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.DelegatingPojoPropertyMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -34,8 +34,8 @@ public class PropertyMappingContextImpl
 	private final TypeMappingContext parent;
 	private final PropertyHandle propertyHandle;
 
-	private final DelegatingPojoPropertyMetadataContributor children =
-			new DelegatingPojoPropertyMetadataContributor();
+	private final ErrorCollectingPojoPropertyMetadataContributor children =
+			new ErrorCollectingPojoPropertyMetadataContributor();
 
 	PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
 		this.parent = parent;

@@ -20,12 +20,17 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
-public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMapping>,
-		MappingKey<StubMapping> {
+public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMapping> {
 
 	private final SearchMappingRepositoryBuilder searchBuilder;
 	private final boolean multiTenancyEnabled;
 	private final List<StubTypeMetadataContributor> mappingContributors = new ArrayList<>();
+	private final MappingKey<StubMapping> mappingKey = new MappingKey<StubMapping>() {
+		@Override
+		public String render() {
+			return "Stub mapping";
+		}
+	};
 
 	public StubMappingInitiator(SearchMappingRepositoryBuilder searchBuilder, boolean multiTenancyEnabled) {
 		this.searchBuilder = searchBuilder;
@@ -39,7 +44,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 
 	@Override
 	public MappingKey<StubMapping> getMappingKey() {
-		return this;
+		return mappingKey;
 	}
 
 	@Override
@@ -60,6 +65,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 	}
 
 	public StubMapping getResult() {
-		return searchBuilder.getBuiltResult().getMapping( this );
+		return searchBuilder.getBuiltResult().getMapping( mappingKey );
 	}
+
 }

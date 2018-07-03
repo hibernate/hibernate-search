@@ -7,7 +7,17 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.log.impl.JavaBeanFailureContextMessages;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
+import org.jboss.logging.Messages;
+
 public final class JavaBeanMappingKey implements MappingKey<JavaBeanMapping> {
+	private static final JavaBeanFailureContextMessages MESSAGES =
+			Messages.getBundle( JavaBeanFailureContextMessages.class );
+
+	@Override
+	public String render() {
+		return MESSAGES.mapping();
+	}
 }

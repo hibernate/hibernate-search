@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+
 public interface PojoAdditionalMetadataCollector {
+
+	ContextualFailureCollector getFailureCollector();
 
 }

@@ -42,6 +42,8 @@ public abstract class BoundPojoModelPath {
 
 	public abstract PojoTypeModel<?> getRootType();
 
+	public abstract PojoModelPath toUnboundPath();
+
 	abstract void appendSelfPath(StringBuilder builder);
 
 	private void appendPath(StringBuilder builder) {

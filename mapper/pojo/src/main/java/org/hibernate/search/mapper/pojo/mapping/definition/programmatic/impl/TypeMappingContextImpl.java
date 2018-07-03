@@ -15,7 +15,8 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.DelegatingPojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -33,7 +34,7 @@ public class TypeMappingContextImpl
 
 	private String indexName;
 
-	private final DelegatingPojoTypeMetadataContributor children = new DelegatingPojoTypeMetadataContributor();
+	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
 
 	public TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
@@ -43,7 +44,14 @@ public class TypeMappingContextImpl
 	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		if ( indexName != null ) {
-			configurationCollector.mapToIndex( typeModel, indexName );
+			try {
+				configurationCollector.mapToIndex( typeModel, indexName );
+			}
+			catch (RuntimeException e) {
+				buildContext.getFailureCollector()
+						.withContext( PojoFailureContexts.fromType( typeModel ) )
+						.add( e );
+			}
 		}
 		configurationCollector.collectContributor( typeModel, this );
 	}

@@ -38,7 +38,7 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  *
  * @param <T> The processed type
  */
-public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcessorNodeBuilder<T>
+public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcessorNodeBuilder
 		implements PojoMappingCollectorTypeNode {
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
@@ -65,7 +65,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	@Override
 	public void bridge(BridgeBuilder<? extends TypeBridge> builder) {
 		mappingHelper.getIndexModelBinder().addTypeBridge( bindingContext, modelPath, builder )
-				.ifPresent( boundBridges::add );
+			.ifPresent( boundBridges::add );
 	}
 
 	@Override
@@ -103,6 +103,16 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	public Optional<PojoIndexingProcessor<T>> build(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
+		try {
+			return doBuild( dependencyCollector );
+		}
+		catch (RuntimeException e) {
+			getFailureCollector().add( e );
+			return Optional.empty();
+		}
+	}
+
+	private Optional<PojoIndexingProcessor<T>> doBuild(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		Collection<IndexObjectFieldAccessor> parentIndexObjectAccessors = bindingContext.getParentIndexObjectAccessors();
 
 		if ( boundRoutingKeyBridge != null ) {

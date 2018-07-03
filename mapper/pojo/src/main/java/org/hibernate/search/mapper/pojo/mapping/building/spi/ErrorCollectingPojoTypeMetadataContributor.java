@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
-public final class DelegatingPojoTypeMetadataContributor implements PojoTypeMetadataContributor {
+public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTypeMetadataContributor {
 
 	private List<PojoTypeMetadataContributor> children;
 
@@ -20,7 +20,12 @@ public final class DelegatingPojoTypeMetadataContributor implements PojoTypeMeta
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
 		if ( children != null ) {
 			for ( PojoTypeMetadataContributor child : children ) {
-				child.contributeModel( collector );
+				try {
+					child.contributeModel( collector );
+				}
+				catch (RuntimeException e) {
+					collector.getFailureCollector().add( e );
+				}
 			}
 		}
 	}
@@ -29,18 +34,23 @@ public final class DelegatingPojoTypeMetadataContributor implements PojoTypeMeta
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
 		if ( children != null ) {
 			for ( PojoTypeMetadataContributor child : children ) {
-				child.contributeMapping( collector );
+				try {
+					child.contributeMapping( collector );
+				}
+				catch (RuntimeException e) {
+					collector.getFailureCollector().add( e );
+				}
 			}
 		}
 	}
 
-	public DelegatingPojoTypeMetadataContributor addAll(Collection<? extends PojoTypeMetadataContributor> children) {
+	public ErrorCollectingPojoTypeMetadataContributor addAll(Collection<? extends PojoTypeMetadataContributor> children) {
 		initChildren();
 		this.children.addAll( children );
 		return this;
 	}
 
-	public DelegatingPojoTypeMetadataContributor add(PojoTypeMetadataContributor child) {
+	public ErrorCollectingPojoTypeMetadataContributor add(PojoTypeMetadataContributor child) {
 		initChildren();
 		this.children.add( child );
 		return this;

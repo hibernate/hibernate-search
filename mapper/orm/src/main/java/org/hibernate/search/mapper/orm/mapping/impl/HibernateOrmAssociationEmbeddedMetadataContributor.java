@@ -10,6 +10,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 
 final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTypeMetadataContributor {
 	private final String propertyName;
@@ -22,7 +23,14 @@ final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTy
 
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
-		collector.property( propertyName ).value( extractorPath ).associationEmbedded();
+		PojoAdditionalMetadataCollectorValueNode collectorValueNode =
+				collector.property( propertyName ).value( extractorPath );
+		try {
+			collectorValueNode.associationEmbedded();
+		}
+		catch (RuntimeException e) {
+			collectorValueNode.getFailureCollector().add( e );
+		}
 	}
 
 	@Override

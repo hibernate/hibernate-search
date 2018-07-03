@@ -1,0 +1,22 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.engine.logging.spi;
+
+/**
+ * An atomic element of context when a failure occurs:
+ * a mapped type, or an index, or a field path, ...
+ */
+public interface FailureContextElement {
+
+	/**
+	 * @return A human-readable representation of this context.
+	 * The representation should use brief, natural language to refer to objects rather than class names,
+	 * e.g. "index 'myIndexName'" rather than "ElasticsearchIndexManager{name = 'myIndexName'}".
+	 */
+	String render();
+
+}

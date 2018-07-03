@@ -69,6 +69,11 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
+	public String getName() {
+		return clazz.getName();
+	}
+
+	@Override
 	public boolean isAbstract() {
 		return Modifier.isAbstract( clazz.getModifiers() );
 	}

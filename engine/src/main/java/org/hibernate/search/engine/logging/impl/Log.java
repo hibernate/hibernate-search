@@ -12,8 +12,11 @@ import java.util.List;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
+
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -81,4 +84,24 @@ public interface Log extends BasicLogger {
 			+ " but rather build SearchSort objects."
 	)
 	SearchException cannotAddSortToUsedContext();
+
+	@Message(id = 19, value = "Hibernate Search bootstrap failed; stopped collecting failures after '%2$s' failures."
+			+ " Failures:\n%1$s"
+	)
+	SearchException boostrapCollectedFailureLimitReached(String renderedFailures, int failureCount);
+
+	@Message(id = 20, value = "Hibernate Search bootstrap failed."
+			+ " Failures:\n%1$s"
+	)
+	SearchException bootstrapCollectedFailures(String renderedFailures);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = 21, value = "Hibernate Search bootstrap encountered a non-fatal failure;"
+			+ " continuing bootstrap for now to list all mapping problems,"
+			+ " but the bootstrap process will ultimately be aborted.\n"
+			+ "Context: %1$s\n"
+			+ "Failure:" // The stack trace follows
+	)
+	void newBootstrapCollectedFailure(String context, @Cause Throwable failure);
+
 }

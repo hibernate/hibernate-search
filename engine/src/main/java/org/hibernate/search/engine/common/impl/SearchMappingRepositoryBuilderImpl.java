@@ -29,6 +29,7 @@ import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
@@ -39,6 +40,8 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.RootFailureCollector;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -47,6 +50,8 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
 public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final int FAILURE_LIMIT = 100;
 
 	private final ConfigurationPropertySource mainPropertySource;
 	private final Properties overriddenProperties = new Properties();
@@ -97,6 +102,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		// Use a LinkedHashMap for deterministic iteration
 		Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
+		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+		boolean checkingRootFailures = false;
 
 		try {
 			frozen = true;
@@ -107,7 +114,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
 			ServiceManager serviceManager = new ServiceManagerImpl( beanProvider );
-			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager );
+			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
 			ConfigurationPropertySource propertySource;
 			if ( !overriddenProperties.isEmpty() ) {
@@ -128,17 +135,26 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				mappingConfigurations.add( configuration );
 				configuration.collect();
 			}
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
 
 			// Second phase: create mappers and their backing index managers
 			for ( MappingConfiguration<?, ?> configuration : mappingConfigurations ) {
 				configuration.createAndAddMapper( mappers, indexManagerBuildingStateHolder );
 			}
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
 
 			// Third phase: create mappings
 			mappers.forEach( (mappingKey, mapper) -> {
 				MappingImplementor<?> mapping = mapper.build();
 				mappings.put( mappingKey, mapping );
 			} );
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
 
 			builtResult = new SearchMappingRepositoryImpl(
 					beanResolver,
@@ -148,7 +164,33 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			);
 		}
 		catch (RuntimeException e) {
-			SuppressingCloser closer = new SuppressingCloser( e );
+			RuntimeException rethrownException;
+			if ( checkingRootFailures ) {
+				// The exception was thrown by one of the failure checks above. No need for an additional check.
+				rethrownException = e;
+			}
+			else {
+				/*
+				 * The exception was thrown by something other than the failure checks above
+				 * (a mapper, a backend, ...).
+				 * We should check that no failure was collected before.
+				 */
+				try {
+					failureCollector.checkNoFailure();
+					// No other failure, just rethrow the exception.
+					rethrownException = e;
+				}
+				catch (SearchException e2) {
+					/*
+					 * At least one failure was collected, most likely before "e" was even thrown.
+					 * Let's throw "e2" (which mentions prior failures), only mentioning "e" as a suppressed exception.
+					 */
+					rethrownException = e2;
+					rethrownException.addSuppressed( e );
+				}
+			}
+
+			SuppressingCloser closer = new SuppressingCloser( rethrownException );
 			// Close the mappers and mappings created so far before aborting
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( Mapper::closeOnFailure, mappers.values() );
@@ -156,7 +198,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
 			// Close the bean resolver before aborting
 			closer.pushAll( BeanResolver::close, beanResolver );
-			throw e;
+
+			throw rethrownException;
 		}
 
 		return builtResult;
@@ -182,7 +225,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 		MappingConfiguration(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
 				MappingInitiator<C, M> mappingInitiator) {
-			this.buildContext = new MappingBuildContextImpl( rootBuildContext );
+			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingInitiator.getMappingKey() );
 			this.propertySource = propertySource;
 			this.mappingInitiator = mappingInitiator;
 		}
@@ -216,10 +259,21 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
 				String indexName = contribution.getIndexName();
 				if ( indexName != null ) {
+					IndexManagerBuildingState<?> indexManagerBuildingState;
+					try {
+						indexManagerBuildingState = indexManagerBuildingStateHolder
+								.startBuilding( indexName, multiTenancyEnabled );
+					}
+					catch (RuntimeException e) {
+						buildContext.getFailureCollector()
+								.withContext( FailureContexts.fromType( typeModel ) )
+								.withContext( FailureContexts.fromIndexName( indexName ) )
+								.add( e );
+						continue;
+					}
 					mapper.addIndexed(
 							typeModel,
-							indexManagerBuildingStateHolder
-									.startBuilding( indexName, multiTenancyEnabled )
+							indexManagerBuildingState
 					);
 				}
 			}

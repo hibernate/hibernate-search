@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in
@@ -14,6 +15,6 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
  *
  * @param <M> The Java type of the mapping
  */
-public interface MappingKey<M> {
+public interface MappingKey<M> extends FailureContextElement {
 
 }

@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorCon
  * @param <C> The type of containers accepted by the container value extractor.
  * @param <V> The type of values extracted by the container value extractor.
  */
-class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extends AbstractPojoProcessorNodeBuilder<C> {
+class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extends AbstractPojoProcessorNodeBuilder {
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
 	private final ContainerValueExtractor<C, V> extractor;
@@ -60,6 +60,17 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 	}
 
 	Optional<PojoIndexingProcessorContainerElementNode<C, V>> build(
+			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
+		try {
+			return doBuild( parentDependencyCollector );
+		}
+		catch (RuntimeException e) {
+			getFailureCollector().add( e );
+			return Optional.empty();
+		}
+	}
+
+	private Optional<PojoIndexingProcessorContainerElementNode<C, V>> doBuild(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		Collection<PojoIndexingProcessor<? super V>> immutableNestedProcessors =
 				valueNodeProcessorCollectionBuilder.build( parentDependencyCollector );

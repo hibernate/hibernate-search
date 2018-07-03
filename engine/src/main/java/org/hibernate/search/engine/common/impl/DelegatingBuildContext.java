@@ -18,4 +18,5 @@ class DelegatingBuildContext {
 	public ServiceManager getServiceManager() {
 		return delegate.getServiceManager();
 	}
+
 }

@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundValueBridge;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -36,12 +36,10 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  * @param <P> The type of the property from which values are retrieved (either directly or using an extractor).
  * @param <V> The type of values extracted by the container value extractor.
  */
-class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMappingCollectorValueNode {
+class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoProcessorNodeBuilder
+		implements PojoMappingCollectorValueNode {
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
-
-	private final PojoMappingHelper mappingHelper;
-	private final IndexModelBindingContext bindingContext;
 
 	private final Collection<BoundValueBridge<? super V, ?>> boundBridges = new ArrayList<>();
 
@@ -50,14 +48,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 	PojoIndexingProcessorValueNodeBuilderDelegate(
 			BoundPojoModelPathValueNode<?, P, V> modelPath,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
+		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
-		this.mappingHelper = mappingHelper;
-		this.bindingContext = bindingContext;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + modelPath + "]";
 	}
 
 	@Override
@@ -104,10 +96,12 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 		} );
 	}
 
-	public BoundPojoModelPathValueNode<?, P, V> getModelPath() {
+	@Override
+	BoundPojoModelPathValueNode<?, P, V> getModelPath() {
 		return modelPath;
 	}
 
+	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( boundBridge -> boundBridge.getBridge().close(), boundBridges );
@@ -116,6 +110,17 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> implements PojoMapping
 	}
 
 	Collection<PojoIndexingProcessor<? super V>> build(
+			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
+		try {
+			return doBuild( parentDependencyCollector );
+		}
+		catch (RuntimeException e) {
+			getFailureCollector().add( e );
+			return Collections.emptyList();
+		}
+	}
+
+	private Collection<PojoIndexingProcessor<? super V>> doBuild(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
 		PojoIndexingDependencyCollectorValueNode<P, V> valueDependencyCollector =
 				parentDependencyCollector.value( modelPath.getBoundExtractorPath() );

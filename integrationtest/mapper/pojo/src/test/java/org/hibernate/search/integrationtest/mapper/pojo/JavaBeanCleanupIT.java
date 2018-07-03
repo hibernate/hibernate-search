@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.StartupStubBridge;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
@@ -333,8 +334,8 @@ public class JavaBeanCleanupIT {
 				() -> startup( additionalMappingContributor )
 		)
 				.assertThrown()
-				// TODO Expect some wrapping here
-				.isInstanceOf( SimulatedFailure.class );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( SimulatedFailure.MESSAGE );
 	}
 
 	private void startup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
@@ -470,6 +471,10 @@ public class JavaBeanCleanupIT {
 	}
 
 	private static class SimulatedFailure extends RuntimeException {
+		public static final String MESSAGE = "Simulated failure";
+		SimulatedFailure() {
+			super( MESSAGE );
+		}
 	}
 
 	private static class FailingBridgeBuilder implements BridgeBuilder<StartupStubBridge> {

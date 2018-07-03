@@ -12,26 +12,46 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
+	private final FailureCollector failureCollector;
+	private final PojoRawTypeModel<?> rawTypeModel;
+
 	private PojoEntityTypeAdditionalMetadataBuilder entityTypeMetadataBuilder;
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
+	PojoTypeAdditionalMetadataBuilder(FailureCollector failureCollector, PojoRawTypeModel<?> rawTypeModel) {
+		this.failureCollector = failureCollector;
+		this.rawTypeModel = rawTypeModel;
+	}
+
+	@Override
+	public ContextualFailureCollector getFailureCollector() {
+		return failureCollector.withContext( PojoFailureContexts.fromType( rawTypeModel ) );
+	}
+
 	@Override
 	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
-		entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder( pathFilterFactory );
+		entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder( this, pathFilterFactory );
 		return entityTypeMetadataBuilder;
 	}
 
 	@Override
 	public PojoAdditionalMetadataCollectorPropertyNode property(String propertyName) {
-		return propertyBuilders.computeIfAbsent( propertyName, ignored -> new PojoPropertyAdditionalMetadataBuilder() );
+		return propertyBuilders.computeIfAbsent(
+				propertyName,
+				ignored -> new PojoPropertyAdditionalMetadataBuilder( this, propertyName )
+		);
 	}
 
 	public PojoTypeAdditionalMetadata build() {

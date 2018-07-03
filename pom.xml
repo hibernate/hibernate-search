@@ -652,7 +652,7 @@
                         <!-- generated respectively copied code -->
                         <excludes>
                             **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
-                            **/Log_$logger.java
+                            **/*_$logger.java,**/*_$bundle.java
                         </excludes>
                     </configuration>
                     <executions>
@@ -986,7 +986,8 @@
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/Log_$logger.class</exclude>
+                                <exclude>**/*_$logger.class</exclude>
+                                <exclude>**/*_$bundle.class</exclude>
                             </excludes>
                         </configuration>
                         <executions>

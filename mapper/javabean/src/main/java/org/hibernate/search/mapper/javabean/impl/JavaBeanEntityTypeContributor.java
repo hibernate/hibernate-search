@@ -14,7 +14,12 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
-		collector.markAsEntity( new SimpleStringSetPojoPathFilterFactory() );
+		try {
+			collector.markAsEntity( new SimpleStringSetPojoPathFilterFactory() );
+		}
+		catch (RuntimeException e) {
+			collector.getFailureCollector().add( e );
+		}
 	}
 
 	@Override

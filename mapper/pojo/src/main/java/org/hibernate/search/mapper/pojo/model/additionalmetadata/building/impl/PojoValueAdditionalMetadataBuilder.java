@@ -11,15 +11,37 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 
 class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorValueNode {
+	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
+	private final String propertyName;
+	private final ContainerValueExtractorPath extractorPath;
+
 	private PojoModelPathValueNode inverseSidePath;
 	private boolean associationEmbedded = false;
 	private Optional<ReindexOnUpdate> reindexOnUpdate = Optional.empty();
 	private Set<PojoModelPathValueNode> derivedFrom = Collections.emptySet();
+
+	PojoValueAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder, String propertyName,
+			ContainerValueExtractorPath extractorPath) {
+		this.rootBuilder = rootBuilder;
+		this.propertyName = propertyName;
+		this.extractorPath = extractorPath;
+	}
+
+	@Override
+	public ContextualFailureCollector getFailureCollector() {
+		return rootBuilder.getFailureCollector().withContext(
+				PojoFailureContexts.fromPath( PojoModelPath.fromRoot( propertyName ).value( extractorPath ) )
+		);
+	}
 
 	@Override
 	public void associationInverseSide(PojoModelPathValueNode inverseSidePath) {

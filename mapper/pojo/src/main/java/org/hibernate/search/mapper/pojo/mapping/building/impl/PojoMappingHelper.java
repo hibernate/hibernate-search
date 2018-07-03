@@ -8,14 +8,18 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 
 public class PojoMappingHelper {
 
+	private final FailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final PojoIndexModelBinder indexModelBinder;
 
-	PojoMappingHelper(TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
+	PojoMappingHelper(FailureCollector failureCollector,
+			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoIndexModelBinder indexModelBinder) {
+		this.failureCollector = failureCollector;
 		this.contributorProvider = contributorProvider;
 		this.indexModelBinder = indexModelBinder;
 	}
@@ -28,4 +32,7 @@ public class PojoMappingHelper {
 		return indexModelBinder;
 	}
 
+	public FailureCollector getFailureCollector() {
+		return failureCollector;
+	}
 }

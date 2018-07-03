@@ -13,14 +13,17 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 
 public class PojoTypeAdditionalMetadataProvider {
 
+	private final FailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
 	private final Map<PojoRawTypeModel<?>, PojoTypeAdditionalMetadata> cache = new HashMap<>();
 
-	public PojoTypeAdditionalMetadataProvider(
+	public PojoTypeAdditionalMetadataProvider(FailureCollector failureCollector,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
+		this.failureCollector = failureCollector;
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
@@ -29,7 +32,9 @@ public class PojoTypeAdditionalMetadataProvider {
 	}
 
 	private PojoTypeAdditionalMetadata createTypeAdditionalMetadata(PojoRawTypeModel<?> typeModel) {
-		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder();
+		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder(
+				failureCollector, typeModel
+		);
 		modelContributorProvider.forEach( typeModel, c -> c.contributeModel( builder ) );
 		return builder.build();
 	}

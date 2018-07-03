@@ -4,13 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.building.spi;
+package org.hibernate.search.engine.logging.spi;
 
+/**
+ * A failure collector with an implicit context.
+ *
+ * @see FailureCollector
+ */
+public interface ContextualFailureCollector extends FailureCollector {
 
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
-
-public interface PojoMappingCollector {
-
-	ContextualFailureCollector getFailureCollector();
+	void add(Throwable t);
 
 }

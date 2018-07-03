@@ -42,6 +42,11 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 		return parent.getRootType();
 	}
 
+	@Override
+	public PojoModelPathValueNode toUnboundPath() {
+		return parent.toUnboundPath().value( getExtractorPath() );
+	}
+
 	/**
 	 * @return A child path node representing the type of values represented by this node.
 	 */
@@ -74,10 +79,6 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	 */
 	public ContainerValueExtractorPath getExtractorPath() {
 		return boundExtractorPath.getExtractorPath();
-	}
-
-	public PojoModelPathValueNode toUnboundPath() {
-		return parent.toUnboundPath().value( getExtractorPath() );
 	}
 
 	@Override

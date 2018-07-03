@@ -18,6 +18,11 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuild
 public interface MappableTypeModel {
 
 	/**
+	 * @return A human-readable name for this type.
+	 */
+	String getName();
+
+	/**
 	 * @return {@code true} if this type is abstract, i.e. it cannot be instantiated as-is (but may be as a subtype).
 	 * {@code false} otherwise.
 	 */

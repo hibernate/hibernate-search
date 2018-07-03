@@ -41,6 +41,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -50,6 +51,7 @@ public class PojoMapper<M> implements Mapper<M> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final ContextualFailureCollector failureCollector;
 	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final PojoBootstrapIntrospector introspector;
@@ -70,13 +72,16 @@ public class PojoMapper<M> implements Mapper<M> {
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
 			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
+		this.failureCollector = buildContext.getFailureCollector();
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
 		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 
-		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider( contributorProvider );
+		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
+				failureCollector, contributorProvider
+		);
 		extractorBinder = new ContainerValueExtractorBinder( buildContext );
 
 		BridgeResolver bridgeResolver = new BridgeResolver();
@@ -85,7 +90,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		);
 
 		mappingHelper = new PojoMappingHelper(
-				contributorProvider, indexModelBinder
+				failureCollector, contributorProvider, indexModelBinder
 		);
 	}
 

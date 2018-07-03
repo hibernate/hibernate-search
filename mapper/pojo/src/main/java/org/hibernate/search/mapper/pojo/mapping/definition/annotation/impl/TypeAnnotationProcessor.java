@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -41,8 +42,15 @@ abstract class TypeAnnotationProcessor<A extends Annotation> {
 			Stream<? extends A> annotations) {
 		List<A> annotationList = annotations.collect( Collectors.toList() );
 		for ( A annotation : annotationList ) {
-			// TODO add a try/catch block to add some context (the annotation in particular) to thrown exceptions
-			doProcess( mappingContext, typeModel, annotation );
+			try {
+				doProcess( mappingContext, typeModel, annotation );
+			}
+			catch (RuntimeException e) {
+				helper.getRootFailureCollector()
+						.withContext( PojoFailureContexts.fromType( typeModel ) )
+						.withContext( PojoFailureContexts.fromAnnotation( annotation ) )
+						.add( e );
+			}
 		}
 	}
 }

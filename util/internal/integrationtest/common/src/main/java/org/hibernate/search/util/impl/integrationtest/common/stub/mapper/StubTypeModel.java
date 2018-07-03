@@ -24,6 +24,11 @@ public class StubTypeModel implements MappableTypeModel {
 	}
 
 	@Override
+	public String getName() {
+		return typeIdentifier;
+	}
+
+	@Override
 	public boolean isAbstract() {
 		return false;
 	}

@@ -45,6 +45,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -55,8 +56,8 @@ class AnnotationProcessorProvider {
 	private final List<TypeAnnotationProcessor<?>> typeAnnotationProcessors;
 	private final List<PropertyAnnotationProcessor<?>> propertyAnnotationProcessors;
 
-	AnnotationProcessorProvider(BeanProvider beanProvider) {
-		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( beanProvider );
+	AnnotationProcessorProvider(BeanProvider beanProvider, FailureCollector rootFailureCollector) {
+		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( beanProvider, rootFailureCollector );
 
 		this.typeAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
 				new RoutingKeyBridgeProcessor( helper ),
