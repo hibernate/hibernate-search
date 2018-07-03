@@ -21,6 +21,11 @@ public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 		this.expectedType = expectedType;
 		this.beanReference = beanReference;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + beanReference + "]";
+	}
 
 	@Override
 	public T build(BuildContext buildContext) {

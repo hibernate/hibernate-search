@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.common.spi;
 
 
+import java.util.StringJoiner;
+
 /**
  * @author Yoann Rodiere
  */
@@ -27,6 +29,23 @@ public final class ImmutableBeanReference implements BeanReference {
 	public ImmutableBeanReference(String name, Class<?> type) {
 		this.name = name;
 		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( "<" );
+		StringJoiner joiner = new StringJoiner( ", " );
+		if ( name != null ) {
+			// Add this even if name is empty
+			joiner.add( "name=" + name );
+		}
+		if ( type != null ) {
+			joiner.add( "type=" + type );
+		}
+		builder.append( joiner );
+		builder.append( ">" );
+		return builder.toString();
 	}
 
 	@Override
