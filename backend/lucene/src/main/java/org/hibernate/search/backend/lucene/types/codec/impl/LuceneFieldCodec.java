@@ -11,18 +11,39 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
- * @author Guillaume Smet
+ * Define how a given value will be encoded in the Lucene document and how it will be decoded.
  */
 public interface LuceneFieldCodec<T> {
 
+	/**
+	 * Encode the given value in the document by adding new fields to the Lucene document.
+	 *
+	 * @param documentBuilder The document builder.
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param value The value to encode.
+	 */
 	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, T value);
 
+	/**
+	 * If not empty, override the fields extracted from the document when doing a projection. Typically used to return
+	 * the latitude and longitude fields when dealing with {@link GeoPoint}s.
+	 *
+	 * @return The set of stored fields overriding the default field.
+	 */
 	default Set<String> getOverriddenStoredFields() {
 		return Collections.emptySet();
 	}
 
+	/**
+	 * Extract the value from the Lucene document, typically used in projections.
+	 *
+	 * @param document The Lucene document.
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return The decoded value.
+	 */
 	T decode(Document document, String absoluteFieldPath);
 
 	// equals()/hashCode() needs to be implemented if the codec is not a singleton
