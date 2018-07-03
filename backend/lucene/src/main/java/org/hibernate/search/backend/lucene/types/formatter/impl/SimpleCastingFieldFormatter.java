@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.formatter.impl;
 
-public final class IntegerFieldFormatter implements LuceneFieldFormatter<Integer> {
+public final class SimpleCastingFieldFormatter<T> implements LuceneFieldFormatter<T> {
 
-	public static final IntegerFieldFormatter INSTANCE = new IntegerFieldFormatter();
-
-	private IntegerFieldFormatter() {
+	public SimpleCastingFieldFormatter() {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Integer format(Object value) {
-		return (Integer) value;
+	public T format(Object value) {
+		return (T) value;
 	}
 }
