@@ -21,6 +21,13 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <jqassistant.skip>true</jqassistant.skip>
+
+        <!--
+            This module generates the rules used in the Checkstyle and ForbiddenAPIs plugins,
+            so obviously we cannot use those rules while building this module.
+         -->
+        <checkstyle.skip>true</checkstyle.skip>
+        <forbiddenapis.skip>true</forbiddenapis.skip>
     </properties>
 
     <dependencies>
