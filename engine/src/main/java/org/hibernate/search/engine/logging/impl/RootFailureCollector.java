@@ -8,6 +8,7 @@ package org.hibernate.search.engine.logging.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +126,10 @@ public class RootFailureCollector implements FailureCollector {
 				}
 			}
 		}
+
+		final Map<FailureContextElement, ContextualFailureCollectorImpl> getChildren() {
+			return children != null ? children : Collections.emptyMap();
+		}
 	}
 
 	private static class ContextualFailureCollectorImpl extends FailureCollectorImpl implements ContextualFailureCollector {
@@ -137,6 +142,19 @@ public class RootFailureCollector implements FailureCollector {
 			super( parent );
 			this.parent = parent;
 			this.context = context;
+		}
+
+		@Override
+		public boolean hasFailure() {
+			if ( failures != null && !failures.isEmpty() ) {
+				return true;
+			}
+			for ( ContextualFailureCollectorImpl child : getChildren().values() ) {
+				if ( child.hasFailure() ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		@Override

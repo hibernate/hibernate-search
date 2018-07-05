@@ -39,7 +39,9 @@ public interface Mapper<M> {
 	 * May only be called once on a given object.
 	 *
 	 * @return The mapping.
+	 * @throws MappingAbortedException When aborting the mapping due to
+	 * {@link org.hibernate.search.engine.logging.spi.ContextualFailureCollector#add(Throwable) collected} failures.
 	 */
-	MappingImplementor<M> build();
+	MappingImplementor<M> build() throws MappingAbortedException;
 
 }

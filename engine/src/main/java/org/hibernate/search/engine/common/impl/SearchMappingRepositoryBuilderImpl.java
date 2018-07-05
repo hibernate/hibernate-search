@@ -31,6 +31,7 @@ import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -41,6 +42,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.logging.impl.RootFailureCollector;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
@@ -100,7 +102,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	public SearchMappingRepository build() {
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
-		Map<MappingKey<?>, Mapper<?>> mappers = new LinkedHashMap<>();
+		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
 		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
 		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
 		boolean checkingRootFailures = false;
@@ -128,30 +130,28 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( rootBuildContext, propertySource );
 
 			// First phase: collect configuration for all mappings
-			List<MappingConfiguration<?, ?>> mappingConfigurations = new ArrayList<>();
 			for ( MappingInitiator initiator : mappingInitiators ) {
-				MappingConfiguration<?, ?> configuration =
-						new MappingConfiguration<>( rootBuildContext, propertySource, initiator );
-				mappingConfigurations.add( configuration );
-				configuration.collect();
+				MappingBuildingState<?, ?> mappingBuildingState =
+						new MappingBuildingState<>( rootBuildContext, propertySource, initiator );
+				mappingBuildingStates.add( mappingBuildingState );
+				mappingBuildingState.collect();
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
 			// Second phase: create mappers and their backing index managers
-			for ( MappingConfiguration<?, ?> configuration : mappingConfigurations ) {
-				configuration.createAndAddMapper( mappers, indexManagerBuildingStateHolder );
+			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
+				mappingBuildingState.createMapper( indexManagerBuildingStateHolder );
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
 			// Third phase: create mappings
-			mappers.forEach( (mappingKey, mapper) -> {
-				MappingImplementor<?> mapping = mapper.build();
-				mappings.put( mappingKey, mapping );
-			} );
+			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
+				mappingBuildingState.createAndAddMapping( mappings );
+			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
@@ -193,7 +193,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			SuppressingCloser closer = new SuppressingCloser( rethrownException );
 			// Close the mappers and mappings created so far before aborting
 			closer.pushAll( MappingImplementor::close, mappings.values() );
-			closer.pushAll( Mapper::closeOnFailure, mappers.values() );
+			closer.pushAll( MappingBuildingState::closeOnFailure, mappingBuildingStates );
 			// Close the resources contained in the index manager building state before aborting
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
 			// Close the bean resolver before aborting
@@ -210,10 +210,11 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		return builtResult;
 	}
 
-	private static class MappingConfiguration<C, M> {
+	private static class MappingBuildingState<C, M> {
 		private final MappingBuildContext buildContext;
 		private final ConfigurationPropertySource propertySource;
 
+		private final MappingKey<M> mappingKey;
 		private final MappingInitiator<C, M> mappingInitiator;
 
 		// Use a LinkedHashMap for deterministic iteration
@@ -223,9 +224,12 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
-		MappingConfiguration(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
+		private Mapper<M> mapper; // Initially null, set in createMapper()
+
+		MappingBuildingState(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
 				MappingInitiator<C, M> mappingInitiator) {
-			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingInitiator.getMappingKey() );
+			this.mappingKey = mappingInitiator.getMappingKey();
+			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingKey );
 			this.propertySource = propertySource;
 			this.mappingInitiator = mappingInitiator;
 		}
@@ -234,24 +238,10 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			mappingInitiator.configure( buildContext, propertySource, new ConfigurationCollector() );
 		}
 
-		/*
-		 * Note that the mapper map is passed as a parameter, instead of returning a mapper,
-		 * so that even in case of failure, the caller can access the mappers built so far.
-		 * Then the caller can close all mappers as necessary.
-		 */
-		void createAndAddMapper(Map<MappingKey<?>, Mapper<?>> mappers,
-				IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-			MappingKey<M> mappingKey = mappingInitiator.getMappingKey();
-			if ( mappers.containsKey( mappingKey ) ) {
-				throw new SearchException(
-						"Found two mapping initiators using the same key."
-						+ " There is a bug in the mapper integration."
-				);
-			}
+		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 
 			ContributorProvider contributorProvider = new ContributorProvider();
-			Mapper<M> mapper = mappingInitiator.createMapper( buildContext, propertySource, contributorProvider );
-			mappers.put( mappingInitiator.getMappingKey(), mapper );
+			mapper = mappingInitiator.createMapper( buildContext, propertySource, contributorProvider );
 
 			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
 					contributionByType.keySet() );
@@ -279,6 +269,47 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			}
 		}
 
+		void createAndAddMapping(Map<MappingKey<?>, MappingImplementor<?>> mappings) {
+			if ( mappings.containsKey( mappingKey ) ) {
+				throw new AssertionFailure(
+						"Found two mapping initiators using the same key."
+						+ " There is a bug in the mapper, please report it."
+				);
+			}
+
+			try {
+				MappingImplementor<M> mapping = mapper.build();
+				mappings.put( mappingKey, mapping );
+			}
+			catch (MappingAbortedException e) {
+				ContextualFailureCollector failureCollector = buildContext.getFailureCollector();
+
+				if ( !failureCollector.hasFailure() ) {
+					throw new AssertionFailure(
+							"Caught " + MappingAbortedException.class.getSimpleName()
+									+ ", but the mapper did not collect any failure."
+									+ " There is a bug in the mapper, please report it.",
+							e
+					);
+				}
+
+				/*
+				 * This generally shouldn't do anything, because we don't expect a cause nor suppressed exceptions
+				 * in the MappingAbortedException, but ignoring exceptions can lead to
+				 * spending some really annoying hours debugging.
+				 * So let's be extra cautious not to lose these.
+				 */
+				Throwable cause = e.getCause();
+				if ( cause != null ) {
+					failureCollector.add( cause );
+				}
+				Throwable[] suppressed = e.getSuppressed();
+				for ( Throwable throwable : suppressed ) {
+					failureCollector.add( throwable );
+				}
+			}
+		}
+
 		private TypeMappingContribution<C> getOrCreateContribution(MappableTypeModel typeModel) {
 			TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
 			if ( contribution == null ) {
@@ -302,6 +333,12 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				typesSubmittedToDiscoverers.add( typeModel );
 			}
 			return contributionByType.get( typeModel );
+		}
+
+		public void closeOnFailure() {
+			if ( mapper != null ) {
+				mapper.closeOnFailure();
+			}
 		}
 
 		private class ConfigurationCollector implements MappingConfigurationCollector<C> {
@@ -333,7 +370,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			@Override
 			public void forEach(MappableTypeModel typeModel, Consumer<C> contributorConsumer) {
 				typeModel.getDescendingSuperTypes()
-						.map( MappingConfiguration.this::getContributionIncludingAutomaticallyDiscovered )
+						.map( MappingBuildingState.this::getContributionIncludingAutomaticallyDiscovered )
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
 						.forEach( contributorConsumer );
