@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 
 public class BridgeBuildContextImpl implements BridgeBuildContext {
 
-	private final BuildContext buildContext;
+	private final MappingBuildContext buildContext;
 
-	public BridgeBuildContextImpl(BuildContext buildContext) {
+	public BridgeBuildContextImpl(MappingBuildContext buildContext) {
 		this.buildContext = buildContext;
 	}
 

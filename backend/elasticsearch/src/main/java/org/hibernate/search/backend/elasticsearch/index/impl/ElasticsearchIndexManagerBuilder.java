@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 
 /**
  * @author Yoann Rodiere
@@ -28,14 +28,14 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
-	private final BuildContext buildContext;
+	private final BackendBuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
-			BuildContext buildContext, ConfigurationPropertySource propertySource) {
+			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 

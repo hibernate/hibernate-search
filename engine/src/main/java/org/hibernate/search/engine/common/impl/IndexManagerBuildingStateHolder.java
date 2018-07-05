@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -39,16 +39,16 @@ class IndexManagerBuildingStateHolder {
 	private static final ConfigurationProperty<Optional<String>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( "type" ).asString().build();
 
-	private final BuildContext buildContext;
+	private final RootBuildContext rootBuildContext;
 	private final ConfigurationPropertySource propertySource;
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
-	private final Map<String, BackendImplementor<?>> backendsByName = new HashMap<>();
+	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new HashMap<>();
 	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
-	IndexManagerBuildingStateHolder(BuildContext buildContext,
+	IndexManagerBuildingStateHolder(RootBuildContext rootBuildContext,
 			ConfigurationPropertySource propertySource) {
-		this.buildContext = buildContext;
+		this.rootBuildContext = rootBuildContext;
 		this.propertySource = propertySource;
 		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
 	}
@@ -58,17 +58,24 @@ class IndexManagerBuildingStateHolder {
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
-		BackendImplementor<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
+		BackendBuildingState<?> backendBuildingstate =
+				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
 
 		IndexMappingBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( indexName );
 		if ( state == null ) {
-			state = createIndexManagerBuildingState( backend, indexName, multiTenancyEnabled, indexPropertySource );
+			state = backendBuildingstate.createIndexManagerBuildingState(
+					indexName, multiTenancyEnabled, indexPropertySource
+			);
 			indexManagerBuildingStateByName.put( indexName, state );
 		}
 		return state;
 	}
 
 	Map<String, BackendImplementor<?>> getBackendsByName() {
+		Map<String, BackendImplementor<?>> backendsByName = new HashMap<>();
+		for ( Map.Entry<String, BackendBuildingState<?>> entry : backendBuildingStateByName.entrySet() ) {
+			backendsByName.put( entry.getKey(), entry.getValue().getBuilt() );
+		}
 		return backendsByName;
 	}
 
@@ -82,26 +89,49 @@ class IndexManagerBuildingStateHolder {
 
 	void closeOnFailure(SuppressingCloser closer) {
 		closer.pushAll( state -> state.closeOnFailure( closer ), indexManagerBuildingStateByName.values() );
-		closer.pushAll( BackendImplementor::close, backendsByName.values() );
+		closer.pushAll( BackendBuildingState::closeOnFailure, backendBuildingStateByName.values() );
 	}
 
-	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
-			BackendImplementor<D> backend, String indexName, boolean multiTenancyEnabled,
-			ConfigurationPropertySource indexPropertySource) {
-		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, multiTenancyEnabled, buildContext, indexPropertySource );
-		IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
-		IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
-		return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
-	}
-
-	private BackendImplementor<?> createBackend(String backendName) {
+	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backend." + backendName );
 		// TODO more checks on the backend type (non-null, non-empty)
 		String backendType = BACKEND_TYPE.get( backendPropertySource ).get();
 
-		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
 		BackendFactory backendFactory = beanProvider.getBean( backendType, BackendFactory.class );
-		return backendFactory.create( backendName, buildContext, backendPropertySource );
+		BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
+
+		BackendImplementor<?> backend = backendFactory.create( backendName, backendBuildContext, backendPropertySource );
+		return new BackendBuildingState<>( backendBuildContext, backend );
+	}
+
+	private class BackendBuildingState<D extends DocumentElement> {
+		private final BackendBuildContext backendBuildContext;
+		private final BackendImplementor<D> backend;
+
+		private BackendBuildingState(BackendBuildContext backendBuildContext, BackendImplementor<D> backend) {
+			this.backendBuildContext = backendBuildContext;
+			this.backend = backend;
+		}
+
+		IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
+				String indexName, boolean multiTenancyEnabled,
+				ConfigurationPropertySource indexPropertySource) {
+			IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
+					indexName, multiTenancyEnabled, backendBuildContext, indexPropertySource
+			);
+			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
+			IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
+			return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
+		}
+
+		void closeOnFailure() {
+			backend.close();
+		}
+
+		BackendImplementor<D> getBuilt() {
+			return backend;
+		}
 	}
 
 	private class IndexMappingBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {

@@ -6,23 +6,17 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 
-
-/**
- * @author Yoann Rodiere
- */
-public class BuildContextImpl implements BuildContext {
+class RootBuildContext {
 
 	private final ServiceManager serviceManager;
 
-	public BuildContextImpl(ServiceManager serviceManager) {
+	RootBuildContext(ServiceManager serviceManager) {
 		this.serviceManager = serviceManager;
 	}
 
-	@Override
-	public ServiceManager getServiceManager() {
+	ServiceManager getServiceManager() {
 		return serviceManager;
 	}
 

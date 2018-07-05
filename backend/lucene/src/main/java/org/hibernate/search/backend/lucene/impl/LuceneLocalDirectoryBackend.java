@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContex
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -79,7 +79,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 
 	@Override
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
-			String indexName, boolean multiTenancyEnabled, BuildContext context, ConfigurationPropertySource propertySource) {
+			String indexName, boolean multiTenancyEnabled, BackendBuildContext context, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
 			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
 		}

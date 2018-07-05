@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -55,7 +55,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private final BridgeResolver bridgeResolver;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 
-	PojoIndexModelBinderImpl(BuildContext buildContext, PojoBootstrapIntrospector introspector,
+	PojoIndexModelBinderImpl(MappingBuildContext buildContext, PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.bridgeBuildContext = new BridgeBuildContextImpl( buildContext );

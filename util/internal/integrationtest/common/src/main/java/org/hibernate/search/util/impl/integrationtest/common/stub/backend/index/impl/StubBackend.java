@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -43,7 +43,7 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	}
 
 	@Override
-	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName, boolean isMultiTenancyEnabled, BuildContext context,
+	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName, boolean isMultiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
 		return new StubIndexManagerBuilder( this, indexName );
 	}

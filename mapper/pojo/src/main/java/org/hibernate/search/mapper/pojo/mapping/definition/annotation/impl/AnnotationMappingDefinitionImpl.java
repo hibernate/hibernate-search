@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -54,7 +54,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	}
 
 	@Override
-	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 		AnnotationProcessorProvider annotationProcessorProvider =

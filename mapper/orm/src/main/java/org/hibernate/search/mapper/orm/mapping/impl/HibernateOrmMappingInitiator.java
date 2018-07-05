@@ -19,7 +19,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
@@ -77,7 +77,7 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 	}
 
 	@Override
-	public void configure(BuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
 				// getMappedClass() can return null, which should be ignored

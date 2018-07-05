@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
@@ -75,7 +75,7 @@ public class ContainerValueExtractorBinder {
 	private Map<Class<? extends ContainerValueExtractor>, ExtractorContributor> extractorContributorCache =
 			new HashMap<>();
 
-	public ContainerValueExtractorBinder(BuildContext buildContext) {
+	public ContainerValueExtractorBinder(MappingBuildContext buildContext) {
 		this.beanProvider = buildContext.getServiceManager().getBeanProvider();
 		addDefaultExtractor( MapValueExtractor.class );
 		addDefaultExtractor( CollectionElementExtractor.class );

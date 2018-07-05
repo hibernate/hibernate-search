@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.backend.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
 
 /**
  * @author Yoann Rodiere
@@ -23,6 +22,6 @@ public interface BackendFactory {
 	 * <strong>CAUTION:</strong> the property key {@code type} is reserved for use by the engine.
 	 * @return A backend.
 	 */
-	BackendImplementor<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource);
+	BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource);
 
 }

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
@@ -38,13 +38,13 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private final String indexName;
 	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder();
 
-	private final BuildContext buildContext;
+	private final BackendBuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
 	public LuceneDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName,
-			BuildContext buildContext, ConfigurationPropertySource propertySource) {
+			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.indexName = indexName;

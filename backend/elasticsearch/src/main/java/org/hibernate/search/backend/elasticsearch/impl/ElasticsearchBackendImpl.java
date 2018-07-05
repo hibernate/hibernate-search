@@ -28,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFac
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -102,7 +102,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
-			String hibernateSearchIndexName, boolean multiTenancyEnabled, BuildContext buildContext, ConfigurationPropertySource propertySource) {
+			String hibernateSearchIndexName, boolean multiTenancyEnabled, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
 			throw log.multiTenancyRequiredButNotSupportedByBackend( name, hibernateSearchIndexName );
 		}

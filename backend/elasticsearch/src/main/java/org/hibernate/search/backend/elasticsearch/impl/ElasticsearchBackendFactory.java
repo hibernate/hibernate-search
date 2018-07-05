@@ -30,7 +30,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
@@ -55,7 +55,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor<?> create(String name, BuildContext context, ConfigurationPropertySource propertySource) {
+	public BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
 		ElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );

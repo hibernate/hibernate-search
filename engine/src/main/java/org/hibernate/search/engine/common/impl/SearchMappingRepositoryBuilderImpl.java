@@ -27,7 +27,6 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanResolver;
-import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
@@ -35,6 +34,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -107,7 +107,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
 			ServiceManager serviceManager = new ServiceManagerImpl( beanProvider );
-			BuildContext buildContext = new BuildContextImpl( serviceManager );
+			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager );
 
 			ConfigurationPropertySource propertySource;
 			if ( !overriddenProperties.isEmpty() ) {
@@ -118,13 +118,13 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 				propertySource = mainPropertySource;
 			}
 
-			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( buildContext, propertySource );
+			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( rootBuildContext, propertySource );
 
 			// First phase: collect configuration for all mappings
 			List<MappingConfiguration<?, ?>> mappingConfigurations = new ArrayList<>();
 			for ( MappingInitiator initiator : mappingInitiators ) {
 				MappingConfiguration<?, ?> configuration =
-						new MappingConfiguration<>( buildContext, propertySource, initiator );
+						new MappingConfiguration<>( rootBuildContext, propertySource, initiator );
 				mappingConfigurations.add( configuration );
 				configuration.collect();
 			}
@@ -168,7 +168,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	private static class MappingConfiguration<C, M> {
-		private final BuildContext buildContext;
+		private final MappingBuildContext buildContext;
 		private final ConfigurationPropertySource propertySource;
 
 		private final MappingInitiator<C, M> mappingInitiator;
@@ -180,9 +180,9 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
-		MappingConfiguration(BuildContext buildContext, ConfigurationPropertySource propertySource,
+		MappingConfiguration(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
 				MappingInitiator<C, M> mappingInitiator) {
-			this.buildContext = buildContext;
+			this.buildContext = new MappingBuildContextImpl( rootBuildContext );
 			this.propertySource = propertySource;
 			this.mappingInitiator = mappingInitiator;
 		}

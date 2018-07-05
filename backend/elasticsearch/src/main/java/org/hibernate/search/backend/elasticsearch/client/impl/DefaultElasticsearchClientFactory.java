@@ -103,7 +103,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 	private ServiceManager serviceManager;
 
 	@Override
-	public void start(ConfigurationPropertySource propertySource, BuildContext context) {
+	public void start(ConfigurationPropertySource propertySource, BackendBuildContext context) {
 		this.serviceManager = context.getServiceManager();
 	}
 

@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.BuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -65,7 +65,7 @@ public class PojoMapper<M> implements Mapper<M> {
 
 	private boolean closed = false;
 
-	public PojoMapper(BuildContext buildContext, ConfigurationPropertySource propertySource,
+	public PojoMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
