@@ -2365,15 +2365,9 @@
             </build>
         </profile>
         
-        <!-- Elasticsearch 5.2+ test environment (default) -->
+        <!-- Elasticsearch 5.2+ test environment -->
         <profile>
             <id>elasticsearch-5.2</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.host.version</name>
-                </property>
-            </activation>
             <properties>
                 <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
@@ -2396,6 +2390,57 @@
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                             <executions>
                                 <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 6.3+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-6.3</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.version</name>
+                </property>
+            </activation>
+            <properties>
+                <version.elasticsearch.plugin>6.6</version.elasticsearch.plugin>
+                <test.elasticsearch.host.version>6.3.1</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${version.elasticsearch.plugin}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <version>${test.elasticsearch.host.version}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
+                                <autoCreateIndex>false</autoCreateIndex>
+                            </configuration>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution>
                                     <id>start-elasticsearch</id>
                                     <phase>pre-integration-test</phase>
                                     <goals>
