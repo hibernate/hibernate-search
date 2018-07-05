@@ -1985,6 +1985,21 @@
         </profile>
 
         <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <properties>
+                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
+                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
+                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
+            </properties>
+            <modules>
+                <module>integrationtest/jdk9-modules</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>perf</id>
             <properties>
                 <org.hibernate.search.enable_performance_tests>true</org.hibernate.search.enable_performance_tests>
