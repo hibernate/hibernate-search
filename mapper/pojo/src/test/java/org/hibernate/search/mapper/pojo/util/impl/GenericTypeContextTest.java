@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.test.util.TypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
 import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
-import org.hibernate.search.util.SearchException;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -504,7 +504,7 @@ public class GenericTypeContextTest {
 				fail( "Expected resolveTypeArgument(" + rawSuperClass + ", " + typeArgumentIndex + ")"
 						+ " for type " + getTypeContext() + " to fail because " + rawSuperClass + " doesn't have any type parameter" );
 			}
-			catch (SearchException e) {
+			catch (IllegalArgumentException e) {
 				assertThat( e.getMessage() )
 						.contains( rawSuperClass.getName() )
 						.contains( "doesn't declare any type parameter" );
@@ -518,7 +518,7 @@ public class GenericTypeContextTest {
 				fail( "Expected resolveTypeArgument(" + rawSuperClass + ", " + typeArgumentIndex + ")"
 						+ " for type " + getTypeContext() + " to fail because of the invalid index" );
 			}
-			catch (SearchException e) {
+			catch (IllegalArgumentException e) {
 				assertThat( e.getMessage() )
 						.contains( rawSuperClass.getName() )
 						.contains( "should be 0 or greater" );
@@ -532,7 +532,7 @@ public class GenericTypeContextTest {
 				fail( "Expected resolveTypeArgument(" + rawSuperClass + ", " + typeArgumentIndex + ")"
 						+ " for type " + getTypeContext() + " to fail because of the invalid index" );
 			}
-			catch (SearchException e) {
+			catch (IllegalArgumentException e) {
 				assertThat( e.getMessage() )
 						.contains( rawSuperClass.getName() )
 						.contains( "only declares " )

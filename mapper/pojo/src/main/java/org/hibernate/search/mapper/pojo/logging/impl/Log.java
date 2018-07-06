@@ -81,17 +81,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 12, value = "Requested type argument %3$s to type %2$s"
 			+ " in implementing type %1$s, but %2$s doesn't declare any type parameter")
-	SearchException cannotRequestTypeParameterOfUnparameterizedType(Type type, Class<?> rawSuperType,
+	IllegalArgumentException cannotRequestTypeParameterOfUnparameterizedType(Type type, Class<?> rawSuperType,
 			int typeArgumentIndex);
 
 	@Message(id = 13, value = "Requested type argument %3$s to type %2$s"
 			+ " in implementing type %1$s, but %2$s only declares %4$s type parameter(s)")
-	SearchException typeParameterIndexOutOfBound(Type type, Class<?> rawSuperType, int typeArgumentIndex,
+	IllegalArgumentException typeParameterIndexOutOfBound(Type type, Class<?> rawSuperType, int typeArgumentIndex,
 			int typeParametersLength);
 
 	@Message(id = 14, value = "Requested type argument index %3$s to type %2$s"
 			+ " in implementing type %1$s should be 0 or greater")
-	SearchException invalidTypeParameterIndex(Type type, Class<?> rawSuperType, int typeArgumentIndex);
+	IllegalArgumentException invalidTypeParameterIndex(Type type, Class<?> rawSuperType, int typeArgumentIndex);
 
 	@Message(id = 15, value = "Could not interpret the type arguments to the ContainerValueExtractor interface in "
 			+ " implementation '%1$s'. Only the following implementations of ContainerValueExtractor are valid: "
