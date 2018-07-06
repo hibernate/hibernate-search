@@ -107,6 +107,8 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				createMock( "inverseSideEmbeddableType2Mock", PojoRawTypeModel.class );
 		EasyMock.expect( inverseSideEntityTypeMock.getRawType() )
 				.andStubReturn( (PojoRawTypeModel) inverseSideEntityTypeMock );
+		EasyMock.expect( inverseSideEntityTypeMock.getName() )
+				.andStubReturn( "inverseSideEntityTypeMock" );
 
 		PojoGenericTypeModel<?> inverseSideProperty1TypeMock =
 				createMock( "inverseSideProperty1TypeMock", PojoGenericTypeModel.class );
@@ -178,7 +180,8 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				+ PojoModelPath.fromRoot( inverseSideProperty1Name ).value( ContainerValueExtractorPath.noExtractors() )
 						.property( inverseSideProperty2Name ).value( ContainerValueExtractorPath.noExtractors() )
 						.property( inverseSideProperty3Name ).value( ContainerValueExtractorPath.noExtractors() )
-				+ "' on type '" + inverseSideEntityTypeMock + "'" );
+						.toPathString()
+				+ "' on type '" + inverseSideEntityTypeMock.getName() + "'" );
 		try {
 			inverter.invertPath( inverseSideEntityTypeMock, boundPathToInvert );
 		}

@@ -113,7 +113,9 @@ class AnnotationProcessorHelper {
 						markerBuilderReferenceAnnotation.type(),
 						MarkerMappingBuilderReference.UndefinedImplementationType.class
 				)
-						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping( annotation.annotationType() ) );
+						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping(
+								MarkerMapping.class, annotation.annotationType() )
+						);
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		AnnotationMarkerBuilder<A> builder =

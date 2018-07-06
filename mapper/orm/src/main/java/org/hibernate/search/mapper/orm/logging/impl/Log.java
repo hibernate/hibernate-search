@@ -14,12 +14,15 @@ import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -63,4 +66,8 @@ public interface Log extends BasicLogger {
 			+ " Hibernate ORM metadata node of type '%1$s'.")
 	SearchException invalidContainerValueExtractorForDirtyChecking(Class<?> ormMappingClass,
 			Class<? extends ContainerValueExtractor> extractorClass);
+
+	@Message(id = 10, value = "Unable to find a readable property '%2$s' on type '%1$s'.")
+	SearchException cannotFindReadableProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			String propertyName);
 }

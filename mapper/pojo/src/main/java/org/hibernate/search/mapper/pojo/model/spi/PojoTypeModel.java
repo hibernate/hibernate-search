@@ -9,6 +9,11 @@ package org.hibernate.search.mapper.pojo.model.spi;
 public interface PojoTypeModel<T> {
 
 	/**
+	 * @return A human-readable name for this type.
+	 */
+	String getName();
+
+	/**
 	 * @return A representation of the closest parent Java {@link Class} for this type.
 	 */
 	PojoRawTypeModel<? super T> getRawType();

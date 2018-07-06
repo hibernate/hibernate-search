@@ -11,12 +11,14 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
@@ -24,9 +26,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.JavaClassOrdering;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanBootstrapIntrospector introspector;
 	private final Class<T> clazz;
@@ -125,15 +129,10 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
-		try {
-			String normalizedName = Introspector.decapitalize( propertyName );
-			PropertyDescriptor propertyDescriptor = getPropertyDescriptor( normalizedName );
-			return createProperty( propertyDescriptor );
-		}
-		catch (RuntimeException e) {
-			throw new SearchException( "Exception while retrieving property model for '"
-					+ propertyName + "' on '" + this + "'", e );
-		}
+		String normalizedName = Introspector.decapitalize( propertyName );
+		// The methods below may throw SearchExceptions, which include all the necessary context in their message
+		PropertyDescriptor propertyDescriptor = getPropertyDescriptor( normalizedName );
+		return createProperty( propertyDescriptor );
 	}
 
 	@Override
@@ -164,13 +163,12 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 				return descriptor;
 			}
 		}
-		throw new SearchException( "JavaBean property '" + normalizedName + "' not found in '" + this + "'" );
+		throw log.cannotFindProperty( this, normalizedName );
 	}
 
 	private PojoPropertyModel<?> createProperty(PropertyDescriptor propertyDescriptor) {
 		if ( propertyDescriptor.getReadMethod() == null ) {
-			throw new SearchException( "Property '" + propertyDescriptor.getName() + "' on '"
-					+ this + "' can't be read" );
+			throw log.cannotReadProperty( this, propertyDescriptor.getName() );
 		}
 		return new JavaBeanPropertyModel<>( introspector, this, propertyDescriptor );
 	}

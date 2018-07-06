@@ -10,12 +10,14 @@ package org.hibernate.search.engine.logging.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -59,7 +61,8 @@ public interface Log extends BasicLogger {
 			+ " Index mappings are not inherited: they apply to exact instances of a given type."
 			+ " As a result, mapping an abstract type to an index does not make sense,"
 			+ " since the index would always be empty.")
-	SearchException cannotMapAbstractTypeToIndex(MappableTypeModel typeModel, String indexName);
+	SearchException cannotMapAbstractTypeToIndex(
+			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName);
 
 	@Message(id = 14, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
 	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName);

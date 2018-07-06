@@ -107,7 +107,12 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + genericTypeContext.getResolvedType().getTypeName() + "]";
+		return getClass().getSimpleName() + "[" + getName() + "]";
+	}
+
+	@Override
+	public String getName() {
+		return genericTypeContext.getResolvedType().getTypeName();
 	}
 
 	@Override

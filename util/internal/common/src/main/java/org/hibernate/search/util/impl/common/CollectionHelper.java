@@ -42,7 +42,14 @@ public final class CollectionHelper {
 
 	@SafeVarargs
 	public static <T> Set<T> asSet(T... ts) {
-		Set<T> set = new HashSet<>( ts.length );
+		Set<T> set = new HashSet<>( getInitialCapacityFromExpectedSize( ts.length ) );
+		Collections.addAll( set, ts );
+		return set;
+	}
+
+	@SafeVarargs
+	public static <T> Set<T> asLinkedHashSet(T... ts) {
+		Set<T> set = new LinkedHashSet<>( getInitialCapacityFromExpectedSize( ts.length ) );
 		Collections.addAll( set, ts );
 		return set;
 	}

@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -21,18 +22,21 @@ import java.util.stream.Stream;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ManagedType;
 
-import org.hibernate.PropertyNotFoundException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.cfg.annotations.HCANNHelper;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final XClass xClass;
@@ -138,9 +142,7 @@ class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	public final PojoPropertyModel<?> getProperty(String propertyName) {
 		PojoPropertyModel<?> propertyModel = getPropertyOrNull( propertyName );
 		if ( propertyModel == null ) {
-			throw new PropertyNotFoundException(
-					"Unable to locate property named " + propertyName + " on " + getJavaClass().getName()
-			);
+			throw log.cannotFindReadableProperty( this, propertyName );
 		}
 		return propertyModel;
 	}
