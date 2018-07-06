@@ -64,7 +64,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 		return formatter;
 	}
 
-	public LuceneFieldCodec<T> getEncoding() {
+	public LuceneFieldCodec<T> getCodec() {
 		return codec;
 	}
 
