@@ -9,13 +9,20 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.List;
+
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LatLonPoint;
+import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -32,7 +39,10 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -226,10 +236,89 @@ public class ExtensionIT {
 				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
+	@Test
+	public void predicate_nativeField_throwsException() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException(
+				"match() predicate on unsupported native field",
+				() -> searchTarget.query( sessionContext )
+						.asReferences()
+						.predicate()
+								.match().onField( "nativeField" ).matching( "37" )
+						.build()
+				)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Field 'nativeField' does not support defining predicates with the DSL: use the Lucene extension and a native query." );
+	}
+
+	@Test
+	public void sort_nativeField_throwsException() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException(
+				"sort on unsupported native field",
+				() -> searchTarget.query( sessionContext )
+						.asReferences()
+						.predicate().matchAll().end()
+						.sort().byField( "nativeField" ).end()
+						.build()
+				)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Field 'nativeField' does not support defining sorts with the DSL: use the Lucene extension and a native sort." );
+	}
+
+	@Test
+	public void predicate_nativeField_nativeQuery() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate()
+						.withExtension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
+				.build();
+
+		assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, FIRST_ID );
+	}
+
+	@Test
+	public void projection_nativeField() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections( "nativeField" )
+				.predicate().match().onField( "string" ).matching( "text 1" )
+				.build();
+
+		ProjectionsSearchResultAssert.assertThat( query ).hasProjectionsHitsAnyOrder( c -> {
+			c.projection( 37 );
+		} );
+	}
+
+	@Test
+	public void predicate_nativeField_nativeSort() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll().end()
+				.sort().withExtension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField_docValues", Type.STRING ) ).end()
+				.build();
+
+		assertThat( query )
+				.hasReferencesHitsExactOrder( indexName, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "text 1" );
+
+			indexAccessors.nativeField.write( document, 37 );
+			indexAccessors.nativeField_docValues.write( document, "value37" );
 
 			indexAccessors.sort1.write( document, "a" );
 			indexAccessors.sort2.write( document, "z" );
@@ -238,6 +327,8 @@ public class ExtensionIT {
 		worker.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.integer.write( document, 2 );
 
+			indexAccessors.nativeField_docValues.write( document, "value78" );
+
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "a" );
 			indexAccessors.sort3.write( document, "z" );
@@ -245,11 +336,15 @@ public class ExtensionIT {
 		worker.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 40.12, -71.34 ) );
 
+			indexAccessors.nativeField_docValues.write( document, "value13" );
+
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "a" );
 		} );
 		worker.add( referenceProvider( FOURTH_ID ), document -> {
+			indexAccessors.nativeField_docValues.write( document, "value89" );
+
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "z" );
@@ -259,6 +354,9 @@ public class ExtensionIT {
 			indexAccessors.string.write( document, "text 2" );
 			indexAccessors.integer.write( document, 1 );
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.12, -75.34 ) );
+
+			indexAccessors.nativeField.write( document, 53 );
+			indexAccessors.nativeField_docValues.write( document, "value53" );
 
 			indexAccessors.sort1.write( document, "zz" );
 			indexAccessors.sort2.write( document, "zz" );
@@ -283,6 +381,8 @@ public class ExtensionIT {
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<String> string;
 		final IndexFieldAccessor<GeoPoint> geoPoint;
+		final IndexFieldAccessor<Integer> nativeField;
+		final IndexFieldAccessor<String> nativeField_docValues;
 
 		final IndexFieldAccessor<String> sort1;
 		final IndexFieldAccessor<String> sort2;
@@ -297,6 +397,14 @@ public class ExtensionIT {
 					.createAccessor();
 			geoPoint = root.field( "geoPoint" )
 					.asGeoPoint()
+					.createAccessor();
+			nativeField = root.field( "nativeField" )
+					.withExtension( LuceneExtension.get() )
+					.asLuceneField( ExtensionIT::toStringField, ExtensionIT::fromStringField )
+					.createAccessor();
+			nativeField_docValues = root.field( "nativeField_docValues" )
+					.withExtension( LuceneExtension.get() )
+					.asLuceneField( ExtensionIT::toDocValuesField, ExtensionIT::fromDocValuesField )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )
@@ -314,4 +422,19 @@ public class ExtensionIT {
 		}
 	}
 
+	private static StringField toStringField(String absoluteFieldPath, Integer value) {
+		return new StringField( absoluteFieldPath, value.toString(), Store.YES );
+	}
+
+	private static Integer fromStringField(IndexableField field) {
+		return Integer.parseInt( field.stringValue() );
+	}
+
+	private static SortedDocValuesField toDocValuesField(String absoluteFieldPath, String value) {
+		return new SortedDocValuesField( absoluteFieldPath, new BytesRef( value ) );
+	}
+
+	private static String fromDocValuesField(IndexableField field) {
+		return field.stringValue();
+	}
 }

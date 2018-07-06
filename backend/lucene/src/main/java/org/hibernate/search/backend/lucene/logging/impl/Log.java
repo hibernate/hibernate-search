@@ -190,4 +190,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 545, value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ignoreConstraintCeiling);
+
+	@Message(id = 546, value = "Field '%1$s' does not support defining predicates with the DSL: use the Lucene extension and a native query.")
+	SearchException unsupportedDSLPredicates(String absoluteFieldPath);
+
+	@Message(id = 547, value = "Field '%1$s' does not support defining sorts with the DSL: use the Lucene extension and a native sort.")
+	SearchException unsupportedDSLSorts(String absoluteFieldPath);
 }

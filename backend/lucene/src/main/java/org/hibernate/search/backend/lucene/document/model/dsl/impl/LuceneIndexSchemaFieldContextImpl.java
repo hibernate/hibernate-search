@@ -7,15 +7,20 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.time.LocalDate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.dsl.impl.GeoPointIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.IntegerIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LocalDateIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
@@ -25,7 +30,7 @@ import org.hibernate.search.util.impl.common.Contracts;
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSchemaFieldContextImpl implements IndexSchemaFieldContext, LuceneIndexSchemaNodeContributor {
+public class LuceneIndexSchemaFieldContextImpl implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor {
 
 	private final String relativeFieldName;
 
@@ -81,6 +86,12 @@ public class LuceneIndexSchemaFieldContextImpl implements IndexSchemaFieldContex
 		Contracts.assertNotNull( delegate, "delegate" );
 
 		delegate.contribute( collector, parentNode );
+	}
+
+	@Override
+	public <V> IndexSchemaFieldTerminalContext<V> asLuceneField(BiFunction<String, V, IndexableField> fieldProducer,
+			Function<IndexableField, V> fieldValueExtractor) {
+		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>( relativeFieldName, fieldProducer, fieldValueExtractor ) );
 	}
 
 	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {

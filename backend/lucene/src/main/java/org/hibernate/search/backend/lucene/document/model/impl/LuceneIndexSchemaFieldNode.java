@@ -6,17 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
 public class LuceneIndexSchemaFieldNode<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String relativeFieldName;
 
@@ -64,10 +69,16 @@ public class LuceneIndexSchemaFieldNode<T> {
 	}
 
 	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+		if ( predicateBuilderFactory == null ) {
+			throw log.unsupportedDSLPredicates( absoluteFieldPath );
+		}
 		return predicateBuilderFactory;
 	}
 
 	public LuceneFieldSortContributor getSortContributor() {
+		if ( sortContributor == null ) {
+			throw log.unsupportedDSLSorts( absoluteFieldPath );
+		}
 		return sortContributor;
 	}
 
