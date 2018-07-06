@@ -199,4 +199,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 548, value = "Field '%1$s' does not support projection.")
 	SearchException unsupportedProjection(String absoluteFieldPath);
+
+	@Message(id = 549, value = "Invalid field path; expected path '%1$s', got '%2$s'.")
+	SearchException invalidFieldPath(String expectedPath, String actualPath);
 }

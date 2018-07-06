@@ -341,6 +341,20 @@ public class ExtensionIT {
 				.hasReferencesHitsExactOrder( indexName, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
 	}
 
+	@Test
+	public void nativeField_invalidFieldPath() {
+		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+
+		SubTest.expectException(
+				"native field contributing field with invalid field path",
+				() -> worker.add( referenceProvider( FIRST_ID ), document -> {
+					indexAccessors.nativeField_invalidFieldPath.write( document, 45 );
+				} ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
+	}
+
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( FIRST_ID ), document -> {
@@ -415,6 +429,7 @@ public class ExtensionIT {
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 		final IndexFieldAccessor<Integer> nativeField;
 		final IndexFieldAccessor<Integer> nativeField_unsupportedProjection;
+		final IndexFieldAccessor<Integer> nativeField_invalidFieldPath;
 
 		final IndexFieldAccessor<String> sort1;
 		final IndexFieldAccessor<String> sort2;
@@ -437,6 +452,10 @@ public class ExtensionIT {
 			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
 					.withExtension( LuceneExtension.get() )
 					.asLuceneField( ExtensionIT::contributeNativeField )
+					.createAccessor();
+			nativeField_invalidFieldPath = root.field( "nativeField_invalidFieldPath" )
+					.withExtension( LuceneExtension.get() )
+					.asLuceneField( ExtensionIT::contributeNativeFieldInvalidFieldPath )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )
@@ -461,5 +480,9 @@ public class ExtensionIT {
 
 	private static Integer fromNativeField(IndexableField field) {
 		return Integer.parseInt( field.stringValue() );
+	}
+
+	private static void contributeNativeFieldInvalidFieldPath(String absoluteFieldPath, Integer value, Consumer<IndexableField> collector) {
+		collector.accept( new StringField( "not the expected path", value.toString(), Store.YES ) );
 	}
 }

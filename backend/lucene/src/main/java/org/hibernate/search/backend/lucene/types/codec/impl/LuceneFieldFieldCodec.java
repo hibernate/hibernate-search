@@ -36,7 +36,7 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 			return;
 		}
 
-		fieldContributor.contribute( absoluteFieldPath, value, documentBuilder::addField );
+		fieldContributor.contribute( absoluteFieldPath, value, f -> contributeField( documentBuilder, absoluteFieldPath, f ) );
 	}
 
 	@Override
@@ -75,5 +75,12 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 	@Override
 	public int hashCode() {
 		return Objects.hash( fieldContributor, fieldValueExtractor );
+	}
+
+	private static void contributeField(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, IndexableField field) {
+		if ( !absoluteFieldPath.equals( field.name() ) ) {
+			throw log.invalidFieldPath( absoluteFieldPath, field.name() );
+		}
+		documentBuilder.addField( field );
 	}
 }
