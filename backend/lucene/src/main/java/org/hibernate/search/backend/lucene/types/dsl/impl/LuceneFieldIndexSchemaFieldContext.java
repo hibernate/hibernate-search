@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -23,15 +22,15 @@ import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFie
  */
 public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField> extends AbstractLuceneIndexSchemaFieldTypedContext<V> {
 
-	private BiFunction<String, V, IndexableField> fieldProducer;
+	private LuceneFieldContributor<V> fieldContributor;
 
-	private Function<IndexableField, V> fieldValueExtractor;
+	private LuceneFieldValueExtractor<V> fieldValueExtractor;
 
-	public LuceneFieldIndexSchemaFieldContext(String relativeFieldName, BiFunction<String, V, IndexableField> fieldProducer,
-			Function<IndexableField, V> fieldValueExtractor) {
+	public LuceneFieldIndexSchemaFieldContext(String relativeFieldName, LuceneFieldContributor<V> fieldContributor,
+			LuceneFieldValueExtractor<V> fieldValueExtractor) {
 		super( relativeFieldName );
 
-		this.fieldProducer = fieldProducer;
+		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
 
@@ -42,7 +41,7 @@ public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField> ext
 				parentNode,
 				getRelativeFieldName(),
 				new SimpleCastingFieldFormatter<>(),
-				new LuceneFieldFieldCodec<>( fieldProducer, fieldValueExtractor ),
+				new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor ),
 				null,
 				null
 		);

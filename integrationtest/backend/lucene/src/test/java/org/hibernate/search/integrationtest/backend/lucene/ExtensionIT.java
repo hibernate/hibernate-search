@@ -10,11 +10,12 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Do
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LatLonPoint;
-import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
@@ -22,7 +23,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -305,7 +305,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().matchAll().end()
-				.sort().withExtension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField_docValues", Type.STRING ) ).end()
+				.sort().withExtension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ).end()
 				.build();
 
 		assertThat( query )
@@ -318,7 +318,6 @@ public class ExtensionIT {
 			indexAccessors.string.write( document, "text 1" );
 
 			indexAccessors.nativeField.write( document, 37 );
-			indexAccessors.nativeField_docValues.write( document, "value37" );
 
 			indexAccessors.sort1.write( document, "a" );
 			indexAccessors.sort2.write( document, "z" );
@@ -327,7 +326,7 @@ public class ExtensionIT {
 		worker.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.integer.write( document, 2 );
 
-			indexAccessors.nativeField_docValues.write( document, "value78" );
+			indexAccessors.nativeField.write( document, 78 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "a" );
@@ -336,14 +335,14 @@ public class ExtensionIT {
 		worker.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 40.12, -71.34 ) );
 
-			indexAccessors.nativeField_docValues.write( document, "value13" );
+			indexAccessors.nativeField.write( document, 13 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "a" );
 		} );
 		worker.add( referenceProvider( FOURTH_ID ), document -> {
-			indexAccessors.nativeField_docValues.write( document, "value89" );
+			indexAccessors.nativeField.write( document, 89 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
@@ -356,7 +355,6 @@ public class ExtensionIT {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.12, -75.34 ) );
 
 			indexAccessors.nativeField.write( document, 53 );
-			indexAccessors.nativeField_docValues.write( document, "value53" );
 
 			indexAccessors.sort1.write( document, "zz" );
 			indexAccessors.sort2.write( document, "zz" );
@@ -382,7 +380,6 @@ public class ExtensionIT {
 		final IndexFieldAccessor<String> string;
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 		final IndexFieldAccessor<Integer> nativeField;
-		final IndexFieldAccessor<String> nativeField_docValues;
 
 		final IndexFieldAccessor<String> sort1;
 		final IndexFieldAccessor<String> sort2;
@@ -400,11 +397,7 @@ public class ExtensionIT {
 					.createAccessor();
 			nativeField = root.field( "nativeField" )
 					.withExtension( LuceneExtension.get() )
-					.asLuceneField( ExtensionIT::toStringField, ExtensionIT::fromStringField )
-					.createAccessor();
-			nativeField_docValues = root.field( "nativeField_docValues" )
-					.withExtension( LuceneExtension.get() )
-					.asLuceneField( ExtensionIT::toDocValuesField, ExtensionIT::fromDocValuesField )
+					.asLuceneField( ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )
@@ -422,19 +415,12 @@ public class ExtensionIT {
 		}
 	}
 
-	private static StringField toStringField(String absoluteFieldPath, Integer value) {
-		return new StringField( absoluteFieldPath, value.toString(), Store.YES );
+	private static void contributeNativeField(String absoluteFieldPath, Integer value, Consumer<IndexableField> collector) {
+		collector.accept( new StringField( absoluteFieldPath, value.toString(), Store.YES ) );
+		collector.accept( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
 	}
 
-	private static Integer fromStringField(IndexableField field) {
+	private static Integer fromNativeField(IndexableField field) {
 		return Integer.parseInt( field.stringValue() );
-	}
-
-	private static SortedDocValuesField toDocValuesField(String absoluteFieldPath, String value) {
-		return new SortedDocValuesField( absoluteFieldPath, new BytesRef( value ) );
-	}
-
-	private static String fromDocValuesField(IndexableField field) {
-		return field.stringValue();
 	}
 }

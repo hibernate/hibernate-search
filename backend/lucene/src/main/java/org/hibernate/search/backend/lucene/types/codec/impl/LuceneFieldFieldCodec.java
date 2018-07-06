@@ -7,21 +7,21 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 
 public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 
-	private BiFunction<String, V, IndexableField> fieldProducer;
+	private LuceneFieldContributor<V> fieldContributor;
 
-	private Function<IndexableField, V> fieldValueExtractor;
+	private LuceneFieldValueExtractor<V> fieldValueExtractor;
 
-	public LuceneFieldFieldCodec(BiFunction<String, V, IndexableField> fieldProducer, Function<IndexableField, V> fieldValueExtractor) {
-		this.fieldProducer = fieldProducer;
+	public LuceneFieldFieldCodec(LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor) {
+		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
 
@@ -31,7 +31,7 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 			return;
 		}
 
-		documentBuilder.addField( fieldProducer.apply( absoluteFieldPath, value ) );
+		fieldContributor.contribute( absoluteFieldPath, value, documentBuilder::addField );
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 			return null;
 		}
 
-		return fieldValueExtractor.apply( field );
+		return fieldValueExtractor.extract( field );
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 
 		LuceneFieldFieldCodec<?> other = (LuceneFieldFieldCodec<?>) obj;
 
-		return Objects.equals( fieldProducer, other.fieldProducer )
+		return Objects.equals( fieldContributor, other.fieldContributor )
 				&& Objects.equals( fieldValueExtractor, other.fieldValueExtractor );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( fieldProducer, fieldValueExtractor );
+		return Objects.hash( fieldContributor, fieldValueExtractor );
 	}
 }

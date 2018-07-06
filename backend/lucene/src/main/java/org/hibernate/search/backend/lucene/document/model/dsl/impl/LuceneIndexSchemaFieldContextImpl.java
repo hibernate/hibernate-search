@@ -7,12 +7,11 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.time.LocalDate;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
@@ -89,9 +88,9 @@ public class LuceneIndexSchemaFieldContextImpl implements LuceneIndexSchemaField
 	}
 
 	@Override
-	public <V> IndexSchemaFieldTerminalContext<V> asLuceneField(BiFunction<String, V, IndexableField> fieldProducer,
-			Function<IndexableField, V> fieldValueExtractor) {
-		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>( relativeFieldName, fieldProducer, fieldValueExtractor ) );
+	public <V> IndexSchemaFieldTerminalContext<V> asLuceneField(LuceneFieldContributor<V> fieldContributor,
+			LuceneFieldValueExtractor<V> fieldValueExtractor) {
+		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>( relativeFieldName, fieldContributor, fieldValueExtractor ) );
 	}
 
 	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {
