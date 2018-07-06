@@ -23,7 +23,7 @@ public interface HitExtractor<C> {
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
 	 * other fields e.g. if the stored fields have different names.
 	 *
-	 * @param absoluteFieldPaths
+	 * @param absoluteFieldPaths The set of absolute field paths contributed.
 	 */
 	void contributeFields(Set<String> absoluteFieldPaths);
 
