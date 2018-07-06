@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtrac
 public interface LuceneIndexSchemaFieldContext extends IndexSchemaFieldContext {
 
 	/**
-	 * Declares a native field.
+	 * Declares a native field, on which projection is allowed.
 	 *
 	 * @param fieldContributor The field contributor.
 	 * @param fieldValueExtractor The field value extractor used when projecting on this field.
@@ -26,5 +26,16 @@ public interface LuceneIndexSchemaFieldContext extends IndexSchemaFieldContext {
 	 * @return The DSL context.
 	 */
 	<V> IndexSchemaFieldTerminalContext<V> asLuceneField(LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor);
+
+	/**
+	 * Declares a native field on which projection is not allowed.
+	 *
+	 * @param fieldContributor The field contributor.
+	 * @param <V> The type of the value.
+	 * @return The DSL context.
+	 */
+	default <V> IndexSchemaFieldTerminalContext<V> asLuceneField(LuceneFieldContributor<V> fieldContributor) {
+		return asLuceneField( fieldContributor, null );
+	}
 
 }

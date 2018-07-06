@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import org.apache.lucene.document.Document;
@@ -13,8 +14,12 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private LuceneFieldContributor<V> fieldContributor;
 
@@ -36,6 +41,10 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 
 	@Override
 	public V decode(Document document, String absoluteFieldPath) {
+		if ( fieldValueExtractor == null ) {
+			throw log.unsupportedProjection( absoluteFieldPath );
+		}
+
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {

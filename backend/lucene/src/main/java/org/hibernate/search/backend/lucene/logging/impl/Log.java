@@ -196,4 +196,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 547, value = "Field '%1$s' does not support defining sorts with the DSL: use the Lucene extension and a native sort.")
 	SearchException unsupportedDSLSorts(String absoluteFieldPath);
+
+	@Message(id = 548, value = "Field '%1$s' does not support projection.")
+	SearchException unsupportedProjection(String absoluteFieldPath);
 }

@@ -299,6 +299,35 @@ public class ExtensionIT {
 	}
 
 	@Test
+	public void projection_nativeField_unsupportedProjection() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		// let's check that it's possible to query the field beforehand
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate()
+						.withExtension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
+				.build();
+
+		assertThat( query )
+				.hasReferencesHitsAnyOrder( indexName, FIRST_ID );
+
+		// now, let's check that projecting on the field throws an exception
+		SubTest.expectException(
+				"projection on native field not supporting projections",
+				() -> {
+						SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
+								.asProjections( "nativeField_unsupportedProjection" )
+								.predicate().matchAll().end()
+								.build();
+						projectionQuery.execute();
+				} )
+				.assertThrown()
+				.hasCauseInstanceOf( SearchException.class )
+				.hasMessageContaining( "Field 'nativeField_unsupportedProjection' does not support projection." );
+	}
+
+	@Test
 	public void predicate_nativeField_nativeSort() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
@@ -318,6 +347,7 @@ public class ExtensionIT {
 			indexAccessors.string.write( document, "text 1" );
 
 			indexAccessors.nativeField.write( document, 37 );
+			indexAccessors.nativeField_unsupportedProjection.write( document, 37 );
 
 			indexAccessors.sort1.write( document, "a" );
 			indexAccessors.sort2.write( document, "z" );
@@ -327,6 +357,7 @@ public class ExtensionIT {
 			indexAccessors.integer.write( document, 2 );
 
 			indexAccessors.nativeField.write( document, 78 );
+			indexAccessors.nativeField_unsupportedProjection.write( document, 78 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "a" );
@@ -336,6 +367,7 @@ public class ExtensionIT {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 40.12, -71.34 ) );
 
 			indexAccessors.nativeField.write( document, 13 );
+			indexAccessors.nativeField_unsupportedProjection.write( document, 13 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
@@ -343,6 +375,7 @@ public class ExtensionIT {
 		} );
 		worker.add( referenceProvider( FOURTH_ID ), document -> {
 			indexAccessors.nativeField.write( document, 89 );
+			indexAccessors.nativeField_unsupportedProjection.write( document, 89 );
 
 			indexAccessors.sort1.write( document, "z" );
 			indexAccessors.sort2.write( document, "z" );
@@ -355,6 +388,7 @@ public class ExtensionIT {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.12, -75.34 ) );
 
 			indexAccessors.nativeField.write( document, 53 );
+			indexAccessors.nativeField_unsupportedProjection.write( document, 53 );
 
 			indexAccessors.sort1.write( document, "zz" );
 			indexAccessors.sort2.write( document, "zz" );
@@ -380,6 +414,7 @@ public class ExtensionIT {
 		final IndexFieldAccessor<String> string;
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 		final IndexFieldAccessor<Integer> nativeField;
+		final IndexFieldAccessor<Integer> nativeField_unsupportedProjection;
 
 		final IndexFieldAccessor<String> sort1;
 		final IndexFieldAccessor<String> sort2;
@@ -398,6 +433,10 @@ public class ExtensionIT {
 			nativeField = root.field( "nativeField" )
 					.withExtension( LuceneExtension.get() )
 					.asLuceneField( ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
+					.createAccessor();
+			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
+					.withExtension( LuceneExtension.get() )
+					.asLuceneField( ExtensionIT::contributeNativeField )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )
