@@ -6,23 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.LoggerFactory;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 
 /**
  * @author Guillaume Smet
  */
 public class LuceneIndexModel implements AutoCloseable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
 
