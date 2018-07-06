@@ -8,8 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo;
 
 import java.util.Collections;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -19,13 +17,12 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.engine.search.SearchQuery;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,42 +35,36 @@ public class JavaBeanProgrammaticMappingRoutingIT {
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
-	private SearchMappingRepository mappingRepository;
+	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
 	private JavaBeanMapping mapping;
 
 	@Before
 	public void setup() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityType( IndexedEntity.class );
-
-		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
-		mappingDefinition.type( IndexedEntity.class )
-				.indexed( IndexedEntity.INDEX )
-				.routingKeyBridge( MyRoutingKeyBridge.class )
-				.property( "id" )
-						.documentId()
-				.property( "value" ).field();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.explicitRouting()
 				.field( "value", String.class )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityType( IndexedEntity.class );
+
+					ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
+					mappingDefinition.type( IndexedEntity.class )
+							.indexed( IndexedEntity.INDEX )
+							.routingKeyBridge( MyRoutingKeyBridge.class )
+							.property( "id" )
+									.documentId()
+							.property( "value" ).field();
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

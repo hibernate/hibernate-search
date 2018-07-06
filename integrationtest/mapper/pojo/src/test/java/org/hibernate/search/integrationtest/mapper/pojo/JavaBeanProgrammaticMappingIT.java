@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -39,11 +37,10 @@ import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,105 +54,15 @@ public class JavaBeanProgrammaticMappingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
+	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private SearchMappingRepository mappingRepository;
 	private JavaBeanMapping mapping;
 
 	@Before
 	public void setup() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityTypes( CollectionHelper.asSet(
-				IndexedEntity.class,
-				OtherIndexedEntity.class,
-				YetAnotherIndexedEntity.class
-		) );
-
-		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
-		mappingDefinition.type( IndexedEntity.class )
-				.indexed( IndexedEntity.INDEX )
-				.bridge(
-						new CustomTypeBridge.Builder()
-						.objectName( "customBridgeOnClass" )
-				)
-				.property( "id" )
-						.documentId()
-				.property( "text" )
-						.field( "myTextField" )
-				.property( "embedded" )
-						.indexedEmbedded()
-								.prefix( "embedded.prefix_" )
-								.maxDepth( 1 )
-								.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
-
-		ProgrammaticMappingDefinition secondMappingDefinition = initiator.programmaticMapping();
-		secondMappingDefinition.type( ParentIndexedEntity.class )
-				.property( "localDate" )
-						.field( "myLocalDateField" )
-				.property( "embedded" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embeddingAsSingle" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.bridge(
-								new CustomPropertyBridge.Builder()
-								.objectName( "customBridgeOnProperty" )
-						);
-		secondMappingDefinition.type( OtherIndexedEntity.class )
-				.indexed( OtherIndexedEntity.INDEX )
-				.property( "id" )
-						.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
-				.property( "numeric" )
-						.field()
-						.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
-		secondMappingDefinition.type( YetAnotherIndexedEntity.class )
-				.indexed( YetAnotherIndexedEntity.INDEX )
-				.property( "id" )
-						.documentId()
-				.property( "numeric" )
-						.field()
-				.property( "optionalText" )
-						.field()
-				.property( "optionalInt" )
-						.field()
-						.field( "optionalIntAsString" )
-								.valueBridge( OptionalIntAsStringValueBridge.class )
-								.withoutExtractors()
-				.property( "numericArray" )
-						.field()
-				.property( "embeddedIterable" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embeddingAsIterable" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
-				.property( "embeddedList" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embeddingAsList" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.indexedEmbedded()
-								.prefix( "embeddedList.otherPrefix_" )
-								.includePaths( "embedded.prefix_customBridgeOnClass.text" )
-				.property( "embeddedArrayList" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embeddingAsArrayList" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
-				.property( "embeddedMap" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embeddingAsMap" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
-						.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
-
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
@@ -227,16 +134,100 @@ public class JavaBeanProgrammaticMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityTypes( CollectionHelper.asSet(
+							IndexedEntity.class,
+							OtherIndexedEntity.class,
+							YetAnotherIndexedEntity.class
+					) );
+
+					ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
+					mappingDefinition.type( IndexedEntity.class )
+							.indexed( IndexedEntity.INDEX )
+							.bridge(
+									new CustomTypeBridge.Builder()
+									.objectName( "customBridgeOnClass" )
+							)
+							.property( "id" )
+									.documentId()
+							.property( "text" )
+									.field( "myTextField" )
+							.property( "embedded" )
+									.indexedEmbedded()
+											.prefix( "embedded.prefix_" )
+											.maxDepth( 1 )
+											.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
+
+					ProgrammaticMappingDefinition secondMappingDefinition = initiator.programmaticMapping();
+					secondMappingDefinition.type( ParentIndexedEntity.class )
+							.property( "localDate" )
+									.field( "myLocalDateField" )
+							.property( "embedded" )
+									.associationInverseSide(
+											PojoModelPath.fromRoot( "embeddingAsSingle" )
+													.value( ContainerValueExtractorPath.defaultExtractors() )
+									)
+									.bridge(
+											new CustomPropertyBridge.Builder()
+											.objectName( "customBridgeOnProperty" )
+									);
+					secondMappingDefinition.type( OtherIndexedEntity.class )
+							.indexed( OtherIndexedEntity.INDEX )
+							.property( "id" )
+									.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
+							.property( "numeric" )
+									.field()
+									.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
+					secondMappingDefinition.type( YetAnotherIndexedEntity.class )
+							.indexed( YetAnotherIndexedEntity.INDEX )
+							.property( "id" )
+									.documentId()
+							.property( "numeric" )
+									.field()
+							.property( "optionalText" )
+									.field()
+							.property( "optionalInt" )
+									.field()
+									.field( "optionalIntAsString" )
+											.valueBridge( OptionalIntAsStringValueBridge.class )
+											.withoutExtractors()
+							.property( "numericArray" )
+									.field()
+							.property( "embeddedIterable" )
+									.associationInverseSide(
+											PojoModelPath.fromRoot( "embeddingAsIterable" )
+													.value( ContainerValueExtractorPath.defaultExtractors() )
+									)
+									.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
+							.property( "embeddedList" )
+									.associationInverseSide(
+											PojoModelPath.fromRoot( "embeddingAsList" )
+													.value( ContainerValueExtractorPath.defaultExtractors() )
+									)
+									.indexedEmbedded()
+											.prefix( "embeddedList.otherPrefix_" )
+											.includePaths( "embedded.prefix_customBridgeOnClass.text" )
+							.property( "embeddedArrayList" )
+									.associationInverseSide(
+											PojoModelPath.fromRoot( "embeddingAsArrayList" )
+													.value( ContainerValueExtractorPath.defaultExtractors() )
+									)
+									.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
+							.property( "embeddedMap" )
+									.associationInverseSide(
+											PojoModelPath.fromRoot( "embeddingAsMap" )
+													.value( ContainerValueExtractorPath.defaultExtractors() )
+									)
+									.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
+									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

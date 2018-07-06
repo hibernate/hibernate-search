@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotEquals;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -23,7 +22,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.StartupStubBridge;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -45,6 +44,9 @@ public class JavaBeanCleanupIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -339,46 +341,51 @@ public class JavaBeanCleanupIT {
 	}
 
 	private void startup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
+		this.mappingRepository = setupHelper.withBackendMock( backendMock )
+				.withMapping(
+						mappingRepositoryBuilder -> {
+							JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+							initiator.addEntityType( IndexedEntity.class );
+							initiator.addEntityType( OtherIndexedEntity.class );
 
-		initiator.addEntityType( IndexedEntity.class );
-		initiator.addEntityType( OtherIndexedEntity.class );
+							ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
+							mappingDefinition.type( IndexedEntity.class )
+									.indexed( IndexedEntity.INDEX )
+									.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
+									.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+									.property( "id" )
+											.documentId().identifierBridge(
+													new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS )
+											)
+									.property( "text" )
+											.field().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									.property( "embedded" )
+											.associationInverseSide(
+													PojoModelPath.fromRoot( "embedding" )
+															.value( ContainerValueExtractorPath.defaultExtractors() )
+											)
+											.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+											/*
+											 * This is important so that there are bridges that only contribute fields that are filtered out.
+											 * These bridges are created to check what they want to contribute,
+											 * and we test that they are properly closed.
+											 */
+											.indexedEmbedded()
+													.includePaths( "text" )
+									.property( "otherEmbedded" )
+											.associationInverseSide(
+													PojoModelPath.fromRoot( "otherEmbedding" )
+															.value( ContainerValueExtractorPath.defaultExtractors() )
+											);
 
-		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
-		mappingDefinition.type( IndexedEntity.class )
-				.indexed( IndexedEntity.INDEX )
-				.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
-				.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-				.property( "id" )
-						.documentId().identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
-				.property( "text" )
-						.field().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-				.property( "embedded" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "embedding" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						)
-						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-						/*
-						 * This is important so that there are bridges that only contribute fields that are filtered out.
-						 * These bridges are created to check what they want to contribute,
-						 * and we test that they are properly closed.
-						 */
-						.indexedEmbedded()
-								.includePaths( "text" )
-				.property( "otherEmbedded" )
-						.associationInverseSide(
-								PojoModelPath.fromRoot( "otherEmbedding" )
-										.value( ContainerValueExtractorPath.defaultExtractors() )
-						);
+							additionalMappingContributor.accept( mappingDefinition );
 
-		additionalMappingContributor.accept( mappingDefinition );
-
-		mappingRepository = mappingRepositoryBuilder.build();
+							return initiator;
+						},
+						(mappingRepository, mapping) -> { }
+				)
+				.setup();
 	}
 
 	public static class IndexedEntity {

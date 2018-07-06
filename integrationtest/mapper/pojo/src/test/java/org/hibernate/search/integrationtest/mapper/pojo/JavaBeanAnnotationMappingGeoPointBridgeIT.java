@@ -7,8 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
@@ -22,9 +20,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,30 +34,13 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
-	private SearchMappingRepository mappingRepository;
+	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
 	private JavaBeanMapping mapping;
 
 	@Before
 	public void setup() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityTypes( CollectionHelper.asSet(
-				GeoPointOnTypeEntity.class,
-				GeoPointOnCoordinatesPropertyEntity.class,
-				GeoPointOnCustomCoordinatesPropertyEntity.class
-		) );
-
-		AnnotationMappingDefinition mappingDefinition = initiator.annotationMapping();
-
-		mappingDefinition.add( GeoPointOnTypeEntity.class );
-		mappingDefinition.add( GeoPointOnCoordinatesPropertyEntity.class );
-		mappingDefinition.add( GeoPointOnCustomCoordinatesPropertyEntity.class );
-		mappingDefinition.add( CustomCoordinates.class );
-
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
 				.field( "homeLocation", GeoPoint.class, b2 -> b2.store( Store.YES ) )
 				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
@@ -74,16 +54,27 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityTypes( CollectionHelper.asSet(
+							GeoPointOnTypeEntity.class,
+							GeoPointOnCoordinatesPropertyEntity.class,
+							GeoPointOnCustomCoordinatesPropertyEntity.class
+					) );
+
+					AnnotationMappingDefinition mappingDefinition = initiator.annotationMapping();
+
+					mappingDefinition.add( GeoPointOnTypeEntity.class );
+					mappingDefinition.add( GeoPointOnCoordinatesPropertyEntity.class );
+					mappingDefinition.add( GeoPointOnCustomCoordinatesPropertyEntity.class );
+					mappingDefinition.add( CustomCoordinates.class );
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

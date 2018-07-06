@@ -37,6 +37,10 @@ public class BackendMock implements TestRule {
 		this.backendName = backendName;
 	}
 
+	public String getBackendName() {
+		return backendName;
+	}
+
 	@Override
 	public Statement apply(Statement base, Description description) {
 		return new Statement() {

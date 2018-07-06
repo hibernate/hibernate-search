@@ -7,8 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
@@ -20,14 +18,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.json.JSONException;
 
 /**
  * @author Yoann Rodiere
@@ -37,74 +32,13 @@ public class JavaBeanProgrammaticMappingGeoPointBridgeIT {
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
-	private SearchMappingRepository mappingRepository;
+	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
 	private JavaBeanMapping mapping;
 
 	@Before
-	public void setup() throws JSONException {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityTypes( CollectionHelper.asSet(
-				GeoPointOnTypeEntity.class,
-				GeoPointOnCoordinatesPropertyEntity.class,
-				GeoPointOnCustomCoordinatesPropertyEntity.class
-		) );
-
-		ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
-		mappingDefinition.type( GeoPointOnTypeEntity.class )
-				.indexed( GeoPointOnTypeEntity.INDEX )
-				.bridge( new GeoPointBridge.Builder()
-						.fieldName( "homeLocation" )
-						.markerSet( "home" )
-						.store( Store.YES )
-				)
-				.bridge(
-						new GeoPointBridge.Builder()
-						.fieldName( "workLocation" )
-						.markerSet( "work" )
-				)
-				.property( "id" )
-						.documentId()
-				.property( "homeLatitude" )
-						.marker( new LatitudeMarker.Builder().markerSet( "home" ) )
-				.property( "homeLongitude" )
-						.marker( new LongitudeMarker.Builder().markerSet( "home" ) )
-				.property( "workLatitude" )
-						.marker( new LatitudeMarker.Builder().markerSet( "work" ) )
-				.property( "workLongitude" )
-						.marker( new LongitudeMarker.Builder().markerSet( "work" ) );
-
-		mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
-				.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
-				.property( "id" )
-						.documentId()
-				.property( "coord" )
-						.bridge( new GeoPointBridge.Builder() )
-						.bridge( new GeoPointBridge.Builder()
-								.fieldName( "location" )
-								.store( Store.NO )
-						);
-
-		mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
-				.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
-				.property( "id" )
-						.documentId()
-				.property( "coord" )
-						.bridge( new GeoPointBridge.Builder() )
-						.bridge( new GeoPointBridge.Builder()
-								.fieldName( "location" )
-						);
-
-		mappingDefinition.type( CustomCoordinates.class )
-				.property( "lat" )
-						.marker( new LatitudeMarker.Builder() )
-				.property( "lon" )
-						.marker( new LongitudeMarker.Builder() );
-
+	public void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
 				.field( "homeLocation", GeoPoint.class, b2 -> b2.store( Store.YES ) )
 				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
@@ -118,16 +52,71 @@ public class JavaBeanProgrammaticMappingGeoPointBridgeIT {
 				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityTypes( CollectionHelper.asSet(
+							GeoPointOnTypeEntity.class,
+							GeoPointOnCoordinatesPropertyEntity.class,
+							GeoPointOnCustomCoordinatesPropertyEntity.class
+					) );
+
+					ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
+					mappingDefinition.type( GeoPointOnTypeEntity.class )
+							.indexed( GeoPointOnTypeEntity.INDEX )
+							.bridge( new GeoPointBridge.Builder()
+									.fieldName( "homeLocation" )
+									.markerSet( "home" )
+									.store( Store.YES )
+							)
+							.bridge(
+									new GeoPointBridge.Builder()
+											.fieldName( "workLocation" )
+											.markerSet( "work" )
+							)
+							.property( "id" )
+									.documentId()
+							.property( "homeLatitude" )
+									.marker( new LatitudeMarker.Builder().markerSet( "home" ) )
+							.property( "homeLongitude" )
+									.marker( new LongitudeMarker.Builder().markerSet( "home" ) )
+							.property( "workLatitude" )
+									.marker( new LatitudeMarker.Builder().markerSet( "work" ) )
+							.property( "workLongitude" )
+									.marker( new LongitudeMarker.Builder().markerSet( "work" ) );
+
+					mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
+							.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
+							.property( "id" )
+									.documentId()
+							.property( "coord" )
+									.bridge( new GeoPointBridge.Builder() )
+									.bridge( new GeoPointBridge.Builder()
+											.fieldName( "location" )
+											.store( Store.NO )
+									);
+
+					mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
+							.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
+							.property( "id" )
+									.documentId()
+							.property( "coord" )
+									.bridge( new GeoPointBridge.Builder() )
+									.bridge( new GeoPointBridge.Builder()
+											.fieldName( "location" )
+									);
+
+					mappingDefinition.type( CustomCoordinates.class )
+							.property( "lat" )
+									.marker( new LatitudeMarker.Builder() )
+							.property( "lon" )
+									.marker( new LongitudeMarker.Builder() );
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

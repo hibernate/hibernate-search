@@ -21,8 +21,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -48,11 +46,10 @@ import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,32 +63,15 @@ public class JavaBeanAnnotationMappingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
+	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private SearchMappingRepository mappingRepository;
 	private JavaBeanMapping mapping;
 
 	@Before
 	public void setup() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityTypes( CollectionHelper.asSet(
-				IndexedEntity.class,
-				OtherIndexedEntity.class,
-				YetAnotherIndexedEntity.class
-		) );
-
-		initiator.annotationMapping().add( IndexedEntity.class );
-
-		Set<Class<?>> classSet = new HashSet<>();
-		classSet.add( OtherIndexedEntity.class );
-		classSet.add( YetAnotherIndexedEntity.class );
-		initiator.annotationMapping().add( classSet );
-
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
@@ -163,16 +143,27 @@ public class JavaBeanAnnotationMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityTypes( CollectionHelper.asSet(
+							IndexedEntity.class,
+							OtherIndexedEntity.class,
+							YetAnotherIndexedEntity.class
+					) );
+
+					initiator.annotationMapping().add( IndexedEntity.class );
+
+					Set<Class<?>> classSet = new HashSet<>();
+					classSet.add( OtherIndexedEntity.class );
+					classSet.add( YetAnotherIndexedEntity.class );
+					initiator.annotationMapping().add( classSet );
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

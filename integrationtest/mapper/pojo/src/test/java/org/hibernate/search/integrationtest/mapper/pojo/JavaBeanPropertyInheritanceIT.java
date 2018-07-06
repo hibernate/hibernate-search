@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -19,10 +17,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,23 +33,15 @@ public class JavaBeanPropertyInheritanceIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+
+	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private SearchMappingRepository mappingRepository;
 	private JavaBeanMapping mapping;
 
 	@Before
 	public void setup() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityType( IndexedEntity.class );
-
-		initiator.annotationMapping().add( IndexedEntity.class );
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "parentDeclaredProperty", String.class )
 				.field( "childDeclaredProperty", String.class )
@@ -63,16 +52,18 @@ public class JavaBeanPropertyInheritanceIT {
 				)
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		mapping = initiator.getResult();
-		backendMock.verifyExpectationsMet();
-	}
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+					initiator.addEntityType( IndexedEntity.class );
+
+					initiator.annotationMapping().add( IndexedEntity.class );
+
+					return initiator;
+				} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

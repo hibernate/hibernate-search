@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -17,10 +15,9 @@ import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomMarkerConsu
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomMarkerAnnotation;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -30,28 +27,13 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public StaticCounters counters = new StaticCounters();
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
 
-	private SearchMappingRepository mappingRepository;
+	@Rule
+	public StaticCounters counters = new StaticCounters();
 
 	@Test
 	public void discoveryEnabled() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-		initiator.addEntityType( IndexedEntity.class );
-
-		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
-		initiator.annotationMapping().add( IndexedEntity.class );
-
-		initiator.programmaticMapping()
-				.type( IndexedEntity.class )
-						.property( "nonAnnotationMappedEmbedded" )
-								.indexedEmbedded();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> b2
 						/*
@@ -73,30 +55,28 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 				)
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
+		setupHelper.withBackendMock( backendMock )
+				.setup( mappingRepositoryBuilder -> {
+					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+
+					initiator.addEntityType( IndexedEntity.class );
+
+					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
+					initiator.annotationMapping().add( IndexedEntity.class );
+
+					initiator.programmaticMapping()
+							.type( IndexedEntity.class )
+									.property( "nonAnnotationMappedEmbedded" )
+											.indexedEmbedded();
+
+					return initiator;
+				} );
+
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void discoveryDisabled() {
-		SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder()
-				.setProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.setProperty( "index.default.backend", "stubBackend" );
-
-		JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
-				mappingRepositoryBuilder, false
-		);
-
-		initiator.addEntityType( IndexedEntity.class );
-
-		// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
-		initiator.annotationMapping().add( IndexedEntity.class );
-
-		initiator.programmaticMapping()
-				.type( IndexedEntity.class )
-						.property( "nonAnnotationMappedEmbedded" )
-								.indexedEmbedded();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> {
 					/*
@@ -112,15 +92,22 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 				} )
 		);
 
-		mappingRepository = mappingRepositoryBuilder.build();
-		backendMock.verifyExpectationsMet();
-	}
+		setupHelper.withBackendMock( backendMock ).setup( mappingRepositoryBuilder -> {
+			JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
+					mappingRepositoryBuilder, false
+			);
 
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
+			initiator.addEntityType( IndexedEntity.class );
+
+			// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
+			initiator.annotationMapping().add( IndexedEntity.class );
+
+			initiator.programmaticMapping()
+					.type( IndexedEntity.class )
+							.property( "nonAnnotationMappedEmbedded" )
+									.indexedEmbedded();
+			return initiator;
+		} );
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
