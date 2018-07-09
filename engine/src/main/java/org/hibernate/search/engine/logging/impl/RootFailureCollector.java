@@ -17,6 +17,7 @@ import java.util.StringJoiner;
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -136,7 +137,7 @@ public class RootFailureCollector implements FailureCollector {
 		private final FailureCollectorImpl parent;
 		private final FailureContextElement context;
 
-		private List<Throwable> failures;
+		private List<String> failureMessages;
 
 		private ContextualFailureCollectorImpl(FailureCollectorImpl parent, FailureContextElement context) {
 			super( parent );
@@ -146,7 +147,7 @@ public class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public boolean hasFailure() {
-			if ( failures != null && !failures.isEmpty() ) {
+			if ( failureMessages != null && !failureMessages.isEmpty() ) {
 				return true;
 			}
 			for ( ContextualFailureCollectorImpl child : getChildren().values() ) {
@@ -159,16 +160,18 @@ public class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public void add(Throwable t) {
-			if ( failures == null ) {
-				failures = new ArrayList<>();
+			if ( t instanceof SearchExceptionWithContext ) {
+				SearchExceptionWithContext e = (SearchExceptionWithContext) t;
+				ContextualFailureCollectorImpl failureCollector = this;
+				for ( FailureContextElement contextElement : e.getContextElements() ) {
+					failureCollector = failureCollector.withContext( contextElement );
+				}
+				// Do not include the context in the failure message, since we will render it as part of the failure report
+				failureCollector.doAdd( e, e.getMessageWithoutContext() );
 			}
-			failures.add( t );
-
-			StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
-			appendContextTo( contextJoiner );
-			log.newBootstrapCollectedFailure( contextJoiner.toString(), t );
-
-			root.onAddFailure();
+			else {
+				doAdd( t, t.getMessage() );
+			}
 		}
 
 		@Override
@@ -180,15 +183,28 @@ public class RootFailureCollector implements FailureCollector {
 		@Override
 		void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
-			if ( failures != null ) {
+			if ( failureMessages != null ) {
 				builder.startList( MESSAGES.failures() );
-				for ( Throwable failure : failures ) {
-					builder.value( failure.getMessage() );
+				for ( String failureMessage : failureMessages ) {
+					builder.value( failureMessage );
 				}
 				builder.endList();
 			}
 			appendChildrenFailuresTo( builder );
 			builder.endObject();
+		}
+
+		private void doAdd(Throwable failure, String failureMessage) {
+			if ( failureMessages == null ) {
+				failureMessages = new ArrayList<>();
+			}
+			failureMessages.add( failureMessage );
+
+			StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
+			appendContextTo( contextJoiner );
+			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
+
+			root.onAddFailure();
 		}
 	}
 

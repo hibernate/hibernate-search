@@ -33,6 +33,9 @@ public interface FailureContextMessages {
 	@Message(value = "    ")
 	String contextFailuresNoBulletPoint();
 
+	@Message(value = "\nContext: ")
+	String contextPrefixInException();
+
 	@Message(value = "failures")
 	String failures();
 

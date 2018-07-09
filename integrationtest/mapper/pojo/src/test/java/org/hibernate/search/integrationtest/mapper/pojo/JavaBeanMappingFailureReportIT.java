@@ -7,11 +7,14 @@
 package org.hibernate.search.integrationtest.mapper.pojo;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
@@ -251,6 +254,82 @@ public class JavaBeanMappingFailureReportIT {
 								+ "            path '.myProperty2': \n"
 								+ "                failures: \n"
 								+ "                  - " + field2FailureMessage
+				);
+	}
+
+	@Test
+	public void failuresFromBackend() {
+		final String indexName = "indexName";
+		@Indexed(index = indexName)
+		class IndexedEntity {
+			Integer id;
+			Integer myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field(name = "failingField1")
+			@Field(name = "failingField2")
+			public Integer getMyProperty() {
+				return myProperty;
+			}
+		}
+		String field1FailureMessage = "This is the failure message for field 1";
+		String field2FailureMessage = "This is the failure message for field 2";
+
+		backendMock.expectFailingField(
+				indexName, "failingField1",
+				() -> new SearchExceptionWithContext(
+						field1FailureMessage,
+						Arrays.asList(
+								FailureContexts.fromIndexName( indexName ),
+								FailureContexts.fromIndexFieldAbsolutePath( "failingField1" )
+						)
+				)
+		);
+		backendMock.expectFailingField(
+				indexName, "failingField2", () -> new SearchExceptionWithContext(
+						field2FailureMessage,
+						Arrays.asList(
+								FailureContexts.fromIndexName( indexName ),
+								FailureContexts.fromIndexFieldAbsolutePath( "failingField2" )
+						)
+				)
+		);
+
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( SearchExceptionWithContext.class )
+						.withMessage( field1FailureMessage ).build(),
+				FAILURE_LOG_INTRODUCTION
+						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty',"
+						+ " index '" + indexName + "', field 'failingField1'\n"
+		);
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( SearchExceptionWithContext.class )
+						.withMessage( field2FailureMessage ).build(),
+				FAILURE_LOG_INTRODUCTION
+						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty',"
+						+ " index '" + indexName + "', field 'failingField2'\n"
+		);
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage(
+						FAILURE_REPORT_INTRODUCTION
+								+ "        type '" + IndexedEntity.class.getName() + "': \n"
+								+ "            path '.myProperty': \n"
+								+ "                index '" + indexName + "': \n"
+								+ "                    field 'failingField1': \n"
+								+ "                        failures: \n"
+								+ "                          - " + field1FailureMessage + "\n"
+								+ "                    field 'failingField2': \n"
+								+ "                        failures: \n"
+								+ "                          - " + field2FailureMessage
 				);
 	}
 
