@@ -10,19 +10,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -73,6 +75,14 @@ public class BackendMock implements TestRule {
 
 	private void tearDown() {
 		StubBackendBehavior.unset( backendName, behaviorMock );
+	}
+
+	public BackendMock expectFailingField(String indexName, String absoluteFieldPath,
+			Supplier<RuntimeException> exceptionSupplier) {
+		behaviorMock.setIndexFieldAddBehavior( indexName, absoluteFieldPath, () -> {
+			throw exceptionSupplier.get();
+		} );
+		return this;
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor) {
@@ -201,11 +211,17 @@ public class BackendMock implements TestRule {
 
 	private class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
+		private final Map<IndexFieldKey, IndexFieldAddBehavior> indexFieldAddBehaviors = new HashMap<>();
+
 		private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
 
 		private final Map<String, CallQueue<IndexWorkCall>> indexWorkCalls = new HashMap<>();
 
 		private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
+
+		void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, IndexFieldAddBehavior behavior) {
+			indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
+		}
 
 		CallQueue<PushSchemaCall> getPushSchemaCalls(String indexName) {
 			return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
@@ -220,6 +236,7 @@ public class BackendMock implements TestRule {
 		}
 
 		void resetExpectations() {
+			indexFieldAddBehaviors.clear();
 			pushSchemaCalls.clear();
 			indexWorkCalls.clear();
 			searchCalls.reset();
@@ -229,6 +246,14 @@ public class BackendMock implements TestRule {
 			pushSchemaCalls.values().forEach( CallQueue::verifyEmpty );
 			indexWorkCalls.values().forEach( CallQueue::verifyEmpty );
 			searchCalls.verifyEmpty();
+		}
+
+		@Override
+		public void onAddField(String indexName, String absoluteFieldPath) {
+			IndexFieldAddBehavior behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
+			if ( behavior != null ) {
+				behavior.execute();
+			}
 		}
 
 		@Override
@@ -259,6 +284,31 @@ public class BackendMock implements TestRule {
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
 				HitAggregator<?, List<T>> hitAggregator) {
 			return searchCalls.verify( new SearchWorkCall<>( indexNames, work, hitAggregator ), SearchWorkCall::<T>verify );
+		}
+	}
+
+	private static class IndexFieldKey {
+		final String indexName;
+		final String absoluteFieldPath;
+
+		private IndexFieldKey(String indexName, String absoluteFieldPath) {
+			this.indexName = indexName;
+			this.absoluteFieldPath = absoluteFieldPath;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( ! (obj instanceof IndexFieldKey) ) {
+				return false;
+			}
+			IndexFieldKey other = (IndexFieldKey) obj;
+			return Objects.equals( indexName, other.indexName )
+					&& Objects.equals( absoluteFieldPath, other.absoluteFieldPath );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( indexName, absoluteFieldPath );
 		}
 	}
 

@@ -13,11 +13,14 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder {
 
+	private StubIndexSchemaObjectNodeBuilder parent;
 	private final boolean included;
 	private IndexObjectFieldAccessor accessor;
 
-	StubIndexSchemaObjectFieldNodeBuilder(StubIndexSchemaNode.Builder builder, boolean included) {
+	StubIndexSchemaObjectFieldNodeBuilder(StubIndexSchemaObjectNodeBuilder parent,
+			StubIndexSchemaNode.Builder builder, boolean included) {
 		super( builder );
+		this.parent = parent;
 		this.included = included;
 	}
 
@@ -36,5 +39,10 @@ class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBui
 			}
 		}
 		return accessor;
+	}
+
+	@Override
+	StubIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+		return parent.getRootNodeBuilder();
 	}
 }

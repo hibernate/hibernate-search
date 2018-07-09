@@ -30,9 +30,8 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 				.objectFieldStorage( storage );
 	}
 
-	public static Builder field(Builder parent, String relativeFieldName, Class<?> inputType) {
-		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD )
-				.inputType( inputType );
+	public static Builder field(Builder parent, String relativeFieldName) {
+		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
 	}
 
 	private StubIndexSchemaNode(Builder builder) {
@@ -52,7 +51,8 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder field(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName, inputType );
+			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName )
+					.inputType( inputType );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -80,7 +80,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		Builder inputType(Class<?> inputType) {
+		public Builder inputType(Class<?> inputType) {
 			attribute( "inputType", inputType );
 			return this;
 		}

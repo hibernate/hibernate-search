@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
+abstract class StubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
 	protected final StubIndexSchemaNode.Builder builder;
 
@@ -22,20 +22,31 @@ class StubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
 	@Override
 	public IndexSchemaFieldContext addField(String relativeFieldName) {
-		return new StubIndexSchemaFieldContext( builder, relativeFieldName, true );
+		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
+		getRootNodeBuilder().getBackendBehavior().onAddField(
+				getRootNodeBuilder().getIndexName(),
+				childBuilder.getAbsolutePath()
+		);
+		builder.child( childBuilder );
+		return new StubIndexSchemaFieldContext( childBuilder, true );
 	}
 
 	@Override
 	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
-		return new StubIndexSchemaFieldContext( builder, relativeFieldName, false );
+		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
+		return new StubIndexSchemaFieldContext( childBuilder, false );
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		StubIndexSchemaNode.Builder childBuilder =
 				StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
+		getRootNodeBuilder().getBackendBehavior().onAddField(
+				getRootNodeBuilder().getIndexName(),
+				childBuilder.getAbsolutePath()
+		);
 		builder.child( childBuilder );
-		return new StubIndexSchemaObjectFieldNodeBuilder( childBuilder, true );
+		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, true );
 	}
 
 	@Override
@@ -43,7 +54,9 @@ class StubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 			ObjectFieldStorage storage) {
 		StubIndexSchemaNode.Builder childBuilder =
 				StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
-		return new StubIndexSchemaObjectFieldNodeBuilder( childBuilder, false );
+		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, false );
 	}
+
+	abstract StubIndexSchemaRootNodeBuilder getRootNodeBuilder();
 
 }

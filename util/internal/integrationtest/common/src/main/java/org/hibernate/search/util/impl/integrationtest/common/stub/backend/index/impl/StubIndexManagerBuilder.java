@@ -22,7 +22,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 
 	private final StubBackend backend;
 	private final String name;
-	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder();
+	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private boolean closed = false;
 
@@ -30,6 +30,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name );
 	}
 
 	@Override

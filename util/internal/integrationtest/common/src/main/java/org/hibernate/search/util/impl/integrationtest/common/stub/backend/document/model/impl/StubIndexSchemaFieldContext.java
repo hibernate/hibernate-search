@@ -15,25 +15,18 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 
 class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 
-	private final StubIndexSchemaNode.Builder parentBuilder;
-	private final String relativeFieldName;
+	private final StubIndexSchemaNode.Builder builder;
 	private final boolean included;
 
-	StubIndexSchemaFieldContext(StubIndexSchemaNode.Builder parentBuilder, String relativeFieldName,
-			boolean included) {
-		this.parentBuilder = parentBuilder;
-		this.relativeFieldName = relativeFieldName;
+	StubIndexSchemaFieldContext(StubIndexSchemaNode.Builder builder, boolean included) {
+		this.builder = builder;
 		this.included = included;
 	}
 
 	@Override
 	public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
-		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.field( parentBuilder, relativeFieldName, inputType );
-		if ( included ) {
-			parentBuilder.child( childBuilder );
-		}
-		return new StubIndexSchemaFieldTypedContext<>( childBuilder, included );
+		builder.inputType( inputType );
+		return new StubIndexSchemaFieldTypedContext<>( builder, included );
 	}
 
 	@Override

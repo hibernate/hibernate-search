@@ -21,6 +21,12 @@ public abstract class StubBackendBehavior {
 
 	private static final StubBackendBehavior DEFAULT = new StubBackendBehavior() {
 		@Override
+		public void onAddField(String indexName, String absoluteFieldPath) {
+			throw new IllegalStateException( "The stub backend behavior was not set when a field was added to index '"
+					+ indexName + "': " + absoluteFieldPath );
+		}
+
+		@Override
 		public void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a schema was pushed for index '"
 					+ indexName + "': " + rootSchemaNode );
@@ -66,6 +72,8 @@ public abstract class StubBackendBehavior {
 
 	protected StubBackendBehavior() {
 	}
+
+	public abstract void onAddField(String indexName, String absoluteFieldPath);
 
 	public abstract void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
