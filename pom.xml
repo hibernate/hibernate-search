@@ -48,7 +48,7 @@
         <version.javax.persistence>2.2</version.javax.persistence>
         <version.javax.enterprise>2.0</version.javax.enterprise>
 
-        <version.org.elasticsearch.client>5.6.6</version.org.elasticsearch.client>
+        <version.org.elasticsearch.client>6.3.1</version.org.elasticsearch.client>
         <version.com.google.code.gson>2.8.0</version.com.google.code.gson>
         <version.com.google.protobuf>3.0.2</version.com.google.protobuf>
         <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
@@ -1303,6 +1303,51 @@
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
+                                <autoCreateIndex>false</autoCreateIndex>
+                            </configuration>
+                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                            <executions>
+                                <execution >
+                                    <id>start-elasticsearch</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>runforked</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>stop-elasticsearch</id>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>stop</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 6.0+ test environment -->
+        <profile>
+            <id>elasticsearch-6.0</id>
+            <properties>
+                <test.elasticsearch.mavenPlugin.version>6.6</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>6.3.1</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <version>${test.elasticsearch.host.version}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
                                 <autoCreateIndex>false</autoCreateIndex>
                             </configuration>
                             <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
