@@ -35,6 +35,8 @@ import org.assertj.core.api.Assertions;
 
 public class SearchPredicateIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String MATCHING_ID = "matching";
 	private static final String NON_MATCHING_ID = "nonMatching";
 	private static final String EMPTY_ID = "empty";
@@ -48,19 +50,15 @@ public class SearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -77,7 +75,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 	}
 
 	@Test
@@ -92,7 +90,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 	}
 
 	@Test
@@ -105,7 +103,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 	}
 
 	@Test
@@ -132,7 +130,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
@@ -142,7 +140,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 	}
 
 	private void initData() {
@@ -163,7 +161,7 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

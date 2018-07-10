@@ -128,7 +128,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public interface IndexSetupListener {
 
-		void onSetup(IndexManager<?> indexManager, String normalizedIndexName);
+		void onSetup(IndexManager<?> indexManager);
 
 	}
 
@@ -152,8 +152,7 @@ public class SearchSetupHelper implements TestRule {
 
 		void afterBuild(StubMapping mapping) {
 			listener.onSetup(
-					mapping.getIndexManagerByTypeIdentifier( typeName ),
-					mapping.getNormalizedIndexNameByTypeIdentifier( typeName )
+					mapping.getIndexManagerByTypeIdentifier( typeName )
 			);
 		}
 

@@ -37,6 +37,8 @@ import org.junit.Test;
 
 public class RangeSearchPredicateIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -86,19 +88,15 @@ public class RangeSearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -119,7 +117,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
@@ -139,7 +137,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 			// explicit inclusion
 
@@ -149,7 +147,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 			// explicit exclusion
 
@@ -159,7 +157,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 		}
 	}
 
@@ -177,7 +175,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -197,7 +195,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit inclusion
 
@@ -207,7 +205,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion
 
@@ -217,7 +215,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		}
 	}
 
@@ -236,7 +234,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 		}
 	}
 
@@ -258,7 +256,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit inclusion
 
@@ -270,7 +268,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion for the from clause
 
@@ -282,7 +280,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 			// explicit exclusion for the to clause
 
@@ -294,7 +292,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 			// explicit exclusion for both clauses
 
@@ -306,7 +304,7 @@ public class RangeSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 		}
 	}
 
@@ -343,7 +341,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -355,7 +353,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, DOCUMENT_3, DOCUMENT_1 );
+				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
@@ -370,7 +368,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -378,7 +376,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		// onField().orFields(...)
 
@@ -388,7 +386,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -396,7 +394,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -404,7 +402,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		// onFields(...)
 
@@ -414,7 +412,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -422,7 +420,7 @@ public class RangeSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	@Test
@@ -543,7 +541,7 @@ public class RangeSearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

@@ -50,6 +50,8 @@ import org.junit.Test;
 
 public class ExtensionIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
 	private static final String THIRD_ID = "3";
@@ -61,19 +63,15 @@ public class ExtensionIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -103,7 +101,7 @@ public class ExtensionIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
 	}
 
@@ -135,7 +133,7 @@ public class ExtensionIT {
 				.predicate( booleanPredicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
 	}
 
@@ -161,7 +159,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query ).hasReferencesHitsExactOrder(
-				indexName,
+				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
@@ -181,7 +179,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query ).hasReferencesHitsExactOrder(
-				indexName,
+				INDEX_NAME,
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
 		);
 	}
@@ -213,7 +211,7 @@ public class ExtensionIT {
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = searchTarget.sort()
 				.withExtensionOptional(
@@ -233,7 +231,7 @@ public class ExtensionIT {
 				.sort().by( sort ).end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -281,7 +279,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID );
 	}
 
 	@Test
@@ -310,7 +308,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
 		SubTest.expectException(
@@ -338,7 +336,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
@@ -418,7 +416,7 @@ public class ExtensionIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder(
-				indexName,
+				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 	}

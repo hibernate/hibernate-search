@@ -40,7 +40,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -48,7 +48,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -56,7 +56,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -65,7 +65,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -73,7 +73,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -116,7 +116,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -139,7 +139,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		// onField().orFields(...)
 
@@ -150,7 +150,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -159,7 +159,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -168,7 +168,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		// onFields(...)
 
@@ -178,7 +178,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, CHEZ_MARGOTTE_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -186,7 +186,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test

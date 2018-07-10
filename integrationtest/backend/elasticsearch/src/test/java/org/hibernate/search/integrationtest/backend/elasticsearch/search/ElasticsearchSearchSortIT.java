@@ -33,6 +33,8 @@ import org.junit.Test;
 
 public class ElasticsearchSearchSortIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
 	private static final String THIRD_ID = "3";
@@ -43,19 +45,15 @@ public class ElasticsearchSearchSortIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -76,12 +74,12 @@ public class ElasticsearchSearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ).desc() );
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, FIRST_ID, THIRD_ID, SECOND_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, THIRD_ID, SECOND_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).desc() );
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, FIRST_ID, THIRD_ID, SECOND_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, THIRD_ID, SECOND_ID );
 	}
 
 	private void initData() {
@@ -105,7 +103,7 @@ public class ElasticsearchSearchSortIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

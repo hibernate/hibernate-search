@@ -45,6 +45,8 @@ import org.junit.Test;
  */
 public class IndexFieldAccessorIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -56,11 +58,9 @@ public class IndexFieldAccessorIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 	}

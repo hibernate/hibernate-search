@@ -33,6 +33,8 @@ import org.junit.rules.ExpectedException;
 
 public class ObjectFieldStorageIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String EXPECTED_NESTED_MATCH_ID = "nestedQueryShouldMatchId";
 	private static final String EXPECTED_NON_NESTED_MATCH_ID = "nonNestedQueryShouldMatchId";
 
@@ -54,19 +56,15 @@ public class ObjectFieldStorageIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private StubSessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -133,7 +131,7 @@ public class ObjectFieldStorageIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -146,7 +144,7 @@ public class ObjectFieldStorageIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NESTED_MATCH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 	}
 
@@ -166,7 +164,7 @@ public class ObjectFieldStorageIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -181,7 +179,7 @@ public class ObjectFieldStorageIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, EXPECTED_NESTED_MATCH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 	}
 
@@ -318,7 +316,7 @@ public class ObjectFieldStorageIT {
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder(
-						indexName,
+						INDEX_NAME,
 						EXPECTED_NESTED_MATCH_ID, EXPECTED_NON_NESTED_MATCH_ID, "neverMatching", "empty"
 				);
 	}

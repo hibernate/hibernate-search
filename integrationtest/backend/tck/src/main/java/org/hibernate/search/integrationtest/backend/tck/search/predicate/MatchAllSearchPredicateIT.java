@@ -27,6 +27,8 @@ import org.junit.Test;
 
 public class MatchAllSearchPredicateIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String DOCUMENT_1 = "1";
 	private static final String STRING_1 = "aaa";
 
@@ -41,19 +43,15 @@ public class MatchAllSearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -70,7 +68,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -83,7 +81,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -91,7 +89,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
 
@@ -101,7 +99,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -117,7 +115,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -128,7 +126,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
 		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 );
@@ -139,7 +137,7 @@ public class MatchAllSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	private void initData() {
@@ -162,7 +160,7 @@ public class MatchAllSearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexAccessors {

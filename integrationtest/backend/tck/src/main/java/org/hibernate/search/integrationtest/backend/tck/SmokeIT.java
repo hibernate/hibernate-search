@@ -37,24 +37,22 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
  */
 public class SmokeIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -70,7 +68,7 @@ public class SmokeIT {
 				.predicate().match().onField( "string" ).matching( "text 1" )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -78,7 +76,7 @@ public class SmokeIT {
 				.predicate().match().onField( "string_analyzed" ).matching( "text" )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "2", "3" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
 				.hasHitCount( 3 );
 
 		query = searchTarget.query( sessionContext )
@@ -86,7 +84,7 @@ public class SmokeIT {
 				.predicate().match().onField( "integer" ).matching( 1 )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -94,7 +92,7 @@ public class SmokeIT {
 				.predicate().match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -102,7 +100,7 @@ public class SmokeIT {
 				.predicate().match().onField( "flattenedObject.string" ).matching( "text 1_1" )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 	}
 
@@ -115,7 +113,7 @@ public class SmokeIT {
 				.predicate().range().onField( "string" ).from( "text 2" ).to( "text 42" )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "2", "3" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
 		query = searchTarget.query( sessionContext )
@@ -123,7 +121,7 @@ public class SmokeIT {
 				.predicate().range().onField( "string_analyzed" ).from( "2" ).to( "42" )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "2", "3" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
 		query = searchTarget.query( sessionContext )
@@ -131,7 +129,7 @@ public class SmokeIT {
 				.predicate().range().onField( "integer" ).from( 2 ).to( 42 )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "2", "3" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
 		query = searchTarget.query( sessionContext )
@@ -141,7 +139,7 @@ public class SmokeIT {
 						.to( LocalDate.of( 2018, 2, 23 ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "2" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -149,7 +147,7 @@ public class SmokeIT {
 				.predicate().range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "2" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
 	}
 
@@ -165,7 +163,7 @@ public class SmokeIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "2" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 
 		query = searchTarget.query( sessionContext )
@@ -176,7 +174,7 @@ public class SmokeIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query( sessionContext )
@@ -187,7 +185,7 @@ public class SmokeIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "3" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "3" )
 				.hasHitCount( 2 );
 	}
 
@@ -204,7 +202,7 @@ public class SmokeIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		// With nested storage, we expect direct queries to never match
@@ -237,7 +235,7 @@ public class SmokeIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 	}
 
@@ -251,7 +249,7 @@ public class SmokeIT {
 				.predicate( predicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
 		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 );
@@ -260,7 +258,7 @@ public class SmokeIT {
 				.predicate( predicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "2" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 
 		predicate = searchTarget.predicate().bool()
@@ -272,7 +270,7 @@ public class SmokeIT {
 				.predicate( predicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "2" )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 	}
 
@@ -345,7 +343,7 @@ public class SmokeIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, "1", "2", "3", "neverMatching", "empty" );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );
 	}
 
 	private static class IndexAccessors {

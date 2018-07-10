@@ -27,6 +27,8 @@ import org.junit.Test;
  */
 public class DocumentModelDslIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -207,9 +209,9 @@ public class DocumentModelDslIT {
 	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						mappingContributor,
-						(indexManager, indexName) -> { }
+						indexManager -> { }
 				)
 				.setup();
 	}

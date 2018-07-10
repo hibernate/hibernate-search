@@ -44,6 +44,8 @@ public class SearchMultiIndexIT {
 
 	// Backend 1 / Index 1
 
+	private static final String INDEX_NAME_1_1 = "IndexName_1_1";
+
 	private static final String DOCUMENT_1_1_1 = "1_1_1";
 	private static final String ADDITIONAL_FIELD_1_1_1 = "additional_field_1_1_1";
 	private static final String SORT_FIELD_1_1_1 = "1_1_1";
@@ -56,11 +58,15 @@ public class SearchMultiIndexIT {
 
 	// Backend 1 / Index 2
 
+	private static final String INDEX_NAME_1_2 = "IndexName_1_2";
+
 	private static final String DOCUMENT_1_2_1 = "1_2_1";
 	private static final String SORT_FIELD_1_2_1 = "1_2_1";
 	private static final Integer DIFFERENT_TYPES_FIELD_1_2_1 = 37;
 
 	// Backend 2 / Index 1
+
+	private static final String INDEX_NAME_2_1 = "IndexName_2_1";
 
 	private static final String DOCUMENT_2_1_1 = "2_1_1";
 
@@ -73,19 +79,16 @@ public class SearchMultiIndexIT {
 
 	private IndexAccessors_1_1 indexAccessors_1_1;
 	private IndexManager<?> indexManager_1_1;
-	private String indexName_1_1;
 
 	// Backend 1 / Index 2
 
 	private IndexAccessors_1_2 indexAccessors_1_2;
 	private IndexManager<?> indexManager_1_2;
-	private String indexName_1_2;
 
 	// Backend 2 / Index 1
 
 	private IndexAccessors_2_1 indexAccessors_2_1;
 	private IndexManager<?> indexManager_2_1;
-	private String indexName_2_1;
 
 	private SessionContext sessionContext = new StubSessionContext();
 
@@ -93,31 +96,22 @@ public class SearchMultiIndexIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_1 )
 				.withIndex(
-						"MappedType_1_1", "IndexName_1_1",
+						"MappedType_1_1", INDEX_NAME_1_1,
 						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager_1_1 = indexManager;
-							this.indexName_1_1 = indexName;
-						}
+						indexManager -> this.indexManager_1_1 = indexManager
 				)
 				.withIndex(
-						"MappedType_1_2", "IndexName_1_2",
+						"MappedType_1_2", INDEX_NAME_1_2,
 						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager_1_2 = indexManager;
-							this.indexName_1_2 = indexName;
-						}
+						indexManager -> this.indexManager_1_2 = indexManager
 				)
 				.setup();
 
 		setupHelper.withDefaultConfiguration( BACKEND_2 )
 				.withIndex(
-						"MappedType_2_1", "IndexName_2_1",
+						"MappedType_2_1", INDEX_NAME_2_1,
 						ctx -> this.indexAccessors_2_1 = new IndexAccessors_2_1( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager_2_1 = indexManager;
-							this.indexName_2_1 = indexName;
-						}
+						indexManager -> this.indexManager_2_1 = indexManager
 				)
 				.setup();
 
@@ -136,8 +130,8 @@ public class SearchMultiIndexIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( c -> {
-			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
-			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
+			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 	}
 
@@ -154,9 +148,9 @@ public class SearchMultiIndexIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
-			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
-			c.doc( indexName_1_1, DOCUMENT_1_1_2 );
-			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
+			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 
 		query = searchTarget.query( sessionContext )
@@ -166,9 +160,9 @@ public class SearchMultiIndexIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
-			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
-			c.doc( indexName_1_1, DOCUMENT_1_1_2 );
-			c.doc( indexName_1_1, DOCUMENT_1_1_1 );
+			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 		} );
 	}
 
@@ -202,7 +196,7 @@ public class SearchMultiIndexIT {
 				.predicate().match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_1, DOCUMENT_1_1_1 );
+		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 
 		// Sort
 
@@ -238,8 +232,8 @@ public class SearchMultiIndexIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
-				.hasMessageContaining( indexName_1_1 )
-				.hasMessageContaining( indexName_1_2 );
+				.hasMessageContaining( INDEX_NAME_1_1 )
+				.hasMessageContaining( INDEX_NAME_1_2 );
 
 		// Sort
 
@@ -250,8 +244,8 @@ public class SearchMultiIndexIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field 'unknownField' in indexes" )
-				.hasMessageContaining( indexName_1_1 )
-				.hasMessageContaining( indexName_1_2 );
+				.hasMessageContaining( INDEX_NAME_1_1 )
+				.hasMessageContaining( INDEX_NAME_1_2 );
 
 		// Projection
 
@@ -262,8 +256,8 @@ public class SearchMultiIndexIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown projections [unknownField] in indexes" )
-				.hasMessageContaining( indexName_1_1 )
-				.hasMessageContaining( indexName_1_2 );
+				.hasMessageContaining( INDEX_NAME_1_1 )
+				.hasMessageContaining( INDEX_NAME_1_2 );
 	}
 
 	@Test
@@ -323,7 +317,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
 
@@ -342,7 +336,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 
 		// Backend 2 / Index 1
 
@@ -362,7 +356,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}
 
 	private static class IndexAccessors_1_1 {

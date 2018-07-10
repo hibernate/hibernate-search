@@ -41,6 +41,8 @@ public class LuceneSearchMultiIndexIT {
 
 	// Backend 1 / Index 1
 
+	private static final String INDEX_NAME_1_1 = "IndexName_1_1";
+
 	private static final String DOCUMENT_1_1_1 = "1_1_1";
 	private static final String ADDITIONAL_FIELD_1_1_1 = "additional_field_1_1_1";
 
@@ -48,6 +50,8 @@ public class LuceneSearchMultiIndexIT {
 	private static final String ADDITIONAL_FIELD_1_1_2 = "additional_field_1_1_2";
 
 	// Backend 1 / Index 2
+
+	private static final String INDEX_NAME_1_2 = "IndexName_1_2";
 
 	private static final String DOCUMENT_1_2_1 = "1_2_1";
 
@@ -58,13 +62,11 @@ public class LuceneSearchMultiIndexIT {
 
 	private IndexAccessors_1_1 indexAccessors_1_1;
 	private IndexManager<?> indexManager_1_1;
-	private String indexName_1_1;
 
 	// Backend 1 / Index 2
 
 	private IndexAccessors_1_2 indexAccessors_1_2;
 	private IndexManager<?> indexManager_1_2;
-	private String indexName_1_2;
 
 	private SessionContext sessionContext = new StubSessionContext();
 
@@ -72,20 +74,14 @@ public class LuceneSearchMultiIndexIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_1 )
 				.withIndex(
-						"MappedType_1_1", "IndexName_1_1",
+						"MappedType_1_1", INDEX_NAME_1_1,
 						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager_1_1 = indexManager;
-							this.indexName_1_1 = indexName;
-						}
+						indexManager -> this.indexManager_1_1 = indexManager
 				)
 				.withIndex(
-						"MappedType_1_2", "IndexName_1_2",
+						"MappedType_1_2", INDEX_NAME_1_2,
 						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager_1_2 = indexManager;
-							this.indexName_1_2 = indexName;
-						}
+						indexManager -> this.indexManager_1_2 = indexManager
 				)
 				.setup();
 
@@ -105,8 +101,8 @@ public class LuceneSearchMultiIndexIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
-			c.doc( indexName_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
-			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 
 		query = searchTarget.query( sessionContext )
@@ -116,8 +112,8 @@ public class LuceneSearchMultiIndexIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
-			c.doc( indexName_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-			c.doc( indexName_1_2, DOCUMENT_1_2_1 );
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
+			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 	}
 
@@ -142,7 +138,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
 
@@ -159,7 +155,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}
 
 	private static class IndexAccessors_1_1 {

@@ -50,6 +50,8 @@ import org.easymock.EasyMock;
 
 public class SearchResultIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String MAIN_ID = "main";
 	private static final String EMPTY_ID = "empty";
 
@@ -71,19 +73,15 @@ public class SearchResultIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -99,7 +97,7 @@ public class SearchResultIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -111,7 +109,7 @@ public class SearchResultIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -138,8 +136,8 @@ public class SearchResultIT {
 		} );
 
 		// Special projections without any document transformer nor object loader (those cases are addressed in other methods)
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		query = searchTarget.query( sessionContext )
 				.asProjections( ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT )
 				.predicate().matchAll().end()
@@ -157,7 +155,7 @@ public class SearchResultIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown projections" );
 		thrown.expectMessage( "unknownField" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asProjections( "unknownField" )
@@ -172,7 +170,7 @@ public class SearchResultIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown projections" );
 		thrown.expectMessage( "nestedObject" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asProjections( "nestedObject" )
@@ -187,7 +185,7 @@ public class SearchResultIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown projections" );
 		thrown.expectMessage( "flattenedObject" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asProjections( "flattenedObject" )
@@ -239,8 +237,8 @@ public class SearchResultIT {
 	public void references_referenceTransformer() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 
@@ -269,8 +267,8 @@ public class SearchResultIT {
 	public void objects_referencesTransformer_objectLoading() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
@@ -307,8 +305,8 @@ public class SearchResultIT {
 	public void projection_referencesTransformer_objectLoading() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
@@ -353,8 +351,8 @@ public class SearchResultIT {
 	public void projections_hitTransformer() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
@@ -389,8 +387,8 @@ public class SearchResultIT {
 	public void projections_hitTransformer_referencesTransformer_objectLoading() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		DocumentReference mainReference = reference( indexName, MAIN_ID );
-		DocumentReference emptyReference = reference( indexName, EMPTY_ID );
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -471,7 +469,7 @@ public class SearchResultIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, MAIN_ID, EMPTY_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

@@ -27,6 +27,8 @@ import org.junit.Rule;
 
 public abstract class AbstractSpatialWithinSearchPredicateIT {
 
+	protected static final String INDEX_NAME = "IndexName";
+
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = new ImmutableGeoPoint( 45.7705687,4.835233 );
 	protected static final String OURSON_QUI_BOIT_STRING = "L'ourson qui boit";
@@ -46,19 +48,15 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 
 	protected IndexAccessors indexAccessors;
 	protected IndexManager<?> indexManager;
-	protected String indexName;
 	protected SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -101,7 +99,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
 	}
 
 	protected static class IndexAccessors {

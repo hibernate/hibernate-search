@@ -30,6 +30,8 @@ import org.junit.rules.ExpectedException;
 
 public class NestedSearchPredicateIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
 	private static final String DOCUMENT_2 = "nonNestedQueryShouldMatchId";
 
@@ -53,7 +55,6 @@ public class NestedSearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 
 	private StubSessionContext sessionContext = new StubSessionContext();
 
@@ -61,12 +62,9 @@ public class NestedSearchPredicateIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -97,7 +95,7 @@ public class NestedSearchPredicateIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
 	}
 
@@ -125,7 +123,7 @@ public class NestedSearchPredicateIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
 				.hasHitCount( 2 );
 	}
 
@@ -147,7 +145,7 @@ public class NestedSearchPredicateIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
 				.hasHitCount( 1 );
 	}
 
@@ -179,7 +177,7 @@ public class NestedSearchPredicateIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
 	}
 
@@ -307,7 +305,7 @@ public class NestedSearchPredicateIT {
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder(
-						indexName,
+						INDEX_NAME,
 						DOCUMENT_1, DOCUMENT_2, "neverMatching", "empty"
 				);
 	}

@@ -35,6 +35,8 @@ import org.junit.rules.ExpectedException;
 
 public class MultiTenancyIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String TENANT_1 = "tenant_1";
 	private static final String TENANT_2 = "tenant_2";
 
@@ -61,7 +63,6 @@ public class MultiTenancyIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 
 	private SessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
 
@@ -71,12 +72,9 @@ public class MultiTenancyIT {
 	public void setup() {
 		setupHelper.withMultiTenancyConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
 				.setup();
@@ -128,7 +126,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
@@ -144,7 +142,7 @@ public class MultiTenancyIT {
 		worker.execute().join();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
 				.predicate().matchAll().end()
@@ -158,7 +156,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -171,7 +169,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( checkQuery )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		worker.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, UPDATED_STRING );
@@ -234,12 +232,9 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
 				.setup();
@@ -257,10 +252,7 @@ public class MultiTenancyIT {
 				.withIndex(
 						"MappedType", "IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -270,7 +262,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -283,10 +275,7 @@ public class MultiTenancyIT {
 				.withIndex(
 						"MappedType", "IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -314,10 +303,7 @@ public class MultiTenancyIT {
 				.withIndex(
 						"MappedType", "IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -345,10 +331,7 @@ public class MultiTenancyIT {
 				.withIndex(
 						"MappedType", "IndexName-using_multi_tenancy_for_delete_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -369,7 +352,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -473,7 +456,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
@@ -489,7 +472,7 @@ public class MultiTenancyIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )

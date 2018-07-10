@@ -42,6 +42,7 @@ import org.elasticsearch.client.RestClient;
 public class ExtensionIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
+	private static final String INDEX_NAME = "IndexName";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -59,19 +60,15 @@ public class ExtensionIT {
 	private SearchMappingRepository mappingRepository;
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		this.mappingRepository = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -112,7 +109,7 @@ public class ExtensionIT {
 				} )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
 	}
 
@@ -157,7 +154,7 @@ public class ExtensionIT {
 				.predicate( booleanPredicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
 	}
 
@@ -186,7 +183,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query ).hasReferencesHitsExactOrder(
-				indexName,
+				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
@@ -210,7 +207,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query ).hasReferencesHitsExactOrder(
-				indexName,
+				INDEX_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
 	}
@@ -247,7 +244,7 @@ public class ExtensionIT {
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		sort1 = searchTarget.sort()
 				.withExtensionOptional(
@@ -276,7 +273,7 @@ public class ExtensionIT {
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -361,7 +358,7 @@ public class ExtensionIT {
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder(
-				indexName,
+				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
 		);
 	}

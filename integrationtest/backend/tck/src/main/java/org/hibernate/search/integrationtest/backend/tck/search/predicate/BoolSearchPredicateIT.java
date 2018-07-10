@@ -34,6 +34,8 @@ import org.junit.Test;
 
 public class BoolSearchPredicateIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -67,19 +69,15 @@ public class BoolSearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -98,7 +96,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -119,7 +117,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -134,7 +132,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -151,7 +149,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -166,7 +164,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -177,7 +175,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -193,7 +191,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -212,7 +210,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
@@ -227,7 +225,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -238,7 +236,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -253,7 +251,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -270,7 +268,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
@@ -287,7 +285,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	@Test
@@ -313,7 +311,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -332,7 +330,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -347,7 +345,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -368,7 +366,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// One matching and one non-matching "should" clause
 		query = searchTarget.query( sessionContext )
@@ -381,7 +379,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -402,7 +400,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// One matching and one non-matching "should" clause
 		query = searchTarget.query( sessionContext )
@@ -415,7 +413,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -451,7 +449,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -469,7 +467,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query( sessionContext )
@@ -483,7 +481,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -497,7 +495,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Expect to require all "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -510,7 +508,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -528,7 +526,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query( sessionContext )
@@ -542,7 +540,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -556,7 +554,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -574,7 +572,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query( sessionContext )
@@ -588,7 +586,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -602,7 +600,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Expect to require all "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -615,7 +613,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -633,7 +631,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_3 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query( sessionContext )
@@ -647,7 +645,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -661,7 +659,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -682,7 +680,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		// 1 "should" clause: expect to require all "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -694,7 +692,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 2 "should" clauses: expect to require all "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -707,7 +705,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -721,7 +719,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 4 "should" clauses: expect to require 3 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -736,7 +734,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 5 "should" clauses: expect to require 3 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -752,7 +750,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 6 "should" clauses: expect to require 4 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -769,7 +767,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -792,7 +790,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// 2 "should" clauses: expect to require 1 "should" clause to match
 		query = searchTarget.query( sessionContext )
@@ -805,7 +803,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = searchTarget.query( sessionContext )
@@ -819,7 +817,7 @@ public class BoolSearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( indexName, DOCUMENT_1 );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// The rest should behave exactly as in the other multiple-constraints test
 	}
@@ -898,7 +896,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexAccessors {

@@ -49,6 +49,8 @@ import org.assertj.core.api.Assertions;
 
 public class SearchSortIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	private static final int INDEX_ORDER_CHECKS = 10;
 
 	private static final String FIRST_ID = "1";
@@ -64,19 +66,15 @@ public class SearchSortIT {
 
 	private IndexAccessors indexAccessors;
 	private IndexManager<?> indexManager;
-	private String indexName;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName",
+						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
-						(indexManager, indexName) -> {
-							this.indexManager = indexManager;
-							this.indexName = indexName;
-						}
+						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
 
@@ -101,23 +99,23 @@ public class SearchSortIT {
 
 			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+					.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+					.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+					.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( indexName, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( indexName, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
+					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 		}
 	}
 
@@ -131,7 +129,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
 		SearchResult<DocumentReference> firstCallResult = query.execute();
 		assertThat( firstCallResult ).fromQuery( query )
-				.hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();
 
 		for ( int i = 0; i < INDEX_ORDER_CHECKS; ++i ) {
@@ -161,7 +159,7 @@ public class SearchSortIT {
 				.sort().byScore().end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -169,7 +167,7 @@ public class SearchSortIT {
 				.sort().byScore().desc().end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -177,7 +175,7 @@ public class SearchSortIT {
 				.sort().byScore().asc().end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
@@ -189,28 +187,28 @@ public class SearchSortIT {
 				.then().byField( "identicalForLastTwo" ).asc()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = simpleQuery( b -> b
 				.byField( "identicalForFirstTwo" ).desc().onMissingValue().sortFirst()
 				.then().byField( "identicalForLastTwo" ).desc()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 
 		query = simpleQuery( b -> b
 				.byField( "identicalForFirstTwo" ).asc().onMissingValue().sortFirst()
 				.then().byField( "identicalForLastTwo" ).desc()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, SECOND_ID, FIRST_ID, THIRD_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, FIRST_ID, THIRD_ID );
 
 		query = simpleQuery( b -> b
 				.byField( "identicalForFirstTwo" ).desc().onMissingValue().sortFirst()
 				.then().byField( "identicalForLastTwo" ).asc()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, EMPTY_ID, THIRD_ID, FIRST_ID, SECOND_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, FIRST_ID, SECOND_ID );
 	}
 
 	@Test
@@ -228,7 +226,7 @@ public class SearchSortIT {
 				.sort( sort )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -236,7 +234,7 @@ public class SearchSortIT {
 				.sort().by( sort ).end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		sort = searchTarget.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
@@ -248,7 +246,7 @@ public class SearchSortIT {
 				.sort( sort )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -256,7 +254,7 @@ public class SearchSortIT {
 				.sort().by( sort ).end()
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 	@Test
 	public void lambda_caching() {
@@ -280,13 +278,13 @@ public class SearchSortIT {
 
 		query = simpleQuery( cachingContributor );
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = simpleQuery( cachingContributor );
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -294,12 +292,12 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ) );
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ) );
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( indexName, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
 		// we don't test the descending order here as it's currently not supported by Lucene
 		// see the additional tests in the specific backend tests
@@ -321,7 +319,7 @@ public class SearchSortIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "unknownField" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asReferences()
@@ -340,7 +338,7 @@ public class SearchSortIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "nestedObject" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asReferences()
@@ -359,7 +357,7 @@ public class SearchSortIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "flattenedObject" );
-		thrown.expectMessage( indexName );
+		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
 				.asReferences()
@@ -447,7 +445,7 @@ public class SearchSortIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( indexName, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {
