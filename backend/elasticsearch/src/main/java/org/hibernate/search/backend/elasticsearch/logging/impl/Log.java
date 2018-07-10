@@ -8,6 +8,7 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -15,6 +16,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
@@ -26,6 +29,7 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.Param;
 
 @MessageLogger(projectCode = "HSEARCH-ES")
 public interface Log extends BasicLogger {
@@ -129,12 +133,13 @@ public interface Log extends BasicLogger {
 			+ " but this backend can only be unwrapped to %2$s." )
 	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
 
-	@Message(id = 520, value = "The index schema node '%2$s' was added twice at path '%1$s'."
+	@Message(id = 520, value = "The index schema node '%1$s' was added twice."
 			+ " Multiple bridges may be trying to access the same index field, "
 			+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
-	SearchException indexSchemaNodeNameConflict(String absolutePath, String name);
+	SearchExceptionWithContext indexSchemaNodeNameConflict(String name,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 523, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);

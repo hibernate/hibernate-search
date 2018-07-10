@@ -118,7 +118,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		}
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
-				new ElasticsearchIndexSchemaRootNodeBuilder( multiTenancyStrategy );
+				new ElasticsearchIndexSchemaRootNodeBuilder( hibernateSearchIndexName, multiTenancyStrategy );
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,

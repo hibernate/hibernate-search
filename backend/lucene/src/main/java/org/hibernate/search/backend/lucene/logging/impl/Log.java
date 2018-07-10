@@ -9,12 +9,15 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManager;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.SearchException;
@@ -24,6 +27,7 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.Param;
 
 @MessageLogger(projectCode = "HSEARCH-LUCENE")
 public interface Log extends BasicLogger {
@@ -156,12 +160,13 @@ public interface Log extends BasicLogger {
 			+ " but this backend can only be unwrapped to %2$s." )
 	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
 
-	@Message(id = 534, value = "The index schema node '%2$s' was added twice at path '%1$s'."
+	@Message(id = 534, value = "The index schema node '%1$s' was added twice."
 			+ " Multiple bridges may be trying to access the same index field, "
 			+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
-	SearchException indexSchemaNodeNameConflict(String absolutePath, String name);
+	SearchExceptionWithContext indexSchemaNodeNameConflict(String relativeFieldName,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 537, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);

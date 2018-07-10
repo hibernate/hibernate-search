@@ -10,7 +10,9 @@ package org.hibernate.search.engine.logging.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
@@ -21,6 +23,7 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.Param;
 
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
@@ -65,13 +68,15 @@ public interface Log extends BasicLogger {
 			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName);
 
 	@Message(id = 14, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
-	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName);
+	SearchExceptionWithContext relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 15, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
 			+ " Remove the dot from your field name,"
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
-	SearchException relativeFieldNameCannotContainDot(String relativeFieldName);
+	SearchExceptionWithContext relativeFieldNameCannotContainDot(String relativeFieldName,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 16, value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);

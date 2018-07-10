@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert;
 
 /**
  * A util allowing to run blocks of code ("sub-tests"), expecting them to throw an exception.
@@ -64,8 +64,8 @@ public class SubTest {
 		this.thrown = thrown;
 	}
 
-	public AbstractThrowableAssert<?, ? extends Throwable> assertThrown() {
-		return Assertions.assertThat( thrown )
+	public AbstractThrowableAssert<?, Throwable> assertThrown() {
+		return new ThrowableAssert( thrown )
 				.as( description );
 	}
 

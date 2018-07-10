@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBuilder
@@ -22,6 +27,14 @@ class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBui
 		super( builder );
 		this.parent = parent;
 		this.included = included;
+	}
+
+	@Override
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				getRootNodeBuilder().getIndexFailureContextElement(),
+				FailureContexts.fromIndexFieldAbsolutePath( builder.getAbsolutePath() )
+		);
 	}
 
 	@Override

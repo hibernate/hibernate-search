@@ -53,14 +53,14 @@ abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements Inde
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
+				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 		putProperty( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		return new ElasticsearchIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
+		return new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
@@ -73,12 +73,14 @@ abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements Inde
 		}
 	}
 
+	abstract ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder();
+
 	abstract String getAbsolutePath();
 
 	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name );
+			throw log.indexSchemaNodeNameConflict( name, getFailureContext() );
 		}
 	}
 

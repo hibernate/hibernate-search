@@ -51,15 +51,17 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new LuceneIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
+				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 		putProperty( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		return new LuceneIndexSchemaObjectFieldNodeBuilder( getAbsolutePath(), relativeFieldName, storage );
+		return new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 	}
+
+	abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();
 
 	abstract String getAbsolutePath();
 
@@ -72,7 +74,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	private void putProperty(String name, LuceneIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( getAbsolutePath(), name );
+			throw log.indexSchemaNodeNameConflict( name, getFailureContext() );
 		}
 	}
 }

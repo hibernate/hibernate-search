@@ -6,17 +6,31 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneRootIndexSchemaContributor;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder, LuceneRootIndexSchemaContributor {
 
+	private final String indexName;
+
+	public LuceneIndexSchemaRootNodeBuilder(String indexName) {
+		this.indexName = indexName;
+	}
+
 	@Override
-	public String getAbsolutePath() {
-		return null;
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				getIndexFailureContextElement(),
+				FailureContexts.indexSchemaRoot()
+		);
 	}
 
 	@Override
@@ -30,5 +44,19 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		LuceneIndexSchemaObjectNode node = LuceneIndexSchemaObjectNode.root();
 
 		contributeChildren( node, collector );
+	}
+
+	@Override
+	LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+		return this;
+	}
+
+	@Override
+	String getAbsolutePath() {
+		return null;
+	}
+
+	FailureContextElement getIndexFailureContextElement() {
+		return FailureContexts.fromIndexName( indexName );
 	}
 }

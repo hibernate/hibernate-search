@@ -7,10 +7,36 @@
 package org.hibernate.search.util.impl.integrationtest.common;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+
+import org.assertj.core.api.Assertions;
 
 public final class FailureReportUtils {
 
 	private FailureReportUtils() {
+	}
+
+	/**
+	 * @param contextElements The expect context elements, in order.
+	 * @return A consumer representing an assertion to be passed as a parameter to
+	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
+	 */
+	public static Consumer<Throwable> hasContext(FailureContextElement ... contextElements) {
+		return throwable -> {
+			Assertions.assertThat( throwable )
+					.isInstanceOf( SearchExceptionWithContext.class );
+			Assertions.assertThat( ( (SearchExceptionWithContext) throwable ).getContextElements() )
+					.containsExactly( contextElements );
+			String renderedContexts = Arrays.stream( contextElements ).map( FailureContextElement::render )
+					.collect( Collectors.joining( ", " ) );
+			Assertions.assertThat( throwable.getMessage() )
+					.endsWith( "Context: " + renderedContexts );
+		};
 	}
 
 	public static SingleContextFailureReportPatternBuilder buildSingleContextFailureReportPattern() {

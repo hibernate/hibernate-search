@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
@@ -14,16 +17,29 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder, ElasticsearchRootIndexSchemaContributor {
 
-	private MultiTenancyStrategy multiTenancyStrategy;
+	private final String hibernateSearchIndexName;
+	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private RoutingType routing = null;
 
-	public ElasticsearchIndexSchemaRootNodeBuilder(MultiTenancyStrategy multiTenancyStrategy) {
+	public ElasticsearchIndexSchemaRootNodeBuilder(String hibernateSearchIndexName,
+			MultiTenancyStrategy multiTenancyStrategy) {
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+	}
+
+	@Override
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				getIndexFailureContextElement(),
+				FailureContexts.indexSchemaRoot()
+		);
 	}
 
 	@Override
@@ -51,7 +67,16 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
+	ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+		return this;
+	}
+
+	@Override
 	String getAbsolutePath() {
 		return null;
+	}
+
+	FailureContextElement getIndexFailureContextElement() {
+		return FailureContexts.fromIndexName( hibernateSearchIndexName );
 	}
 }

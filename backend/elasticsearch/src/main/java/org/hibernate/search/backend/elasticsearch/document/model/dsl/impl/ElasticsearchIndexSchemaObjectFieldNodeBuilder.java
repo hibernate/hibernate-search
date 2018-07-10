@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -19,10 +22,13 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
+	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
 	private final ObjectFieldStorage storage;
@@ -30,11 +36,21 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	private final DeferredInitializationIndexObjectFieldAccessor accessor =
 			new DeferredInitializationIndexObjectFieldAccessor();
 
-	ElasticsearchIndexSchemaObjectFieldNodeBuilder(String parentPath, String relativeFieldName,
-			ObjectFieldStorage storage) {
-		this.absoluteFieldPath = parentPath == null ? relativeFieldName : parentPath + "." + relativeFieldName;
+	ElasticsearchIndexSchemaObjectFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+			String relativeFieldName, ObjectFieldStorage storage) {
+		this.parent = parent;
+		String parentAbsolutePath = parent.getAbsolutePath();
+		this.absoluteFieldPath = parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName;
 		this.relativeFieldName = relativeFieldName;
 		this.storage = storage;
+	}
+
+	@Override
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				getRootNodeBuilder().getIndexFailureContextElement(),
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override
@@ -74,6 +90,11 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		contributeChildren( mapping, node, collector );
 
 		return mapping;
+	}
+
+	@Override
+	ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+		return parent.getRootNodeBuilder();
 	}
 
 	@Override

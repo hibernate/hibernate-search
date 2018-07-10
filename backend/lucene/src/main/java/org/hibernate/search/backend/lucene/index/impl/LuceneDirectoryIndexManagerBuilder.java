@@ -36,7 +36,7 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private final SearchBackendContext searchBackendContext;
 
 	private final String indexName;
-	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder();
+	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private final BackendBuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
@@ -48,6 +48,7 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.indexName = indexName;
+		this.schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder( indexName );
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 	}

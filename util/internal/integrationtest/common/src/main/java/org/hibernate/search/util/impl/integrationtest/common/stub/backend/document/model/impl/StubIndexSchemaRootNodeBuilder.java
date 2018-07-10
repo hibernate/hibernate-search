@@ -6,7 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
@@ -32,6 +37,14 @@ public class StubIndexSchemaRootNodeBuilder extends StubIndexSchemaObjectNodeBui
 		builder.explicitRouting();
 	}
 
+	@Override
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				getIndexFailureContextElement(),
+				FailureContexts.indexSchemaRoot()
+		);
+	}
+
 	public StubIndexSchemaNode build() {
 		return builder.build();
 	}
@@ -39,6 +52,10 @@ public class StubIndexSchemaRootNodeBuilder extends StubIndexSchemaObjectNodeBui
 	@Override
 	StubIndexSchemaRootNodeBuilder getRootNodeBuilder() {
 		return this;
+	}
+
+	FailureContextElement getIndexFailureContextElement() {
+		return FailureContexts.fromIndexName( indexName );
 	}
 
 	StubBackendBehavior getBackendBehavior() {
