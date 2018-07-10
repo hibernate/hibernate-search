@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.apache.lucene.index.IndexableField;
-
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
@@ -15,33 +15,44 @@ import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFieldFormatter;
 
+import org.apache.lucene.index.IndexableField;
+
 /**
  * @author Guillaume Smet
  */
-public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField> extends AbstractLuceneIndexSchemaFieldTypedContext<V> {
+public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField>
+		implements IndexSchemaFieldTerminalContext<V>, LuceneIndexSchemaNodeContributor {
 
-	private LuceneFieldContributor<V> fieldContributor;
+	private final IndexSchemaContext schemaContext;
+	private final String relativeFieldName;
+	private final LuceneFieldContributor<V> fieldContributor;
+	private final LuceneFieldValueExtractor<V> fieldValueExtractor;
 
-	private LuceneFieldValueExtractor<V> fieldValueExtractor;
+	private final DeferredInitializationIndexFieldAccessor<V> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
 	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
 			LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor) {
-		super( schemaContext, relativeFieldName );
-
+		this.schemaContext = schemaContext;
+		this.relativeFieldName = relativeFieldName;
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldAccessor<V> accessor, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	public IndexFieldAccessor<V> createAccessor() {
+		return accessor;
+	}
+
+	@Override
+	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
 		LuceneIndexSchemaFieldNode<V> schemaNode = new LuceneIndexSchemaFieldNode<V>(
 				parentNode,
-				getRelativeFieldName(),
+				relativeFieldName,
 				new SimpleCastingFieldFormatter<>(),
 				new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor ),
 				null,

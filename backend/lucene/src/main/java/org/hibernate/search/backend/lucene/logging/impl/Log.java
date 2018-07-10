@@ -143,9 +143,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 527, value = "An IOException happened while executing the query '%1$s' on indexes %2$s." )
 	SearchException ioExceptionOnQueryExecution(Query luceneQuery, Collection<String> indexNames, @Cause IOException e);
 
-	@Message(id = 528, value = "Cannot define field '%1$s' as sortable: fields of this type cannot be sortable." )
-	SearchException cannotUseSortableOnFieldType(String relativeFieldName);
-
 	@Message(id = 529, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(BackendImplementor<?> backend, String indexName);
 
