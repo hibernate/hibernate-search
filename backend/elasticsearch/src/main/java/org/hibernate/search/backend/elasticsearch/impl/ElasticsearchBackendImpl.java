@@ -8,6 +8,9 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -48,6 +51,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
+	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
+
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
@@ -62,7 +67,18 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				this, client, workFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
-				this, workFactory, multiTenancyStrategy, queryOrchestrator
+				this, workFactory,
+				new Function<String, String>() {
+					@Override
+					public String apply(String elasticsearchIndexName) {
+						String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
+						if ( result == null ) {
+							throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName );
+						}
+						return result;
+					}
+				},
+				multiTenancyStrategy, queryOrchestrator
 		);
 	}
 
@@ -85,15 +101,20 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	@Override
-	public String normalizeIndexName(String rawIndexName) {
-		return ElasticsearchIndexNameNormalizer.normalize( rawIndexName );
-	}
-
-	@Override
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
-			String normalizedIndexName, boolean multiTenancyEnabled, BuildContext buildContext, ConfigurationPropertySource propertySource) {
+			String hibernateSearchIndexName, boolean multiTenancyEnabled, BuildContext buildContext, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
-			throw log.multiTenancyRequiredButNotSupportedByBackend( name, normalizedIndexName );
+			throw log.multiTenancyRequiredButNotSupportedByBackend( name, hibernateSearchIndexName );
+		}
+
+		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
+		String existingHibernateSearchIndexName = hibernateSearchIndexNamesByElasticsearchIndexNames.putIfAbsent(
+				elasticsearchIndexName, hibernateSearchIndexName
+		);
+		if ( existingHibernateSearchIndexName != null ) {
+			throw log.duplicateNormalizedIndexNames(
+					existingHibernateSearchIndexName, hibernateSearchIndexName, elasticsearchIndexName
+			);
 		}
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
@@ -101,7 +122,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
-				normalizedIndexName, indexSchemaRootNodeBuilder, buildContext, propertySource
+				hibernateSearchIndexName, elasticsearchIndexName,
+				indexSchemaRootNodeBuilder, buildContext, propertySource
 		);
 	}
 

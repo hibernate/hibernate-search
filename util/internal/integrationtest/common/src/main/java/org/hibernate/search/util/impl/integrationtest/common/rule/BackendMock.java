@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
@@ -74,25 +72,22 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor) {
-		String normalizedIndexName = StubBackendUtils.normalizeIndexName( indexName );
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( normalizedIndexName );
+		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
-		callQueue.expect( new PushSchemaCall( normalizedIndexName, builder.build() ) );
+		callQueue.expect( new PushSchemaCall( indexName, builder.build() ) );
 		return this;
 	}
 
 	public BackendMock expectAnySchema(String indexName) {
-		String normalizedIndexName = StubBackendUtils.normalizeIndexName( indexName );
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( normalizedIndexName );
-		callQueue.expect( new PushSchemaCall( normalizedIndexName, null ) );
+		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
+		callQueue.expect( new PushSchemaCall( indexName, null ) );
 		return this;
 	}
 
 	public WorkCallListContext expectWorks(String indexName) {
-		String normalizedIndexName = StubBackendUtils.normalizeIndexName( indexName );
-		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( normalizedIndexName );
-		return new WorkCallListContext( normalizedIndexName, callQueue );
+		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
+		return new WorkCallListContext( indexName, callQueue );
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -112,22 +107,20 @@ public class BackendMock implements TestRule {
 
 	private BackendMock expectSearch(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWork.ResultType resultType, StubSearchWorkBehavior<?> behavior) {
-		List<String> normalizedIndexNames = indexNames.stream().map( StubBackendUtils::normalizeIndexName )
-				.collect( Collectors.toList() );
 		CallQueue<SearchWorkCall<?>> callQueue = behaviorMock.getSearchWorkCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );
-		callQueue.expect( new SearchWorkCall<>( normalizedIndexNames, builder.build(), behavior ) );
+		callQueue.expect( new SearchWorkCall<>( indexNames, builder.build(), behavior ) );
 		return this;
 	}
 
 	public class WorkCallListContext {
-		private final String normalizedIndexName;
+		private final String indexName;
 		private final CallQueue<IndexWorkCall> callQueue;
 		private final List<StubIndexWork> works = new ArrayList<>();
 
-		private WorkCallListContext(String normalizedIndexName, CallQueue<IndexWorkCall> callQueue) {
-			this.normalizedIndexName = normalizedIndexName;
+		private WorkCallListContext(String indexName, CallQueue<IndexWorkCall> callQueue) {
+			this.indexName = indexName;
 			this.callQueue = callQueue;
 		}
 
@@ -179,24 +172,24 @@ public class BackendMock implements TestRule {
 		public BackendMock preparedThenExecuted() {
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
-					.map( work -> new IndexWorkCall( normalizedIndexName, IndexWorkCall.Operation.PREPARE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
 					.forEach( callQueue::expect );
 			works.stream()
-					.map( work -> new IndexWorkCall( normalizedIndexName, IndexWorkCall.Operation.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
 					.forEach( callQueue::expect );
 			return BackendMock.this;
 		}
 
 		public BackendMock executed() {
 			works.stream()
-					.map( work -> new IndexWorkCall( normalizedIndexName, IndexWorkCall.Operation.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
 					.forEach( callQueue::expect );
 			return BackendMock.this;
 		}
 
 		public BackendMock prepared() {
 			works.stream()
-					.map( work -> new IndexWorkCall( normalizedIndexName, IndexWorkCall.Operation.PREPARE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
 					.forEach( callQueue::expect );
 			return BackendMock.this;
 		}

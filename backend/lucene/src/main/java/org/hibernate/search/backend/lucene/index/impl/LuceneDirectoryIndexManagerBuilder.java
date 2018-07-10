@@ -35,7 +35,7 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
-	private final String normalizedIndexName;
+	private final String indexName;
 	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder();
 
 	private final BuildContext buildContext;
@@ -43,11 +43,11 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 
 	public LuceneDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
-			String normalizedIndexName,
+			String indexName,
 			BuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
-		this.normalizedIndexName = normalizedIndexName;
+		this.indexName = indexName;
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 	}
@@ -67,10 +67,10 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 		LuceneIndexModel model = null;
 		IndexWriter indexWriter = null;
 		try {
-			model = new LuceneIndexModel( normalizedIndexName, schemaRootNodeBuilder );
+			model = new LuceneIndexModel( indexName, schemaRootNodeBuilder );
 			indexWriter = createIndexWriter( model );
 			return new LuceneDirectoryIndexManager(
-					indexingBackendContext, searchBackendContext, normalizedIndexName, model, indexWriter
+					indexingBackendContext, searchBackendContext, indexName, model, indexWriter
 			);
 		}
 		catch (RuntimeException e) {
@@ -84,7 +84,7 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private IndexWriter createIndexWriter(LuceneIndexModel model) {
 		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( model.getScopedAnalyzer() );
 		try {
-			Directory directory = indexingBackendContext.createDirectory( normalizedIndexName );
+			Directory directory = indexingBackendContext.createDirectory( indexName );
 			try {
 				return new IndexWriter( directory, indexWriterConfig );
 			}

@@ -13,22 +13,15 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 
 public class StubMapping implements MappingImplementor<StubMapping> {
 
-	private final Map<String, String> normalizedIndexNamesByTypeIdentifier;
 	private final Map<String, IndexManager<?>> indexManagersByTypeIdentifier;
 
-	StubMapping(Map<String, String> normalizedIndexNamesByTypeIdentifier,
-			Map<String, IndexManager<?>> indexManagersByTypeIdentifier) {
-		this.normalizedIndexNamesByTypeIdentifier = normalizedIndexNamesByTypeIdentifier;
+	StubMapping(Map<String, IndexManager<?>> indexManagersByTypeIdentifier) {
 		this.indexManagersByTypeIdentifier = indexManagersByTypeIdentifier;
 	}
 
 	@Override
 	public StubMapping toAPI() {
 		return this;
-	}
-
-	public String getNormalizedIndexNameByTypeIdentifier(String typeId) {
-		return normalizedIndexNamesByTypeIdentifier.get( typeId );
 	}
 
 	public IndexManager<?> getIndexManagerByTypeIdentifier(String typeId) {

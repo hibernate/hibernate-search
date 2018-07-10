@@ -24,7 +24,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
-	private final String indexName;
+	private final String hibernateSearchIndexName;
+	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private final BuildContext buildContext;
@@ -32,12 +33,14 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
-			String indexName, ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
+			String hibernateSearchIndexName, String elasticsearchIndexName,
+			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			BuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
-		this.indexName = indexName;
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
+		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 
 		this.buildContext = buildContext;
@@ -56,18 +59,23 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	@Override
 	public ElasticsearchIndexManager build() {
-		URLEncodedString encodedIndexName = URLEncodedString.fromString( indexName );
+		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
 		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
 		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
 
-		ElasticsearchIndexModel model = new ElasticsearchIndexModel( encodedIndexName, schemaRootNodeBuilder );
+		ElasticsearchIndexModel model = new ElasticsearchIndexModel(
+				hibernateSearchIndexName, encodedElasticsearchIndexName,
+				schemaRootNodeBuilder
+		);
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
-		indexingBackendContext.initializeIndex( encodedIndexName, encodedTypeName, model )
+		indexingBackendContext.initializeIndex( encodedElasticsearchIndexName, encodedTypeName, model )
 				.join();
 
 		return new ElasticsearchIndexManager(
-				indexingBackendContext, searchBackendContext, encodedIndexName, encodedTypeName, model
+				indexingBackendContext, searchBackendContext,
+				hibernateSearchIndexName, encodedElasticsearchIndexName,
+				encodedTypeName, model
 		);
 	}
 

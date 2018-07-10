@@ -13,13 +13,13 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -75,29 +75,29 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget, ElasticsearchIndexManager otherTarget);
 
 	@Message(id = 504, value = "Unknown field '%1$s' in indexes %2$s." )
-	SearchException unknownFieldForSearch(String absoluteFieldPath, Collection<URLEncodedString> indexNames);
+	SearchException unknownFieldForSearch(String absoluteFieldPath, Collection<String> indexNames);
 
 	@Message(id = 505, value = "Multiple conflicting types for field '%1$s': '%2$s' in index '%3$s', but '%4$s' in index '%5$s'." )
 	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
-			ElasticsearchIndexSchemaFieldNode schemaNode1, URLEncodedString indexName1,
-			ElasticsearchIndexSchemaFieldNode schemaNode2, URLEncodedString indexName2);
+			ElasticsearchIndexSchemaFieldNode schemaNode1, String indexName1,
+			ElasticsearchIndexSchemaFieldNode schemaNode2, String indexName2);
 
 	@Message(id = 506, value = "The Elasticsearch extension can only be applied to objects"
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead." )
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = 507, value = "Unknown projections %1$s in indexes %2$s." )
-	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<URLEncodedString> indexNames);
+	SearchException unknownProjectionForSearch(Collection<String> projections, Collection<String> indexNames);
 
 	@Message(id = 508, value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
 			+ " Given predicate was: '%1$s'" )
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
 	@Message(id = 509, value = "Field '%2$s' is not an object field in index '%1$s'." )
-	SearchException nonObjectFieldForNestedQuery(URLEncodedString indexName, String absoluteFieldPath);
+	SearchException nonObjectFieldForNestedQuery(String indexName, String absoluteFieldPath);
 
 	@Message(id = 510, value = "Object field '%2$s' is not stored as nested in index '%1$s'." )
-	SearchException nonNestedFieldForNestedQuery(URLEncodedString indexName, String absoluteFieldPath);
+	SearchException nonNestedFieldForNestedQuery(String indexName, String absoluteFieldPath);
 
 	@Message(id = 511, value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
 			+ " Given sort was: '%1$s'" )
@@ -156,4 +156,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 529, value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
+
+	@Message(id = 530, value = "Duplicate index names when normalized to conform to Elasticsearch rules:"
+			+ " '%1$s' and '%2$s' both become '%3$s'")
+	SearchException duplicateNormalizedIndexNames(String firstHibernateSearchIndexName,
+			String secondHibernateSearchIndexName, String elasticsearchIndexName);
+
+	@Message(id = 531, value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
+	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName);
 }

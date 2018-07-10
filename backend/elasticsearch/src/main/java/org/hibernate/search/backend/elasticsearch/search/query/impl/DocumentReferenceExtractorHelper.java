@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -17,24 +18,27 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-abstract class AbstractDocumentReferenceHitExtractor<C> implements HitExtractor<C> {
+class DocumentReferenceExtractorHelper {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 
+	private final Function<String, String> indexNameConverter;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	protected AbstractDocumentReferenceHitExtractor(MultiTenancyStrategy multiTenancyStrategy) {
+	DocumentReferenceExtractorHelper(Function<String, String> indexNameConverter, MultiTenancyStrategy multiTenancyStrategy) {
+		this.indexNameConverter = indexNameConverter;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
-	@Override
-	public void contributeRequest(JsonObject requestBody) {
+	void contributeRequest(JsonObject requestBody) {
 		multiTenancyStrategy.contributeToSearchRequest( requestBody );
 	}
 
-	protected DocumentReference extractDocumentReference(JsonObject hit) {
-		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
+	DocumentReference extractDocumentReference(JsonObject hit) {
+		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
+				.map( indexNameConverter )
+				.orElseThrow( log::elasticsearchResponseMissingData );
 		String id = multiTenancyStrategy.extractTenantScopedDocumentId( hit );
 		return new ElasticsearchDocumentReference( indexName, id );
 	}

@@ -29,23 +29,23 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 			.property( "_index" )
 			.asString();
 
-	private final Map<String, HitExtractor<? super C>> extractorByIndex;
+	private final Map<String, HitExtractor<? super C>> extractorByElasticsearchIndexName;
 
-	IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByIndex) {
-		this.extractorByIndex = extractorByIndex;
+	IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByElasticsearchIndexName) {
+		this.extractorByElasticsearchIndexName = extractorByElasticsearchIndexName;
 	}
 
 	@Override
 	public void contributeRequest(JsonObject requestBody) {
-		for ( HitExtractor<?> extractor : extractorByIndex.values() ) {
+		for ( HitExtractor<?> extractor : extractorByElasticsearchIndexName.values() ) {
 			extractor.contributeRequest( requestBody );
 		}
 	}
 
 	@Override
 	public void extract(C collector, JsonObject responseBody, JsonObject hit) {
-		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
-		HitExtractor<? super C> delegate = extractorByIndex.get( indexName );
+		String elasticsearchIndexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
+		HitExtractor<? super C> delegate = extractorByElasticsearchIndexName.get( elasticsearchIndexName );
 		delegate.extract( collector, responseBody, hit );
 	}
 }

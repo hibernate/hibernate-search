@@ -23,17 +23,25 @@ public class ElasticsearchSearchTargetModel {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Set<URLEncodedString> indexNames;
+	private final Set<String> hibernateSearchIndexNames;
+	private final Set<URLEncodedString> elasticsearchIndexNames;
 
 	public ElasticsearchSearchTargetModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
-		this.indexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getIndexName )
+		this.hibernateSearchIndexNames = indexModels.stream()
+				.map( ElasticsearchIndexModel::getHibernateSearchIndexName )
+				.collect( Collectors.toSet() );
+		this.elasticsearchIndexNames = indexModels.stream()
+				.map( ElasticsearchIndexModel::getElasticsearchIndexName )
 				.collect( Collectors.toSet() );
 	}
 
-	public Set<URLEncodedString> getIndexNames() {
-		return indexNames;
+	public Set<String> getHibernateSearchIndexNames() {
+		return hibernateSearchIndexNames;
+	}
+
+	public Set<URLEncodedString> getElasticsearchIndexNames() {
+		return elasticsearchIndexNames;
 	}
 
 	public Set<ElasticsearchIndexModel> getIndexModels() {
@@ -54,13 +62,13 @@ public class ElasticsearchSearchTargetModel {
 				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
 					throw log.conflictingFieldTypesForSearch(
 							absoluteFieldPath,
-							selectedSchemaNode, indexModelForSelectedSchemaNode.getIndexName(),
-							schemaNode, indexModel.getIndexName() );
+							selectedSchemaNode, indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+							schemaNode, indexModel.getHibernateSearchIndexName() );
 				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, getHibernateSearchIndexNames() );
 		}
 		return selectedSchemaNode;
 	}
@@ -73,7 +81,7 @@ public class ElasticsearchSearchTargetModel {
 			if ( schemaNode != null ) {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
-					throw log.nonNestedFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
+					throw log.nonNestedFieldForNestedQuery( indexModel.getHibernateSearchIndexName(), absoluteFieldPath );
 				}
 			}
 		}
@@ -81,10 +89,10 @@ public class ElasticsearchSearchTargetModel {
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
-					throw log.nonObjectFieldForNestedQuery( indexModel.getIndexName(), absoluteFieldPath );
+					throw log.nonObjectFieldForNestedQuery( indexModel.getHibernateSearchIndexName(), absoluteFieldPath );
 				}
 			}
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexNames() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, getHibernateSearchIndexNames() );
 		}
 	}
 }

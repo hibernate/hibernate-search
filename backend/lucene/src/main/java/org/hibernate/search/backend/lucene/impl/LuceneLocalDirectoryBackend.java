@@ -78,19 +78,20 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 	}
 
 	@Override
-	public String normalizeIndexName(String rawIndexName) {
-		return rawIndexName;
-	}
-
-	@Override
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
 			String indexName, boolean multiTenancyEnabled, BuildContext context, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
 			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
 		}
 
+		/*
+		 * We do not normalize index names: directory providers are expected to use the exact given index name,
+		 * or a reversible conversion of that name, as an internal key (file names, ...),
+		 * and therefore the internal key should stay unique.
+		 */
 		return new LuceneDirectoryIndexManagerBuilder(
-				indexingContext, searchContext, normalizeIndexName( indexName ), context, propertySource
+				indexingContext, searchContext,
+				indexName, context, propertySource
 		);
 	}
 

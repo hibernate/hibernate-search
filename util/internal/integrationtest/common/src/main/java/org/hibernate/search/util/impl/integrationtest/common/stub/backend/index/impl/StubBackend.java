@@ -13,7 +13,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.BuildContext;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
 public class StubBackend implements BackendImplementor<StubDocumentElement>, Backend {
@@ -44,14 +43,9 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	}
 
 	@Override
-	public String normalizeIndexName(String rawIndexName) {
-		return StubBackendUtils.normalizeIndexName( rawIndexName );
-	}
-
-	@Override
-	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String name, boolean isMultiTenancyEnabled, BuildContext context,
+	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName, boolean isMultiTenancyEnabled, BuildContext context,
 			ConfigurationPropertySource propertySource) {
-		return new StubIndexManagerBuilder( this, name );
+		return new StubIndexManagerBuilder( this, indexName );
 	}
 
 	@Override

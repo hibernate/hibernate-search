@@ -32,18 +32,20 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
-	private final URLEncodedString name;
+	private final String hibernateSearchIndexName;
+	private final URLEncodedString elasticsearchIndexName;
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
 	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
 
 	ElasticsearchIndexManager(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
-			URLEncodedString name, URLEncodedString typeName,
+			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
-		this.name = name;
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
+		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.typeName = typeName;
 		this.model = model;
 		this.changesetOrchestrator = indexingBackendContext.createChangesetOrchestrator();
@@ -55,22 +57,18 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 		changesetOrchestrator.close();
 	}
 
-	public String getName() {
-		return name.original;
-	}
-
 	public ElasticsearchIndexModel getModel() {
 		return model;
 	}
 
 	@Override
 	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createChangesetIndexWorker( changesetOrchestrator, name, typeName, sessionContext );
+		return indexingBackendContext.createChangesetIndexWorker( changesetOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override
 	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createStreamIndexWorker( name, typeName, sessionContext );
+		return indexingBackendContext.createStreamIndexWorker( elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override
@@ -92,7 +90,8 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "name=" ).append( name.original )
+				.append( "name=" ).append( hibernateSearchIndexName )
+				.append( "elasticsearchName=" ).append( elasticsearchIndexName.original )
 				.append( "]" )
 				.toString();
 	}

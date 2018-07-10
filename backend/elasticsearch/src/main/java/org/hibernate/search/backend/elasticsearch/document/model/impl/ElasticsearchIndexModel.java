@@ -17,13 +17,16 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
  */
 public class ElasticsearchIndexModel {
 
-	private final URLEncodedString indexName;
+	private final String hibernateSearchIndexName;
+	private final URLEncodedString elasticsearchIndexName;
 	private final RootTypeMapping mapping;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
 
-	public ElasticsearchIndexModel(URLEncodedString indexName, ElasticsearchRootIndexSchemaContributor contributor) {
-		this.indexName = indexName;
+	public ElasticsearchIndexModel(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
+			ElasticsearchRootIndexSchemaContributor contributor) {
+		this.hibernateSearchIndexName = hibernateSearchIndexName;
+		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.mapping = contributor.contribute( new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node) {
@@ -37,8 +40,12 @@ public class ElasticsearchIndexModel {
 		} );
 	}
 
-	public URLEncodedString getIndexName() {
-		return indexName;
+	public String getHibernateSearchIndexName() {
+		return hibernateSearchIndexName;
+	}
+
+	public URLEncodedString getElasticsearchIndexName() {
+		return elasticsearchIndexName;
 	}
 
 	public RootTypeMapping getMapping() {
@@ -57,7 +64,7 @@ public class ElasticsearchIndexModel {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexName=" ).append( indexName )
+				.append( "elasticsearchIndexName=" ).append( elasticsearchIndexName )
 				.append( ", mapping=" ).append( mapping )
 				.append( "]" )
 				.toString();

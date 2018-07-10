@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -32,16 +33,20 @@ public class SearchBackendContext {
 
 	public SearchBackendContext(BackendImplementor<?> backend,
 			ElasticsearchWorkFactory workFactory,
+			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
 		this.backend = backend;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 
-		this.documentReferenceHitExtractor = new DocumentReferenceHitExtractor( multiTenancyStrategy );
-		this.objectHitExtractor = new ObjectHitExtractor( multiTenancyStrategy );
-		this.documentReferenceProjectionHitExtractor = new DocumentReferenceProjectionHitExtractor( multiTenancyStrategy );
+		DocumentReferenceExtractorHelper documentReferenceExtractorHelper =
+				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
+		this.documentReferenceHitExtractor = new DocumentReferenceHitExtractor( documentReferenceExtractorHelper );
+		this.objectHitExtractor = new ObjectHitExtractor( documentReferenceExtractorHelper );
+		this.documentReferenceProjectionHitExtractor =
+				new DocumentReferenceProjectionHitExtractor( documentReferenceExtractorHelper );
 	}
 
 	@Override

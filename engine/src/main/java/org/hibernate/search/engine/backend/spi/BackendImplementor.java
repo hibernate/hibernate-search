@@ -23,16 +23,9 @@ public interface BackendImplementor<D extends DocumentElement> extends AutoClose
 	Backend toAPI();
 
 	/**
-	 * Normalize the name of the index, so that we cannot end up with two index names in Hibernate Search
-	 * that would target the same physical index.
-	 *
-	 * @param rawIndexName The index name to be normalized.
-	 * @return The normalized index name.
-	 */
-	String normalizeIndexName(String rawIndexName);
-
-	/**
-	 * @param normalizedIndexName The (already {@link #normalizeIndexName(String) normalized}) name of the index
+	 * @param indexName The name of the index from the point of view of Hibernate Search.
+	 * A slightly different name may be used by the backend internally,
+	 * but {@code indexName} is the one that will appear everywhere the index is mentioned to the user.
 	 * @param multiTenancyEnabled {@code true} if multi-tenancy is enabled for this index, {@code false} otherwise.
 	 * @param context The build context
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
@@ -41,7 +34,7 @@ public interface BackendImplementor<D extends DocumentElement> extends AutoClose
 	 * <strong>CAUTION:</strong> the property key {@code backend} is reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
-	IndexManagerBuilder<D> createIndexManagerBuilder(String normalizedIndexName, boolean multiTenancyEnabled, BuildContext context,
+	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName, boolean multiTenancyEnabled, BuildContext context,
 			ConfigurationPropertySource propertySource);
 
 	@Override

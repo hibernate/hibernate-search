@@ -39,10 +39,8 @@ class StubMapper implements Mapper<StubMapping> {
 
 	@Override
 	public StubMapping build() {
-		Map<String, String> normalizedIndexNamesByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
-				.collect( Collectors.toMap( e -> e.getKey().asString(), e -> e.getValue().getIndexName() ) );
 		Map<String, IndexManager<?>> indexManagersByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
 				.collect( Collectors.toMap( e -> e.getKey().asString(), e -> e.getValue().build() ) );
-		return new StubMapping( normalizedIndexNamesByTypeIdentifier, indexManagersByTypeIdentifier );
+		return new StubMapping( indexManagersByTypeIdentifier );
 	}
 }

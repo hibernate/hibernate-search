@@ -54,18 +54,17 @@ class IndexManagerBuildingStateHolder {
 		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
 	}
 
-	public IndexManagerBuildingState<?> startBuilding(String rawIndexName, boolean multiTenancyEnabled) {
-		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "index." + rawIndexName )
+	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
+		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "index." + indexName )
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
 		BackendImplementor<?> backend = backendsByName.computeIfAbsent( backendName, this::createBackend );
-		String normalizedIndexName = backend.normalizeIndexName( rawIndexName );
 
-		IndexMappingBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( normalizedIndexName );
+		IndexMappingBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( indexName );
 		if ( state == null ) {
-			state = createIndexManagerBuildingState( backend, normalizedIndexName, multiTenancyEnabled, indexPropertySource );
-			indexManagerBuildingStateByName.put( normalizedIndexName, state );
+			state = createIndexManagerBuildingState( backend, indexName, multiTenancyEnabled, indexPropertySource );
+			indexManagerBuildingStateByName.put( indexName, state );
 		}
 		return state;
 	}
@@ -88,12 +87,12 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	private <D extends DocumentElement> IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
-			BackendImplementor<D> backend, String normalizedIndexName, boolean multiTenancyEnabled,
+			BackendImplementor<D> backend, String indexName, boolean multiTenancyEnabled,
 			ConfigurationPropertySource indexPropertySource) {
-		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( normalizedIndexName, multiTenancyEnabled, buildContext, indexPropertySource );
+		IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder( indexName, multiTenancyEnabled, buildContext, indexPropertySource );
 		IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 		IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
-		return new IndexMappingBuildingStateImpl<>( normalizedIndexName, builder, bindingContext );
+		return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
 	}
 
 	private BackendImplementor<?> createBackend(String backendName) {

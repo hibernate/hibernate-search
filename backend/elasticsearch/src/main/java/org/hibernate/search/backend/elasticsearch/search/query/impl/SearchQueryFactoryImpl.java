@@ -75,20 +75,20 @@ class SearchQueryFactoryImpl
 		}
 		else {
 			// Use LinkedHashMap to ensure stable order when generating requests
-			Map<String, HitExtractor<? super ProjectionHitCollector>> extractorByIndex = new LinkedHashMap<>();
+			Map<String, HitExtractor<? super ProjectionHitCollector>> extractorByElasticsearchIndexName = new LinkedHashMap<>();
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				HitExtractor<? super ProjectionHitCollector> indexHitExtractor =
 						createProjectionHitExtractor( indexModel, projections, projectionFound );
-				extractorByIndex.put( indexModel.getIndexName().original, indexHitExtractor );
+				extractorByElasticsearchIndexName.put( indexModel.getElasticsearchIndexName().original, indexHitExtractor );
 			}
-			hitExtractor = new IndexSensitiveHitExtractor<>( extractorByIndex );
+			hitExtractor = new IndexSensitiveHitExtractor<>( extractorByElasticsearchIndexName );
 		}
 		if ( projectionFound.cardinality() < projections.length ) {
 			projectionFound.flip( 0, projections.length );
 			List<String> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
-			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getIndexNames() );
+			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getHibernateSearchIndexNames() );
 		}
 
 		return createSearchQueryBuilder( sessionContext, hitExtractor, hitAggregator );
@@ -131,7 +131,7 @@ class SearchQueryFactoryImpl
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
 		return searchBackendContext.createSearchQueryBuilder(
-				searchTargetModel.getIndexNames(),
+				searchTargetModel.getElasticsearchIndexNames(),
 				sessionContext,
 				hitExtractor, hitAggregator
 		);

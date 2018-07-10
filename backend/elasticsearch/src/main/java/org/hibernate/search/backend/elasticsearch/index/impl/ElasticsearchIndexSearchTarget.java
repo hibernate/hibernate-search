@@ -34,7 +34,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchTargetModel.getIndexNames() )
+				.append( "indexNames=" ).append( searchTargetModel.getHibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}
