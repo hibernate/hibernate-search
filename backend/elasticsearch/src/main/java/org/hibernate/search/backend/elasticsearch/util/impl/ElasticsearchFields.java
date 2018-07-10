@@ -10,6 +10,8 @@ public class ElasticsearchFields {
 
 	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
 
+	private static final char PATH_SEPARATOR = '.';
+
 	private static final String ID_FIELD_NAME = internalFieldName( "id" );
 
 	private static final String TENANT_ID_FIELD_NAME = internalFieldName( "tenantId" );
@@ -30,5 +32,18 @@ public class ElasticsearchFields {
 
 	public static String tenantIdFieldName() {
 		return TENANT_ID_FIELD_NAME;
+	}
+
+	public static String compose(String absolutePath, String relativeFieldName) {
+		if ( absolutePath == null ) {
+			return relativeFieldName;
+		}
+
+		StringBuilder sb = new StringBuilder( absolutePath.length() + relativeFieldName.length() + 1 );
+		sb.append( absolutePath )
+				.append( PATH_SEPARATOR )
+				.append( relativeFieldName );
+
+		return sb.toString();
 	}
 }

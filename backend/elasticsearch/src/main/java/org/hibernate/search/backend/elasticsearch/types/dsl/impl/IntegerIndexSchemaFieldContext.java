@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -29,8 +30,8 @@ public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedCont
 
 	private final String relativeFieldName;
 
-	public IntegerIndexSchemaFieldContext(String relativeFieldName) {
-		super( relativeFieldName, DataType.INTEGER );
+	public IntegerIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, DataType.INTEGER );
 		this.relativeFieldName = relativeFieldName;
 	}
 

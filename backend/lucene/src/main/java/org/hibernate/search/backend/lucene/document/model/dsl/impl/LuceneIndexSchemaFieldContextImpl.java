@@ -7,9 +7,12 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
@@ -21,6 +24,9 @@ import org.hibernate.search.backend.lucene.types.dsl.impl.IntegerIndexSchemaFiel
 import org.hibernate.search.backend.lucene.types.dsl.impl.LocalDateIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.StringIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Contracts;
@@ -29,14 +35,20 @@ import org.hibernate.search.util.impl.common.Contracts;
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSchemaFieldContextImpl implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor {
+class LuceneIndexSchemaFieldContextImpl
+		implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor, IndexSchemaContext {
 
+	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
+	private final String absoluteFieldPath;
 
 	private LuceneIndexSchemaNodeContributor delegate;
 
-	public LuceneIndexSchemaFieldContextImpl(String relativeFieldName) {
+	LuceneIndexSchemaFieldContextImpl(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+			String relativeFieldName) {
+		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
+		this.absoluteFieldPath = LuceneFields.compose( parent.getAbsolutePath(), relativeFieldName );
 	}
 
 	@Override
@@ -62,22 +74,22 @@ public class LuceneIndexSchemaFieldContextImpl implements LuceneIndexSchemaField
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new StringIndexSchemaFieldContext( relativeFieldName ) );
+		return setDelegate( new StringIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IntegerIndexSchemaFieldContext( relativeFieldName ) );
+		return setDelegate( new IntegerIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateIndexSchemaFieldContext( relativeFieldName ) );
+		return setDelegate( new LocalDateIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointIndexSchemaFieldContext( relativeFieldName ) );
+		return setDelegate( new GeoPointIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
@@ -90,7 +102,17 @@ public class LuceneIndexSchemaFieldContextImpl implements LuceneIndexSchemaField
 	@Override
 	public <V> IndexSchemaFieldTerminalContext<V> asLuceneField(LuceneFieldContributor<V> fieldContributor,
 			LuceneFieldValueExtractor<V> fieldValueExtractor) {
-		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>( relativeFieldName, fieldContributor, fieldValueExtractor ) );
+		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>(
+				this, relativeFieldName, fieldContributor, fieldValueExtractor
+		) );
+	}
+
+	@Override
+	public List<FailureContextElement> getFailureContext() {
+		return Arrays.asList(
+				parent.getRootNodeBuilder().getIndexFailureContextElement(),
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {

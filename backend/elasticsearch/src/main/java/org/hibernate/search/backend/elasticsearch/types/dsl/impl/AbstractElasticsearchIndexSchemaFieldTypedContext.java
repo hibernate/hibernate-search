@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldTypedContext;
@@ -21,7 +22,13 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<T>
 		implements ElasticsearchIndexSchemaFieldTypedContext<T>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
-	private DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	protected final IndexSchemaContext schemaContext;
+
+	private final DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
+
+	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext) {
+		this.schemaContext = schemaContext;
+	}
 
 	@Override
 	public IndexFieldAccessor<T> createAccessor() {

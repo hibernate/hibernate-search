@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
@@ -33,7 +34,9 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public AbstractScalarFieldTypedContext(String relativeFieldName, DataType dataType) {
+	AbstractScalarFieldTypedContext(IndexSchemaContext schemaContext,
+			String relativeFieldName, DataType dataType) {
+		super( schemaContext );
 		this.relativeFieldName = relativeFieldName;
 		this.dataType = dataType;
 	}
@@ -72,10 +75,10 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 		mapping.setType( dataType );
 
 		if ( analyzerName != null ) {
-			throw log.cannotUseAnalyzerOnFieldType( parentNode.getAbsolutePath( relativeFieldName ), dataType );
+			throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, dataType, schemaContext.getFailureContext() );
 		}
 		if ( normalizerName != null ) {
-			throw log.cannotUseNormalizerOnFieldType( parentNode.getAbsolutePath( relativeFieldName ), dataType );
+			throw log.cannotUseNormalizerOnFieldType( relativeFieldName, dataType, schemaContext.getFailureContext() );
 		}
 
 		switch ( store ) {

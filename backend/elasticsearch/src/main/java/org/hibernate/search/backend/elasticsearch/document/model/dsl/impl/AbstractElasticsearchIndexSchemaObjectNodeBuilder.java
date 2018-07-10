@@ -40,14 +40,14 @@ abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements Inde
 	@Override
 	public IndexSchemaFieldContext addField(String relativeFieldName) {
 		ElasticsearchIndexSchemaFieldContextImpl fieldContext =
-				new ElasticsearchIndexSchemaFieldContextImpl( relativeFieldName );
+				new ElasticsearchIndexSchemaFieldContextImpl( this, relativeFieldName );
 		putProperty( relativeFieldName, fieldContext );
 		return fieldContext;
 	}
 
 	@Override
 	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
-		return new ElasticsearchIndexSchemaFieldContextImpl( relativeFieldName );
+		return new ElasticsearchIndexSchemaFieldContextImpl( this, relativeFieldName );
 	}
 
 	@Override

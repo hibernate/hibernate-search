@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -28,8 +29,8 @@ public class GeoPointIndexSchemaFieldContext extends AbstractScalarFieldTypedCon
 
 	private final String relativeFieldName;
 
-	public GeoPointIndexSchemaFieldContext(String relativeFieldName) {
-		super( relativeFieldName, DataType.GEO_POINT );
+	public GeoPointIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, DataType.GEO_POINT );
 		this.relativeFieldName = relativeFieldName;
 	}
 

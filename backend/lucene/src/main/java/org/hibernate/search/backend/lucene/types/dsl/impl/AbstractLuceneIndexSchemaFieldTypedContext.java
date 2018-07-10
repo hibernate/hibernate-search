@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
@@ -29,13 +30,15 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
-
+	private final IndexSchemaContext schemaContext;
 	private final String relativeFieldName;
+
+	private final DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
 	private Store store;
 
-	protected AbstractLuceneIndexSchemaFieldTypedContext(String relativeFieldName) {
+	protected AbstractLuceneIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		this.schemaContext = schemaContext;
 		this.relativeFieldName = relativeFieldName;
 	}
 
@@ -65,12 +68,12 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
-		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName );
+		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, schemaContext.getFailureContext() );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
-		throw log.cannotUseNormalizerOnFieldType( relativeFieldName );
+		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, schemaContext.getFailureContext() );
 	}
 
 	protected String getRelativeFieldName() {

@@ -6,15 +6,20 @@
  */
 package org.hibernate.search.integrationtest.backend.tck;
 
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -34,6 +39,13 @@ public class DocumentModelDslIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private static List<Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>>> NON_ANALYZABLE_TYPES =
+			CollectionHelper.toImmutableList( CollectionHelper.asList(
+					IndexSchemaFieldContext::asInteger,
+					IndexSchemaFieldContext::asLocalDate,
+					IndexSchemaFieldContext::asGeoPoint
+			) );
 
 	@Test
 	public void nullFieldName() {
@@ -345,6 +357,92 @@ public class DocumentModelDslIT {
 						FailureContexts.fromIndexName( INDEX_NAME ),
 						FailureContexts.fromIndexFieldAbsolutePath( "object1.object2" )
 				) );
+	}
+
+	@Test
+	public void analyzerOnNonAnalyzableType() {
+		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction
+				: NON_ANALYZABLE_TYPES ) {
+			SubTest.expectException(
+					"Setting an analyzer after " + typedContextFunction + " on schema root",
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						typedContextFunction.apply(
+								root.field( "myField" )
+						)
+								.analyzer( "someAnalyzer" );
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchExceptionWithContext.class )
+					.hasMessageContaining( "An analyzer was set on field 'myField'" )
+					.hasMessageContaining( "fields of this type cannot be analyzed" )
+					.satisfies( FailureReportUtils.hasContext(
+							FailureContexts.fromIndexName( INDEX_NAME ),
+							FailureContexts.fromIndexFieldAbsolutePath( "myField" )
+					) );
+			SubTest.expectException(
+					"Setting an analyzer after " + typedContextFunction + " on non-root",
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						typedContextFunction.apply(
+								root.objectField( "nonRoot" ).field( "myField" )
+						)
+								.analyzer( "someAnalyzer" );
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchExceptionWithContext.class )
+					.hasMessageContaining( "An analyzer was set on field 'myField'" )
+					.hasMessageContaining( "fields of this type cannot be analyzed" )
+					.satisfies( FailureReportUtils.hasContext(
+							FailureContexts.fromIndexName( INDEX_NAME ),
+							FailureContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
+					) );
+		}
+	}
+
+	@Test
+	public void normalizerOnNonAnalyzableType() {
+		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction
+				: NON_ANALYZABLE_TYPES ) {
+			SubTest.expectException(
+					"Setting a normalizer after " + typedContextFunction + " on schema root",
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						typedContextFunction.apply(
+								root.field( "myField" )
+						)
+								.normalizer( "someNormalizer" );
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchExceptionWithContext.class )
+					.hasMessageContaining( "A normalizer was set on field 'myField'" )
+					.hasMessageContaining( "fields of this type cannot be analyzed" )
+					.satisfies( FailureReportUtils.hasContext(
+							FailureContexts.fromIndexName( INDEX_NAME ),
+							FailureContexts.fromIndexFieldAbsolutePath( "myField" )
+					) );
+			SubTest.expectException(
+					"Setting a normalizer after " + typedContextFunction + " on non-root",
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						typedContextFunction.apply(
+								root.objectField( "nonRoot" ).field( "myField" )
+						)
+								.normalizer( "someNormalizer" );
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchExceptionWithContext.class )
+					.hasMessageContaining( "A normalizer was set on field 'myField'" )
+					.hasMessageContaining( "fields of this type cannot be analyzed" )
+					.satisfies( FailureReportUtils.hasContext(
+							FailureContexts.fromIndexName( INDEX_NAME ),
+							FailureContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
+					) );
+		}
 	}
 
 	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {

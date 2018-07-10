@@ -17,6 +17,7 @@ import java.time.format.SignStyle;
 import java.util.Arrays;
 import java.util.Locale;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -50,8 +51,8 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 	private final String relativeFieldName;
 	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	public LocalDateIndexSchemaFieldContext(String relativeFieldName) {
-		super( relativeFieldName, DataType.DATE );
+	public LocalDateIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}
 

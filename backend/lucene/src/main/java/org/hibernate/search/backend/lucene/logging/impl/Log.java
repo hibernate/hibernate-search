@@ -79,10 +79,12 @@ public interface Log extends BasicLogger {
 	SearchException luceneExtensionOnUnknownType(Object context);
 
 	@Message(id = 506, value = "An analyzer was set on field '%1$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseAnalyzerOnFieldType(String relativeFieldName);
+	SearchExceptionWithContext cannotUseAnalyzerOnFieldType(String relativeFieldName,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 507, value = "A normalizer was set on field '%1$s', but fields of this type cannot be analyzed." )
-	SearchException cannotUseNormalizerOnFieldType(String relativeFieldName);
+	SearchExceptionWithContext cannotUseNormalizerOnFieldType(String relativeFieldName,
+			@Param List<FailureContextElement> context);
 
 	@Message(id = 510, value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
 			+ " Given predicate was: '%1$s'" )

@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.apache.lucene.index.IndexableField;
+
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
@@ -26,9 +28,9 @@ public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField> ext
 
 	private LuceneFieldValueExtractor<V> fieldValueExtractor;
 
-	public LuceneFieldIndexSchemaFieldContext(String relativeFieldName, LuceneFieldContributor<V> fieldContributor,
-			LuceneFieldValueExtractor<V> fieldValueExtractor) {
-		super( relativeFieldName );
+	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
+			LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor) {
+		super( schemaContext, relativeFieldName );
 
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;

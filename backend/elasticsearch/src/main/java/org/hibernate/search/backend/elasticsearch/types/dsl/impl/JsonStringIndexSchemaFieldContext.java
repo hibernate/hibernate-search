@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
@@ -37,6 +38,8 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 
 	private static final StandardFieldPredicateBuilderFactory PREDICATE_BUILDER_FACTORY = new StandardFieldPredicateBuilderFactory( CODEC );
 
+	private final IndexSchemaContext schemaContext;
+
 	private DeferredInitializationIndexFieldAccessor<String> reference =
 			new DeferredInitializationIndexFieldAccessor<>();
 
@@ -44,7 +47,8 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 
 	private final String mappingJsonString;
 
-	public JsonStringIndexSchemaFieldContext(String relativeFieldName, String mappingJsonString) {
+	public JsonStringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
+		this.schemaContext = schemaContext;
 		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;
 	}

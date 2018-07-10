@@ -38,14 +38,14 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	@Override
 	public IndexSchemaFieldContext addField(String relativeFieldName) {
 		LuceneIndexSchemaFieldContextImpl fieldContext =
-				new LuceneIndexSchemaFieldContextImpl( relativeFieldName );
+				new LuceneIndexSchemaFieldContextImpl( this, relativeFieldName );
 		putProperty( relativeFieldName, fieldContext );
 		return fieldContext;
 	}
 
 	@Override
 	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
-		return new LuceneIndexSchemaFieldContextImpl( relativeFieldName );
+		return new LuceneIndexSchemaFieldContextImpl( this, relativeFieldName );
 	}
 
 	@Override
