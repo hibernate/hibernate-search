@@ -28,10 +28,8 @@ class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBui
 
 	@Override
 	public FailureContext getFailureContext() {
-		return FailureContext.create(
-				getRootNodeBuilder().getIndexFailureContextElement(),
-				FailureContexts.fromIndexFieldAbsolutePath( builder.getAbsolutePath() )
-		);
+		return getRootNodeBuilder().getIndexFailureContext()
+				.append( FailureContexts.fromIndexFieldAbsolutePath( builder.getAbsolutePath() ) );
 	}
 
 	@Override

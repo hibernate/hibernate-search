@@ -15,60 +15,80 @@ public class FailureContexts {
 
 	private static final FailureContextMessages MESSAGES = Messages.getBundle( FailureContextMessages.class );
 
-	private static final FailureContextElement INDEX_SCHEMA_ROOT = new FailureContextElement() {
-		@Override
-		public String toString() {
-			return "FailureContextElement[" + render() + "]";
-		}
+	private static final FailureContext DEFAULT = FailureContext.create(
+			new FailureContextElement() {
+				@Override
+				public String toString() {
+					return "FailureContextElement[" + render() + "]";
+				}
 
-		@Override
-		public String render() {
-			return MESSAGES.indexSchemaRoot();
-		}
-	};
+				@Override
+				public String render() {
+					return MESSAGES.defaultOnMissingContextElement();
+				}
+			}
+	);
+
+	private static final FailureContext INDEX_SCHEMA_ROOT = FailureContext.create(
+			new FailureContextElement() {
+				@Override
+				public String toString() {
+					return "FailureContextElement[" + render() + "]";
+				}
+
+				@Override
+				public String render() {
+					return MESSAGES.indexSchemaRoot();
+				}
+			}
+	);
 
 	private FailureContexts() {
 	}
 
-	public static FailureContextElement fromType(MappableTypeModel typeModel) {
-		return new AbstractSimpleFailureContextElement<MappableTypeModel>( typeModel ) {
+	public static FailureContext getDefault() {
+		return DEFAULT;
+	}
+
+	public static FailureContext fromType(MappableTypeModel typeModel) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<MappableTypeModel>( typeModel ) {
 			@Override
 			public String render(MappableTypeModel param) {
 				String typeName = param.getName();
 				return MESSAGES.type( typeName );
 			}
-		};
+		} );
 	}
 
-	public static FailureContextElement fromBackendName(String name) {
-		return new AbstractSimpleFailureContextElement<String>( name ) {
+	public static FailureContext fromBackendName(String name) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<String>( name ) {
 			@Override
 			public String render(String param) {
 				return MESSAGES.backend( param );
 			}
-		};
+		} );
 	}
 
-	public static FailureContextElement fromIndexName(String name) {
-		return new AbstractSimpleFailureContextElement<String>( name ) {
+	public static FailureContext fromIndexName(String name) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<String>( name ) {
 			@Override
 			public String render(String param) {
 				return MESSAGES.index( param );
 			}
-		};
+		} );
 	}
 
-	public static FailureContextElement indexSchemaRoot() {
+	public static FailureContext indexSchemaRoot() {
 		return INDEX_SCHEMA_ROOT;
 	}
 
-	public static FailureContextElement fromIndexFieldAbsolutePath(String absolutePath) {
-		return new AbstractSimpleFailureContextElement<String>( absolutePath ) {
+	public static FailureContext fromIndexFieldAbsolutePath(String absolutePath) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<String>( absolutePath ) {
 			@Override
 			public String render(String param) {
 				return MESSAGES.indexFieldAbsolutePath( param );
 			}
-		};
+		} );
 	}
 
 }

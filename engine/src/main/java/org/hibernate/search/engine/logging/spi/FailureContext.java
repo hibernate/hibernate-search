@@ -7,12 +7,10 @@
 package org.hibernate.search.engine.logging.spi;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
 import org.hibernate.search.engine.logging.impl.FailureContextMessages;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 
 import org.jboss.logging.Messages;
 
@@ -23,24 +21,28 @@ public final class FailureContext {
 
 	private static final FailureContextMessages MESSAGES = Messages.getBundle( FailureContextMessages.class );
 
-	public static FailureContext create(FailureContextElement singleElement) {
-		return new FailureContext( Collections.singletonList( singleElement ) );
-	}
-
 	public static FailureContext create(FailureContextElement firstElement, FailureContextElement ... otherElements) {
-		return new FailureContext( Collections.unmodifiableList(
-				CollectionHelper.asList( firstElement, otherElements )
-		) );
+		FailureContext result = new FailureContext( null, firstElement );
+		for ( FailureContextElement otherElement : otherElements ) {
+			result = new FailureContext( result, otherElement );
+		}
+		return result;
 	}
 
-	public static FailureContext create(List<FailureContextElement> elements) {
-		return new FailureContext( Collections.unmodifiableList( new ArrayList<>( elements ) ) );
+	public static FailureContext concat(FailureContext first, FailureContext ... others) {
+		FailureContext result = first;
+		for ( FailureContext other : others ) {
+			result = first.append( other );
+		}
+		return result;
 	}
 
-	private final List<FailureContextElement> elements;
+	private final FailureContext parent;
+	private final FailureContextElement element;
 
-	private FailureContext(List<FailureContextElement> elements) {
-		this.elements = elements;
+	private FailureContext(FailureContext parent, FailureContextElement element) {
+		this.parent = parent;
+		this.element = element;
 	}
 
 	@Override
@@ -49,7 +51,9 @@ public final class FailureContext {
 	}
 
 	public List<FailureContextElement> getElements() {
-		return elements;
+		List<FailureContextElement> result = new ArrayList<>();
+		addTo( result );
+		return result;
 	}
 
 	/**
@@ -57,10 +61,30 @@ public final class FailureContext {
 	 */
 	public String render() {
 		StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
-		for ( FailureContextElement element : elements ) {
+		for ( FailureContextElement element : getElements() ) {
 			contextJoiner.add( element.render() );
 		}
 		return MESSAGES.contextPrefix() + contextJoiner.toString();
+	}
+
+	public FailureContext append(FailureContext other) {
+		return other.appendTo( this );
+	}
+
+	private FailureContext appendTo(FailureContext other) {
+		FailureContext result = other;
+		if ( parent != null ) {
+			result = parent.appendTo( result );
+		}
+		result = new FailureContext( result, element );
+		return result;
+	}
+
+	private void addTo(List<FailureContextElement> list) {
+		if ( parent != null ) {
+			parent.addTo( list );
+		}
+		list.add( element );
 	}
 
 }

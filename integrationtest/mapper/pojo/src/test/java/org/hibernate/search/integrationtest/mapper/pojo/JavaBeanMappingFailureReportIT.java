@@ -281,19 +281,15 @@ public class JavaBeanMappingFailureReportIT {
 				indexName, "failingField1",
 				() -> new SearchExceptionWithContext(
 						field1FailureMessage,
-						FailureContext.create(
-								FailureContexts.fromIndexName( indexName ),
-								FailureContexts.fromIndexFieldAbsolutePath( "failingField1" )
-						)
+						FailureContexts.fromIndexName( indexName )
+								.append( FailureContexts.fromIndexFieldAbsolutePath( "failingField1" ) )
 				)
 		);
 		backendMock.expectFailingField(
 				indexName, "failingField2", () -> new SearchExceptionWithContext(
 						field2FailureMessage,
-						FailureContext.create(
-								FailureContexts.fromIndexName( indexName ),
-								FailureContexts.fromIndexFieldAbsolutePath( "failingField2" )
-						)
+						FailureContexts.fromIndexName( indexName )
+								.append( FailureContexts.fromIndexFieldAbsolutePath( "failingField2" ) )
 				)
 		);
 

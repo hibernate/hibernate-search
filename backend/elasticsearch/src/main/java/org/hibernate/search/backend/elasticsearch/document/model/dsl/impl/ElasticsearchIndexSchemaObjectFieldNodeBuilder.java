@@ -46,10 +46,8 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 	@Override
 	public FailureContext getFailureContext() {
-		return FailureContext.create(
-				getRootNodeBuilder().getIndexFailureContextElement(),
-				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+		return getRootNodeBuilder().getIndexFailureContext()
+				.append( FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	@Override

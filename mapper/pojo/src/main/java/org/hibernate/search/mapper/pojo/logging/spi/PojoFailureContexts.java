@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.PojoFailureContextMessages;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.engine.logging.spi.AbstractSimpleFailureContextElement;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 import org.jboss.logging.Messages;
@@ -24,27 +24,27 @@ public final class PojoFailureContexts {
 	private PojoFailureContexts() {
 	}
 
-	public static FailureContextElement fromType(PojoRawTypeModel<?> typeModel) {
+	public static FailureContext fromType(PojoRawTypeModel<?> typeModel) {
 		return FailureContexts.fromType( typeModel );
 	}
 
-	public static FailureContextElement fromPath(PojoModelPath unboundPath) {
-		return new AbstractSimpleFailureContextElement<PojoModelPath>( unboundPath ) {
+	public static FailureContext fromPath(PojoModelPath unboundPath) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<PojoModelPath>( unboundPath ) {
 			@Override
 			public String render(PojoModelPath param) {
 				String pathString = param == null ? "" : param.toPathString();
 				return MESSAGES.path( pathString );
 			}
-		};
+		} );
 	}
 
-	public static FailureContextElement fromAnnotation(Annotation annotation) {
-		return new AbstractSimpleFailureContextElement<Annotation>( annotation ) {
+	public static FailureContext fromAnnotation(Annotation annotation) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<Annotation>( annotation ) {
 			@Override
 			public String render(Annotation annotation) {
 				String annotationString = annotation.toString();
 				return MESSAGES.annotation( annotationString );
 			}
-		};
+		} );
 	}
 }

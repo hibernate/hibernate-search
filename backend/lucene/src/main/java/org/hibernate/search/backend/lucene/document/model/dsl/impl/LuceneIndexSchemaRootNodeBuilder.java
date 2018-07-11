@@ -11,7 +11,6 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneRootIndexSchemaContributor;
 import org.hibernate.search.engine.logging.spi.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
@@ -25,10 +24,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	@Override
 	public FailureContext getFailureContext() {
-		return FailureContext.create(
-				getIndexFailureContextElement(),
-				FailureContexts.indexSchemaRoot()
-		);
+		return getIndexFailureContext().append( FailureContexts.indexSchemaRoot() );
 	}
 
 	@Override
@@ -54,7 +50,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		return null;
 	}
 
-	FailureContextElement getIndexFailureContextElement() {
+	FailureContext getIndexFailureContext() {
 		return FailureContexts.fromIndexName( indexName );
 	}
 }

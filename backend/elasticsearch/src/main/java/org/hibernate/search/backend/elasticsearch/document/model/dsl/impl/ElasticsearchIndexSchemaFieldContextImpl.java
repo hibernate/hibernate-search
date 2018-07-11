@@ -102,10 +102,8 @@ class ElasticsearchIndexSchemaFieldContextImpl
 
 	@Override
 	public FailureContext getFailureContext() {
-		return FailureContext.create(
-				parent.getRootNodeBuilder().getIndexFailureContextElement(),
-				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+		return parent.getRootNodeBuilder().getIndexFailureContext()
+				.append( FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	private <T extends ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> T setDelegate(T context) {

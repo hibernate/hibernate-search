@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 
@@ -19,6 +20,18 @@ import org.assertj.core.api.Assertions;
 public final class FailureReportUtils {
 
 	private FailureReportUtils() {
+	}
+
+	/**
+	 * @param first The first part of the expected context.
+	 * @param others The other parts of the expected context, if any. To be concatenated to the first part.
+	 * @return A consumer representing an assertion to be passed as a parameter to
+	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
+	 */
+	public static Consumer<Throwable> hasContext(FailureContext first, FailureContext ... others) {
+		return hasContext(
+				FailureContext.concat( first, others ).getElements().toArray( new FailureContextElement[] { } )
+		);
 	}
 
 	/**

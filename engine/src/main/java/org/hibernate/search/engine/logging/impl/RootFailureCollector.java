@@ -18,6 +18,7 @@ import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -92,13 +93,6 @@ public class RootFailureCollector implements FailureCollector {
 	}
 
 	private static class FailureCollectorImpl implements FailureCollector {
-		private static final FailureContextElement DEFAULT_CONTEXT_ELEMENT = new FailureContextElement() {
-			@Override
-			public String render() {
-				return MESSAGES.defaultOnMissingContextElement();
-			}
-		};
-
 		protected final RootFailureCollector root;
 		private Map<FailureContextElement, ContextualFailureCollectorImpl> children;
 
@@ -113,17 +107,15 @@ public class RootFailureCollector implements FailureCollector {
 		@Override
 		public ContextualFailureCollectorImpl withContext(FailureContext context) {
 			List<FailureContextElement> elements = context.getElements();
+			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			if ( elements.isEmpty() ) {
-				/*
-				 * Do not fail, since we are already probably processing a failure.
-				 * Just log the problem and degrade gracefully.
-				 */
+				// Just log the problem and degrade gracefully.
 				log.unexpectedEmptyFailureContext( new SearchException( "Exception for stack trace" ) );
 				return withDefaultContext();
 			}
 			else {
 				FailureCollectorImpl failureCollector = this;
-				for ( FailureContextElement contextElement : context.getElements() ) {
+				for ( FailureContextElement contextElement : elements ) {
 					failureCollector = failureCollector.withContext( contextElement );
 				}
 				return (ContextualFailureCollectorImpl) failureCollector;
@@ -148,7 +140,7 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		ContextualFailureCollectorImpl withDefaultContext() {
-			return withContext( DEFAULT_CONTEXT_ELEMENT );
+			return withContext( FailureContexts.getDefault() );
 		}
 
 		void appendContextTo(StringJoiner joiner) {
