@@ -43,7 +43,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.logging.impl.RootFailureCollector;
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -256,8 +256,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 					}
 					catch (RuntimeException e) {
 						buildContext.getFailureCollector()
-								.withContext( FailureContexts.fromType( typeModel ) )
-								.withContext( FailureContexts.fromIndexName( indexName ) )
+								.withContext( EventContexts.fromType( typeModel ) )
+								.withContext( EventContexts.fromIndexName( indexName ) )
 								.add( e );
 						continue;
 					}

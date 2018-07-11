@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate.spatial;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -90,7 +90,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Spatial predicates are not supported by" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexFieldAbsolutePath( "string" )
+						EventContexts.fromIndexFieldAbsolutePath( "string" )
 				) );
 	}
 

@@ -15,22 +15,22 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.EventContext;
 
 import org.apache.lucene.store.Directory;
 
 public class IndexingBackendContext {
-	private final FailureContext failureContext;
+	private final EventContext eventContext;
 
 	private final DirectoryProvider directoryProvider;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	public IndexingBackendContext(FailureContext failureContext,
+	public IndexingBackendContext(EventContext eventContext,
 			DirectoryProvider directoryProvider,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy) {
-		this.failureContext = failureContext;
+		this.eventContext = eventContext;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
@@ -38,11 +38,11 @@ public class IndexingBackendContext {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + failureContext + "]";
+		return getClass().getSimpleName() + "[" + eventContext + "]";
 	}
 
-	FailureContext getFailureContext() {
-		return failureContext;
+	EventContext getEventContext() {
+		return eventContext;
 	}
 
 	Directory createDirectory(String indexName) throws IOException {
@@ -52,7 +52,7 @@ public class IndexingBackendContext {
 	ChangesetIndexWorker<LuceneRootDocumentBuilder> createChangesetIndexWorker(
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), failureContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneChangesetIndexWorker( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );
@@ -61,7 +61,7 @@ public class IndexingBackendContext {
 	StreamIndexWorker<LuceneRootDocumentBuilder> createStreamIndexWorker(
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), failureContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneStreamIndexWorker( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );

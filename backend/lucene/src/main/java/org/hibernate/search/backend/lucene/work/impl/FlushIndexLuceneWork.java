@@ -36,7 +36,7 @@ public class FlushIndexLuceneWork extends AbstractLuceneWork<Void> {
 			indexWriter.flush();
 		}
 		catch (IOException e) {
-			throw log.unableToFlushIndex( getFailureContext(), e );
+			throw log.unableToFlushIndex( getEventContext(), e );
 		}
 	}
 

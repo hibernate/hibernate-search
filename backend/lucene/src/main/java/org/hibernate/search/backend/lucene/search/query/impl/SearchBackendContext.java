@@ -15,22 +15,22 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrc
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 public class SearchBackendContext {
-	private final FailureContext failureContext;
+	private final EventContext eventContext;
 
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final LuceneQueryWorkOrchestrator orchestrator;
 
-	public SearchBackendContext(FailureContext failureContext,
+	public SearchBackendContext(EventContext eventContext,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			LuceneQueryWorkOrchestrator orchestrator) {
-		this.failureContext = failureContext;
+		this.eventContext = eventContext;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
@@ -38,11 +38,11 @@ public class SearchBackendContext {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + failureContext + "]";
+		return getClass().getSimpleName() + "[" + eventContext + "]";
 	}
 
-	public FailureContext getFailureContext() {
-		return failureContext;
+	public EventContext getEventContext() {
+		return eventContext;
 	}
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
@@ -50,7 +50,7 @@ public class SearchBackendContext {
 			SessionContext sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), failureContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		Set<String> storedFields = new HashSet<>();
 		hitExtractor.contributeFields( storedFields );

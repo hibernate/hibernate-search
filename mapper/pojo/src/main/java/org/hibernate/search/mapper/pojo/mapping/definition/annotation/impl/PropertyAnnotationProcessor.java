@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -52,9 +52,9 @@ abstract class PropertyAnnotationProcessor<A extends Annotation> {
 			}
 			catch (RuntimeException e) {
 				helper.getRootFailureCollector()
-						.withContext( PojoFailureContexts.fromType( typeModel ) )
-						.withContext( PojoFailureContexts.fromPath( PojoModelPath.fromRoot( propertyModel.getName() ) ) )
-						.withContext( PojoFailureContexts.fromAnnotation( annotation ) )
+						.withContext( PojoEventContexts.fromType( typeModel ) )
+						.withContext( PojoEventContexts.fromPath( PojoModelPath.fromRoot( propertyModel.getName() ) ) )
+						.withContext( PojoEventContexts.fromAnnotation( annotation ) )
 						.add( e );
 			}
 		}

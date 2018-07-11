@@ -33,7 +33,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -252,7 +252,7 @@ public class ExtensionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexFieldAbsolutePath( "nativeField" )
+						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
 				) );
 	}
 
@@ -272,7 +272,7 @@ public class ExtensionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexFieldAbsolutePath( "nativeField" )
+						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
 				) );
 	}
 
@@ -332,7 +332,7 @@ public class ExtensionIT {
 				.hasCauseInstanceOf( SearchException.class )
 				.hasMessageContaining( "This native field does not support projection." )
 				.satisfies( FailureReportUtils.hasCauseWithContext(
-						FailureContexts.fromIndexFieldAbsolutePath( "nativeField_unsupportedProjection" )
+						EventContexts.fromIndexFieldAbsolutePath( "nativeField_unsupportedProjection" )
 				) );
 	}
 

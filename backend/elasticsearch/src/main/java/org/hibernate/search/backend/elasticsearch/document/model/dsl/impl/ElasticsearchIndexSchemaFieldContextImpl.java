@@ -22,8 +22,8 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndex
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
@@ -101,9 +101,9 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public FailureContext getFailureContext() {
-		return parent.getRootNodeBuilder().getIndexFailureContext()
-				.append( FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	public EventContext getEventContext() {
+		return parent.getRootNodeBuilder().getIndexEventContext()
+				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	private <T extends ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> T setDelegate(T context) {

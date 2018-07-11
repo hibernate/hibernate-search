@@ -4,18 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean.log.impl;
+package org.hibernate.search.util.impl.common.logging;
 
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
- * Message bundle for failure contexts in the JavaBean mapper.
+ * Common message bundle related to event contexts.
  */
 @MessageBundle(projectCode = "HSEARCH")
-public interface JavaBeanFailureContextMessages {
+public interface CommonEventContextMessages {
 
-	@Message(value = "JavaBean mapping")
-	String mapping();
+	@Message(value = "Context: ")
+	String contextPrefix();
+
+	@Message(value = ", ")
+	String contextSeparator();
 
 }

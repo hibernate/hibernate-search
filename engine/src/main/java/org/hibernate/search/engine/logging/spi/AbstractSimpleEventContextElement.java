@@ -8,30 +8,30 @@ package org.hibernate.search.engine.logging.spi;
 
 import java.util.Objects;
 
-import org.hibernate.search.util.FailureContextElement;
+import org.hibernate.search.util.EventContextElement;
 
 /**
- * An abstract base for simple failure contexts based on a single parameter
+ * An abstract base for simple event context elements based on a single parameter
  * passed to a rendering function.
  *
  * @param <T> The type of the parameter.
  */
-public abstract class AbstractSimpleFailureContextElement<T> implements FailureContextElement {
+public abstract class AbstractSimpleEventContextElement<T> implements EventContextElement {
 	private final T param;
 
-	protected AbstractSimpleFailureContextElement(T param) {
+	protected AbstractSimpleEventContextElement(T param) {
 		this.param = param;
 	}
 
 	@Override
 	public String toString() {
-		return "SimpleFailureContextElement[" + render() + "]";
+		return "SimpleEventContextElement[" + render() + "]";
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		return obj != null && getClass().equals( obj.getClass() )
-				&& Objects.equals( param, ( (AbstractSimpleFailureContextElement<?>) obj ).param );
+				&& Objects.equals( param, ( (AbstractSimpleEventContextElement<?>) obj ).param );
 	}
 
 	@Override

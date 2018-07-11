@@ -7,10 +7,10 @@
 package org.hibernate.search.util;
 
 /**
- * An atomic element of context when a failure occurs:
+ * An atomic element of context when an event occurs:
  * a mapped type, or an index, or a field path, ...
  */
-public interface FailureContextElement {
+public interface EventContextElement {
 
 	/**
 	 * @return A human-readable representation of this context.

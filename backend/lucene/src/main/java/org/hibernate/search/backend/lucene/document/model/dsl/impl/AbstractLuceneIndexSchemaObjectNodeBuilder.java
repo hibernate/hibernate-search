@@ -74,7 +74,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	private void putProperty(String name, LuceneIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( name, getFailureContext() );
+			throw log.indexSchemaNodeNameConflict( name, getEventContext() );
 		}
 	}
 }

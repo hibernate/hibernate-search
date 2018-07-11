@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.util.FailureContextElement;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.EventContextElement;
 import org.hibernate.search.util.SearchException;
 
 import org.assertj.core.api.Assertions;
@@ -28,9 +28,9 @@ public final class FailureReportUtils {
 	 * @return A consumer representing an assertion to be passed as a parameter to
 	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
 	 */
-	public static Consumer<Throwable> hasContext(FailureContext first, FailureContext ... others) {
+	public static Consumer<Throwable> hasContext(EventContext first, EventContext... others) {
 		return hasContext(
-				FailureContext.concat( first, others ).getElements().toArray( new FailureContextElement[] { } )
+				EventContext.concat( first, others ).getElements().toArray( new EventContextElement[] { } )
 		);
 	}
 
@@ -39,20 +39,20 @@ public final class FailureReportUtils {
 	 * @return A consumer representing an assertion to be passed as a parameter to
 	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
 	 */
-	public static Consumer<Throwable> hasContext(FailureContextElement ... contextElements) {
+	public static Consumer<Throwable> hasContext(EventContextElement... contextElements) {
 		return throwable -> {
 			Assertions.assertThat( throwable )
 					.isInstanceOf( SearchException.class );
 			Assertions.assertThat( ( (SearchException) throwable ).getContext().getElements() )
 					.containsExactly( contextElements );
-			String renderedContextElements = Arrays.stream( contextElements ).map( FailureContextElement::render )
+			String renderedContextElements = Arrays.stream( contextElements ).map( EventContextElement::render )
 					.collect( Collectors.joining( ", " ) );
 			Assertions.assertThat( throwable.getMessage() )
 					.endsWith( "Context: " + renderedContextElements );
 		};
 	}
 
-	public static Consumer<Throwable> hasCauseWithContext(FailureContext first, FailureContext ... others) {
+	public static Consumer<Throwable> hasCauseWithContext(EventContext first, EventContext ... others) {
 		Consumer<Throwable> delegate = hasContext( first, others );
 		return e -> delegate.accept( e.getCause() );
 

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -39,7 +39,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	@Override
 	public ContextualFailureCollector getFailureCollector() {
 		return rootBuilder.getFailureCollector().withContext(
-				PojoFailureContexts.fromPath( PojoModelPath.fromRoot( propertyName ) )
+				PojoEventContexts.fromPath( PojoModelPath.fromRoot( propertyName ) )
 		);
 	}
 

@@ -10,7 +10,7 @@ package org.hibernate.search.engine.logging.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -68,14 +68,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 14, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
 	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName,
-			@Param FailureContext context);
+			@Param EventContext context);
 
 	@Message(id = 15, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
 			+ " Remove the dot from your field name,"
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
 	SearchException relativeFieldNameCannotContainDot(String relativeFieldName,
-			@Param FailureContext context);
+			@Param EventContext context);
 
 	@Message(id = 16, value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
@@ -112,6 +112,6 @@ public interface Log extends BasicLogger {
 	void newBootstrapCollectedFailure(String context, @Cause Throwable failure);
 
 	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = 22, value = "Unexpected empty failure context; there is a bug in Hibernate Search, please report it")
-	void unexpectedEmptyFailureContext(@Cause SearchException exceptionForStackTrace);
+	@Message(id = 22, value = "Unexpected empty event context; there is a bug in Hibernate Search, please report it")
+	void unexpectedEmptyEventContext(@Cause SearchException exceptionForStackTrace);
 }

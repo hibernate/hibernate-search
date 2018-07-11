@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -123,7 +123,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Spatial predicates are not supported by" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexFieldAbsolutePath( "string" )
+						EventContexts.fromIndexFieldAbsolutePath( "string" )
 				) );
 	}
 

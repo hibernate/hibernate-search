@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.util.FailureContextElement;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.EventContextElement;
 
 /**
  * A failure collector without any context.
@@ -20,8 +20,8 @@ import org.hibernate.search.util.FailureContextElement;
  */
 public interface FailureCollector {
 
-	ContextualFailureCollector withContext(FailureContext context);
+	ContextualFailureCollector withContext(EventContext context);
 
-	ContextualFailureCollector withContext(FailureContextElement contextElement);
+	ContextualFailureCollector withContext(EventContextElement contextElement);
 
 }

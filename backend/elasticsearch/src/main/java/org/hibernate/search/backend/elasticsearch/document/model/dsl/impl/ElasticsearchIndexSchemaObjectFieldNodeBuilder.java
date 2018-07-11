@@ -20,8 +20,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 
 class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
@@ -45,9 +45,9 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public FailureContext getFailureContext() {
-		return getRootNodeBuilder().getIndexFailureContext()
-				.append( FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	public EventContext getEventContext() {
+		return getRootNodeBuilder().getIndexEventContext()
+				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	@Override

@@ -74,10 +74,10 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	private void checkRelativeFieldName(String relativeFieldName) {
 		if ( StringHelper.isEmpty( relativeFieldName ) ) {
-			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.getFailureContext() );
+			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.getEventContext() );
 		}
 		if ( relativeFieldName.contains( "." ) ) {
-			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.getFailureContext() );
+			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.getEventContext() );
 		}
 	}
 

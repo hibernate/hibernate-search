@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 
 /**
  * @author Guillaume Smet
@@ -23,7 +23,7 @@ public abstract class AbstractLuceneWork<T> implements LuceneIndexWork<T> {
 		this.indexName = indexName;
 	}
 
-	protected final FailureContext getFailureContext() {
-		return FailureContexts.fromIndexName( indexName );
+	protected final EventContext getEventContext() {
+		return EventContexts.fromIndexName( indexName );
 	}
 }

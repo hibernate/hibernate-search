@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmFailureContextMessages;
+import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMessages;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 
 import org.jboss.logging.Messages;
 
 public final class HibernateOrmMappingKey implements MappingKey<HibernateOrmMapping> {
-	private static final HibernateOrmFailureContextMessages MESSAGES =
-			Messages.getBundle( HibernateOrmFailureContextMessages.class );
+	private static final HibernateOrmEventContextMessages MESSAGES =
+			Messages.getBundle( HibernateOrmEventContextMessages.class );
 
 	@Override
 	public String render() {

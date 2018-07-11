@@ -62,12 +62,12 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
-		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, schemaContext.getFailureContext() );
+		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
-		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, schemaContext.getFailureContext() );
+		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
 	}
 
 	protected String getRelativeFieldName() {

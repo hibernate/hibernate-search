@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -59,8 +59,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -74,8 +74,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 
 		SubTest.expectException(
@@ -89,8 +89,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -104,8 +104,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 	}
 
@@ -122,8 +122,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name '' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -137,8 +137,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name '' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 
 		SubTest.expectException(
@@ -152,8 +152,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name '' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -167,8 +167,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name '' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 	}
 
@@ -188,8 +188,8 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 						+ " declare an object field using the objectField() method." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -206,8 +206,8 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 						+ " declare an object field using the objectField() method." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 
 		SubTest.expectException(
@@ -224,8 +224,8 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 						+ " declare an object field using the objectField() method." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -242,8 +242,8 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "if you are declaring the field in a bridge and want a tree of fields,"
 						+ " declare an object field using the objectField() method." )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "nonRoot" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "nonRoot" )
 				) );
 	}
 
@@ -261,8 +261,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -279,8 +279,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "object1.object2" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "object1.object2" )
 				) );
 	}
 
@@ -298,8 +298,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -316,8 +316,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "object1.object2" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "object1.object2" )
 				) );
 	}
 
@@ -335,8 +335,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.indexSchemaRoot()
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.indexSchemaRoot()
 				) );
 
 		SubTest.expectException(
@@ -353,8 +353,8 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "schema node 'field1' was added twice" )
 				.satisfies( FailureReportUtils.hasContext(
-						FailureContexts.fromIndexName( INDEX_NAME ),
-						FailureContexts.fromIndexFieldAbsolutePath( "object1.object2" )
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "object1.object2" )
 				) );
 	}
 
@@ -377,8 +377,8 @@ public class DocumentModelDslIT {
 					.hasMessageContaining( "An analyzer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
-							FailureContexts.fromIndexName( INDEX_NAME ),
-							FailureContexts.fromIndexFieldAbsolutePath( "myField" )
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "myField" )
 					) );
 			SubTest.expectException(
 					"Setting an analyzer after " + typedContextFunction + " on non-root",
@@ -395,8 +395,8 @@ public class DocumentModelDslIT {
 					.hasMessageContaining( "An analyzer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
-							FailureContexts.fromIndexName( INDEX_NAME ),
-							FailureContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
 					) );
 		}
 	}
@@ -420,8 +420,8 @@ public class DocumentModelDslIT {
 					.hasMessageContaining( "A normalizer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
-							FailureContexts.fromIndexName( INDEX_NAME ),
-							FailureContexts.fromIndexFieldAbsolutePath( "myField" )
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "myField" )
 					) );
 			SubTest.expectException(
 					"Setting a normalizer after " + typedContextFunction + " on non-root",
@@ -438,8 +438,8 @@ public class DocumentModelDslIT {
 					.hasMessageContaining( "A normalizer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
-							FailureContexts.fromIndexName( INDEX_NAME ),
-							FailureContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
 					) );
 		}
 	}

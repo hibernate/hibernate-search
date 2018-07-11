@@ -20,8 +20,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrc
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -96,7 +96,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
 		if ( ! (searchTargetBuilder instanceof LuceneIndexSearchTargetBuilder ) ) {
 			throw log.cannotMixLuceneSearchTargetWithOtherType(
-					searchTargetBuilder, this, searchBackendContext.getFailureContext()
+					searchTargetBuilder, this, searchBackendContext.getEventContext()
 			);
 		}
 
@@ -138,7 +138,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 			return DirectoryReader.open( indexWriter );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexReader( getBackendAndIndexFailureContext(), e );
+			throw log.unableToCreateIndexReader( getBackendAndIndexEventContext(), e );
 		}
 	}
 
@@ -148,13 +148,13 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 			reader.close();
 		}
 		catch (IOException e) {
-			log.unableToCloseIndexReader( getBackendAndIndexFailureContext(), e );
+			log.unableToCloseIndexReader( getBackendAndIndexEventContext(), e );
 		}
 	}
 
-	private FailureContext getBackendAndIndexFailureContext() {
-		return indexingBackendContext.getFailureContext().append(
-				FailureContexts.fromIndexName( indexName )
+	private EventContext getBackendAndIndexEventContext() {
+		return indexingBackendContext.getEventContext().append(
+				EventContexts.fromIndexName( indexName )
 		);
 	}
 }

@@ -8,7 +8,7 @@ package org.hibernate.search.util;
 
 public class SearchException extends RuntimeException {
 	private final String messageWithoutContext;
-	private final FailureContext context;
+	private final EventContext context;
 
 	public SearchException(String message, Throwable cause) {
 		super( message, cause );
@@ -24,17 +24,17 @@ public class SearchException extends RuntimeException {
 		this( null, cause );
 	}
 
-	public SearchException(String message, Throwable cause, FailureContext context) {
+	public SearchException(String message, Throwable cause, EventContext context) {
 		super( message + "\n" + context.render(), cause );
 		this.messageWithoutContext = message;
 		this.context = context;
 	}
 
-	public SearchException(String message, FailureContext context) {
+	public SearchException(String message, EventContext context) {
 		this( message, null, context );
 	}
 
-	public SearchException(Throwable cause, FailureContext context) {
+	public SearchException(Throwable cause, EventContext context) {
 		this( null, cause, context );
 	}
 
@@ -42,7 +42,7 @@ public class SearchException extends RuntimeException {
 		return messageWithoutContext;
 	}
 
-	public FailureContext getContext() {
+	public EventContext getContext() {
 		return context;
 	}
 }

@@ -75,10 +75,10 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 		mapping.setType( dataType );
 
 		if ( analyzerName != null ) {
-			throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, dataType, schemaContext.getFailureContext() );
+			throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, dataType, schemaContext.getEventContext() );
 		}
 		if ( normalizerName != null ) {
-			throw log.cannotUseNormalizerOnFieldType( relativeFieldName, dataType, schemaContext.getFailureContext() );
+			throw log.cannotUseNormalizerOnFieldType( relativeFieldName, dataType, schemaContext.getEventContext() );
 		}
 
 		switch ( store ) {

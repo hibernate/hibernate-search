@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 
 class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, LuceneIndexSchemaNodeContributor {
@@ -36,9 +36,9 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public FailureContext getFailureContext() {
-		return getRootNodeBuilder().getIndexFailureContext()
-				.append( FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	public EventContext getEventContext() {
+		return getRootNodeBuilder().getIndexEventContext()
+				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	@Override

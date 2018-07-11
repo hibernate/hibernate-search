@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder, ElasticsearchRootIndexSchemaContributor {
@@ -32,9 +32,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public FailureContext getFailureContext() {
-		return getIndexFailureContext()
-				.append( FailureContexts.indexSchemaRoot() );
+	public EventContext getEventContext() {
+		return getIndexEventContext()
+				.append( EventContexts.indexSchemaRoot() );
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		return null;
 	}
 
-	FailureContext getIndexFailureContext() {
-		return FailureContexts.fromIndexName( hibernateSearchIndexName );
+	EventContext getIndexEventContext() {
+		return EventContexts.fromIndexName( hibernateSearchIndexName );
 	}
 }

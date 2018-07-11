@@ -17,7 +17,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -87,8 +87,8 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 							collector.mapToIndex( typeModel, indexedAnnotation.get().index() );
 						}
 						catch (RuntimeException e) {
-							failureCollector.withContext( PojoFailureContexts.fromType( typeModel ) )
-									.withContext( PojoFailureContexts.fromAnnotation( indexedAnnotation.get() ) )
+							failureCollector.withContext( PojoEventContexts.fromType( typeModel ) )
+									.withContext( PojoEventContexts.fromAnnotation( indexedAnnotation.get() ) )
 									.add( e );
 						}
 					}

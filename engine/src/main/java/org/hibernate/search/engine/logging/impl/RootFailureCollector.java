@@ -16,14 +16,14 @@ import java.util.StringJoiner;
 
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
-import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.util.FailureContextElement;
-import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
-import org.hibernate.search.util.impl.common.logging.CommonFailureContextMessages;
+import org.hibernate.search.util.impl.common.logging.CommonEventContextMessages;
 
 import org.jboss.logging.Messages;
 
@@ -31,9 +31,9 @@ public class RootFailureCollector implements FailureCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final CommonFailureContextMessages COMMON_MESSAGES = Messages.getBundle( CommonFailureContextMessages.class );
+	private static final CommonEventContextMessages COMMON_MESSAGES = Messages.getBundle( CommonEventContextMessages.class );
 
-	private static final EngineFailureContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineFailureContextMessages.class );
+	private static final EngineEventContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
 
 	/**
 	 * This prevents Hibernate Search from trying too hard to collect errors,
@@ -58,10 +58,10 @@ public class RootFailureCollector implements FailureCollector {
 
 	private String renderFailures() {
 		ToStringStyle style = ToStringStyle.multilineIndentStructure(
-				ENGINE_MESSAGES.contextFailuresSeparator(),
-				ENGINE_MESSAGES.contextIndent(),
-				ENGINE_MESSAGES.contextFailuresBulletPoint(),
-				ENGINE_MESSAGES.contextFailuresNoBulletPoint()
+				ENGINE_MESSAGES.failureReportContextFailuresSeparator(),
+				ENGINE_MESSAGES.failureReportContextIndent(),
+				ENGINE_MESSAGES.failureReportFailuresBulletPoint(),
+				ENGINE_MESSAGES.failureReportFailuresNoBulletPoint()
 		);
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
 		if ( delegate != null ) {
@@ -71,7 +71,7 @@ public class RootFailureCollector implements FailureCollector {
 	}
 
 	@Override
-	public ContextualFailureCollector withContext(FailureContext context) {
+	public ContextualFailureCollector withContext(EventContext context) {
 		if ( delegate == null ) {
 			delegate = new FailureCollectorImpl( this );
 		}
@@ -79,7 +79,7 @@ public class RootFailureCollector implements FailureCollector {
 	}
 
 	@Override
-	public ContextualFailureCollector withContext(FailureContextElement contextElement) {
+	public ContextualFailureCollector withContext(EventContextElement contextElement) {
 		if ( delegate == null ) {
 			delegate = new FailureCollectorImpl( this );
 		}
@@ -96,7 +96,7 @@ public class RootFailureCollector implements FailureCollector {
 
 	private static class FailureCollectorImpl implements FailureCollector {
 		protected final RootFailureCollector root;
-		private Map<FailureContextElement, ContextualFailureCollectorImpl> children;
+		private Map<EventContextElement, ContextualFailureCollectorImpl> children;
 
 		private FailureCollectorImpl(RootFailureCollector root) {
 			this.root = root;
@@ -107,17 +107,17 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public ContextualFailureCollectorImpl withContext(FailureContext context) {
-			List<FailureContextElement> elements = context.getElements();
+		public ContextualFailureCollectorImpl withContext(EventContext context) {
+			List<EventContextElement> elements = context.getElements();
 			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			if ( elements.isEmpty() ) {
 				// Just log the problem and degrade gracefully.
-				log.unexpectedEmptyFailureContext( new SearchException( "Exception for stack trace" ) );
+				log.unexpectedEmptyEventContext( new SearchException( "Exception for stack trace" ) );
 				return withDefaultContext();
 			}
 			else {
 				FailureCollectorImpl failureCollector = this;
-				for ( FailureContextElement contextElement : elements ) {
+				for ( EventContextElement contextElement : elements ) {
 					failureCollector = failureCollector.withContext( contextElement );
 				}
 				return (ContextualFailureCollectorImpl) failureCollector;
@@ -125,7 +125,7 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public ContextualFailureCollectorImpl withContext(FailureContextElement contextElement) {
+		public ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
 			if ( children == null ) {
 				// Use a LinkedHashMap for deterministic iteration
 				children = new LinkedHashMap<>();
@@ -142,7 +142,7 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		ContextualFailureCollectorImpl withDefaultContext() {
-			return withContext( FailureContexts.getDefault() );
+			return withContext( EventContexts.getDefault() );
 		}
 
 		void appendContextTo(StringJoiner joiner) {
@@ -163,18 +163,18 @@ public class RootFailureCollector implements FailureCollector {
 			}
 		}
 
-		final Map<FailureContextElement, ContextualFailureCollectorImpl> getChildren() {
+		final Map<EventContextElement, ContextualFailureCollectorImpl> getChildren() {
 			return children != null ? children : Collections.emptyMap();
 		}
 	}
 
 	private static class ContextualFailureCollectorImpl extends FailureCollectorImpl implements ContextualFailureCollector {
 		private final FailureCollectorImpl parent;
-		private final FailureContextElement context;
+		private final EventContextElement context;
 
 		private List<String> failureMessages;
 
-		private ContextualFailureCollectorImpl(FailureCollectorImpl parent, FailureContextElement context) {
+		private ContextualFailureCollectorImpl(FailureCollectorImpl parent, EventContextElement context) {
 			super( parent );
 			this.parent = parent;
 			this.context = context;
@@ -198,8 +198,8 @@ public class RootFailureCollector implements FailureCollector {
 			if ( t instanceof SearchException ) {
 				SearchException e = (SearchException) t;
 				ContextualFailureCollectorImpl failureCollector = this;
-				FailureContext failureContext = e.getContext();
-				if ( failureContext != null ) {
+				EventContext eventContext = e.getContext();
+				if ( eventContext != null ) {
 					failureCollector = failureCollector.withContext( e.getContext() );
 				}
 				// Do not include the context in the failure message, since we will render it as part of the failure report
@@ -225,7 +225,7 @@ public class RootFailureCollector implements FailureCollector {
 		void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( failureMessages != null ) {
-				builder.startList( ENGINE_MESSAGES.failures() );
+				builder.startList( ENGINE_MESSAGES.failureReportFailures() );
 				for ( String failureMessage : failureMessages ) {
 					builder.value( failureMessage );
 				}

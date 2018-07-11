@@ -80,7 +80,7 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
 		if ( ! (searchTargetBuilder instanceof ElasticsearchIndexSearchTargetBuilder ) ) {
 			throw log.cannotMixElasticsearchSearchTargetWithOtherType(
-					searchTargetBuilder, this, searchBackendContext.getFailureContext()
+					searchTargetBuilder, this, searchBackendContext.getEventContext()
 			);
 		}
 

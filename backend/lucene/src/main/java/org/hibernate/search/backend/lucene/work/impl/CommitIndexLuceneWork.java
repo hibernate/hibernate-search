@@ -37,7 +37,7 @@ public class CommitIndexLuceneWork extends AbstractLuceneWork<Long> {
 			return CompletableFuture.completedFuture( indexWriter.commit() );
 		}
 		catch (IOException e) {
-			throw log.unableToCommitIndex( getFailureContext(), e );
+			throw log.unableToCommitIndex( getEventContext(), e );
 		}
 	}
 

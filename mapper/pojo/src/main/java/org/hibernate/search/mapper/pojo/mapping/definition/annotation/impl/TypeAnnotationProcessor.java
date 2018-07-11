@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -47,8 +47,8 @@ abstract class TypeAnnotationProcessor<A extends Annotation> {
 			}
 			catch (RuntimeException e) {
 				helper.getRootFailureCollector()
-						.withContext( PojoFailureContexts.fromType( typeModel ) )
-						.withContext( PojoFailureContexts.fromAnnotation( annotation ) )
+						.withContext( PojoEventContexts.fromType( typeModel ) )
+						.withContext( PojoEventContexts.fromAnnotation( annotation ) )
 						.add( e );
 			}
 		}

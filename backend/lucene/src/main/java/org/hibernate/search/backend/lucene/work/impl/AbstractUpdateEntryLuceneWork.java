@@ -47,7 +47,7 @@ public abstract class AbstractUpdateEntryLuceneWork extends AbstractLuceneWork<L
 			return doUpdateEntry( indexWriter, tenantId, id, indexEntry );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, getFailureContext(), e );
+			throw log.unableToIndexEntry( tenantId, id, getEventContext(), e );
 		}
 	}
 

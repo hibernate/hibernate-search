@@ -12,28 +12,28 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
- * Message bundle for failure contexts related to engine concepts.
+ * Message bundle for event contexts related to engine concepts.
  */
 @MessageBundle(projectCode = "HSEARCH")
-public interface EngineFailureContextMessages {
+public interface EngineEventContextMessages {
 
 	@Message(value = "    ")
-	String contextIndent();
+	String failureReportContextIndent();
 
 	@Message(value = ": ")
-	String contextFailuresSeparator();
+	String failureReportContextFailuresSeparator();
 
 	@Message(value = "  - ")
-	String contextFailuresBulletPoint();
+	String failureReportFailuresBulletPoint();
 
 	/**
-	 * @return A message with the same length as {@link #contextFailuresBulletPoint()}, but containing only blanks.
+	 * @return A message with the same length as {@link #failureReportFailuresBulletPoint()}, but containing only blanks.
 	 */
 	@Message(value = "    ")
-	String contextFailuresNoBulletPoint();
+	String failureReportFailuresNoBulletPoint();
 
 	@Message(value = "failures")
-	String failures();
+	String failureReportFailures();
 
 	/**
 	 * @return A string used when a context element is missing.

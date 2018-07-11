@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.store.Directory;
@@ -22,11 +22,11 @@ import org.apache.lucene.store.MMapDirectory;
 class MMapDirectoryProvider implements DirectoryProvider {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final FailureContext backendContext;
+	private final EventContext backendContext;
 
 	private final Path rootDirectory;
 
-	public MMapDirectoryProvider(FailureContext backendContext, Path rootDirectory) {
+	public MMapDirectoryProvider(EventContext backendContext, Path rootDirectory) {
 		this.backendContext = backendContext;
 		this.rootDirectory = rootDirectory;
 	}

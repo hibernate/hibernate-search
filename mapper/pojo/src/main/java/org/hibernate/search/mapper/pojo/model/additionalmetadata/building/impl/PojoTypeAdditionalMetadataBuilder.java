@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.logging.spi.PojoFailureContexts;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -37,7 +37,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 
 	@Override
 	public ContextualFailureCollector getFailureCollector() {
-		return failureCollector.withContext( PojoFailureContexts.fromType( rawTypeModel ) );
+		return failureCollector.withContext( PojoEventContexts.fromType( rawTypeModel ) );
 	}
 
 	@Override
