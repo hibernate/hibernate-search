@@ -7,12 +7,12 @@
 package org.hibernate.search.integrationtest.mapper.pojo;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
@@ -281,7 +281,7 @@ public class JavaBeanMappingFailureReportIT {
 				indexName, "failingField1",
 				() -> new SearchExceptionWithContext(
 						field1FailureMessage,
-						Arrays.asList(
+						FailureContext.create(
 								FailureContexts.fromIndexName( indexName ),
 								FailureContexts.fromIndexFieldAbsolutePath( "failingField1" )
 						)
@@ -290,7 +290,7 @@ public class JavaBeanMappingFailureReportIT {
 		backendMock.expectFailingField(
 				indexName, "failingField2", () -> new SearchExceptionWithContext(
 						field2FailureMessage,
-						Arrays.asList(
+						FailureContext.create(
 								FailureContexts.fromIndexName( indexName ),
 								FailureContexts.fromIndexFieldAbsolutePath( "failingField2" )
 						)

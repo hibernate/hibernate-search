@@ -9,14 +9,13 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManager;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
@@ -80,11 +79,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 506, value = "An analyzer was set on field '%1$s', but fields of this type cannot be analyzed." )
 	SearchExceptionWithContext cannotUseAnalyzerOnFieldType(String relativeFieldName,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 507, value = "A normalizer was set on field '%1$s', but fields of this type cannot be analyzed." )
 	SearchExceptionWithContext cannotUseNormalizerOnFieldType(String relativeFieldName,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 510, value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
 			+ " Given predicate was: '%1$s'" )
@@ -165,7 +164,7 @@ public interface Log extends BasicLogger {
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
 	SearchExceptionWithContext indexSchemaNodeNameConflict(String relativeFieldName,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 537, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);

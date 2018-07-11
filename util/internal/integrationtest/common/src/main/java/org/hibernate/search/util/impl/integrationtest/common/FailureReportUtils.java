@@ -30,12 +30,12 @@ public final class FailureReportUtils {
 		return throwable -> {
 			Assertions.assertThat( throwable )
 					.isInstanceOf( SearchExceptionWithContext.class );
-			Assertions.assertThat( ( (SearchExceptionWithContext) throwable ).getContextElements() )
+			Assertions.assertThat( ( (SearchExceptionWithContext) throwable ).getContext().getElements() )
 					.containsExactly( contextElements );
-			String renderedContexts = Arrays.stream( contextElements ).map( FailureContextElement::render )
+			String renderedContextElements = Arrays.stream( contextElements ).map( FailureContextElement::render )
 					.collect( Collectors.joining( ", " ) );
 			Assertions.assertThat( throwable.getMessage() )
-					.endsWith( "Context: " + renderedContexts );
+					.endsWith( "Context: " + renderedContextElements );
 		};
 	}
 

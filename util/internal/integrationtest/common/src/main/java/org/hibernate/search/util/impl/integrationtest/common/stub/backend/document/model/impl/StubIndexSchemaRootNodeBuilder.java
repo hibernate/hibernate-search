@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
@@ -38,8 +36,8 @@ public class StubIndexSchemaRootNodeBuilder extends StubIndexSchemaObjectNodeBui
 	}
 
 	@Override
-	public List<FailureContextElement> getFailureContext() {
-		return Arrays.asList(
+	public FailureContext getFailureContext() {
+		return FailureContext.create(
 				getIndexFailureContextElement(),
 				FailureContexts.indexSchemaRoot()
 		);

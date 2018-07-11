@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
@@ -30,8 +27,8 @@ class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBui
 	}
 
 	@Override
-	public List<FailureContextElement> getFailureContext() {
-		return Arrays.asList(
+	public FailureContext getFailureContext() {
+		return FailureContext.create(
 				getRootNodeBuilder().getIndexFailureContextElement(),
 				FailureContexts.fromIndexFieldAbsolutePath( builder.getAbsolutePath() )
 		);

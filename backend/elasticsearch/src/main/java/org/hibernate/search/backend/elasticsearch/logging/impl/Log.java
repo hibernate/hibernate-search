@@ -8,7 +8,6 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -16,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
@@ -109,11 +108,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 512, value = "An analyzer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed." )
 	SearchExceptionWithContext cannotUseAnalyzerOnFieldType(String relativeName, DataType fieldType,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 513, value = "A normalizer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed." )
 	SearchExceptionWithContext cannotUseNormalizerOnFieldType(String relativeName, DataType fieldType,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 514, value = "Index '%2$s' requires multi-tenancy but backend '%1$s' does not support it in its current configuration.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String backendName, String indexName);
@@ -141,7 +140,7 @@ public interface Log extends BasicLogger {
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
 	SearchExceptionWithContext indexSchemaNodeNameConflict(String name,
-			@Param List<FailureContextElement> context);
+			@Param FailureContext context);
 
 	@Message(id = 523, value = "Range predicates are not supported by the GeoPoint type of field '%1$s', use spatial predicates instead.")
 	SearchException rangePredicatesNotSupportedByGeoPoint(String absoluteFieldPath);

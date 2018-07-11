@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
@@ -24,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndex
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
@@ -103,8 +101,8 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public List<FailureContextElement> getFailureContext() {
-		return Arrays.asList(
+	public FailureContext getFailureContext() {
+		return FailureContext.create(
 				parent.getRootNodeBuilder().getIndexFailureContextElement(),
 				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

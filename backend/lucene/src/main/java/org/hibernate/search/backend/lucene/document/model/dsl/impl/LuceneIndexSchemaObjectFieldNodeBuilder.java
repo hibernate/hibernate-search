@@ -6,19 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldAccessor;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
@@ -39,8 +36,8 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public List<FailureContextElement> getFailureContext() {
-		return Arrays.asList(
+	public FailureContext getFailureContext() {
+		return FailureContext.create(
 				getRootNodeBuilder().getIndexFailureContextElement(),
 				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

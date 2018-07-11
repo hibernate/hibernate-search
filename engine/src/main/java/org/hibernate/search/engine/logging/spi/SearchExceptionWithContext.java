@@ -6,33 +6,31 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
-import java.util.List;
-
 import org.hibernate.search.util.SearchException;
 
 public class SearchExceptionWithContext extends SearchException {
 	private final String messageWithoutContext;
-	private final List<FailureContextElement> contextElements;
+	private final FailureContext context;
 
-	public SearchExceptionWithContext(String message, Throwable cause, List<FailureContextElement> contextElements) {
-		super( message + FailureContexts.renderForException( contextElements ), cause );
+	public SearchExceptionWithContext(String message, Throwable cause, FailureContext context) {
+		super( message + "\n" + context.render(), cause );
 		this.messageWithoutContext = message;
-		this.contextElements = contextElements;
+		this.context = context;
 	}
 
-	public SearchExceptionWithContext(String message, List<FailureContextElement> contextElements) {
-		this( message, null, contextElements );
+	public SearchExceptionWithContext(String message, FailureContext context) {
+		this( message, null, context );
 	}
 
-	public SearchExceptionWithContext(Throwable cause, List<FailureContextElement> contextElements) {
-		this( null, cause, contextElements );
+	public SearchExceptionWithContext(Throwable cause, FailureContext context) {
+		this( null, cause, context );
 	}
 
 	public String getMessageWithoutContext() {
 		return messageWithoutContext;
 	}
 
-	public List<FailureContextElement> getContextElements() {
-		return contextElements;
+	public FailureContext getContext() {
+		return context;
 	}
 }

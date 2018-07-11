@@ -17,6 +17,8 @@ package org.hibernate.search.engine.logging.spi;
  */
 public interface FailureCollector {
 
+	ContextualFailureCollector withContext(FailureContext context);
+
 	ContextualFailureCollector withContext(FailureContextElement contextElement);
 
 }

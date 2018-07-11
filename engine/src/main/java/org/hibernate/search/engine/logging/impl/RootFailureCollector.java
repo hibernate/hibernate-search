@@ -16,8 +16,10 @@ import java.util.StringJoiner;
 
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -66,6 +68,14 @@ public class RootFailureCollector implements FailureCollector {
 	}
 
 	@Override
+	public ContextualFailureCollector withContext(FailureContext context) {
+		if ( delegate == null ) {
+			delegate = new FailureCollectorImpl( this );
+		}
+		return delegate.withContext( context );
+	}
+
+	@Override
 	public ContextualFailureCollector withContext(FailureContextElement contextElement) {
 		if ( delegate == null ) {
 			delegate = new FailureCollectorImpl( this );
@@ -82,6 +92,13 @@ public class RootFailureCollector implements FailureCollector {
 	}
 
 	private static class FailureCollectorImpl implements FailureCollector {
+		private static final FailureContextElement DEFAULT_CONTEXT_ELEMENT = new FailureContextElement() {
+			@Override
+			public String render() {
+				return MESSAGES.defaultOnMissingContextElement();
+			}
+		};
+
 		protected final RootFailureCollector root;
 		private Map<FailureContextElement, ContextualFailureCollectorImpl> children;
 
@@ -91,6 +108,26 @@ public class RootFailureCollector implements FailureCollector {
 
 		protected FailureCollectorImpl(FailureCollectorImpl parent) {
 			this.root = parent.root;
+		}
+
+		@Override
+		public ContextualFailureCollectorImpl withContext(FailureContext context) {
+			List<FailureContextElement> elements = context.getElements();
+			if ( elements.isEmpty() ) {
+				/*
+				 * Do not fail, since we are already probably processing a failure.
+				 * Just log the problem and degrade gracefully.
+				 */
+				log.unexpectedEmptyFailureContext( new SearchException( "Exception for stack trace" ) );
+				return withDefaultContext();
+			}
+			else {
+				FailureCollectorImpl failureCollector = this;
+				for ( FailureContextElement contextElement : context.getElements() ) {
+					failureCollector = failureCollector.withContext( contextElement );
+				}
+				return (ContextualFailureCollectorImpl) failureCollector;
+			}
 		}
 
 		@Override
@@ -108,6 +145,10 @@ public class RootFailureCollector implements FailureCollector {
 				children.put( contextElement, child );
 				return child;
 			}
+		}
+
+		ContextualFailureCollectorImpl withDefaultContext() {
+			return withContext( DEFAULT_CONTEXT_ELEMENT );
 		}
 
 		void appendContextTo(StringJoiner joiner) {
@@ -162,16 +203,18 @@ public class RootFailureCollector implements FailureCollector {
 		public void add(Throwable t) {
 			if ( t instanceof SearchExceptionWithContext ) {
 				SearchExceptionWithContext e = (SearchExceptionWithContext) t;
-				ContextualFailureCollectorImpl failureCollector = this;
-				for ( FailureContextElement contextElement : e.getContextElements() ) {
-					failureCollector = failureCollector.withContext( contextElement );
-				}
+				ContextualFailureCollectorImpl failureCollector = withContext( e.getContext() );
 				// Do not include the context in the failure message, since we will render it as part of the failure report
 				failureCollector.doAdd( e, e.getMessageWithoutContext() );
 			}
 			else {
 				doAdd( t, t.getMessage() );
 			}
+		}
+
+		@Override
+		ContextualFailureCollectorImpl withDefaultContext() {
+			return this;
 		}
 
 		@Override

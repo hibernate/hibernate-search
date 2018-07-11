@@ -33,11 +33,18 @@ public interface FailureContextMessages {
 	@Message(value = "    ")
 	String contextFailuresNoBulletPoint();
 
-	@Message(value = "\nContext: ")
-	String contextPrefixInException();
+	@Message(value = "Context: ")
+	String contextPrefix();
 
 	@Message(value = "failures")
 	String failures();
+
+	/**
+	 * @return A string used when a context element is missing.
+	 * Should only be used if there is a bug in Hibernate Search.
+	 */
+	@Message(value = "<DEFAULT>")
+	String defaultOnMissingContextElement();
 
 	@Message(value = "type '%1$s'")
 	String type(String name);
