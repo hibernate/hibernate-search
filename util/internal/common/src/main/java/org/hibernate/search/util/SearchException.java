@@ -6,22 +6,43 @@
  */
 package org.hibernate.search.util;
 
-
-/**
- * @author Yoann Rodiere
- */
 public class SearchException extends RuntimeException {
+	private final String messageWithoutContext;
+	private final FailureContext context;
 
 	public SearchException(String message, Throwable cause) {
 		super( message, cause );
+		this.messageWithoutContext = message;
+		this.context = null;
 	}
 
 	public SearchException(String message) {
-		super( message );
+		this( message, (Throwable) null );
 	}
 
 	public SearchException(Throwable cause) {
-		super( cause );
+		this( null, cause );
 	}
 
+	public SearchException(String message, Throwable cause, FailureContext context) {
+		super( message + "\n" + context.render(), cause );
+		this.messageWithoutContext = message;
+		this.context = context;
+	}
+
+	public SearchException(String message, FailureContext context) {
+		this( message, null, context );
+	}
+
+	public SearchException(Throwable cause, FailureContext context) {
+		this( null, cause, context );
+	}
+
+	public String getMessageWithoutContext() {
+		return messageWithoutContext;
+	}
+
+	public FailureContext getContext() {
+		return context;
+	}
 }

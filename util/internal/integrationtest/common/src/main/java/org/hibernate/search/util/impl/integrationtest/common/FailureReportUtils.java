@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.util.FailureContextElement;
-import org.hibernate.search.util.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchException;
 
 import org.assertj.core.api.Assertions;
 
@@ -42,8 +42,8 @@ public final class FailureReportUtils {
 	public static Consumer<Throwable> hasContext(FailureContextElement ... contextElements) {
 		return throwable -> {
 			Assertions.assertThat( throwable )
-					.isInstanceOf( SearchExceptionWithContext.class );
-			Assertions.assertThat( ( (SearchExceptionWithContext) throwable ).getContext().getElements() )
+					.isInstanceOf( SearchException.class );
+			Assertions.assertThat( ( (SearchException) throwable ).getContext().getElements() )
 					.containsExactly( contextElements );
 			String renderedContextElements = Arrays.stream( contextElements ).map( FailureContextElement::render )
 					.collect( Collectors.joining( ", " ) );

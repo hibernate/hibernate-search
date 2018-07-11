@@ -12,9 +12,8 @@ import java.util.List;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.util.SearchExceptionWithContext;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -68,14 +67,14 @@ public interface Log extends BasicLogger {
 			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName);
 
 	@Message(id = 14, value = "Field name '%1$s' is invalid: field names cannot be null or empty." )
-	SearchExceptionWithContext relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName,
+	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName,
 			@Param FailureContext context);
 
 	@Message(id = 15, value = "Field name '%1$s' is invalid: field names cannot contain a dot ('.')."
 			+ " Remove the dot from your field name,"
 			+ " or if you are declaring the field in a bridge and want a tree of fields,"
 			+ " declare an object field using the objectField() method." )
-	SearchExceptionWithContext relativeFieldNameCannotContainDot(String relativeFieldName,
+	SearchException relativeFieldNameCannotContainDot(String relativeFieldName,
 			@Param FailureContext context);
 
 	@Message(id = 16, value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )

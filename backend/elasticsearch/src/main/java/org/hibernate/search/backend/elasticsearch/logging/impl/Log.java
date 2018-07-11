@@ -15,11 +15,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.util.FailureContext;
-import org.hibernate.search.util.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
@@ -70,19 +69,19 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 502, value = "A search query cannot target both an Elasticsearch index and other types of index."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
-	SearchExceptionWithContext cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetBuilder firstTarget,
 			ElasticsearchIndexManager otherTarget, @Param FailureContext context);
 
 	@Message(id = 503, value = "A search query cannot target multiple Elasticsearch backends."
 			+ " First target was: '%1$s', other target was: '%2$s'" )
-	SearchExceptionWithContext cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget,
 			ElasticsearchIndexManager otherTarget, @Param FailureContext context);
 
 	@Message(id = 504, value = "Unknown field '%1$s'." )
-	SearchExceptionWithContext unknownFieldForSearch(String absoluteFieldPath, @Param FailureContext context);
+	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param FailureContext context);
 
 	@Message(id = 505, value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'." )
-	SearchExceptionWithContext conflictingFieldTypesForSearch(String absoluteFieldPath,
+	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
 			ElasticsearchIndexSchemaFieldNode schemaNode1, ElasticsearchIndexSchemaFieldNode schemaNode2,
 			@Param FailureContext context);
 
@@ -91,41 +90,41 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = 507, value = "Unknown projections %1$s." )
-	SearchExceptionWithContext unknownProjectionForSearch(Collection<String> projections, @Param FailureContext context);
+	SearchException unknownProjectionForSearch(Collection<String> projections, @Param FailureContext context);
 
 	@Message(id = 508, value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
 			+ " Given predicate was: '%1$s'" )
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
 	@Message(id = 509, value = "Field '%1$s' is not an object field." )
-	SearchExceptionWithContext nonObjectFieldForNestedQuery(String absoluteFieldPath, @Param FailureContext context);
+	SearchException nonObjectFieldForNestedQuery(String absoluteFieldPath, @Param FailureContext context);
 
 	@Message(id = 510, value = "Object field '%1$s' is not stored as nested." )
-	SearchExceptionWithContext nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param FailureContext context);
+	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param FailureContext context);
 
 	@Message(id = 511, value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
 			+ " Given sort was: '%1$s'" )
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = 512, value = "An analyzer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed." )
-	SearchExceptionWithContext cannotUseAnalyzerOnFieldType(String relativeName, DataType fieldType,
+	SearchException cannotUseAnalyzerOnFieldType(String relativeName, DataType fieldType,
 			@Param FailureContext context);
 
 	@Message(id = 513, value = "A normalizer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed." )
-	SearchExceptionWithContext cannotUseNormalizerOnFieldType(String relativeName, DataType fieldType,
+	SearchException cannotUseNormalizerOnFieldType(String relativeName, DataType fieldType,
 			@Param FailureContext context);
 
 	@Message(id = 514, value = "Index '%1$s' requires multi-tenancy but the backend does not support it in its current configuration.")
-	SearchExceptionWithContext multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param FailureContext context);
+	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param FailureContext context);
 
 	@Message(id = 515, value = "Unknown multi-tenancy strategy '%1$s'.")
 	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
 
 	@Message(id = 516, value = "Tenant identifier '%1$s' is provided, but multi-tenancy is disabled for this backend.")
-	SearchExceptionWithContext tenantIdProvidedButMultiTenancyDisabled(String tenantId, @Param FailureContext context);
+	SearchException tenantIdProvidedButMultiTenancyDisabled(String tenantId, @Param FailureContext context);
 
 	@Message(id = 517, value = "Backend has multi-tenancy enabled, but no tenant identifier is provided.")
-	SearchExceptionWithContext multiTenancyEnabledButNoTenantIdProvided(@Param FailureContext context);
+	SearchException multiTenancyEnabledButNoTenantIdProvided(@Param FailureContext context);
 
 	@Message(id = 518, value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
 			+ " but the client can only be unwrapped to %2$s." )
@@ -133,7 +132,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 519, value = "Attempt to unwrap an Elasticsearch backend to %1$s,"
 			+ " but this backend can only be unwrapped to %2$s." )
-	SearchExceptionWithContext backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass,
+	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass,
 			@Param FailureContext context);
 
 	@Message(id = 520, value = "The index schema node '%1$s' was added twice."
@@ -141,14 +140,14 @@ public interface Log extends BasicLogger {
 			+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
 			+ " or you may have declared multiple conflicting mappings."
 			+ " In any case, there is something wrong with your mapping and you should fix it." )
-	SearchExceptionWithContext indexSchemaNodeNameConflict(String name,
+	SearchException indexSchemaNodeNameConflict(String name,
 			@Param FailureContext context);
 
 	@Message(id = 523, value = "Range predicates are not supported by the GeoPoint field type, use spatial predicates instead.")
-	SearchExceptionWithContext rangePredicatesNotSupportedByGeoPoint(@Param FailureContext context);
+	SearchException rangePredicatesNotSupportedByGeoPoint(@Param FailureContext context);
 
 	@Message(id = 524, value = "Match predicates are not supported by the GeoPoint field type, use spatial predicates instead.")
-	SearchExceptionWithContext matchPredicatesNotSupportedByGeoPoint(@Param FailureContext context);
+	SearchException matchPredicatesNotSupportedByGeoPoint(@Param FailureContext context);
 
 	@Message(id = 525, value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
 	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
@@ -157,21 +156,21 @@ public interface Log extends BasicLogger {
 	AssertionFailure elasticsearchResponseMissingData();
 
 	@Message(id = 527, value = "Spatial predicates are not supported by this field's type.")
-	SearchExceptionWithContext spatialPredicatesNotSupportedByFieldType(@Param FailureContext context);
+	SearchException spatialPredicatesNotSupportedByFieldType(@Param FailureContext context);
 
 	@Message(id = 528, value = "Distance related operations are not supported by this field's type.")
-	SearchExceptionWithContext distanceOperationsNotSupportedByFieldType(@Param FailureContext context);
+	SearchException distanceOperationsNotSupportedByFieldType(@Param FailureContext context);
 
 	@Message(id = 529, value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
 
 	@Message(id = 530, value = "Duplicate index names when normalized to conform to Elasticsearch rules:"
 			+ " '%1$s' and '%2$s' both become '%3$s'")
-	SearchExceptionWithContext duplicateNormalizedIndexNames(String firstHibernateSearchIndexName,
+	SearchException duplicateNormalizedIndexNames(String firstHibernateSearchIndexName,
 			String secondHibernateSearchIndexName, String elasticsearchIndexName,
 			@Param FailureContext context);
 
 	@Message(id = 531, value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
-	SearchExceptionWithContext elasticsearchResponseUnknownIndexName(String elasticsearchIndexName,
+	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName,
 			@Param FailureContext context);
 }

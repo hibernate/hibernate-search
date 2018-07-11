@@ -13,7 +13,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
-import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
@@ -278,14 +277,14 @@ public class JavaBeanMappingFailureReportIT {
 
 		backendMock.expectFailingField(
 				indexName, "failingField1",
-				() -> new SearchExceptionWithContext(
+				() -> new SearchException(
 						field1FailureMessage,
 						FailureContexts.fromIndexName( indexName )
 								.append( FailureContexts.fromIndexFieldAbsolutePath( "failingField1" ) )
 				)
 		);
 		backendMock.expectFailingField(
-				indexName, "failingField2", () -> new SearchExceptionWithContext(
+				indexName, "failingField2", () -> new SearchException(
 						field2FailureMessage,
 						FailureContexts.fromIndexName( indexName )
 								.append( FailureContexts.fromIndexFieldAbsolutePath( "failingField2" ) )
@@ -294,7 +293,7 @@ public class JavaBeanMappingFailureReportIT {
 
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( SearchExceptionWithContext.class )
+				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field1FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty',"
@@ -302,7 +301,7 @@ public class JavaBeanMappingFailureReportIT {
 		);
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( SearchExceptionWithContext.class )
+				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( field2FailureMessage ).build(),
 				FAILURE_LOG_INTRODUCTION
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty',"

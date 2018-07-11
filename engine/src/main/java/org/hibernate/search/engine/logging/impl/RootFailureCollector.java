@@ -19,7 +19,6 @@ import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.util.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
-import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
@@ -196,9 +195,13 @@ public class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public void add(Throwable t) {
-			if ( t instanceof SearchExceptionWithContext ) {
-				SearchExceptionWithContext e = (SearchExceptionWithContext) t;
-				ContextualFailureCollectorImpl failureCollector = withContext( e.getContext() );
+			if ( t instanceof SearchException ) {
+				SearchException e = (SearchException) t;
+				ContextualFailureCollectorImpl failureCollector = this;
+				FailureContext failureContext = e.getContext();
+				if ( failureContext != null ) {
+					failureCollector = failureCollector.withContext( e.getContext() );
+				}
 				// Do not include the context in the failure message, since we will render it as part of the failure report
 				failureCollector.doAdd( e, e.getMessageWithoutContext() );
 			}

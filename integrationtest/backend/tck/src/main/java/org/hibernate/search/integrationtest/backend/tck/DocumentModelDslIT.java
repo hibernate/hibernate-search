@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
-import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -57,7 +56,7 @@ public class DocumentModelDslIT {
 				} )
 		)
 				.assertThrown()
-				.isInstanceOf( SearchExceptionWithContext.class )
+				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
 						FailureContexts.fromIndexName( INDEX_NAME ),
@@ -72,7 +71,7 @@ public class DocumentModelDslIT {
 				} )
 		)
 				.assertThrown()
-				.isInstanceOf( SearchExceptionWithContext.class )
+				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.satisfies( FailureReportUtils.hasContext(
 						FailureContexts.fromIndexName( INDEX_NAME ),
@@ -374,7 +373,7 @@ public class DocumentModelDslIT {
 					} )
 			)
 					.assertThrown()
-					.isInstanceOf( SearchExceptionWithContext.class )
+					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "An analyzer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
@@ -392,7 +391,7 @@ public class DocumentModelDslIT {
 					} )
 			)
 					.assertThrown()
-					.isInstanceOf( SearchExceptionWithContext.class )
+					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "An analyzer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
@@ -417,7 +416,7 @@ public class DocumentModelDslIT {
 					} )
 			)
 					.assertThrown()
-					.isInstanceOf( SearchExceptionWithContext.class )
+					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "A normalizer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
@@ -435,7 +434,7 @@ public class DocumentModelDslIT {
 					} )
 			)
 					.assertThrown()
-					.isInstanceOf( SearchExceptionWithContext.class )
+					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "A normalizer was set on field 'myField'" )
 					.hasMessageContaining( "fields of this type cannot be analyzed" )
 					.satisfies( FailureReportUtils.hasContext(
