@@ -21,11 +21,13 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -121,7 +123,9 @@ public class MatchSearchPredicateIT {
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Match predicates are not supported by" )
-					.hasMessageContaining( " of field '" + absoluteFieldPath + "'" );
+					.satisfies( FailureReportUtils.hasContext(
+							FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
 		}
 	}
 

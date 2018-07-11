@@ -40,7 +40,9 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 
 	void add(SearchBackendContext searchBackendContext, LuceneIndexManager indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
-			throw log.cannotMixLuceneSearchTargetWithOtherBackend( this, indexManager );
+			throw log.cannotMixLuceneSearchTargetWithOtherBackend(
+					this, indexManager, searchBackendContext.getFailureContext()
+			);
 		}
 		indexManagers.add( indexManager );
 	}

@@ -16,8 +16,10 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
@@ -95,9 +97,13 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 			}
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateIndexWriter(
-					indexingBackendContext.getBackendImplementor(), model.getIndexName(), e
-			);
+			throw log.unableToCreateIndexWriter( getFailureContext(), e );
 		}
+	}
+
+	private FailureContext getFailureContext() {
+		return indexingBackendContext.getFailureContext().append(
+				FailureContexts.fromIndexName( indexName )
+		);
 	}
 }

@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -45,18 +46,24 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	@Override
 	public SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
-		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
+		throw log.spatialPredicatesNotSupportedByFieldType(
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
-		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
+		throw log.spatialPredicatesNotSupportedByFieldType(
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
-		throw log.spatialPredicatesNotSupportedByFieldType( absoluteFieldPath );
+		throw log.spatialPredicatesNotSupportedByFieldType(
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 }

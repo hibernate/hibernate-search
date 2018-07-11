@@ -43,7 +43,7 @@ public abstract class AbstractDeleteEntryLuceneWork extends AbstractLuceneWork<L
 			return doDeleteDocuments( indexWriter, tenantId, id );
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteEntryFromIndex( indexName, tenantId, id, e );
+			throw log.unableToDeleteEntryFromIndex( tenantId, id, getFailureContext(), e );
 		}
 	}
 

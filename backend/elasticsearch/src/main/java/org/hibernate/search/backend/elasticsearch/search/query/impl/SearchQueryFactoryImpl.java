@@ -88,7 +88,7 @@ class SearchQueryFactoryImpl
 			List<String> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
-			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getHibernateSearchIndexNames() );
+			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getIndexesFailureContext() );
 		}
 
 		return createSearchQueryBuilder( sessionContext, hitExtractor, hitAggregator );

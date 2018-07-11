@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.index.IndexReader;
 
 /**
  * Creates and closes the IndexReaders encompassing multiple indexes.
@@ -38,7 +40,9 @@ public final class MultiReaderFactory {
 				return ManagedMultiReader.createInstance( readerProviders );
 			}
 			catch (IOException e) {
-				throw log.ioExceptionOnMultiReaderRefresh( indexNames, e );
+				throw log.ioExceptionOnMultiReaderRefresh(
+						FailureContexts.fromIndexNames( indexNames ), e
+				);
 			}
 		}
 	}

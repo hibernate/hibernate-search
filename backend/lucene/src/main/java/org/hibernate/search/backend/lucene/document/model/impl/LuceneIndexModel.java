@@ -9,9 +9,12 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
+import org.hibernate.search.util.impl.common.CollectionHelper;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 
 /**
  * @author Guillaume Smet
@@ -62,6 +65,10 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	public String getIndexName() {
 		return indexName;
+	}
+
+	public FailureContext getFailureContext() {
+		return FailureContexts.fromIndexName( indexName );
 	}
 
 	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absoluteFieldPath) {

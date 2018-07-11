@@ -227,7 +227,7 @@ public class MultiTenancyIT {
 	public void backend_multi_tenancy_disabled_but_indexes_requiring_multi_tenancy_throws_exception() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Index" );
-		thrown.expectMessage( "requires multi-tenancy but backend" );
+		thrown.expectMessage( "requires multi-tenancy but the backend" );
 		thrown.expectMessage( "does not support it in its current configuration." );
 
 		setupHelper.withDefaultConfiguration()
@@ -246,7 +246,7 @@ public class MultiTenancyIT {
 	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for the backend" );
+		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
@@ -269,7 +269,7 @@ public class MultiTenancyIT {
 	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for the backend" );
+		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
@@ -297,7 +297,7 @@ public class MultiTenancyIT {
 	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for the backend" );
+		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
@@ -325,7 +325,7 @@ public class MultiTenancyIT {
 	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for the backend" );
+		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(

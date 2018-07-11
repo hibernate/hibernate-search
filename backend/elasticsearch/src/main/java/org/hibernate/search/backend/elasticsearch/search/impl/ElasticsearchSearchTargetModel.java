@@ -16,6 +16,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ElasticsearchSearchTargetModel {
@@ -44,6 +46,10 @@ public class ElasticsearchSearchTargetModel {
 		return elasticsearchIndexNames;
 	}
 
+	public FailureContext getIndexesFailureContext() {
+		return FailureContexts.fromIndexNames( hibernateSearchIndexNames );
+	}
+
 	public Set<ElasticsearchIndexModel> getIndexModels() {
 		return indexModels;
 	}
@@ -61,14 +67,17 @@ public class ElasticsearchSearchTargetModel {
 				}
 				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
 					throw log.conflictingFieldTypesForSearch(
-							absoluteFieldPath,
-							selectedSchemaNode, indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-							schemaNode, indexModel.getHibernateSearchIndexName() );
+							absoluteFieldPath, selectedSchemaNode, schemaNode,
+							FailureContexts.fromIndexNames(
+									indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+									indexModel.getHibernateSearchIndexName()
+							)
+					);
 				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, getHibernateSearchIndexNames() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesFailureContext() );
 		}
 		return selectedSchemaNode;
 	}
@@ -81,7 +90,9 @@ public class ElasticsearchSearchTargetModel {
 			if ( schemaNode != null ) {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
-					throw log.nonNestedFieldForNestedQuery( indexModel.getHibernateSearchIndexName(), absoluteFieldPath );
+					throw log.nonNestedFieldForNestedQuery(
+							absoluteFieldPath, indexModel.getFailureContext()
+					);
 				}
 			}
 		}
@@ -89,10 +100,12 @@ public class ElasticsearchSearchTargetModel {
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
-					throw log.nonObjectFieldForNestedQuery( indexModel.getHibernateSearchIndexName(), absoluteFieldPath );
+					throw log.nonObjectFieldForNestedQuery(
+							absoluteFieldPath, indexModel.getFailureContext()
+					);
 				}
 			}
-			throw log.unknownFieldForSearch( absoluteFieldPath, getHibernateSearchIndexNames() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesFailureContext() );
 		}
 	}
 }

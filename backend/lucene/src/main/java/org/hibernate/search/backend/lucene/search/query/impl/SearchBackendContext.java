@@ -14,24 +14,23 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 public class SearchBackendContext {
-	// TODO use a dedicated object for the error context instead of the backend
-	private final BackendImplementor<?> backend;
+	private final FailureContext failureContext;
 
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final LuceneQueryWorkOrchestrator orchestrator;
 
-	public SearchBackendContext(BackendImplementor<?> backend,
+	public SearchBackendContext(FailureContext failureContext,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			LuceneQueryWorkOrchestrator orchestrator) {
-		this.backend = backend;
+		this.failureContext = failureContext;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
@@ -39,7 +38,11 @@ public class SearchBackendContext {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[backend=" + backend + "]";
+		return getClass().getSimpleName() + "[" + failureContext + "]";
+	}
+
+	public FailureContext getFailureContext() {
+		return failureContext;
 	}
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
@@ -47,7 +50,7 @@ public class SearchBackendContext {
 			SessionContext sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
-		multiTenancyStrategy.checkTenantId( backend, sessionContext.getTenantIdentifier() );
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), failureContext );
 
 		Set<String> storedFields = new HashSet<>();
 		hitExtractor.contributeFields( storedFields );

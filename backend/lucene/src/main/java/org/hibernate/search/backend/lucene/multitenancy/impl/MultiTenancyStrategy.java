@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.work.impl.AbstractDeleteEntryLuceneWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractUpdateEntryLuceneWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 
 /**
  * Defines how the additional information required by multiTenancy are handled.
@@ -46,10 +46,10 @@ public interface MultiTenancyStrategy {
 	/**
 	 * Check that the tenant id value is consistent with the strategy.
 	 *
-	 * @param backend The backend.
 	 * @param tenantId The tenant id.
+	 * @param backendContext The backend.
 	 */
-	void checkTenantId(BackendImplementor<?> backend, String tenantId);
+	void checkTenantId(String tenantId, FailureContext backendContext);
 
 	/**
 	 * Creates the according update {@link LuceneIndexWork}.

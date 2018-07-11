@@ -8,18 +8,19 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.work.impl.QueryBasedDeleteEntryLuceneWork;
+import org.hibernate.search.backend.lucene.work.impl.QueryBasedUpdateEntryLuceneWork;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
-import org.hibernate.search.backend.lucene.work.impl.QueryBasedDeleteEntryLuceneWork;
-import org.hibernate.search.backend.lucene.work.impl.QueryBasedUpdateEntryLuceneWork;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 
@@ -51,9 +52,9 @@ public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrate
 	}
 
 	@Override
-	public void checkTenantId(BackendImplementor<?> backend, String tenantId) {
+	public void checkTenantId(String tenantId, FailureContext backendContext) {
 		if ( tenantId == null ) {
-			throw log.multiTenancyEnabledButNoTenantIdProvided( backend );
+			throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
 		}
 	}
 }

@@ -29,6 +29,8 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -53,6 +55,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
 
+	private final FailureContext failureContext;
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
@@ -63,17 +66,19 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
+
+		this.failureContext = FailureContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				this, client, workFactory, multiTenancyStrategy, streamOrchestrator
+				failureContext, client, workFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
-				this, workFactory,
+				failureContext, workFactory,
 				new Function<String, String>() {
 					@Override
 					public String apply(String elasticsearchIndexName) {
 						String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 						if ( result == null ) {
-							throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName );
+							throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName, failureContext );
 						}
 						return result;
 					}
@@ -87,7 +92,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		if ( ElasticsearchBackend.class.isAssignableFrom( clazz ) ) {
 			return (T) this;
 		}
-		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class );
+		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, failureContext );
 	}
 
 	@Override
@@ -104,7 +109,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
 			String hibernateSearchIndexName, boolean multiTenancyEnabled, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
-			throw log.multiTenancyRequiredButNotSupportedByBackend( name, hibernateSearchIndexName );
+			throw log.multiTenancyRequiredButNotSupportedByBackend( hibernateSearchIndexName, failureContext );
 		}
 
 		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
@@ -113,7 +118,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		);
 		if ( existingHibernateSearchIndexName != null ) {
 			throw log.duplicateNormalizedIndexNames(
-					existingHibernateSearchIndexName, hibernateSearchIndexName, elasticsearchIndexName
+					existingHibernateSearchIndexName, hibernateSearchIndexName, elasticsearchIndexName,
+					failureContext
 			);
 		}
 

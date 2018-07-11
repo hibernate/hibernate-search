@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -32,13 +33,17 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	@Override
 	public MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createMatchPredicateBuilder(
 			String absoluteFieldPath) {
-		throw log.matchPredicatesNotSupportedByGeoPoint( absoluteFieldPath );
+		throw log.matchPredicatesNotSupportedByGeoPoint(
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override
 	public RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(
 			String absoluteFieldPath) {
-		throw log.rangePredicatesNotSupportedByGeoPoint( absoluteFieldPath );
+		throw log.rangePredicatesNotSupportedByGeoPoint(
+				FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override

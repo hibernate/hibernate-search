@@ -20,6 +20,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrc
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -93,7 +95,9 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	@Override
 	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
 		if ( ! (searchTargetBuilder instanceof LuceneIndexSearchTargetBuilder ) ) {
-			throw log.cannotMixLuceneSearchTargetWithOtherType( searchTargetBuilder, this );
+			throw log.cannotMixLuceneSearchTargetWithOtherType(
+					searchTargetBuilder, this, searchBackendContext.getFailureContext()
+			);
 		}
 
 		LuceneIndexSearchTargetBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetBuilder) searchTargetBuilder;
@@ -134,7 +138,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 			return DirectoryReader.open( indexWriter );
 		}
 		catch (IOException e) {
-			throw log.unableToCreateIndexReader( indexingBackendContext.getBackendImplementor(), indexName, e );
+			throw log.unableToCreateIndexReader( getBackendAndIndexFailureContext(), e );
 		}
 	}
 
@@ -144,7 +148,13 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 			reader.close();
 		}
 		catch (IOException e) {
-			log.unableToCloseIndexReader( indexingBackendContext.getBackendImplementor(), indexName, e );
+			log.unableToCloseIndexReader( getBackendAndIndexFailureContext(), e );
 		}
+	}
+
+	private FailureContext getBackendAndIndexFailureContext() {
+		return indexingBackendContext.getFailureContext().append(
+				FailureContexts.fromIndexName( indexName )
+		);
 	}
 }

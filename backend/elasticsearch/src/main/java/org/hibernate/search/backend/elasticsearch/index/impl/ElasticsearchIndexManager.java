@@ -79,7 +79,9 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	@Override
 	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
 		if ( ! (searchTargetBuilder instanceof ElasticsearchIndexSearchTargetBuilder ) ) {
-			throw log.cannotMixElasticsearchSearchTargetWithOtherType( searchTargetBuilder, this );
+			throw log.cannotMixElasticsearchSearchTargetWithOtherType(
+					searchTargetBuilder, this, searchBackendContext.getFailureContext()
+			);
 		}
 
 		ElasticsearchIndexSearchTargetBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetBuilder) searchTargetBuilder;

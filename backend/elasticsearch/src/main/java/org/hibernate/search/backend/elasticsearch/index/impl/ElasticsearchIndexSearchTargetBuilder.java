@@ -39,7 +39,9 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 
 	void add(SearchBackendContext searchBackendContext, ElasticsearchIndexManager indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
-			throw log.cannotMixElasticsearchSearchTargetWithOtherBackend( this, indexManager );
+			throw log.cannotMixElasticsearchSearchTargetWithOtherBackend(
+					this, indexManager, searchBackendContext.getFailureContext()
+			);
 		}
 		indexManagers.add( indexManager );
 	}

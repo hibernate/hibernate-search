@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 /**
  * @author Yoann Rodiere
@@ -46,6 +48,10 @@ public class ElasticsearchIndexModel {
 
 	public URLEncodedString getElasticsearchIndexName() {
 		return elasticsearchIndexName;
+	}
+
+	public FailureContext getFailureContext() {
+		return FailureContexts.fromIndexName( hibernateSearchIndexName );
 	}
 
 	public RootTypeMapping getMapping() {

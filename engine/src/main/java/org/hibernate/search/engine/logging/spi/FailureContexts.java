@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.logging.impl.FailureContextMessages;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 
 import org.jboss.logging.Messages;
 
@@ -77,6 +80,19 @@ public class FailureContexts {
 			}
 		} );
 	}
+	public static FailureContext fromIndexNames(String ... indexNames) {
+		return fromIndexNames( CollectionHelper.asLinkedHashSet( indexNames ) );
+	}
+
+	public static FailureContext fromIndexNames(Set<String> indexNames) {
+		return FailureContext.create( new AbstractSimpleFailureContextElement<Set<String>>( indexNames ) {
+			@Override
+			public String render(Set<String> indexNames) {
+				return MESSAGES.indexes( indexNames );
+			}
+		} );
+	}
+
 
 	public static FailureContext indexSchemaRoot() {
 		return INDEX_SCHEMA_ROOT;

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.logging.impl;
 
+import java.util.Set;
+
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -54,6 +56,9 @@ public interface FailureContextMessages {
 
 	@Message(value = "index '%1$s'")
 	String index(String name);
+
+	@Message(value = "indexes %1$s")
+	String indexes(Set<String> names);
 
 	@Message(value = "index schema root")
 	String indexSchemaRoot();

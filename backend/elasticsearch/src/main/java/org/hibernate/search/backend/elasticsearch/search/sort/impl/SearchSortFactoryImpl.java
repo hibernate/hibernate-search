@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -67,7 +68,9 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortCollector> distance(String absoluteFieldPath, GeoPoint location) {
 		if ( !searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec().supportsSortingByDistance() ) {
-			throw log.distanceOperationsNotSupportedByFieldType( absoluteFieldPath );
+			throw log.distanceOperationsNotSupportedByFieldType(
+					FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
 		}
 
 		return new DistanceSortBuilderImpl( absoluteFieldPath, location );

@@ -14,6 +14,8 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -70,14 +72,14 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
 		if ( predicateBuilderFactory == null ) {
-			throw log.unsupportedDSLPredicates( absoluteFieldPath );
+			throw log.unsupportedDSLPredicates( getFailureContext() );
 		}
 		return predicateBuilderFactory;
 	}
 
 	public LuceneFieldSortContributor getSortContributor() {
 		if ( sortContributor == null ) {
-			throw log.unsupportedDSLSorts( absoluteFieldPath );
+			throw log.unsupportedDSLSorts( getFailureContext() );
 		}
 		return sortContributor;
 	}
@@ -100,5 +102,9 @@ public class LuceneIndexSchemaFieldNode<T> {
 				.append( ", sortContributor=" ).append( sortContributor )
 				.append( "]" );
 		return sb.toString();
+	}
+
+	private FailureContext getFailureContext() {
+		return FailureContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
 	}
 }

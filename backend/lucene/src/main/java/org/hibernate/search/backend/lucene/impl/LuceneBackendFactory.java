@@ -24,6 +24,8 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -57,8 +59,10 @@ public class LuceneBackendFactory implements BackendFactory {
 		// TODO be more clever about the type, also supports providing a class
 		Optional<String> directoryProviderProperty = DIRECTORY_PROVIDER.get( propertySource );
 
+		FailureContext backendContext = FailureContexts.fromBackendName( name );
+
 		if ( !directoryProviderProperty.isPresent() ) {
-			throw log.undefinedLuceneDirectoryProvider( name );
+			throw log.undefinedLuceneDirectoryProvider( backendContext );
 		}
 
 		String directoryProvider = directoryProviderProperty.get();
@@ -67,15 +71,15 @@ public class LuceneBackendFactory implements BackendFactory {
 			// TODO GSM: implement the checks properly
 			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
 
-			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( backendContext, propertySource );
 
 			return new LuceneLocalDirectoryBackend( name, rootDirectory, new StubLuceneWorkFactory( multiTenancyStrategy ), multiTenancyStrategy );
 		}
 
-		throw log.unrecognizedLuceneDirectoryProvider( name, directoryProvider );
+		throw log.unrecognizedLuceneDirectoryProvider( directoryProvider, backendContext );
 	}
 
-	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
+	private MultiTenancyStrategy getMultiTenancyStrategy(FailureContext backendContext, ConfigurationPropertySource propertySource) {
 		MultiTenancyStrategyConfiguration multiTenancyStrategyConfiguration = MULTI_TENANCY_STRATEGY.get( propertySource );
 
 		switch ( multiTenancyStrategyConfiguration ) {
@@ -85,8 +89,9 @@ public class LuceneBackendFactory implements BackendFactory {
 				return new DiscriminatorMultiTenancyStrategyImpl();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",
-						backendName, multiTenancyStrategyConfiguration
+						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'. %2$s",
+						multiTenancyStrategyConfiguration,
+						backendContext.render()
 				) );
 		}
 	}

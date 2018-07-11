@@ -40,7 +40,7 @@ public class ExecuteQueryLuceneWork<T> implements LuceneQueryWork<SearchResult<T
 			return searcher.execute();
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQuery(), searcher.getIndexNames(), e );
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQuery(), searcher.getFailureContext(), e );
 		}
 		finally {
 			searcher.close();

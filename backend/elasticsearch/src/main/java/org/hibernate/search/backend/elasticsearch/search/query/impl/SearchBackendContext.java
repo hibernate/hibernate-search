@@ -14,13 +14,12 @@ import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 public class SearchBackendContext {
-	// TODO use a dedicated object for the error context instead of the backend
-	private final BackendImplementor<?> backend;
+	private final FailureContext failureContext;
 
 	private final ElasticsearchWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -31,12 +30,12 @@ public class SearchBackendContext {
 	private final ObjectHitExtractor objectHitExtractor;
 	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
 
-	public SearchBackendContext(BackendImplementor<?> backend,
+	public SearchBackendContext(FailureContext failureContext,
 			ElasticsearchWorkFactory workFactory,
 			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
-		this.backend = backend;
+		this.failureContext = failureContext;
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
@@ -51,7 +50,11 @@ public class SearchBackendContext {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[backend=" + backend + "]";
+		return getClass().getSimpleName() + "[" + failureContext + "]";
+	}
+
+	public FailureContext getFailureContext() {
+		return failureContext;
 	}
 
 	DocumentReferenceHitExtractor getDocumentReferenceHitExtractor() {
@@ -71,7 +74,7 @@ public class SearchBackendContext {
 			SessionContext sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
-		multiTenancyStrategy.checkTenantId( backend, sessionContext.getTenantIdentifier() );
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), failureContext );
 		return new SearchQueryBuilderImpl<>(
 				workFactory, orchestrator, multiTenancyStrategy,
 				indexNames, sessionContext, hitExtractor, hitAggregator

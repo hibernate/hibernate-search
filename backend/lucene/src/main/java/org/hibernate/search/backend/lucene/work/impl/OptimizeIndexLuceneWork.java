@@ -38,7 +38,7 @@ public class OptimizeIndexLuceneWork extends AbstractLuceneWork<Long> {
 			return CompletableFuture.completedFuture( indexWriter.commit() );
 		}
 		catch (IOException e) {
-			throw log.unableToCommitIndex( indexName, e );
+			throw log.unableToCommitIndex( getFailureContext(), e );
 		}
 	}
 

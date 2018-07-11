@@ -25,6 +25,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -42,6 +44,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
+	private final FailureContext failureContext;
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
@@ -53,15 +56,16 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
+		this.failureContext = FailureContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				this, new MMapDirectoryProvider( this, rootDirectory ),
+				failureContext, new MMapDirectoryProvider( failureContext, rootDirectory ),
 				workFactory, multiTenancyStrategy
 		);
 		this.searchContext = new SearchBackendContext(
-				this, workFactory, multiTenancyStrategy, queryOrchestrator
+				failureContext, workFactory, multiTenancyStrategy, queryOrchestrator
 		);
 
-		initializeRootDirectory( name, rootDirectory );
+		initializeRootDirectory( rootDirectory );
 	}
 
 	@Override
@@ -69,7 +73,9 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 		if ( LuceneBackend.class.isAssignableFrom( clazz ) ) {
 			return (T) this;
 		}
-		throw log.backendUnwrappingWithUnknownType( clazz, LuceneBackend.class );
+		throw log.backendUnwrappingWithUnknownType(
+				clazz, LuceneBackend.class, failureContext
+		);
 	}
 
 	@Override
@@ -81,7 +87,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
 			String indexName, boolean multiTenancyEnabled, BackendBuildContext context, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
-			throw log.multiTenancyRequiredButNotSupportedByBackend( this, indexName );
+			throw log.multiTenancyRequiredButNotSupportedByBackend( indexName, failureContext );
 		}
 
 		/*
@@ -112,10 +118,10 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 				.toString();
 	}
 
-	private static void initializeRootDirectory(String name, Path rootDirectory) {
+	private void initializeRootDirectory(Path rootDirectory) {
 		if ( Files.exists( rootDirectory ) ) {
 			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( name, rootDirectory );
+				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory, failureContext );
 			}
 		}
 		else {
@@ -123,7 +129,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 				Files.createDirectories( rootDirectory );
 			}
 			catch (Exception e) {
-				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( name, rootDirectory, e );
+				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, failureContext, e );
 			}
 		}
 	}

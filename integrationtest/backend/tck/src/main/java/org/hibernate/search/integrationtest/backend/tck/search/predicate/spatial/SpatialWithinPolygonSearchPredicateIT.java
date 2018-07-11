@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -17,6 +18,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPolygon;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -85,7 +87,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Spatial predicates are not supported by" )
-				.hasMessageContaining( " of field 'string'" );
+				.satisfies( FailureReportUtils.hasContext(
+						FailureContexts.fromIndexFieldAbsolutePath( "string" )
+				) );
 	}
 
 	@Test
