@@ -8,7 +8,7 @@ package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchExceptionWithContext;
 
 /**
  * A build context for mappings.

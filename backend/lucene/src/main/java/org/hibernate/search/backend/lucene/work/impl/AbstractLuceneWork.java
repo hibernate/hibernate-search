@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 /**

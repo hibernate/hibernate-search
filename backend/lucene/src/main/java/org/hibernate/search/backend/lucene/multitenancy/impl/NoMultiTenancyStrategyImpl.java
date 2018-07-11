@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.work.impl.TermBasedDeleteEntryLuceneWork;
 import org.hibernate.search.backend.lucene.work.impl.TermBasedUpdateEntryLuceneWork;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.store.Directory;

@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.util.FailureContextElement;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in

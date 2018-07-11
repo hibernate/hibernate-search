@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.logging.spi;
+package org.hibernate.search.util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-import org.hibernate.search.engine.logging.impl.FailureContextMessages;
+import org.hibernate.search.util.impl.common.logging.CommonFailureContextMessages;
 
 import org.jboss.logging.Messages;
 
@@ -19,7 +19,7 @@ import org.jboss.logging.Messages;
  */
 public final class FailureContext {
 
-	private static final FailureContextMessages MESSAGES = Messages.getBundle( FailureContextMessages.class );
+	private static final CommonFailureContextMessages MESSAGES = Messages.getBundle( CommonFailureContextMessages.class );
 
 	public static FailureContext create(FailureContextElement firstElement, FailureContextElement ... otherElements) {
 		FailureContext result = new FailureContext( null, firstElement );

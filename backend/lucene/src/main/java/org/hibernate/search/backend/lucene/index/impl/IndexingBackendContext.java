@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 
 import org.apache.lucene.store.Directory;
 

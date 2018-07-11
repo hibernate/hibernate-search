@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.logging.spi.FailureContext;
-import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;

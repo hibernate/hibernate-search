@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.SearchExceptionWithContext;
 
 public interface IndexSchemaContext {
 
 	/**
 	 * @return A list of failure context elements to be passed to the constructor of any
-	 * {@link org.hibernate.search.engine.logging.spi.SearchExceptionWithContext} occurring in this context.
+	 * {@link SearchExceptionWithContext} occurring in this context.
 	 */
 	FailureContext getFailureContext();
 

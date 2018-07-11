@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.spi.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
-import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.FailureContextElement;
+import org.hibernate.search.util.SearchExceptionWithContext;
 
 import org.assertj.core.api.Assertions;
 

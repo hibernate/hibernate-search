@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 
 import com.google.gson.JsonObject;
 

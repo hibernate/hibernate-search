@@ -9,14 +9,16 @@ package org.hibernate.search.engine.logging.spi;
 import java.util.Set;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.engine.logging.impl.FailureContextMessages;
+import org.hibernate.search.engine.logging.impl.EngineFailureContextMessages;
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.FailureContextElement;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
 import org.jboss.logging.Messages;
 
 public class FailureContexts {
 
-	private static final FailureContextMessages MESSAGES = Messages.getBundle( FailureContextMessages.class );
+	private static final EngineFailureContextMessages MESSAGES = Messages.getBundle( EngineFailureContextMessages.class );
 
 	private static final FailureContext DEFAULT = FailureContext.create(
 			new FailureContextElement() {

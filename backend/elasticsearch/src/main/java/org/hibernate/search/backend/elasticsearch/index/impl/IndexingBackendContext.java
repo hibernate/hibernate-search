@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFac
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 
 public class IndexingBackendContext {
 	private final FailureContext failureContext;

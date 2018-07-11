@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.types.dsl.impl.LocalDateIndexSchemaFi
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;

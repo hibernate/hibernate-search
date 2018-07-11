@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.FailureContextElement;
+
 /**
  * A failure collector without any context.
  * <p>

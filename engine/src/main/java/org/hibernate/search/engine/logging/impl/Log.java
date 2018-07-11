@@ -10,9 +10,9 @@ package org.hibernate.search.engine.logging.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 

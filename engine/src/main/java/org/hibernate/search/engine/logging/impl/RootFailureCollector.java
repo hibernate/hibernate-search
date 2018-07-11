@@ -16,14 +16,15 @@ import java.util.StringJoiner;
 
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
-import org.hibernate.search.engine.logging.spi.FailureContext;
-import org.hibernate.search.engine.logging.spi.FailureContextElement;
+import org.hibernate.search.util.FailureContext;
+import org.hibernate.search.util.FailureContextElement;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
-import org.hibernate.search.engine.logging.spi.SearchExceptionWithContext;
+import org.hibernate.search.util.SearchExceptionWithContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.impl.common.logging.CommonFailureContextMessages;
 
 import org.jboss.logging.Messages;
 
@@ -31,7 +32,9 @@ public class RootFailureCollector implements FailureCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final FailureContextMessages MESSAGES = Messages.getBundle( FailureContextMessages.class );
+	private static final CommonFailureContextMessages COMMON_MESSAGES = Messages.getBundle( CommonFailureContextMessages.class );
+
+	private static final EngineFailureContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineFailureContextMessages.class );
 
 	/**
 	 * This prevents Hibernate Search from trying too hard to collect errors,
@@ -56,10 +59,10 @@ public class RootFailureCollector implements FailureCollector {
 
 	private String renderFailures() {
 		ToStringStyle style = ToStringStyle.multilineIndentStructure(
-				MESSAGES.contextFailuresSeparator(),
-				MESSAGES.contextIndent(),
-				MESSAGES.contextFailuresBulletPoint(),
-				MESSAGES.contextFailuresNoBulletPoint()
+				ENGINE_MESSAGES.contextFailuresSeparator(),
+				ENGINE_MESSAGES.contextIndent(),
+				ENGINE_MESSAGES.contextFailuresBulletPoint(),
+				ENGINE_MESSAGES.contextFailuresNoBulletPoint()
 		);
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
 		if ( delegate != null ) {
@@ -219,7 +222,7 @@ public class RootFailureCollector implements FailureCollector {
 		void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( failureMessages != null ) {
-				builder.startList( MESSAGES.failures() );
+				builder.startList( ENGINE_MESSAGES.failures() );
 				for ( String failureMessage : failureMessages ) {
 					builder.value( failureMessage );
 				}
@@ -235,7 +238,7 @@ public class RootFailureCollector implements FailureCollector {
 			}
 			failureMessages.add( failureMessage );
 
-			StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
+			StringJoiner contextJoiner = new StringJoiner( COMMON_MESSAGES.contextSeparator() );
 			appendContextTo( contextJoiner );
 			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
 

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.PojoFailureContextMessages;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.engine.logging.spi.AbstractSimpleFailureContextElement;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 import org.hibernate.search.engine.logging.spi.FailureContexts;
 
 import org.jboss.logging.Messages;

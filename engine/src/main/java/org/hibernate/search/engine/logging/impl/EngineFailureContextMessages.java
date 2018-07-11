@@ -12,13 +12,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
- * Message bundle for failure contexts.
+ * Message bundle for failure contexts related to engine concepts.
  */
 @MessageBundle(projectCode = "HSEARCH")
-public interface FailureContextMessages {
-
-	@Message(value = ", ")
-	String contextSeparator();
+public interface EngineFailureContextMessages {
 
 	@Message(value = "    ")
 	String contextIndent();
@@ -34,9 +31,6 @@ public interface FailureContextMessages {
 	 */
 	@Message(value = "    ")
 	String contextFailuresNoBulletPoint();
-
-	@Message(value = "Context: ")
-	String contextPrefix();
 
 	@Message(value = "failures")
 	String failures();
@@ -65,4 +59,5 @@ public interface FailureContextMessages {
 
 	@Message(value = "field '%1$s'")
 	String indexFieldAbsolutePath(String absolutePath);
+
 }

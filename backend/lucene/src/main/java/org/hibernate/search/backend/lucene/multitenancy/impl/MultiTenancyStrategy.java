@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.work.impl.AbstractDeleteEntryLuceneWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractUpdateEntryLuceneWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
-import org.hibernate.search.engine.logging.spi.FailureContext;
+import org.hibernate.search.util.FailureContext;
 
 /**
  * Defines how the additional information required by multiTenancy are handled.
