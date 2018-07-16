@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.bridge.builtin.impl;
 
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class ElasticsearchCalendarBridge
 		try {
 			return convertFromString( indexNullAs );
 		}
-		catch (IllegalArgumentException e) {
+		catch (DateTimeParseException e) {
 			throw LOG.invalidNullMarkerForCalendarAndDate( e );
 		}
 	}
