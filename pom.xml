@@ -202,7 +202,6 @@
         <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
         <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
         <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
-        <version.org.apache.commons.collections>3.2.1</version.org.apache.commons.collections>
         <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
         <version.org.apache.avro>1.7.6</version.org.apache.avro>
@@ -237,10 +236,6 @@
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <!-- Derby driver used by JBatch -->
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
-
-        <!-- This should be aligned with the version used in ORM -->
-        <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
-        <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
@@ -678,16 +673,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${version.org.apache.commons.lang3}</version>
-            </dependency>
-            <dependency>
-                <!--
-                     Dependency management is necessary to avoid divergence between the version required by unitils
-                     and the one required by commons-beanutils used in jaxb
-                     HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB
-                 -->
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${version.org.apache.commons.collections}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -1141,13 +1126,6 @@
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${version.javax.xml.bind.jaxb-api}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
