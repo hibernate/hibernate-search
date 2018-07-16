@@ -1979,7 +1979,7 @@
             </activation>
             <properties>
                 <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
-                <test.performance.jvm.args>${test.wildfly.jvm.args} --add-modules java.xml.bind</test.performance.jvm.args>
+                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
                 <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
             </properties>
             <modules>
@@ -1994,7 +1994,7 @@
             </activation>
             <properties>
                 <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
-                <test.performance.jvm.args>${test.wildfly.jvm.args} --add-modules java.xml.bind</test.performance.jvm.args>
+                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
                 <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
             </properties>
             <modules>
