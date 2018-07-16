@@ -2010,7 +2010,7 @@
             <properties>
                 <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
                 <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
-                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
+                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</test.jvm.args>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
