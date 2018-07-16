@@ -175,46 +175,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>9</jdk>
-            </activation>
-            <dependencies>
-                <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
-                <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jdk10</id>
-            <activation>
-                <jdk>10</jdk>
-            </activation>
-            <dependencies>
-                <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
-                <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <dependencies>
-                <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
-                <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

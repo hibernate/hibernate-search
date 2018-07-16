@@ -265,7 +265,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'term':{'dateWritten':{'value':'1958-04-07T00:00:00Z'}}}}", queryString );
+			assertJsonEquals( "{'query':{'term':{'dateWritten':{'value':'1958-04-07T00:00:00.000Z'}}}}", queryString );
 		}
 	}
 
@@ -287,7 +287,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'term':{'dateSent':{'value':'1958-04-07T00:00:00Z'}}}}", queryString );
+			assertJsonEquals( "{'query':{'term':{'dateSent':{'value':'1958-04-07T00:00:00.000Z'}}}}", queryString );
 		}
 	}
 
