@@ -178,7 +178,7 @@
 
         <!-- Dependencies versions -->
 
-        <version.org.hibernate>5.3.2.Final</version.org.hibernate>
+        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
@@ -190,7 +190,7 @@
 
         <version.org.infinispan>9.2.2.Final</version.org.infinispan>
 
-        <version.net.bytebuddy>1.8.12</version.net.bytebuddy>
+        <version.net.bytebuddy>1.8.13</version.net.bytebuddy>
 
         <version.wildfly>12.0.0.Final</version.wildfly>
 
@@ -280,8 +280,8 @@
         <version.jpa22.wildfly-patch>1.0.0.Beta2</version.jpa22.wildfly-patch>
         <test.jpa22.wildfly-patch.filename>hibernate-jpa-api-2.2-wildflymodules-${version.jpa22.wildfly-patch}-wildfly-${version.wildfly}-patch.zip</test.jpa22.wildfly-patch.filename>
         <!-- Necessary for OSGi integration tests with Karaf -->
-        <version.org.javassist>3.22.0-GA</version.org.javassist>
-        <version.org.jboss.jandex>2.0.3.Final</version.org.jboss.jandex>
+        <version.org.javassist>3.23.1-GA</version.org.javassist>
+        <version.org.jboss.jandex>2.0.5.Final</version.org.jboss.jandex>
 
         <!-- OSGi ranges for some primary dependencies -->
 
