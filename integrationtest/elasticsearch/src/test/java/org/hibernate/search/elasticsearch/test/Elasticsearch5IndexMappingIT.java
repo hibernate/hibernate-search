@@ -259,7 +259,7 @@ public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 	}
 
 	/*
-	 * Allows generating a date exactly as it would be outputed by the Elasticsearch date Helper.
+	 * Allows formatting a date exactly as the Elasticsearch date helper would.
 	 * This helper internally uses the JVM's timezone to format dates, so the actual output
 	 * depends on the platform and cannot be stored as a constant string.
 	 */
