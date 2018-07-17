@@ -152,6 +152,12 @@
          -->
         <jacoco.mergedExecFilePath>${rootProject.directory}/target/jacoco-merged.exec</jacoco.mergedExecFilePath>
 
+        <!-- Elasticsearch tests properties -->
+
+        <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+        <test.elasticsearch.host.username></test.elasticsearch.host.username>
+        <test.elasticsearch.host.password></test.elasticsearch.host.password>
+
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
         <maven.min.version>3.2.3</maven.min.version>
@@ -1170,6 +1176,8 @@
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
+                                <clusterName>hsearchEsTestCluster</clusterName>
+                                <httpPort>9200</httpPort>
                                 <tcpPort>9300</tcpPort>
                                 <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                                 <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
@@ -1266,6 +1274,8 @@
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
+                                <clusterName>hsearchEsTestCluster</clusterName>
+                                <httpPort>9200</httpPort>
                                 <tcpPort>9300</tcpPort>
                                 <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                                 <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
@@ -1318,6 +1328,7 @@
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
+                                <clusterName>hsearchEsTestCluster</clusterName>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
@@ -1369,6 +1380,7 @@
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
+                                <clusterName>hsearchEsTestCluster</clusterName>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
