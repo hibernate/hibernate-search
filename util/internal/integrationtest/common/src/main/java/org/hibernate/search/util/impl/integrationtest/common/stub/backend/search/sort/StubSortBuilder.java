@@ -10,10 +10,14 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
-public class StubSortBuilder implements ScoreSortBuilder<StubQueryElementCollector>,
-		FieldSortBuilder<StubQueryElementCollector>, DistanceSortBuilder<StubQueryElementCollector> {
+public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
+		FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
+
+	@Override
+	public StubSortBuilder toImplementation() {
+		return this;
+	}
 
 	@Override
 	public void missingFirst() {
@@ -35,8 +39,7 @@ public class StubSortBuilder implements ScoreSortBuilder<StubQueryElementCollect
 		// No-op
 	}
 
-	@Override
-	public void contribute(StubQueryElementCollector collector) {
-		collector.simulateCollectCall();
+	void simulateBuild() {
+		// No-op, just simulates a call on this object
 	}
 }

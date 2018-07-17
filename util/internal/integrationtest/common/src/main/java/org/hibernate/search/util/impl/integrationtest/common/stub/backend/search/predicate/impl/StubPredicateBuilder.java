@@ -11,7 +11,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -19,35 +18,39 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
-public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, StubQueryElementCollector>,
-		BooleanJunctionPredicateBuilder<Void, StubQueryElementCollector>,
-		MatchPredicateBuilder<Void, StubQueryElementCollector>,
-		RangePredicateBuilder<Void, StubQueryElementCollector>,
-		NestedPredicateBuilder<Void, StubQueryElementCollector>,
-		SpatialWithinCirclePredicateBuilder<Void, StubQueryElementCollector>,
-		SpatialWithinPolygonPredicateBuilder<Void, StubQueryElementCollector>,
-		SpatialWithinBoundingBoxPredicateBuilder<Void, StubQueryElementCollector> {
+public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredicateBuilder>,
+		BooleanJunctionPredicateBuilder<StubPredicateBuilder>,
+		MatchPredicateBuilder<StubPredicateBuilder>,
+		RangePredicateBuilder<StubPredicateBuilder>,
+		NestedPredicateBuilder<StubPredicateBuilder>,
+		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
+		SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
+		SpatialWithinBoundingBoxPredicateBuilder<StubPredicateBuilder> {
 
 	@Override
-	public void must(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+	public StubPredicateBuilder toImplementation() {
+		return this;
+	}
+
+	@Override
+	public void must(StubPredicateBuilder clauseBuilder) {
 		// No-op
 	}
 
 	@Override
-	public void mustNot(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+	public void mustNot(StubPredicateBuilder clauseBuilder) {
 		// No-op
 	}
 
 	@Override
-	public void should(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+	public void should(StubPredicateBuilder clauseBuilder) {
 		// No-op
 
 	}
 
 	@Override
-	public void filter(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+	public void filter(StubPredicateBuilder clauseBuilder) {
 		// No-op
 	}
 
@@ -107,13 +110,12 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<Void, Stub
 	}
 
 	@Override
-	public void nested(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
+	public void nested(StubPredicateBuilder clauseBuilder) {
 		// No-op
 	}
 
-	@Override
-	public void contribute(Void context, StubQueryElementCollector collector) {
-		collector.simulateCollectCall();
+	void simulateBuild() {
+		// No-op, just simulates a call on this object
 	}
 
 }

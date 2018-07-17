@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateContainerContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+
+import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateContainerContextImpl<N>
@@ -22,11 +22,11 @@ public class LuceneSearchPredicateContainerContextImpl<N>
 
 	private final LuceneSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, LuceneSearchPredicateContext, ? extends LuceneSearchPredicateCollector> dslContext;
+	private final SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder> dslContext;
 
 	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
 			LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, LuceneSearchPredicateContext, ? extends LuceneSearchPredicateCollector> dslContext) {
+			SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
@@ -34,7 +34,7 @@ public class LuceneSearchPredicateContainerContextImpl<N>
 
 	@Override
 	public N fromLuceneQuery(Query luceneQuery) {
-		dslContext.addContributor( factory.fromLuceneQuery( luceneQuery ) );
+		dslContext.addChild( factory.fromLuceneQuery( luceneQuery ) );
 		return dslContext.getNextContext();
 	}
 }

@@ -42,7 +42,6 @@ class SearchQueryFactoryImpl
 	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
-
 	}
 
 	@Override

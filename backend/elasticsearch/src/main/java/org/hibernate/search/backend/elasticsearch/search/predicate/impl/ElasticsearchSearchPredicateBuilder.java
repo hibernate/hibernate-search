@@ -8,16 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchPredicateQueryBuilder implements ElasticsearchSearchPredicateCollector {
+public interface ElasticsearchSearchPredicateBuilder {
 
-	private JsonObject jsonQuery;
+	JsonObject build();
 
-	@Override
-	public void collectPredicate(JsonObject jsonQuery) {
-		this.jsonQuery = jsonQuery;
-	}
-
-	public JsonObject build() {
-		return jsonQuery;
-	}
 }

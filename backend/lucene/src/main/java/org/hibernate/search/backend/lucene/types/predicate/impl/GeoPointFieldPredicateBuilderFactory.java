@@ -9,8 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -29,33 +28,33 @@ public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPr
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> createMatchPredicateBuilder(String absoluteFieldPath) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath) {
+	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(
+	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(
+	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
+	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}

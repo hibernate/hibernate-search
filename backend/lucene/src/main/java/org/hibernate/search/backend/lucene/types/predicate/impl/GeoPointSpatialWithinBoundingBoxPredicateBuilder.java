@@ -19,7 +19,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSpatialWi
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.getBottomRight().getLatitude(), boundingBox.getTopLeft().getLatitude(),
 				boundingBox.getTopLeft().getLongitude(), boundingBox.getBottomRight().getLongitude() );
 	}

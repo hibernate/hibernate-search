@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonObject;
 
 class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicateBuilder
-		implements SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
+		implements SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_DISTANCE = JsonAccessor.root().property( "geo_distance" ).asObject();
 
@@ -28,7 +28,7 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicat
 
 	private final ElasticsearchFieldCodec codec;
 
-	public GeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	GeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}
@@ -40,10 +40,10 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicat
 	}
 
 	@Override
-	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected JsonObject doBuild() {
 		JsonObject outerObject = getOuterObject();
 		GEO_DISTANCE.set( outerObject, getInnerObject() );
-		collector.collectPredicate( outerObject );
+		return outerObject;
 	}
 
 }

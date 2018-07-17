@@ -7,10 +7,9 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 
 
-class UserProvidedLuceneSortFieldSortContributor implements SearchSortContributor<LuceneSearchSortCollector> {
+class UserProvidedLuceneSortFieldSortContributor implements LuceneSearchSortBuilder {
 
 	private final SortField luceneSortField;
 
@@ -19,7 +18,7 @@ class UserProvidedLuceneSortFieldSortContributor implements SearchSortContributo
 	}
 
 	@Override
-	public void contribute(LuceneSearchSortCollector collector) {
+	public void buildAndAddTo(LuceneSearchSortCollector collector) {
 		collector.collectSortField( luceneSortField );
 	}
 }

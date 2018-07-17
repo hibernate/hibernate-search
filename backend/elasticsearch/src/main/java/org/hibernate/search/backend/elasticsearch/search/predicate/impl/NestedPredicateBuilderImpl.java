@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 import com.google.gson.JsonObject;
 
@@ -17,32 +16,32 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements NestedPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
+		implements NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonAccessor<String> PATH = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY = JsonAccessor.root().property( "query" ).asObject();
 
 	private final String absoluteFieldPath;
 
-	private SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor;
+	private ElasticsearchSearchPredicateBuilder nestedBuilder;
 
 	NestedPredicateBuilderImpl(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
-	public void nested(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> nestedContributor) {
-		this.nestedContributor = nestedContributor;
+	public void nested(ElasticsearchSearchPredicateBuilder nestedBuilder) {
+		this.nestedBuilder = nestedBuilder;
 	}
 
 	@Override
-	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected JsonObject doBuild() {
 		JsonObject outerObject = getOuterObject();
 		JsonObject innerObject = getInnerObject();
 		PATH.set( innerObject, absoluteFieldPath );
-		QUERY.set( innerObject, getQueryFromContributor( nestedContributor ) );
+		QUERY.set( innerObject, nestedBuilder.build() );
 		outerObject.add( "nested", getInnerObject() );
-		collector.collectPredicate( outerObject );
+		return outerObject;
 	}
 
 }

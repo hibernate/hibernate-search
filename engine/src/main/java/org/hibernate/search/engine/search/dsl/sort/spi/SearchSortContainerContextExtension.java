@@ -30,14 +30,15 @@ public interface SearchSortContainerContextExtension<N, T> {
 	 * @param original The original, non-extended {@link SearchSortContainerContext}.
 	 * @param factory A {@link SearchSortFactory}.
 	 * @param dslContext A {@link SearchSortDslContext}.
-	 * @param <C> The type of collector expected by search predicate contributors for the given search target.
+	 * @param <C> The type of query element collector for the given DSL context.
+	 * @param <B> The implementation type of builders for the given DSL context.
 	 * @return An extended search predicate container context ({@link T})
 	 * @throws org.hibernate.search.util.SearchException If the current extension does not support the given
 	 * search target (incompatible technology).
 	 */
-	<C> T extendOrFail(
+	<C, B> T extendOrFail(
 			SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext);
+			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext);
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -45,12 +46,13 @@ public interface SearchSortContainerContextExtension<N, T> {
 	 * @param original The original, non-extended {@link SearchSortContainerContext}.
 	 * @param factory A {@link SearchSortFactory}.
 	 * @param dslContext A {@link SearchSortDslContext}.
-	 * @param <C> The type of collector expected by search predicate contributors for the given search target.
+	 * @param <C> The type of query element collector for the given DSL context.
+	 * @param <B> The implementation type of builders for the given DSL context.
 	 * @return An optional containing the extended search predicate container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	<C> Optional<T> extendOptional(
+	<C, B> Optional<T> extendOptional(
 			SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext);
+			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext);
 
 }

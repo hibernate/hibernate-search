@@ -8,21 +8,18 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.util.List;
 
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 
-class LuceneSearchSort implements SearchSort, SearchSortContributor<LuceneSearchSortCollector> {
+class LuceneSearchSort implements SearchSort {
 
-	private final List<SortField> sortFields;
+	private final List<LuceneSearchSortBuilder> builders;
 
-	LuceneSearchSort(List<SortField> sortFields) {
-		this.sortFields = sortFields;
+	LuceneSearchSort(List<LuceneSearchSortBuilder> builders) {
+		this.builders = builders;
 	}
 
-	@Override
-	public void contribute(LuceneSearchSortCollector collector) {
-		collector.collectSortFields( sortFields );
+	List<LuceneSearchSortBuilder> getBuilders() {
+		return builders;
 	}
 
 }

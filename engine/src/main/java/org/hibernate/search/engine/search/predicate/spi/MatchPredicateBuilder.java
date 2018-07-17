@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface MatchPredicateBuilder<CTX, C> extends SearchPredicateBuilder<CTX, C> {
+public interface MatchPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void value(Object value);
 

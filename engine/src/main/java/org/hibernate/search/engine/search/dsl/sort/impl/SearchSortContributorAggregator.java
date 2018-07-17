@@ -9,9 +9,10 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -23,16 +24,16 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *     <li>new contributors cannot be added after the other contributors have been used</li>
  * </ul>
  */
-public final class SearchSortContributorAggregator<C>
-		implements SearchSortContributor<C> {
+public final class SearchSortContributorAggregator<B>
+		implements SearchSortContributor<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final List<SearchSortContributor<? super C>> sortContributors = new ArrayList<>();
+	private final List<SearchSortContributor<? extends B>> sortContributors = new ArrayList<>();
 
 	private boolean contributed = false;
 
-	public void add(SearchSortContributor<? super C> child) {
+	public void add(SearchSortContributor<? extends B> child) {
 		if ( contributed ) {
 			throw log.cannotAddSortToUsedContext();
 		}
@@ -40,7 +41,7 @@ public final class SearchSortContributorAggregator<C>
 	}
 
 	@Override
-	public void contribute(C collector) {
+	public void contribute(Consumer<? super B> collector) {
 		if ( contributed ) {
 			// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
 			throw new AssertionFailure(
@@ -48,7 +49,7 @@ public final class SearchSortContributorAggregator<C>
 			);
 		}
 		contributed = true;
-		for ( SearchSortContributor<? super C> sortContributor : sortContributors ) {
+		for ( SearchSortContributor<? extends B> sortContributor : sortContributors ) {
 			sortContributor.contribute( collector );
 		}
 	}

@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
-
 import com.google.gson.JsonPrimitive;
 
-class IndexOrderSortContributor implements SearchSortContributor<ElasticsearchSearchSortCollector> {
+class IndexOrderSortContributor implements ElasticsearchSearchSortBuilder {
 
 	public static final IndexOrderSortContributor INSTANCE = new IndexOrderSortContributor();
 
@@ -20,7 +18,7 @@ class IndexOrderSortContributor implements SearchSortContributor<ElasticsearchSe
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector) {
+	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		collector.collectSort( UID_SORT_KEYWORD_JSON );
 	}
 }

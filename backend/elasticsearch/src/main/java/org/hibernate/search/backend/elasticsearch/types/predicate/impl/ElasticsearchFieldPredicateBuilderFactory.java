@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -15,16 +15,16 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 
 public interface ElasticsearchFieldPredicateBuilderFactory {
 
-	MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createMatchPredicateBuilder(String absoluteFieldPath);
+	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(String absoluteFieldPath);
 
-	RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(String absoluteFieldPath);
+	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(String absoluteFieldPath);
 
-	SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(
+	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);
 
-	SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(
+	SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath);
 
-	SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
+	SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath);
 }

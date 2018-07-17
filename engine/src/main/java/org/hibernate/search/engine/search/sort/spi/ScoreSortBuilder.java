@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
-public interface ScoreSortBuilder<C> extends SearchSortBuilder<C> {
+public interface ScoreSortBuilder<B> extends SearchSortBuilder<B> {
 
 }

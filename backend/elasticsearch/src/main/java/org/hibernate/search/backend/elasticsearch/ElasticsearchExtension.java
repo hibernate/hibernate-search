@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortContainerContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
@@ -51,8 +51,8 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <CTX, C> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<CTX, C> factory, SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+	public <C, B> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
+			SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
 			return extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext );
 		}
@@ -62,9 +62,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <CTX, C> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
-			SearchPredicateContainerContext<N> original, SearchPredicateFactory<CTX, C> factory,
-			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+	public <C, B> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
+			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C, B> factory,
+			SearchPredicateDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
 			return Optional.of( extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext ) );
 		}
@@ -74,8 +74,8 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <C> ElasticsearchSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext) {
+	public <C, B> ElasticsearchSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
+			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof ElasticsearchSearchSortFactory ) {
 			return extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext );
 		}
@@ -85,9 +85,9 @@ public final class ElasticsearchExtension<N>
 	}
 
 	@Override
-	public <C> Optional<ElasticsearchSearchSortContainerContext<N>> extendOptional(
-			SearchSortContainerContext<N> original, SearchSortFactory<C> factory,
-			SearchSortDslContext<N, ? extends C> dslContext) {
+	public <C, B> Optional<ElasticsearchSearchSortContainerContext<N>> extendOptional(
+			SearchSortContainerContext<N> original, SearchSortFactory<C, B> factory,
+			SearchSortDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof ElasticsearchSearchSortFactory ) {
 			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext ) );
 		}
@@ -106,23 +106,23 @@ public final class ElasticsearchExtension<N>
 		}
 	}
 
-	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchPredicateCollector
-	private <CTX, C> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
+	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchPredicateBuilder
+	private <B> ElasticsearchSearchPredicateContainerContext<N> extendUnsafe(
 			SearchPredicateContainerContext<N> original, ElasticsearchSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+			SearchPredicateDslContext<N, ? super B> dslContext) {
 		return new ElasticsearchSearchPredicateContainerContextImpl<>(
 				original, factory,
-				(SearchPredicateDslContext<N, Void, ? extends ElasticsearchSearchPredicateCollector>) dslContext
+				(SearchPredicateDslContext<N, ? super ElasticsearchSearchPredicateBuilder>) dslContext
 		);
 	}
 
-	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know C = ElasticsearchSearchSortCollector
-	private <C> ElasticsearchSearchSortContainerContext<N> extendUnsafe(
+	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchSortBuilder
+	private <B> ElasticsearchSearchSortContainerContext<N> extendUnsafe(
 			SearchSortContainerContext<N> original, ElasticsearchSearchSortFactory factory,
-			SearchSortDslContext<N, ? extends C> dslContext) {
+			SearchSortDslContext<N, ? super B> dslContext) {
 		return new ElasticsearchSearchSortContainerContextImpl<>(
 				original, factory,
-				(SearchSortDslContext<N, ? extends ElasticsearchSearchSortCollector>) dslContext
+				(SearchSortDslContext<N, ? super ElasticsearchSearchSortBuilder>) dslContext
 		);
 	}
 }

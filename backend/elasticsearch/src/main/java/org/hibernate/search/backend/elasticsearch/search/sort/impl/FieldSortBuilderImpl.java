@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 class FieldSortBuilderImpl extends AbstractSearchSortBuilder
-		implements FieldSortBuilder<ElasticsearchSearchSortCollector> {
+		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final JsonAccessor<JsonElement> MISSING = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
@@ -45,7 +45,7 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector) {
+	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		JsonObject innerObject = getInnerObject();
 		if ( innerObject.size() == 0 ) {
 			collector.collectSort( new JsonPrimitive( absoluteFieldPath ) );

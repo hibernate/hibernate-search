@@ -11,26 +11,25 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class MultiFieldPredicateCommonState<N, CTX, C, F extends MultiFieldPredicateCommonState.FieldSetContext<CTX, C>>
-		implements SearchPredicateContributor<CTX, C> {
+class MultiFieldPredicateCommonState<N, B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
+		implements SearchPredicateContributor<B> {
 
-	private final SearchPredicateFactory<CTX, C> factory;
+	private final SearchPredicateFactory<?, B> factory;
 
 	private final Supplier<N> nextContextProvider;
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	MultiFieldPredicateCommonState(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
+	MultiFieldPredicateCommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
 
-	public SearchPredicateFactory<CTX, C> getFactory() {
+	public SearchPredicateFactory<?, B> getFactory() {
 		return factory;
 	}
 
@@ -47,24 +46,24 @@ class MultiFieldPredicateCommonState<N, CTX, C, F extends MultiFieldPredicateCom
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
-		List<SearchPredicateBuilder<CTX, ? super C>> predicateBuilders = new ArrayList<>();
+	public B contribute() {
+		List<B> predicateBuilders = new ArrayList<>();
 		for ( F fieldSetContext : fieldSetContexts ) {
 			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
-			BooleanJunctionPredicateBuilder<CTX, C> boolBuilder = factory.bool();
-			for ( SearchPredicateBuilder<CTX, ? super C> predicateBuilder : predicateBuilders ) {
+			BooleanJunctionPredicateBuilder<B> boolBuilder = factory.bool();
+			for ( B predicateBuilder : predicateBuilders ) {
 				boolBuilder.should( predicateBuilder );
 			}
-			boolBuilder.contribute( context, collector );
+			return boolBuilder.toImplementation();
 		}
 		else {
-			predicateBuilders.get( 0 ).contribute( context, collector );
+			return predicateBuilders.get( 0 );
 		}
 	}
 
-	public interface FieldSetContext<CTX, C> {
-		void contributePredicateBuilders(Consumer<SearchPredicateBuilder<CTX, ? super C>> collector);
+	public interface FieldSetContext<B> {
+		void contributePredicateBuilders(Consumer<B> collector);
 	}
 }

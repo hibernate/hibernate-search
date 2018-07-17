@@ -17,10 +17,9 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateContainerContextImpl;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSortContainerContextImpl;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContainerContextExtension;
@@ -52,8 +51,8 @@ public final class LuceneExtension<N>
 	}
 
 	@Override
-	public <CTX, C> LuceneSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<CTX, C> factory, SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+	public <C, B> LuceneSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
+			SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
 			return extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext );
 		}
@@ -63,9 +62,9 @@ public final class LuceneExtension<N>
 	}
 
 	@Override
-	public <CTX, C> Optional<LuceneSearchPredicateContainerContext<N>> extendOptional(
-			SearchPredicateContainerContext<N> original, SearchPredicateFactory<CTX, C> factory,
-			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+	public <C, B> Optional<LuceneSearchPredicateContainerContext<N>> extendOptional(
+			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C, B> factory,
+			SearchPredicateDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext ) );
 		}
@@ -75,8 +74,8 @@ public final class LuceneExtension<N>
 	}
 
 	@Override
-	public <C> LuceneSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
-			SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext) {
+	public <C, B> LuceneSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
+			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof LuceneSearchSortFactory ) {
 			return extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext );
 		}
@@ -86,9 +85,9 @@ public final class LuceneExtension<N>
 	}
 
 	@Override
-	public <C> Optional<LuceneSearchSortContainerContext<N>> extendOptional(
-			SearchSortContainerContext<N> original, SearchSortFactory<C> factory,
-			SearchSortDslContext<N, ? extends C> dslContext) {
+	public <C, B> Optional<LuceneSearchSortContainerContext<N>> extendOptional(
+			SearchSortContainerContext<N> original, SearchSortFactory<C, B> factory,
+			SearchSortDslContext<N, ? super B> dslContext) {
 		if ( factory instanceof LuceneSearchSortFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext ) );
 		}
@@ -107,23 +106,23 @@ public final class LuceneExtension<N>
 		}
 	}
 
-	@SuppressWarnings("unchecked") // If the target is Lucene, then we know C = LuceneSearchPredicateCollector
-	private <CTX, C> LuceneSearchPredicateContainerContext<N> extendUnsafe(
+	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchPredicateBuilder
+	private <B> LuceneSearchPredicateContainerContext<N> extendUnsafe(
 			SearchPredicateContainerContext<N> original, LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, CTX, C> dslContext) {
+			SearchPredicateDslContext<N, ? super B> dslContext) {
 		return new LuceneSearchPredicateContainerContextImpl<>(
 				original, factory,
-				(SearchPredicateDslContext<N, LuceneSearchPredicateContext, ? extends LuceneSearchPredicateCollector>) dslContext
+				(SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder>) dslContext
 		);
 	}
 
-	@SuppressWarnings("unchecked") // If the target is Lucene, then we know C = LuceneSearchSortCollector
-	private <C> LuceneSearchSortContainerContext<N> extendUnsafe(
+	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchSortBuilder
+	private <B> LuceneSearchSortContainerContext<N> extendUnsafe(
 			SearchSortContainerContext<N> original, LuceneSearchSortFactory factory,
-			SearchSortDslContext<N, C> dslContext) {
+			SearchSortDslContext<N, ? super B> dslContext) {
 		return new LuceneSearchSortContainerContextImpl<>(
 				original, factory,
-				(SearchSortDslContext<N, ? extends LuceneSearchSortCollector>) dslContext
+				(SearchSortDslContext<N, ? super LuceneSearchSortBuilder>) dslContext
 		);
 	}
 }

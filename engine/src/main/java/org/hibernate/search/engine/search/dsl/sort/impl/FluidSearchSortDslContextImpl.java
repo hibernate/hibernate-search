@@ -7,28 +7,32 @@
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 
 /**
  * A DSL context used when calling {@link SearchQueryContext#sort()} to build the sort
  * in a fluid way (in the same call chain as the query).
  */
-public final class QuerySearchSortDslContextImpl<N, C>
-		implements SearchSortDslContext<N, C> {
+public final class FluidSearchSortDslContextImpl<N, B>
+		implements SearchSortDslContext<N, B> {
 
-	private final SearchSortContributorAggregator<C> searchSortContributorAggregator;
+	private final RootSearchSortDslContextImpl<B> rootContext;
 	private final N nextContext;
 
-	public QuerySearchSortDslContextImpl(SearchSortContributorAggregator<C> searchSortContributorAggregator,
-			N nextContext) {
-		this.searchSortContributorAggregator = searchSortContributorAggregator;
+	public FluidSearchSortDslContextImpl(RootSearchSortDslContextImpl<B> rootContext, N nextContext) {
+		this.rootContext = rootContext;
 		this.nextContext = nextContext;
 	}
 
 	@Override
-	public void addContributor(SearchSortContributor<? super C> child) {
-		this.searchSortContributorAggregator.add( child );
+	public void addChild(SearchSortContributor<? extends B> contributor) {
+		rootContext.addChild( contributor );
+	}
+
+	@Override
+	public void addChild(B builder) {
+		rootContext.addChild( builder );
 	}
 
 	@Override

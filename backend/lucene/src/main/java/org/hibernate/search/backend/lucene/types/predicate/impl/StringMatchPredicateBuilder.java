@@ -27,7 +27,7 @@ class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> 
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
 			return queryBuilder.createBooleanQuery( absoluteFieldPath, value );
 		}

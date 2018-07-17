@@ -7,20 +7,21 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.function.Consumer;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 /**
  * @author Guillaume Smet
@@ -36,27 +37,32 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public SearchSort toSearchSort(SearchSortContributor<? super LuceneSearchSortCollector> contributor) {
-		LuceneSearchQueryElementCollector collector = new LuceneSearchQueryElementCollector();
-		contributor.contribute( collector );
-		return new LuceneSearchSort( collector.toLuceneSortFields() );
+	public SearchSort toSearchSort(List<LuceneSearchSortBuilder> builders) {
+		return new LuceneSearchSort( builders );
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> toContributor(SearchSort sort) {
+	public void toImplementation(SearchSort sort, Consumer<LuceneSearchSortBuilder> implementationConsumer) {
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
-		return (LuceneSearchSort) sort;
+		((LuceneSearchSort) sort).getBuilders().forEach( implementationConsumer );
 	}
 
 	@Override
-	public ScoreSortBuilder<LuceneSearchSortCollector> score() {
+	public void contribute(LuceneSearchSortCollector collector, List<LuceneSearchSortBuilder> builders) {
+		for ( LuceneSearchSortBuilder builder : builders ) {
+			builder.buildAndAddTo( collector );
+		}
+	}
+
+	@Override
+	public ScoreSortBuilder<LuceneSearchSortBuilder> score() {
 		return new ScoreSortBuilderImpl();
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortCollector> field(String absoluteFieldPath) {
+	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
 		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
 
 		return new FieldSortBuilderImpl(
@@ -67,7 +73,7 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortCollector> distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		return new DistanceSortBuilderImpl(
 				absoluteFieldPath,
 				location,
@@ -76,17 +82,17 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> indexOrder() {
+	public LuceneSearchSortBuilder indexOrder() {
 		return IndexOrderSortContributor.INSTANCE;
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> fromLuceneSortField(SortField luceneSortField) {
+	public LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField) {
 		return new UserProvidedLuceneSortFieldSortContributor( luceneSortField );
 	}
 
 	@Override
-	public SearchSortContributor<LuceneSearchSortCollector> fromLuceneSort(Sort luceneSort) {
+	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
 		return new UserProvidedLuceneSortSortContributor( luceneSort );
 	}
 }

@@ -19,7 +19,7 @@ class LocalDateMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Long>
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return LongPoint.newExactQuery( absoluteFieldPath, value );
 	}
 }

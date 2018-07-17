@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -43,20 +42,12 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	}
 
 	@Override
-	public Void createRootContext() {
-		return null;
-	}
-
-	@Override
-	public SearchPredicate toSearchPredicate(
-			SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		ElasticsearchSearchPredicateQueryBuilder builder = new ElasticsearchSearchPredicateQueryBuilder();
-		contributor.contribute( null, builder );
+	public SearchPredicate toSearchPredicate(ElasticsearchSearchPredicateBuilder builder) {
 		return new ElasticsearchSearchPredicate( builder.build() );
 	}
 
 	@Override
-	public SearchPredicateContributor<Void, ElasticsearchSearchPredicateCollector> toContributor(SearchPredicate predicate) {
+	public ElasticsearchSearchPredicateBuilder toImplementation(SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}
@@ -64,53 +55,59 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	}
 
 	@Override
-	public MatchAllPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> matchAll() {
+	public void contribute(ElasticsearchSearchPredicateCollector collector,
+			ElasticsearchSearchPredicateBuilder builder) {
+		collector.collectPredicate( builder.build() );
+	}
+
+	@Override
+	public MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> matchAll() {
 		return new MatchAllPredicateBuilderImpl();
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> bool() {
+	public BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> bool() {
 		return new BooleanJunctionPredicateBuilderImpl();
 	}
 
 	@Override
-	public MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> match(String absoluteFieldPath) {
+	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createMatchPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> range(String absoluteFieldPath) {
+	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createRangePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> spatialWithinCircle(
+	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinCircle(
 			String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> spatialWithinPolygon(
+	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinPolygon(
 			String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
 				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> spatialWithinBoundingBox(
+	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
 				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public NestedPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> nested(String absoluteFieldPath) {
+	public NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		searchTargetModel.checkNestedField( absoluteFieldPath );
 		return new NestedPredicateBuilderImpl( absoluteFieldPath );
 	}
 
 	@Override
-	public SearchPredicateContributor<Void, ElasticsearchSearchPredicateCollector> fromJsonString(String jsonString) {
+	public ElasticsearchSearchPredicateBuilder fromJsonString(String jsonString) {
 		return new UserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 

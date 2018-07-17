@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.util.AssertionFailure;
 
 import com.google.gson.JsonObject;
@@ -18,7 +17,8 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 public abstract class AbstractSearchPredicateBuilder
-		implements SearchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
+		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
+				ElasticsearchSearchPredicateBuilder {
 
 	private static final JsonAccessor<Float> BOOST = JsonAccessor.root().property( "boost" ).asFloat();
 
@@ -26,39 +26,37 @@ public abstract class AbstractSearchPredicateBuilder
 
 	private final JsonObject innerObject = new JsonObject();
 
-	private boolean contributed;
+	private boolean built;
 
 	@Override
 	public void boost(float boost) {
 		BOOST.set( getInnerObject(), boost );
 	}
 
-	protected JsonObject getInnerObject() {
-		return innerObject;
-	}
-
-	protected JsonObject getOuterObject() {
-		return outerObject;
-	}
-
-	protected JsonObject getQueryFromContributor(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> queryContributor) {
-		ElasticsearchSearchPredicateQueryBuilder queryBuilder = new ElasticsearchSearchPredicateQueryBuilder();
-		queryContributor.contribute( null, queryBuilder );
-		return queryBuilder.build();
+	@Override
+	public ElasticsearchSearchPredicateBuilder toImplementation() {
+		return this;
 	}
 
 	@Override
-	public final void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
-		if ( contributed ) {
-			// we must never call a contribution twice. Contributions may have side-effects.
+	public final JsonObject build() {
+		if ( built ) {
+			// we must never call a builder twice. Building may have side-effects.
 			throw new AssertionFailure(
-					"A predicate contributor was called twice. There is a bug in Hibernate Search, please report it."
+					"A predicate builder was called twice. There is a bug in Hibernate Search, please report it."
 			);
 		}
-		contributed = true;
-
-		doContribute( context, collector );
+		built = true;
+		return doBuild();
 	}
 
-	protected abstract void doContribute(Void context, ElasticsearchSearchPredicateCollector collector);
+	protected final JsonObject getInnerObject() {
+		return innerObject;
+	}
+
+	protected final JsonObject getOuterObject() {
+		return outerObject;
+	}
+
+	protected abstract JsonObject doBuild();
 }

@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
-	private final SearchTargetContext<Void, ?> searchTargetContext;
+	private final SearchTargetContext<?> searchTargetContext;
 
 	ElasticsearchIndexSearchTarget(SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
@@ -49,7 +49,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 	}
 
 	@Override
-	protected SearchTargetContext<Void, ?> getSearchTargetContext() {
+	protected SearchTargetContext<?> getSearchTargetContext() {
 		return searchTargetContext;
 	}
 }

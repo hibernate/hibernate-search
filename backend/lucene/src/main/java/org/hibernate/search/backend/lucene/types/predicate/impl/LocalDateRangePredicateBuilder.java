@@ -19,7 +19,7 @@ class LocalDateRangePredicateBuilder extends AbstractRangePredicateBuilder<Long>
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return LongPoint.newRangeQuery(
 				absoluteFieldPath,
 				getLowerValue( lowerLimit, excludeLowerLimit ),

@@ -6,20 +6,29 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
-
 /**
  * Represents the current context in the search DSL,
- * i.e. the current position in the predicate tree.
+ * i.e. the current position in the sort tree.
  */
-public interface SearchSortDslContext<N, C> {
+public interface SearchSortDslContext<N, B> {
 
 	/**
-	 * Add a predicate contributor at the current position in the predicate tree.
+	 * Add a sort contributor at the current position in the sort tree.
+	 * <p>
+	 * The contributor will be called as late as possible to retrieve its contributed builders.
 	 *
-	 * @param child The contributor to add.
+	 * @param contributor The contributor to add.
 	 */
-	void addContributor(SearchSortContributor<? super C> child);
+	void addChild(SearchSortContributor<? extends B> contributor);
+
+	/**
+	 * Add a sort builder at the current position in the sort tree.
+	 *
+	 * @param builder The builder to add.
+	 */
+	default void addChild(B builder) {
+		addChild( new StaticSearchSortContributor( builder ) );
+	}
 
 	/**
 	 * @return The context that should be exposed to the user after the current predicate has been fully defined.

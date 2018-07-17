@@ -6,42 +6,44 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
-import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 
 /**
  * @author Guillaume Smet
  */
 class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements NestedPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+		implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private final String absoluteFieldPath;
 
-	private SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor;
+	private LuceneSearchPredicateBuilder nestedBuilder;
 
 	NestedPredicateBuilderImpl(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
-	public void nested(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> nestedPredicateContributor) {
-		this.nestedPredicateContributor = nestedPredicateContributor;
+	public void nested(LuceneSearchPredicateBuilder nestedBuilder) {
+		this.nestedBuilder = nestedBuilder;
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
+		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( absoluteFieldPath );
+
 		BooleanQuery.Builder childQueryBuilder = new BooleanQuery.Builder();
 		childQueryBuilder.add( LuceneQueries.childDocumentQuery(), Occur.FILTER );
 		childQueryBuilder.add( LuceneQueries.nestedDocumentPathQuery( absoluteFieldPath ), Occur.FILTER );
-		childQueryBuilder.add( getQueryFromContributor( new LuceneSearchPredicateContext( absoluteFieldPath ), nestedPredicateContributor ), Occur.MUST );
+		childQueryBuilder.add( nestedBuilder.build( childContext ), Occur.MUST );
 
 		Query parentQuery;
 		if ( context.getNestedPath() == null ) {

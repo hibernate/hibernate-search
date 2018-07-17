@@ -14,32 +14,32 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class MatchAllPredicateContextImpl<N, CTX, C>
-		implements MatchAllPredicateContext<N>, SearchPredicateContributor<CTX, C> {
+class MatchAllPredicateContextImpl<N, B>
+		implements MatchAllPredicateContext<N>, SearchPredicateContributor<B> {
 
-	private final SearchPredicateFactory<CTX, C> factory;
+	private final SearchPredicateFactory<?, B> factory;
 	private final Supplier<N> nextContextProvider;
 
-	private final MatchAllPredicateBuilder<CTX, C> builder;
+	private final MatchAllPredicateBuilder<B> matchAllBuilder;
 	private MatchAllExceptContext exceptContext;
 
-	MatchAllPredicateContextImpl(SearchPredicateFactory<CTX, C> factory,
+	MatchAllPredicateContextImpl(SearchPredicateFactory<?, B> factory,
 			Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
-		this.builder = factory.matchAll();
+		this.matchAllBuilder = factory.matchAll();
 	}
 
 	@Override
 	public MatchAllPredicateContext<N> boostedTo(float boost) {
-		this.builder.boost( boost );
+		this.matchAllBuilder.boost( boost );
 		return this;
 	}
 
@@ -61,17 +61,12 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
+	public B contribute() {
 		if ( exceptContext != null ) {
-			BooleanJunctionPredicateBuilder<CTX, C> booleanBuilder = factory.bool();
-			booleanBuilder.must( builder );
-			for ( SearchPredicateContributor<CTX, ? super C> child : exceptContext.children ) {
-				booleanBuilder.mustNot( child );
-			}
-			booleanBuilder.contribute( context, collector );
+			return exceptContext.contribute();
 		}
 		else {
-			builder.contribute( context, collector );
+			return matchAllBuilder.toImplementation();
 		}
 	}
 
@@ -87,25 +82,39 @@ class MatchAllPredicateContextImpl<N, CTX, C>
 		return exceptContext;
 	}
 
-	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, CTX, C> {
+	private class MatchAllExceptContext implements SearchPredicateDslContext<MatchAllPredicateContext<N>, B>,
+			SearchPredicateContributor<B> {
 
-		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, CTX, C> containerContext;
+		private final BooleanJunctionPredicateBuilder<B> booleanBuilder;
+		private final List<SearchPredicateContributor<? extends B>> exceptClauseContributors = new ArrayList<>();
 
-		private List<SearchPredicateContributor<CTX, ? super C>> children = new ArrayList<>();
+		private final SearchPredicateContainerContextImpl<MatchAllPredicateContext<N>, B> containerContext;
 
 		MatchAllExceptContext() {
+			this.booleanBuilder = MatchAllPredicateContextImpl.this.factory.bool();
+			this.booleanBuilder.must( matchAllBuilder.toImplementation() );
 			this.containerContext = new SearchPredicateContainerContextImpl<>(
-					MatchAllPredicateContextImpl.this.factory, this );
+					MatchAllPredicateContextImpl.this.factory, this
+			);
 		}
 
 		@Override
-		public void addContributor(SearchPredicateContributor<CTX, ? super C> child) {
-			children.add( child );
+		public void addChild(SearchPredicateContributor<? extends B> contributor) {
+			exceptClauseContributors.add( contributor );
 		}
 
 		@Override
 		public MatchAllPredicateContext<N> getNextContext() {
 			return MatchAllPredicateContextImpl.this;
 		}
+
+		@Override
+		public B contribute() {
+			for ( SearchPredicateContributor<? extends B> contributor : exceptClauseContributors ) {
+				booleanBuilder.mustNot( contributor.contribute() );
+			}
+			return booleanBuilder.toImplementation();
+		}
+
 	}
 }

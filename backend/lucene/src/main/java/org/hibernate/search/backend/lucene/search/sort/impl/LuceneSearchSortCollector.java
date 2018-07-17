@@ -16,12 +16,13 @@ import org.apache.lucene.search.SortField;
  * <p>
  * Used by Lucene-specific sort contributors.
  *
- * @see org.hibernate.search.engine.search.sort.spi.SearchSortContributor
- * @see org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder
+ * @see SearchSortFactoryImpl#contribute(Object, List)
+ * @see LuceneSearchSortBuilder
  */
 public interface LuceneSearchSortCollector {
 
-	void collectSortFields(List<SortField> sortFields);
-
 	void collectSortField(SortField sortField);
+
+	void collectSortFields(SortField[] sortFields);
+
 }

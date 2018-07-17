@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
-		implements DistanceSortBuilder<LuceneSearchSortCollector> {
+		implements DistanceSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,7 +44,7 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 	}
 
 	@Override
-	public void contribute(LuceneSearchSortCollector collector) {
+	public void buildAndAddTo(LuceneSearchSortCollector collector) {
 		fieldSortContributor.contributeDistanceSort( collector, absoluteFieldPath, location, order );
 	}
 }

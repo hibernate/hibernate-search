@@ -11,15 +11,16 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class SpatialWithinPredicateContextImpl<N, CTX, C> implements SpatialWithinPredicateContext<N>, SearchPredicateContributor<CTX, C> {
+class SpatialWithinPredicateContextImpl<N, B> implements SpatialWithinPredicateContext<N>,
+		SearchPredicateContributor<B> {
 
-	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<N, CTX, C> commonState;
+	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<N, B> commonState;
 
-	SpatialWithinPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
+	SpatialWithinPredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
@@ -29,7 +30,7 @@ class SpatialWithinPredicateContextImpl<N, CTX, C> implements SpatialWithinPredi
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
-		commonState.contribute( context, collector );
+	public B contribute() {
+		return commonState.contribute();
 	}
 }

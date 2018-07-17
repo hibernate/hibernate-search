@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 
 public abstract class AbstractMatchPredicateBuilder<T> extends AbstractSearchPredicateBuilder
-		implements MatchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+		implements MatchPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 

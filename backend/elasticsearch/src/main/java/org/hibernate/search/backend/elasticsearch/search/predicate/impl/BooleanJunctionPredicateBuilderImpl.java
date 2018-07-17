@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -26,14 +25,14 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
+		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private List<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> mustContributors;
-	private List<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> mustNotContributors;
-	private List<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> shouldContributors;
-	private List<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> filterContributors;
+	private List<ElasticsearchSearchPredicateBuilder> mustClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> mustNotClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> shouldClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> filterClauseBuilders;
 
 	private static final JsonAccessor<JsonObject> MUST = JsonAccessor.root().property( "must" ).asObject();
 	private static final JsonAccessor<JsonObject> MUST_NOT = JsonAccessor.root().property( "must_not" ).asObject();
@@ -46,35 +45,35 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	@Override
-	public void must(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( mustContributors == null ) {
-			mustContributors = new ArrayList<>();
+	public void must(ElasticsearchSearchPredicateBuilder clauseBuilder) {
+		if ( mustClauseBuilders == null ) {
+			mustClauseBuilders = new ArrayList<>();
 		}
-		mustContributors.add( contributor );
+		mustClauseBuilders.add( clauseBuilder );
 	}
 
 	@Override
-	public void mustNot(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( mustNotContributors == null ) {
-			mustNotContributors = new ArrayList<>();
+	public void mustNot(ElasticsearchSearchPredicateBuilder clauseBuilder) {
+		if ( mustNotClauseBuilders == null ) {
+			mustNotClauseBuilders = new ArrayList<>();
 		}
-		mustNotContributors.add( contributor );
+		mustNotClauseBuilders.add( clauseBuilder );
 	}
 
 	@Override
-	public void should(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( shouldContributors == null ) {
-			shouldContributors = new ArrayList<>();
+	public void should(ElasticsearchSearchPredicateBuilder clauseBuilder) {
+		if ( shouldClauseBuilders == null ) {
+			shouldClauseBuilders = new ArrayList<>();
 		}
-		shouldContributors.add( contributor );
+		shouldClauseBuilders.add( clauseBuilder );
 	}
 
 	@Override
-	public void filter(SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor) {
-		if ( filterContributors == null ) {
-			filterContributors = new ArrayList<>();
+	public void filter(ElasticsearchSearchPredicateBuilder clauseBuilder) {
+		if ( filterClauseBuilders == null ) {
+			filterClauseBuilders = new ArrayList<>();
 		}
-		filterContributors.add( contributor );
+		filterClauseBuilders.add( clauseBuilder );
 	}
 
 	@Override
@@ -106,13 +105,13 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	}
 
 	@Override
-	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected JsonObject doBuild() {
 		JsonObject innerObject = getInnerObject();
 
-		contributeQueries( innerObject, MUST, mustContributors );
-		contributeQueries( innerObject, MUST_NOT, mustNotContributors );
-		contributeQueries( innerObject, SHOULD, shouldContributors );
-		contributeQueries( innerObject, FILTER, filterContributors );
+		contributeClauses( innerObject, MUST, mustClauseBuilders );
+		contributeClauses( innerObject, MUST_NOT, mustNotClauseBuilders );
+		contributeClauses( innerObject, SHOULD, shouldClauseBuilders );
+		contributeClauses( innerObject, FILTER, filterClauseBuilders );
 
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH.set(
@@ -123,18 +122,19 @@ class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 		JsonObject outerObject = getOuterObject();
 		outerObject.add( "bool", innerObject );
-		collector.collectPredicate( outerObject );
+
+		return outerObject;
 	}
 
-	private void contributeQueries(JsonObject innerObject,
+	private void contributeClauses(JsonObject innerObject,
 			JsonAccessor<JsonObject> occurAccessor,
-			List<SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector>> contributors) {
-		if ( contributors == null ) {
+			List<ElasticsearchSearchPredicateBuilder> clauseBuilders) {
+		if ( clauseBuilders == null ) {
 			return;
 		}
 
-		for ( SearchPredicateContributor<Void, ? super ElasticsearchSearchPredicateCollector> contributor : contributors ) {
-			occurAccessor.add( innerObject, getQueryFromContributor( contributor ) );
+		for ( ElasticsearchSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
+			occurAccessor.add( innerObject, clauseBuilder.build() );
 		}
 	}
 

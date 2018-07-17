@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.dsl.sort.impl;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -23,11 +23,11 @@ public class LuceneSearchSortContainerContextImpl<N>
 
 	private final LuceneSearchSortFactory factory;
 
-	private final SearchSortDslContext<N, ? extends LuceneSearchSortCollector> dslContext;
+	private final SearchSortDslContext<N, ? super LuceneSearchSortBuilder> dslContext;
 
 	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate,
 			LuceneSearchSortFactory factory,
-			SearchSortDslContext<N, ? extends LuceneSearchSortCollector> dslContext) {
+			SearchSortDslContext<N, ? super LuceneSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
@@ -35,13 +35,13 @@ public class LuceneSearchSortContainerContextImpl<N>
 
 	@Override
 	public NonEmptySortContext<N> fromLuceneSortField(SortField luceneSortField) {
-		dslContext.addContributor( factory.fromLuceneSortField( luceneSortField ) );
+		dslContext.addChild( factory.fromLuceneSortField( luceneSortField ) );
 		return nonEmptyContext();
 	}
 
 	@Override
 	public NonEmptySortContext<N> fromLuceneSort(Sort luceneSort) {
-		dslContext.addContributor( factory.fromLuceneSort( luceneSort ) );
+		dslContext.addChild( factory.fromLuceneSort( luceneSort ) );
 		return nonEmptyContext();
 	}
 

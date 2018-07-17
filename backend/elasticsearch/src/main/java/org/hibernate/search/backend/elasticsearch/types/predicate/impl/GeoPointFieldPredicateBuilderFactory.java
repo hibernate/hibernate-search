@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -31,7 +31,7 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	}
 
 	@Override
-	public MatchPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createMatchPredicateBuilder(
+	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
@@ -39,7 +39,7 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	}
 
 	@Override
-	public RangePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createRangePredicateBuilder(
+	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
@@ -47,19 +47,19 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinCirclePredicateBuilder(
+	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinPolygonPredicateBuilder(
+	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> createSpatialWithinBoundingBoxPredicateBuilder(
+	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
 		return new GeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, CODEC );
 	}

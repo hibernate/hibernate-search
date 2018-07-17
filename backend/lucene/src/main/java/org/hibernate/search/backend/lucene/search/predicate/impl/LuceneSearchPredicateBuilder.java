@@ -8,16 +8,8 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.apache.lucene.search.Query;
 
-public class LuceneSearchPredicateQueryBuilder implements LuceneSearchPredicateCollector {
+public interface LuceneSearchPredicateBuilder {
 
-	private Query luceneQueryPredicate;
+	Query build(LuceneSearchPredicateContext context);
 
-	@Override
-	public void collectPredicate(Query luceneQuery) {
-		this.luceneQueryPredicate = luceneQuery;
-	}
-
-	public Query build() {
-		return luceneQueryPredicate;
-	}
 }

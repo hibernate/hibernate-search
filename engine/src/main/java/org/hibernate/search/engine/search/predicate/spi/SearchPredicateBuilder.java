@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface SearchPredicateBuilder<CTX, C> extends SearchPredicateContributor<CTX, C> {
+/**
+ * A search predicate builder, i.e. an object responsible for collecting parameters
+ * and then building a search predicate.
+ *
+ * @param <B> The implementation type of the builder, which should expose a {@code build()} method.
+ * This type is backend-specific, as the parameters to the build method may vary from one backend to another.
+ */
+public interface SearchPredicateBuilder<B> {
 
 	void boost(float boost);
 
 	/**
-	 * Contribute exactly one predicate to the collector (no more, no less).
-	 *
-	 * @param context The context in which the predicates are registered.
-	 * @param collector A collector to contribute to.
+	 * @return An implementation-specific view of this builder,
+	 * allowing the backend to call a {@code build()} method in particular.
 	 */
-	@Override
-	void contribute(CTX context, C collector);
+	B toImplementation();
 }

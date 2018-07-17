@@ -19,7 +19,7 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSpatialWithinC
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.getLatitude(), center.getLongitude(), radiusInMeters );
 	}
 }

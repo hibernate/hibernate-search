@@ -8,21 +8,16 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SearchSortFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
 public class ElasticsearchSearchTargetContext
-		implements SearchTargetContext<Void, ElasticsearchSearchQueryElementCollector> {
+		implements SearchTargetContext<ElasticsearchSearchQueryElementCollector> {
 
-	private final SearchPredicateFactory<Void, ElasticsearchSearchPredicateCollector> searchPredicateFactory;
-	private final SearchSortFactory<ElasticsearchSearchSortCollector> searchSortFactory;
-	private final SearchQueryFactory<ElasticsearchSearchQueryElementCollector> searchQueryFactory;
+	private final SearchPredicateFactoryImpl searchPredicateFactory;
+	private final SearchSortFactoryImpl searchSortFactory;
+	private final SearchQueryFactoryImpl searchQueryFactory;
 
 	public ElasticsearchSearchTargetContext(SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
@@ -32,17 +27,17 @@ public class ElasticsearchSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateFactory<Void, ElasticsearchSearchPredicateCollector> getSearchPredicateFactory() {
+	public SearchPredicateFactoryImpl getSearchPredicateFactory() {
 		return searchPredicateFactory;
 	}
 
 	@Override
-	public SearchSortFactory<ElasticsearchSearchSortCollector> getSearchSortFactory() {
+	public SearchSortFactoryImpl getSearchSortFactory() {
 		return searchSortFactory;
 	}
 
 	@Override
-	public SearchQueryFactory<ElasticsearchSearchQueryElementCollector> getSearchQueryFactory() {
+	public SearchQueryFactoryImpl getSearchQueryFactory() {
 		return searchQueryFactory;
 	}
 }

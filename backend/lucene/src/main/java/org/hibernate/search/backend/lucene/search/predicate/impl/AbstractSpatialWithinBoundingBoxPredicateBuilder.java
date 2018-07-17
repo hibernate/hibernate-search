@@ -11,7 +11,7 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 
 
 public abstract class AbstractSpatialWithinBoundingBoxPredicateBuilder<T> extends AbstractSearchPredicateBuilder
-		implements SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+		implements SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 

@@ -21,20 +21,20 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class SearchSortContainerContextImpl<N, C> implements SearchSortContainerContext<N> {
+public class SearchSortContainerContextImpl<N, B> implements SearchSortContainerContext<N> {
 
-	private final SearchSortFactory<C> factory;
+	private final SearchSortFactory<?, B> factory;
 
-	private final SearchSortDslContext<N, ? extends C> dslContext;
+	private final SearchSortDslContext<N, ? super B> dslContext;
 
-	public SearchSortContainerContextImpl(SearchSortFactory<C> factory, SearchSortDslContext<N, ? extends C> dslContext) {
+	public SearchSortContainerContextImpl(SearchSortFactory<?, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public NonEmptySortContext<N> by(SearchSort sort) {
-		dslContext.addContributor( factory.toContributor( sort ) );
+		factory.toImplementation( sort, dslContext::addChild );
 		return new NonEmptySortContext<N>() {
 			@Override
 			public SearchSortContainerContext<N> then() {
@@ -49,32 +49,32 @@ public class SearchSortContainerContextImpl<N, C> implements SearchSortContainer
 
 	@Override
 	public ScoreSortContext<N> byScore() {
-		ScoreSortContextImpl<N, C> child = new ScoreSortContextImpl<>( this, factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		ScoreSortContextImpl<N, B> child = new ScoreSortContextImpl<>( this, factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public NonEmptySortContext<N> byIndexOrder() {
-		dslContext.addContributor( factory.indexOrder() );
+		dslContext.addChild( factory.indexOrder() );
 		return nonEmptyContext();
 	}
 
 	@Override
 	public FieldSortContext<N> byField(String absoluteFieldPath) {
-		FieldSortContextImpl<N, C> child = new FieldSortContextImpl<>(
+		FieldSortContextImpl<N, B> child = new FieldSortContextImpl<>(
 				this, factory, dslContext::getNextContext, absoluteFieldPath
 		);
-		dslContext.addContributor( child );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
-		DistanceSortContextImpl<N, C> child = new DistanceSortContextImpl<>(
+		DistanceSortContextImpl<N, B> child = new DistanceSortContextImpl<>(
 				this, factory, dslContext::getNextContext, absoluteFieldPath, location
 		);
-		dslContext.addContributor( child );
+		dslContext.addChild( child );
 		return child;
 	}
 

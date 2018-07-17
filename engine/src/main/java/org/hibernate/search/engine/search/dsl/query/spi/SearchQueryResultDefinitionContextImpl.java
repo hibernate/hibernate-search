@@ -31,7 +31,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements SearchQueryResultDefinitionContext<R, O> {
 
-	private final SearchTargetContext<?, C> targetContext;
+	private final SearchTargetContext<C> targetContext;
 
 	private final SessionContext sessionContext;
 
@@ -39,7 +39,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	private final ObjectLoader<R, O> objectLoader;
 
-	public SearchQueryResultDefinitionContextImpl(SearchTargetContext<?, C> targetContext,
+	public SearchQueryResultDefinitionContextImpl(SearchTargetContext<C> targetContext,
 			SessionContext sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {

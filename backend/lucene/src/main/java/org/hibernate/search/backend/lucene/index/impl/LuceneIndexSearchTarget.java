@@ -30,7 +30,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 class LuceneIndexSearchTarget extends IndexSearchTargetBase {
 
 	private final LuceneSearchTargetModel searchTargetModel;
-	private final SearchTargetContext<?, ?> searchTargetContext;
+	private final SearchTargetContext<?> searchTargetContext;
 
 	LuceneIndexSearchTarget(SearchBackendContext searchBackendContext,
 			Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
@@ -48,7 +48,7 @@ class LuceneIndexSearchTarget extends IndexSearchTargetBase {
 	}
 
 	@Override
-	protected SearchTargetContext<?, ?> getSearchTargetContext() {
+	protected SearchTargetContext<?> getSearchTargetContext() {
 		return searchTargetContext;
 	}
 

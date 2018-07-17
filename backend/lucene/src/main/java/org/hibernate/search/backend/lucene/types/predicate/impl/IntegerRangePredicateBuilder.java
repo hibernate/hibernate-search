@@ -19,7 +19,7 @@ class IntegerRangePredicateBuilder extends AbstractRangePredicateBuilder<Integer
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return IntPoint.newRangeQuery(
 				absoluteFieldPath,
 				getLowerValue( lowerLimit, excludeLowerLimit ),

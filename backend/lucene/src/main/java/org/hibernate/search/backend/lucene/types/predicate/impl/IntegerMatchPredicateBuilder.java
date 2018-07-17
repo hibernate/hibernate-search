@@ -19,7 +19,7 @@ class IntegerMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Integer
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return IntPoint.newExactQuery( absoluteFieldPath, value );
 	}
 }

@@ -7,11 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 
 import com.google.gson.JsonArray;
 
-class ElasticsearchSearchSort implements SearchSort, SearchSortContributor<ElasticsearchSearchSortCollector> {
+class ElasticsearchSearchSort implements SearchSort, ElasticsearchSearchSortBuilder {
 
 	private final JsonArray jsonArray;
 
@@ -20,7 +19,7 @@ class ElasticsearchSearchSort implements SearchSort, SearchSortContributor<Elast
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector) {
+	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		collector.collectSort( jsonArray );
 	}
 

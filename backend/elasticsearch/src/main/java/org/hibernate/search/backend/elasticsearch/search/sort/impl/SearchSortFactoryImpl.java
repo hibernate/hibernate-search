@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
@@ -16,7 +18,6 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -41,32 +42,41 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	}
 
 	@Override
-	public SearchSort toSearchSort(SearchSortContributor<? super ElasticsearchSearchSortCollector> contributor) {
+	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
 		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector();
-		contributor.contribute( collector );
+		for ( ElasticsearchSearchSortBuilder builder : builders ) {
+			builder.buildAndAddTo( collector );
+		}
 		return new ElasticsearchSearchSort( collector.toJsonSort() );
 	}
 
 	@Override
-	public SearchSortContributor<ElasticsearchSearchSortCollector> toContributor(SearchSort predicate) {
-		if ( !( predicate instanceof ElasticsearchSearchSort ) ) {
-			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( predicate );
+	public void toImplementation(SearchSort sort, Consumer<ElasticsearchSearchSortBuilder> implementationConsumer) {
+		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
+			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
-		return (ElasticsearchSearchSort) predicate;
+		implementationConsumer.accept( (ElasticsearchSearchSort) sort );
 	}
 
 	@Override
-	public ScoreSortBuilder<ElasticsearchSearchSortCollector> score() {
+	public void contribute(ElasticsearchSearchSortCollector collector, List<ElasticsearchSearchSortBuilder> builders) {
+		for ( ElasticsearchSearchSortBuilder builder : builders ) {
+			builder.buildAndAddTo( collector );
+		}
+	}
+
+	@Override
+	public ScoreSortBuilder<ElasticsearchSearchSortBuilder> score() {
 		return new ScoreSortBuilderImpl();
 	}
 
 	@Override
-	public FieldSortBuilder<ElasticsearchSearchSortCollector> field(String absoluteFieldPath) {
+	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		return new FieldSortBuilderImpl( absoluteFieldPath, searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec() );
 	}
 
 	@Override
-	public DistanceSortBuilder<ElasticsearchSearchSortCollector> distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		if ( !searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec().supportsSortingByDistance() ) {
 			throw log.distanceOperationsNotSupportedByFieldType(
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
@@ -77,12 +87,12 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	}
 
 	@Override
-	public SearchSortContributor<ElasticsearchSearchSortCollector> indexOrder() {
+	public ElasticsearchSearchSortBuilder indexOrder() {
 		return IndexOrderSortContributor.INSTANCE;
 	}
 
 	@Override
-	public SearchSortContributor<ElasticsearchSearchSortCollector> fromJsonString(String jsonString) {
+	public ElasticsearchSearchSortBuilder fromJsonString(String jsonString) {
 		return new UserProvidedJsonSortContributor( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 }

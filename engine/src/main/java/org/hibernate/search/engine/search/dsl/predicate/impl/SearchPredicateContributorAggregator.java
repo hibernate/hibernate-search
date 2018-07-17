@@ -9,27 +9,29 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * An aggregator of {@link SearchPredicateContributor}, ensuring aggregated contributors are used appropriately:
  * <ul>
- *     <li>at most one predicate must be added</li>
+ *     <li>at most one predicate contributor must be added</li>
+ *     <li>it must be used at most once</li>
  *     <li>new contributors cannot be added after the contributor has been used
  *     (the other constraints already prevent that, but we need a specific error message in this case)</li>
  * </ul>
  */
-public final class SearchPredicateContributorAggregator<CTX, C>
-		implements SearchPredicateContributor<CTX, C> {
+public final class SearchPredicateContributorAggregator<B>
+		implements SearchPredicateContributor<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private SearchPredicateContributor<CTX, ? super C> singlePredicateContributor;
+	private SearchPredicateContributor<? extends B> singlePredicateContributor;
 
 	private boolean contributed = false;
 
-	public void add(SearchPredicateContributor<CTX, ? super C> child) {
+	public void add(SearchPredicateContributor<? extends B> child) {
 		if ( contributed ) {
 			throw log.cannotAddPredicateToUsedContext();
 		}
@@ -40,8 +42,14 @@ public final class SearchPredicateContributorAggregator<CTX, C>
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
+	public B contribute() {
+		if ( contributed ) {
+			// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
+			throw new AssertionFailure(
+					"A predicate contributor was called twice. There is a bug in Hibernate Search, please report it."
+			);
+		}
 		contributed = true;
-		singlePredicateContributor.contribute( context, collector );
+		return singlePredicateContributor.contribute();
 	}
 }

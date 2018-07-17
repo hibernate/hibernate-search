@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 
 public abstract class AbstractRangePredicateBuilder<T> extends AbstractSearchPredicateBuilder
-		implements RangePredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+		implements RangePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 

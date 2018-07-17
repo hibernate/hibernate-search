@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.util.SearchException;
 
 /**
  * A factory for search predicates.
@@ -14,32 +15,57 @@ import org.hibernate.search.engine.search.SearchPredicate;
  * This is the main entry point for the engine
  * to ask the backend to build search predicates.
  *
- * @param <CTX> The type of the context passed to the contribution method.
- * @param <C> The type of predicate collector the builders contributor will contribute to.
- * This type is backend-specific. See {@link SearchPredicateBuilder#contribute(Object, Object)}
+ * @param <C> The type of query element collector
+ * @param <B> The implementation type of builders
+ * This type is backend-specific. See {@link SearchPredicateBuilder#toImplementation()}
  */
-public interface SearchPredicateFactory<CTX, C> {
+public interface SearchPredicateFactory<C, B> {
 
-	CTX createRootContext();
+	/**
+	 * Convert a predicate builder to a reusable {@link SearchPredicate} object.
+	 * <p>
+	 * Implementations may decide to just wrap the builder if it is reusable,
+	 * or to convert it to another representation if it is not reusable.
+	 *
+	 * @param builder The predicate builder implementation.
+	 */
+	SearchPredicate toSearchPredicate(B builder);
 
-	SearchPredicate toSearchPredicate(SearchPredicateContributor<CTX, ? super C> contributor);
+	/**
+	 * Convert a {@link SearchPredicate} object back to a predicate builder.
+	 * <p>
+	 * May be called multiple times for a given {@link SearchPredicate} object.
+	 *
+	 * @param predicate The {@link SearchPredicate} object to convert.
+	 * @throws SearchException If the {@link SearchPredicate} object was created
+	 * by a different, incompatible factory.
+	 */
+	B toImplementation(SearchPredicate predicate);
 
-	SearchPredicateContributor<CTX, C> toContributor(SearchPredicate predicate);
+	/**
+	 * Contribute a predicate builder to a collector.
+	 * <p>
+	 * Will only ever be called once per collector.
+	 *
+	 * @param collector The query element collector.
+	 * @param builder The predicate builder implementation.
+	 */
+	void contribute(C collector, B builder);
 
-	MatchAllPredicateBuilder<CTX, C> matchAll();
+	MatchAllPredicateBuilder<B> matchAll();
 
-	BooleanJunctionPredicateBuilder<CTX, C> bool();
+	BooleanJunctionPredicateBuilder<B> bool();
 
-	MatchPredicateBuilder<CTX, C> match(String absoluteFieldPath);
+	MatchPredicateBuilder<B> match(String absoluteFieldPath);
 
-	RangePredicateBuilder<CTX, C> range(String absoluteFieldPath);
+	RangePredicateBuilder<B> range(String absoluteFieldPath);
 
-	NestedPredicateBuilder<CTX, C> nested(String absoluteFieldPath);
+	NestedPredicateBuilder<B> nested(String absoluteFieldPath);
 
-	SpatialWithinCirclePredicateBuilder<CTX, C> spatialWithinCircle(String absoluteFieldPath);
+	SpatialWithinCirclePredicateBuilder<B> spatialWithinCircle(String absoluteFieldPath);
 
-	SpatialWithinPolygonPredicateBuilder<CTX, C> spatialWithinPolygon(String absoluteFieldPath);
+	SpatialWithinPolygonPredicateBuilder<B> spatialWithinPolygon(String absoluteFieldPath);
 
-	SpatialWithinBoundingBoxPredicateBuilder<CTX, C> spatialWithinBoundingBox(String absoluteFieldPath);
+	SpatialWithinBoundingBoxPredicateBuilder<B> spatialWithinBoundingBox(String absoluteFieldPath);
 
 }

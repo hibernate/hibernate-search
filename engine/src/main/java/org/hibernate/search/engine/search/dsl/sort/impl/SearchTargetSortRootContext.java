@@ -9,10 +9,10 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-public final class SearchTargetSortRootContext<C> extends SearchSortContainerContextImpl<SearchSort, C> {
+public final class SearchTargetSortRootContext<B> extends SearchSortContainerContextImpl<SearchSort, B> {
 
-	public SearchTargetSortRootContext(SearchSortFactory<C> factory) {
-		super( factory, new BuildingRootSearchSortDslContextImpl<>( factory ) );
+	public SearchTargetSortRootContext(SearchSortFactory<?, B> factory) {
+		super( factory, new RootSearchSortDslContextImpl<>( factory ) );
 	}
 
 }

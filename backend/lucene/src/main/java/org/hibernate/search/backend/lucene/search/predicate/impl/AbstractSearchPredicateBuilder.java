@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
+
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 
 
 /**
  * @author Guillaume Smet
  */
-abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
+		LuceneSearchPredicateBuilder {
 
 	private Float boost;
 
@@ -24,22 +25,20 @@ abstract class AbstractSearchPredicateBuilder implements SearchPredicateBuilder<
 		this.boost = boost;
 	}
 
-	protected abstract Query buildQuery(LuceneSearchPredicateContext context);
+	@Override
+	public LuceneSearchPredicateBuilder toImplementation() {
+		return this;
+	}
 
 	@Override
-	public void contribute(LuceneSearchPredicateContext context, LuceneSearchPredicateCollector collector) {
+	public final Query build(LuceneSearchPredicateContext context) {
 		if ( boost != null ) {
-			collector.collectPredicate( new BoostQuery( buildQuery( context ), boost ) );
+			return new BoostQuery( doBuild( context ), boost );
 		}
 		else {
-			collector.collectPredicate( buildQuery( context ) );
+			return doBuild( context );
 		}
 	}
 
-	protected Query getQueryFromContributor(LuceneSearchPredicateContext context,
-			SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		LuceneSearchPredicateQueryBuilder queryBuilder = new LuceneSearchPredicateQueryBuilder();
-		contributor.contribute( context, queryBuilder );
-		return queryBuilder.build();
-	}
+	protected abstract Query doBuild(LuceneSearchPredicateContext context);
 }

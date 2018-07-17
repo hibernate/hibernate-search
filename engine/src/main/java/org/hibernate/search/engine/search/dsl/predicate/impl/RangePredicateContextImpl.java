@@ -11,15 +11,15 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class RangePredicateContextImpl<N, CTX, C> implements RangePredicateContext<N>, SearchPredicateContributor<CTX, C> {
+class RangePredicateContextImpl<N, B> implements RangePredicateContext<N>, SearchPredicateContributor<B> {
 
-	private final RangePredicateFieldSetContextImpl.CommonState<N, CTX, C> commonState;
+	private final RangePredicateFieldSetContextImpl.CommonState<N, B> commonState;
 
-	RangePredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
+	RangePredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
 	}
 
@@ -29,7 +29,7 @@ class RangePredicateContextImpl<N, CTX, C> implements RangePredicateContext<N>, 
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
-		commonState.contribute( context, collector );
+	public B contribute() {
+		return commonState.contribute();
 	}
 }

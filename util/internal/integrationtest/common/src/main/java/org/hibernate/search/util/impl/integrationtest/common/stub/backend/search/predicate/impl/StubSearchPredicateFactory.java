@@ -13,67 +13,66 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicate
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 
-public class StubSearchPredicateFactory implements SearchPredicateFactory<Void, StubQueryElementCollector> {
+public class StubSearchPredicateFactory implements SearchPredicateFactory<StubQueryElementCollector, StubPredicateBuilder> {
 
 	@Override
-	public Void createRootContext() {
-		return null;
+	public SearchPredicate toSearchPredicate(StubPredicateBuilder builder) {
+		return new StubSearchPredicate( builder );
 	}
 
 	@Override
-	public SearchPredicate toSearchPredicate(SearchPredicateContributor<Void, ? super StubQueryElementCollector> contributor) {
-		contributor.contribute( null, StubQueryElementCollector.get() );
-		return new StubSearchPredicate();
+	public StubPredicateBuilder toImplementation(SearchPredicate predicate) {
+		return ((StubSearchPredicate) predicate).get();
 	}
 
 	@Override
-	public SearchPredicateContributor<Void, StubQueryElementCollector> toContributor(SearchPredicate predicate) {
-		return (StubSearchPredicate) predicate;
+	public void contribute(StubQueryElementCollector collector, StubPredicateBuilder builder) {
+		builder.simulateBuild();
+		collector.simulateCollectCall();
 	}
 
 	@Override
-	public MatchAllPredicateBuilder<Void, StubQueryElementCollector> matchAll() {
+	public MatchAllPredicateBuilder<StubPredicateBuilder> matchAll() {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<Void, StubQueryElementCollector> bool() {
+	public BooleanJunctionPredicateBuilder<StubPredicateBuilder> bool() {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public MatchPredicateBuilder<Void, StubQueryElementCollector> match(String absoluteFieldPath) {
+	public MatchPredicateBuilder<StubPredicateBuilder> match(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public RangePredicateBuilder<Void, StubQueryElementCollector> range(String absoluteFieldPath) {
+	public RangePredicateBuilder<StubPredicateBuilder> range(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<Void, StubQueryElementCollector> spatialWithinCircle(String absoluteFieldPath) {
+	public SpatialWithinCirclePredicateBuilder<StubPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<Void, StubQueryElementCollector> spatialWithinPolygon(String absoluteFieldPath) {
+	public SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<Void, StubQueryElementCollector> spatialWithinBoundingBox(String absoluteFieldPath) {
+	public SpatialWithinBoundingBoxPredicateBuilder<StubPredicateBuilder> spatialWithinBoundingBox(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
 	@Override
-	public NestedPredicateBuilder<Void, StubQueryElementCollector> nested(String absoluteFieldPath) {
+	public NestedPredicateBuilder<StubPredicateBuilder> nested(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 }

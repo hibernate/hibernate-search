@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
-
 import com.google.gson.JsonObject;
 
 
-class UserProvidedJsonPredicateContributor implements SearchPredicateContributor<Void, ElasticsearchSearchPredicateCollector> {
+class UserProvidedJsonPredicateContributor implements ElasticsearchSearchPredicateBuilder {
 
 	private final JsonObject json;
 
@@ -20,8 +18,8 @@ class UserProvidedJsonPredicateContributor implements SearchPredicateContributor
 	}
 
 	@Override
-	public void contribute(Void context, ElasticsearchSearchPredicateCollector collector) {
-		collector.collectPredicate( json );
+	public JsonObject build() {
+		return json;
 	}
 
 }

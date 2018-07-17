@@ -8,25 +8,19 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateFactoryImpl;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
 /**
  * @author Guillaume Smet
  */
 public class LuceneSearchTargetContext
-		implements SearchTargetContext<LuceneSearchPredicateContext, LuceneSearchQueryElementCollector> {
+		implements SearchTargetContext<LuceneSearchQueryElementCollector> {
 
-	private final SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> searchPredicateFactory;
-	private final SearchSortFactory<LuceneSearchSortCollector> searchSortFactory;
-	private final SearchQueryFactory<LuceneSearchQueryElementCollector> searchQueryFactory;
+	private final SearchPredicateFactoryImpl searchPredicateFactory;
+	private final SearchSortFactoryImpl searchSortFactory;
+	private final SearchQueryFactoryImpl searchQueryFactory;
 
 	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
@@ -35,17 +29,17 @@ public class LuceneSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> getSearchPredicateFactory() {
+	public SearchPredicateFactoryImpl getSearchPredicateFactory() {
 		return searchPredicateFactory;
 	}
 
 	@Override
-	public SearchSortFactory<LuceneSearchSortCollector> getSearchSortFactory() {
+	public SearchSortFactoryImpl getSearchSortFactory() {
 		return searchSortFactory;
 	}
 
 	@Override
-	public SearchQueryFactory<LuceneSearchQueryElementCollector> getSearchQueryFactory() {
+	public SearchQueryFactoryImpl getSearchQueryFactory() {
 		return searchQueryFactory;
 	}
 }

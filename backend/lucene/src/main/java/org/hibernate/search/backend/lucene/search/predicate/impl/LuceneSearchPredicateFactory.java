@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.apache.lucene.search.Query;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-public interface LuceneSearchPredicateFactory extends SearchPredicateFactory<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> {
+import org.apache.lucene.search.Query;
 
-	SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> fromLuceneQuery(Query luceneQuery);
+public interface LuceneSearchPredicateFactory
+		extends SearchPredicateFactory<LuceneSearchPredicateCollector, LuceneSearchPredicateBuilder> {
+
+	LuceneSearchPredicateBuilder fromLuceneQuery(Query luceneQuery);
 
 }

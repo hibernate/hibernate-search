@@ -18,28 +18,27 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class MatchPredicateFieldSetContextImpl<N, CTX, C>
-		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<CTX, C> {
+class MatchPredicateFieldSetContextImpl<N, B>
+		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<N, CTX, C> commonState;
+	private final CommonState<N, B> commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<MatchPredicateBuilder<CTX, C>> queryBuilders = new ArrayList<>();
+	private final List<MatchPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
-	MatchPredicateFieldSetContextImpl(CommonState<N, CTX, C> commonState, List<String> absoluteFieldPaths) {
+	MatchPredicateFieldSetContextImpl(CommonState<N, B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateFactory<CTX, C> predicateFactory = commonState.getFactory();
+		SearchPredicateFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			queryBuilders.add( predicateFactory.match( absoluteFieldPath ) );
+			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
 		}
 	}
 
@@ -50,7 +49,7 @@ class MatchPredicateFieldSetContextImpl<N, CTX, C>
 
 	@Override
 	public MatchPredicateFieldSetContext<N> boostedTo(float boost) {
-		queryBuilders.forEach( b -> b.boost( boost ) );
+		predicateBuilders.forEach( b -> b.boost( boost ) );
 		return this;
 	}
 
@@ -60,13 +59,15 @@ class MatchPredicateFieldSetContextImpl<N, CTX, C>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<SearchPredicateBuilder<CTX, ? super C>> collector) {
-		queryBuilders.forEach( collector );
+	public void contributePredicateBuilders(Consumer<B> collector) {
+		for ( MatchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+			collector.accept( predicateBuilder.toImplementation() );
+		}
 	}
 
-	static class CommonState<N, CTX, C> extends MultiFieldPredicateCommonState<N, CTX, C, MatchPredicateFieldSetContextImpl<N, CTX, C>> {
+	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, MatchPredicateFieldSetContextImpl<N, B>> {
 
-		CommonState(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
+		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
@@ -83,8 +84,8 @@ class MatchPredicateFieldSetContextImpl<N, CTX, C>
 					.collect( Collectors.toList() );
 		}
 
-		private Stream<MatchPredicateBuilder<CTX, C>> getQueryBuilders() {
-			return getFieldSetContexts().stream().flatMap( f -> f.queryBuilders.stream() );
+		private Stream<MatchPredicateBuilder<B>> getQueryBuilders() {
+			return getFieldSetContexts().stream().flatMap( f -> f.predicateBuilders.stream() );
 		}
 
 	}

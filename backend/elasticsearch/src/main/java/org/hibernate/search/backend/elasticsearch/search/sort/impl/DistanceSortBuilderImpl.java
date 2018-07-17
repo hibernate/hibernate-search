@@ -15,7 +15,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonObject;
 
 class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
-		implements DistanceSortBuilder<ElasticsearchSearchSortCollector> {
+		implements DistanceSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final JsonObjectAccessor GEO_DISTANCE = JsonAccessor.root().property( "_geo_distance" ).asObject();
 
@@ -28,7 +28,7 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector) {
+	protected void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		getInnerObject().add( absoluteFieldPath, GeoPointFieldCodec.INSTANCE.encode( location ) );
 
 		JsonObject outerObject = new JsonObject();

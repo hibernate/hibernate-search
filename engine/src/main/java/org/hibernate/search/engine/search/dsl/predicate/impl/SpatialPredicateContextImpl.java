@@ -10,31 +10,32 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class SpatialPredicateContextImpl<N, CTX, C> implements SpatialPredicateContext<N>, SearchPredicateContributor<CTX, C> {
+class SpatialPredicateContextImpl<N, B> implements SpatialPredicateContext<N>, SearchPredicateContributor<B> {
 
-	private final SearchPredicateFactory<CTX, C> factory;
+	private final SearchPredicateFactory<?, B> factory;
 
 	private final Supplier<N> nextContextProvider;
 
-	private SearchPredicateContributor<CTX, C> child;
+	private SearchPredicateContributor<B> child;
 
-	SpatialPredicateContextImpl(SearchPredicateFactory<CTX, C> factory, Supplier<N> nextContextProvider) {
+	SpatialPredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 		this.factory = factory;
 		this.nextContextProvider = nextContextProvider;
 	}
 
 	@Override
 	public SpatialWithinPredicateContext<N> within() {
-		SpatialWithinPredicateContextImpl<N, CTX, C> child = new SpatialWithinPredicateContextImpl<>( factory, nextContextProvider );
+		SpatialWithinPredicateContextImpl<N, B> child = new SpatialWithinPredicateContextImpl<>( factory, nextContextProvider );
 		this.child = child;
 		return child;
 	}
 
 	@Override
-	public void contribute(CTX context, C collector) {
-		child.contribute( context, collector );
+	public B contribute() {
+		return child.contribute();
 	}
+
 }

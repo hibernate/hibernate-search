@@ -14,37 +14,28 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.BuildingRootSearchSortDslContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.impl.QuerySearchSortDslContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContributorAggregator;
-import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
-public final class SearchQueryContextImpl<T, Q, CTX, C> implements SearchQueryContext<Q> {
+final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 
-	private final SearchTargetContext<CTX, C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
-	private final SearchPredicateContributor<CTX, ? super C> searchPredicateContributor;
-	private final SearchSortContributorAggregator<C> searchSortContributorAggregator;
+	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
-	public SearchQueryContextImpl(SearchTargetContext<CTX, C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
+
+	SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchPredicateContributor<CTX, ? super C> searchPredicateContributor) {
-		this.targetContext = targetContext;
+			SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
-		this.searchPredicateContributor = searchPredicateContributor;
-		this.searchSortContributorAggregator = new SearchSortContributorAggregator<>();
+		this.searchPredicateCollector = searchPredicateCollector;
+		this.searchSortCollector = new SearchQuerySortCollector<>( targetContext.getSearchSortFactory() );
 	}
 
 	@Override
@@ -61,34 +52,19 @@ public final class SearchQueryContextImpl<T, Q, CTX, C> implements SearchQueryCo
 
 	@Override
 	public SearchQueryContext<Q> sort(SearchSort sort) {
-		SearchSortFactory<? super C> factory = targetContext.getSearchSortFactory();
-		searchSortContributorAggregator.add( factory.toContributor( sort ) );
+		searchSortCollector.collect( sort );
 		return this;
 	}
 
 	@Override
 	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
-		searchSortContributorAggregator.add(
-				toContributor( targetContext.getSearchSortFactory(), dslSortContributor )
-		);
+		searchSortCollector.collect( dslSortContributor );
 		return this;
 	}
 
 	@Override
 	public SearchSortContainerContext<SearchQueryContext<Q>> sort() {
-		SearchSortDslContext<SearchQueryContext<Q>, C> dslContext =
-				new QuerySearchSortDslContextImpl<>( searchSortContributorAggregator, this );
-		return new SearchSortContainerContextImpl<>( targetContext.getSearchSortFactory(), dslContext );
-	}
-
-	private <C extends SC, SC> SearchSortContributor<? super C> toContributor(SearchSortFactory<SC> factory,
-			Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
-		BuildingRootSearchSortDslContextImpl<SC> dslContext =
-				new BuildingRootSearchSortDslContextImpl<>( factory );
-		SearchSortContainerContext<SearchSort> containerContext =
-				new SearchSortContainerContextImpl<>( factory, dslContext );
-		dslSortContributor.accept( containerContext );
-		return dslContext.getResultingContributor();
+		return searchSortCollector.createContainerContext( this );
 	}
 
 	@Override
@@ -105,8 +81,8 @@ public final class SearchQueryContextImpl<T, Q, CTX, C> implements SearchQueryCo
 		 * (an end() method for example), and this method could be called twice by the user.
 		 */
 		C collector = searchQueryBuilder.getQueryElementCollector();
-		searchPredicateContributor.contribute( targetContext.getSearchPredicateFactory().createRootContext(), collector );
-		searchSortContributorAggregator.contribute( collector );
+		searchPredicateCollector.contribute( collector );
+		searchSortCollector.contribute( collector );
 		return searchQueryBuilder.build( searchQueryWrapperFactory );
 	}
 

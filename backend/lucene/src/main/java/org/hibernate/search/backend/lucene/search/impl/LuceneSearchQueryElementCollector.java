@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
@@ -38,15 +39,15 @@ public class LuceneSearchQueryElementCollector
 	}
 
 	@Override
-	public void collectSortFields(List<SortField> sortFields) {
-		if ( sortFields == null || sortFields.isEmpty() ) {
+	public void collectSortFields(SortField[] sortFields) {
+		if ( sortFields == null || sortFields.length == 0 ) {
 			return;
 		}
 
 		if ( this.sortFields == null ) {
-			this.sortFields = new ArrayList<>( sortFields.size() );
+			this.sortFields = new ArrayList<>( sortFields.length );
 		}
-		this.sortFields.addAll( sortFields );
+		Collections.addAll( this.sortFields, sortFields );
 	}
 
 	public Query toLuceneQueryPredicate() {

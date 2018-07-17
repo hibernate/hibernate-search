@@ -12,12 +12,12 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 class ScoreSortBuilderImpl extends AbstractSearchSortBuilder
-		implements ScoreSortBuilder<LuceneSearchSortCollector> {
+		implements ScoreSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final SortField FIELD_SCORE_ASC = new SortField( null, Type.SCORE, true );
 
 	@Override
-	public void contribute(LuceneSearchSortCollector collector) {
+	public void buildAndAddTo(LuceneSearchSortCollector collector) {
 		if ( order == SortOrder.ASC ) {
 			collector.collectSortField( FIELD_SCORE_ASC );
 		}

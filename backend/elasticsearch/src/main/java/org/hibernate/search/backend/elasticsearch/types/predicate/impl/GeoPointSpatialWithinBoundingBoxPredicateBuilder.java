@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import com.google.gson.JsonObject;
 
 class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPredicateBuilder
-		implements SpatialWithinBoundingBoxPredicateBuilder<Void, ElasticsearchSearchPredicateCollector> {
+		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
 
@@ -29,7 +29,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPre
 
 	private final ElasticsearchFieldCodec codec;
 
-	public GeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	GeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}
@@ -40,10 +40,10 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPre
 	}
 
 	@Override
-	protected void doContribute(Void context, ElasticsearchSearchPredicateCollector collector) {
+	protected JsonObject doBuild() {
 		JsonObject outerObject = getOuterObject();
 		GEO_BOUNDING_BOX.set( outerObject, getInnerObject() );
-		collector.collectPredicate( outerObject );
+		return outerObject;
 	}
 
 	private JsonObject toBoundingBoxObject(GeoBoundingBox boundingBox) {

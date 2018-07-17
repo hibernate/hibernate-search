@@ -22,29 +22,29 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-public class SearchPredicateContainerContextImpl<N, CTX, C> implements SearchPredicateContainerContext<N> {
+public class SearchPredicateContainerContextImpl<N, B> implements SearchPredicateContainerContext<N> {
 
-	private final SearchPredicateFactory<CTX, C> factory;
+	private final SearchPredicateFactory<?, B> factory;
 
-	private final SearchPredicateDslContext<N, CTX, ? extends C> dslContext;
+	private final SearchPredicateDslContext<N, ? super B> dslContext;
 
-	public SearchPredicateContainerContextImpl(SearchPredicateFactory<CTX, C> factory,
-			SearchPredicateDslContext<N, CTX, ? extends C> dslContext) {
+	public SearchPredicateContainerContextImpl(SearchPredicateFactory<?, B> factory,
+			SearchPredicateDslContext<N, ? super B> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public MatchAllPredicateContext<N> matchAll() {
-		MatchAllPredicateContextImpl<N, CTX, C> child = new MatchAllPredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		MatchAllPredicateContextImpl<N, B> child = new MatchAllPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> bool() {
-		BooleanJunctionPredicateContextImpl<N, CTX, C> child = new BooleanJunctionPredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		BooleanJunctionPredicateContextImpl<N, B> child = new BooleanJunctionPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
@@ -57,35 +57,35 @@ public class SearchPredicateContainerContextImpl<N, CTX, C> implements SearchPre
 
 	@Override
 	public MatchPredicateContext<N> match() {
-		MatchPredicateContextImpl<N, CTX, C> child = new MatchPredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		MatchPredicateContextImpl<N, B> child = new MatchPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public RangePredicateContext<N> range() {
-		RangePredicateContextImpl<N, CTX, C> child = new RangePredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		RangePredicateContextImpl<N, B> child = new RangePredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public NestedPredicateContext<N> nested() {
-		NestedPredicateContextImpl<N, CTX, C> child = new NestedPredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		NestedPredicateContextImpl<N, B> child = new NestedPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public SpatialPredicateContext<N> spatial() {
-		SpatialPredicateContextImpl<N, CTX, C> child = new SpatialPredicateContextImpl<>( factory, dslContext::getNextContext );
-		dslContext.addContributor( child );
+		SpatialPredicateContextImpl<N, B> child = new SpatialPredicateContextImpl<>( factory, dslContext::getNextContext );
+		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
 	public N predicate(SearchPredicate predicate) {
-		dslContext.addContributor( factory.toContributor( predicate ) );
+		dslContext.addChild( factory.toImplementation( predicate ) );
 		return dslContext.getNextContext();
 	}
 

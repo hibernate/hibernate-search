@@ -22,7 +22,7 @@ class GeoPointSpatialWithinPolygonPredicateBuilder extends AbstractSpatialWithin
 	}
 
 	@Override
-	protected Query buildQuery(LuceneSearchPredicateContext context) {
+	protected Query doBuild(LuceneSearchPredicateContext context) {
 		List<GeoPoint> points = polygon.getPoints();
 
 		double[] polyLats = new double[points.size()];

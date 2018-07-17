@@ -12,13 +12,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 class ScoreSortBuilderImpl extends AbstractSearchSortBuilder
-		implements ScoreSortBuilder<ElasticsearchSearchSortCollector> {
+		implements ScoreSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final String SCORE_SORT_KEYWORD = "_score";
 	private static final JsonPrimitive SCORE_SORT_KEYWORD_JSON = new JsonPrimitive( SCORE_SORT_KEYWORD );
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector) {
+	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		JsonObject innerObject = getInnerObject();
 		if ( innerObject.size() == 0 ) {
 			collector.collectSort( SCORE_SORT_KEYWORD_JSON );

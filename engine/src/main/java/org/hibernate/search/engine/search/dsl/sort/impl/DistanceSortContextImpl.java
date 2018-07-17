@@ -6,24 +6,25 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceSortContextImpl<N, C> implements DistanceSortContext<N>, SearchSortContributor<C> {
+class DistanceSortContextImpl<N, B> implements DistanceSortContext<N>, SearchSortContributor<B> {
 
 	private final SearchSortContainerContext<N> containerContext;
 	private final Supplier<N> nextContextProvider;
-	private final DistanceSortBuilder<C> builder;
+	private final DistanceSortBuilder<B> builder;
 
 	DistanceSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<C> factory, Supplier<N> nextContextProvider,
+			SearchSortFactory<?, B> factory, Supplier<N> nextContextProvider,
 			String absoluteFieldPath, GeoPoint location) {
 		this.containerContext = containerContext;
 		this.nextContextProvider = nextContextProvider;
@@ -47,7 +48,7 @@ class DistanceSortContextImpl<N, C> implements DistanceSortContext<N>, SearchSor
 	}
 
 	@Override
-	public void contribute(C collector) {
-		builder.contribute( collector );
+	public void contribute(Consumer<? super B> collector) {
+		collector.accept( builder.toImplementation() );
 	}
 }

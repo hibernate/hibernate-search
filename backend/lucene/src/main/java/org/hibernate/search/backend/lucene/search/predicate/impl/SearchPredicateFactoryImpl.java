@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -17,11 +16,12 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Guillaume Smet
@@ -37,17 +37,12 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	}
 
 	@Override
-	public LuceneSearchPredicateContext createRootContext() {
-		return LuceneSearchPredicateContext.root();
+	public SearchPredicate toSearchPredicate(LuceneSearchPredicateBuilder builder) {
+		return new LuceneSearchPredicate( builder );
 	}
 
 	@Override
-	public SearchPredicate toSearchPredicate(SearchPredicateContributor<LuceneSearchPredicateContext, ? super LuceneSearchPredicateCollector> contributor) {
-		return new LuceneSearchPredicate( contributor );
-	}
-
-	@Override
-	public SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> toContributor(SearchPredicate predicate) {
+	public LuceneSearchPredicateBuilder toImplementation(SearchPredicate predicate) {
 		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
@@ -55,50 +50,56 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 	}
 
 	@Override
-	public MatchAllPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> matchAll() {
+	public void contribute(LuceneSearchPredicateCollector collector,
+			LuceneSearchPredicateBuilder builder) {
+		collector.collectPredicate( builder.build( LuceneSearchPredicateContext.root() ) );
+	}
+
+	@Override
+	public MatchAllPredicateBuilder<LuceneSearchPredicateBuilder> matchAll() {
 		return new MatchAllPredicateBuilderImpl();
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> bool() {
+	public BooleanJunctionPredicateBuilder<LuceneSearchPredicateBuilder> bool() {
 		return new BooleanJunctionPredicateBuilderImpl();
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> match(String absoluteFieldPath) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createMatchPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> range(String absoluteFieldPath) {
+	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createRangePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> spatialWithinCircle(String absoluteFieldPath) {
+	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> spatialWithinPolygon(String absoluteFieldPath) {
+	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> spatialWithinBoundingBox(
+	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
 		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
 				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
-	public NestedPredicateBuilder<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> nested(String absoluteFieldPath) {
+	public NestedPredicateBuilder<LuceneSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		searchTargetModel.checkNestedField( absoluteFieldPath );
 		return new NestedPredicateBuilderImpl( absoluteFieldPath );
 	}
 
 	@Override
-	public SearchPredicateContributor<LuceneSearchPredicateContext, LuceneSearchPredicateCollector> fromLuceneQuery(Query query) {
+	public LuceneSearchPredicateBuilder fromLuceneQuery(Query query) {
 		return new UserProvidedLuceneQueryPredicateContributor( query );
 	}
 
