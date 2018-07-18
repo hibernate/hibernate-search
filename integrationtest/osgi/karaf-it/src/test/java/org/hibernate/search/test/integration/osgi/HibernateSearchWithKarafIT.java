@@ -130,14 +130,14 @@ public class HibernateSearchWithKarafIT {
 			mavenProperties.load( inputStream );
 		}
 
-		String jacocoVMArgs = mavenProperties.getProperty( "test.container.jacoco.args" );
+		String vmArgsFromProperties = mavenProperties.getProperty( "pax-exam.jvm.args" );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
 				DEBUG ? debugConfiguration( "5005", true ) : null,
-				jacocoVMArgs != null && !jacocoVMArgs.isEmpty()
-						? CoreOptions.vmOptions( jacocoVMArgs.split( " " ) ) : null,
+				vmArgsFromProperties != null && !vmArgsFromProperties.isEmpty()
+						? CoreOptions.vmOptions( vmArgsFromProperties.split( " " ) ) : null,
 				logLevel( LogLevelOption.LogLevel.WARN ),
 				karafDistributionConfiguration()
 						.frameworkUrl( karafUrl )

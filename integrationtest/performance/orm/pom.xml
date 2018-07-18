@@ -28,9 +28,6 @@
         <scenario></scenario>
         <serverName>wildfly-${version.wildfly}</serverName>
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
-
-        <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
-        <test.jvm.args>${test.performance.jvm.args}</test.jvm.args>
     </properties>
 
     <dependencyManagement>
