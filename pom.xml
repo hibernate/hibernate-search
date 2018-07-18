@@ -387,24 +387,28 @@
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
-        <test.jvm.args></test.jvm.args>
-        <test.performance.jvm.args></test.performance.jvm.args>
-        <test.wildfly.jvm.args></test.wildfly.jvm.args>
-        <surefire.jacoco.args></surefire.jacoco.args>
-        <failsafe.jacoco.args></failsafe.jacoco.args>
-        <test.container.jacoco.args></test.container.jacoco.args>
+        <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
+        <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
+        <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
+        <surefire.jvm.args>${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
+
+        <arquillian.wildfly.jvm.args.java-version></arquillian.wildfly.jvm.args.java-version>
+        <arquillian.wildfly.jvm.args.jacoco></arquillian.wildfly.jvm.args.jacoco>
         <!--
           The arguments below are JBoss modules settings taken from
           https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
           - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
           - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
          -->
-        <test.container.jbossmodules.args>
+        <arquillian.wildfly.jvm.args.jbossmodules>
             -Dremote.maven.repo=${jboss.public.repo.url}
             -Dmaven.repo.local=${settings.localRepository}
-        </test.container.jbossmodules.args>
-        <surefire.system.args>${test.jvm.args} ${surefire.jacoco.args}</surefire.system.args>
-        <failsafe.system.args>${test.jvm.args} ${failsafe.jacoco.args}</failsafe.system.args>
+        </arquillian.wildfly.jvm.args.jbossmodules>
+        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.java-version} ${arquillian.wildfly.jvm.args.jacoco} ${arquillian.wildfly.jvm.args.jbossmodules}</arquillian.wildfly.jvm.args>
+
+        <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
+        <pax-exam.jvm.args>${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
 
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
@@ -1438,7 +1442,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${surefire.system.args}</argLine>
+                        <argLine>${surefire.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1561,7 +1565,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${failsafe.system.args}</argLine>
+                        <argLine>${failsafe.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1970,9 +1974,13 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
-                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
-                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                </surefire.jvm.args.java-version>
+                <arquillian.wildfly.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                </arquillian.wildfly.jvm.args.java-version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -1985,9 +1993,13 @@
                 <jdk>10</jdk>
             </activation>
             <properties>
-                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
-                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
-                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny</test.jvm.args>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                </surefire.jvm.args.java-version>
+                <arquillian.wildfly.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                </arquillian.wildfly.jvm.args.java-version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -2000,9 +2012,14 @@
                 <jdk>11</jdk>
             </activation>
             <properties>
-                <test.wildfly.jvm.args>-Djdk.attach.allowAttachSelf=true</test.wildfly.jvm.args>
-                <test.performance.jvm.args>${test.wildfly.jvm.args}</test.performance.jvm.args>
-                <test.jvm.args>${test.performance.jvm.args} --illegal-access=deny -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</test.jvm.args>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                    -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true
+                </surefire.jvm.args.java-version>
+                <arquillian.wildfly.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                </arquillian.wildfly.jvm.args.java-version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -2477,14 +2494,15 @@
                     As a result, this profile will not work in IntelliJ,
                     but we don't need JaCoCo in IntelliJ anyway.
                  -->
-                <surefire.jacoco.args>@{surefire.jacoco.args.lateEval}</surefire.jacoco.args>
-                <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
+                <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
+                <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
                 <!--
                     We don't use @{...} for late property evaluation here,
                     because these properties are evaluated by the maven-resource-plugin,
                     which doesn't understand the @{...} syntax but somehow manages to always use late evaluation.
                  -->
-                <test.container.jacoco.args>${failsafe.jacoco.args.lateEval}</test.container.jacoco.args>
+                <arquillian.wildfly.jvm.args.jacoco>${failsafe.jvm.args.jacoco.lateEval}</arquillian.wildfly.jvm.args.jacoco>
+                <pax-exam.jvm.args.jacoco>${failsafe.jvm.args.jacoco.lateEval}</pax-exam.jvm.args.jacoco>
             </properties>
             <build>
                 <plugins>
@@ -2504,7 +2522,7 @@
                                     <goal>prepare-agent</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>surefire.jacoco.args.lateEval</propertyName>
+                                    <propertyName>surefire.jvm.args.jacoco.lateEval</propertyName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -2518,7 +2536,7 @@
                                     <goal>prepare-agent-integration</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>failsafe.jacoco.args.lateEval</propertyName>
+                                    <propertyName>failsafe.jvm.args.jacoco.lateEval</propertyName>
                                 </configuration>
                             </execution>
                         </executions>
