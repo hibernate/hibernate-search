@@ -2051,6 +2051,7 @@
                 </surefire.jvm.args.java-version.strict>
                 <arquillian.wildfly.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
+                    --add-modules=java.se
                 </arquillian.wildfly.jvm.args.java-version>
             </properties>
             <modules>
