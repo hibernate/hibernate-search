@@ -12,9 +12,6 @@ git:
   # Required in order for Sonar to retrieve blame information
   depth: false
 addons:
-  apt:
-    packages:
-      - oracle-java8-installer
   sonarcloud:
     organization: "hibernate"
     token:
