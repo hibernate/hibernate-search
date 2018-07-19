@@ -3,7 +3,7 @@
 # therefore deactivated. Activating Travis for your own fork is as easy as
 # activating it in the travis site of your fork.
 
-sudo: required
+sudo: false
 dist: trusty
 language: java
 jdk:
