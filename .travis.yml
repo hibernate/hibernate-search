@@ -12,9 +12,6 @@ addons:
   # for now, let's test only with H2
   #postgresql: '9.4'
   #mariadb: '10.0'
-  apt:
-    packages:
-      - oracle-java8-installer
 # might be useful to push reports to an S3 bucket
 #  artifacts:
 #    paths:
