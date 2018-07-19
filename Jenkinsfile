@@ -415,5 +415,5 @@ void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = itEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-	sh "mvn -Dsurefire.reportNameSuffix=$testSuffix $args"
+	sh "mvn -Dsurefire.environment=$testSuffix $args"
 }

@@ -12,6 +12,10 @@
     <name>Hibernate Search Integration Tests - Backend - Lucene</name>
     <description>Hibernate Search integration tests for the Lucene backend, running the Backend TCK in particular</description>
 
+    <properties>
+        <surefire.executing-module>it-lucene</surefire.executing-module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
