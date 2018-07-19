@@ -125,6 +125,13 @@
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
+        <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
+        <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
+        <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
+        <surefire.jvm.args>${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
+
         <!--
             The path to the root project directory.
             This property is set by the build-helper plugin.
@@ -707,7 +714,7 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
-                        <argLine>${surefire.jacoco.args}</argLine>
+                        <argLine>${surefire.jvm.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -719,7 +726,7 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
-                        <argLine>${failsafe.jacoco.args}</argLine>
+                        <argLine>${failsafe.jvm.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -821,6 +828,66 @@
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
                 <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
             </properties>
+        </profile>
+
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <modules>
+                <!-- Nothing at the moment -->
+            </modules>
+        </profile>
+
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <!-- Java 9 doesn't identify itself as "1.9" but "9" -->
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                </surefire.jvm.args.java-version>
+            </properties>
+            <modules>
+                <!-- Nothing at the moment -->
+            </modules>
+        </profile>
+
+        <profile>
+            <id>jdk10</id>
+            <activation>
+                <jdk>10</jdk>
+            </activation>
+            <properties>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                </surefire.jvm.args.java-version>
+            </properties>
+            <modules>
+                <!-- Nothing at the moment -->
+            </modules>
+        </profile>
+
+        <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <properties>
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    --illegal-access=deny
+                    -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true
+                </surefire.jvm.args.java-version>
+            </properties>
+            <modules>
+                <!-- Nothing at the moment -->
+            </modules>
         </profile>
 
         <profile>
@@ -976,8 +1043,8 @@
                     As a result, this profile will not work in IntelliJ,
                     but we don't need JaCoCo in IntelliJ anyway.
                  -->
-                <surefire.jacoco.args>@{surefire.jacoco.args.lateEval}</surefire.jacoco.args>
-                <failsafe.jacoco.args>@{failsafe.jacoco.args.lateEval}</failsafe.jacoco.args>
+                <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
+                <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
             </properties>
             <build>
                 <plugins>
@@ -997,7 +1064,7 @@
                                     <goal>prepare-agent</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>surefire.jacoco.args.lateEval</propertyName>
+                                    <propertyName>surefire.jvm.args.jacoco.lateEval</propertyName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -1006,7 +1073,7 @@
                                     <goal>prepare-agent-integration</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>failsafe.jacoco.args.lateEval</propertyName>
+                                    <propertyName>failsafe.jvm.args.jacoco.lateEval</propertyName>
                                 </configuration>
                             </execution>
                         </executions>
