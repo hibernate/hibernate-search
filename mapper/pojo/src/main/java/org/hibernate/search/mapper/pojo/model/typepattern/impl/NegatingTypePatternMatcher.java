@@ -7,22 +7,21 @@
 package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-class RawSuperTypeMatcher implements TypePatternMatcher {
-	private final PojoRawTypeModel<?> matchedRawType;
+class NegatingTypePatternMatcher implements TypePatternMatcher {
+	private final TypePatternMatcher delegate;
 
-	RawSuperTypeMatcher(PojoRawTypeModel<?> matchedRawType) {
-		this.matchedRawType = matchedRawType;
+	NegatingTypePatternMatcher(TypePatternMatcher delegate) {
+		this.delegate = delegate;
 	}
 
 	@Override
 	public String toString() {
-		return "hasRawSuperType(" + matchedRawType.getName() + ")";
+		return "not(" + delegate.toString() + ")";
 	}
 
 	@Override
 	public boolean matches(PojoGenericTypeModel<?> typeToInspect) {
-		return typeToInspect.getRawType().isSubTypeOf( matchedRawType );
+		return !delegate.matches( typeToInspect );
 	}
 }

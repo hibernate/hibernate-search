@@ -29,6 +29,16 @@ public class TypePatternMatcherFactory {
 		this.introspector = introspector;
 	}
 
+	public TypePatternMatcher createExactRawTypeMatcher(Class<?> exactTypeToMatch) {
+		PojoRawTypeModel<?> exactTypeToMatchModel = introspector.getTypeModel( exactTypeToMatch );
+		return new ExactRawTypeMatcher( exactTypeToMatchModel );
+	}
+
+	public TypePatternMatcher createRawSuperTypeMatcher(Class<?> superTypeToMatch) {
+		PojoRawTypeModel<?> superTypeToMatchModel = introspector.getTypeModel( superTypeToMatch );
+		return new RawSuperTypeMatcher( superTypeToMatchModel );
+	}
+
 	/**
 	 * @param typePattern The type used as a pattern to be matched. Not all types are accepted.
 	 * @param typeToExtract The type to extract when matching the pattern. Not all types are accepted.

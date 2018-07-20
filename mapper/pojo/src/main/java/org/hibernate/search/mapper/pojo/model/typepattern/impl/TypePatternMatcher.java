@@ -25,4 +25,12 @@ public interface TypePatternMatcher {
 	 */
 	boolean matches(PojoGenericTypeModel<?> typeToInspect);
 
+	default TypePatternMatcher negate() {
+		return new NegatingTypePatternMatcher( this );
+	}
+
+	default TypePatternMatcher and(TypePatternMatcher other) {
+		return new AndTypePatternMatcher( this, other );
+	}
+
 }
