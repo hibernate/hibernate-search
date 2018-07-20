@@ -14,10 +14,8 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-import org.hibernate.search.integrationtest.showcase.library.bridge.BookMediumBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge;
-import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumBridge;
 
 /**
  * A programmatic mapping contributor that reproduces the exact same mapping as the annotations on model types.
@@ -71,9 +69,9 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 						.indexedEmbedded().maxDepth( 1 );
 		mapping.type( BookCopy.class )
 				.property( "medium" )
-						.field().valueBridge( BookMediumBridge.class );
+						.field();
 		mapping.type( VideoCopy.class )
 				.property( "medium" )
-						.field().valueBridge( VideoMediumBridge.class );
+						.field();
 	}
 }

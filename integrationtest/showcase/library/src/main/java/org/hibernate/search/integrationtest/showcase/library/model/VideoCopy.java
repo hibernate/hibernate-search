@@ -9,8 +9,6 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 import javax.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
-import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumBridge;
 
 /**
  * A concrete copy of a video document.
@@ -20,8 +18,7 @@ import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumB
 @Entity
 public class VideoCopy extends DocumentCopy<Video> {
 
-	// TODO add default bridge (and maybe field type?) for enums
-	@Field(valueBridge = @ValueBridgeBeanReference(type = VideoMediumBridge.class))
+	@Field
 	// TODO facet
 	private VideoMedium medium;
 

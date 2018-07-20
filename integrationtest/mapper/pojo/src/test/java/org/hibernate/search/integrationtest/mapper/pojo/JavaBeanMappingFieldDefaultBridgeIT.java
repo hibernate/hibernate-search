@@ -119,6 +119,39 @@ public class JavaBeanMappingFieldDefaultBridgeIT {
 		);
 	}
 
+	@Test
+	public void myEnum() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			MyEnum myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field
+			public MyEnum getMyProperty() {
+				return myProperty;
+			}
+		}
+		doTestBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				MyEnum.class, String.class,
+				MyEnum.VALUE1, "VALUE1"
+		);
+	}
+
+	enum MyEnum {
+		VALUE1,
+		VALUE2
+	}
+
 	private <E, T> void doTestPassThroughBridge(Class<E> entityType,
 			BiFunction<Integer, T, E> newEntityFunction,
 			Class<T> propertyAndIndexFieldType,

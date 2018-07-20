@@ -68,6 +68,102 @@ public class JavaBeanMappingFieldBaseIT {
 	}
 
 	@Test
+	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassRaw() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			Enum myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field
+			public Enum getMyProperty() {
+				return myProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"Unable to find a default value bridge implementation for type 'java.lang.Enum'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithWildcard() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			Enum<?> myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field
+			public Enum<?> getMyProperty() {
+				return myProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"Unable to find a default value bridge implementation for type 'java.lang.Enum<?>'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithParameters() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			Enum<EnumForEnumSuperClassTest> myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field
+			public Enum<EnumForEnumSuperClassTest> getMyProperty() {
+				return myProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"Unable to find a default value bridge implementation for type 'java.lang.Enum<"
+										+ EnumForEnumSuperClassTest.class.getName() + ">'"
+						)
+						.build()
+				);
+	}
+
+	enum EnumForEnumSuperClassTest {
+		VALUE1,
+		VALUE2
+	}
+
+	@Test
 	public void error_invalidInputTypeForValueBridge() {
 		@Indexed
 		class IndexedEntity {

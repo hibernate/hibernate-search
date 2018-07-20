@@ -62,6 +62,33 @@ public class JavaBeanMappingDocumentIdDefaultBridgeIT {
 		);
 	}
 
+	@Test
+	public void myEnum() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			MyEnum id;
+			@DocumentId
+			public MyEnum getId() {
+				return id;
+			}
+		}
+		doTestBridge(
+				IndexedEntity.class,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					return entity;
+				},
+				MyEnum.VALUE1,
+				"VALUE1"
+		);
+	}
+
+	enum MyEnum {
+		VALUE1,
+		VALUE2
+	}
+
 	private <E, T> void doTestBridge(Class<E> entityType,
 			Function<T, E> newEntityFunction, T identifierValue, String identifierAsString) {
 		// Schema

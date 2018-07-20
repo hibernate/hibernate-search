@@ -61,6 +61,87 @@ public class JavaBeanMappingDocumentIdBaseIT {
 	}
 
 	@Test
+	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassRaw() {
+		@Indexed
+		class IndexedEntity {
+			Enum id;
+			@DocumentId
+			public Enum getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithWildcard() {
+		@Indexed
+		class IndexedEntity {
+			Enum<?> id;
+			@DocumentId
+			public Enum<?> getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum<?>'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithParameters() {
+		@Indexed
+		class IndexedEntity {
+			Enum<JavaBeanMappingFieldBaseIT.EnumForEnumSuperClassTest> id;
+			@DocumentId
+			public Enum<JavaBeanMappingFieldBaseIT.EnumForEnumSuperClassTest> getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum<"
+										+ JavaBeanMappingFieldBaseIT.EnumForEnumSuperClassTest.class.getName() + ">'"
+						)
+						.build()
+				);
+	}
+
+	enum EnumForEnumSuperClassTest {
+		VALUE1,
+		VALUE2
+	}
+
+	@Test
 	public void error_definingBothBridgeReferenceAndBridgeBuilderReference() {
 		@Indexed
 		class IndexedEntity {
