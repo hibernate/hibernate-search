@@ -38,7 +38,7 @@ public class TypePatternMatcherFactory {
 	 * @throws UnsupportedOperationException If this factory does not support creating a type pattern matcher
 	 * for the given types.
 	 */
-	public TypePatternMatcher create(Type typePattern, Type typeToExtract) {
+	public ExtractingTypePatternMatcher createExtractingMatcher(Type typePattern, Type typeToExtract) {
 		if ( typePattern instanceof TypeVariable ) {
 			throw new UnsupportedOperationException( "Matching a type variable is not supported" );
 		}
@@ -110,7 +110,10 @@ public class TypePatternMatcherFactory {
 			}
 			PojoRawTypeModel<?> typePatternModel = introspector.getTypeModel( (Class<?>) typePattern );
 			PojoGenericTypeModel<?> typeToExtractModel = introspector.getGenericTypeModel( (Class<?>) typeToExtract );
-			return new RawSuperTypeMatcher( typePatternModel, typeToExtractModel );
+			return new ConstantExtractingTypePatternMatcherAdapter(
+					new RawSuperTypeMatcher( typePatternModel ),
+					typeToExtractModel
+			);
 		}
 		else if ( typePattern instanceof GenericArrayType ) {
 			GenericArrayType arrayTypePattern = (GenericArrayType) typePattern;

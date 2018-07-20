@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalLongValueExtra
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
+import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.util.AssertionFailure;
@@ -239,9 +239,9 @@ public class ContainerValueExtractorBinder {
 				.orElseThrow( () -> log.cannotInferContainerValueExtractorClassTypePattern( extractorClass ) );
 		Type typeToExtract = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 1 )
 				.orElseThrow( () -> log.cannotInferContainerValueExtractorClassTypePattern( extractorClass ) );
-		TypePatternMatcher typePatternMatcher;
+		ExtractingTypePatternMatcher typePatternMatcher;
 		try {
-			typePatternMatcher = typePatternMatcherFactory.create( typePattern, typeToExtract );
+			typePatternMatcher = typePatternMatcherFactory.createExtractingMatcher( typePattern, typeToExtract );
 		}
 		catch (UnsupportedOperationException e) {
 			throw log.cannotInferContainerValueExtractorClassTypePattern( extractorClass );
@@ -262,10 +262,10 @@ public class ContainerValueExtractorBinder {
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private class SingleExtractorContributor implements ExtractorContributor {
-		private final TypePatternMatcher typePatternMatcher;
+		private final ExtractingTypePatternMatcher typePatternMatcher;
 		private final Class<? extends ContainerValueExtractor> extractorClass;
 
-		SingleExtractorContributor(TypePatternMatcher typePatternMatcher,
+		SingleExtractorContributor(ExtractingTypePatternMatcher typePatternMatcher,
 				Class<? extends ContainerValueExtractor> extractorClass) {
 			this.typePatternMatcher = typePatternMatcher;
 			this.extractorClass = extractorClass;
@@ -274,7 +274,7 @@ public class ContainerValueExtractorBinder {
 		@Override
 		public boolean tryAppend(ExtractorResolutionState<?> state) {
 			Optional<? extends PojoGenericTypeModel<?>> resultTypeOptional =
-					typePatternMatcher.match( state.extractedType );
+					typePatternMatcher.extract( state.extractedType );
 			if ( resultTypeOptional.isPresent() ) {
 				state.append( extractorClass, resultTypeOptional.get() );
 				return true;

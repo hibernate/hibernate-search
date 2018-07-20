@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
-class ParameterizedTypeArgumentMatcher implements TypePatternMatcher {
+class ParameterizedTypeArgumentMatcher implements ExtractingTypePatternMatcher {
 	private final Class<?> matchedRawType;
 	private final int resultTypeParameterIndex;
 
@@ -42,7 +42,7 @@ class ParameterizedTypeArgumentMatcher implements TypePatternMatcher {
 
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> match(PojoGenericTypeModel<?> typeToInspect) {
+	public Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect) {
 		return typeToInspect.getTypeArgument( matchedRawType, resultTypeParameterIndex );
 	}
 }

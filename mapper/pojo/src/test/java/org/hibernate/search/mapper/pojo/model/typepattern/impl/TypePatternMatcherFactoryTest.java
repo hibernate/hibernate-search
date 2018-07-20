@@ -40,7 +40,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public void wildcardType() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new WildcardTypeCapture<Of<?>>() { }.getType(),
 				String.class
 		);
@@ -50,7 +50,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void typeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<T>() { }.getType(),
 				String.class
 		);
@@ -68,8 +68,8 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();
-		TypePatternMatcher matcher = factory.create( String.class, Integer.class );
-		assertThat( matcher ).isInstanceOf( RawSuperTypeMatcher.class );
+		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String.class, Integer.class );
+		assertThat( matcher ).isNotNull();
 		verifyAll();
 
 		resetAll();
@@ -90,7 +90,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( true );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isTrue();
@@ -102,7 +102,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( false );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isFalse();
@@ -112,7 +112,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void rawSuperType_resultIsTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				String.class,
 				new TypeCapture<T>() { }.getType()
 		);
@@ -122,7 +122,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void rawSuperType_resultIsWildcard() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				String.class,
 				new WildcardTypeCapture<Of<?>>() { }.getType()
 		);
@@ -132,7 +132,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public void rawSuperType_resultIsParameterized() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				String.class,
 				new TypeCapture<List<String>>() { }.getType()
 		);
@@ -150,8 +150,8 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();
-		TypePatternMatcher matcher = factory.create( String[].class, Integer.class );
-		assertThat( matcher ).isInstanceOf( RawSuperTypeMatcher.class );
+		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String[].class, Integer.class );
+		assertThat( matcher ).isNotNull();
 		verifyAll();
 
 		resetAll();
@@ -172,7 +172,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( true );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isTrue();
@@ -184,7 +184,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel<?> typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoGenericTypeModel<T> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
-		TypePatternMatcher matcher = factory.create(
+		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -198,7 +198,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectMock.getArrayElementType() )
 				.andReturn( (Optional) Optional.of( resultTypeMock ) );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isTrue();
@@ -208,7 +208,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectMock.getArrayElementType() )
 				.andReturn( Optional.empty() );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isFalse();
@@ -218,7 +218,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T extends Iterable<?>> void genericArrayElement_boundedTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -228,7 +228,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T extends Object & Serializable> void genericArrayElement_multiBoundedTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -238,7 +238,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void genericArrayElement_resultIsRawType() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
 				Object.class
 		);
@@ -248,7 +248,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T, U> void genericArrayElement_resultIsDifferentTypeArgument() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
 				new TypeCapture<U>() { }.getType()
 		);
@@ -259,7 +259,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel<?> typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoGenericTypeModel<Integer> resultTypeMock = createMock( PojoGenericTypeModel.class );
 
-		TypePatternMatcher matcher = factory.create(
+		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -273,7 +273,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectMock.getTypeArgument( Map.class, 1 ) )
 				.andReturn( (Optional) Optional.of( resultTypeMock ) );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isTrue();
@@ -283,7 +283,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		EasyMock.expect( typeToInspectMock.getTypeArgument( Map.class, 1 ) )
 				.andReturn( Optional.empty() );
 		replayAll();
-		actualReturn = matcher.match( typeToInspectMock );
+		actualReturn = matcher.extract( typeToInspectMock );
 		verifyAll();
 		assertThat( actualReturn ).isNotNull();
 		assertThat( actualReturn.isPresent() ).isFalse();
@@ -293,7 +293,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void parameterizedType_upperBoundedWildcard() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<? extends Long, T>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -303,7 +303,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void parameterizedType_lowerBoundedWildcard() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<? super Long, T>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -313,7 +313,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void parameterizedType_onlyWildcards() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, ?>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -323,7 +323,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T> void parameterizedType_rawType() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, String>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -333,7 +333,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T extends Iterable<?>> void parameterizedType_boundedTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -343,7 +343,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T extends Object & Serializable> void parameterizedType_multiBoundedTypeVariable() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -353,7 +353,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T, U> void parameterizedType_multipleTypeVariables() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<T, U>>() { }.getType(),
 				new TypeCapture<T>() { }.getType()
 		);
@@ -363,7 +363,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T, U> void parameterizedType_resultIsRawType() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
 				Object.class
 		);
@@ -373,7 +373,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 	public <T, U> void parameterizedType_resultIsDifferentTypeArgument() {
 		thrown.expect( UnsupportedOperationException.class );
 
-		factory.create(
+		factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
 				new TypeCapture<U>() { }.getType()
 		);

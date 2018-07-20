@@ -10,14 +10,27 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
-class ArrayElementTypeMatcher implements ExtractingTypePatternMatcher {
+class ConstantExtractingTypePatternMatcherAdapter implements ExtractingTypePatternMatcher {
+	private final TypePatternMatcher delegate;
+	private final PojoGenericTypeModel<?> resultType;
+
+	ConstantExtractingTypePatternMatcherAdapter(TypePatternMatcher delegate, PojoGenericTypeModel<?> resultType) {
+		this.delegate = delegate;
+		this.resultType = resultType;
+	}
+
 	@Override
 	public String toString() {
-		return "T[] => T";
+		return delegate.toString() + " => " + resultType.getName();
 	}
 
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect) {
-		return typeToInspect.getArrayElementType();
+		if ( delegate.matches( typeToInspect ) ) {
+			return Optional.of( resultType );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 }
