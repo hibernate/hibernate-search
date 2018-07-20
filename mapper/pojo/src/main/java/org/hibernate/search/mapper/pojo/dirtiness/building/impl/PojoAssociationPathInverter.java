@@ -29,7 +29,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -44,14 +43,11 @@ public final class PojoAssociationPathInverter {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
-	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 
 	public PojoAssociationPathInverter(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
-			PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder) {
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
-		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 	}
 
@@ -132,7 +128,6 @@ public final class PojoAssociationPathInverter {
 	private boolean isDefaultExtractorPath(PojoPropertyModel<?> propertyModel,
 			BoundContainerValueExtractorPath<?, ?> originalSideBoundExtractorPath) {
 		return extractorBinder.isDefaultExtractorPath(
-				introspector,
 				propertyModel.getTypeModel(),
 				originalSideBoundExtractorPath.getExtractorPath()
 		);
@@ -277,7 +272,7 @@ public final class PojoAssociationPathInverter {
 			ContainerValueExtractorPath extractorPath) {
 		BoundContainerValueExtractorPath<P, ?> resolvedExtractorPath =
 				extractorBinder.bindPath(
-						introspector, inverseSidePathPropertyNode.getPropertyModel().getTypeModel(),
+						inverseSidePathPropertyNode.getPropertyModel().getTypeModel(),
 						extractorPath
 				);
 		return inverseSidePathPropertyNode.value( resolvedExtractorPath );

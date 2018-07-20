@@ -9,27 +9,26 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class RawSuperTypeMatcher implements TypePatternMatcher {
-	private final Class<?> matchedRawType;
-	private final Class<?> resultRawType;
+	private final PojoRawTypeModel<?> matchedRawType;
+	private final PojoGenericTypeModel<?> resultType;
 
-	RawSuperTypeMatcher(Class<?> matchedRawType, Class<?> resultRawType) {
+	RawSuperTypeMatcher(PojoRawTypeModel<?> matchedRawType, PojoGenericTypeModel<?> resultType) {
 		this.matchedRawType = matchedRawType;
-		this.resultRawType = resultRawType;
+		this.resultType = resultType;
 	}
 
 	@Override
 	public String toString() {
-		return matchedRawType.getName() + " => " + resultRawType.getName();
+		return matchedRawType.getName() + " => " + resultType.getName();
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> match(PojoBootstrapIntrospector introspector,
-			PojoGenericTypeModel<?> typeToInspect) {
+	public Optional<? extends PojoGenericTypeModel<?>> match(PojoGenericTypeModel<?> typeToInspect) {
 		if ( typeToInspect.getRawType().isSubTypeOf( matchedRawType ) ) {
-			return Optional.of( introspector.getGenericTypeModel( resultRawType ) );
+			return Optional.of( resultType );
 		}
 		else {
 			return Optional.empty();

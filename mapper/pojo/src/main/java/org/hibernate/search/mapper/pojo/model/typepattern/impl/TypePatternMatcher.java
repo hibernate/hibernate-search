@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 /**
  * A pattern-matching implementation for generic types.
@@ -24,11 +23,9 @@ public interface TypePatternMatcher {
 	 * Attempts to match a given type against this pattern,
 	 * and if matched, returns an upper bound of the extracted type.
 	 *
-	 * @param introspector An introspector to use for reflection, mainly for {@link PojoBootstrapIntrospector#getGenericTypeModel(Class)}
 	 * @param typeToInspect A type that may, or may not, match the pattern.
 	 * @return The extracted type if there was a match, or an empty {@link Optional} otherwise.
 	 */
-	Optional<? extends PojoGenericTypeModel<?>> match(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToInspect);
+	Optional<? extends PojoGenericTypeModel<?>> match(PojoGenericTypeModel<?> typeToInspect);
 
 }

@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -42,8 +41,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock =
 			createMock( PojoTypeAdditionalMetadataProvider.class );
-	private final PojoBootstrapIntrospector introspectorMock =
-			createMock( PojoBootstrapIntrospector.class );
 	private final ContainerValueExtractorBinder extractorBinderMock =
 			createMock( ContainerValueExtractorBinder.class );
 
@@ -56,7 +53,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		String inverseSideProperty3Name = "inverseSideProperty3";
 
 		PojoAssociationPathInverter inverter =
-				new PojoAssociationPathInverter( typeAdditionalMetadataProviderMock, introspectorMock, extractorBinderMock );
+				new PojoAssociationPathInverter( typeAdditionalMetadataProviderMock, extractorBinderMock );
 
 		resetAll();
 		/*
@@ -154,17 +151,17 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 		// Let's not complicate things any further: assume that none of the paths is the default one
 		EasyMock.expect( extractorBinderMock.isDefaultExtractorPath(
-				EasyMock.eq( introspectorMock ), EasyMock.anyObject(), EasyMock.anyObject()
+				EasyMock.anyObject(), EasyMock.anyObject()
 		) )
 				.andStubReturn( false );
 		// Let's not complicate things any further: assume that all extractor paths are noExtractors() paths
 		EasyMock.expect( extractorBinderMock.bindPath(
-				EasyMock.eq( introspectorMock ), EasyMock.anyObject(),
+				EasyMock.anyObject(),
 				EasyMock.eq( ContainerValueExtractorPath.noExtractors() )
 		) )
 				.andStubAnswer( (IAnswer) () -> {
 					PojoGenericTypeModel<?> sourceType =
-							(PojoGenericTypeModel<?>) EasyMock.getCurrentArguments()[1];
+							(PojoGenericTypeModel<?>) EasyMock.getCurrentArguments()[0];
 					return BoundContainerValueExtractorPath.noExtractors( sourceType );
 				} );
 

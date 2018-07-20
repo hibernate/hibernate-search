@@ -12,9 +12,22 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.AssertionFailure;
 
 public class TypePatternMatcherFactory {
+
+	private final PojoBootstrapIntrospector introspector;
+
+	/**
+	 * @param introspector An introspector to use for reflection,
+	 * mainly for {@link PojoBootstrapIntrospector#getGenericTypeModel(Class)}
+	 */
+	public TypePatternMatcherFactory(PojoBootstrapIntrospector introspector) {
+		this.introspector = introspector;
+	}
 
 	/**
 	 * @param typePattern The type used as a pattern to be matched. Not all types are accepted.
@@ -95,7 +108,9 @@ public class TypePatternMatcherFactory {
 						"Extracting a non-raw result type when matching a raw type is not supported"
 				);
 			}
-			return new RawSuperTypeMatcher( (Class<?>) typePattern, (Class<?>) typeToExtract );
+			PojoRawTypeModel<?> typePatternModel = introspector.getTypeModel( (Class<?>) typePattern );
+			PojoGenericTypeModel<?> typeToExtractModel = introspector.getGenericTypeModel( (Class<?>) typeToExtract );
+			return new RawSuperTypeMatcher( typePatternModel, typeToExtractModel );
 		}
 		else if ( typePattern instanceof GenericArrayType ) {
 			GenericArrayType arrayTypePattern = (GenericArrayType) typePattern;

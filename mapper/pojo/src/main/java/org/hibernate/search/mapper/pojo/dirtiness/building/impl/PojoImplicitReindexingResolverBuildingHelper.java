@@ -23,14 +23,12 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
 
-	private final PojoBootstrapIntrospector introspector;
 	private final ContainerValueExtractorBinder extractorBinder;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final PojoAssociationPathInverter pathInverter;
@@ -41,12 +39,10 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			new HashMap<>();
 
 	public PojoImplicitReindexingResolverBuildingHelper(
-			PojoBootstrapIntrospector introspector,
 			ContainerValueExtractorBinder extractorBinder,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			PojoAssociationPathInverter pathInverter,
 			Set<PojoRawTypeModel<?>> entityTypes) {
-		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.pathInverter = pathInverter;
@@ -123,7 +119,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	<T> BoundContainerValueExtractorPath<T, ?> bindExtractorPath(
 			PojoGenericTypeModel<T> typeModel, ContainerValueExtractorPath extractorPath) {
-		return extractorBinder.bindPath( introspector, typeModel, extractorPath );
+		return extractorBinder.bindPath( typeModel, extractorPath );
 	}
 
 	<V, T> ContainerValueExtractor<? super T, V> createExtractors(
@@ -145,7 +141,6 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 							.getReindexOnUpdate();
 			if ( !reindexOnUpdateOptional.isPresent() ) {
 				if ( extractorBinder.isDefaultExtractorPath(
-						introspector,
 						typeModel.getProperty( propertyName ).getTypeModel(),
 						extractorPath
 				) ) {
@@ -169,7 +164,6 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 						.getDerivedFrom();
 		if ( derivedFrom.isEmpty() ) {
 			if ( extractorBinder.isDefaultExtractorPath(
-					introspector,
 					typeModel.getProperty( propertyName ).getTypeModel(),
 					extractorPath
 			) ) {

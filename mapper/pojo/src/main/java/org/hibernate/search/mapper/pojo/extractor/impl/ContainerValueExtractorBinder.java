@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalIntValueExtrac
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalLongValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
@@ -68,15 +67,17 @@ public class ContainerValueExtractorBinder {
 	// TODO add an extension point to override the builtin extractors, or at least to add defaults for other types
 
 	private final BeanProvider beanProvider;
-	private final TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory();
+	private final TypePatternMatcherFactory typePatternMatcherFactory;
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
 	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
 	private Map<Class<? extends ContainerValueExtractor>, ExtractorContributor> extractorContributorCache =
 			new HashMap<>();
 
-	public ContainerValueExtractorBinder(MappingBuildContext buildContext) {
+	public ContainerValueExtractorBinder(MappingBuildContext buildContext,
+			TypePatternMatcherFactory typePatternMatcherFactory) {
 		this.beanProvider = buildContext.getServiceManager().getBeanProvider();
+		this.typePatternMatcherFactory = typePatternMatcherFactory;
 		addDefaultExtractor( MapValueExtractor.class );
 		addDefaultExtractor( CollectionElementExtractor.class );
 		addDefaultExtractor( IterableElementExtractor.class );
@@ -92,7 +93,6 @@ public class ContainerValueExtractorBinder {
 	 * i.e. to resolve the possibly implicit extractor path ({@link ContainerValueExtractorPath#defaultExtractors()})
 	 * and to validate that all extractors in the path can be applied.
 	 *
-	 * @param introspector An introspector, to retrieve type models.
 	 * @param sourceType A model of the source type to apply extractors to.
 	 * @param extractorPath The list of extractors to apply.
 	 * @param <C> The source type.
@@ -100,10 +100,9 @@ public class ContainerValueExtractorBinder {
 	 * one of the extractors in the path cannot be applied.
 	 */
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindPath(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<C> sourceType,
+	public <C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerValueExtractorPath extractorPath) {
-		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
+		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
@@ -129,7 +128,6 @@ public class ContainerValueExtractorBinder {
 	 * and validate that all extractors in the path can be applied,
 	 * or fail.
 	 *
-	 * @param introspector An introspector, to retrieve type models.
 	 * @param sourceType A model of the source type to apply extractors to.
 	 * @param extractorPath The list of extractors to apply.
 	 * @param <C> The source type.
@@ -138,10 +136,9 @@ public class ContainerValueExtractorBinder {
 	 * one of the extractors in the path cannot be applied.
 	 */
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C> BoundContainerValueExtractorPath<C, ?> bindPath(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<C> sourceType,
+	public <C> BoundContainerValueExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerValueExtractorPath extractorPath) {
-		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( introspector, sourceType );
+		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
@@ -211,11 +208,10 @@ public class ContainerValueExtractorBinder {
 		return tryCreate( boundPath ).get();
 	}
 
-	public boolean isDefaultExtractorPath(PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> sourceType,
-			ContainerValueExtractorPath extractorPath) {
+	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerValueExtractorPath extractorPath) {
 		Optional<? extends BoundContainerValueExtractorPath<?, ?>> boundDefaultExtractorPathOptional =
 				tryBindPath(
-						introspector, sourceType,
+						sourceType,
 						ContainerValueExtractorPath.defaultExtractors()
 				);
 		return boundDefaultExtractorPathOptional.isPresent() && extractorPath.equals(
@@ -278,7 +274,7 @@ public class ContainerValueExtractorBinder {
 		@Override
 		public boolean tryAppend(ExtractorResolutionState<?> state) {
 			Optional<? extends PojoGenericTypeModel<?>> resultTypeOptional =
-					typePatternMatcher.match( state.introspector, state.extractedType );
+					typePatternMatcher.match( state.extractedType );
 			if ( resultTypeOptional.isPresent() ) {
 				state.append( extractorClass, resultTypeOptional.get() );
 				return true;
@@ -312,13 +308,11 @@ public class ContainerValueExtractorBinder {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
-		private final PojoBootstrapIntrospector introspector;
 		private final List<Class<? extends ContainerValueExtractor>> extractorClasses = new ArrayList<>();
 		private final PojoGenericTypeModel<C> sourceType;
 		private PojoGenericTypeModel<?> extractedType;
 
-		ExtractorResolutionState(PojoBootstrapIntrospector introspector, PojoGenericTypeModel<C> sourceType) {
-			this.introspector = introspector;
+		ExtractorResolutionState(PojoGenericTypeModel<C> sourceType) {
 			this.sourceType = sourceType;
 			this.extractedType = sourceType;
 		}

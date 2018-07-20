@@ -43,6 +43,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Closer;
@@ -56,7 +57,6 @@ public class PojoMapper<M> implements Mapper<M> {
 	private final ContextualFailureCollector failureCollector;
 	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
-	private final PojoBootstrapIntrospector introspector;
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -77,18 +77,19 @@ public class PojoMapper<M> implements Mapper<M> {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
-		this.introspector = introspector;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
 				failureCollector, contributorProvider
 		);
-		extractorBinder = new ContainerValueExtractorBinder( buildContext );
+
+		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
+		extractorBinder = new ContainerValueExtractorBinder( buildContext, typePatternMatcherFactory );
 
 		BridgeResolver bridgeResolver = new BridgeResolver();
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
-				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
+				buildContext, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
 
 		mappingHelper = new PojoMappingHelper(
@@ -143,11 +144,11 @@ public class PojoMapper<M> implements Mapper<M> {
 		PojoContainedTypeManagerContainer.Builder containedTypeManagerContainerBuilder =
 				PojoContainedTypeManagerContainer.builder();
 		PojoAssociationPathInverter pathInverter = new PojoAssociationPathInverter(
-				typeAdditionalMetadataProvider, introspector, extractorBinder
+				typeAdditionalMetadataProvider, extractorBinder
 		);
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
-						introspector, extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
+						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
 				);
 
 		// First phase: build the processors and contribute to the reindexing resolvers
