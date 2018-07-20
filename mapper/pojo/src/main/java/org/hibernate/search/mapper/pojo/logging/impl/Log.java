@@ -39,10 +39,12 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface Log extends BasicLogger {
 
 	@Message(id = 1, value = "Unable to find a default identifier bridge implementation for type '%1$s'")
-	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(@FormatWith(ClassFormatter.class) Class<?> sourceType);
+	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
 
 	@Message(id = 2, value = "Unable to find a default value bridge implementation for type '%1$s'")
-	SearchException unableToResolveDefaultValueBridgeFromSourceType(@FormatWith(ClassFormatter.class) Class<?> sourceType);
+	SearchException unableToResolveDefaultValueBridgeFromSourceType(
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
 
 	@Message(id = 3, value = "Annotation type '%2$s' is annotated with '%1$s',"
 			+ " but neither a bridge reference nor a bridge builder reference was provided.")

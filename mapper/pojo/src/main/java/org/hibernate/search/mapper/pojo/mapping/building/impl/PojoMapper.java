@@ -87,7 +87,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
 		extractorBinder = new ContainerValueExtractorBinder( buildContext, typePatternMatcherFactory );
 
-		BridgeResolver bridgeResolver = new BridgeResolver();
+		BridgeResolver bridgeResolver = new BridgeResolver( typePatternMatcherFactory );
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
 				buildContext, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);

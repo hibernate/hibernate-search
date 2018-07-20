@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.integrationtest.showcase.library.bridge.BookMediumBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
-import org.hibernate.search.integrationtest.showcase.library.bridge.LibraryServiceBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.VideoMediumBridge;
 
@@ -42,7 +41,7 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 				.property( "latitude" ).marker( new LatitudeMarker.Builder() )
 				.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 				.property( "services" )
-						.field().valueBridge( LibraryServiceBridge.class );
+						.field();
 
 		mapping.type( Document.class )
 				.property( "id" ).documentId()
