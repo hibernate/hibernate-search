@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 
 /**
  * A bridge from a POJO entity to a document routing key.
@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
  */
 public interface RoutingKeyBridge extends AutoCloseable {
 
-	void bind(PojoModelElement pojoModelElement);
+	void bind(PojoModelType pojoModelType);
 
 	/**
 	 * Generate a routing key using the given {@code tenantIdentifier}, {@code entityIdentifier} and {@link PojoElement}
@@ -24,7 +24,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * <p>
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
-	 * {@link #bind(PojoModelElement)} method was called.
+	 * {@link #bind(PojoModelType)} method was called.
 	 *
 	 * @param tenantIdentifier The tenant identifier currently in use ({@code null} if none).
 	 * @param entityIdentifier The value of the POJO property used to generate the document identifier,

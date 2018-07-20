@@ -9,9 +9,11 @@ package org.hibernate.search.mapper.pojo.model;
 import java.util.stream.Stream;
 
 /**
- * @author Yoann Rodiere
+ * A model element representing a property bound to a bridge.
+ *
+ * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
  */
-public interface PojoModelProperty extends PojoModelElement {
+public interface PojoModelProperty extends PojoModelCompositeElement {
 
 	String getName();
 

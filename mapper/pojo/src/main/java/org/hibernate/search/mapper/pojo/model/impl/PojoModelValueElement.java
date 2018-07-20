@@ -9,38 +9,34 @@ package org.hibernate.search.mapper.pojo.model.impl;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @param <T> The type used as a root element.
  */
-public class PojoModelTypeRootElement<T> extends AbstractPojoModelCompositeElement<T> implements PojoModelType {
+public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
-	private final BoundPojoModelPathTypeNode<T> modelPath;
+	private final PojoGenericTypeModel<? extends T> valueTypeModel;
+	private final PojoRawTypeModel<? extends T> valueRawTypeModel;
 
-	public PojoModelTypeRootElement(BoundPojoModelPathTypeNode<T> modelPath,
-			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		super( typeAdditionalMetadataProvider );
-		this.modelPath = modelPath;
+	public PojoModelValueElement(PojoGenericTypeModel<? extends T> valueTypeModel,
+			PojoRawTypeModel<? extends T> valueRawTypeModel) {
+		this.valueTypeModel = valueTypeModel;
+		this.valueRawTypeModel = valueRawTypeModel;
 	}
 
 	@Override
 	public String toString() {
-		return modelPath.getTypeModel().toString();
-	}
-
-	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
-		contributePropertyDependencies( dependencyCollector );
+		return "PojoModelValueElement[" + valueTypeModel.toString() + "]";
 	}
 
 	@Override
-	PojoModelElementAccessor<T> doCreateAccessor() {
-		return new PojoModelRootElementAccessor<>();
-	}
-
-	@Override
-	BoundPojoModelPathTypeNode<T> getModelPathTypeNode() {
-		return modelPath;
+	public Class<? extends T> getRawType() {
+		return valueRawTypeModel.getJavaClass();
 	}
 }

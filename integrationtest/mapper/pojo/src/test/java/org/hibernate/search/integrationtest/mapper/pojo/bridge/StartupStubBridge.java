@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.AssertionFailure;
@@ -78,7 +77,7 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void bind(PojoModelElement pojoModelElement) {
+	public void bind(PojoModelType pojoModelType) {
 		// Nothing to do
 	}
 

@@ -24,13 +24,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
  * @param <T> The type holding the property.
  * @param <P> The type of the property.
  */
-class PojoModelNestedElement<T, P> extends AbstractPojoModelElement<P> implements PojoModelProperty {
+class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeElement<P> implements PojoModelProperty {
 
-	private final AbstractPojoModelElement<T> parent;
+	private final AbstractPojoModelCompositeElement<T> parent;
 	private final BoundPojoModelPathValueNode<T, P, P> modelPath;
 	private final PojoPropertyAdditionalMetadata propertyAdditionalMetadata;
 
-	PojoModelNestedElement(AbstractPojoModelElement<T> parent, BoundPojoModelPathPropertyNode<T, P> modelPath,
+	PojoModelNestedCompositeElement(AbstractPojoModelCompositeElement<T> parent, BoundPojoModelPathPropertyNode<T, P> modelPath,
 			PojoPropertyAdditionalMetadata propertyAdditionalMetadata,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		super( typeAdditionalMetadataProvider );

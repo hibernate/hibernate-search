@@ -6,22 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
-import java.util.stream.Stream;
-
 /**
- * @author Yoann Rodiere
+ * An element in the POJO model.
+ *
+ * @see PojoModelType
+ * @see PojoModelProperty
  */
 public interface PojoModelElement {
 
-	// FIXME what if I want a PojoModelElementAccessor<List<MyType>>?
-	<T> PojoModelElementAccessor<T> createAccessor(Class<T> type);
-
-	PojoModelElementAccessor<?> createAccessor();
-
 	boolean isAssignableTo(Class<?> clazz);
-
-	PojoModelProperty property(String relativeFieldName);
-
-	Stream<? extends PojoModelProperty> properties();
 
 }

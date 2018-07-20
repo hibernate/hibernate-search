@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.PojoModelElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
@@ -26,17 +26,17 @@ import org.hibernate.search.util.SearchException;
 /**
  * @param <V> The type of the element, i.e. the type of values returned by accessors to this element.
  */
-abstract class AbstractPojoModelElement<V> implements PojoModelElement {
+abstract class AbstractPojoModelCompositeElement<V> implements PojoModelCompositeElement {
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, PojoModelNestedElement<V, ?>> properties = new LinkedHashMap<>();
+	private final Map<String, PojoModelNestedCompositeElement<V, ?>> properties = new LinkedHashMap<>();
 	private PojoTypeAdditionalMetadata typeAdditionalMetadata;
 	private boolean propertiesInitialized = false;
 
 	private PojoModelElementAccessor<?> accessor;
 
-	AbstractPojoModelElement(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+	AbstractPojoModelCompositeElement(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 	}
 
@@ -63,12 +63,12 @@ abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 	}
 
 	@Override
-	public PojoModelNestedElement<?, ?> property(String relativeFieldName) {
+	public PojoModelNestedCompositeElement<?, ?> property(String relativeFieldName) {
 		return properties.computeIfAbsent( relativeFieldName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
 			PojoPropertyModel<?> model = modelPathTypeNode.getTypeModel().getProperty( name );
 			PojoPropertyAdditionalMetadata additionalMetadata = getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );
-			return new PojoModelNestedElement<>(
+			return new PojoModelNestedCompositeElement<>(
 					this,
 					modelPathTypeNode.property( model.getHandle() ),
 					additionalMetadata,
@@ -100,7 +100,7 @@ abstract class AbstractPojoModelElement<V> implements PojoModelElement {
 	}
 
 	final void contributePropertyDependencies(PojoIndexingDependencyCollectorTypeNode<V> dependencyCollector) {
-		for ( Map.Entry<String, PojoModelNestedElement<V, ?>> entry : properties.entrySet() ) {
+		for ( Map.Entry<String, PojoModelNestedCompositeElement<V, ?>> entry : properties.entrySet() ) {
 			entry.getValue().contributeDependencies( dependencyCollector );
 		}
 	}

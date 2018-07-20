@@ -15,9 +15,7 @@ package org.hibernate.search.mapper.pojo.model;
  * {@link PojoElement}s only provide access to a set of previously
  * registered paths, accessed through a {@link PojoModelElementAccessor}.
  *
- * @see PojoModelElement
- *
- * @author Yoann Rodiere
+ * @see PojoModelCompositeElement
  */
 public interface PojoElement {
 
