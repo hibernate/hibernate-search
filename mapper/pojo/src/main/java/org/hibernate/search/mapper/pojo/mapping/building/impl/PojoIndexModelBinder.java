@@ -36,7 +36,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * Also binds the bridges where appropriate:
  * {@link TypeBridge#bind(IndexSchemaElement, PojoModelType, SearchModel)},
  * {@link PropertyBridge#bind(IndexSchemaElement, PojoModelProperty, SearchModel)},
- * {@link ValueBridge#bind(IndexSchemaFieldContext)}.
+ * {@link ValueBridge#bind(org.hibernate.search.mapper.pojo.model.PojoModelValue, IndexSchemaFieldContext)}.
  * <p>
  * Incidentally, this will also generate the index model,
  * due to bridges contributing to the index model as we bind them.
@@ -57,7 +57,7 @@ public interface PojoIndexModelBinder {
 	<C, V> Optional<? extends ContainerValueExtractor<? super C, V>> tryCreateExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
-	<P> IdentifierBridge<P> createIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
+	<P> IdentifierBridge<P> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
 	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,

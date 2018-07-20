@@ -6,37 +6,32 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @param <T> The type used as a root element.
  */
 public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
-	private final PojoGenericTypeModel<? extends T> valueTypeModel;
-	private final PojoRawTypeModel<? extends T> valueRawTypeModel;
+	private final PojoGenericTypeModel<? extends T> typeModel;
 
-	public PojoModelValueElement(PojoGenericTypeModel<? extends T> valueTypeModel,
-			PojoRawTypeModel<? extends T> valueRawTypeModel) {
-		this.valueTypeModel = valueTypeModel;
-		this.valueRawTypeModel = valueRawTypeModel;
+	public PojoModelValueElement(PojoGenericTypeModel<? extends T> typeModel) {
+		this.typeModel = typeModel;
 	}
 
 	@Override
 	public String toString() {
-		return "PojoModelValueElement[" + valueTypeModel.toString() + "]";
+		return "PojoModelValueElement[" + typeModel.toString() + "]";
 	}
 
 	@Override
-	public Class<? extends T> getRawType() {
-		return valueRawTypeModel.getJavaClass();
+	public boolean isAssignableTo(Class<?> clazz) {
+		return typeModel.getRawType().isSubTypeOf( clazz );
+	}
+
+	@Override
+	public Class<?> getRawType() {
+		return typeModel.getRawType().getJavaClass();
 	}
 }

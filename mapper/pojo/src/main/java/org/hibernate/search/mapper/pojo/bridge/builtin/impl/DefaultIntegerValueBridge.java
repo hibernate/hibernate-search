@@ -9,12 +9,15 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
 public final class DefaultIntegerValueBridge implements ValueBridge<Integer, Integer> {
 
 	@Override
-	public IndexSchemaFieldTypedContext<Integer> bind(IndexSchemaFieldContext context) {
-		return context.asInteger();
+	public IndexSchemaFieldTypedContext<Integer> bind(
+			PojoModelValue<Integer> pojoModelValue,
+			IndexSchemaFieldContext fieldContext) {
+		return fieldContext.asInteger();
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
 /**
  * A bridge between a POJO-extracted value of type {@code T} and an index field of type {@code R}.
@@ -24,17 +25,23 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 public interface ValueBridge<T, R> extends AutoCloseable {
 
 	/**
-	 * Bind this bridge instance to the given index field model.
+	 * Bind this bridge instance to the given index field model and the given POJO model element.
 	 * <p>
 	 * This method is called exactly once for each bridge instance, before any other method.
-	 * It allows the bridge to declare its expectations regarding the index field (type, storage options, ...).
+	 * It allows the bridge to:
+	 * <ul>
+	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge.
+	 *     <li>Declare its expectations regarding the index field (type, storage options, ...).
+	 * </ul>
 	 *
-	 * @param context An entry point to declaring expectations and retrieving accessors to the index schema.
-	 * @return The result provided by {@code context} after setting the expectations regarding the index field
-	 * (for instance {@code return context.asString()}). {@code null} to let Hibernate Search derive the expectations
+	 * @param pojoModelValue An entry point to inspecting the type of values that will be passed to this bridge.
+	 * @param fieldContext An entry point to declaring expectations and retrieving accessors to the index schema.
+	 * @return The result provided by {@code fieldContext} after setting the expectations regarding the index field
+	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default IndexSchemaFieldTypedContext<R> bind(IndexSchemaFieldContext context) {
+	default IndexSchemaFieldTypedContext<R> bind(PojoModelValue<T> pojoModelValue,
+			IndexSchemaFieldContext fieldContext) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 

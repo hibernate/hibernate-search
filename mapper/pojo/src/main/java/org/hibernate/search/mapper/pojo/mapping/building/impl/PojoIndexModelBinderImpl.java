@@ -32,12 +32,12 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -90,9 +90,9 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <P> IdentifierBridge<P> createIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
+	public <P> IdentifierBridge<P> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
-		PojoTypeModel<P> typeModel = modelPath.valueWithoutExtractors().type().getTypeModel();
+		PojoGenericTypeModel<P> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
@@ -101,9 +101,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		 * TODO check that the bridge is suitable for the given typeModel
 		 * (use introspection, similarly to what we do to detect the value bridge's field type?)
 		 */
-		IdentifierBridge<?> bridge = defaultedBuilder.build( bridgeBuildContext );
+		IdentifierBridge<P> bridge = (IdentifierBridge<P>) defaultedBuilder.build( bridgeBuildContext );
 
-		return (IdentifierBridge<P>) bridge;
+		bridge.bind( new PojoModelValueElement<>( typeModel ) );
+
+		return bridge;
 	}
 
 	@Override
@@ -170,11 +172,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <V> Optional<BoundValueBridge<? super V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
-		PojoTypeModel<V> typeModel = modelPath.type().getTypeModel();
+		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> defaultedBuilder = builder;
 		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( typeModel );
+			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( valueTypeModel );
 		}
 
 		ValueBridge<?, ?> bridge = defaultedBuilder.build( bridgeBuildContext );
@@ -184,25 +186,30 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
 				.map( ReflectionUtils::getRawType )
 				.orElseThrow( () -> log.unableToInferValueBridgeInputType( bridge ) );
-		if ( !typeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
-			throw log.invalidInputTypeForValueBridge( bridge, typeModel );
+		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
+		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
+			throw log.invalidInputTypeForValueBridge( bridge, valueTypeModel );
 		}
 
 		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
 		ValueBridge<? super V, ?> typedBridge = (ValueBridge<? super V, ?>) bridge;
 
-		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, relativeFieldName, contributor );
+		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, valueTypeModel, relativeFieldName, contributor );
 	}
 
-	private <T, R> Optional<BoundValueBridge<? super T, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
-			ValueBridge<? super T, R> bridge, GenericTypeContext bridgeTypeContext,
+	private <V, R> Optional<BoundValueBridge<? super V, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
+			ValueBridge<? super V, R> bridge, GenericTypeContext bridgeTypeContext,
+			PojoGenericTypeModel<V> valueTypeModel,
 			String relativeFieldName, FieldModelContributor contributor) {
 		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
 
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
 
 		// First give the bridge a chance to contribute to the model
-		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind( fieldContext );
+		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind(
+				new PojoModelValueElement<>( valueTypeModel ),
+				fieldContext
+		);
 		if ( typedFieldContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
 			Class<? super R> returnType =

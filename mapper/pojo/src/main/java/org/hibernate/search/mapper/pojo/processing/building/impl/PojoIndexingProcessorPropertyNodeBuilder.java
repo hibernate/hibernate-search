@@ -81,7 +81,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		if ( identityMappingCollector.isPresent() ) {
-			IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().createIdentifierBridge(
+			IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().addIdentifierBridge(
 					modelPath, builder
 			);
 			identityMappingCollector.get().identifierBridge( modelPath, bridge );
