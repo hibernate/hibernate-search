@@ -19,7 +19,7 @@ class ArrayElementTypeMatcher implements TypePatternMatcher {
 
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> match(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToMatch) {
-		return typeToMatch.getArrayElementType();
+			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToInspect) {
+		return typeToInspect.getArrayElementType();
 	}
 }

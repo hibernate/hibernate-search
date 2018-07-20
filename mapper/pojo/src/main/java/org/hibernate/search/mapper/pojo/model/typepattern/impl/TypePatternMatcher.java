@@ -16,19 +16,19 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
  * <p>
  * For example, such a pattern could be described with the expression {@code Collection<T> => T}.
  * It would only match against {@code Collection} and its subclasses,
- * and would return the resolved type for parameter {@code T} in the event of a match.
+ * and would extract the resolved type for parameter {@code T} in the event of a match.
  */
 public interface TypePatternMatcher {
 
 	/**
 	 * Attempts to match a given type against this pattern,
-	 * and if matched, returns an upper bound of the resulting type.
+	 * and if matched, returns an upper bound of the extracted type.
 	 *
 	 * @param introspector An introspector to use for reflection, mainly for {@link PojoBootstrapIntrospector#getGenericTypeModel(Class)}
-	 * @param typeToMatch A type to be matched against
-	 * @return The resulting type if there was a match, or an empty {@link Optional} otherwise.
+	 * @param typeToInspect A type that may, or may not, match the pattern.
+	 * @return The extracted type if there was a match, or an empty {@link Optional} otherwise.
 	 */
 	Optional<? extends PojoGenericTypeModel<?>> match(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToMatch);
+			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToInspect);
 
 }

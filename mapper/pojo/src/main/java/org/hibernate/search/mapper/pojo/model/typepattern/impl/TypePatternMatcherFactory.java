@@ -17,24 +17,25 @@ import org.hibernate.search.util.AssertionFailure;
 public class TypePatternMatcherFactory {
 
 	/**
-	 * @param typeToMatch The type to match. Not all types are accepted.
-	 * @param resultType The result type. Not all types are accepted.
-	 * @return A type pattern matcher matching subtypes of {@code typeToMatch}
-	 * and returning {@code resultType}.
+	 * @param typePattern The type used as a pattern to be matched. Not all types are accepted.
+	 * @param typeToExtract The type to extract when matching the pattern. Not all types are accepted.
+	 * @return A type pattern matcher matching subtypes of {@code typePattern}
+	 * and returning the {@code typeToExtract} resolved against the type submitted to the matcher
+	 * in the even of a match.
 	 * @throws UnsupportedOperationException If this factory does not support creating a type pattern matcher
 	 * for the given types.
 	 */
-	public TypePatternMatcher create(Type typeToMatch, Type resultType) {
-		if ( typeToMatch instanceof TypeVariable ) {
+	public TypePatternMatcher create(Type typePattern, Type typeToExtract) {
+		if ( typePattern instanceof TypeVariable ) {
 			throw new UnsupportedOperationException( "Matching a type variable is not supported" );
 		}
-		else if ( typeToMatch instanceof WildcardType ) {
+		else if ( typePattern instanceof WildcardType ) {
 			throw new UnsupportedOperationException( "Matching a wildcard type is not supported" );
 		}
-		else if ( typeToMatch instanceof ParameterizedType ) {
-			ParameterizedType parameterizedTypeToMatch = (ParameterizedType) typeToMatch;
-			Class<?> rawTypeToMatch = (Class<?>) parameterizedTypeToMatch.getRawType();
-			Type[] typeArguments = parameterizedTypeToMatch.getActualTypeArguments();
+		else if ( typePattern instanceof ParameterizedType ) {
+			ParameterizedType parameterizedTypePattern = (ParameterizedType) typePattern;
+			Class<?> rawTypePattern = (Class<?>) parameterizedTypePattern.getRawType();
+			Type[] typeArguments = parameterizedTypePattern.getActualTypeArguments();
 
 			Integer typeVariableIndex = null;
 			for ( int i = 0; i < typeArguments.length; i++ ) {
@@ -44,9 +45,9 @@ public class TypePatternMatcherFactory {
 						typeVariableIndex = i;
 						TypeVariable<?> typeVariable = (TypeVariable<?>) typeArgument;
 						Type[] upperBounds = typeVariable.getBounds();
-						if ( !resultType.equals( typeVariable ) ) {
+						if ( !typeToExtract.equals( typeVariable ) ) {
 							throw new UnsupportedOperationException(
-									"Returning anything other than the type variable when matching parameterized types"
+									"Extracting anything other than the type variable when matching parameterized types"
 											+ " is not supported"
 							);
 						}
@@ -86,26 +87,26 @@ public class TypePatternMatcherFactory {
 						"Matching a parameterized type without a type variable in its arguments is not supported"
 				);
 			}
-			return new ParameterizedTypeArgumentMatcher( rawTypeToMatch, typeVariableIndex );
+			return new ParameterizedTypeArgumentMatcher( rawTypePattern, typeVariableIndex );
 		}
-		else if ( typeToMatch instanceof Class ) {
-			if ( !( resultType instanceof Class ) ) {
+		else if ( typePattern instanceof Class ) {
+			if ( !( typeToExtract instanceof Class ) ) {
 				throw new UnsupportedOperationException(
-						"Returning a non-raw result type when matching a raw type is not supported"
+						"Extracting a non-raw result type when matching a raw type is not supported"
 				);
 			}
-			return new RawSuperTypeMatcher( (Class<?>) typeToMatch, (Class<?>) resultType );
+			return new RawSuperTypeMatcher( (Class<?>) typePattern, (Class<?>) typeToExtract );
 		}
-		else if ( typeToMatch instanceof GenericArrayType ) {
-			GenericArrayType arrayTypeToMatch = (GenericArrayType) typeToMatch;
-			if ( !( resultType instanceof TypeVariable )
-					|| !arrayTypeToMatch.getGenericComponentType().equals( resultType ) ) {
+		else if ( typePattern instanceof GenericArrayType ) {
+			GenericArrayType arrayTypePattern = (GenericArrayType) typePattern;
+			if ( !( typeToExtract instanceof TypeVariable )
+					|| !arrayTypePattern.getGenericComponentType().equals( typeToExtract ) ) {
 				throw new UnsupportedOperationException(
-						"Returning anything other than the array element type when matching array types"
+						"Extracting anything other than the array element type when matching array types"
 								+ " is not supported"
 				);
 			}
-			TypeVariable<?> resultTypeVariable = (TypeVariable<?>) resultType;
+			TypeVariable<?> resultTypeVariable = (TypeVariable<?>) typeToExtract;
 			Type[] upperBounds = resultTypeVariable.getBounds();
 			if ( upperBounds.length > 1 || !Object.class.equals( upperBounds[0] ) ) {
 				throw new UnsupportedOperationException(
@@ -115,7 +116,7 @@ public class TypePatternMatcherFactory {
 			return new ArrayElementTypeMatcher();
 		}
 		else {
-			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + typeToMatch.getClass() );
+			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + typePattern.getClass() );
 		}
 	}
 }

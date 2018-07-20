@@ -44,7 +44,7 @@ class ParameterizedTypeArgumentMatcher implements TypePatternMatcher {
 
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> match(
-			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToMatch) {
-		return typeToMatch.getTypeArgument( matchedRawType, resultTypeParameterIndex );
+			PojoBootstrapIntrospector introspector, PojoGenericTypeModel<?> typeToInspect) {
+		return typeToInspect.getTypeArgument( matchedRawType, resultTypeParameterIndex );
 	}
 }
