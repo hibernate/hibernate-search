@@ -124,8 +124,6 @@ ALL_ENV""",
 		case 'EXPERIMENTAL_ENV_ONLY':
 			enableExperimentalEnvIT = true
 			break
-		default:
-			echo "Unknown value for param 'INTEGRATION_TESTS': '$params.INTEGRATION_TESTS'. Defaulting to 'AUTOMATIC'."
 		case 'AUTOMATIC':
 			if (params.RELEASE_VERSION) {
 				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
@@ -143,6 +141,10 @@ ALL_ENV""",
 				enableDefaultEnvIT = true
 			}
 			break
+		default:
+			throw new IllegalArgumentException(
+					"Unknown value for param 'INTEGRATION_TESTS': '$params.INTEGRATION_TESTS'."
+			)
 	}
 
 	enableDefaultBuild = enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT
