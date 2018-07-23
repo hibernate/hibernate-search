@@ -1021,4 +1021,7 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 352, value = "Multiple conflicting minimumShouldMatch constraints")
 	SearchException minimumShouldMatchConflictingConstraints();
+
+	@Message(id = 353, value = "Unknown analyzer: '%1$s'. Make sure you defined this analyzer.")
+	SearchException unknownAnalyzerForOverride(String analyzerName);
 }
