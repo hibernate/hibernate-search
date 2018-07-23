@@ -8,10 +8,12 @@ package org.hibernate.search.integrationtest.mapper.pojo;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -21,7 +23,12 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JavaBeanMappingDocumentIdIT {
+/**
+ * Test common use cases of the {@code @Field} annotation.
+ *
+ * Does not test default bridges, which are tested in {@link JavaBeanMappingFieldDefaultBridgeIT}.
+ */
+public class JavaBeanMappingFieldBaseIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -30,13 +37,18 @@ public class JavaBeanMappingDocumentIdIT {
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
 	@Test
-	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType() {
+	public void error_unableToResolveDefaultValueBridgeFromSourceType() {
 		@Indexed
 		class IndexedEntity {
-			Object id;
+			Integer id;
+			Object myProperty;
 			@DocumentId
-			public Object getId() {
+			public Integer getId() {
 				return id;
+			}
+			@Field
+			public Object getMyProperty() {
+				return myProperty;
 			}
 		}
 		SubTest.expectException(
@@ -46,9 +58,9 @@ public class JavaBeanMappingDocumentIdIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
+						.pathContext( ".myProperty" )
 						.failure(
-								"Unable to find a default identifier bridge implementation for type '"
+								"Unable to find a default value bridge implementation for type '"
 										+ Object.class.getName() + "'"
 						)
 						.build()
@@ -56,15 +68,13 @@ public class JavaBeanMappingDocumentIdIT {
 	}
 
 	@Test
-	public void error_definingBothBridgeReferenceAndBridgeBuilderReference() {
+	public void error_invalidInputTypeForValueBridge() {
 		@Indexed
 		class IndexedEntity {
-			Object id;
-			@DocumentId(
-					identifierBridge = @IdentifierBridgeBeanReference(name = "foo"),
-					identifierBridgeBuilder = @IdentifierBridgeBuilderBeanReference(name = "bar")
-			)
-			public Object getId() {
+			Integer id;
+			@DocumentId
+			@Field(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			public Integer getId() {
 				return id;
 			}
 		}
@@ -76,21 +86,37 @@ public class JavaBeanMappingDocumentIdIT {
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.annotationContextAnyParameters( DocumentId.class )
 						.failure(
-								"Annotation @DocumentId on property 'id' defines both identifierBridge and identifierBridgeBuilder."
-										+ " Only one of those can be defined, not both."
+								"Value bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
+										+ Integer.class.getName() + "'"
 						)
 						.build()
 				);
 	}
 
+	public static class MyStringBridge implements ValueBridge<String, String> {
+		private static String TOSTRING = "<MyStringBridge toString() result>";
+		@Override
+		public String toIndexedValue(String value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+	}
+
 	@Test
-	public void error_missing() {
+	public void error_definingBothBridgeReferenceAndBridgeBuilderReference() {
 		@Indexed
 		class IndexedEntity {
-			Object id;
-			public Object getId() {
+			Integer id;
+			@DocumentId
+			@Field(
+					valueBridge = @ValueBridgeBeanReference(name = "foo"),
+					valueBridgeBuilder = @ValueBridgeBuilderBeanReference(name = "bar")
+			)
+			public Integer getId() {
 				return id;
 			}
 		}
@@ -101,10 +127,11 @@ public class JavaBeanMappingDocumentIdIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.annotationContextAnyParameters( Field.class )
 						.failure(
-								"There isn't any explicit document ID mapping for indexed type '"
-										+ IndexedEntity.class.getName() + "',"
-										+ " and the entity ID cannot be used as a default because it is unknown"
+								"Annotation @Field on property 'id' defines both valueBridge and valueBridgeBuilder."
+										+ " Only one of those can be defined, not both."
 						)
 						.build()
 				);
