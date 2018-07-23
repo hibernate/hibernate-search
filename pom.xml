@@ -55,8 +55,8 @@
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
-        <version.org.jboss.logging.jboss-logging>3.3.0.Final</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-tools>2.0.1.Final</version.org.jboss.logging.jboss-logging-tools>
+        <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Test dependencies -->
 
@@ -86,7 +86,7 @@
         <version.site.plugin>3.6</version.site.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs, so depending on context we need to choose a different one -->
-        <version.surefire.plugin>2.20.1</version.surefire.plugin>
+        <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
