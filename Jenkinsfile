@@ -285,7 +285,7 @@ stage('Non-default environment ITs') {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
 							clean install -pl integrationtest/backend-elasticsearch \\
-							-P!$DEFAULT_ES_PROFILE,$itEnv.mavenProfile
+							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
 					"""
 				}
 			}
@@ -308,7 +308,7 @@ stage('Non-default environment ITs') {
 						withAwsCredentials {
 							mavenNonDefaultIT itEnv, """ \\
 								clean install -pl integrationtest/backend-elasticsearch \\
-								-P!$DEFAULT_ES_PROFILE,$itEnv.mavenProfile \\
+								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
 								-Dtest.elasticsearch.host.provided=true \\
 								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \\
 								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \\
@@ -450,4 +450,16 @@ void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
 	// of the same test in different environments in reports
 	def testSuffix = itEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 	sh "mvn -Dsurefire.environment=$testSuffix $args"
+}
+
+String toMavenElasticsearchProfileArg(String mavenEsProfile) {
+	if (mavenEsProfile != DEFAULT_ES_PROFILE) {
+		// Disable the default profile to avoid conflicting configurations
+		"-P!$DEFAULT_ES_PROFILE,$itEnv.mavenProfile"
+	}
+	else {
+		// Do not do as above, as we would tell Maven "disable the default profile, but enable it"
+		// and Maven would end up disabling it.
+		''
+	}
 }
