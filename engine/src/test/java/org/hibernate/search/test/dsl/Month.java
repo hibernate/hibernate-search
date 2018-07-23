@@ -96,6 +96,8 @@ class Month {
 			@Field,
 			@Field(name = "mythology_stem", analyzer = @Analyzer(definition = "stemmer")),
 			@Field(name = "mythology_ngram", analyzer = @Analyzer(definition = "ngram")),
+			// This field must exist in order for tests to pass with the Elasticsearch integration... See HSEARCH-2534
+			@Field(name = "mythology_same_base_as_ngram", analyzer = @Analyzer(definition = "same_base_as_ngram")),
 			@Field(name = "mythology_normalized", normalizer = @Normalizer(definition = "lower"))
 	})
 	public String getMythology() {

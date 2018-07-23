@@ -48,6 +48,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Emmanuel Bernard
@@ -57,6 +58,9 @@ import org.junit.experimental.categories.Category;
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
 public class DSLTest {
 	private final Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
+
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Month.class, Car.class,
@@ -976,6 +980,58 @@ public class DSLTest {
 		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3233")
+	public void testOverridesForField() {
+		final QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
+				.overridesForField( "mythology_ngram", "same_base_as_ngram" )
+				.get();
+
+		// If the analyzer is correctly overridden, only ngram of size 3 should produce results
+
+		Query query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snowboard" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snowboar" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snowboa" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snowbo" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snowb" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snow" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 0 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "sno" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "now" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "owb" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "wbo" ).createQuery();
+		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+
+		// etc.
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3233")
+	public void testOverridesForFieldUnknownAnalyzer() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Unknown analyzer: 'invalid_analyzer_name'" );
+
+		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
+				.overridesForField( "mythology_ngram", "invalid_analyzer_name" );
+	}
+
 	private void indexTestData() {
 		final Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		calendar.set( 1900, 2, 12, 0, 0, 0 );
@@ -1063,6 +1119,10 @@ public class DSLTest {
 							.filter( NGramFilterFactory.class )
 									.param( "minGramSize", "3" )
 									.param( "maxGramSize", "3" )
+					.analyzerDef( "same_base_as_ngram", StandardTokenizerFactory.class )
+							.filter( StandardFilterFactory.class )
+							.filter( LowerCaseFilterFactory.class )
+							.filter( StopFilterFactory.class )
 					.analyzerDef( "htmlStrip", StandardTokenizerFactory.class )
 							.charFilter( HTMLStripCharFilterFactory.class )
 									.param( "escapedTags", "escaped" )
