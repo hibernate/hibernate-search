@@ -18,6 +18,8 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
  * - staticMethod org.jenkinsci.plugins.pipeline.modeldefinition.Utils markStageSkippedForConditional java.lang.String
+ * - new java.lang.IllegalArgumentException java.lang.String
+ *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  */
 
@@ -69,6 +71,8 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
 
+@Field String releaseVersionFamily
+
 stage('Configure') {
 	properties([
 			parameters([
@@ -88,12 +92,6 @@ ALL_ENV""",
 							name: 'RELEASE_VERSION',
 							defaultValue: '',
 							description: 'The version to be released, e.g. 5.10.0.Final. Setting this triggers a release.',
-							trim: true
-					),
-					string(
-							name: 'RELEASE_FAMILY_VERSION',
-							defaultValue: '5.10',
-							description: 'The minor version family to be used for the documentation upload, e.g. 5.10.',
 							trim: true
 					),
 					string(
@@ -197,6 +195,24 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 	}
 	else {
 		echo "Non-default environment ITs are completely disabled."
+	}
+
+	def versionPattern = ~/^(\d+)\.(\d+)\.\d+\S*$/
+
+	// Compute the version truncated to the minor component, a.k.a. the version family
+	// To be used for the documentation upload in particular
+	if (params.RELEASE_VERSION) {
+		def matcher = (params.RELEASE_VERSION =~ versionPattern)
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(
+					"Invalid version number: '$params.RELEASE_VERSION'. Version numbers must match /$versionPattern/"
+			)
+		}
+		String major = matcher.group(1)
+		String minor = matcher.group(2)
+		releaseVersionFamily = "$major.$minor"
+
+		echo "Inferred version family for the release to '$releaseVersionFamily'"
 	}
 }
 
@@ -326,7 +342,7 @@ stage('Release') {
 
 			if (!params.RELEASE_DRY_RUN) {
 				sh "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${params.RELEASE_VERSION}"
-				sh "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${params.RELEASE_VERSION} ${params.RELEASE_FAMILY_VERSION}"
+				sh "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${params.RELEASE_VERSION} ${releaseVersionFamily}"
 			}
 			else {
 				echo "WARNING: Not uploading anything"
