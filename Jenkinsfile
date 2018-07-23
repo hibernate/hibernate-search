@@ -216,6 +216,13 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 
 		echo "Inferred version family for the release to '$releaseVersionFamily'"
 	}
+
+	if (params.RELEASE_DEVELOPMENT_VERSION && !(params.RELEASE_DEVELOPMENT_VERSION ==~ versionPattern)) {
+		throw new IllegalArgumentException(
+				"Invalid development version number: '$params.RELEASE_DEVELOPMENT_VERSION'." +
+						" Version numbers must match /$versionPattern/"
+		)
+	}
 }
 
 stage('Default build') {
