@@ -7,6 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -94,7 +95,11 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 		@Override
 		public EntityContext overridesForField(String field, String analyzerName) {
-			queryAnalyzerReferenceBuilder.addAnalyzerReference( field, analyzerRegistry.getAnalyzerReference( analyzerName ) );
+			AnalyzerReference reference = analyzerRegistry.getAnalyzerReference( analyzerName );
+			if ( reference == null ) {
+				throw log.unknownAnalyzerForOverride( analyzerName );
+			}
+			queryAnalyzerReferenceBuilder.addAnalyzerReference( field, reference );
 			return this;
 		}
 
