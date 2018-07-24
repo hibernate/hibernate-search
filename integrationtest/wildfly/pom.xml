@@ -31,6 +31,12 @@
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>
         <test.module-slot.org.hibernate.search>main</test.module-slot.org.hibernate.search>
         <test.module-slot.org.hibernate>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</test.module-slot.org.hibernate>
+
+        <!--
+            Relax the JVM restrictions on the client side of Arquillian:
+            strict restrictions wouldn't work and it's not what we want to check.
+         -->
+        <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.lenient}</surefire.jvm.args.java-version>
     </properties>
 
     <dependencyManagement>
