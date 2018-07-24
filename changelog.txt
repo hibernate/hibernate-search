@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.3.Final (24-07-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3216 Deprecated API usage in example Implementing a class bridge
+    * HSEARCH-3215 Reference guide typos
+
+** Improvement
+    * HSEARCH-3234 Upgrade to ORM 5.3.3
+    * HSEARCH-3233 Overriding an analyzer in the queryBuilder with an unknown analyzer should lead to a proper SearchException
+    * HSEARCH-3211 Upgrade to ORM 5.3.2
+    * HSEARCH-3210 Upgrade to HCANN 5.0.4.Final
+
+** Task
+    * HSEARCH-3248 Restore lenient illegal access checks on the client side of Arquillian during integration tests
+    * HSEARCH-3241 Reorganize and clarify Maven properties used to pass JVM args
+    * HSEARCH-3240 Use the pre-installed JDK in the Travis build instead of trying to update it in each build
+    * HSEARCH-3236 Forbid restricted signatures from all JDK versions we plan to support
+    * HSEARCH-3235 Introduce a profile for JDK11 testing
+    * HSEARCH-3232 Upgrade to Byteman 4.0.4
+    * HSEARCH-3228 Upgrade GSON 2.8.5
+    * HSEARCH-3226 Add test dependencies to javax.xml.bind when building with JDK9 and above
+    * HSEARCH-3224 Upgrade to Byteman 4.0.3
+    * HSEARCH-3219 Remove no longer required Java 9 compatibility flags from WildFly integration tests
+
 5.10.2.Final (22-06-2018)
 -------------------------
 
