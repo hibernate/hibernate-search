@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,7 +13,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.Hibernate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
@@ -24,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
  */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class DocumentCopy<D extends Document<?>> {
+public abstract class DocumentCopy<D extends Document<?>> extends AbstractEntity<Integer> {
 
 	@Id
 	@GeneratedValue
@@ -40,34 +38,6 @@ public abstract class DocumentCopy<D extends Document<?>> {
 	private Library library;
 
 	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != Hibernate.getClass( o ) ) {
-			return false;
-		}
-		DocumentCopy<?> documentCopy = (DocumentCopy<?>) o;
-		return Objects.equals( id, documentCopy.getId() );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( getClass() );
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "document=" )
-				.append( document )
-				.append( ",library=" )
-				.append( library )
-				.append( "]" )
-				.toString();
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -86,5 +56,10 @@ public abstract class DocumentCopy<D extends Document<?>> {
 
 	public void setLibrary(Library library) {
 		this.library = library;
+	}
+
+	@Override
+	protected String getDescriptionForToString() {
+		return "document=" + document + ",library=" + library;
 	}
 }

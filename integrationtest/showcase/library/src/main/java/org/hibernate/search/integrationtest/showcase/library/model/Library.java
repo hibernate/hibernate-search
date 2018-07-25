@@ -8,14 +8,12 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.Hibernate;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
@@ -29,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Entity
 @Indexed(index = Library.INDEX)
 @GeoPointBridge(fieldName = "location")
-public class Library {
+public class Library extends AbstractEntity<Integer> {
 
 	static final String INDEX = "Library";
 
@@ -63,31 +61,6 @@ public class Library {
 	private List<DocumentCopy<?>> copies = new ArrayList<>();
 
 	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != Hibernate.getClass( o ) ) {
-			return false;
-		}
-		Library library = (Library) o;
-		return Objects.equals( id, library.getId() );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( getClass() );
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( id )
-				.append( "]" )
-				.toString();
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -138,5 +111,10 @@ public class Library {
 
 	public List<DocumentCopy<?>> getCopies() {
 		return copies;
+	}
+
+	@Override
+	protected String getDescriptionForToString() {
+		return getName();
 	}
 }
