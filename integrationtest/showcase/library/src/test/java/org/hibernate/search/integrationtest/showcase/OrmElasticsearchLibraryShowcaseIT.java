@@ -26,21 +26,27 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
+import org.hibernate.search.integrationtest.showcase.library.dao.PersonDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandlambda.FluidAndLambdaSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandobject.FluidAndObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.object.ObjectSyntaxDaoFactory;
+import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
+import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
+import org.hibernate.search.integrationtest.showcase.library.model.BorrowalType;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.DocumentCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
+import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.integrationtest.showcase.library.model.ProgrammaticMappingContributor;
 import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
@@ -106,6 +112,18 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	private static final int SUBURBAN_2_ID = 3;
 	private static final int UNIVERSITY_ID = 4;
 
+	// Person IDs
+	private static final int JANE_SMITH_ID = 1;
+	private static final int JANE_FONDA_ID = 2;
+	private static final int JANE_PORTER_ID = 3;
+	private static final int JOHN_LENNON_ID = 4;
+	private static final int ELTON_JOHN_ID = 5;
+	private static final int PATTY_SMITH_ID = 6;
+	private static final int JOHN_SMITH_ID = 7;
+	private static final int JOHN_PAUL_SMITH_ID = 8;
+	private static final int JOHN_PAUL_ID = 9;
+	private static final int PAUL_JOHN_ID = 10;
+
 	private final MappingMode mappingMode;
 	private final DaoFactory daoFactory;
 
@@ -139,7 +157,10 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				.addAnnotatedClass( Library.class )
 				.addAnnotatedClass( DocumentCopy.class )
 				.addAnnotatedClass( BookCopy.class )
-				.addAnnotatedClass( VideoCopy.class );
+				.addAnnotatedClass( VideoCopy.class )
+				.addAnnotatedClass( Person.class )
+				.addAnnotatedClass( Account.class )
+				.addAnnotatedClass( Borrowal.class );
 
 		Metadata metadata = ms.buildMetadata();
 
@@ -155,7 +176,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	}
 
 	@Test
-	public void search() {
+	public void search_library() {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
@@ -192,6 +213,52 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	}
 
 	@Test
+	public void search_person() {
+		withinTransaction( sessionFactory, this::initData );
+
+		withinSession( sessionFactory, session -> {
+			PersonDao dao = daoFactory.createPersonDao( sessionFactory.createEntityManager() );
+
+			List<Person> results = dao.search(
+					"smith", 0, 10
+			);
+			assertThat( results ).containsExactly(
+					session.get( Person.class, JANE_SMITH_ID ),
+					session.get( Person.class, JOHN_SMITH_ID ),
+					session.get( Person.class, JOHN_PAUL_SMITH_ID ),
+					session.get( Person.class, PATTY_SMITH_ID )
+			);
+
+			results = dao.search(
+					"john", 0, 10
+			);
+			assertThat( results ).containsExactly(
+					session.get( Person.class, ELTON_JOHN_ID ),
+					session.get( Person.class, PAUL_JOHN_ID ),
+					session.get( Person.class, JOHN_LENNON_ID ),
+					session.get( Person.class, JOHN_PAUL_ID ),
+					session.get( Person.class, JOHN_SMITH_ID ),
+					session.get( Person.class, JOHN_PAUL_SMITH_ID )
+			);
+
+			// TODO introduce an AND operator in the match query to make this match JOHN_SMITH_ID and JOHN_PAUL_SMITH_ID only
+			results = dao.search(
+					"john smith", 0, 10
+			);
+			assertThat( results ).containsExactly(
+					session.get( Person.class, ELTON_JOHN_ID ),
+					session.get( Person.class, PAUL_JOHN_ID ),
+					session.get( Person.class, JOHN_LENNON_ID ),
+					session.get( Person.class, JOHN_PAUL_ID ),
+					session.get( Person.class, JANE_SMITH_ID ),
+					session.get( Person.class, JOHN_SMITH_ID ),
+					session.get( Person.class, JOHN_PAUL_SMITH_ID ),
+					session.get( Person.class, PATTY_SMITH_ID )
+			);
+		} );
+	}
+
+	@Test
 	public void search_single() {
 		withinTransaction( sessionFactory, this::initData );
 
@@ -211,10 +278,10 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		} );
 	}
 
-	/*
-	 * This demonstrates generics are resolved properly, since the field "medium" doesn't appear in DocumentCopy
-	 * and could only exist in the index if the "copies" property in class Book
-	 * was successfully resolved to List<BookCopy>.
+	/**
+	 * This demonstrates generics are resolved properly, since the field "medium" doesn't appear in {@link DocumentCopy}
+	 * and could only exist in the index if the "copies" property in class {@link Book}
+	 * was successfully resolved to {@code List<BookCopy>}.
 	 */
 	@Test
 	public void searchByMedium() {
@@ -398,6 +465,41 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		} );
 	}
 
+	/**
+	 * This demonstrates how a non-trivial bridge ({@link AccountBorrowalSummaryBridge})
+	 * can be used to index data derived from the main model,
+	 * and how this indexed data can then be queried.
+	 */
+	@Test
+	public void listTopBorrowers() {
+		withinTransaction( sessionFactory, this::initData );
+
+		withinSession( sessionFactory, session -> {
+			PersonDao dao = daoFactory.createPersonDao( session );
+
+			List<Person> results = dao.listTopBorrowers( 0, 3 );
+			assertThat( results ).containsExactly(
+					session.get( Person.class, JANE_SMITH_ID ),
+					session.get( Person.class, JANE_FONDA_ID ),
+					session.get( Person.class, JANE_PORTER_ID )
+			);
+
+			results = dao.listTopShortTermBorrowers( 0, 3 );
+			assertThat( results ).containsExactly(
+					session.get( Person.class, JANE_FONDA_ID ),
+					session.get( Person.class, JANE_SMITH_ID ),
+					session.get( Person.class, PAUL_JOHN_ID )
+			);
+
+			results = dao.listTopLongTermBorrowers( 0, 3 );
+			assertThat( results ).containsExactly(
+					session.get( Person.class, JANE_PORTER_ID ),
+					session.get( Person.class, JANE_SMITH_ID ),
+					session.get( Person.class, JOHN_SMITH_ID )
+			);
+		} );
+	}
+
 	@Test
 	public void aggregation() {
 		// TODO aggregation
@@ -407,6 +509,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	private void initData(Session session) {
 		LibraryDao libraryDao = daoFactory.createLibraryDao( session );
 		DocumentDao documentDao = daoFactory.createDocumentDao( session );
+		PersonDao personDao = daoFactory.createPersonDao( session );
 
 		Book calligraphy = documentDao.createBook(
 				CALLIGRAPHY_ID,
@@ -530,5 +633,83 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		documentDao.createCopy( universityLibrary, javaForDummies, BookMedium.HARDCOPY );
 		documentDao.createCopy( universityLibrary, artOfComputerProg, BookMedium.HARDCOPY );
 		documentDao.createCopy( universityLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
+
+		Person janeSmith = personDao.create( JANE_SMITH_ID, "Jane", "Smith" );
+		personDao.createAccount( janeSmith );
+		createBorrowal( personDao, janeSmith, cityCenterLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeSmith, cityCenterLibrary, artOfComputerProg, BorrowalType.LONG_TERM );
+		createBorrowal( personDao, janeSmith, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeSmith, cityCenterLibrary, calligraphy, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeSmith, cityCenterLibrary, javaDancing, BorrowalType.LONG_TERM );
+
+		Person janeFonda = personDao.create( JANE_FONDA_ID, "Jane", "Fonda" );
+		personDao.createAccount( janeFonda );
+		createBorrowal( personDao, janeFonda, universityLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeFonda, universityLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeFonda, universityLibrary, thesaurusOfLanguages, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, janeFonda, universityLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
+
+		Person janePorter = personDao.create( JANE_PORTER_ID, "Jane", "Porter" );
+		personDao.createAccount( janePorter );
+		createBorrowal( personDao, janePorter, suburbanLibrary1, indonesianEconomy, BorrowalType.LONG_TERM );
+		createBorrowal( personDao, janePorter, suburbanLibrary2, livingOnIsland, 1, BorrowalType.LONG_TERM );
+		createBorrowal( personDao, janePorter, universityLibrary, thesaurusOfLanguages, BorrowalType.LONG_TERM );
+
+		Person johnLennon = personDao.create( JOHN_LENNON_ID, "John", "Lennon" );
+		personDao.createAccount( johnLennon );
+		createBorrowal( personDao, johnLennon, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+
+		Person eltonJohn = personDao.create( ELTON_JOHN_ID, "Elton", "John" );
+		personDao.createAccount( eltonJohn );
+		createBorrowal( personDao, eltonJohn, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+
+		Person pattySmith = personDao.create( PATTY_SMITH_ID, "Patty", "Smith" );
+		personDao.createAccount( pattySmith );
+		createBorrowal( personDao, pattySmith, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+
+		Person johnSmith = personDao.create( JOHN_SMITH_ID, "John", "Smith" );
+		personDao.createAccount( johnSmith );
+		createBorrowal( personDao, johnSmith, suburbanLibrary1, indonesianEconomy, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, johnSmith, suburbanLibrary1, artOfComputerProg, BorrowalType.LONG_TERM );
+
+		Person johnPaulSmith = personDao.create( JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
+		// No account for this one
+
+		Person johnPaul = personDao.create( JOHN_PAUL_ID, "John", "Paul" );
+		personDao.createAccount( johnPaul );
+		// This one has an account, but no borrowal
+
+		Person paulJohn = personDao.create( PAUL_JOHN_ID, "Paul", "John" );
+		personDao.createAccount( paulJohn );
+		createBorrowal( personDao, paulJohn, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personDao, paulJohn, cityCenterLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
+	}
+
+	// Helper methods
+
+	private <D extends Document<C>, C extends DocumentCopy<D>> Borrowal createBorrowal(
+			PersonDao personDao, Person person, Library library, D document, BorrowalType borrowalType) {
+		return createBorrowal( personDao, person, library, document, 0, borrowalType );
+	}
+
+	private <D extends Document<C>, C extends DocumentCopy<D>> Borrowal createBorrowal(
+			PersonDao personDao, Person person, Library library, D document, int copyIndex, BorrowalType borrowalType) {
+		return personDao.createBorrowal(
+				person.getAccount(),
+				getCopy( library, document, copyIndex ),
+				borrowalType
+		);
+	}
+
+	private <D extends Document<C>, C extends DocumentCopy<D>> C getCopy(Library library, D document, int copyIndex) {
+		return document.getCopies().stream()
+				.filter( c -> c.getLibrary().equals( library ) )
+				.skip( copyIndex )
+				.findFirst()
+				.orElseThrow( () -> new IllegalStateException(
+						"The test setup is incorrect; could not find copy #" + copyIndex
+								+ " of document " + document
+								+ " for library " + library
+				) );
 	}
 }

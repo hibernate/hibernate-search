@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
@@ -37,6 +41,10 @@ public abstract class DocumentCopy<D extends Document<?>> extends AbstractEntity
 	// TODO facet
 	private Library library;
 
+	@OneToMany(mappedBy = "copy")
+	@OrderBy("id")
+	private List<Borrowal> borrowals = new ArrayList<>();
+
 	@Override
 	public Integer getId() {
 		return id;
@@ -56,6 +64,14 @@ public abstract class DocumentCopy<D extends Document<?>> extends AbstractEntity
 
 	public void setLibrary(Library library) {
 		this.library = library;
+	}
+
+	public List<Borrowal> getBorrowals() {
+		return borrowals;
+	}
+
+	public void setBorrowals(List<Borrowal> borrowals) {
+		this.borrowals = borrowals;
 	}
 
 	@Override

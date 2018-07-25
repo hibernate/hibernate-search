@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge;
 
@@ -73,5 +74,18 @@ public class ProgrammaticMappingContributor implements HibernateOrmSearchMapping
 		mapping.type( VideoCopy.class )
 				.property( "medium" )
 						.field();
+
+		mapping.type( Person.class ).indexed( Person.INDEX )
+				.property( "firstName" )
+						.field().analyzer( "default" )
+						.field( "firstName_sort" ).sortable( Sortable.YES )
+				.property( "lastName" )
+						.field().analyzer( "default" )
+						.field( "lastName_sort" ).sortable( Sortable.YES )
+				.property( "account" )
+						.indexedEmbedded();
+
+		mapping.type( Account.class )
+				.bridge( AccountBorrowalSummaryBridge.class );
 	}
 }

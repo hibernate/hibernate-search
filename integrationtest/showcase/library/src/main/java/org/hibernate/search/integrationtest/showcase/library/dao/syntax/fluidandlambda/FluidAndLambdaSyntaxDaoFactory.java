@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
+import org.hibernate.search.integrationtest.showcase.library.dao.PersonDao;
 
 public class FluidAndLambdaSyntaxDaoFactory implements DaoFactory {
 	@Override
@@ -21,6 +22,11 @@ public class FluidAndLambdaSyntaxDaoFactory implements DaoFactory {
 	@Override
 	public LibraryDao createLibraryDao(EntityManager entityManager) {
 		return new FluidAndLambdaSyntaxLibraryDao( entityManager );
+	}
+
+	@Override
+	public PersonDao createPersonDao(EntityManager entityManager) {
+		return new FluidAndLambdaSyntaxPersonDao( entityManager );
 	}
 
 	@Override

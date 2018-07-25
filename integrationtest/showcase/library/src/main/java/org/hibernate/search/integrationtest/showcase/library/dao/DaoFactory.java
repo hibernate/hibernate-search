@@ -14,4 +14,6 @@ public interface DaoFactory {
 
 	LibraryDao createLibraryDao(EntityManager entityManager);
 
+	PersonDao createPersonDao(EntityManager entityManager);
+
 }
