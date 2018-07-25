@@ -218,11 +218,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	 */
 	@Test
 	public void searchByMedium() {
-		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
-
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
+			DocumentDao dao = daoFactory.createDocumentDao( session );
+
 			List<Book> books = dao.searchByMedium(
 					"java", BookMedium.DEMATERIALIZED, 0, 10
 			);
@@ -242,11 +242,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Test
 	public void searchAroundMe_spatial() {
-		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
-
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
+			DocumentDao dao = daoFactory.createDocumentDao( session );
+
 			GeoPoint myLocation = new ImmutableGeoPoint( 42.0, 0.5 );
 
 			List<Document<?>> documents = dao.searchAroundMe(
@@ -308,11 +308,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Test
 	public void searchAroundMe_nested() {
-		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
-
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
+			DocumentDao dao = daoFactory.createDocumentDao( session );
+
 			List<Document<?>> documents = dao.searchAroundMe(
 					"java", null,
 					null, null,
@@ -357,11 +357,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 	@Test
 	public void searchAroundMe_searchBridge() {
-		DocumentDao dao = daoFactory.createDocumentDao( sessionFactory.createEntityManager() );
-
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
+			DocumentDao dao = daoFactory.createDocumentDao( session );
+
 			List<Document<?>> documents = dao.searchAroundMe(
 					null, "java",
 					null, null,
