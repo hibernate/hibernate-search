@@ -39,7 +39,7 @@ env:
     - MAVEN_OPTS=-Xmx756m
   matrix:
     #- DB=h2 ELASTICSEARCH=2.0
-    - DB=h2 ELASTICSEARCH=2.2
+    #- DB=h2 ELASTICSEARCH=2.2
     - DB=h2 ELASTICSEARCH=5.0
     - DB=h2 ELASTICSEARCH=5.2
     # for now, let's test only with H2
