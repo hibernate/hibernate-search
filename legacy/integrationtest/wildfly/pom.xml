@@ -426,37 +426,37 @@
                                   version in the local repository.
                              -->
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-engine</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-orm</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-backend-jgroups</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-testing</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>
                             </dependency>
                             <dependency>
-                                <groupId>${project.groupId}</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
                                 <type>zip</type>
                                 <version>${project.version}</version>

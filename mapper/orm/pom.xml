@@ -16,11 +16,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-pojo</artifactId>
         </dependency>
         <dependency>

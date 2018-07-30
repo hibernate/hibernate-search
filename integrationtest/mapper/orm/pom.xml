@@ -14,17 +14,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
             <scope>test</scope>
         </dependency>

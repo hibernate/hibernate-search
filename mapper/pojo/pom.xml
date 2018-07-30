@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
@@ -34,7 +34,7 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test</artifactId>
             <scope>test</scope>
         </dependency>

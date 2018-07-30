@@ -30,22 +30,22 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-backend-tck</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
                 <classifier>build-resources</classifier>
                 <type>zip</type>

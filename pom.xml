@@ -436,67 +436,67 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-lucene</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-pojo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-javabean</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1508,7 +1508,7 @@
                     <skip>true</skip>
                     <oldVersion>
                         <dependency>
-                            <groupId>${project.groupId}</groupId>
+                            <groupId>org.hibernate.search</groupId>
                             <artifactId>${project.artifactId}</artifactId>
                             <version>${previous.stable}</version>
                             <type>${project.packaging}</type>

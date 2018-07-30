@@ -25,7 +25,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <exclusions>
                 <exclusion>
@@ -43,7 +43,7 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <type>test-jar</type>
             <scope>test</scope>

@@ -33,14 +33,14 @@
     <dependencies>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-osgi</artifactId>
             <version>${version.org.hibernate}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -53,14 +53,14 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-integrationtest-osgi-features</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

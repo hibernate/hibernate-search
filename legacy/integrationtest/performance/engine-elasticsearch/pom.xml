@@ -21,19 +21,19 @@
  
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-elasticsearch</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-elasticsearch-aws</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <type>test-jar</type>
         </dependency>

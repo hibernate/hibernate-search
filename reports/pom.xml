@@ -34,55 +34,55 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-lucene</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-pojo</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-javabean</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-orm</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-orm</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
             <scope>test</scope>
         </dependency>
