@@ -7,16 +7,15 @@
 package org.hibernate.search.integrationtest.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -63,21 +62,19 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
-			SearchModel searchModel) {
+	public void bind(PropertyBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		indexSchemaElement.field( "fieldFromPropertyBridge" ).asString().createAccessor();
+		context.getIndexSchemaElement().field( "fieldFromPropertyBridge" ).asString().createAccessor();
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-			SearchModel searchModel) {
+	public void bind(TypeBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		indexSchemaElement.field( "fieldFromTypeBridge" ).asString().createAccessor();
+		context.getIndexSchemaElement().field( "fieldFromTypeBridge" ).asString().createAccessor();
 	}
 
 	@Override
-	public void bind(PojoModelType pojoModelType) {
+	public void bind(RoutingKeyBridgeBindingContext context) {
 		// Nothing to do
 	}
 

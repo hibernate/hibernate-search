@@ -11,14 +11,12 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 
@@ -45,12 +43,11 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-			SearchModel searchModel) {
+	public void bind(TypeBridgeBindingContext context) {
 		// TODO allow to access collections properly, and more importantly to declare dependencies on parts of collection items
-		accountAccessor = bridgedPojoModelType.createAccessor( Account.class );
+		accountAccessor = context.getBridgedElement().createAccessor( Account.class );
 
-		IndexSchemaObjectField borrowalsObjectField = indexSchemaElement.objectField( "borrowals" );
+		IndexSchemaObjectField borrowalsObjectField = context.getIndexSchemaElement().objectField( "borrowals" );
 		borrowalsObjectFieldAccessor = borrowalsObjectField.createAccessor();
 		shortTermBorrowalCountAccessor = borrowalsObjectField.field( "shortTermCount" ).asInteger()
 				.sortable( Sortable.YES )

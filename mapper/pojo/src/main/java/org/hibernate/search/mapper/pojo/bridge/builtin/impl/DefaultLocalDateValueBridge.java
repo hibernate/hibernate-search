@@ -8,18 +8,15 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
 public final class DefaultLocalDateValueBridge implements ValueBridge<LocalDate, LocalDate> {
 
 	@Override
-	public IndexSchemaFieldTypedContext<LocalDate> bind(
-			PojoModelValue<LocalDate> pojoModelValue,
-			IndexSchemaFieldContext fieldContext) {
-		return fieldContext.asLocalDate();
+	public IndexSchemaFieldTypedContext<LocalDate> bind(ValueBridgeBindingContext context) {
+		return context.getIndexSchemaFieldContext().asLocalDate();
 	}
 
 	@Override

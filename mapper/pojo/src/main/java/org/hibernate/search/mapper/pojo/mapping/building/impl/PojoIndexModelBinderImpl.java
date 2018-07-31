@@ -21,6 +21,11 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.IdentifierBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -100,7 +105,9 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		 */
 		IdentifierBridge<P> bridge = (IdentifierBridge<P>) defaultedBuilder.build( bridgeBuildContext );
 
-		bridge.bind( new PojoModelValueElement<>( typeModel ) );
+		bridge.bind( new IdentifierBridgeBindingContextImpl<>(
+				new PojoModelValueElement<>( typeModel )
+		) );
 
 		return bridge;
 	}
@@ -112,7 +119,9 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind( pojoModelRootElement );
+		bridge.bind( new RoutingKeyBridgeBindingContextImpl(
+				pojoModelRootElement
+		) );
 
 		bindingContext.explicitRouting();
 
@@ -128,9 +137,10 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind(
-				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
-		);
+		bridge.bind( new TypeBridgeBindingContextImpl(
+				pojoModelRootElement,
+				bindingContext.getSchemaElement( listener )
+		) );
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
@@ -151,9 +161,10 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
 				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind(
-				bindingContext.getSchemaElement( listener ), pojoModelRootElement, bindingContext.getSearchModel()
-		);
+		bridge.bind( new PropertyBridgeBindingContextImpl(
+				pojoModelRootElement,
+				bindingContext.getSchemaElement( listener )
+		) );
 
 		// If all fields are filtered out, we should ignore the bridge
 		if ( listener.schemaContributed ) {
@@ -203,10 +214,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
 
 		// First give the bridge a chance to contribute to the model
-		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind(
+		IndexSchemaFieldTypedContext<? super R> typedFieldContext = bridge.bind( new ValueBridgeBindingContextImpl(
 				new PojoModelValueElement<>( valueTypeModel ),
 				fieldContext
-		);
+		) );
+
 		if ( typedFieldContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
 			Class<? super R> returnType =

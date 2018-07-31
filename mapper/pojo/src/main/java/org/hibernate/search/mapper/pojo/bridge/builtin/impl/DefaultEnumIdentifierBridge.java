@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 
 public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements IdentifierBridge<T> {
 
@@ -15,8 +15,8 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public void bind(PojoModelValue<T> pojoModelValue) {
-		this.enumType = (Class<T>) pojoModelValue.getRawType();
+	public void bind(IdentifierBridgeBindingContext<T> context) {
+		this.enumType = (Class<T>) context.getBridgedElement().getRawType();
 	}
 
 	@Override

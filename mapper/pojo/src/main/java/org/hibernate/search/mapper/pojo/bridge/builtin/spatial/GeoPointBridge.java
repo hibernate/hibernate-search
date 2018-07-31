@@ -15,17 +15,16 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
@@ -93,27 +92,25 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-			SearchModel searchModel) {
+	public void bind(TypeBridgeBindingContext context) {
 		if ( fieldName == null || fieldName.isEmpty() ) {
-			throw log.missingFieldNameForGeoPointBridgeOnType( bridgedPojoModelType.toString() );
+			throw log.missingFieldNameForGeoPointBridgeOnType( context.getBridgedElement().toString() );
 		}
 
-		bind( fieldName, indexSchemaElement, bridgedPojoModelType );
+		bind( fieldName, context.getIndexSchemaElement(), context.getBridgedElement() );
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
-			SearchModel searchModel) {
+	public void bind(PropertyBridgeBindingContext context) {
 		String defaultedFieldName;
 		if ( fieldName != null && !fieldName.isEmpty() ) {
 			defaultedFieldName = fieldName;
 		}
 		else {
-			defaultedFieldName = bridgedPojoModelProperty.getName();
+			defaultedFieldName = context.getBridgedElement().getName();
 		}
 
-		bind( defaultedFieldName, indexSchemaElement, bridgedPojoModelProperty );
+		bind( defaultedFieldName, context.getIndexSchemaElement(), context.getBridgedElement() );
 	}
 
 	private void bind(String defaultedFieldName, IndexSchemaElement indexSchemaElement,

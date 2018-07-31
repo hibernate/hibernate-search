@@ -11,11 +11,11 @@ import java.util.Collections;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -185,8 +185,9 @@ public class JavaBeanProgrammaticMappingRoutingIT {
 		private PojoModelElementAccessor<EntityCategory> categoryAccessor;
 
 		@Override
-		public void bind(PojoModelType pojoModelType) {
-			categoryAccessor = pojoModelType.property( "category" ).createAccessor( EntityCategory.class );
+		public void bind(RoutingKeyBridgeBindingContext context) {
+			categoryAccessor = context.getBridgedElement().property( "category" )
+					.createAccessor( EntityCategory.class );
 		}
 
 		@Override

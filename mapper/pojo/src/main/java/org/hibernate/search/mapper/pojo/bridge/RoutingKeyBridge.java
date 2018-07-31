@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 
 /**
  * A bridge from a POJO entity to a document routing key.
@@ -16,7 +16,23 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
  */
 public interface RoutingKeyBridge extends AutoCloseable {
 
-	void bind(PojoModelType pojoModelType);
+	/**
+	 * Bind this bridge instance to the given context,
+	 * i.e. to an object type in the POJO model and to an element in the index schema.
+	 * <p>
+	 * This method is called exactly once for each bridge instance, before any other method.
+	 * It allows the bridge to:
+	 * <ul>
+	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...)
+	 *     using {@link RoutingKeyBridgeBindingContext#getBridgedElement()}.
+	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
+	 *     {@link #toRoutingKey(String, Object, PojoElement)} method
+	 *     using {@link RoutingKeyBridgeBindingContext#getBridgedElement()}.
+	 * </ul>
+	 *
+	 * @param context An entry point allowing to perform the operations listed above.
+	 */
+	void bind(RoutingKeyBridgeBindingContext context);
 
 	/**
 	 * Generate a routing key using the given {@code tenantIdentifier}, {@code entityIdentifier} and {@link PojoElement}
@@ -24,7 +40,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * <p>
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
-	 * {@link #bind(PojoModelType)} method was called.
+	 * {@link #bind(RoutingKeyBridgeBindingContext)} method was called.
 	 *
 	 * @param tenantIdentifier The tenant identifier currently in use ({@code null} if none).
 	 * @param entityIdentifier The value of the POJO property used to generate the document identifier,

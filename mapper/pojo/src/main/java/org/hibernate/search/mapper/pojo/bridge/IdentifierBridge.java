@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 
-import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 
 /**
  * A bridge between a POJO property of type {@code T} and a document identifier.
@@ -17,14 +17,15 @@ import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 public interface IdentifierBridge<T> extends AutoCloseable {
 
 	/**
-	 * Bind this bridge instance to the given POJO model element.
+	 * Bind this bridge instance to the given context,
+	 * i.e. to an object property in the POJO model.
 	 * <p>
 	 * This method is called exactly once for each bridge instance, before any other method.
 	 * It allows the bridge to inspect the type of values extracted from the POJO model that will be passed to this bridge.
 	 *
-	 * @param pojoModelValue An entry point to inspecting the type of values that will be passed to this bridge.
+	 * @param context An entry point to perform the operations listed above.
 	 */
-	default void bind(PojoModelValue<T> pojoModelValue) {
+	default void bind(IdentifierBridgeBindingContext<T> context) {
 		// No-op by default
 	}
 

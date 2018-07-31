@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
-import org.hibernate.search.engine.mapper.model.SearchModel;
+import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexModelBindingContext {

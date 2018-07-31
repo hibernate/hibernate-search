@@ -11,10 +11,9 @@ import java.time.LocalDate;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
@@ -62,12 +61,12 @@ public final class CustomTypeBridge implements TypeBridge {
 	}
 
 	@Override
-	public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-			SearchModel searchModel) {
-		textPropertyAccessor = bridgedPojoModelType.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
-		localDatePropertyAccessor = bridgedPojoModelType.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
+	public void bind(TypeBridgeBindingContext context) {
+		PojoModelType bridgedElement = context.getBridgedElement();
+		textPropertyAccessor = bridgedElement.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
+		localDatePropertyAccessor = bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
 
-		IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
+		IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( objectName );
 		objectFieldAccessor = objectField.createAccessor();
 		textFieldAccessor = objectField.field( TEXT_FIELD_NAME ).asString().createAccessor();
 		localDateFieldAccessor = objectField.field( LOCAL_DATE_FIELD_NAME ).asLocalDate().createAccessor();

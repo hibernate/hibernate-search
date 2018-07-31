@@ -22,10 +22,9 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
@@ -34,7 +33,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -337,13 +335,12 @@ public class OrmAutomaticIndexingOverReindexingIT {
 		private IndexFieldAccessor<String> typeBridgeFieldAccessor;
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-				SearchModel searchModel) {
-			level3Property1SourceAccessor = bridgedPojoModelType.property( "level2" )
+		public void bind(TypeBridgeBindingContext context) {
+			level3Property1SourceAccessor = context.getBridgedElement().property( "level2" )
 					.property( "level3" )
 					.property( "property1" )
 					.createAccessor( String.class );
-			typeBridgeFieldAccessor = indexSchemaElement.field( "property1FromBridge" )
+			typeBridgeFieldAccessor = context.getIndexSchemaElement().field( "property1FromBridge" )
 					.asString().createAccessor();
 		}
 

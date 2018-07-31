@@ -7,10 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.mapper.model.SearchModel;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 
 /**
  * A bridge between a POJO property and an element of the index schema.
@@ -24,26 +22,24 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 public interface PropertyBridge extends AutoCloseable {
 
 	/**
-	 * Bind this bridge instance to the given index schema element and the given POJO model element.
+	 * Bind this bridge instance to the given context,
+	 * i.e. to an object property in the POJO model and to an element in the index schema.
 	 * <p>
 	 * This method is called exactly once for each bridge instance, before any other method.
 	 * It allows the bridge to:
 	 * <ul>
-	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...).
-	 *     <li>Declare its expectations regarding the index schema (field names and field types, storage options, ...).
+	 *     <li>Declare its expectations regarding the index schema (field names and field types, storage options, ...)
+	 *     using {@link PropertyBridgeBindingContext#getIndexSchemaElement()}.
+	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...)
+	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
-	 *     {@link #write(DocumentElement, PojoElement)} method.
-	 *     <li>Optionally, using the {@link SearchModel}, define how to map POJO properties to fields when searching
-	 *     (in predicates and projections).
+	 *     {@link #write(DocumentElement, PojoElement)} method
+	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
 	 *
-	 * @param indexSchemaElement An entry point to declaring expectations and retrieving accessors to the index schema.
-	 * @param bridgedPojoModelProperty An entry point to declaring expectations and retrieving accessors to the
-	 * bridged POJO property.
-	 * @param searchModel An entry point to defining how to map POJO properties to fields when searching.
+	 * @param context An entry point allowing to perform the operations listed above.
 	 */
-	void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
-			SearchModel searchModel);
+	void bind(PropertyBridgeBindingContext context);
 
 	/**
 	 * Write to fields in the given {@link DocumentElement},
@@ -51,11 +47,11 @@ public interface PropertyBridge extends AutoCloseable {
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
 	 * {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor}s retrieved when the
-	 * {@link #bind(IndexSchemaElement, PojoModelProperty, SearchModel)} method was called.
+	 * {@link #bind(PropertyBridgeBindingContext)} method was called.
 	 * <p>
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
-	 * {@link #bind(IndexSchemaElement, PojoModelProperty, SearchModel)} method was called.
+	 * {@link #bind(PropertyBridgeBindingContext)} method was called.
 	 *
 	 * @param target The {@link DocumentElement} to write to.
 	 * @param source The {@link PojoElement} to read from.

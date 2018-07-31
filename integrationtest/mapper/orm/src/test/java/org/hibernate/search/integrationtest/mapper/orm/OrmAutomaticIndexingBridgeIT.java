@@ -28,12 +28,12 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.model.SearchModel;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -41,7 +41,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -745,15 +744,15 @@ public class OrmAutomaticIndexingBridgeIT {
 		private IndexFieldAccessor<String> includedInTypeBridgeTargetAccessor;
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelType bridgedPojoModelType,
-				SearchModel searchModel) {
-			directFieldSourceAccessor = bridgedPojoModelType.property( "directField" )
+		public void bind(TypeBridgeBindingContext context) {
+			PojoModelType bridgedElement = context.getBridgedElement();
+			directFieldSourceAccessor = bridgedElement.property( "directField" )
 					.createAccessor( String.class );
-			includedInTypeBridgeSourceAccessor = bridgedPojoModelType.property( "child" )
+			includedInTypeBridgeSourceAccessor = bridgedElement.property( "child" )
 					.property( "containedSingle" )
 					.property( "includedInTypeBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField typeBridgeObjectField = indexSchemaElement.objectField( "typeBridge" );
+			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldAccessor = typeBridgeObjectField.createAccessor();
 			directFieldTargetAccessor = typeBridgeObjectField.field( "directField" ).asString().createAccessor();
 			IndexSchemaObjectField childObjectField = typeBridgeObjectField.objectField( "child" );
@@ -787,12 +786,11 @@ public class OrmAutomaticIndexingBridgeIT {
 		private IndexFieldAccessor<String> includedInPropertyBridgeTargetAccessor;
 
 		@Override
-		public void bind(IndexSchemaElement indexSchemaElement, PojoModelProperty bridgedPojoModelProperty,
-				SearchModel searchModel) {
-			includedInPropertyBridgeSourceAccessor = bridgedPojoModelProperty.property( "containedSingle" )
+		public void bind(PropertyBridgeBindingContext context) {
+			includedInPropertyBridgeSourceAccessor = context.getBridgedElement().property( "containedSingle" )
 					.property( "includedInPropertyBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField propertyBridgeObjectField = indexSchemaElement.objectField( "propertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
 			propertyBridgeObjectFieldAccessor = propertyBridgeObjectField.createAccessor();
 			includedInPropertyBridgeTargetAccessor = propertyBridgeObjectField.field( "includedInPropertyBridge" )
 					.asString().createAccessor();

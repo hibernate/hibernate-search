@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
 public final class DefaultEnumValueBridge<T extends Enum<T>> implements ValueBridge<T, String> {
 
@@ -17,10 +16,9 @@ public final class DefaultEnumValueBridge<T extends Enum<T>> implements ValueBri
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public IndexSchemaFieldTypedContext<String> bind(PojoModelValue<T> pojoModelValue,
-			IndexSchemaFieldContext fieldContext) {
-		this.enumType = (Class<T>) pojoModelValue.getRawType();
-		return fieldContext.asString();
+	public IndexSchemaFieldTypedContext<String> bind(ValueBridgeBindingContext context) {
+		this.enumType = (Class<T>) context.getBridgedElement().getRawType();
+		return context.getIndexSchemaFieldContext().asString();
 	}
 
 	@Override

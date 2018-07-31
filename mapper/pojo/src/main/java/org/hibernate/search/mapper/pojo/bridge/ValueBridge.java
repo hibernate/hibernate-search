@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
-import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
 /**
  * A bridge between a POJO-extracted value of type {@code T} and an index field of type {@code R}.
@@ -30,18 +29,18 @@ public interface ValueBridge<T, R> extends AutoCloseable {
 	 * This method is called exactly once for each bridge instance, before any other method.
 	 * It allows the bridge to:
 	 * <ul>
-	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge.
-	 *     <li>Declare its expectations regarding the index field (type, storage options, ...).
+	 *     <li>Declare its expectations regarding the index field (type, storage options, ...)
+	 *     using {@link ValueBridgeBindingContext#getIndexSchemaFieldContext()}.
+	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge
+	 *     using {@link ValueBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
 	 *
-	 * @param pojoModelValue An entry point to inspecting the type of values that will be passed to this bridge.
-	 * @param fieldContext An entry point to declaring expectations and retrieving accessors to the index schema.
+	 * @param context An entry point allowing to perform the operations listed above.
 	 * @return The result provided by {@code fieldContext} after setting the expectations regarding the index field
 	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default IndexSchemaFieldTypedContext<R> bind(PojoModelValue<T> pojoModelValue,
-			IndexSchemaFieldContext fieldContext) {
+	default IndexSchemaFieldTypedContext<R> bind(ValueBridgeBindingContext context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 
