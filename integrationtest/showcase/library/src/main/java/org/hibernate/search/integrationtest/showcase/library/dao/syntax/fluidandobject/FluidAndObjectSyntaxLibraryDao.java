@@ -27,7 +27,7 @@ class FluidAndObjectSyntaxLibraryDao extends LibraryDao {
 		}
 		FullTextQuery<Library> query = entityManager.search( Library.class ).query()
 				.asEntities()
-				.predicate().match().onField( "name" ).matching( terms )
+				.predicate().match().onField( "name" ).matching( terms ).end()
 				.sort().byField( "collectionSize" ).desc()
 						.then().byField( "name_sort" )
 						.end()

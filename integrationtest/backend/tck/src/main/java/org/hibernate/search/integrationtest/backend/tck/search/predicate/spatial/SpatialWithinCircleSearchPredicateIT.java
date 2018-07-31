@@ -102,7 +102,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 400 ).end()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
@@ -114,7 +114,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).boostedTo( 42 ).circle( METRO_GARIBALDI, 400 ).end()
-						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();

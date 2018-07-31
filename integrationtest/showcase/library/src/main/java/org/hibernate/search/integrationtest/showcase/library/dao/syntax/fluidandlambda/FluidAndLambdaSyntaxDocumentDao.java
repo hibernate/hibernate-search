@@ -38,7 +38,7 @@ class FluidAndLambdaSyntaxDocumentDao extends DocumentDao {
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
 				fullTextSession.search( Book.class ).query()
 				.asEntities()
-				.predicate().match().onField( "isbn" ).matching( isbnAsString )
+				.predicate().match().onField( "isbn" ).matching( isbnAsString ).end()
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -59,7 +59,7 @@ class FluidAndLambdaSyntaxDocumentDao extends DocumentDao {
 						} )
 						.must().nested().onObjectField( "copies" )
 								// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-								.match().onField( "copies.medium" ).matching( medium.name() )
+								.match().onField( "copies.medium" ).matching( medium.name() ).end()
 						.end()
 				.sort().byField( "title_sort" ).end()
 				.build();

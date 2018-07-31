@@ -100,7 +100,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ).end()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
@@ -112,7 +112,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).boostedTo( 42 ).polygon( CHEZ_MARGOTTE_POLYGON ).end()
-						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();

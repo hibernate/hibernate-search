@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
@@ -61,12 +62,12 @@ class RangePredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public N above(Object value, RangeBoundInclusion inclusion) {
+	public ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion) {
 		return commonState.above( value, inclusion );
 	}
 
 	@Override
-	public N below(Object value, RangeBoundInclusion inclusion) {
+	public ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion) {
 		return commonState.below( value, inclusion );
 	}
 
@@ -77,7 +78,8 @@ class RangePredicateFieldSetContextImpl<N, B>
 		}
 	}
 
-	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, RangePredicateFieldSetContextImpl<N, B>> {
+	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, RangePredicateFieldSetContextImpl<N, B>>
+			implements RangePredicateFromContext<N>, ExplicitEndContext<N> {
 
 		private boolean hasNonNullBound = false;
 
@@ -104,15 +106,15 @@ class RangePredicateFieldSetContextImpl<N, B>
 				case INCLUDED:
 					break;
 			}
-			return new RangePredicateFromContext<N>() {
-				@Override
-				public N to(Object value, RangeBoundInclusion inclusion) {
-					return below( value, inclusion );
-				}
-			};
+			return this;
 		}
 
-		N above(Object value, RangeBoundInclusion inclusion) {
+		@Override
+		public ExplicitEndContext<N> to(Object value, RangeBoundInclusion inclusion) {
+			return below( value, inclusion );
+		}
+
+		ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
@@ -125,10 +127,10 @@ class RangePredicateFieldSetContextImpl<N, B>
 					break;
 			}
 			checkHasNonNullBound();
-			return getNextContextProvider().get();
+			return this;
 		}
 
-		N below(Object value, RangeBoundInclusion inclusion) {
+		ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
@@ -141,6 +143,11 @@ class RangePredicateFieldSetContextImpl<N, B>
 					break;
 			}
 			checkHasNonNullBound();
+			return this;
+		}
+
+		@Override
+		public N end() {
 			return getNextContextProvider().get();
 		}
 

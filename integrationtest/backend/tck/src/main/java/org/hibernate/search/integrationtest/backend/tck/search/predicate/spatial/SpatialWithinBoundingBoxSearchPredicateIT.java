@@ -135,7 +135,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ).end()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
@@ -147,7 +147,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.asReferences()
 				.predicate().bool()
 						.should().spatial().within().onField( "geoPoint" ).boostedTo( 42 ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ).end()
-						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING )
+						.should().match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();

@@ -31,7 +31,7 @@ class FluidAndObjectSyntaxPersonDao extends PersonDao {
 
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
-				.predicate().match().onFields( "firstName", "lastName" ).matching( terms )
+				.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).end()
 				.sort().byField( "lastName_sort" )
 						.then().byField( "firstName_sort" )
 						.end()

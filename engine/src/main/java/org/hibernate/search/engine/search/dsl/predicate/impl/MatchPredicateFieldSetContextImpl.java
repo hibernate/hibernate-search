@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
@@ -54,7 +55,7 @@ class MatchPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public N matching(Object value) {
+	public ExplicitEndContext<N> matching(Object value) {
 		return commonState.matching( value );
 	}
 
@@ -65,17 +66,23 @@ class MatchPredicateFieldSetContextImpl<N, B>
 		}
 	}
 
-	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, MatchPredicateFieldSetContextImpl<N, B>> {
+	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, MatchPredicateFieldSetContextImpl<N, B>>
+			implements ExplicitEndContext<N> {
 
 		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
-		public N matching(Object value) {
+		public ExplicitEndContext<N> matching(Object value) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
 			getQueryBuilders().forEach( b -> b.value( value ) );
+			return this;
+		}
+
+		@Override
+		public N end() {
 			return getNextContextProvider().get();
 		}
 

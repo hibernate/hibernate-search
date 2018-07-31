@@ -77,7 +77,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().except().match().onField( "string" ).matching( STRING_1 ).end()
+				.predicate().matchAll().except().match().onField( "string" ).matching( STRING_1 ).end().end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -91,7 +91,7 @@ public class MatchAllSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
+		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).end();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -109,8 +109,8 @@ public class MatchAllSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().matchAll()
-						.except().match().onField( "string" ).matching( STRING_1 )
-						.except().match().onField( "string" ).matching( STRING_2 )
+						.except().match().onField( "string" ).matching( STRING_1 ).end()
+						.except().match().onField( "string" ).matching( STRING_2 ).end()
 						.end()
 				.build();
 
@@ -128,8 +128,8 @@ public class MatchAllSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 );
-		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 );
+		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).end();
+		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).end();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()

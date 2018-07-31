@@ -151,7 +151,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = searchTarget.predicate()
-				.match().onField( "string_analyzed_forScore" ).matching( "hooray" );
+				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).end();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()

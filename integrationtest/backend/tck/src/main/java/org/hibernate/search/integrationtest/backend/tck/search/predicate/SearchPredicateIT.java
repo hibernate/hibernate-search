@@ -71,7 +71,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( MATCHING_STRING )
+				.predicate().match().onField( "string" ).matching( MATCHING_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -82,7 +82,7 @@ public class SearchPredicateIT {
 	public void match_search_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( MATCHING_STRING );
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( MATCHING_STRING ).end();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -114,7 +114,7 @@ public class SearchPredicateIT {
 
 		Consumer<? super SearchPredicateContainerContext<SearchPredicate>> cachingContributor = c -> {
 			if ( cache.get() == null ) {
-				SearchPredicate result = c.match().onField( "string" ).matching( MATCHING_STRING );
+				SearchPredicate result = c.match().onField( "string" ).matching( MATCHING_STRING ).end();
 				cache.set( result );
 			}
 			else {

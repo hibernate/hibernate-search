@@ -43,7 +43,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().match().onField( "isbn" ).matching( isbnAsString )
+						target.predicate().match().onField( "isbn" ).matching( isbnAsString ).end()
 				)
 				.build();
 
@@ -61,13 +61,14 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
+					.end()
 			);
 		}
 
 		booleanBuilder.must(
 				target.predicate().nested().onObjectField( "copies" )
 				// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-				.match().onField( "copies.medium" ).matching( medium.name() )
+				.match().onField( "copies.medium" ).matching( medium.name() ).end()
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
@@ -97,6 +98,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
+					.end()
 			);
 		}
 
@@ -108,6 +110,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						target.predicate().match()
 						.onField( "tags" )
 						.matching( tag )
+						.end()
 				);
 			}
 		}
@@ -134,6 +137,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						.onField( "copies.library.services" )
 						// Bridged query with value bridge: TODO rely on the bridge to convert to a String
 						.matching( service.name() )
+						.end()
 				);
 			}
 			booleanBuilder.must( nestedBoolean.end() );

@@ -141,7 +141,7 @@ public class ExtensionIT {
 		);
 		// Also test using the standard DSL on a field defined with the extension
 		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
-				.matching( "'2018:12'" );
+				.matching( "'2018:12'" ).end();
 		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
 			b.should( predicate1 );
 			b.should( predicate2 );

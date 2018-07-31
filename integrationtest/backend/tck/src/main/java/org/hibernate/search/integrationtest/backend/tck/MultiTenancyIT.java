@@ -88,13 +88,13 @@ public class MultiTenancyIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 )
+				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 )
+				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -105,13 +105,15 @@ public class MultiTenancyIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().nested().onObjectField( "nestedObject" ).match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate().nested().onObjectField( "nestedObject" )
+						.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().nested().onObjectField( "nestedObject" ).match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate().nested().onObjectField( "nestedObject" )
+						.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -186,13 +188,14 @@ public class MultiTenancyIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().match().onField( "string" ).matching( UPDATED_STRING )
+				.predicate().match().onField( "string" ).matching( UPDATED_STRING ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().nested().onObjectField( "nestedObject" ).match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+				.predicate().nested().onObjectField( "nestedObject" )
+						.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
@@ -200,25 +203,27 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().match().onField( "string" ).matching( UPDATED_STRING )
+				.predicate().match().onField( "string" ).matching( UPDATED_STRING ).end()
 				.build();
 		assertThat( query ).hasNoHits();
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().nested().onObjectField( "nestedObject" ).match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+				.predicate().nested().onObjectField( "nestedObject" )
+						.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ).end()
 				.build();
 		assertThat( query ).hasNoHits();
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 )
+				.predicate().match().onField( "string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asProjections( "string", "integer" )
-				.predicate().nested().onObjectField( "nestedObject" ).match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate().nested().onObjectField( "nestedObject" )
+						.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 ).end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 	}

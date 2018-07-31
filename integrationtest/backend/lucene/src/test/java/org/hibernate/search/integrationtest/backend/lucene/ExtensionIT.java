@@ -245,7 +245,7 @@ public class ExtensionIT {
 				() -> searchTarget.query( sessionContext )
 						.asReferences()
 						.predicate()
-								.match().onField( "nativeField" ).matching( "37" )
+								.match().onField( "nativeField" ).matching( "37" ).end()
 						.build()
 				)
 				.assertThrown()
@@ -296,7 +296,7 @@ public class ExtensionIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
 				.asProjections( "nativeField" )
-				.predicate().match().onField( "string" ).matching( "text 1" )
+				.predicate().match().onField( "string" ).matching( "text 1" ).end()
 				.build();
 
 		ProjectionsSearchResultAssert.assertThat( query ).hasProjectionsHitsAnyOrder( c -> {

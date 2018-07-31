@@ -32,7 +32,7 @@ class ObjectSyntaxPersonDao extends PersonDao {
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms )
+						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).end()
 				)
 				.sort(
 						target.sort()

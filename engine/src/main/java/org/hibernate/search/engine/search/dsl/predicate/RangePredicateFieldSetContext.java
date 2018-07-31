@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * The context used when defining a range predicate, after at least one field was mentioned.
@@ -21,15 +22,15 @@ public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFie
 		return from( value, RangeBoundInclusion.INCLUDED );
 	}
 
-	N above(Object value, RangeBoundInclusion inclusion);
+	ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion);
 
-	default N above(Object value) {
+	default ExplicitEndContext<N> above(Object value) {
 		return above( value, RangeBoundInclusion.INCLUDED );
 	}
 
-	N below(Object value, RangeBoundInclusion inclusion);
+	ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion);
 
-	default N below(Object value) {
+	default ExplicitEndContext<N> below(Object value) {
 		return below( value, RangeBoundInclusion.INCLUDED );
 	}
 

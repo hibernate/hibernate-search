@@ -100,7 +100,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
-					.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch )
+					.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch ).end()
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
@@ -154,8 +154,8 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).matching( MATCHING_STRING )
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( ADDITIONAL_MATCHING_STRING )
+						.should().match().onField( "string" ).matching( MATCHING_STRING ).end()
+						.should().match().onField( "string" ).boostedTo( 42 ).matching( ADDITIONAL_MATCHING_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
@@ -166,8 +166,8 @@ public class MatchSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( MATCHING_STRING )
-						.should().match().onField( "string" ).matching( ADDITIONAL_MATCHING_STRING )
+						.should().match().onField( "string" ).boostedTo( 42 ).matching( MATCHING_STRING ).end()
+						.should().match().onField( "string" ).matching( ADDITIONAL_MATCHING_STRING ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
@@ -184,7 +184,7 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_STRING )
+				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -192,7 +192,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_ONE_MORE_STRING )
+				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -202,7 +202,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_STRING )
+				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -210,7 +210,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_ONE_MORE_STRING )
+				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -218,7 +218,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_EVEN_MORE_STRING )
+				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_EVEN_MORE_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -228,7 +228,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_STRING )
+				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -236,7 +236,7 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_ONE_MORE_STRING )
+				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )

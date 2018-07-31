@@ -162,7 +162,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( "platypus" )
+				.predicate().match().onField( "string" ).matching( "platypus" ).end()
 				.build();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
@@ -175,7 +175,7 @@ public class SearchQueryIT {
 		QueryWrapper queryWrapper = searchTarget.query( sessionContext )
 				.asReferences()
 				.asWrappedQuery( q -> new QueryWrapper( q ) )
-				.predicate().match().onField( "string" ).matching( "platypus" )
+				.predicate().match().onField( "string" ).matching( "platypus" ).end()
 				.build();
 
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );

@@ -128,7 +128,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( STRING_1 )
+				.predicate().match().onField( "string" ).matching( STRING_1 ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( c -> {
@@ -195,7 +195,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 )
+				.predicate().match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
