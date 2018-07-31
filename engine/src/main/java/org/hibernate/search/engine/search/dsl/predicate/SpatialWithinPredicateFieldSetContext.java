@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -20,25 +21,25 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
  */
 public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<SpatialWithinPredicateFieldSetContext<N>> {
 
-	SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radiusInMeters, DistanceUnit unit);
+	ExplicitEndContext<N> circle(GeoPoint center, double radiusInMeters, DistanceUnit unit);
 
-	default SpatialWithinCirclePredicateContext<N> circle(GeoPoint center, double radius) {
+	default ExplicitEndContext<N> circle(GeoPoint center, double radius) {
 		return circle( center, radius, DistanceUnit.METERS );
 	}
 
-	default SpatialWithinCirclePredicateContext<N> circle(double latitude, double longitude, double radiusInMeters) {
+	default ExplicitEndContext<N> circle(double latitude, double longitude, double radiusInMeters) {
 		return circle( new ImmutableGeoPoint( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
 	}
 
-	default SpatialWithinCirclePredicateContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
+	default ExplicitEndContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
 		return circle( new ImmutableGeoPoint( latitude, longitude ), radius, unit );
 	}
 
-	SpatialWithinPolygonPredicateContext<N> polygon(GeoPolygon polygon);
+	ExplicitEndContext<N> polygon(GeoPolygon polygon);
 
-	SpatialWithinBoundingBoxPredicateContext<N> boundingBox(GeoBoundingBox boundingBox);
+	ExplicitEndContext<N> boundingBox(GeoBoundingBox boundingBox);
 
-	default SpatialWithinBoundingBoxPredicateContext<N> boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
+	default ExplicitEndContext<N> boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
 			double bottomRightLongitude) {
 		return boundingBox( new ImmutableGeoBoundingBox( topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude ) );
 	}
