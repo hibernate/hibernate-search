@@ -52,6 +52,7 @@
     <properties>
         <!-- Skip plugin executions that are not relevant for legacy code -->
         <jqassistant.skip>true</jqassistant.skip>
+        <forbiddenapis.skip>true</forbiddenapis.skip>
 
 
         <!-- Dependencies versions -->
