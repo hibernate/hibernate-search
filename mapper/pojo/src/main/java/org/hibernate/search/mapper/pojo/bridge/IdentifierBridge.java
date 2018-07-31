@@ -10,11 +10,11 @@ package org.hibernate.search.mapper.pojo.bridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 
 /**
- * A bridge between a POJO property of type {@code T} and a document identifier.
+ * A bridge between a POJO property of type {@code I} and a document identifier.
  *
  * @author Yoann Rodiere
  */
-public interface IdentifierBridge<T> extends AutoCloseable {
+public interface IdentifierBridge<I> extends AutoCloseable {
 
 	/**
 	 * Bind this bridge instance to the given context,
@@ -25,7 +25,7 @@ public interface IdentifierBridge<T> extends AutoCloseable {
 	 *
 	 * @param context An entry point to perform the operations listed above.
 	 */
-	default void bind(IdentifierBridgeBindingContext<T> context) {
+	default void bind(IdentifierBridgeBindingContext<I> context) {
 		// No-op by default
 	}
 
@@ -37,7 +37,7 @@ public interface IdentifierBridge<T> extends AutoCloseable {
 	 * @param propertyValue The POJO property value to be transformed.
 	 * @return The value of the document identifier.
 	 */
-	String toDocumentIdentifier(T propertyValue);
+	String toDocumentIdentifier(I propertyValue);
 
 	/**
 	 * Transform the given document identifier value back to the value of the POJO property.
@@ -48,7 +48,7 @@ public interface IdentifierBridge<T> extends AutoCloseable {
 	 * @param documentIdentifier The document identifier value to be transformed.
 	 * @return The value of the document identifier.
 	 */
-	T fromDocumentIdentifier(String documentIdentifier);
+	I fromDocumentIdentifier(String documentIdentifier);
 
 	/**
 	 * Close any resource before the bridge is discarded.

@@ -13,9 +13,9 @@ import org.apache.lucene.index.IndexableField;
 /**
  * A contributor adding native Lucene fields to the index schema.
  *
- * @param <V> The type of the value.
+ * @param <F> The type of the value.
  */
-public interface LuceneFieldContributor<V> {
+public interface LuceneFieldContributor<F> {
 
 	/**
 	 * Contribute Lucene fields to the collector.
@@ -24,6 +24,6 @@ public interface LuceneFieldContributor<V> {
 	 * @param value The value.
 	 * @param collector The collector to which the fields are contributing.
 	 */
-	void contribute(String absoluteFieldPath, V value, Consumer<IndexableField> collector);
+	void contribute(String absoluteFieldPath, F value, Consumer<IndexableField> collector);
 
 }

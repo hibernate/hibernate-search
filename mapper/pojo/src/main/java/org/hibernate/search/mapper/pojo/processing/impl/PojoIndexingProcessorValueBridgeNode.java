@@ -14,16 +14,16 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link ValueBridge} to a value.
  *
- * @param <T> The processed type
- * @param <R> The index field type
+ * @param <V> The processed type
+ * @param <F> The index field type
  */
-public class PojoIndexingProcessorValueBridgeNode<T, R> extends PojoIndexingProcessor<T> {
+public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProcessor<V> {
 
-	private final ValueBridge<? super T, R> bridge;
-	private final IndexFieldAccessor<? super R> indexFieldAccessor;
+	private final ValueBridge<? super V, F> bridge;
+	private final IndexFieldAccessor<? super F> indexFieldAccessor;
 
-	public PojoIndexingProcessorValueBridgeNode(ValueBridge<? super T, R> bridge,
-			IndexFieldAccessor<? super R> indexFieldAccessor) {
+	public PojoIndexingProcessorValueBridgeNode(ValueBridge<? super V, F> bridge,
+			IndexFieldAccessor<? super F> indexFieldAccessor) {
 		this.bridge = bridge;
 		this.indexFieldAccessor = indexFieldAccessor;
 	}
@@ -41,8 +41,8 @@ public class PojoIndexingProcessorValueBridgeNode<T, R> extends PojoIndexingProc
 	}
 
 	@Override
-	public void process(DocumentElement target, T source) {
-		R indexFieldValue = bridge.toIndexedValue( source );
+	public void process(DocumentElement target, V source) {
+		F indexFieldValue = bridge.toIndexedValue( source );
 		indexFieldAccessor.write( target, indexFieldValue );
 	}
 

@@ -12,6 +12,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchIndexSchemaFieldTypedContext<T> extends IndexSchemaFieldTypedContext<T> {
+public interface ElasticsearchIndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTypedContext<F> {
 
 }

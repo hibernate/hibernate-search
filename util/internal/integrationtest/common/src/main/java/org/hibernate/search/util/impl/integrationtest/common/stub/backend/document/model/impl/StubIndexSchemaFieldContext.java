@@ -24,7 +24,7 @@ class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 	}
 
 	@Override
-	public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
+	public <F> IndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
 		builder.inputType( inputType );
 		return new StubIndexSchemaFieldTypedContext<>( builder, included );
 	}

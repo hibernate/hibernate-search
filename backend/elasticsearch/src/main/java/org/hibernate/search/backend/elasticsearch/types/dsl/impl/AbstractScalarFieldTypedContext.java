@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchIndexSchemaFieldTypedContext<T> {
+abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchIndexSchemaFieldTypedContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -42,32 +42,32 @@ abstract class AbstractScalarFieldTypedContext<T> extends AbstractElasticsearchI
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
+	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
+	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> store(Store store) {
+	public IndexSchemaFieldTypedContext<F> store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> sortable(Sortable sortable) {
+	public IndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
 
 	@Override
 	protected PropertyMapping contribute(
-			DeferredInitializationIndexFieldAccessor<T> reference,
+			DeferredInitializationIndexFieldAccessor<F> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();

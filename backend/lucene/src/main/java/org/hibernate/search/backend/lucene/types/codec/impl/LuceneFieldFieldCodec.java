@@ -18,21 +18,21 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
+public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneFieldContributor<V> fieldContributor;
+	private LuceneFieldContributor<F> fieldContributor;
 
-	private LuceneFieldValueExtractor<V> fieldValueExtractor;
+	private LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	public LuceneFieldFieldCodec(LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor) {
+	public LuceneFieldFieldCodec(LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, V value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
 		if ( value == null ) {
 			return;
 		}
@@ -41,7 +41,7 @@ public final class LuceneFieldFieldCodec<V> implements LuceneFieldCodec<V> {
 	}
 
 	@Override
-	public V decode(Document document, String absoluteFieldPath) {
+	public F decode(Document document, String absoluteFieldPath) {
 		if ( fieldValueExtractor == null ) {
 			throw log.unsupportedProjection(
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

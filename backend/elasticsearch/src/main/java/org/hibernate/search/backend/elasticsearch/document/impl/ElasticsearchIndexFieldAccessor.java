@@ -18,7 +18,7 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+public class ElasticsearchIndexFieldAccessor<F> implements IndexFieldAccessor<F> {
 
 	private final JsonAccessor<JsonElement> accessor;
 
@@ -35,7 +35,7 @@ public class ElasticsearchIndexFieldAccessor<T> implements IndexFieldAccessor<T>
 	}
 
 	@Override
-	public void write(DocumentElement target, T value) {
+	public void write(DocumentElement target, F value) {
 		ElasticsearchDocumentObjectBuilder builder = (ElasticsearchDocumentObjectBuilder) target;
 		builder.checkTreeConsistency( schemaNode.getParent() );
 		builder.add( accessor, schemaNode.getCodec().encode( value ) );

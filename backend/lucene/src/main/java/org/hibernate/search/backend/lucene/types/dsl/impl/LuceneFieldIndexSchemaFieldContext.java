@@ -20,23 +20,21 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFieldFormatter;
 
-import org.apache.lucene.index.IndexableField;
-
 /**
  * @author Guillaume Smet
  */
-public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField>
-		implements IndexSchemaFieldTerminalContext<V>, LuceneIndexSchemaNodeContributor {
+public class LuceneFieldIndexSchemaFieldContext<F>
+		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
 
 	private final IndexSchemaContext schemaContext;
 	private final String relativeFieldName;
-	private final LuceneFieldContributor<V> fieldContributor;
-	private final LuceneFieldValueExtractor<V> fieldValueExtractor;
+	private final LuceneFieldContributor<F> fieldContributor;
+	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	private final DeferredInitializationIndexFieldAccessor<V> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
 	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
-			LuceneFieldContributor<V> fieldContributor, LuceneFieldValueExtractor<V> fieldValueExtractor) {
+			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.schemaContext = schemaContext;
 		this.relativeFieldName = relativeFieldName;
 		this.fieldContributor = fieldContributor;
@@ -44,13 +42,13 @@ public class LuceneFieldIndexSchemaFieldContext<V, F extends IndexableField>
 	}
 
 	@Override
-	public IndexFieldAccessor<V> createAccessor() {
+	public IndexFieldAccessor<F> createAccessor() {
 		return accessor;
 	}
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		LuceneIndexSchemaFieldNode<V> schemaNode = new LuceneIndexSchemaFieldNode<V>(
+		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<F>(
 				parentNode,
 				relativeFieldName,
 				new SimpleCastingFieldFormatter<>(),

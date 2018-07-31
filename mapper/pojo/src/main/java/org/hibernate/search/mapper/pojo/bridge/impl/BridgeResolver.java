@@ -84,7 +84,7 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	private <T> void addIdentifierBridgeForExactRawType(Class<T> type, BridgeBuilder<? extends IdentifierBridge<T>> builder) {
+	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, BridgeBuilder<? extends IdentifierBridge<I>> builder) {
 		exactRawTypeIdentifierBridgeMappings.put( type, builder );
 	}
 
@@ -93,7 +93,7 @@ public final class BridgeResolver {
 		typePatternIdentifierBridgeMappings.add( new TypePatternBridgeMapping<>( typePatternMatcher, builder ) );
 	}
 
-	private <T> void addValueBridgeForExactRawType(Class<T> type, BridgeBuilder<? extends ValueBridge<? super T, ?>> builder) {
+	private <V> void addValueBridgeForExactRawType(Class<V> type, BridgeBuilder<? extends ValueBridge<? super V, ?>> builder) {
 		exactRawTypeValueBridgeMappings.put( type, builder );
 	}
 

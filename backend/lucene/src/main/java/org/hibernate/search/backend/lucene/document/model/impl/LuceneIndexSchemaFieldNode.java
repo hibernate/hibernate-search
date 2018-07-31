@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSchemaFieldNode<T> {
+public class LuceneIndexSchemaFieldNode<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -33,13 +33,13 @@ public class LuceneIndexSchemaFieldNode<T> {
 
 	private final LuceneFieldFormatter<?> formatter;
 
-	private final LuceneFieldCodec<T> codec;
+	private final LuceneFieldCodec<F> codec;
 
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 
 	private final LuceneFieldSortContributor sortContributor;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<T> codec,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
@@ -66,7 +66,7 @@ public class LuceneIndexSchemaFieldNode<T> {
 		return formatter;
 	}
 
-	public LuceneFieldCodec<T> getCodec() {
+	public LuceneFieldCodec<F> getCodec() {
 		return codec;
 	}
 

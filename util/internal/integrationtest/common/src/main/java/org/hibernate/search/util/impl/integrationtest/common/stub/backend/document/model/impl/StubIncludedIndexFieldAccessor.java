@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIncludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+class StubIncludedIndexFieldAccessor<F> implements IndexFieldAccessor<F> {
 	private final String absolutePath;
 	private final String relativeFieldName;
 
@@ -25,7 +25,7 @@ class StubIncludedIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
 	}
 
 	@Override
-	public void write(DocumentElement target, T value) {
+	public void write(DocumentElement target, F value) {
 		StubDocumentElement stubTarget = (StubDocumentElement) target;
 		stubTarget.putValue( relativeFieldName, value );
 	}

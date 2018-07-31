@@ -7,18 +7,18 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 /**
- * @author Yoann Rodiere
+ * @param <F> The type of field values.
  */
-public interface IndexSchemaFieldTypedContext<T> extends IndexSchemaFieldTerminalContext<T> {
+public interface IndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTerminalContext<F> {
 
 	// TODO add common options: stored, sortable, ...
 
-	IndexSchemaFieldTypedContext<T> analyzer(String analyzerName);
+	IndexSchemaFieldTypedContext<F> analyzer(String analyzerName);
 
-	IndexSchemaFieldTypedContext<T> normalizer(String normalizerName);
+	IndexSchemaFieldTypedContext<F> normalizer(String normalizerName);
 
-	IndexSchemaFieldTypedContext<T> store(Store store);
+	IndexSchemaFieldTypedContext<F> store(Store store);
 
-	IndexSchemaFieldTypedContext<T> sortable(Sortable sortable);
+	IndexSchemaFieldTypedContext<F> sortable(Sortable sortable);
 
 }

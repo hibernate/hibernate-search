@@ -55,7 +55,7 @@ public interface PojoIndexModelBinder {
 	<C, V> Optional<? extends ContainerValueExtractor<? super C, V>> tryCreateExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
-	<P> IdentifierBridge<P> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, P> modelPath,
+	<I> IdentifierBridge<I> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
 	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,

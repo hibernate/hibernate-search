@@ -10,24 +10,24 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
-public final class DefaultEnumValueBridge<T extends Enum<T>> implements ValueBridge<T, String> {
+public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBridge<V, String> {
 
-	private Class<T> enumType;
+	private Class<V> enumType;
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 	public IndexSchemaFieldTypedContext<String> bind(ValueBridgeBindingContext context) {
-		this.enumType = (Class<T>) context.getBridgedElement().getRawType();
+		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString();
 	}
 
 	@Override
-	public String toIndexedValue(T value) {
+	public String toIndexedValue(V value) {
 		return value == null ? null : value.name();
 	}
 
 	@Override
-	public T fromIndexedValue(String indexedValue) {
+	public V fromIndexedValue(String indexedValue) {
 		return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
 	}
 

@@ -11,7 +11,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public abstract class AbstractSpatialWithinCirclePredicateBuilder<T> extends AbstractSearchPredicateBuilder
+public abstract class AbstractSpatialWithinCirclePredicateBuilder<F> extends AbstractSearchPredicateBuilder
 		implements SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;

@@ -51,18 +51,18 @@ class LuceneIndexSchemaFieldContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType) {
+	public <F> IndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<T>) asString();
+			return (IndexSchemaFieldTypedContext<F>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<T>) asInteger();
+			return (IndexSchemaFieldTypedContext<F>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<T>) asLocalDate();
+			return (IndexSchemaFieldTypedContext<F>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<T>) asGeoPoint();
+			return (IndexSchemaFieldTypedContext<F>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -98,8 +98,8 @@ class LuceneIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public <V> IndexSchemaFieldTerminalContext<V> asLuceneField(LuceneFieldContributor<V> fieldContributor,
-			LuceneFieldValueExtractor<V> fieldValueExtractor) {
+	public <F> IndexSchemaFieldTerminalContext<F> asLuceneField(LuceneFieldContributor<F> fieldContributor,
+			LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>(
 				this, relativeFieldName, fieldContributor, fieldValueExtractor
 		) );

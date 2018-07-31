@@ -12,6 +12,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 /**
  * @author Guillaume Smet
  */
-public interface LuceneIndexSchemaFieldTypedContext<T> extends IndexSchemaFieldTypedContext<T> {
+public interface LuceneIndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTypedContext<F> {
 
 }

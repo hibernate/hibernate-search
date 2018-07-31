@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContext<T> {
+class StubIndexSchemaFieldTypedContext<F> implements IndexSchemaFieldTypedContext<F> {
 
 	private final StubIndexSchemaNode.Builder builder;
 	private final boolean included;
 
-	private IndexFieldAccessor<T> accessor;
+	private IndexFieldAccessor<F> accessor;
 
 	StubIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, boolean included) {
 		this.builder = builder;
@@ -25,31 +25,31 @@ class StubIndexSchemaFieldTypedContext<T> implements IndexSchemaFieldTypedContex
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
+	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
 		builder.analyzerName( analyzerName );
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
+	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
 		builder.normalizerName( normalizerName );
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> store(Store store) {
+	public IndexSchemaFieldTypedContext<F> store(Store store) {
 		builder.store( store );
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> sortable(Sortable sortable) {
+	public IndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
 		builder.sortable( sortable );
 		return this;
 	}
 
 	@Override
-	public IndexFieldAccessor<T> createAccessor() {
+	public IndexFieldAccessor<F> createAccessor() {
 		if ( accessor == null ) {
 			if ( included ) {
 				accessor = new StubIncludedIndexFieldAccessor<>( builder.getAbsolutePath(), builder.getRelativeName() );

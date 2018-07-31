@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface IndexSchemaFieldContext {
 
-	<T> IndexSchemaFieldTypedContext<T> as(Class<T> inputType);
+	<F> IndexSchemaFieldTypedContext<F> as(Class<F> inputType);
 
 	IndexSchemaFieldTypedContext<String> asString();
 

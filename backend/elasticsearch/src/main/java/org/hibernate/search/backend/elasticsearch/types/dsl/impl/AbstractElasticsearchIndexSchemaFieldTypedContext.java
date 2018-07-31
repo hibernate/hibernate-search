@@ -18,20 +18,20 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<T>
-		implements ElasticsearchIndexSchemaFieldTypedContext<T>,
+public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<F>
+		implements ElasticsearchIndexSchemaFieldTypedContext<F>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	protected final IndexSchemaContext schemaContext;
 
-	private final DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
 	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext) {
 		this.schemaContext = schemaContext;
 	}
 
 	@Override
-	public IndexFieldAccessor<T> createAccessor() {
+	public IndexFieldAccessor<F> createAccessor() {
 		return accessor;
 	}
 
@@ -41,7 +41,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<T>
 		return contribute( accessor, collector, parentNode );
 	}
 
-	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<T> reference,
+	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<F> reference,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode);
 

@@ -16,7 +16,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 /**
  * Define how a given value will be encoded in the Lucene document and how it will be decoded.
  */
-public interface LuceneFieldCodec<T> {
+public interface LuceneFieldCodec<F> {
 
 	/**
 	 * Encode the given value in the document by adding new fields to the Lucene document.
@@ -25,7 +25,7 @@ public interface LuceneFieldCodec<T> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param value The value to encode.
 	 */
-	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, T value);
+	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
 
 	/**
 	 * If not empty, override the fields extracted from the document when doing a projection. Typically used to return
@@ -44,7 +44,7 @@ public interface LuceneFieldCodec<T> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @return The decoded value.
 	 */
-	T decode(Document document, String absoluteFieldPath);
+	F decode(Document document, String absoluteFieldPath);
 
 	// equals()/hashCode() needs to be implemented if the codec is not a singleton
 

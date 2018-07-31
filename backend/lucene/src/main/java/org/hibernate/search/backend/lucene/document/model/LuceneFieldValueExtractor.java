@@ -11,9 +11,9 @@ import org.apache.lucene.index.IndexableField;
 /**
  * An extractor extracting the value from a native Lucene field.
  *
- * @param <V> The type of the value.
+ * @param <F> The type of the value.
  */
-public interface LuceneFieldValueExtractor<V> {
+public interface LuceneFieldValueExtractor<F> {
 
 	/**
 	 * Extract the value from the Lucene field.
@@ -21,6 +21,6 @@ public interface LuceneFieldValueExtractor<V> {
 	 * @param field The first field contributed to the schema.
 	 * @return The extracted value.
 	 */
-	V extract(IndexableField field);
+	F extract(IndexableField field);
 
 }

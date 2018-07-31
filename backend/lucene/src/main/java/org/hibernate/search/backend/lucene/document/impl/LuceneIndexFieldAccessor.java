@@ -14,16 +14,16 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+public class LuceneIndexFieldAccessor<F> implements IndexFieldAccessor<F> {
 
-	private final LuceneIndexSchemaFieldNode<T> schemaNode;
+	private final LuceneIndexSchemaFieldNode<F> schemaNode;
 
-	public LuceneIndexFieldAccessor(LuceneIndexSchemaFieldNode<T> schemaNode) {
+	public LuceneIndexFieldAccessor(LuceneIndexSchemaFieldNode<F> schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
 	@Override
-	public void write(DocumentElement target, T value) {
+	public void write(DocumentElement target, F value) {
 		LuceneDocumentBuilder documentBuilder = (LuceneDocumentBuilder) target;
 		documentBuilder.checkTreeConsistency( schemaNode.getParent() );
 		schemaNode.getCodec().encode( documentBuilder, schemaNode.getAbsoluteFieldPath(), value );

@@ -11,9 +11,9 @@ package org.hibernate.search.engine.backend.document;
  * An accessor to a specific field of an index document,
  * allowing to add new values to this field for a given document.
  *
- * @author Yoann Rodiere
+ * @param <F> The indexed field value type.
  */
-public interface IndexFieldAccessor<T> {
+public interface IndexFieldAccessor<F> {
 
 	/**
 	 * Add a new value to the given state for the field targeted by this reference.
@@ -24,6 +24,6 @@ public interface IndexFieldAccessor<T> {
 	 * @param target The parent to which the field value will be added.
 	 * @param value The value to add to the field.
 	 */
-	void write(DocumentElement target, T value);
+	void write(DocumentElement target, F value);
 
 }

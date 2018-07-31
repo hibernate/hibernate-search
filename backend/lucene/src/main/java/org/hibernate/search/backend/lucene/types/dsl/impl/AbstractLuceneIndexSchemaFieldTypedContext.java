@@ -24,15 +24,15 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
-		implements LuceneIndexSchemaFieldTypedContext<T>, LuceneIndexSchemaNodeContributor {
+public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
+		implements LuceneIndexSchemaFieldTypedContext<F>, LuceneIndexSchemaNodeContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexSchemaContext schemaContext;
 	private final String relativeFieldName;
 
-	private final DeferredInitializationIndexFieldAccessor<T> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
 
 	private Store store;
 
@@ -42,7 +42,7 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 	}
 
 	@Override
-	public IndexFieldAccessor<T> createAccessor() {
+	public IndexFieldAccessor<F> createAccessor() {
 		return accessor;
 	}
 
@@ -51,22 +51,22 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<T>
 		contribute( accessor, collector, parentNode );
 	}
 
-	protected abstract void contribute(DeferredInitializationIndexFieldAccessor<T> reference, LuceneIndexSchemaNodeCollector collector,
+	protected abstract void contribute(DeferredInitializationIndexFieldAccessor<F> reference, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode);
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> store(Store store) {
+	public IndexSchemaFieldTypedContext<F> store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> analyzer(String analyzerName) {
+	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
 		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<T> normalizer(String normalizerName) {
+	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
 		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
 	}
 

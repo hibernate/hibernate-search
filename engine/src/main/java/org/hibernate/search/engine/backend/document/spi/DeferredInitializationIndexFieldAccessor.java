@@ -9,21 +9,21 @@ package org.hibernate.search.engine.backend.document.spi;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 
-public class DeferredInitializationIndexFieldAccessor<T> implements IndexFieldAccessor<T> {
+public class DeferredInitializationIndexFieldAccessor<F> implements IndexFieldAccessor<F> {
 
-	private IndexFieldAccessor<T> delegate;
+	private IndexFieldAccessor<F> delegate;
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + delegate + "]";
 	}
 
-	public void initialize(IndexFieldAccessor<T> delegate) {
+	public void initialize(IndexFieldAccessor<F> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public void write(DocumentElement state, T value) {
+	public void write(DocumentElement state, F value) {
 		if ( delegate != null ) {
 			delegate.write( state, value );
 		}
