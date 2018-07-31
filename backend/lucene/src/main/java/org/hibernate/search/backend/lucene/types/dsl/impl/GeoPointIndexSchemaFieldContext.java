@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -37,7 +37,7 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldAccessor<GeoPoint> accessor, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -48,7 +48,7 @@ public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFi
 				GeoPointFieldSortContributor.INSTANCE
 		);
 
-		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
+		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}

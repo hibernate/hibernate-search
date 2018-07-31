@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
@@ -29,29 +29,28 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final IndexSchemaContext schemaContext;
-	private final String relativeFieldName;
+	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
-	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	private final String relativeFieldName;
 
 	private Store store;
 
 	protected AbstractLuceneIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		this.schemaContext = schemaContext;
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
-		return accessor;
+		return helper.createAccessor();
 	}
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		contribute( accessor, collector, parentNode );
+		contribute( helper, collector, parentNode );
 	}
 
-	protected abstract void contribute(DeferredInitializationIndexFieldAccessor<F> reference, LuceneIndexSchemaNodeCollector collector,
+	protected abstract void contribute(IndexSchemaFieldDefinitionHelper<F> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode);
 
 	@Override
@@ -62,12 +61,12 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	@Override
 	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
-		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
+		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, getSchemaContext().getEventContext() );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
-		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, schemaContext.getEventContext() );
+		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, getSchemaContext().getEventContext() );
 	}
 
 	protected String getRelativeFieldName() {
@@ -84,5 +83,9 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	protected Analyzer getNormalizer() {
 		return null;
+	}
+
+	protected final IndexSchemaContext getSchemaContext() {
+		return helper.getSchemaContext();
 	}
 }

@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -57,15 +57,15 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<LocalDate> reference,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
-		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
+		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, codec, new StandardFieldPredicateBuilderFactory( codec ) );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
+		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );

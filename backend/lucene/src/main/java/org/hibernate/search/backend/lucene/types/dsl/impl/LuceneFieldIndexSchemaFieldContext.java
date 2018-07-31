@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
@@ -26,16 +26,14 @@ import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFie
 public class LuceneFieldIndexSchemaFieldContext<F>
 		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
 
-	private final IndexSchemaContext schemaContext;
+	private final IndexSchemaFieldDefinitionHelper<F> helper;
 	private final String relativeFieldName;
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
-
 	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		this.schemaContext = schemaContext;
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext );
 		this.relativeFieldName = relativeFieldName;
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
@@ -43,7 +41,7 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
-		return accessor;
+		return helper.createAccessor();
 	}
 
 	@Override
@@ -57,7 +55,7 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 				null
 		);
 
-		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
+		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}

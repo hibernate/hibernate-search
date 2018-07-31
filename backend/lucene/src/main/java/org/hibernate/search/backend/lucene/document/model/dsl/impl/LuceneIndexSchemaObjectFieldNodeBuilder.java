@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaObjectFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
@@ -25,14 +25,14 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	private final String absoluteFieldPath;
 	private final ObjectFieldStorage storage;
 
-	private final DeferredInitializationIndexObjectFieldAccessor accessor =
-			new DeferredInitializationIndexObjectFieldAccessor();
+	private final IndexSchemaObjectFieldDefinitionHelper helper;
 
 	LuceneIndexSchemaObjectFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
 			String relativeFieldName, ObjectFieldStorage storage) {
 		this.parent = parent;
 		this.absoluteFieldPath = LuceneFields.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.storage = storage;
+		this.helper = new IndexSchemaObjectFieldDefinitionHelper( this );
 	}
 
 	@Override
@@ -42,8 +42,8 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public IndexObjectFieldAccessor getAccessor() {
-		return accessor;
+	public IndexObjectFieldAccessor createAccessor() {
+		return helper.createAccessor();
 	}
 
 	@Override
@@ -51,7 +51,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
 		collector.collectObjectNode( absoluteFieldPath, node );
 
-		accessor.initialize( new LuceneIndexObjectFieldAccessor( node, storage ) );
+		helper.initialize( new LuceneIndexObjectFieldAccessor( node, storage ) );
 
 		contributeChildren( node, collector );
 	}

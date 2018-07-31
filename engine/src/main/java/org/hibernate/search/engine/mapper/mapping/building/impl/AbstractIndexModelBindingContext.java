@@ -91,7 +91,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, storage );
-			parentObjectAccessors.add( nextNodeBuilder.getAccessor() );
+			parentObjectAccessors.add( nextNodeBuilder.createAccessor() );
 			currentNodeBuilder = nextNodeBuilder;
 		}
 

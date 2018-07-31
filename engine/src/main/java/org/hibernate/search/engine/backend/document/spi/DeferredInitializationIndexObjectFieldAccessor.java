@@ -13,11 +13,11 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 /**
  * @author Yoann Rodiere
  */
-public class DeferredInitializationIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
+class DeferredInitializationIndexObjectFieldAccessor implements IndexObjectFieldAccessor {
 
 	private IndexObjectFieldAccessor delegate;
 
-	public void initialize(IndexObjectFieldAccessor delegate) {
+	void initialize(IndexObjectFieldAccessor delegate) {
 		this.delegate = delegate;
 	}
 

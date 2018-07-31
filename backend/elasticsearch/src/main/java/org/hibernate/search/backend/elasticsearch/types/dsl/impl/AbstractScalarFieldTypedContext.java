@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
@@ -29,8 +29,6 @@ abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchI
 
 	private final String relativeFieldName;
 	private final DataType dataType;
-	private String analyzerName;
-	private String normalizerName;
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
@@ -43,14 +41,16 @@ abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchI
 
 	@Override
 	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
-		this.analyzerName = analyzerName;
-		return this;
+		throw log.cannotUseAnalyzerOnFieldType(
+				relativeFieldName, dataType, getSchemaContext().getEventContext()
+		);
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
-		this.normalizerName = normalizerName;
-		return this;
+		throw log.cannotUseNormalizerOnFieldType(
+				relativeFieldName, dataType, getSchemaContext().getEventContext()
+		);
 	}
 
 	@Override
@@ -67,19 +67,12 @@ abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchI
 
 	@Override
 	protected PropertyMapping contribute(
-			DeferredInitializationIndexFieldAccessor<F> reference,
+			IndexSchemaFieldDefinitionHelper<F> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
 		mapping.setType( dataType );
-
-		if ( analyzerName != null ) {
-			throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, dataType, schemaContext.getEventContext() );
-		}
-		if ( normalizerName != null ) {
-			throw log.cannotUseNormalizerOnFieldType( relativeFieldName, dataType, schemaContext.getEventContext() );
-		}
 
 		switch ( store ) {
 			case DEFAULT:

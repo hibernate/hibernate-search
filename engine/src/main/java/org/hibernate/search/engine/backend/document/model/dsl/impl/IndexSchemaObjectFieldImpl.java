@@ -20,7 +20,7 @@ class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjec
 
 	@Override
 	public IndexObjectFieldAccessor createAccessor() {
-		return objectNodeBuilder.getAccessor();
+		return objectNodeBuilder.createAccessor();
 	}
 
 }

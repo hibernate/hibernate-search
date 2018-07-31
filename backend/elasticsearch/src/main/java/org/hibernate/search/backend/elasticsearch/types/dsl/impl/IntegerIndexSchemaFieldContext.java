@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -36,15 +36,15 @@ public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedCont
 	}
 
 	@Override
-	protected PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<Integer> reference,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Integer> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
-		PropertyMapping mapping = super.contribute( reference, collector, parentNode );
+		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
 		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY );
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		reference.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
+		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
 		collector.collect( absoluteFieldPath, node );

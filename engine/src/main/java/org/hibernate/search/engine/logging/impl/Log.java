@@ -114,4 +114,12 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = 22, value = "Unexpected empty event context; there is a bug in Hibernate Search, please report it")
 	void unexpectedEmptyEventContext(@Cause SearchException exceptionForStackTrace);
+
+	@Message(id = 23, value = "Incomplete field definition."
+			+ " You must call createAccessor() to complete the field definition." )
+	SearchException incompleteFieldDefinition(@Param EventContext context);
+
+	@Message(id = 24, value = "Multiple calls to createAccessor() for the same field definition."
+			+ " You must call createAccessor() exactly once." )
+	SearchException cannotCreateAccessorMultipleTimes(@Param EventContext context);
 }

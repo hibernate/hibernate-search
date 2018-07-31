@@ -10,6 +10,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 
 public interface IndexSchemaObjectFieldNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
-	IndexObjectFieldAccessor getAccessor();
+	IndexObjectFieldAccessor createAccessor();
 
 }

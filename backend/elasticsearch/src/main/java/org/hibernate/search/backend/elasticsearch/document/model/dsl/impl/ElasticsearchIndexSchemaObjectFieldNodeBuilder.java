@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaObjectFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
@@ -31,8 +31,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	private final String relativeFieldName;
 	private final ObjectFieldStorage storage;
 
-	private final DeferredInitializationIndexObjectFieldAccessor accessor =
-			new DeferredInitializationIndexObjectFieldAccessor();
+	private final IndexSchemaObjectFieldDefinitionHelper helper;
 
 	ElasticsearchIndexSchemaObjectFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
 			String relativeFieldName, ObjectFieldStorage storage) {
@@ -42,6 +41,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 				: ElasticsearchFields.compose( parentAbsolutePath, relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
 		this.storage = storage;
+		this.helper = new IndexSchemaObjectFieldDefinitionHelper( this );
 	}
 
 	@Override
@@ -51,8 +51,8 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public IndexObjectFieldAccessor getAccessor() {
-		return accessor;
+	public IndexObjectFieldAccessor createAccessor() {
+		return helper.createAccessor();
 	}
 
 	@Override
@@ -65,7 +65,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		JsonObjectAccessor jsonAccessor = JsonAccessor.root().property( relativeFieldName ).asObject();
 
-		accessor.initialize( new ElasticsearchIndexObjectFieldAccessor( jsonAccessor, node ) );
+		helper.initialize( new ElasticsearchIndexObjectFieldAccessor( jsonAccessor, node ) );
 
 		PropertyMapping mapping = new PropertyMapping();
 		DataType dataType = DataType.OBJECT;

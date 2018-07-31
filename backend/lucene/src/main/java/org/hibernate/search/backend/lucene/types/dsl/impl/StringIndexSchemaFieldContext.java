@@ -13,10 +13,10 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -50,7 +50,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldAccessor<String> accessor, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		// TODO For now, we allow the sortable - analyzed combination, it will be disallowed later
 //		if ( Sortable.YES.equals( getSortable() ) && getAnalyzer() != null ) {
@@ -76,7 +76,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 				StringFieldSortContributor.INSTANCE
 		);
 
-		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
+		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 

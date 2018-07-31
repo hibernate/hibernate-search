@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -38,7 +38,7 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	protected void contribute(DeferredInitializationIndexFieldAccessor<LocalDate> accessor, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -49,7 +49,7 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 				LocalDateFieldSortContributor.INSTANCE
 		);
 
-		accessor.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
+		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}

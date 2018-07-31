@@ -33,7 +33,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBui
 	}
 
 	@Override
-	public IndexObjectFieldAccessor getAccessor() {
+	public IndexObjectFieldAccessor createAccessor() {
 		if ( accessor == null ) {
 			if ( included ) {
 				accessor = new StubIncludedIndexObjectFieldAccessor(

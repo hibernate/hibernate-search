@@ -39,6 +39,14 @@ public class DocumentModelDslIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	private static List<Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>>> MAIN_TYPES =
+			CollectionHelper.toImmutableList( CollectionHelper.asList(
+					IndexSchemaFieldContext::asString,
+					IndexSchemaFieldContext::asInteger,
+					IndexSchemaFieldContext::asLocalDate,
+					IndexSchemaFieldContext::asGeoPoint
+			) );
+
 	private static List<Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>>> NON_ANALYZABLE_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexSchemaFieldContext::asInteger,
@@ -442,6 +450,82 @@ public class DocumentModelDslIT {
 							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
 					) );
 		}
+	}
+
+	@Test
+	public void missingCreateAccessorCall() {
+		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+			SubTest.expectException(
+					"Missing createAccessor() call after " + typedContextFunction,
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						typedContextFunction.apply(
+								root.field( "myField" )
+						);
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Incomplete field definition" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "myField" )
+					) );
+		}
+		SubTest.expectException(
+				"Missing createAccessor() call after objectField()",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.objectField( "myField" );
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Incomplete field definition" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+				) );
+	}
+
+	@Test
+	public void multipleCreateAccessorCall() {
+		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+			SubTest.expectException(
+					"Multiple createAccessor() calls after " + typedContextFunction,
+					() -> setup( ctx -> {
+						IndexSchemaElement root = ctx.getSchemaElement();
+						IndexSchemaFieldTypedContext<?> context = typedContextFunction.apply(
+								root.field( "myField" )
+						);
+						context.createAccessor();
+						context.createAccessor();
+					} )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple calls to createAccessor() for the same field definition" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexName( INDEX_NAME ),
+							EventContexts.fromIndexFieldAbsolutePath( "myField" )
+					) );
+		}
+		SubTest.expectException(
+				"Multiple createAccessor() calls after objectField()",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaObjectField context = root.objectField( "myField" );
+					context.createAccessor();
+					context.createAccessor();
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple calls to createAccessor() for the same field definition" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+				) );
 	}
 
 	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {

@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.DeferredInitializationIndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
@@ -22,27 +22,29 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<F>
 		implements ElasticsearchIndexSchemaFieldTypedContext<F>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
-	protected final IndexSchemaContext schemaContext;
-
-	private final DeferredInitializationIndexFieldAccessor<F> accessor = new DeferredInitializationIndexFieldAccessor<>();
+	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
 	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext) {
-		this.schemaContext = schemaContext;
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext );
 	}
 
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
-		return accessor;
+		return helper.createAccessor();
 	}
 
 	@Override
 	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
-		return contribute( accessor, collector, parentNode );
+		return contribute( helper, collector, parentNode );
 	}
 
-	protected abstract PropertyMapping contribute(DeferredInitializationIndexFieldAccessor<F> reference,
+	protected abstract PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<F> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode);
+
+	protected final IndexSchemaContext getSchemaContext() {
+		return helper.getSchemaContext();
+	}
 
 }
