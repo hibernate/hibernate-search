@@ -26,6 +26,8 @@ env:
     # Unset _JAVA_OPTIONS to avoid raising the memory used by Elasticsearch
     # See https://hibernate.atlassian.net/browse/HSEARCH-3252
     - _JAVA_OPTIONS=
+    # Ensure Maven doesn't eat up too much memory
+    - MAVEN_OPTS=-Xmx756m
 before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
