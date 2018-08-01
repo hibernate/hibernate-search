@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -16,15 +16,15 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldFormatter<?> fieldFormatter;
+	private final LuceneFieldConverter<?> fieldConverter;
 
 	private final LuceneFieldSortContributor fieldSortContributor;
 
 	private Object missingValue;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldFormatter<?> fieldFormatter, LuceneFieldSortContributor fieldSortContributor) {
+	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldConverter<?> fieldConverter, LuceneFieldSortContributor fieldSortContributor) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.fieldFormatter = fieldFormatter;
+		this.fieldConverter = fieldConverter;
 		this.fieldSortContributor = fieldSortContributor;
 	}
 
@@ -40,7 +40,7 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	@Override
 	public void missingAs(Object value) {
-		missingValue = fieldFormatter.format( value );
+		missingValue = fieldConverter.convertFromDsl( value );
 	}
 
 	@Override

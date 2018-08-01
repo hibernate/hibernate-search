@@ -8,24 +8,24 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 
 public final class LocalDateFieldPredicateBuilderFactory extends AbstractStandardLuceneFieldPredicateBuilderFactory {
 
-	private final LocalDateFieldFormatter formatter;
+	private final LocalDateFieldConverter converter;
 
-	public LocalDateFieldPredicateBuilderFactory(LocalDateFieldFormatter formatter) {
-		this.formatter = formatter;
+	public LocalDateFieldPredicateBuilderFactory(LocalDateFieldConverter converter) {
+		this.converter = converter;
 	}
 
 	@Override
 	public LocalDateMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new LocalDateMatchPredicateBuilder( absoluteFieldPath, formatter );
+		return new LocalDateMatchPredicateBuilder( absoluteFieldPath, converter );
 	}
 
 	@Override
 	public LocalDateRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new LocalDateRangePredicateBuilder( absoluteFieldPath, formatter );
+		return new LocalDateRangePredicateBuilder( absoluteFieldPath, converter );
 	}
 
 	@Override
@@ -42,11 +42,11 @@ public final class LocalDateFieldPredicateBuilderFactory extends AbstractStandar
 
 		LocalDateFieldPredicateBuilderFactory other = (LocalDateFieldPredicateBuilderFactory) obj;
 
-		return Objects.equals( formatter, other.formatter );
+		return Objects.equals( converter, other.converter );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( formatter );
+		return Objects.hash( converter );
 	}
 }

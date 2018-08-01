@@ -11,7 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
 import org.hibernate.search.util.EventContext;
@@ -31,7 +31,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldFormatter<?> formatter;
+	private final LuceneFieldConverter<?> converter;
 
 	private final LuceneFieldCodec<F> codec;
 
@@ -39,12 +39,12 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final LuceneFieldSortContributor sortContributor;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName, LuceneFieldFormatter<?> formatter, LuceneFieldCodec<F> codec,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName, LuceneFieldConverter<?> converter, LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
-		this.formatter = formatter;
+		this.converter = converter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortContributor = sortContributor;
@@ -62,8 +62,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return absoluteFieldPath;
 	}
 
-	public LuceneFieldFormatter<?> getFormatter() {
-		return formatter;
+	public LuceneFieldConverter<?> getConverter() {
+		return converter;
 	}
 
 	public LuceneFieldCodec<F> getCodec() {
@@ -85,7 +85,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 	}
 
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
-		return Objects.equals( formatter, other.formatter )
+		return Objects.equals( converter, other.converter )
 				&& Objects.equals( codec, other.codec )
 				&& Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory )
 				&& Objects.equals( sortContributor, other.sortContributor );
@@ -96,7 +96,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
 				.append( ", relativeFieldName=" ).append( relativeFieldName )
-				.append( ", formatter=" ).append( formatter )
+				.append( ", converter=" ).append( converter )
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
 				.append( ", sortContributor=" ).append( sortContributor )

@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.IntegerFieldCodec;
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
-import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.SimpleCastingFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.IntegerFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContributor;
 
@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContr
  */
 public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
 
-	public static final LuceneFieldFormatter<Integer> FORMATTER = new SimpleCastingFieldFormatter<>();
+	public static final LuceneFieldConverter<Integer> CONVERTER = new SimpleCastingFieldConverter<>();
 
 	private Sortable sortable;
 
@@ -44,7 +44,7 @@ public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFie
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				FORMATTER,
+				CONVERTER,
 				new IntegerFieldCodec( getStore(), sortable ),
 				IntegerFieldPredicateBuilderFactory.INSTANCE,
 				IntegerFieldSortContributor.INSTANCE

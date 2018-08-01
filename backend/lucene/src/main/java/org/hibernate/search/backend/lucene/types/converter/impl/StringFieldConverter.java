@@ -4,23 +4,23 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.formatter.impl;
+package org.hibernate.search.backend.lucene.types.converter.impl;
 
 import java.util.Objects;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
-public final class StringFieldFormatter implements LuceneFieldFormatter<String> {
+public final class StringFieldConverter implements LuceneFieldConverter<String> {
 
 	private final Analyzer analyzerOrNormalizer;
 
-	public StringFieldFormatter(Analyzer analyzerOrNormalizer) {
+	public StringFieldConverter(Analyzer analyzerOrNormalizer) {
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
-	public String format(Object value) {
+	public String convertFromDsl(Object value) {
 		return (String) value;
 	}
 
@@ -44,11 +44,11 @@ public final class StringFieldFormatter implements LuceneFieldFormatter<String> 
 		if ( obj == null ) {
 			return false;
 		}
-		if ( StringFieldFormatter.class != obj.getClass() ) {
+		if ( StringFieldConverter.class != obj.getClass() ) {
 			return false;
 		}
 
-		StringFieldFormatter other = (StringFieldFormatter) obj;
+		StringFieldConverter other = (StringFieldConverter) obj;
 
 		return Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer );
 	}

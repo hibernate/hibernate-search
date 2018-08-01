@@ -4,19 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.formatter.impl;
+package org.hibernate.search.backend.lucene.types.converter.impl;
 
 import java.time.LocalDate;
 
-public final class LocalDateFieldFormatter implements LuceneFieldFormatter<Long> {
+public final class LocalDateFieldConverter implements LuceneFieldConverter<Long> {
 
-	public static final LocalDateFieldFormatter INSTANCE = new LocalDateFieldFormatter();
+	public static final LocalDateFieldConverter INSTANCE = new LocalDateFieldConverter();
 
-	private LocalDateFieldFormatter() {
+	private LocalDateFieldConverter() {
 	}
 
 	@Override
-	public Long format(Object value) {
+	public Long convertFromDsl(Object value) {
 		if ( value == null ) {
 			return null;
 		}

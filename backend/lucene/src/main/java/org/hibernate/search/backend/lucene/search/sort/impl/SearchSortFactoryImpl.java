@@ -67,7 +67,7 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 
 		return new FieldSortBuilderImpl(
 				absoluteFieldPath,
-				schemaNode.getFormatter(),
+				schemaNode.getConverter(),
 				schemaNode.getSortContributor()
 		);
 	}

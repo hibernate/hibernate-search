@@ -10,12 +10,12 @@ import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 
 class IntegerRangePredicateBuilder extends AbstractRangePredicateBuilder<Integer> {
 
-	IntegerRangePredicateBuilder(String absoluteFieldPath, LuceneFieldFormatter<Integer> formatter) {
-		super( absoluteFieldPath, formatter );
+	IntegerRangePredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<Integer> converter) {
+		super( absoluteFieldPath, converter );
 	}
 
 	@Override

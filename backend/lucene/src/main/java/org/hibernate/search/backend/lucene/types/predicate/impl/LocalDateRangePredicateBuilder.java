@@ -10,12 +10,12 @@ import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 
 class LocalDateRangePredicateBuilder extends AbstractRangePredicateBuilder<Long> {
 
-	LocalDateRangePredicateBuilder(String absoluteFieldPath, LocalDateFieldFormatter formatter) {
-		super( absoluteFieldPath, formatter );
+	LocalDateRangePredicateBuilder(String absoluteFieldPath, LocalDateFieldConverter converter) {
+		super( absoluteFieldPath, converter );
 	}
 
 	@Override

@@ -9,30 +9,30 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
-import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 
 public class StringFieldPredicateBuilderFactory extends AbstractStandardLuceneFieldPredicateBuilderFactory {
 
-	private final StringFieldFormatter formatter;
+	private final StringFieldConverter converter;
 
 	private final boolean tokenized;
 
 	private final QueryBuilder queryBuilder;
 
-	public StringFieldPredicateBuilderFactory(StringFieldFormatter formatter, boolean tokenized, QueryBuilder queryBuilder) {
-		this.formatter = formatter;
+	public StringFieldPredicateBuilderFactory(StringFieldConverter converter, boolean tokenized, QueryBuilder queryBuilder) {
+		this.converter = converter;
 		this.tokenized = tokenized;
 		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
 	public StringMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new StringMatchPredicateBuilder( absoluteFieldPath, formatter, queryBuilder );
+		return new StringMatchPredicateBuilder( absoluteFieldPath, converter, queryBuilder );
 	}
 
 	@Override
 	public StringRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new StringRangePredicateBuilder( absoluteFieldPath, formatter );
+		return new StringRangePredicateBuilder( absoluteFieldPath, converter );
 	}
 
 	@Override
@@ -49,13 +49,13 @@ public class StringFieldPredicateBuilderFactory extends AbstractStandardLuceneFi
 
 		StringFieldPredicateBuilderFactory other = (StringFieldPredicateBuilderFactory) obj;
 
-		return Objects.equals( formatter, other.formatter ) &&
+		return Objects.equals( converter, other.converter ) &&
 				tokenized == other.tokenized &&
 				Objects.equals( queryBuilder, other.queryBuilder );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( formatter, tokenized, queryBuilder );
+		return Objects.hash( converter, tokenized, queryBuilder );
 	}
 }

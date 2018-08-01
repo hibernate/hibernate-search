@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LocalDateFieldCodec;
-import org.hibernate.search.backend.lucene.types.formatter.impl.LocalDateFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LocalDateFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortContributor;
 
@@ -43,9 +43,9 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				LocalDateFieldFormatter.INSTANCE,
+				LocalDateFieldConverter.INSTANCE,
 				new LocalDateFieldCodec( getStore(), sortable ),
-				new LocalDateFieldPredicateBuilderFactory( LocalDateFieldFormatter.INSTANCE ),
+				new LocalDateFieldPredicateBuilderFactory( LocalDateFieldConverter.INSTANCE ),
 				LocalDateFieldSortContributor.INSTANCE
 		);
 

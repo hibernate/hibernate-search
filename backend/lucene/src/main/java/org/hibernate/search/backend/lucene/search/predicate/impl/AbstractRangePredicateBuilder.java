@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 
@@ -15,7 +15,7 @@ public abstract class AbstractRangePredicateBuilder<T> extends AbstractSearchPre
 
 	protected final String absoluteFieldPath;
 
-	protected final LuceneFieldFormatter<T> formatter;
+	protected final LuceneFieldConverter<T> converter;
 
 	protected T lowerLimit;
 
@@ -25,14 +25,14 @@ public abstract class AbstractRangePredicateBuilder<T> extends AbstractSearchPre
 
 	protected boolean excludeUpperLimit = false;
 
-	protected AbstractRangePredicateBuilder(String absoluteFieldPath, LuceneFieldFormatter<T> formatter) {
+	protected AbstractRangePredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<T> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.formatter = formatter;
+		this.converter = converter;
 	}
 
 	@Override
 	public void lowerLimit(Object value) {
-		lowerLimit = formatter.format( value );
+		lowerLimit = converter.convertFromDsl( value );
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public abstract class AbstractRangePredicateBuilder<T> extends AbstractSearchPre
 
 	@Override
 	public void upperLimit(Object value) {
-		upperLimit = formatter.format( value );
+		upperLimit = converter.convertFromDsl( value );
 	}
 
 	@Override

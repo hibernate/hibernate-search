@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
-import org.hibernate.search.backend.lucene.types.formatter.impl.SimpleCastingFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.SimpleCastingFieldConverter;
 
 /**
  * @author Guillaume Smet
@@ -49,7 +49,7 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<F>(
 				parentNode,
 				relativeFieldName,
-				new SimpleCastingFieldFormatter<>(),
+				new SimpleCastingFieldConverter<>(),
 				new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor ),
 				null,
 				null

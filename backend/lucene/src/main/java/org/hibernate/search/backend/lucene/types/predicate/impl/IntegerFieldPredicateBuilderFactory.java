@@ -17,11 +17,11 @@ public final class IntegerFieldPredicateBuilderFactory extends AbstractStandardL
 
 	@Override
 	public IntegerMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new IntegerMatchPredicateBuilder( absoluteFieldPath, IntegerIndexSchemaFieldContext.FORMATTER );
+		return new IntegerMatchPredicateBuilder( absoluteFieldPath, IntegerIndexSchemaFieldContext.CONVERTER );
 	}
 
 	@Override
 	public IntegerRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new IntegerRangePredicateBuilder( absoluteFieldPath, IntegerIndexSchemaFieldContext.FORMATTER );
+		return new IntegerRangePredicateBuilder( absoluteFieldPath, IntegerIndexSchemaFieldContext.CONVERTER );
 	}
 }

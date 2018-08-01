@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.types.formatter.impl.LuceneFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 
@@ -15,17 +15,17 @@ public abstract class AbstractMatchPredicateBuilder<T> extends AbstractSearchPre
 
 	protected final String absoluteFieldPath;
 
-	private final LuceneFieldFormatter<T> formatter;
+	private final LuceneFieldConverter<T> converter;
 
 	protected T value;
 
-	protected AbstractMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldFormatter<T> formatter) {
+	protected AbstractMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<T> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.formatter = formatter;
+		this.converter = converter;
 	}
 
 	@Override
 	public void value(Object value) {
-		this.value = formatter.format( value );
+		this.value = converter.convertFromDsl( value );
 	}
 }

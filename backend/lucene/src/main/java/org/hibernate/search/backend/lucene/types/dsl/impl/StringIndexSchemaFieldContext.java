@@ -22,7 +22,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
-import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortContributor;
 
@@ -61,18 +61,18 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
-		StringFieldFormatter formatter = new StringFieldFormatter( analyzerOrNormalizer );
+		StringFieldConverter converter = new StringFieldConverter( analyzerOrNormalizer );
 
 		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				formatter,
+				converter,
 				new StringFieldCodec(
 						sortable,
 						getFieldType( getStore(), analyzer != null ),
 						analyzerOrNormalizer
 				),
-				new StringFieldPredicateBuilderFactory( formatter, analyzer != null, queryBuilder ),
+				new StringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
 				StringFieldSortContributor.INSTANCE
 		);
 

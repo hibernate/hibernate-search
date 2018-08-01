@@ -12,17 +12,17 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 
 class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> {
 
-	private final StringFieldFormatter formatter;
+	private final StringFieldConverter converter;
 
 	private final QueryBuilder queryBuilder;
 
-	StringMatchPredicateBuilder(String absoluteFieldPath, StringFieldFormatter formatter, QueryBuilder queryBuilder) {
-		super( absoluteFieldPath, formatter );
-		this.formatter = formatter;
+	StringMatchPredicateBuilder(String absoluteFieldPath, StringFieldConverter converter, QueryBuilder queryBuilder) {
+		super( absoluteFieldPath, converter );
+		this.converter = converter;
 		this.queryBuilder = queryBuilder;
 	}
 
@@ -35,7 +35,7 @@ class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String> 
 			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
 			// the queryBuilder case above
 
-			return new TermQuery( new Term( absoluteFieldPath, formatter.normalize( absoluteFieldPath, value ) ) );
+			return new TermQuery( new Term( absoluteFieldPath, converter.normalize( absoluteFieldPath, value ) ) );
 		}
 	}
 }

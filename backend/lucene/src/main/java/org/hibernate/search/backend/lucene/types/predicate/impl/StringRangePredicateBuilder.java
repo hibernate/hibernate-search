@@ -10,15 +10,15 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.formatter.impl.StringFieldFormatter;
+import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 
 class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> {
 
-	private final StringFieldFormatter stringFormatter;
+	private final StringFieldConverter stringConverter;
 
-	StringRangePredicateBuilder(String absoluteFieldPath, StringFieldFormatter stringFormatter) {
-		super( absoluteFieldPath, stringFormatter );
-		this.stringFormatter = stringFormatter;
+	StringRangePredicateBuilder(String absoluteFieldPath, StringFieldConverter stringConverter) {
+		super( absoluteFieldPath, stringConverter );
+		this.stringConverter = stringConverter;
 	}
 
 	@Override
@@ -29,8 +29,8 @@ class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> 
 
 		return TermRangeQuery.newStringRange(
 				absoluteFieldPath,
-				stringFormatter.normalize( absoluteFieldPath, lowerLimit ),
-				stringFormatter.normalize( absoluteFieldPath, upperLimit ),
+				stringConverter.normalize( absoluteFieldPath, lowerLimit ),
+				stringConverter.normalize( absoluteFieldPath, upperLimit ),
 				// we force the true value if the limit is null because of some Lucene checks down the hill
 				lowerLimit == null ? true : !excludeLowerLimit,
 				upperLimit == null ? true : !excludeUpperLimit
