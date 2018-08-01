@@ -22,13 +22,18 @@ cache:
   directories:
     - $HOME/.m2
 env:
-  #- DB=h2 ELASTICSEARCH=2.0
-  - DB=h2 ELASTICSEARCH=2.2
-  - DB=h2 ELASTICSEARCH=5.0
-  - DB=h2 ELASTICSEARCH=5.2
-  # for now, let's test only with H2
-  #- DB=pgsql
-  #- DB=mariadb
+  global:
+    # Unset _JAVA_OPTIONS to avoid raising the memory used by Elasticsearch
+    # See https://hibernate.atlassian.net/browse/HSEARCH-3252
+    - _JAVA_OPTIONS=
+  matrix:
+    #- DB=h2 ELASTICSEARCH=2.0
+    - DB=h2 ELASTICSEARCH=2.2
+    - DB=h2 ELASTICSEARCH=5.0
+    - DB=h2 ELASTICSEARCH=5.2
+    # for now, let's test only with H2
+    #- DB=pgsql
+    #- DB=mariadb
 before_install:
   # Build options must be set before install, so that
   # we properly retrieve *all* the necessary dependencies
