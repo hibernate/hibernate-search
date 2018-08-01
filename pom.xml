@@ -162,49 +162,49 @@
     </modules>
 
     <properties>
-        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
-        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
-        <version.javax.persistence>2.2</version.javax.persistence>
-        <version.javax.enterprise>2.0</version.javax.enterprise>
+        <!-- Dependencies versions -->
 
-        <version.org.elasticsearch.client>6.3.1</version.org.elasticsearch.client>
-        <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
-        <version.com.google.protobuf>3.0.2</version.com.google.protobuf>
-        <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
-
-        <version.org.slf4j>1.7.25</version.org.slf4j>
-        <version.log4j>1.2.16</version.log4j>
+        <!-- >>> Common -->
         <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
 
+        <!-- >>> Engine -->
+        <!-- Nothing beyond common dependencies -->
+
+        <!-- >>> Lucene -->
+        <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
+        <!-- TODO define feature pack version for Lucene in this module, not in the legacy module (requires a release of Lucene feature packs) -->
+        <version.feature-pack.org.apache.lucene>OVERRIDDEN_IN_LEGACY</version.feature-pack.org.apache.lucene>
+
+        <!-- >>> Elasticsearch -->
+        <!-- When updating the following versions you will likely need to update the
+             matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
+        <version.org.elasticsearch.client>6.3.1</version.org.elasticsearch.client>
+        <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
+
+        <!-- >>> ORM -->
+        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
+        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
+        <version.javax.persistence>2.2</version.javax.persistence>
+
+        <!-- >>> Protobuf -->
+        <version.com.google.protobuf>3.0.2</version.com.google.protobuf>
+
+        <!-- >>> Java EE/Jakarta EE dependencies -->
+        <!-- Used in the ORM integration and various tests -->
+        <version.javax.enterprise>2.0</version.javax.enterprise>
+
         <!-- Test dependencies -->
 
+        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.log4j>1.2.16</version.log4j>
         <version.junit>4.12</version.junit>
         <version.org.easymock>3.5.1</version.org.easymock>
         <version.org.unitils>3.4.6</version.org.unitils>
-        <version.simple-jndi>0.11.4.1</version.simple-jndi>
         <version.org.assertj.assertj-core>3.9.1</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
-        <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
-        <!-- Fixes dependency convergence within Wiremock, see below -->
-        <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
-        <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.h2database>1.4.178</version.com.h2database>
-
-        <!-- Integration tests -->
-
-        <version.org.openjdk.jmh>1.20</version.org.openjdk.jmh>
-        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
-        <version.org.jboss.shrinkwrap.resolver>2.2.2</version.org.jboss.shrinkwrap.resolver>
-        <version.org.wildfly.arquillian>2.0.0.Final</version.org.wildfly.arquillian>
-        <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
-        <version.org.apache.karaf>4.1.2</version.org.apache.karaf>
-        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
-        <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
-        <!-- Necessary for OSGi integration tests with Karaf -->
-        <version.org.javassist>3.23.1-GA</version.org.javassist>
-        <version.org.jboss.jandex>2.0.5.Final</version.org.jboss.jandex>
 
         <!-- Maven plugins versions -->
 
@@ -830,6 +830,78 @@
                         </goals>
                         <configuration>
                             <rootLocationProperty>rootProject.directory</rootLocationProperty>
+                        </configuration>
+                    </execution>
+                    <!-- The following defines the properties 'parsedVersion.majorVersion'
+                        and 'parsedVersion.minorVersion' to be in synch with the current project version -->
+                    <execution>
+                        <id>parse-project-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
+                            <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-orm-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate</propertyPrefix>
+                            <versionString>${version.org.hibernate}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-lucene-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.apache.lucene</propertyPrefix>
+                            <versionString>${version.org.apache.lucene}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-elasticsearch-client-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.elasticsearch.client</propertyPrefix>
+                            <versionString>${version.org.elasticsearch.client}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-gson-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.com.google.code.gson</propertyPrefix>
+                            <versionString>${version.com.google.code.gson}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-aws-v4-signer-java-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.uk.co.lucasweb.aws-v4-signer-java</propertyPrefix>
+                            <versionString>${version.uk.co.lucasweb.aws-v4-signer-java}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-jpa-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.javax.persistence</propertyPrefix>
+                            <versionString>${version.javax.persistence}</versionString>
                         </configuration>
                     </execution>
                 </executions>

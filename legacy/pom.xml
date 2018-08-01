@@ -53,51 +53,15 @@
         <!-- Skip plugin executions that are not relevant for legacy code -->
         <jqassistant.skip>true</jqassistant.skip>
 
+
         <!-- Dependencies versions -->
 
-        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
-        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
-        <version.javax.persistence>2.2</version.javax.persistence>
-
+        <!-- >>> Lucene -->
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
         <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
+        <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
 
-        <version.org.apache.tika>1.4</version.org.apache.tika>
-        <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
-
-        <version.org.infinispan>9.2.2.Final</version.org.infinispan>
-
-        <version.net.bytebuddy>1.8.13</version.net.bytebuddy>
-
-        <version.wildfly>13.0.0.Final</version.wildfly>
-
-        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
-        <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
-        <version.org.jgroups>4.0.11.Final</version.org.jgroups>
-
-        <version.org.apache.commons.codec>1.10</version.org.apache.commons.codec>
-        <version.org.apache.commons.compress>1.5</version.org.apache.commons.compress>
-        <version.org.apache.commons.io>2.1</version.org.apache.commons.io>
-        <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
-        <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
-        <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
-        <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
-        <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
-        <version.com.fasterxml.classmate>1.3.4</version.com.fasterxml.classmate>
-        <version.org.apache.avro>1.7.6</version.org.apache.avro>
-        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
-        <version.xml-apis>1.3.03</version.xml-apis>
-
-        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
-        <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.1.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
-        <version.org.jboss.ejb3.ext-api>2.2.0.Final</version.org.jboss.ejb3.ext-api>
-        <version.javax.inject>1</version.javax.inject>
-        <version.javax.enterprise>2.0</version.javax.enterprise>
-        <version.org.jboss.narayana>5.8.1.Final</version.org.jboss.narayana>
-        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
-        <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
-
-        <!-- Elasticsearch -->
+        <!-- >>> Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
         <version.org.elasticsearch.client>5.6.8</version.org.elasticsearch.client>
@@ -107,41 +71,119 @@
         <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
         <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate03</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
 
-        <!-- JSR 352 -->
-        <version.javax.batch>1.0</version.javax.batch>
-        <!-- in line with the version used in WildFly 13 -->
-        <version.org.jberet>1.2.4.Final</version.org.jberet>
-        <!-- they didn't publish the javadoc for the other 1.2.x -->
-        <version.org.jberet.javadoc>1.2.0.Final</version.org.jberet.javadoc>
-        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
-        <!-- Derby driver used by JBatch -->
-        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
-
+        <!-- >>> ORM -->
+        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
+        <version.org.hibernate.javadoc>5.3</version.org.hibernate.javadoc>
+        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
+        <version.javax.persistence>2.2</version.javax.persistence>
         <!--
             Using JAXB 2.3.0 as 2.2.11 seems to be broken in more than a few ways.
             In particular version 2.2.11 of the impl depends on version 2.2.12-b140109.1041 of the API.
          -->
         <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
         <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+        <!-- Necessary to build the OSGi feature; must be aligned with ORM dependencies -->
+        <version.org.javassist>3.23.1-GA</version.org.javassist>
+        <version.org.jboss.jandex>2.0.5.Final</version.org.jboss.jandex>
+        <version.net.bytebuddy>1.8.13</version.net.bytebuddy>
+        <version.com.fasterxml.classmate>1.3.4</version.com.fasterxml.classmate>
 
-        <version.org.slf4j>1.7.25</version.org.slf4j>
-        <version.log4j>1.2.16</version.log4j>
-        <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
+        <!-- >>> JSR 352 -->
+        <version.javax.batch>1.0</version.javax.batch>
+        <!-- in line with the version used in WildFly 13 -->
+        <version.org.jberet>1.2.4.Final</version.org.jberet>
+        <!-- they didn't publish the javadoc for the other 1.2.x -->
+        <version.org.jberet.javadoc>1.2.0.Final</version.org.jberet.javadoc>
 
-        <!-- OSGi ranges for some primary dependencies -->
+        <!-- >>> Apache dependencies -->
+        <!-- Some of these are necessary for Avro, some for the Elasticsearch backend, some for additional Lucene analyzers -->
+        <version.org.apache.commons.compress>1.5</version.org.apache.commons.compress>
+        <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
+        <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
+        <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
+        <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
+        <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
+        <version.org.apache.commons.codec>1.10</version.org.apache.commons.codec>
+        <version.org.apache.commons.io>2.1</version.org.apache.commons.io>
 
+        <!-- >>> Java EE/Jakarta EE dependencies -->
+        <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
+        <version.javax.inject>1</version.javax.inject>
+        <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
+
+        <!-- >>> Tika -->
+        <version.org.apache.tika>1.4</version.org.apache.tika>
+        <version.xml-apis>1.3.03</version.xml-apis>
+        <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
+
+        <!-- >>> Infinispan -->
+        <version.org.infinispan>9.2.2.Final</version.org.infinispan>
+
+        <!-- >>> JBoss modules -->
+        <version.wildfly>13.0.0.Final</version.wildfly>
+        <!-- This is used to generate a link to the Java EE javadoc -->
+        <version.javaee.javadoc>7</version.javaee.javadoc>
+
+        <!-- >>> JMS -->
+        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
+        <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
+
+        <!-- >>> JGroups -->
+        <version.org.jgroups>4.0.11.Final</version.org.jgroups>
+
+        <!-- >>> Avro -->
+        <version.org.apache.avro>1.7.6</version.org.apache.avro>
+        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
+
+        <!-- >>> OSGi ranges for some primary dependencies -->
         <!-- Warning:
             Ranges are maintained as best effort on our knowledge but only the
             exact versions in this pom are being tested.
             Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
-        <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
+        <osgi.version-range.org.apache.lucene>[7.4.0,7.5.0)</osgi.version-range.org.apache.lucene>
         <osgi.version-range.org.hibernate>[5.3.0,5.4.0)</osgi.version-range.org.hibernate>
         <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
         <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
         <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
         <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
         <osgi.version-range.org.apache.avro>[${version.org.apache.avro},1.8.0)</osgi.version-range.org.apache.avro>
+
+        <!-- Test dependencies -->
+
+        <version.simple-jndi>0.11.4.1</version.simple-jndi>
+        <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
+        <!-- Fixes dependency convergence within Wiremock, see below -->
+        <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
+        <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
+
+        <!-- Integration test dependencies -->
+
+        <!-- >>> WildFly ITs-->
+        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
+        <version.org.jboss.shrinkwrap.resolver>2.2.2</version.org.jboss.shrinkwrap.resolver>
+        <version.org.wildfly.arquillian>2.0.0.Final</version.org.wildfly.arquillian>
+        <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.1.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
+        <version.org.jboss.ejb3.ext-api>2.2.0.Final</version.org.jboss.ejb3.ext-api>
+        <version.org.jboss.narayana>5.8.1.Final</version.org.jboss.narayana>
+        <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
+
+        <!-- >>> Spring ITs-->
+        <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
+
+        <!-- >>> OSGi ITs with Karaf-->
+        <version.org.apache.karaf>4.1.2</version.org.apache.karaf>
+        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+        <version.org.ops4j.pax.url>1.6.0</version.org.ops4j.pax.url>
+
+        <!-- >>> JSR-352 ITs -->
+        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
+        <!-- Derby driver used by JBatch -->
+        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
+
+        <!-- >>> Performance ITs -->
+        <version.org.openjdk.jmh>1.20</version.org.openjdk.jmh>
     </properties>
 
     <dependencyManagement>
@@ -695,84 +737,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <!-- This defines the properties 'parsedVersion.majorVersion'
-                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>parse-project-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
-                            <versionString>${project.version}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-orm-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.hibernate</propertyPrefix>
-                            <versionString>${version.org.hibernate}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-lucene-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.apache.lucene</propertyPrefix>
-                            <versionString>${version.org.apache.lucene}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-elasticsearch-client-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.elasticsearch.client</propertyPrefix>
-                            <versionString>${version.org.elasticsearch.client}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-gson-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.com.google.code.gson</propertyPrefix>
-                            <versionString>${version.com.google.code.gson}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-aws-v4-signer-java-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.uk.co.lucasweb.aws-v4-signer-java</propertyPrefix>
-                            <versionString>${version.uk.co.lucasweb.aws-v4-signer-java}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-jpa-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.javax.persistence</propertyPrefix>
-                            <versionString>${version.javax.persistence}</versionString>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
