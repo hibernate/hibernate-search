@@ -26,9 +26,9 @@ class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSearchPredicat
 
 	private final String absoluteFieldPath;
 
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
-	GeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	GeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}

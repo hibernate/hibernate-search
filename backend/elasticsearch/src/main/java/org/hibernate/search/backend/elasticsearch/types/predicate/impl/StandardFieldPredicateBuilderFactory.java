@@ -21,26 +21,26 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+public class StandardFieldPredicateBuilderFactory<F> implements ElasticsearchFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldCodec<F> codec;
 
-	public StandardFieldPredicateBuilderFactory(ElasticsearchFieldCodec codec) {
+	public StandardFieldPredicateBuilderFactory(ElasticsearchFieldCodec<F> codec) {
 		this.codec = codec;
 	}
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( absoluteFieldPath, codec );
+		return new MatchPredicateBuilderImpl<>( absoluteFieldPath, codec );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( absoluteFieldPath, codec );
+		return new RangePredicateBuilderImpl<>( absoluteFieldPath, codec );
 	}
 
 	@Override

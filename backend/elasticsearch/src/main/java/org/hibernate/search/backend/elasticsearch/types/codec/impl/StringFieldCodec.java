@@ -12,7 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class StringFieldCodec implements ElasticsearchFieldCodec {
+public class StringFieldCodec implements ElasticsearchFieldCodec<String> {
 	// Must be a singleton so that equals() works as required by the interface
 	public static final StringFieldCodec INSTANCE = new StringFieldCodec();
 
@@ -29,7 +29,7 @@ public class StringFieldCodec implements ElasticsearchFieldCodec {
 	}
 
 	@Override
-	public Object decode(JsonElement element) {
+	public String decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}

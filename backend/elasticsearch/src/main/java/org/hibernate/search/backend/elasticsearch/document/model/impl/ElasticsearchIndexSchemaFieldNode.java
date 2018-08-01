@@ -14,15 +14,16 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexSchemaFieldNode {
+public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
 
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldCodec<F> codec;
 
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
 
-	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, ElasticsearchFieldCodec codec,
+	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent,
+			ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory) {
 		this.parent = parent;
 		this.codec = codec;
@@ -33,7 +34,7 @@ public class ElasticsearchIndexSchemaFieldNode {
 		return parent;
 	}
 
-	public ElasticsearchFieldCodec getCodec() {
+	public ElasticsearchFieldCodec<F> getCodec() {
 		return codec;
 	}
 
@@ -41,7 +42,7 @@ public class ElasticsearchIndexSchemaFieldNode {
 		return predicateBuilderFactory;
 	}
 
-	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode other) {
+	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode<?> other) {
 		return Objects.equals( codec, other.codec )
 				&& Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory );
 	}

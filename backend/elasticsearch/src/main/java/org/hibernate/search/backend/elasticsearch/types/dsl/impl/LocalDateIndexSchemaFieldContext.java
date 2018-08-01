@@ -62,7 +62,9 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, codec, new StandardFieldPredicateBuilderFactory( codec ) );
+		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, codec, new StandardFieldPredicateBuilderFactory<>( codec )
+		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );

@@ -82,7 +82,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 505, value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'." )
 	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
-			ElasticsearchIndexSchemaFieldNode schemaNode1, ElasticsearchIndexSchemaFieldNode schemaNode2,
+			ElasticsearchIndexSchemaFieldNode<?> schemaNode1, ElasticsearchIndexSchemaFieldNode<?> schemaNode2,
 			@Param EventContext context);
 
 	@Message(id = 506, value = "The Elasticsearch extension can only be applied to objects"

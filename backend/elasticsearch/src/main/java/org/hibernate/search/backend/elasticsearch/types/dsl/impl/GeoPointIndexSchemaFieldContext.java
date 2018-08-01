@@ -40,8 +40,9 @@ public class GeoPointIndexSchemaFieldContext extends AbstractScalarFieldTypedCon
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, GeoPointFieldCodec.INSTANCE,
-				GeoPointFieldPredicateBuilderFactory.INSTANCE );
+		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, GeoPointFieldCodec.INSTANCE, GeoPointFieldPredicateBuilderFactory.INSTANCE
+		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );

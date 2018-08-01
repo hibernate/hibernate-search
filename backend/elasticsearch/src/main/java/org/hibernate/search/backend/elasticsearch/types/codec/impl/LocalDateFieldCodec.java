@@ -15,7 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class LocalDateFieldCodec implements ElasticsearchFieldCodec {
+public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 
 	private final DateTimeFormatter delegate;
 
@@ -33,7 +33,7 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec {
 	}
 
 	@Override
-	public Object decode(JsonElement element) {
+	public LocalDate decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}

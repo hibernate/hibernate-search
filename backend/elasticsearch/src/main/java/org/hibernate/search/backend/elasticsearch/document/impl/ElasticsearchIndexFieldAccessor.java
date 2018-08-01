@@ -22,9 +22,10 @@ public class ElasticsearchIndexFieldAccessor<F> implements IndexFieldAccessor<F>
 
 	private final JsonAccessor<JsonElement> accessor;
 
-	private final ElasticsearchIndexSchemaFieldNode schemaNode;
+	private final ElasticsearchIndexSchemaFieldNode<F> schemaNode;
 
-	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor, ElasticsearchIndexSchemaFieldNode schemaNode) {
+	public ElasticsearchIndexFieldAccessor(JsonAccessor<JsonElement> accessor,
+			ElasticsearchIndexSchemaFieldNode<F> schemaNode) {
 		this.accessor = accessor;
 		this.schemaNode = schemaNode;
 	}

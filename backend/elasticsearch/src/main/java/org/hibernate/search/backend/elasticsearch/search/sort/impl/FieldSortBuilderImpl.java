@@ -14,7 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class FieldSortBuilderImpl extends AbstractSearchSortBuilder
+class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final JsonAccessor<JsonElement> MISSING = JsonAccessor.root().property( "missing" );
@@ -22,9 +22,9 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
 	private final String absoluteFieldPath;
-	private final ElasticsearchFieldCodec fieldCodec;
+	private final ElasticsearchFieldCodec<F> fieldCodec;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec fieldCodec) {
+	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec<F> fieldCodec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.fieldCodec = fieldCodec;
 	}

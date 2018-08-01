@@ -19,7 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
-public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
+public class GeoPointFieldCodec implements ElasticsearchFieldCodec<GeoPoint> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Must be a singleton so that equals() works as required by the interface
@@ -46,7 +46,7 @@ public class GeoPointFieldCodec implements ElasticsearchFieldCodec {
 	}
 
 	@Override
-	public Object decode(JsonElement element) {
+	public GeoPoint decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}

@@ -36,7 +36,8 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 	// Must be a singleton so that equals() works as required by the interface
 	private static final JsonStringFieldCodec CODEC = new JsonStringFieldCodec( GSON );
 
-	private static final StandardFieldPredicateBuilderFactory PREDICATE_BUILDER_FACTORY = new StandardFieldPredicateBuilderFactory( CODEC );
+	private static final StandardFieldPredicateBuilderFactory<String> PREDICATE_BUILDER_FACTORY =
+			new StandardFieldPredicateBuilderFactory<>( CODEC );
 
 	private final IndexSchemaFieldDefinitionHelper<String> helper;
 
@@ -60,7 +61,9 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTermin
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, CODEC, PREDICATE_BUILDER_FACTORY );
+		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, CODEC, PREDICATE_BUILDER_FACTORY
+		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );

@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class RangePredicateBuilderImpl<F> extends AbstractSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor RANGE = JsonAccessor.root().property( "range" ).asObject();
@@ -29,14 +29,14 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement lowerLimit;
 	private boolean excludeLowerLimit = false;
 	private JsonElement upperLimit;
 	private boolean excludeUpperLimit = false;
 
-	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}

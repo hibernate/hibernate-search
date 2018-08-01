@@ -30,7 +30,8 @@ import com.google.gson.JsonElement;
  */
 public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
-	private static final StandardFieldPredicateBuilderFactory PREDICATE_BUILDER_FACTORY = new StandardFieldPredicateBuilderFactory( StringFieldCodec.INSTANCE );
+	private static final StandardFieldPredicateBuilderFactory<String> PREDICATE_BUILDER_FACTORY =
+			new StandardFieldPredicateBuilderFactory<>( StringFieldCodec.INSTANCE );
 
 	private final String relativeFieldName;
 	private String analyzerName;
@@ -73,7 +74,9 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, StringFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY );
+		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, StringFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY
+		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );

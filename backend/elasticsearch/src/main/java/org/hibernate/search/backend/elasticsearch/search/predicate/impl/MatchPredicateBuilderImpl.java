@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class MatchPredicateBuilderImpl<F> extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
@@ -26,9 +26,9 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private final String absoluteFieldPath;
 
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldCodec<F> codec;
 
-	public MatchPredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	public MatchPredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}

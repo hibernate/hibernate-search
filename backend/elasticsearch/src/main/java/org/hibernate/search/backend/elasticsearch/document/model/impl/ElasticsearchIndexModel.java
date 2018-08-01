@@ -23,7 +23,7 @@ public class ElasticsearchIndexModel {
 	private final URLEncodedString elasticsearchIndexName;
 	private final RootTypeMapping mapping;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
-	private final Map<String, ElasticsearchIndexSchemaFieldNode> fieldNodes = new HashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
 
 	public ElasticsearchIndexModel(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchRootIndexSchemaContributor contributor) {
@@ -36,7 +36,7 @@ public class ElasticsearchIndexModel {
 			}
 
 			@Override
-			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode node) {
+			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node) {
 				fieldNodes.put( absoluteFieldPath, node );
 			}
 		} );
@@ -62,7 +62,7 @@ public class ElasticsearchIndexModel {
 		return objectNodes.get( absolutePath );
 	}
 
-	public ElasticsearchIndexSchemaFieldNode getFieldNode(String absoluteFieldPath) {
+	public ElasticsearchIndexSchemaFieldNode<?> getFieldNode(String absoluteFieldPath) {
 		return fieldNodes.get( absoluteFieldPath );
 	}
 

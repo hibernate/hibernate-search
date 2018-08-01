@@ -11,11 +11,12 @@ import com.google.gson.JsonElement;
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchFieldCodec {
+public interface ElasticsearchFieldCodec<F> {
 
+	// FIXME only accept type F here
 	JsonElement encode(Object object);
 
-	Object decode(JsonElement element);
+	F decode(JsonElement element);
 
 	default boolean supportsSortingByDistance() {
 		return false;

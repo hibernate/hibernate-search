@@ -26,7 +26,8 @@ import com.google.gson.JsonElement;
  */
 public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<Integer> {
 
-	private static final StandardFieldPredicateBuilderFactory PREDICATE_BUILDER_FACTORY = new StandardFieldPredicateBuilderFactory( IntegerFieldCodec.INSTANCE );
+	private static final StandardFieldPredicateBuilderFactory<Integer> PREDICATE_BUILDER_FACTORY =
+			new StandardFieldPredicateBuilderFactory<>( IntegerFieldCodec.INSTANCE );
 
 	private final String relativeFieldName;
 
@@ -41,7 +42,9 @@ public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedCont
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchIndexSchemaFieldNode node = new ElasticsearchIndexSchemaFieldNode( parentNode, IntegerFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY );
+		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, IntegerFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY
+		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );

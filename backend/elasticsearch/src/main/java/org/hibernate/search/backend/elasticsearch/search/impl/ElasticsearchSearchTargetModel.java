@@ -54,12 +54,12 @@ public class ElasticsearchSearchTargetModel {
 		return indexModels;
 	}
 
-	public ElasticsearchIndexSchemaFieldNode getSchemaNode(String absoluteFieldPath) {
+	public ElasticsearchIndexSchemaFieldNode<?> getSchemaNode(String absoluteFieldPath) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
-		ElasticsearchIndexSchemaFieldNode selectedSchemaNode = null;
+		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 			if ( schemaNode != null ) {
 				if ( selectedSchemaNode == null ) {
 					selectedSchemaNode = schemaNode;
@@ -98,7 +98,7 @@ public class ElasticsearchSearchTargetModel {
 		}
 		if ( !found ) {
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaFieldNode schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+				ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()
