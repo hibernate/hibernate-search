@@ -7,7 +7,12 @@
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
 /**
- * @author Guillaume Smet
+ * Defines how a given value will be converted when performing search queries.
+ * <p>
+ * Used by predicate and sort builders in particular.
+ *
+ * @param <T> The type used internally when querying. May be different from the field type exposed to users;
+ * see for example {@link LocalDateFieldConverter}.
  */
 public interface LuceneFieldConverter<T> {
 

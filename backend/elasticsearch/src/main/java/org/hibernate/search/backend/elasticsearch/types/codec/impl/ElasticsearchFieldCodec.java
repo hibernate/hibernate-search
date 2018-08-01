@@ -9,7 +9,10 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import com.google.gson.JsonElement;
 
 /**
- * @author Yoann Rodiere
+ * Defines how a given value will be encoded as JSON and decoded from JSON.
+ * <p>
+ * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
+ * and returns decoded values to the hit extractor when projecting in a search query.
  */
 public interface ElasticsearchFieldCodec<F> {
 

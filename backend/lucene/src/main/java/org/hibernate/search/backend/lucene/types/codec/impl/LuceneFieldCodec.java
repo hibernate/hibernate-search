@@ -14,7 +14,10 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
- * Define how a given value will be encoded in the Lucene document and how it will be decoded.
+ * Defines how a given value will be encoded in the Lucene document and how it will be decoded.
+ * <p>
+ * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
+ * and returns decoded values to the hit extractor when projecting in a search query.
  */
 public interface LuceneFieldCodec<F> {
 
