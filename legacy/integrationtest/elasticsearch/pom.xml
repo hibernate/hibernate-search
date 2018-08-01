@@ -173,8 +173,8 @@
         <!-- Enable extracting shared test build resources -->
         <!-- See how maven-dependency-plugin is configured in the parent pom -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-sharedtestresources</artifactId>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
             <classifier>build-resources</classifier>
             <type>zip</type>
             <scope>provided</scope>

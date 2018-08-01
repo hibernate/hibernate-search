@@ -21,7 +21,6 @@
     <description>Hibernate Search Legacy Modules Parent POM</description>
 
     <modules>
-        <module>sharedtestresources</module>
         <module>legacy</module>
         <module>engine</module>
         <module>serialization/avro</module>
@@ -189,6 +188,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
+                <classifier>build-resources</classifier>
+                <type>zip</type>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
@@ -767,33 +773,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${version.dependency.plugin}</version>
-                    <executions>
-                        <execution>
-                            <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
-                            <!-- This will only be effective if hibernate-search-sharedtestresources is actually a project dependency -->
-                            <id>unpack-shared-test-build-resources</id>
-                            <goals>
-                                <goal>unpack-dependencies</goal>
-                            </goals>
-                            <phase>generate-test-resources</phase>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/</outputDirectory>
-                                <includeGroupIds>${project.groupId}</includeGroupIds>
-                                <includeArtifacIds>hibernate-search-sharedtestresources</includeArtifacIds>
-                                <includeTypes>zip</includeTypes>
-                                <excludeTransitive>true</excludeTransitive>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <profiles>
