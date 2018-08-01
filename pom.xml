@@ -1911,6 +1911,7 @@
                                     <goal>analyze</goal>
                                 </goals>
                                 <configuration>
+                                    <storeLifecycle>MODULE</storeLifecycle>
                                     <warnOnSeverity>INFO</warnOnSeverity>
                                     <failOnSeverity>MAJOR</failOnSeverity>
                                 </configuration>
