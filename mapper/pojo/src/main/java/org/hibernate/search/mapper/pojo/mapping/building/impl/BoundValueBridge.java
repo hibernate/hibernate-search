@@ -10,15 +10,15 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 public final class BoundValueBridge<V, F> {
-	private final ValueBridge<V, F> bridge;
+	private final ValueBridge<? super V, F> bridge;
 	private final IndexFieldAccessor<? super F> indexFieldAccessor;
 
-	BoundValueBridge(ValueBridge<V, F> bridge, IndexFieldAccessor<? super F> indexFieldAccessor) {
+	BoundValueBridge(ValueBridge<? super V, F> bridge, IndexFieldAccessor<? super F> indexFieldAccessor) {
 		this.bridge = bridge;
 		this.indexFieldAccessor = indexFieldAccessor;
 	}
 
-	public ValueBridge<V, F> getBridge() {
+	public ValueBridge<? super V, F> getBridge() {
 		return bridge;
 	}
 

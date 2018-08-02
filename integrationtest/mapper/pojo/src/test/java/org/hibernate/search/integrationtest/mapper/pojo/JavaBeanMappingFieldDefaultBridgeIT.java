@@ -190,7 +190,18 @@ public class JavaBeanMappingFieldDefaultBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Searching
-		// TODO HSEARCH-3223 also test projections going through the bridge
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+			E entity1 = newEntityFunction.apply( 1, propertyValue );
+
+			manager.getMainWorker().add( entity1 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b
+							.field( "myProperty", indexedFieldValue )
+					)
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 }

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
 /**
@@ -40,7 +40,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default IndexSchemaFieldTypedContext<F> bind(ValueBridgeBindingContext context) {
+	default StandardIndexSchemaFieldTypedContext<F> bind(ValueBridgeBindingContext context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 
@@ -51,6 +51,28 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * @return The value of the indexed field.
 	 */
 	F toIndexedValue(V value);
+
+	/**
+	 * Cast an input value to the expected type {@link V}.
+	 * <p>
+	 * Called for values passed to the predicate DSL in particular.
+	 *
+	 * @param value The value to convert.
+	 * @return The checked value.
+	 * @throws RuntimeException If the value does not match the expected type.
+	 */
+	V cast(Object value);
+
+	/**
+	 * @param other Another {@link ValueBridge}, never {@code null}.
+	 * @return {@code true} if the given object is also a {@link ValueBridge}
+	 * that behaves exactly the same as this object, i.e. its {@link #cast(Object)} and {@link #toIndexedValue(Object)}
+	 * methods are guaranteed to always return the same value as this object's
+	 * when given the same input. {@code false} otherwise, or when in doubt.
+	 */
+	default boolean isCompatibleWith(ValueBridge<?, ?> other) {
+		return equals( other );
+	}
 
 	/**
 	 * Transform the given indexed field value back to the value initially extracted from the POJO,

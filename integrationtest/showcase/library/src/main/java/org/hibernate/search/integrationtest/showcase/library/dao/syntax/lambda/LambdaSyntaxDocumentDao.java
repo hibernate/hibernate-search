@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
+import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -37,7 +38,8 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
 				fullTextSession.search( Book.class ).query()
 				.asEntities()
-				.predicate( c -> c.match().onField( "isbn" ).matching( isbnAsString ) )
+				// TODO allow to bypass the bridge in the DSL
+				.predicate( c -> c.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -57,8 +59,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 						}
 					} );
 					b.must( ctx -> ctx.nested().onObjectField( "copies" )
-							// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-							.match().onField( "copies.medium" ).matching( medium.name() )
+							.match().onField( "copies.medium" ).matching( medium )
 					);
 				} )
 				.sort( b -> b.byField( "title_sort" ) )
@@ -118,8 +119,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								for ( LibraryService service : libraryServices ) {
 									c2.match()
 											.onField( "copies.library.services" )
-											// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-											.matching( service.name() );
+											.matching( service );
 								}
 							} );
 						}

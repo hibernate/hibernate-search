@@ -10,16 +10,15 @@ import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConve
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 
-public abstract class AbstractMatchPredicateBuilder<T> extends AbstractSearchPredicateBuilder
+public abstract class AbstractMatchPredicateBuilder<F, T> extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
-
-	private final LuceneFieldConverter<T> converter;
+	private final LuceneFieldConverter<?, T> converter;
 
 	protected T value;
 
-	protected AbstractMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<T> converter) {
+	protected AbstractMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<?, T> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}

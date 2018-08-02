@@ -12,12 +12,12 @@ import com.google.gson.JsonElement;
  * Defines how a given value will be encoded as JSON and decoded from JSON.
  * <p>
  * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
- * and returns decoded values to the hit extractor when projecting in a search query.
+ * and returns decoded values to the {@link org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter}
+ * when projecting in a search query.
  */
 public interface ElasticsearchFieldCodec<F> {
 
-	// FIXME only accept type F here
-	JsonElement encode(Object object);
+	JsonElement encode(F value);
 
 	F decode(JsonElement element);
 

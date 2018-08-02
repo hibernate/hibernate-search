@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -22,9 +22,9 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndex
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
 
 
@@ -49,18 +49,18 @@ class ElasticsearchIndexSchemaFieldContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> IndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
+	public <F> StandardIndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asString();
+			return (StandardIndexSchemaFieldTypedContext<F>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asInteger();
+			return (StandardIndexSchemaFieldTypedContext<F>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asLocalDate();
+			return (StandardIndexSchemaFieldTypedContext<F>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asGeoPoint();
+			return (StandardIndexSchemaFieldTypedContext<F>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -69,27 +69,27 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> asString() {
+	public StandardIndexSchemaFieldTypedContext<String> asString() {
 		return setDelegate( new StringIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<Integer> asInteger() {
+	public StandardIndexSchemaFieldTypedContext<Integer> asInteger() {
 		return setDelegate( new IntegerIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
+	public StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
 		return setDelegate( new LocalDateIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
+	public StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
 		return setDelegate( new GeoPointIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTerminalContext<String> asJsonString(String mappingJsonString) {
+	public IndexSchemaFieldTypedContext<String> asJsonString(String mappingJsonString) {
 		return setDelegate( new JsonStringIndexSchemaFieldContext( this, relativeFieldName, mappingJsonString ) );
 	}
 

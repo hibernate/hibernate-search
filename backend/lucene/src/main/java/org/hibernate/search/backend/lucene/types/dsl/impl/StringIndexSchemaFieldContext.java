@@ -13,7 +13,7 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -40,7 +40,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	private Analyzer normalizer;
 
 	public StringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName );
+		super( schemaContext, relativeFieldName, String.class );
 	}
 
 	@Override
@@ -61,7 +61,10 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
-		StringFieldConverter converter = new StringFieldConverter( analyzerOrNormalizer );
+		StringFieldConverter converter = new StringFieldConverter(
+				helper.createUserIndexFieldConverter(),
+				analyzerOrNormalizer
+		);
 
 		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -86,7 +89,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
 		if ( !"default".equals( analyzerName ) ) {
 			throw new UnsupportedOperationException( "For now, only the default analyzer is supported by the Lucene backend." );
 		}
@@ -95,7 +98,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
 		throw new UnsupportedOperationException( "For now, normalizers are not supported by the Lucene backend." );
 	}
 

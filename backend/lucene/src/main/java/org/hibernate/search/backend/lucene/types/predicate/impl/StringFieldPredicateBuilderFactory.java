@@ -9,20 +9,30 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
+
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 
-public class StringFieldPredicateBuilderFactory extends AbstractStandardLuceneFieldPredicateBuilderFactory {
-
-	private final StringFieldConverter converter;
+public final class StringFieldPredicateBuilderFactory
+		extends AbstractStandardLuceneFieldPredicateBuilderFactory<StringFieldConverter> {
 
 	private final boolean tokenized;
 
 	private final QueryBuilder queryBuilder;
 
 	public StringFieldPredicateBuilderFactory(StringFieldConverter converter, boolean tokenized, QueryBuilder queryBuilder) {
-		this.converter = converter;
+		super( converter );
 		this.tokenized = tokenized;
 		this.queryBuilder = queryBuilder;
+	}
+
+	@Override
+	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
+		if ( !super.isDslCompatibleWith( other ) ) {
+			return false;
+		}
+		StringFieldPredicateBuilderFactory castedOther = (StringFieldPredicateBuilderFactory) other;
+		return tokenized == castedOther.tokenized
+				&& Objects.equals( queryBuilder, castedOther.queryBuilder );
 	}
 
 	@Override
@@ -37,25 +47,18 @@ public class StringFieldPredicateBuilderFactory extends AbstractStandardLuceneFi
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj == null ) {
-			return false;
-		}
-		if ( StringFieldPredicateBuilderFactory.class != obj.getClass() ) {
+		if ( !super.equals( obj ) ) {
 			return false;
 		}
 
 		StringFieldPredicateBuilderFactory other = (StringFieldPredicateBuilderFactory) obj;
 
-		return Objects.equals( converter, other.converter ) &&
-				tokenized == other.tokenized &&
+		return tokenized == other.tokenized &&
 				Objects.equals( queryBuilder, other.queryBuilder );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( converter, tokenized, queryBuilder );
+		return Objects.hash( super.hashCode(), tokenized, queryBuilder );
 	}
 }

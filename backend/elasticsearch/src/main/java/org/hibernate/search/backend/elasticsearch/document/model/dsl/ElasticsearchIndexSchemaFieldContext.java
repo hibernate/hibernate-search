@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 
 
 /**
@@ -15,6 +15,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTe
  */
 public interface ElasticsearchIndexSchemaFieldContext extends IndexSchemaFieldContext {
 
-	IndexSchemaFieldTerminalContext<String> asJsonString(String mappingJsonString);
+	IndexSchemaFieldTypedContext<String> asJsonString(String mappingJsonString);
 
 }

@@ -22,16 +22,16 @@ import com.google.gson.JsonPrimitive;
  * A hit extractor that will extract a value from the "_source",
  * and insert it into the projection.
  */
-class SourceHitExtractor<F> implements HitExtractor<ProjectionHitCollector> {
+class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
-	private final ElasticsearchFieldCodec<F> codec;
+	private final ElasticsearchFieldCodec codec;
 
-	SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldCodec<F> codec) {
+	SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.property( absoluteFieldPath );
 		this.codec = codec;

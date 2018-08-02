@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 import com.google.gson.JsonElement;
@@ -22,11 +23,11 @@ class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
 	private final String absoluteFieldPath;
-	private final ElasticsearchFieldCodec<F> fieldCodec;
+	private final ElasticsearchFieldConverter converter;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec<F> fieldCodec) {
+	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<F> node) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.fieldCodec = fieldCodec;
+		this.converter = node.getConverter();
 	}
 
 	@Override
@@ -41,7 +42,7 @@ class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 
 	@Override
 	public void missingAs(Object value) {
-		MISSING.set( getInnerObject(), fieldCodec.encode( value ) );
+		MISSING.set( getInnerObject(), converter.convertFromDsl( value ) );
 	}
 
 	@Override

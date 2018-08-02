@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.util.impl.common.Contracts;
@@ -35,8 +35,13 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> bind(ValueBridgeBindingContext context) {
+	public StandardIndexSchemaFieldTypedContext<F> bind(ValueBridgeBindingContext context) {
 		return context.getIndexSchemaFieldContext().as( fieldType );
+	}
+
+	@Override
+	public F cast(Object value) {
+		return fieldType.cast( value );
 	}
 
 	@Override
@@ -44,4 +49,17 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 		return value;
 	}
 
+	@Override
+	public Object fromIndexedValue(F indexedValue) {
+		return indexedValue;
+	}
+
+	@Override
+	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		PassThroughValueBridge<?> castedOther = (PassThroughValueBridge<?>) other;
+		return fieldType.equals( castedOther.fieldType );
+	}
 }

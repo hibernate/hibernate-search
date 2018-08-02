@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.common.spi.BeanReference;
@@ -121,7 +121,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 		}
 
 		@Override
-		public void contribute(IndexSchemaFieldTypedContext<?> context) {
+		public void contribute(StandardIndexSchemaFieldTypedContext<?> context) {
 			delegates.forEach( c -> c.contribute( context ) );
 		}
 	}

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
@@ -51,18 +51,18 @@ class LuceneIndexSchemaFieldContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> IndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
+	public <F> StandardIndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asString();
+			return (StandardIndexSchemaFieldTypedContext<F>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asInteger();
+			return (StandardIndexSchemaFieldTypedContext<F>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asLocalDate();
+			return (StandardIndexSchemaFieldTypedContext<F>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (IndexSchemaFieldTypedContext<F>) asGeoPoint();
+			return (StandardIndexSchemaFieldTypedContext<F>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -71,22 +71,22 @@ class LuceneIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> asString() {
+	public StandardIndexSchemaFieldTypedContext<String> asString() {
 		return setDelegate( new StringIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<Integer> asInteger() {
+	public StandardIndexSchemaFieldTypedContext<Integer> asInteger() {
 		return setDelegate( new IntegerIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
+	public StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
 		return setDelegate( new LocalDateIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
+	public StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
 		return setDelegate( new GeoPointIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 

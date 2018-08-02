@@ -19,6 +19,16 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	}
 
 	@Override
+	public ISBN cast(Object value) {
+		return (ISBN) value;
+	}
+
+	@Override
+	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
+		return getClass().equals( other.getClass() );
+	}
+
+	@Override
 	public Object fromIndexedValue(String indexedValue) {
 		return indexedValue == null ? null : new ISBN( indexedValue );
 	}

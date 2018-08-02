@@ -28,7 +28,7 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 	private Sortable sortable;
 
 	public LocalDateIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName );
+		super( schemaContext, relativeFieldName, LocalDate.class );
 	}
 
 	@Override
@@ -40,12 +40,13 @@ public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaF
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		LocalDateFieldConverter converter = new LocalDateFieldConverter( helper.createUserIndexFieldConverter() );
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				LocalDateFieldConverter.INSTANCE,
+				converter,
 				new LocalDateFieldCodec( getStore(), sortable ),
-				new LocalDateFieldPredicateBuilderFactory( LocalDateFieldConverter.INSTANCE ),
+				new LocalDateFieldPredicateBuilderFactory( converter ),
 				LocalDateFieldSortContributor.INSTANCE
 		);
 

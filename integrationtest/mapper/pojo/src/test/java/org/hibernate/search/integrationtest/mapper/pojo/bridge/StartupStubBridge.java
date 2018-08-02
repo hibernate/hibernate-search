@@ -84,6 +84,11 @@ public class StartupStubBridge
 	}
 
 	@Override
+	public Object cast(Object value) {
+		throw shouldNotBeUsed();
+	}
+
+	@Override
 	public String toIndexedValue(Object value) {
 		throw shouldNotBeUsed();
 	}

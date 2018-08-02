@@ -10,22 +10,22 @@ import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConve
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 
-public abstract class AbstractRangePredicateBuilder<T> extends AbstractSearchPredicateBuilder
+public abstract class AbstractRangePredicateBuilder<F> extends AbstractSearchPredicateBuilder
 		implements RangePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 
-	protected final LuceneFieldConverter<T> converter;
+	protected final LuceneFieldConverter<?, F> converter;
 
-	protected T lowerLimit;
+	protected F lowerLimit;
 
 	protected boolean excludeLowerLimit = false;
 
-	protected T upperLimit;
+	protected F upperLimit;
 
 	protected boolean excludeUpperLimit = false;
 
-	protected AbstractRangePredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<T> converter) {
+	protected AbstractRangePredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<?, F> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}

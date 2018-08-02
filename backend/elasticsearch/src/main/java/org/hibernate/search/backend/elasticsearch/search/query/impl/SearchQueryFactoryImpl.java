@@ -115,7 +115,7 @@ class SearchQueryFactoryImpl
 					ElasticsearchIndexSchemaFieldNode<?> node = indexModel.getFieldNode( projection );
 					if ( node != null ) {
 						projectionFound.set( i );
-						extractors.add( new SourceHitExtractor<>( projection, node.getCodec() ) );
+						extractors.add( new SourceHitExtractor( projection, node.getCodec() ) );
 					}
 					else {
 						// Make sure that the result list will have the correct indices and size

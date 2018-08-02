@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 
 
 /**
  * @author Guillaume Smet
  */
-public interface LuceneIndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTypedContext<F> {
+public interface LuceneIndexSchemaFieldTypedContext<F> extends StandardIndexSchemaFieldTypedContext<F> {
 
 }

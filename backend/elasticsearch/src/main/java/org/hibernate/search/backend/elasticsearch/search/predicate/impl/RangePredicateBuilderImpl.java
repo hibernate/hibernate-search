@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class RangePredicateBuilderImpl<F> extends AbstractSearchPredicateBuilder
+public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor RANGE = JsonAccessor.root().property( "range" ).asObject();
@@ -28,22 +28,21 @@ public class RangePredicateBuilderImpl<F> extends AbstractSearchPredicateBuilder
 	private static final JsonAccessor<JsonElement> LTE = JsonAccessor.root().property( "lte" );
 
 	private final String absoluteFieldPath;
-
-	private final ElasticsearchFieldCodec<F> codec;
+	private final ElasticsearchFieldConverter converter;
 
 	private JsonElement lowerLimit;
 	private boolean excludeLowerLimit = false;
 	private JsonElement upperLimit;
 	private boolean excludeUpperLimit = false;
 
-	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldCodec<F> codec) {
+	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.codec = codec;
+		this.converter = converter;
 	}
 
 	@Override
 	public void lowerLimit(Object value) {
-		this.lowerLimit = codec.encode( value );
+		this.lowerLimit = converter.convertFromDsl( value );
 	}
 
 	@Override
@@ -53,7 +52,7 @@ public class RangePredicateBuilderImpl<F> extends AbstractSearchPredicateBuilder
 
 	@Override
 	public void upperLimit(Object value) {
-		this.upperLimit = codec.encode( value );
+		this.upperLimit = converter.convertFromDsl( value );
 	}
 
 	@Override

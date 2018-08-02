@@ -25,6 +25,4 @@ public interface ValueBridgeBindingContext {
 	 */
 	IndexSchemaFieldContext getIndexSchemaFieldContext();
 
-	// TODO add methods to register backward bridging (from single index field value to single POJO model value)
-
 }

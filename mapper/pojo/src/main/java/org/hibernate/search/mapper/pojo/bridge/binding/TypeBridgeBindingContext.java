@@ -25,10 +25,4 @@ public interface TypeBridgeBindingContext {
 	 */
 	IndexSchemaElement getIndexSchemaElement();
 
-	// TODO add methods to register search predicate bridging (from single POJO model value to single index field value)
-
-	// TODO add methods to register backward bridging (from single index field value to single POJO model value)
-
-	// TODO add methods to register multiple backward bridging (from multiple index field value to single POJO model value)
-
 }

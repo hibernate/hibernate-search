@@ -41,7 +41,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
 
-	private final Collection<BoundValueBridge<? super V, ?>> boundBridges = new ArrayList<>();
+	private final Collection<BoundValueBridge<V, ?>> boundBridges = new ArrayList<>();
 
 	private final Collection<PojoIndexingProcessorTypeNodeBuilder<V>> typeNodeBuilders = new ArrayList<>();
 

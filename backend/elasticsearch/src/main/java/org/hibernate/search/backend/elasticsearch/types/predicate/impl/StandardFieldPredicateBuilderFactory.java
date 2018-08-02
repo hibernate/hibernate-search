@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -21,26 +21,35 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class StandardFieldPredicateBuilderFactory<F> implements ElasticsearchFieldPredicateBuilderFactory {
+public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchFieldCodec<F> codec;
+	private final ElasticsearchFieldConverter converter;
 
-	public StandardFieldPredicateBuilderFactory(ElasticsearchFieldCodec<F> codec) {
-		this.codec = codec;
+	public StandardFieldPredicateBuilderFactory(ElasticsearchFieldConverter converter) {
+		this.converter = converter;
+	}
+
+	@Override
+	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		StandardFieldPredicateBuilderFactory castedOther = (StandardFieldPredicateBuilderFactory) other;
+		return converter.isDslCompatibleWith( castedOther.converter );
 	}
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl<>( absoluteFieldPath, codec );
+		return new MatchPredicateBuilderImpl( absoluteFieldPath, converter );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl<>( absoluteFieldPath, codec );
+		return new RangePredicateBuilderImpl( absoluteFieldPath, converter );
 	}
 
 	@Override

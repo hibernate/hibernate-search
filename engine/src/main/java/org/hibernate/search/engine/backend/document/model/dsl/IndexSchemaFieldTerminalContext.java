@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 
 /**
  * @param <F> The type of field values.

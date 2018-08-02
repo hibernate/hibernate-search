@@ -14,8 +14,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.IntegerFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
-import org.hibernate.search.backend.lucene.types.converter.impl.SimpleCastingFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.IntegerFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContributor;
 
@@ -24,12 +23,10 @@ import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContr
  */
 public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
 
-	public static final LuceneFieldConverter<Integer> CONVERTER = new SimpleCastingFieldConverter<>();
-
 	private Sortable sortable;
 
 	public IntegerIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName );
+		super( schemaContext, relativeFieldName, Integer.class );
 	}
 
 	@Override
@@ -41,12 +38,13 @@ public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFie
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				CONVERTER,
+				converter,
 				new IntegerFieldCodec( getStore(), sortable ),
-				IntegerFieldPredicateBuilderFactory.INSTANCE,
+				new IntegerFieldPredicateBuilderFactory( converter ),
 				IntegerFieldSortContributor.INSTANCE
 		);
 

@@ -31,6 +31,11 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	}
 
 	@Override
+	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other) {
+		return getClass().equals( other.getClass() );
+	}
+
+	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(

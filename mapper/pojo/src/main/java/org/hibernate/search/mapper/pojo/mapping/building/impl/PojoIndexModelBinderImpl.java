@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -177,7 +177,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <V> Optional<BoundValueBridge<? super V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
+	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
@@ -205,7 +205,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, valueTypeModel, relativeFieldName, contributor );
 	}
 
-	private <V, F> Optional<BoundValueBridge<? super V, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
+	private <V, F> Optional<BoundValueBridge<V, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
 			ValueBridge<? super V, F> bridge, GenericTypeContext bridgeTypeContext,
 			PojoGenericTypeModel<V> valueTypeModel,
 			String relativeFieldName, FieldModelContributor contributor) {
@@ -214,10 +214,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
 
 		// First give the bridge a chance to contribute to the model
-		IndexSchemaFieldTypedContext<? super F> typedFieldContext = bridge.bind( new ValueBridgeBindingContextImpl(
+		ValueBridgeBindingContextImpl bridgeBindingContext = new ValueBridgeBindingContextImpl(
 				new PojoModelValueElement<>( valueTypeModel ),
 				fieldContext
-		) );
+		);
+		StandardIndexSchemaFieldTypedContext<? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
 
 		if ( typedFieldContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
@@ -227,6 +228,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 					.orElseThrow( () -> log.unableToInferValueBridgeIndexFieldType( bridge ) );
 			typedFieldContext = fieldContext.as( returnType );
 		}
+
+		// Then register the bridge itself as a converter to use in the DSL
+		typedFieldContext.dslConverter(
+				new ValueBridgeToIndexFieldValueConverter<>( bridge )
+		);
+
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( typedFieldContext );
 

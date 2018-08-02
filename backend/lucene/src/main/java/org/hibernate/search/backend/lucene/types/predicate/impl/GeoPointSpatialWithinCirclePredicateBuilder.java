@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.apache.lucene.document.LatLonPoint;
-import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractSpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
+
+import org.apache.lucene.document.LatLonPoint;
+import org.apache.lucene.search.Query;
 
 class GeoPointSpatialWithinCirclePredicateBuilder extends AbstractSpatialWithinCirclePredicateBuilder<GeoPoint> {
 

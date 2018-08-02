@@ -27,6 +27,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.LocalDateFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
 
 import com.google.gson.JsonElement;
@@ -52,7 +53,7 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
 	public LocalDateIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, DataType.DATE );
+		super( schemaContext, relativeFieldName, LocalDate.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}
 
@@ -62,8 +63,12 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
+		StandardFieldConverter<LocalDate> converter = new StandardFieldConverter<>(
+				helper.createUserIndexFieldConverter(),
+				codec
+		);
 		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, codec, new StandardFieldPredicateBuilderFactory<>( codec )
+				parentNode, converter, codec, new StandardFieldPredicateBuilderFactory( converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchStandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
@@ -19,13 +21,20 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
  * @author Yoann Rodiere
  */
 public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<F>
-		implements ElasticsearchIndexSchemaFieldTypedContext<F>,
+		implements ElasticsearchStandardIndexSchemaFieldTypedContext<F>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
-	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext );
+	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, Class<F> fieldType) {
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<F> dslConverter(
+			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+		helper.dslConverter( toIndexConverter );
+		return this;
 	}
 
 	@Override

@@ -24,11 +24,10 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 	}
 
 	@Override
-	public JsonElement encode(Object object) {
-		if ( object == null ) {
+	public JsonElement encode(LocalDate value) {
+		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		LocalDate value = (LocalDate) object;
 		return new JsonPrimitive( delegate.format( value ) );
 	}
 

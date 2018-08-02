@@ -16,13 +16,14 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldConverter<?> fieldConverter;
+	private final LuceneFieldConverter<?, ?> fieldConverter;
 
 	private final LuceneFieldSortContributor fieldSortContributor;
 
 	private Object missingValue;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldConverter<?> fieldConverter, LuceneFieldSortContributor fieldSortContributor) {
+	FieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldConverter<?, ?> fieldConverter,
+			LuceneFieldSortContributor fieldSortContributor) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.fieldConverter = fieldConverter;
 		this.fieldSortContributor = fieldSortContributor;

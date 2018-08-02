@@ -6,19 +6,13 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
+import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+
 /**
  * @param <F> The type of field values.
  */
 public interface IndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTerminalContext<F> {
 
-	// TODO add common options: stored, sortable, ...
-
-	IndexSchemaFieldTypedContext<F> analyzer(String analyzerName);
-
-	IndexSchemaFieldTypedContext<F> normalizer(String normalizerName);
-
-	IndexSchemaFieldTypedContext<F> store(Store store);
-
-	IndexSchemaFieldTypedContext<F> sortable(Sortable sortable);
+	IndexSchemaFieldTypedContext<F> dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
 
 }

@@ -111,7 +111,7 @@ class SearchQueryFactoryImpl
 					LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( projection );
 					if ( schemaNode != null ) {
 						projectionFound.set( i );
-						extractors.add( new FieldProjectionHitExtractor( projection, schemaNode.getCodec() ) );
+						extractors.add( new FieldProjectionHitExtractor<>( projection, schemaNode ) );
 					}
 					else {
 						// Make sure that the result list will have the correct indices and size

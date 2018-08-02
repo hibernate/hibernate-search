@@ -20,6 +20,11 @@ public final class OptionalIntAsStringValueBridge implements ValueBridge<Optiona
 	}
 
 	@Override
+	public OptionalInt cast(Object value) {
+		return (OptionalInt) value;
+	}
+
+	@Override
 	public void close() {
 		// Nothing to do
 	}

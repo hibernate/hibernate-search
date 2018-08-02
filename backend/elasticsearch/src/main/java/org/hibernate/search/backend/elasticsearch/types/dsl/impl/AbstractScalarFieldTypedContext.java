@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
@@ -33,34 +33,34 @@ abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchI
 	private Sortable sortable = Sortable.DEFAULT;
 
 	AbstractScalarFieldTypedContext(IndexSchemaContext schemaContext,
-			String relativeFieldName, DataType dataType) {
-		super( schemaContext );
+			String relativeFieldName, Class<F> fieldType, DataType dataType) {
+		super( schemaContext, fieldType );
 		this.relativeFieldName = relativeFieldName;
 		this.dataType = dataType;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
+	public StandardIndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
 		throw log.cannotUseAnalyzerOnFieldType(
 				relativeFieldName, dataType, getSchemaContext().getEventContext()
 		);
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
+	public StandardIndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
 		throw log.cannotUseNormalizerOnFieldType(
 				relativeFieldName, dataType, getSchemaContext().getEventContext()
 		);
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> store(Store store) {
+	public StandardIndexSchemaFieldTypedContext<F> store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
+	public StandardIndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}

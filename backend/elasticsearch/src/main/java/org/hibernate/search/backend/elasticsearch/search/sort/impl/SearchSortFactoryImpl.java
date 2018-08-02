@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
@@ -72,7 +73,8 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
-		return new FieldSortBuilderImpl<>( absoluteFieldPath, searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec() );
+		ElasticsearchIndexSchemaFieldNode<?> node = searchTargetModel.getSchemaNode( absoluteFieldPath );
+		return new FieldSortBuilderImpl<>( absoluteFieldPath, node );
 	}
 
 	@Override

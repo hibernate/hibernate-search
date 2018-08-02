@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 
 /**
@@ -18,20 +19,27 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
 
+	private final ElasticsearchFieldConverter converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
 
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent,
+			ElasticsearchFieldConverter converter,
 			ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory) {
 		this.parent = parent;
+		this.converter = converter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
+	}
+
+	public ElasticsearchFieldConverter getConverter() {
+		return converter;
 	}
 
 	public ElasticsearchFieldCodec<F> getCodec() {
@@ -43,15 +51,16 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 	}
 
 	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode<?> other) {
-		return Objects.equals( codec, other.codec )
-				&& Objects.equals( predicateBuilderFactory, other.predicateBuilderFactory );
+		return converter.isDslCompatibleWith( other.converter )
+				&& Objects.equals( codec, other.codec )
+				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory );
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
-				.append( ", codec=" ).append( codec )
+				.append( ", converter=" ).append( converter )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
 				.append( "]" );
 		return sb.toString();

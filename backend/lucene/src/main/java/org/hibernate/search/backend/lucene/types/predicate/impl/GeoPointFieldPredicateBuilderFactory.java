@@ -28,6 +28,11 @@ public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPr
 	}
 
 	@Override
+	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
+		return getClass().equals( other.getClass() );
+	}
+
+	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

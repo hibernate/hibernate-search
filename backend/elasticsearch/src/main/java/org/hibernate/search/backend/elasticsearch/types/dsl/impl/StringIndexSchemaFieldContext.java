@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.F
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
 
 import com.google.gson.JsonElement;
@@ -30,9 +31,6 @@ import com.google.gson.JsonElement;
  */
 public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
 
-	private static final StandardFieldPredicateBuilderFactory<String> PREDICATE_BUILDER_FACTORY =
-			new StandardFieldPredicateBuilderFactory<>( StringFieldCodec.INSTANCE );
-
 	private final String relativeFieldName;
 	private String analyzerName;
 	private String normalizerName;
@@ -40,30 +38,30 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 	private Sortable sortable = Sortable.DEFAULT;
 
 	public StringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext );
+		super( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> store(Store store) {
+	public StandardIndexSchemaFieldTypedContext<String> store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> sortable(Sortable sortable) {
+	public StandardIndexSchemaFieldTypedContext<String> sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -74,8 +72,13 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
+		StandardFieldConverter<String> converter = new StandardFieldConverter<>(
+				helper.createUserIndexFieldConverter(),
+				StringFieldCodec.INSTANCE
+		);
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, StringFieldCodec.INSTANCE, PREDICATE_BUILDER_FACTORY
+				parentNode, converter, StringFieldCodec.INSTANCE,
+				new StandardFieldPredicateBuilderFactory( converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

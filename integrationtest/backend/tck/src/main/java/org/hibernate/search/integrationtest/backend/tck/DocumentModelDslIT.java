@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -39,7 +39,7 @@ public class DocumentModelDslIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static List<Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>>> MAIN_TYPES =
+	private static List<Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>>> MAIN_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexSchemaFieldContext::asString,
 					IndexSchemaFieldContext::asInteger,
@@ -47,7 +47,7 @@ public class DocumentModelDslIT {
 					IndexSchemaFieldContext::asGeoPoint
 			) );
 
-	private static List<Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>>> NON_ANALYZABLE_TYPES =
+	private static List<Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>>> NON_ANALYZABLE_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexSchemaFieldContext::asInteger,
 					IndexSchemaFieldContext::asLocalDate,
@@ -368,7 +368,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void analyzerOnNonAnalyzableType() {
-		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction
 				: NON_ANALYZABLE_TYPES ) {
 			SubTest.expectException(
 					"Setting an analyzer after " + typedContextFunction + " on schema root",
@@ -411,7 +411,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void normalizerOnNonAnalyzableType() {
-		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction
 				: NON_ANALYZABLE_TYPES ) {
 			SubTest.expectException(
 					"Setting a normalizer after " + typedContextFunction + " on schema root",
@@ -454,7 +454,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void missingCreateAccessorCall() {
-		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Missing createAccessor() call after " + typedContextFunction,
 					() -> setup( ctx -> {
@@ -490,12 +490,12 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void multipleCreateAccessorCall() {
-		for ( Function<IndexSchemaFieldContext, IndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Multiple createAccessor() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						IndexSchemaFieldTypedContext<?> context = typedContextFunction.apply(
+						StandardIndexSchemaFieldTypedContext<?> context = typedContextFunction.apply(
 								root.field( "myField" )
 						);
 						context.createAccessor();

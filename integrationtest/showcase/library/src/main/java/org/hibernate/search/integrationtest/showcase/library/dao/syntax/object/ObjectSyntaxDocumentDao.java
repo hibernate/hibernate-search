@@ -17,6 +17,7 @@ import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
+import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
@@ -43,7 +44,8 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().match().onField( "isbn" ).matching( isbnAsString ).end()
+						// TODO allow to bypass the bridge in the DSL
+						target.predicate().match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).end()
 				)
 				.build();
 
@@ -67,8 +69,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 
 		booleanBuilder.must(
 				target.predicate().nested().onObjectField( "copies" )
-				// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-				.match().onField( "copies.medium" ).matching( medium.name() ).end()
+				.match().onField( "copies.medium" ).matching( medium ).end()
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
@@ -135,8 +136,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 				nestedBoolean.must(
 						target.predicate().match()
 						.onField( "copies.library.services" )
-						// Bridged query with value bridge: TODO rely on the bridge to convert to a String
-						.matching( service.name() )
+						.matching( service )
 						.end()
 				);
 			}

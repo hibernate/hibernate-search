@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 
 
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchIndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTypedContext<F> {
+public interface ElasticsearchStandardIndexSchemaFieldTypedContext<F> extends StandardIndexSchemaFieldTypedContext<F> {
 
 }

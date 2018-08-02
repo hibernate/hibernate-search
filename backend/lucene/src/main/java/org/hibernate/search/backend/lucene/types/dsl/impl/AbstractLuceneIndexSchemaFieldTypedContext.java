@@ -10,8 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldTypedContext;
@@ -35,9 +36,17 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	private Store store;
 
-	protected AbstractLuceneIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext );
+	protected AbstractLuceneIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, String relativeFieldName,
+			Class<F> fieldType) {
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
 		this.relativeFieldName = relativeFieldName;
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<F> dslConverter(
+			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+		helper.dslConverter( toIndexConverter );
+		return this;
 	}
 
 	@Override
@@ -54,18 +63,18 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 			LuceneIndexSchemaObjectNode parentNode);
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> store(Store store) {
+	public StandardIndexSchemaFieldTypedContext<F> store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
+	public StandardIndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
 		throw log.cannotUseAnalyzerOnFieldType( relativeFieldName, getSchemaContext().getEventContext() );
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
+	public StandardIndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
 		throw log.cannotUseNormalizerOnFieldType( relativeFieldName, getSchemaContext().getEventContext() );
 	}
 
