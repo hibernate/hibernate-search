@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonArray;
@@ -22,19 +22,19 @@ import com.google.gson.JsonPrimitive;
  * A hit extractor that will extract a value from the "_source",
  * and insert it into the projection.
  */
-class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
+class SourceHitExtractor<F> implements HitExtractor<ProjectionHitCollector> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
-	private final ElasticsearchFieldCodec codec;
+	private final ElasticsearchFieldConverter converter;
 
-	SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldCodec codec) {
+	SourceHitExtractor(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.property( absoluteFieldPath );
-		this.codec = codec;
+		this.converter = converter;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ class SourceHitExtractor implements HitExtractor<ProjectionHitCollector> {
 	@Override
 	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
-		collector.collectProjection( codec.decode( fieldValue ) );
+		collector.collectProjection( converter.convertFromProjection( fieldValue ) );
 	}
 
 }

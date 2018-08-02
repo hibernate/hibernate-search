@@ -51,6 +51,7 @@ class FieldProjectionHitExtractor<F> implements HitExtractor<ProjectionHitCollec
 
 	@Override
 	public void extract(ProjectionHitCollector collector, Document document) {
-		collector.collectProjection( codec.decode( document, absoluteFieldPath ) );
+		F rawValue = codec.decode( document, absoluteFieldPath );
+		collector.collectProjection( converter.convertFromProjection( rawValue ) );
 	}
 }

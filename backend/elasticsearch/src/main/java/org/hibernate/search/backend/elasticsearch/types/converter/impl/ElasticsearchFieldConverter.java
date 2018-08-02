@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 /**
  * Defines how a given value will be converted when performing search queries.
  * <p>
- * Used by predicate and sort builders in particular.
+ * Used by predicate and sort builders in particular, and also by hit extractors when projecting in a search query.
  */
 public interface ElasticsearchFieldConverter {
 
@@ -23,6 +23,12 @@ public interface ElasticsearchFieldConverter {
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
 	JsonElement convertFromDsl(Object value);
+
+	/**
+	 * @param value The projected value returned by the codec.
+	 * @return A value of the type expected by users when projecting.
+	 */
+	Object convertFromProjection(JsonElement value);
 
 	/**
 	 * Determine whether another converter is DSL-compatible with this one.

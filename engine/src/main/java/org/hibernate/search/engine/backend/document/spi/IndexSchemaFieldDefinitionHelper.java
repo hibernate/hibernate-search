@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.document.spi;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.spi.PassThroughToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -30,6 +31,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 			new DeferredInitializationIndexFieldAccessor<>();
 
 	private ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
 
 	private boolean accessorCreated = false;
 
@@ -42,6 +44,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 			ToIndexFieldValueConverter<F, ? extends F> identityToIndexConverter) {
 		this.schemaContext = schemaContext;
 		this.dslToIndexConverter = identityToIndexConverter;
+		this.projectionFromIndexConverter = null;
 	}
 
 	public IndexSchemaContext getSchemaContext() {
@@ -51,6 +54,11 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	public void dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
 		this.dslToIndexConverter = toIndexConverter;
+	}
+
+	public void projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
+		this.projectionFromIndexConverter = fromIndexConverter;
 	}
 
 	/**
@@ -71,7 +79,8 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	public UserIndexFieldConverter<F> createUserIndexFieldConverter() {
 		checkAccessorCreated();
 		return new UserIndexFieldConverter<>(
-				dslToIndexConverter
+				dslToIndexConverter,
+				projectionFromIndexConverter
 		);
 	}
 

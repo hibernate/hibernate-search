@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
@@ -46,6 +47,13 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 	public StandardIndexSchemaFieldTypedContext<F> dslConverter(
 			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
+		return this;
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<F> projectionConverter(
+			FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+		helper.projectionConverter( fromIndexConverter );
 		return this;
 	}
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 
 /**
@@ -15,6 +16,9 @@ public interface StandardIndexSchemaFieldTypedContext<F> extends IndexSchemaFiel
 
 	@Override
 	StandardIndexSchemaFieldTypedContext<F> dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
+
+	@Override
+	StandardIndexSchemaFieldTypedContext<F> projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter);
 
 	// TODO add common options: stored, sortable, ...
 

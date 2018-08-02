@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.spi;
 
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 
 /**
@@ -22,15 +23,19 @@ import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueC
 public final class UserIndexFieldConverter<F> {
 
 	private final ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
 
-	UserIndexFieldConverter(ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter) {
+	UserIndexFieldConverter(ToIndexFieldValueConverter<?,? extends F> dslToIndexConverter,
+			FromIndexFieldValueConverter<? super F,?> projectionFromIndexConverter) {
 		this.dslToIndexConverter = dslToIndexConverter;
+		this.projectionFromIndexConverter = projectionFromIndexConverter;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getName() + "["
 				+ "dslToIndexConverter=" + dslToIndexConverter
+				+ ", projectionFromIndexConverter=" + projectionFromIndexConverter
 				+ "]";
 	}
 
@@ -38,10 +43,21 @@ public final class UserIndexFieldConverter<F> {
 		return dslToIndexConverter.convertUnknown( value );
 	}
 
+	public Object convertFromProjection(F projection) {
+		if ( projectionFromIndexConverter == null ) {
+			// FIXME detect this when the projection is configured and throw an exception with an explicit message instead. A converter set to null means we don't want to enable projections.
+			return projection;
+		}
+		return projectionFromIndexConverter.convert( projection );
+	}
+
 	/**
 	 * Determine whether another converter is DSL-compatible with this one,
 	 * i.e. its {@link #convertFromDsl(Object)} method is guaranteed
 	 * to always return the same value as this converter's when given the same input.
+	 * <p>
+	 * Note: this method is separate from {@link #equals(Object)} because it might return true for two different objects,
+	 * e.g. two objects that implement {@link #convertFromProjection(Object)} differently.
 	 *
 	 * @param other Another {@link UserIndexFieldConverter}.
 	 * @return {@code true} if the given converter is DSL-compatible.
