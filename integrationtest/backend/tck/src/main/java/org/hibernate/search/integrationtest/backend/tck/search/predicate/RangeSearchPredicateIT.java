@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Do
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,6 +23,7 @@ import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -549,6 +551,73 @@ public class RangeSearchPredicateIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
+	}
+
+	@Test
+	public void error_invalidType() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
+		fieldModels.addAll( indexMapping.supportedFieldModels );
+		fieldModels.addAll( indexMapping.supportedFieldWithDslConverterModels );
+
+		for ( ByTypeFieldModel<?> fieldModel : fieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object invalidValueToMatch = new InvalidType();
+
+			SubTest.expectException(
+					"range().above() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().range().onField( absoluteFieldPath ).above( invalidValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unable to convert DSL parameter: " )
+					.hasMessageContaining( InvalidType.class.getName() )
+					.hasCauseInstanceOf( ClassCastException.class )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+
+			SubTest.expectException(
+					"range().below() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().range().onField( absoluteFieldPath ).below( invalidValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unable to convert DSL parameter: " )
+					.hasMessageContaining( InvalidType.class.getName() )
+					.hasCauseInstanceOf( ClassCastException.class )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+
+			SubTest.expectException(
+					"range().from() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().range().onField( absoluteFieldPath ).from( invalidValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unable to convert DSL parameter: " )
+					.hasMessageContaining( InvalidType.class.getName() )
+					.hasCauseInstanceOf( ClassCastException.class )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+
+			SubTest.expectException(
+					"range().from().to() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().range().onField( absoluteFieldPath )
+							.from( null ).to( invalidValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unable to convert DSL parameter: " )
+					.hasMessageContaining( InvalidType.class.getName() )
+					.hasCauseInstanceOf( ClassCastException.class )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+		}
 	}
 
 	private void initData() {

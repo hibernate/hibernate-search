@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Do
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,10 +27,12 @@ import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
@@ -37,8 +40,10 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -293,6 +298,39 @@ public class SearchSortByFieldIT {
 				.predicate().matchAll().end()
 				.sort().byField( absoluteFieldPath ).end()
 				.build();
+	}
+
+	@Test
+	public void error_invalidType() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
+		fieldModels.addAll( indexMapping.supportedFieldModels );
+		fieldModels.addAll( indexMapping.supportedFieldWithDslConverterModels );
+
+		for ( ByTypeFieldModel<?> fieldModel : fieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object invalidValueToMatch = new InvalidType();
+
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
+			) {
+				SubTest.expectException(
+						"byField() sort with invalid parameter type for onMissingValue().use() on field " + absoluteFieldPath,
+						() -> searchTarget.sort().byField( absoluteFieldPath ).onMissingValue()
+								.use( invalidValueToMatch )
+				)
+						.assertThrown()
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Unable to convert DSL parameter: " )
+						.hasMessageContaining( InvalidType.class.getName() )
+						.hasCauseInstanceOf( ClassCastException.class )
+						.satisfies( FailureReportUtils.hasContext(
+								EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+						) );
+			}
+		}
 	}
 
 	private void initData() {
