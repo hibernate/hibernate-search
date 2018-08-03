@@ -16,10 +16,12 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -40,40 +42,15 @@ public class MatchSearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	private static final String MATCHING_ID = "matching";
-	private static final String NON_MATCHING_ID = "nonMatching";
-	private static final String EMPTY_ID = "empty";
-	private static final String ADDITIONAL_MATCHING_ID = "additional_matching";
-
-	private static final String MATCHING_STRING = "Irving";
-	private static final Integer MATCHING_INTEGER = 42;
-	private static final LocalDate MATCHING_LOCAL_DATE = LocalDate.of( 1980, 10, 11 );
-	private static final GeoPoint MATCHING_GEO_POINT = new ImmutableGeoPoint( 40, 70 );
-
-	private static final String MATCHING_ONE_MORE_STRING = "Avenue of mysteries";
-	private static final String MATCHING_EVEN_MORE_STRING = "Oto oto";
-
-	private static final String NON_MATCHING_STRING = "Auster";
-	private static final Integer NON_MATCHING_INTEGER = 67;
-	private static final LocalDate NON_MATCHING_LOCAL_DATE = LocalDate.of( 1984, 10, 7 );
-	private static final GeoPoint NON_MATCHING_GEO_POINT = new ImmutableGeoPoint( 45, 98 );
-
-	private static final String NON_MATCHING_ONE_MORE_STRING = "4 3 2 1";
-	private static final String NON_MATCHING_EVEN_MORE_STRING = "Doma";
-
-	private static final String ADDITIONAL_MATCHING_STRING = "Coe";
-
-	private static final List<String> FIELDS = Arrays.asList( "string", "integer", "localDate" );
-	private static final List<Object> VALUES_TO_MATCH = Arrays.asList( MATCHING_STRING, MATCHING_INTEGER, MATCHING_LOCAL_DATE );
-
-	// unsupported field types
-	private static final List<String> UNSUPPORTED_FIELD_TYPE_PATHS = Arrays.asList( "geoPoint" );
-	private static final List<Object> UNSUPPORTED_FIELD_TYPE_VALUES = Arrays.asList( new ImmutableGeoPoint( 40, 70 ) );
+	private static final String DOCUMENT_1 = "document1";
+	private static final String DOCUMENT_2 = "document2";
+	private static final String DOCUMENT_3 = "document3";
+	private static final String EMPTY = "empty";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private IndexManager<?> indexManager;
 	private SessionContext sessionContext = new StubSessionContext();
 
@@ -82,7 +59,7 @@ public class MatchSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"MappedType", INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -94,9 +71,9 @@ public class MatchSearchPredicateIT {
 	public void match() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		for ( int i = 0; i < FIELDS.size(); i++ ) {
-			String absoluteFieldPath = FIELDS.get( i );
-			Object valueToMatch = VALUES_TO_MATCH.get( i );
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object valueToMatch = fieldModel.predicateParameterValue;
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
@@ -104,7 +81,7 @@ public class MatchSearchPredicateIT {
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		}
 	}
 
@@ -112,9 +89,9 @@ public class MatchSearchPredicateIT {
 	public void unsupported_field_types() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		for ( int i = 0; i < UNSUPPORTED_FIELD_TYPE_PATHS.size(); i++ ) {
-			String absoluteFieldPath = UNSUPPORTED_FIELD_TYPE_PATHS.get( i );
-			Object valueToMatch = UNSUPPORTED_FIELD_TYPE_VALUES.get( i );
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object valueToMatch = fieldModel.document1Value.indexedValue;
 
 			SubTest.expectException(
 					"match() predicate with unsupported type on field " + absoluteFieldPath,
@@ -133,17 +110,17 @@ public class MatchSearchPredicateIT {
 	public void match_error_null() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		for ( String fieldPath : FIELDS ) {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectException(
-					"matching() predicate with null value to match on field " + fieldPath,
-					() -> searchTarget.predicate().match().onField( fieldPath ).matching( null )
+					"matching() predicate with null value to match on field " + fieldModel.relativeFieldName,
+					() -> searchTarget.predicate().match().onField( fieldModel.relativeFieldName ).matching( null )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid value" )
 					.hasMessageContaining( "value to match" )
 					.hasMessageContaining( "must be non-null" )
-					.hasMessageContaining( fieldPath );
+					.hasMessageContaining( fieldModel.relativeFieldName );
 		}
 	}
 
@@ -154,26 +131,30 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).matching( MATCHING_STRING ).end()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( ADDITIONAL_MATCHING_STRING ).end()
+						.should().match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
+						.should().match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, ADDITIONAL_MATCHING_ID, MATCHING_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool()
-						.should().match().onField( "string" ).boostedTo( 42 ).matching( MATCHING_STRING ).end()
-						.should().match().onField( "string" ).matching( ADDITIONAL_MATCHING_STRING ).end()
+						.should().match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+								.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
+						.should().match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
 				.end()
 				.sort().byScore().end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, MATCHING_ID, ADDITIONAL_MATCHING_ID );
+				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
@@ -184,63 +165,75 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_STRING ).end()
+				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+						.orField( indexMapping.string2Field.relativeFieldName )
+						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orField( "one_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
+				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+						.orField( indexMapping.string2Field.relativeFieldName )
+						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// onField().orFields(...)
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_STRING ).end()
+				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
+				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).orFields( "one_more_string", "even_more_string" ).matching( MATCHING_EVEN_MORE_STRING ).end()
+				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+						.matching( indexMapping.string3Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// onFields(...)
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_STRING ).end()
+				.predicate().match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( "string", "one_more_string" ).matching( MATCHING_ONE_MORE_STRING ).end()
+				.predicate().match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
+						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -258,7 +251,7 @@ public class MatchSearchPredicateIT {
 
 		SubTest.expectException(
 				"match() predicate with unknown field",
-				() -> searchTarget.predicate().match().onFields( "string", "unknown_field" )
+				() -> searchTarget.predicate().match().onFields( indexMapping.string1Field.relativeFieldName, "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -267,7 +260,7 @@ public class MatchSearchPredicateIT {
 
 		SubTest.expectException(
 				"match() predicate with unknown field",
-				() -> searchTarget.predicate().match().onField( "string" ).orField( "unknown_field" )
+				() -> searchTarget.predicate().match().onField( indexMapping.string1Field.relativeFieldName ).orField( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -276,7 +269,7 @@ public class MatchSearchPredicateIT {
 
 		SubTest.expectException(
 				"match() predicate with unknown field",
-				() -> searchTarget.predicate().match().onField( "string" ).orFields( "unknown_field" )
+				() -> searchTarget.predicate().match().onField( indexMapping.string1Field.relativeFieldName ).orFields( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -286,27 +279,25 @@ public class MatchSearchPredicateIT {
 
 	private void initData() {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( MATCHING_ID ), document -> {
-			indexAccessors.string.write( document, MATCHING_STRING );
-			indexAccessors.integer.write( document, MATCHING_INTEGER );
-			indexAccessors.localDate.write( document, MATCHING_LOCAL_DATE );
-			indexAccessors.geoPoint.write( document, MATCHING_GEO_POINT );
-
-			indexAccessors.one_more_string.write( document, MATCHING_ONE_MORE_STRING );
-			indexAccessors.even_more_string.write( document, MATCHING_EVEN_MORE_STRING );
+		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
+			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.string1Field.document1Value.write( document );
+			indexMapping.string2Field.document1Value.write( document );
+			indexMapping.string3Field.document1Value.write( document );
 		} );
-		worker.add( referenceProvider( NON_MATCHING_ID ), document -> {
-			indexAccessors.string.write( document, NON_MATCHING_STRING );
-			indexAccessors.integer.write( document, NON_MATCHING_INTEGER );
-			indexAccessors.localDate.write( document, NON_MATCHING_LOCAL_DATE );
-			indexAccessors.geoPoint.write( document, NON_MATCHING_GEO_POINT );
-
-			indexAccessors.one_more_string.write( document, NON_MATCHING_ONE_MORE_STRING );
-			indexAccessors.even_more_string.write( document, NON_MATCHING_EVEN_MORE_STRING );
+		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
+			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.string1Field.document2Value.write( document );
+			indexMapping.string2Field.document2Value.write( document );
+			indexMapping.string3Field.document2Value.write( document );
 		} );
-		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
-		worker.add( referenceProvider( ADDITIONAL_MATCHING_ID ), document -> {
-			indexAccessors.string.write( document, ADDITIONAL_MATCHING_STRING );
+		worker.add( referenceProvider( EMPTY ), document -> { } );
+		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
+			indexMapping.string1Field.document3Value.write( document );
+			indexMapping.string2Field.document3Value.write( document );
+			indexMapping.string3Field.document3Value.write( document );
 		} );
 
 		worker.execute().join();
@@ -317,26 +308,126 @@ public class MatchSearchPredicateIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID, ADDITIONAL_MATCHING_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY,
+				DOCUMENT_3
+		);
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<LocalDate> localDate;
-		final IndexFieldAccessor<GeoPoint> geoPoint;
+	private static class IndexMapping {
+		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
 
-		final IndexFieldAccessor<String> one_more_string;
-		final IndexFieldAccessor<String> even_more_string;
+		final MainFieldModel string1Field;
+		final MainFieldModel string2Field;
+		final MainFieldModel string3Field;
 
-		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
-			integer = root.field( "integer" ).asInteger().createAccessor();
-			localDate = root.field( "localDate" ).asLocalDate().createAccessor();
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			supportedFieldModels = Arrays.asList(
+					ByTypeFieldModel.mapper( String.class, "irving and company", "Auster", "Irving" )
+							.map( root, "analyzedString", c -> c.analyzer( "default" ) ),
+					ByTypeFieldModel.mapper( String.class, "Irving", "Auster" )
+							.map( root, "nonAnalyzedString" ),
+					ByTypeFieldModel.mapper( Integer.class, 42, 67 )
+							.map( root, "integer" ),
+					ByTypeFieldModel.mapper(
+							LocalDate.class,
+							LocalDate.of( 1980, 10, 11 ),
+							LocalDate.of( 1984, 10, 7 )
+					)
+							.map( root, "localDate" )
+			);
+			unsupportedFieldModels = Arrays.asList(
+					ByTypeFieldModel.mapper(
+							GeoPoint.class,
+							new ImmutableGeoPoint( 40, 70 ),
+							new ImmutableGeoPoint( 45, 98 )
+					)
+							.map( root, "geoPoint" )
+			);
+			string1Field = MainFieldModel.mapper(
+					"Irving", "Auster", "Coe"
+			)
+					.map( root, "string1" );
+			string2Field = MainFieldModel.mapper(
+					"Avenue of mysteries", "Oracle Night", "4 3 2 1"
+			)
+					.map( root, "string2" );
+			string3Field = MainFieldModel.mapper(
+					"Avenue of mysteries", "Oracle Night", "4 3 2 1"
+			)
+					.map( root, "string3" );
+		}
+	}
 
-			one_more_string = root.field( "one_more_string" ).asString().createAccessor();
-			even_more_string = root.field( "even_more_string" ).asString().createAccessor();
+	private static class ValueModel<F> {
+		private final IndexFieldAccessor<F> accessor;
+		final F indexedValue;
+
+		private ValueModel(IndexFieldAccessor<F> accessor, F indexedValue) {
+			this.accessor = accessor;
+			this.indexedValue = indexedValue;
+		}
+
+		public void write(DocumentElement target) {
+			accessor.write( target, indexedValue );
+		}
+	}
+
+	private static class MainFieldModel {
+		static StandardFieldMapper<String, MainFieldModel> mapper(
+				String document1Value, String document2Value, String document3Value) {
+			return (parent, name, configuration) -> {
+				StandardIndexSchemaFieldTypedContext<String> context = parent.field( name ).asString();
+				configuration.accept( context );
+				IndexFieldAccessor<String> accessor = context.createAccessor();
+				return new MainFieldModel( accessor, name, document1Value, document3Value, document2Value );
+			};
+		}
+
+		final String relativeFieldName;
+		final ValueModel<String> document1Value;
+		final ValueModel<String> document2Value;
+		final ValueModel<String> document3Value;
+
+		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName,
+				String document1Value, String document2Value, String document3Value) {
+			this.relativeFieldName = relativeFieldName;
+			this.document1Value = new ValueModel<>( accessor, document1Value );
+			this.document3Value = new ValueModel<>( accessor, document3Value );
+			this.document2Value = new ValueModel<>( accessor, document2Value );
+		}
+	}
+
+	private static class ByTypeFieldModel<F> {
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
+				F document1Value, F document2Value) {
+			return mapper( type, document1Value, document2Value, document1Value );
+		}
+
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
+				F document1Value, F document2Value, F predicateParameterValue) {
+			return (parent, name, configuration) -> {
+				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
+				configuration.accept( context );
+				IndexFieldAccessor<F> accessor = context.createAccessor();
+				return new ByTypeFieldModel<>(
+						accessor, name, document1Value, document2Value, predicateParameterValue
+				);
+			};
+		}
+
+		final String relativeFieldName;
+		final ValueModel<F> document1Value;
+		final ValueModel<F> document2Value;
+
+		final F predicateParameterValue;
+
+		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+				F document1Value, F document2Value, F predicateParameterValue) {
+			this.relativeFieldName = relativeFieldName;
+			this.document1Value = new ValueModel<>( accessor, document1Value );
+			this.document2Value = new ValueModel<>( accessor, document2Value );
+			this.predicateParameterValue = predicateParameterValue;
 		}
 	}
 }
