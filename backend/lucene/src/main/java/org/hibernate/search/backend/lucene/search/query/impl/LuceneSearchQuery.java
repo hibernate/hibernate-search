@@ -65,7 +65,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + getQueryString() + "]";
+		return getClass().getSimpleName() + "[query=" + getQueryString() + ", sort=" + luceneSort + "]";
 	}
 
 	@Override
