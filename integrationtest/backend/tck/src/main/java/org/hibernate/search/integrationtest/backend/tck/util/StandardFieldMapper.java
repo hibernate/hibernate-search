@@ -18,6 +18,6 @@ public interface StandardFieldMapper<F, M> {
 		return map( parent, name, ignored -> { } );
 	}
 
-	M map(IndexSchemaElement parent, String name, Consumer<StandardIndexSchemaFieldTypedContext<F>> additionalConfiguration);
+	M map(IndexSchemaElement parent, String name, Consumer<? super StandardIndexSchemaFieldTypedContext<F>> additionalConfiguration);
 
 }

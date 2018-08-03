@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
+import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -128,6 +129,36 @@ public class SearchSortByFieldIT {
 				DocumentReferencesSearchResultAssert.assertThat( query )
 						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			}
+		}
+	}
+
+	@Test
+	public void byField_withDslConverters() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
+			) {
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+						.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+						.use( new ValueWrapper<>( fieldModel.between1And2Value ) ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+						.use( new ValueWrapper<>( fieldModel.between2And3Value ) ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+						.use( new ValueWrapper<>( fieldModel.after3Value ) ) );
 				DocumentReferencesSearchResultAssert.assertThat( query )
 						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 			}
@@ -269,6 +300,7 @@ public class SearchSortByFieldIT {
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 
 			indexMapping.identicalForFirstTwo.document2Value.write( document );
@@ -286,6 +318,7 @@ public class SearchSortByFieldIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 
 			indexMapping.identicalForFirstTwo.document1Value.write( document );
@@ -303,6 +336,7 @@ public class SearchSortByFieldIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 
 			indexMapping.identicalForFirstTwo.document3Value.write( document );
@@ -333,6 +367,7 @@ public class SearchSortByFieldIT {
 
 	private static class IndexMapping {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
 
 		final MainFieldModel identicalForFirstTwo;
@@ -342,7 +377,10 @@ public class SearchSortByFieldIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root );
+			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
+			supportedFieldWithDslConverterModels = mapSupportedFields(
+					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
+			);
 			unsupportedFieldModels = mapUnsupportedFields( root );
 
 			identicalForFirstTwo = MainFieldModel.mapper(
@@ -369,12 +407,13 @@ public class SearchSortByFieldIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.createAccessor();
-			supportedFieldModels = mapSupportedFields( objectField );
+			supportedFieldModels = mapSupportedFields( objectField, "", ignored -> { } );
 			unsupportedFieldModels = mapUnsupportedFields( objectField );
 		}
 	}
 
-	private static List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root) {
+	private static List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
+			Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
 		return Arrays.asList(
 				ByTypeFieldModel
 						// Mix capitalized and non-capitalized text on purpose
@@ -384,16 +423,20 @@ public class SearchSortByFieldIT {
 						)
 						.map(
 								// TODO use a normalizer instead of an analyzer (needs support for normalizer definitions)
-								root, "analyzedString", c -> c.analyzer( "default" )
+								root, prefix + "analyzedString",
+								c -> {
+									c.analyzer( "default" );
+									additionalConfiguration.accept( c );
+								}
 						),
 				ByTypeFieldModel.mapper( String.class, "aaron", "george", "zach",
 						"aaaa", "bastian", "marc", "zzzz"
 				)
-						.map( root, "nonAnalyzedString" ),
+						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
 				ByTypeFieldModel.mapper( Integer.class, 1, 3, 5,
 						Integer.MIN_VALUE, 2, 4, Integer.MAX_VALUE
 				)
-						.map( root, "integer" ),
+						.map( root, prefix + "integer", additionalConfiguration ),
 				ByTypeFieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),
@@ -404,7 +447,7 @@ public class SearchSortByFieldIT {
 						LocalDate.of( 2018, 3, 15 ),
 						LocalDate.of( 2018, 5, 1 )
 				)
-						.map( root, "localDate" )
+						.map( root, prefix + "localDate", additionalConfiguration )
 		);
 	}
 

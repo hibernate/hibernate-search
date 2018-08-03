@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -22,6 +23,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -74,6 +76,24 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.predicateParameterValue;
+
+			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch ).end()
+					.build();
+
+			DocumentReferencesSearchResultAssert.assertThat( query )
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		}
+	}
+
+	@Test
+	public void match_withDslConverter() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object valueToMatch = new ValueWrapper<>( fieldModel.predicateParameterValue );
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
@@ -281,6 +301,7 @@ public class MatchSearchPredicateIT {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
@@ -288,6 +309,7 @@ public class MatchSearchPredicateIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
@@ -315,6 +337,7 @@ public class MatchSearchPredicateIT {
 
 	private static class IndexMapping {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
 
 		final MainFieldModel string1Field;
@@ -322,19 +345,9 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel string3Field;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = Arrays.asList(
-					ByTypeFieldModel.mapper( String.class, "irving and company", "Auster", "Irving" )
-							.map( root, "analyzedString", c -> c.analyzer( "default" ) ),
-					ByTypeFieldModel.mapper( String.class, "Irving", "Auster" )
-							.map( root, "nonAnalyzedString" ),
-					ByTypeFieldModel.mapper( Integer.class, 42, 67 )
-							.map( root, "integer" ),
-					ByTypeFieldModel.mapper(
-							LocalDate.class,
-							LocalDate.of( 1980, 10, 11 ),
-							LocalDate.of( 1984, 10, 7 )
-					)
-							.map( root, "localDate" )
+			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
+			supportedFieldWithDslConverterModels = mapSupportedFields(
+					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			);
 			unsupportedFieldModels = Arrays.asList(
 					ByTypeFieldModel.mapper(
@@ -356,6 +369,30 @@ public class MatchSearchPredicateIT {
 					"Avenue of mysteries", "Oracle Night", "4 3 2 1"
 			)
 					.map( root, "string3" );
+		}
+
+		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
+				Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+			return Arrays.asList(
+					ByTypeFieldModel.mapper( String.class, "irving and company", "Auster", "Irving" )
+							.map(
+									root, prefix + "analyzedString",
+									c -> {
+										c.analyzer( "default" );
+										additionalConfiguration.accept( c );
+									}
+							),
+					ByTypeFieldModel.mapper( String.class, "Irving", "Auster" )
+							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
+					ByTypeFieldModel.mapper( Integer.class, 42, 67 )
+							.map( root, prefix + "integer", additionalConfiguration ),
+					ByTypeFieldModel.mapper(
+							LocalDate.class,
+							LocalDate.of( 1980, 10, 11 ),
+							LocalDate.of( 1984, 10, 7 )
+					)
+							.map( root, prefix + "localDate", additionalConfiguration )
+			);
 		}
 	}
 

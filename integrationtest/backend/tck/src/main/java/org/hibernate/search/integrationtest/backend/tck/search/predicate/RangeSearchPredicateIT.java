@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -22,6 +23,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -75,6 +77,24 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
+
+			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( absoluteFieldPath ).above( lowerValueToMatch ).end()
+					.build();
+
+			DocumentReferencesSearchResultAssert.assertThat( query )
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+		}
+	}
+
+	@Test
+	public void above_withDslConverter() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
@@ -145,6 +165,24 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
+	public void below_withDslConverter() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
+
+			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( absoluteFieldPath ).below( upperValueToMatch ).end()
+					.build();
+
+			DocumentReferencesSearchResultAssert.assertThat( query )
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+	}
+
+	@Test
 	public void below_include_exclude() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
@@ -185,7 +223,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void from_to() {
+	public void fromTo() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -204,7 +242,26 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void from_to_include_exclude() {
+	public void fromTo_withDslConverter() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
+			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
+
+			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+					.asReferences()
+					.predicate().range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).end()
+					.build();
+
+			DocumentReferencesSearchResultAssert.assertThat( query )
+					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		}
+	}
+
+	@Test
+	public void fromTo_include_exclude() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -498,6 +555,7 @@ public class RangeSearchPredicateIT {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
@@ -505,6 +563,7 @@ public class RangeSearchPredicateIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
@@ -512,6 +571,7 @@ public class RangeSearchPredicateIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
@@ -532,6 +592,7 @@ public class RangeSearchPredicateIT {
 
 	private static class IndexMapping {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
 
 		final MainFieldModel string1Field;
@@ -539,24 +600,9 @@ public class RangeSearchPredicateIT {
 		final MainFieldModel string3Field;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = Arrays.asList(
-					// TODO also test analyzed strings
-					ByTypeFieldModel.mapper( String.class, "ccc", "mmm", "xxx",
-							"ggg", "rrr"
-					)
-							.map( root, "nonAnalyzedString" ),
-					ByTypeFieldModel.mapper( Integer.class, 3, 13, 25,
-							10, 19
-					)
-							.map( root, "integer" ),
-					ByTypeFieldModel.mapper(
-							LocalDate.class,
-							LocalDate.of( 2003, 6, 3 ),
-							LocalDate.of( 2013, 6, 3 ),
-							LocalDate.of( 2025, 6, 3 ),
-							LocalDate.of( 2010, 6, 8 ), LocalDate.of( 2019, 4, 18 )
-					)
-							.map( root, "localDate" )
+			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
+			supportedFieldWithDslConverterModels = mapSupportedFields(
+					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			);
 			unsupportedFieldModels = Arrays.asList(
 					ByTypeFieldModel.mapper(
@@ -574,6 +620,29 @@ public class RangeSearchPredicateIT {
 					.map( root, "string2" );
 			string3Field = MainFieldModel.mapper( "eee", "ooo", "zzz" )
 					.map( root, "string3" );
+		}
+
+		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
+				Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+			return Arrays.asList(
+					// TODO also test analyzed strings
+					ByTypeFieldModel.mapper( String.class, "ccc", "mmm", "xxx",
+							"ggg", "rrr"
+					)
+							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
+					ByTypeFieldModel.mapper( Integer.class, 3, 13, 25,
+							10, 19
+					)
+							.map( root, prefix + "integer", additionalConfiguration ),
+					ByTypeFieldModel.mapper(
+							LocalDate.class,
+							LocalDate.of( 2003, 6, 3 ),
+							LocalDate.of( 2013, 6, 3 ),
+							LocalDate.of( 2025, 6, 3 ),
+							LocalDate.of( 2010, 6, 8 ), LocalDate.of( 2019, 4, 18 )
+					)
+							.map( root, prefix + "localDate", additionalConfiguration )
+			);
 		}
 	}
 
