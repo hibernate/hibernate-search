@@ -23,24 +23,22 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,7 +46,7 @@ import org.junit.rules.ExpectedException;
 
 import org.easymock.EasyMock;
 
-public class SearchResultIT {
+public class SearchResultLoadingOrTransformingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -110,127 +108,6 @@ public class SearchResultIT {
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
-	}
-
-	@Test
-	public void projections() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
-				.asProjections( "string", "string_analyzed", "integer", "localDate", "geoPoint" )
-				.predicate().matchAll().end()
-				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE );
-			b.projection( null, null, null, null, null ); // Empty document
-		} );
-
-		// Project twice on the same field
-		query = searchTarget.query( sessionContext )
-				.asProjections( "string", "integer", "string" )
-				.predicate().matchAll().end()
-				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( STRING_VALUE, INTEGER_VALUE, STRING_VALUE );
-			b.projection( null, null, null ); // Empty document
-		} );
-
-		// Special projections without any document transformer nor object loader (those cases are addressed in other methods)
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
-		query = searchTarget.query( sessionContext )
-				.asProjections( ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT )
-				.predicate().matchAll().end()
-				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( mainReference, mainReference, mainReference );
-			b.projection( emptyReference, emptyReference, emptyReference );
-		} );
-	}
-
-	@Test
-	public void projections_error_unknownField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
-		thrown.expectMessage( "unknownField" );
-		thrown.expectMessage( INDEX_NAME );
-
-		searchTarget.query( sessionContext )
-				.asProjections( "unknownField" )
-				.predicate().matchAll().end()
-				.build();
-	}
-
-	@Test
-	public void projections_error_objectField_nested() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
-		thrown.expectMessage( "nestedObject" );
-		thrown.expectMessage( INDEX_NAME );
-
-		searchTarget.query( sessionContext )
-				.asProjections( "nestedObject" )
-				.predicate().matchAll().end()
-				.build();
-	}
-
-	@Test
-	public void projections_error_objectField_flattened() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
-		thrown.expectMessage( "flattenedObject" );
-		thrown.expectMessage( INDEX_NAME );
-
-		searchTarget.query( sessionContext )
-				.asProjections( "flattenedObject" )
-				.predicate().matchAll().end()
-				.build();
-	}
-
-	@Test
-	public void projections_withinObjectField() {
-		Assume.assumeTrue( "Projections on fields within object fields are not supported yet", false );
-		// TODO support projections on fields within object fields
-
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-
-		// Project on fields within a flattened object
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
-				.asProjections( "flattenedObject.string", "flattenedObject.integer" )
-				.predicate().matchAll().end()
-				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( FLATTENED_OBJECT_STRING_VALUE, FLATTENED_OBJECT_INTEGER_VALUE );
-			b.projection( null, null ); // Empty document
-		} );
-
-		// Project on fields within a nested object
-		query = searchTarget.query( sessionContext )
-				.asProjections( "nestedObject.string", "nestedObject.integer" )
-				.predicate().matchAll().end()
-				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( NESTED_OBJECT_STRING_VALUE, NESTED_OBJECT_INTEGER_VALUE );
-			b.projection( null, null ); // Empty document
-		} );
-	}
-
-	@Test
-	public void projections_multivalued() {
-		Assume.assumeTrue( "Multi-valued projections are not supported yet", false );
-		// TODO support multi-valued projections
-
-		// TODO Project on multi-valued field
-
-		// TODO Project on fields within a multi-valued flattened object
-
-		// TODO Project on fields within a multi-valued nested object
 	}
 
 	@Test
