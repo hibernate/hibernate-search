@@ -16,4 +16,7 @@ public class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean distanceSortDesc() {
+		return true;
+	}
 }

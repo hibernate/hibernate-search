@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -225,19 +226,36 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byDistance() {
+	public void byDistance_asc() {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ) );
-
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ) );
-
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
-		// we don't test the descending order here as it's currently not supported by Lucene
-		// see the additional tests in the specific backend tests
+		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).asc() );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+	}
+
+	@Test
+	public void byDistance_desc() {
+		Assume.assumeTrue(
+				"Descending distance sort is not supported, skipping.",
+				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
+		);
+
+		SearchQuery<DocumentReference> query = simpleQuery(
+				b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ).desc()
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+
+		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).desc() );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 	}
 
 	private void initData() {

@@ -16,4 +16,10 @@ public class LuceneTckBackendFeatures extends TckBackendFeatures {
 		return false;
 	}
 
+	@Override
+	public boolean distanceSortDesc() {
+		// we don't test the descending order here as it's currently not supported by Lucene
+		// see LuceneSearchSortIT
+		return false;
+	}
 }
