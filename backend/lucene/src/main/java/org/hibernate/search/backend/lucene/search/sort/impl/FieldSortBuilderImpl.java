@@ -6,13 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 		implements FieldSortBuilder<LuceneSearchSortBuilder> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 
@@ -41,7 +48,14 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	@Override
 	public void missingAs(Object value) {
-		missingValue = fieldConverter.convertFromDsl( value );
+		try {
+			missingValue = fieldConverter.convertFromDsl( value );
+		}
+		catch (RuntimeException e) {
+			throw log.cannotConvertDslParameter(
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
 	}
 
 	@Override

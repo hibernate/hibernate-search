@@ -215,4 +215,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 549, value = "Invalid field path; expected path '%1$s', got '%2$s'.")
 	SearchException invalidFieldPath(String expectedPath, String actualPath);
 
+	@Message(id = 550, value = "Unable to convert DSL parameter: %1$s")
+	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
+
 }

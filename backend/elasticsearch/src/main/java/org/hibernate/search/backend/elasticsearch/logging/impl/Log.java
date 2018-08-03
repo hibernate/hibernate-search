@@ -173,4 +173,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 531, value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
 	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName,
 			@Param EventContext context);
+
+	@Message(id = 532, value = "Unable to convert DSL parameter: %1$s")
+	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
 }

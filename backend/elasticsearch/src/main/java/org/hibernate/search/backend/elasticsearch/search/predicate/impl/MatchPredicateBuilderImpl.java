@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,6 +24,8 @@ import com.google.gson.JsonObject;
  */
 public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
 
@@ -34,7 +41,16 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	@Override
 	public void value(Object value) {
-		QUERY.set( getInnerObject(), converter.convertFromDsl( value ) );
+		JsonElement element;
+		try {
+			element = converter.convertFromDsl( value );
+		}
+		catch (RuntimeException e) {
+			throw log.cannotConvertDslParameter(
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
+		QUERY.set( getInnerObject(), element );
 	}
 
 	@Override

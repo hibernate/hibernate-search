@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +22,8 @@ import com.google.gson.JsonPrimitive;
 
 class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonElement> MISSING = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
@@ -42,7 +49,16 @@ class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 
 	@Override
 	public void missingAs(Object value) {
-		MISSING.set( getInnerObject(), converter.convertFromDsl( value ) );
+		JsonElement element;
+		try {
+			element = converter.convertFromDsl( value );
+		}
+		catch (RuntimeException e) {
+			throw log.cannotConvertDslParameter(
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
+		MISSING.set( getInnerObject(), element );
 	}
 
 	@Override
