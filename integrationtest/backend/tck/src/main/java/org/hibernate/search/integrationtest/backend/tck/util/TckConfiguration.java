@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
@@ -36,9 +38,26 @@ public final class TckConfiguration {
 
 	private final String startupTimestamp;
 
+	private final TckBackendFeatures backendFeatures;
+
 	private TckConfiguration() {
 		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 				.format( new Date() );
+
+		Iterator<TckBackendFeatures> featuresIterator = ServiceLoader.load( TckBackendFeatures.class ).iterator();
+		if ( featuresIterator.hasNext() ) {
+			this.backendFeatures = featuresIterator.next();
+			if ( featuresIterator.hasNext() ) {
+				throw new IllegalStateException( "Multiple backend features services found" );
+			}
+		}
+		else {
+			this.backendFeatures = new TckBackendFeatures();
+		}
+	}
+
+	public TckBackendFeatures getBackendFeatures() {
+		return backendFeatures;
 	}
 
 	public ConfigurationPropertySource getBackendProperties(String testId) {

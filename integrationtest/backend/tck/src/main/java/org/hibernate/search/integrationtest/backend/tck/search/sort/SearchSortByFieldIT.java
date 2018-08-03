@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -91,25 +92,45 @@ public class SearchSortByFieldIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
+			// Default order
 			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
 					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
+			// Explicit order with onMissingValue().sortLast()
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
 					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
 					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
 
+			// Explicit order with onMissingValue().sortFirst()
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
 					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
 			DocumentReferencesSearchResultAssert.assertThat( query )
 					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+			// Explicit order with onMissingValue().use( ... )
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
+			) {
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
+				DocumentReferencesSearchResultAssert.assertThat( query )
+						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			}
 		}
 	}
 
@@ -357,20 +378,31 @@ public class SearchSortByFieldIT {
 		return Arrays.asList(
 				ByTypeFieldModel
 						// Mix capitalized and non-capitalized text on purpose
-						.mapper( String.class, "Aaron", "george", "Zach" )
+						.mapper( String.class, "Aaron", "george", "Zach",
+								// TODO also mix capitalization here, this requires normalizers
+								"aaaaa", "bastian", "marco", "zzzz"
+						)
 						.map(
 								// TODO use a normalizer instead of an analyzer (needs support for normalizer definitions)
 								root, "analyzedString", c -> c.analyzer( "default" )
 						),
-				ByTypeFieldModel.mapper( String.class, "aaron", "george", "zach" )
+				ByTypeFieldModel.mapper( String.class, "aaron", "george", "zach",
+						"aaaa", "bastian", "marc", "zzzz"
+				)
 						.map( root, "nonAnalyzedString" ),
-				ByTypeFieldModel.mapper( Integer.class, 1, 2, 3 )
+				ByTypeFieldModel.mapper( Integer.class, 1, 3, 5,
+						Integer.MIN_VALUE, 2, 4, Integer.MAX_VALUE
+				)
 						.map( root, "integer" ),
 				ByTypeFieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),
-						LocalDate.of( 2018, 2, 2 ),
-						LocalDate.of( 2018, 2, 3 )
+						LocalDate.of( 2018, 3, 1 ),
+						LocalDate.of( 2018, 4, 1 ),
+						LocalDate.of( 2018, 1, 1 ),
+						LocalDate.of( 2018, 2, 15 ),
+						LocalDate.of( 2018, 3, 15 ),
+						LocalDate.of( 2018, 5, 1 )
 				)
 						.map( root, "localDate" )
 		);
@@ -381,8 +413,12 @@ public class SearchSortByFieldIT {
 				ByTypeFieldModel.mapper(
 						GeoPoint.class,
 						new ImmutableGeoPoint( 40, 70 ),
-						new ImmutableGeoPoint( 40, 71 ),
-						new ImmutableGeoPoint( 40, 72 )
+						new ImmutableGeoPoint( 40, 75 ),
+						new ImmutableGeoPoint( 40, 80 ),
+						new ImmutableGeoPoint( 0, 0 ),
+						new ImmutableGeoPoint( 40, 72 ),
+						new ImmutableGeoPoint( 40, 77 ),
+						new ImmutableGeoPoint( 89, 89 )
 				)
 						.map( root, "geoPoint" )
 		);
@@ -429,29 +465,45 @@ public class SearchSortByFieldIT {
 
 	private static class ByTypeFieldModel<F> {
 		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
-				F document1Value, F document2Value, F document3Value) {
+				F document1Value, F document2Value, F document3Value,
+				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
 			return (parent, name, configuration) -> {
 				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
 				context.sortable( Sortable.YES );
 				configuration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new ByTypeFieldModel<>(
-						accessor, name, document1Value, document2Value, document3Value
+						accessor, name, type,
+						document1Value, document2Value, document3Value,
+						before1Value, between1And2Value, between2And3Value, after3Value
 				);
 			};
 		}
 
 		final String relativeFieldName;
+		final Class<F> type;
+
 		final ValueModel<F> document1Value;
 		final ValueModel<F> document2Value;
 		final ValueModel<F> document3Value;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
-				F document1Value, F document2Value, F document3Value) {
+		final F before1Value;
+		final F between1And2Value;
+		final F between2And3Value;
+		final F after3Value;
+
+		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName, Class<F> type,
+				F document1Value, F document2Value, F document3Value,
+				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
 			this.relativeFieldName = relativeFieldName;
+			this.type = type;
 			this.document1Value = new ValueModel<>( accessor, document1Value );
 			this.document2Value = new ValueModel<>( accessor, document2Value );
 			this.document3Value = new ValueModel<>( accessor, document3Value );
+			this.before1Value = before1Value;
+			this.between1And2Value = between1And2Value;
+			this.between2And3Value = between2And3Value;
+			this.after3Value = after3Value;
 		}
 	}
 }
