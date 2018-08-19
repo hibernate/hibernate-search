@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -27,6 +28,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
@@ -91,6 +93,27 @@ public class SearchProjectionIT {
 				b.projection( fieldModel.document2Value.indexedValue );
 				b.projection( fieldModel.document3Value.indexedValue );
 				b.projection( null ); // Empty document
+			} );
+		}
+	}
+
+	@Test
+	public void field_withProjectionConverters() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			SearchQuery<List<?>> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			query = searchTarget.query( sessionContext )
+					.asProjections( fieldPath )
+					.predicate().matchAll().end()
+					.build();
+			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
+				b.projection( new ValueWrapper<>( fieldModel.document1Value.indexedValue ) );
+				b.projection( new ValueWrapper<>( fieldModel.document2Value.indexedValue ) );
+				b.projection( new ValueWrapper<>( fieldModel.document3Value.indexedValue ) );
+				b.projection( new ValueWrapper<>( null ) ); // Empty document
 			} );
 		}
 	}
@@ -295,6 +318,7 @@ public class SearchProjectionIT {
 		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
 		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
@@ -309,6 +333,7 @@ public class SearchProjectionIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
 
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
@@ -323,6 +348,7 @@ public class SearchProjectionIT {
 		} );
 		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
 
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
@@ -351,6 +377,7 @@ public class SearchProjectionIT {
 
 	private static class IndexMapping {
 		final List<FieldModel<?>> supportedFieldModels;
+		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels;
 
 		final FieldModel<String> string1Field;
 		final FieldModel<String> string2Field;
@@ -359,7 +386,10 @@ public class SearchProjectionIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root );
+			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
+			supportedFieldWithProjectionConverterModels = mapSupportedFields(
+					root, "converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
+			);
 
 			string1Field = FieldModel.mapper( String.class,"ccc", "mmm", "xxx" )
 					.map( root, "string1" );
@@ -380,40 +410,42 @@ public class SearchProjectionIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.createAccessor();
-			supportedFieldModels = mapSupportedFields( objectField );
+			supportedFieldModels = mapSupportedFields( objectField, "", ignored -> { } );
 		}
 	}
 
-	private static List<FieldModel<?>> mapSupportedFields(IndexSchemaElement root) {
+	private static List<FieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
+			Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
 		return Arrays.asList(
 				FieldModel
 						// Mix capitalized and non-capitalized text on purpose
 						.mapper( String.class, "Aaron", "george", "Zach" )
 						.map(
 								// TODO use a normalizer instead of an analyzer (needs support for normalizer definitions)
-								root, "analyzedString",
+								root, prefix + "analyzedString",
 								c -> {
 									c.analyzer( "default" );
+									additionalConfiguration.accept( c );
 								}
 						),
 				FieldModel.mapper( String.class, "aaron", "george", "zach" )
-						.map( root, "nonAnalyzedString" ),
+						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
 				FieldModel.mapper( Integer.class, 1, 3, 5 )
-						.map( root, "integer" ),
+						.map( root, prefix + "integer", additionalConfiguration ),
 				FieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),
 						LocalDate.of( 2018, 3, 1 ),
 						LocalDate.of( 2018, 4, 1 )
 				)
-						.map( root, "localDate" ),
+						.map( root, prefix + "localDate", additionalConfiguration ),
 				FieldModel.mapper(
 						GeoPoint.class,
 						new ImmutableGeoPoint( 40, 70 ),
 						new ImmutableGeoPoint( 40, 75 ),
 						new ImmutableGeoPoint( 40, 80 )
 				)
-						.map( root, "geoPoint" )
+						.map( root, prefix + "geoPoint", additionalConfiguration )
 		);
 	}
 
