@@ -29,7 +29,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.agent.options>script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}disablejpadapters.btm,script:${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}jsr352${file.separator}JobInterruptor.btm</byteman.agent.options>
-        <test.module-slot.org.hibernate.search>main</test.module-slot.org.hibernate.search>
+        <!-- the slot will be inferred at runtime -->
+        <test.module-slot.org.hibernate.search/>
         <test.module-slot.org.hibernate>${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}</test.module-slot.org.hibernate>
 
         <!--
@@ -332,6 +333,39 @@
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- Inherit execution unpack-shared-test-build-resources -->
+                    <execution>
+                        <id>copy-drivers</id>
+                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipWildFlyPreparation}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${jdbc.driver.groupId}</groupId>
+                                    <artifactId>${jdbc.driver.artifactId}</artifactId>
+                                    <version>${jdbc.driver.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${jbossHome.node1}/standalone/deployments</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${jdbc.driver.groupId}</groupId>
+                                    <artifactId>${jdbc.driver.artifactId}</artifactId>
+                                    <version>${jdbc.driver.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${jbossHome.node2}/standalone/deployments</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -434,61 +468,9 @@
         </profile>
         <profile>
             <!--
-                With this profile, the TS will create Hibernate Search modules by itself, as opposed to testing the
-                modules already included in WildFly distribution (org.hibernate.search.orm:main).
-                This is active by default.
+                When using an external distribution, set the correct Hibernate Search and Hibernate ORM module slots (main),
+                and expect some tests not to work.
              -->
-            <id>createModules</id>
-            <activation>
-                <property>
-                    <name>!useBuiltinModules</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- the slot will be inferred at runtime -->
-                <test.module-slot.org.hibernate.search/>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-drivers</id>
-                                <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>${skipWildFlyPreparation}</skip>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>${jdbc.driver.groupId}</groupId>
-                                            <artifactId>${jdbc.driver.artifactId}</artifactId>
-                                            <version>${jdbc.driver.version}</version>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${jbossHome.node1}/standalone/deployments</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>${jdbc.driver.groupId}</groupId>
-                                            <artifactId>${jdbc.driver.artifactId}</artifactId>
-                                            <version>${jdbc.driver.version}</version>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${jbossHome.node2}/standalone/deployments</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-        <!--
-            When using built-in modules, set the correct Hibernate ORM module slot (main).
-         -->
             <id>useBuiltinModules</id>
             <activation>
                 <property>
@@ -496,8 +478,34 @@
                 </property>
             </activation>
             <properties>
+                <test.module-slot.org.hibernate.search>main</test.module-slot.org.hibernate.search>
                 <test.module-slot.org.hibernate>main</test.module-slot.org.hibernate>
+                <!-- WildFly doesn't package Hibernate Search ElasticSearch integration, no need to launch an instance -->
+                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!-- WildFly doesn't package hibernate-search-jgroups-backend -->
+                                <exclude>org.hibernate.search.test.integration.jgroups.JGroupsMasterSlaveUsingModulesIT</exclude>
+                                <!-- WildFly doesn't package Apache Tika -->
+                                <exclude>org.hibernate.search.test.integration.tika.SongUploaderWarArchiveWithTikaIT</exclude>
+                                <!-- WildFly doesn't package Hibernate Search JSR352 integration -->
+                                <exclude>org.hibernate.search.test.integration.jsr352.massindexing.RestartIT</exclude>
+                                <exclude>org.hibernate.search.test.integration.jsr352.massindexing.MultipleEntityManagerFactoriesRegisteredAsBeansIT</exclude>
+                                <exclude>org.hibernate.search.test.integration.jsr352.massindexing.MultipleEntityManagerFactoriesNotRegisteredAsBeansIT</exclude>
+                                <exclude>org.hibernate.search.test.integration.jsr352.massindexing.RemoteExecutionIT</exclude>
+                                <!-- WildFly doesn't package Hibernate Search ElasticSearch integration -->
+                                <exclude>org.hibernate.search.test.integration.elasticsearch.ElasticsearchModuleMemberRegistrationIT</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
