@@ -200,7 +200,7 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 		echo "Non-default environment ITs are completely disabled."
 	}
 
-	def versionPattern = ~/^(\d+)\.(\d+)\.\d+\S*$/
+	def versionPattern = ~/^(\d+)\.(\d+)(\.0\.Alpha\d+|\.0\.Beta\d+|\.0\.CR\d+|\.\d+\.Final)$/
 
 	// Compute the version truncated to the minor component, a.k.a. the version family
 	// To be used for the documentation upload in particular
@@ -218,10 +218,12 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 		echo "Inferred version family for the release to '$releaseVersionFamily'"
 	}
 
-	if (params.RELEASE_DEVELOPMENT_VERSION && !(params.RELEASE_DEVELOPMENT_VERSION ==~ versionPattern)) {
+	def developmentVersionPattern = ~/^\d+\.\d+\.\d+-SNAPSHOT$/
+
+	if (params.RELEASE_DEVELOPMENT_VERSION && !(params.RELEASE_DEVELOPMENT_VERSION ==~ developmentVersionPattern)) {
 		throw new IllegalArgumentException(
 				"Invalid development version number: '$params.RELEASE_DEVELOPMENT_VERSION'." +
-						" Version numbers must match /$versionPattern/"
+						" Development version numbers must match /$developmentVersionPattern/"
 		)
 	}
 }
