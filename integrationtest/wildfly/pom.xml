@@ -377,7 +377,7 @@
                 the user is expected to prepare the distributions beforehand.
                 This is active by default, unless you specify a value for jbossHome.node1.
             -->
-            <id>unzipWildFly</id>
+            <id>provisionWildFly</id>
             <activation>
                 <property>
                     <name>!jbossHome.node1</name>
@@ -471,10 +471,10 @@
                 When using an external distribution, set the correct Hibernate Search and Hibernate ORM module slots (main),
                 and expect some tests not to work.
              -->
-            <id>useBuiltinModules</id>
+            <id>useExternalWildFly</id>
             <activation>
                 <property>
-                    <name>useBuiltinModules</name>
+                    <name>jbossHome.node1</name>
                 </property>
             </activation>
             <properties>
