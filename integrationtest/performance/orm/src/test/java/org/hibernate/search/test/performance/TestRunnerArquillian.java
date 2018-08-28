@@ -17,7 +17,7 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.test.performance.scenario.TestContext;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
@@ -84,7 +84,7 @@ public class TestRunnerArquillian {
 
 		PersistenceUnit<PersistenceDescriptor> pu = pd.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( System.getProperty( "datasource", DataSourceConfigurator.DATA_SOURCE_JNDI_NAME ) );
+				.jtaDataSource( System.getProperty( "datasource", WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME ) );
 
 		Properties properties = scenario.getHibernateProperties();
 		for ( Entry<Object, Object> property : properties.entrySet() ) {

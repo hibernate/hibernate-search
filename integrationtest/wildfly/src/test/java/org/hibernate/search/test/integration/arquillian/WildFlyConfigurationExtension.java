@@ -10,6 +10,8 @@ import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
 
 public class WildFlyConfigurationExtension implements RemoteLoadableExtension {
 
+	public static final String DATA_SOURCE_JNDI_NAME = DataSourceConfigurator.DATA_SOURCE_JNDI_NAME;
+
 	@Override
 	public void register(ExtensionBuilder extensionBuilder) {
 		extensionBuilder.observer( LoggingConfigurator.class );

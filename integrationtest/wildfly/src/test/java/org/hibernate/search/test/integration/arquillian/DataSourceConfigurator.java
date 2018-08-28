@@ -31,11 +31,11 @@ import org.jboss.dmr.ModelNode;
 /**
  * Configures WildFly so that the data source exists.
  */
-public class DataSourceConfigurator {
+class DataSourceConfigurator {
 
 	private static Logger log = Logger.getLogger( DataSourceConfigurator.class.getName() );
 
-	public static String DATA_SOURCE_JNDI_NAME = "java:/HibernateSearchTest";
+	static final String DATA_SOURCE_JNDI_NAME = "java:/HibernateSearchTest";
 
 	private static final ModelNode DATA_SOURCE_ADDRESS = PathAddress
 			.pathAddress( "subsystem", "datasources" )

@@ -11,7 +11,7 @@ import static org.hibernate.search.test.integration.VersionTestHelper.getHiberna
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.ManagementClientHelper;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
@@ -70,7 +70,7 @@ public class BootstrapFailureIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
+				.jtaDataSource( WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
