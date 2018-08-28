@@ -12,7 +12,7 @@ import static org.hibernate.search.test.integration.VersionTestHelper.getWildFly
 import java.io.File;
 
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -119,7 +119,7 @@ public final class DeploymentJmsMasterSlave {
 		return Descriptors.create( PersistenceDescriptor.class )
 				.createPersistenceUnit()
 					.name( "pu-" + name )
-					.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
+					.jtaDataSource( WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME )
 					.getOrCreateProperties()
 						.createProperty()
 							.name( "wildfly.jpa.hibernate.search.module" )

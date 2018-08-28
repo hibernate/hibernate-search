@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.util.JobInterruptorUtil;
@@ -82,7 +82,7 @@ public class RestartIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( MessageManager.PERSISTENCE_UNIT_NAME )
-				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
+				.jtaDataSource( WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()

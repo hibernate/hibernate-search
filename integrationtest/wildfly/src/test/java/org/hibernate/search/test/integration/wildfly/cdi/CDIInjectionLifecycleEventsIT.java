@@ -19,7 +19,7 @@ import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.integration.wildfly.cdi.beans.CDIBeansPackage;
 import org.hibernate.search.test.integration.wildfly.cdi.beans.event.BridgeCDILifecycleEventCounter;
@@ -77,7 +77,7 @@ public class CDIInjectionLifecycleEventsIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
+				.jtaDataSource( WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()

@@ -23,7 +23,7 @@ import org.jboss.dmr.ModelNode;
 /**
  * Configures WildFly so that the org.hibernate.search logger exists for the DEBUG level.
  */
-public class LoggingConfigurator {
+class LoggingConfigurator {
 
 	@Inject
 	private Instance<ManagementClient> managementClient;
