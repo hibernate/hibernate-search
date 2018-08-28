@@ -85,7 +85,7 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 			.createEnvEntry()
 				.envEntryName( EXPECTED_SEARCH_VERSION_RESOURCE )
 				.envEntryValue(
-						"main".equals( VersionTestHelper.getModuleSlotString() ) ?
+						VersionTestHelper.isTestingBuiltinHibernateSearch() ?
 								VersionTestHelper.getDependencyVersionHibernateSearchBuiltIn() :
 								VersionTestHelper.getDependencyVersionHibernateSearch()
 				)
