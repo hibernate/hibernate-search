@@ -211,11 +211,19 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 					"Invalid version number: '$params.RELEASE_VERSION'. Version numbers must match /$versionPattern/"
 			)
 		}
+
 		String major = matcher.group(1)
 		String minor = matcher.group(2)
 		releaseVersionFamily = "$major.$minor"
-
 		echo "Inferred version family for the release to '$releaseVersionFamily'"
+
+		// Check that all the necessary parameters are set
+		if (!params.RELEASE_DEVELOPMENT_VERSION) {
+			throw new IllegalArgumentException(
+					"Missing value for parameter RELEASE_DEVELOPMENT_VERSION." +
+							" This parameter must be set when RELEASE_VERSION is set."
+			)
+		}
 	}
 
 	def developmentVersionPattern = ~/^\d+\.\d+\.\d+-SNAPSHOT$/
