@@ -15,7 +15,7 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.arquillian.DataSourceConfigurator;
+import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExtension;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -62,7 +62,7 @@ public class MassIndexingTimeoutIT {
 			.version( "2.0" )
 			.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( DataSourceConfigurator.DATA_SOURCE_JNDI_NAME )
+				.jtaDataSource( WildFlyConfigurationExtension.DATA_SOURCE_JNDI_NAME )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
