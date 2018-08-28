@@ -127,5 +127,4 @@ public class VersionTestHelper {
 		}
 		return inputString;
 	}
-
 }
