@@ -62,7 +62,7 @@ public class ModuleMemberRegistrationIT {
 			.createEnvEntry()
 				.envEntryName( EXPECTED_SEARCH_VERSION_RESOURCE )
 				.envEntryValue(
-						"main".equals( VersionTestHelper.getModuleSlotString() ) ?
+						VersionTestHelper.isTestingBuiltinHibernateSearch() ?
 						VersionTestHelper.getDependencyVersionHibernateSearchBuiltIn() :
 						VersionTestHelper.getDependencyVersionHibernateSearch() )
 				.envEntryType( "java.lang.String" )
