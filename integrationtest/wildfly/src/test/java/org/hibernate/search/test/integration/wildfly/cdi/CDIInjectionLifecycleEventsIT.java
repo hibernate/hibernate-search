@@ -119,6 +119,8 @@ public class CDIInjectionLifecycleEventsIT {
 	@OperateOnDeployment( ERROR_CHECKING_DEPLOYMENT )
 	@InSequence(1)
 	public void countsInitiallyZero() {
+		counter.resetEventCounts();
+
 		log.debug( "Checking whether counts are initially set to 0..." );
 		EventCounts eventCounts = counter.getEventCounts();
 
