@@ -1377,6 +1377,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 		private ListContainingEmbeddable containedEmbeddedList = new ListContainingEmbeddable();
 
 		@ElementCollection
+		@OrderBy("containedSingle.id asc") // Make sure the iteration order is predictable
 		@JoinTable(name = "containing_elementCollection")
 		@AssociationOverride(
 				name = "containedSingle",
@@ -1663,6 +1664,7 @@ public class OrmAutomaticIndexingEmbeddableIT {
 
 		@ManyToMany
 		@IndexedEmbedded
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedList = new ArrayList<>();
 
 		protected ListContainingEmbeddable() {
