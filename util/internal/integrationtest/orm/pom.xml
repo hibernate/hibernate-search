@@ -29,10 +29,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${jdbc.driver.groupId}</groupId>
-            <artifactId>${jdbc.driver.artifactId}</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

@@ -278,9 +278,8 @@ stage('Non-default environment ITs') {
 			node(NODE_PATTERN_BASE) {
 				withDefaultedMaven {
 					resumeFromDefaultBuild()
-					// We must re-generate the ORM integration test utils too, to re-generate hibernate.properties
 					mavenNonDefaultIT itEnv, """ \\
-							clean install -pl util/internal/integrationtest/orm,integrationtest/orm -P$itEnv.mavenProfile
+							clean install -pl integrationtest/orm -P$itEnv.mavenProfile
 					"""
 				}
 			}

@@ -130,8 +130,21 @@
         <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
         <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
         <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
+        <!--
+             Pass these properties as system properties to be able to switch to
+             a different database without re-compiling the hibernate.properties file
+             (which is located in a different file)
+         -->
+        <failsafe.jvm.args.hibernate-orm>
+            -Dhibernate.dialect=${db.dialect}
+            -Dhibernate.connection.driver_class=${jdbc.driver}
+            -Dhibernate.connection.url=${jdbc.url}
+            -Dhibernate.connection.username=${jdbc.user}
+            -Dhibernate.connection.password=${jdbc.pass}
+            -Dhibernate.connection.isolation=${jdbc.isolation}
+        </failsafe.jvm.args.hibernate-orm>
         <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm}</failsafe.jvm.args>
 
         <!--
             Should be set by submodules.

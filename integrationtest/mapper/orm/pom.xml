@@ -28,6 +28,15 @@
             <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
+            Leave this dependency here, not in a utils module, so that we don't need to recompile
+            the utils to re-run the tests with a different database.
+         -->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
