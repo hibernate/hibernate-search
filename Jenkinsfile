@@ -478,7 +478,7 @@ void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
 String toMavenElasticsearchProfileArg(String mavenEsProfile) {
 	if (mavenEsProfile != defaultEsLocalEnv.mavenProfile) {
 		// Disable the default profile to avoid conflicting configurations
-		"-P!$defaultEsLocalEnv.mavenProfile,$itEnv.mavenProfile"
+		"-P!$defaultEsLocalEnv.mavenProfile,$mavenEsProfile"
 	}
 	else {
 		// Do not do as above, as we would tell Maven "disable the default profile, but enable it"
