@@ -9,6 +9,21 @@ import groovy.transform.Field
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 /*
+ * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
+ *
+ * By local, I mean libraries whose files are in the same Git repository.
+ *
+ * The Jenkinsfile is protected and will not be executed if modified in pull requests from external users,
+ * but other local library files are not protected.
+ * A user could potentially craft a malicious PR by modifying a local library.
+ *
+ * See https://blog.grdryn.me/blog/jenkins-pipeline-trust.html for a full explanation,
+ * and a potential solution if we really need local libraries.
+ * Alternatively we might be able to host libraries in a separate GitHub repo and configure
+ * them in the GUI: see http://ci.hibernate.org/job/hibernate-search-6-poc/configure, "Pipeline Libraries".
+ */
+
+/*
  * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
  *
  * This file requires the following plugins in particular:
