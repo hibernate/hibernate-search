@@ -27,34 +27,33 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.5.2'
 
-@Field final String DEFAULT_JDK_TOOL = 'Oracle JDK 8'
-@Field final String DEFAULT_ES_PROFILE = 'elasticsearch-5.2'
-
 @Field final String NODE_PATTERN_BASE = 'Slave'
 
-@Field final List<JdkITEnvironment> nonDefaultJdkEnvs = [
-		// This should not include the default JDK, which is used in the default build
+@Field final List<JdkITEnvironment> jdkEnvs = [
 		// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 		// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 		// TODO add support for JDK10/JDK11
+		new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 		new JdkITEnvironment(version: '10', tool: 'Oracle JDK 10.0.1', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.EXPERIMENTAL)
 ]
-@Field final List<DatabaseITEnvironment> nonDefaultDatabaseEnvs = [
-		// This should not include the default DB, which is used in the default build
+@Field JdkITEnvironment defaultJdkEnv
+@Field final List<DatabaseITEnvironment> databaseEnvs = [
+		new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 		new DatabaseITEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: ITEnvironmentStatus.SUPPORTED),
 		new DatabaseITEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: ITEnvironmentStatus.SUPPORTED)
 ]
-@Field final List<EsLocalITEnvironment> nonDefaultEsLocalEnvs = [
-		// This should not include the default profile, which is used in the default build
+@Field DatabaseITEnvironment defaultDatabaseEnv
+@Field final List<EsLocalITEnvironment> esLocalEnvs = [
 		// TODO add support for Elasticsearch 2? 5.0? 5.1?
 		new EsLocalITEnvironment(versionRange: '[2.0,2.2)', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsLocalITEnvironment(versionRange: '[2.2,5.0)', mavenProfile: 'elasticsearch-2.2', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsLocalITEnvironment(versionRange: '[5.0,5.2)', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.EXPERIMENTAL),
+		new EsLocalITEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 		new EsLocalITEnvironment(versionRange: '[6.0,6.x)', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
 ]
-@Field final List<EsAwsITEnvironment> nonDefaultEsAwsEnvs = [
-		// This should not include the default profile, which is used in the default build
+@Field EsLocalITEnvironment defaultEsLocalEnv
+@Field final List<EsAwsITEnvironment> esAwsEnvs = [
 		// TODO add support for AWS (needs the plugin currently only available in Search 5)
 		new EsAwsITEnvironment(version: '2.3', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '5.1', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.EXPERIMENTAL),
@@ -63,8 +62,8 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 		new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
 ]
-@Field final List<List<? extends ITEnvironment>> allNonDefaultEnvironments = [
-		nonDefaultJdkEnvs, nonDefaultDatabaseEnvs, nonDefaultEsLocalEnvs, nonDefaultEsAwsEnvs
+@Field final List<List<? extends ITEnvironment>> allEnvironmentLists = [
+		jdkEnvs, databaseEnvs, esLocalEnvs, esAwsEnvs
 ]
 
 @Field boolean enableDefaultBuild = false
@@ -75,6 +74,10 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 @Field String releaseVersionFamily
 
 stage('Configure') {
+	defaultJdkEnv = getDefaultEnv( jdkEnvs )
+	defaultDatabaseEnv = getDefaultEnv( databaseEnvs )
+	defaultEsLocalEnv = getDefaultEnv( esLocalEnvs )
+
 	properties([
 			parameters([
 					choice(
@@ -156,7 +159,10 @@ enableDefaultEnvIT=$enableDefaultEnvIT
 enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
 enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 
-	allNonDefaultEnvironments.each { envList ->
+	allEnvironmentLists.each { envList ->
+		// No need to re-test these environments, they are already tested as part of the default build
+		envList.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+
 		if (!enableNonDefaultSupportedEnvIT) {
 			envList.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.SUPPORTED }
 		}
@@ -165,7 +171,7 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 		}
 	}
 
-	nonDefaultEsAwsEnvs.removeAll { itEnv ->
+	esAwsEnvs.removeAll { itEnv ->
 		itEnv.endpointUrl = env.getProperty(itEnv.endpointVariableName)
 		if (!itEnv.endpointUrl) {
 			echo "Skipping test ${itEnv.tag} because environment variable '${itEnv.endpointVariableName}' is not defined."
@@ -188,7 +194,7 @@ enableExperimentalEnvIT=$enableExperimentalEnvIT"""
 	 * Thus the workaround below...
 	 */
 	String stringToPrint = ''
-	allNonDefaultEnvironments.each { envList ->
+	allEnvironmentLists.each { envList ->
 		envList.each {
 			stringToPrint += ' ' + it.toString()
 		}
@@ -260,7 +266,7 @@ stage('Non-default environment ITs') {
 	Map<String, Closure> executions = [:]
 
 	// Test with multiple JDKs
-	nonDefaultJdkEnvs.each { itEnv ->
+	jdkEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				withDefaultedMaven(jdk: itEnv.tool) {
@@ -273,7 +279,7 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test ORM integration with multiple databases
-	nonDefaultDatabaseEnvs.each { itEnv ->
+	databaseEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				withDefaultedMaven {
@@ -287,7 +293,7 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in a local instance
-	nonDefaultEsLocalEnvs.each { itEnv ->
+	esLocalEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				withDefaultedMaven {
@@ -302,7 +308,7 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
-	nonDefaultEsAwsEnvs.each { itEnv ->
+	esAwsEnvs.each { itEnv ->
 		if (!itEnv.endpointUrl) {
 			throw new IllegalStateException("Unexpected empty endpoint URL")
 		}
@@ -378,7 +384,11 @@ stage('Release') {
 // Helpers
 
 enum ITEnvironmentStatus {
+	// For environments used as part of the integration tests in the default build (tested on all branches)
+	USED_IN_DEFAULT_BUILD,
+	// For environments that are expected to work correctly (tested on master and maintenance branches)
 	SUPPORTED,
+	// For environments that may not work correctly (only tested when explicitly requested through job parameters)
 	EXPERIMENTAL
 }
 
@@ -424,12 +434,16 @@ class EsAwsITEnvironment extends ITEnvironment {
 	}
 }
 
+static <T extends ITEnvironment> T getDefaultEnv(List<T> envs) {
+	return envs.find { it.status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+}
+
 void withDefaultedMaven(Closure body) {
 	withDefaultedMaven([:], body)
 }
 
 void withDefaultedMaven(Map args, Closure body) {
-	args.putIfAbsent('jdk', DEFAULT_JDK_TOOL)
+	args.putIfAbsent('jdk', defaultJdkEnv.tool)
 	args.putIfAbsent('maven', MAVEN_TOOL)
 	args.putIfAbsent('options', [artifactsPublisher(disabled: true)])
 	args.putIfAbsent('mavenLocalRepo', "$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE")
@@ -462,9 +476,9 @@ void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
 }
 
 String toMavenElasticsearchProfileArg(String mavenEsProfile) {
-	if (mavenEsProfile != DEFAULT_ES_PROFILE) {
+	if (mavenEsProfile != defaultEsLocalEnv.mavenProfile) {
 		// Disable the default profile to avoid conflicting configurations
-		"-P!$DEFAULT_ES_PROFILE,$itEnv.mavenProfile"
+		"-P!$defaultEsLocalEnv.mavenProfile,$itEnv.mavenProfile"
 	}
 	else {
 		// Do not do as above, as we would tell Maven "disable the default profile, but enable it"
