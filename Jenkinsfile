@@ -30,6 +30,7 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
  * - https://plugins.jenkins.io/pipeline-maven
  * - https://plugins.jenkins.io/ec2
  * - https://plugins.jenkins.io/lockable-resources
+ * - https://plugins.jenkins.io/pipeline-github
  *
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
@@ -94,6 +95,9 @@ stage('Configure') {
 	defaultEsLocalEnv = getDefaultEnv( esLocalEnvs )
 
 	properties([
+			pipelineTriggers([
+					issueCommentTrigger('.*test this please.*')
+			]),
 			parameters([
 					choice(
 							name: 'INTEGRATION_TESTS',
