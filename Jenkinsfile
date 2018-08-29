@@ -8,6 +8,8 @@
 import groovy.transform.Field
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
+import java.util.regex.Pattern
+
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
  *
@@ -31,17 +33,24 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
  * - https://plugins.jenkins.io/ec2
  * - https://plugins.jenkins.io/lockable-resources
  * - https://plugins.jenkins.io/pipeline-github
+ * - https://plugins.jenkins.io/email-ext
  *
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
  * - staticMethod org.jenkinsci.plugins.pipeline.modeldefinition.Utils markStageSkippedForConditional java.lang.String
  * - new java.lang.IllegalArgumentException java.lang.String
+ * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
+ * - method hudson.plugins.git.UserRemoteConfig getUrl
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  */
 
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.5.2'
+
+@Field final Pattern MAIN_REPOSITORY_URL_PATTERN = ~/^(git@github.com:|https:\/\/github.com\/)hibernate\/.*.git$/
+// The following should be a space-separated list of email addresses
+@Field final String MAIN_REPOSITORY_MAINTAINER_EMAILS = "yoann+hibernate-ci@hibernate.org guillaume+ci@hibernate.org"
 
 @Field final String NODE_PATTERN_BASE = 'Slave'
 
@@ -88,6 +97,9 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 @Field boolean enableExperimentalEnvIT = false
 
 @Field String releaseVersionFamily
+
+Throwable mainScriptException = null
+try { // Start of the code triggering notifications, see below. Not indenting for readability.
 
 stage('Configure') {
 	defaultJdkEnv = getDefaultEnv( jdkEnvs )
@@ -400,6 +412,28 @@ stage('Release') {
 	}
 }
 
+currentBuild.result = 'SUCCESS'
+} // End of the code triggering notifications
+catch (any) {
+	mainScriptException = any
+	throw any
+}
+finally {
+	try {
+		notifyBuildEnd()
+	}
+	catch (notifyException) {
+		if (mainScriptException != null) {
+			// We are already throwing an exception, just register the new one as suppressed
+			mainScriptException.addSuppressed(notifyException)
+		}
+		else {
+			// We are not already throwing an exception, we can rethrow the new one
+			throw notifyException
+		}
+	}
+}
+
 // Helpers
 
 enum ITEnvironmentStatus {
@@ -504,4 +538,43 @@ String toMavenElasticsearchProfileArg(String mavenEsProfile) {
 		// and Maven would end up disabling it.
 		''
 	}
+}
+
+def notifyBuildEnd() {
+	boolean success = currentBuild.result == 'SUCCESS'
+	boolean successAfterSuccess = success &&
+			currentBuild.previousBuild != null && currentBuild.previousBuild.result == 'SUCCESS'
+
+	String explicitRecipients = null
+
+	// Always notify people who explicitly requested a build
+	def recipientProviders = [requestor()]
+
+	// In case of failure, notify all the people who committed a change since the last non-broken build
+	if (!success) {
+		echo "Notification recipients: adding culprits()"
+		recipientProviders.add(culprits())
+	}
+	// Always notify the author of the changeset, except in the case of a "success after a success"
+	if (!successAfterSuccess) {
+		echo "Notification recipients: adding developers()"
+		recipientProviders.add(developers())
+	}
+	// Notify the maintainers when building a branch from the main repository,
+	// except in the case of a PR build or of a "success after a success"
+	if (!env.CHANGE_ID && !successAfterSuccess) {
+		String scmUrl = scm.getUserRemoteConfigs()[0].getUrl() // See https://stackoverflow.com/a/38255364/6692043
+		if (scmUrl ==~ MAIN_REPOSITORY_URL_PATTERN) {
+			echo "Notification recipients: adding main repository maintainers"
+			explicitRecipients = MAIN_REPOSITORY_MAINTAINER_EMAILS
+		}
+	}
+
+	// See https://plugins.jenkins.io/email-ext#Email-extplugin-PipelineExamples
+	emailext(
+			subject: '${DEFAULT_SUBJECT}',
+			body: '${DEFAULT_CONTENT}',
+			recipientProviders: recipientProviders,
+			to: explicitRecipients
+	)
 }
