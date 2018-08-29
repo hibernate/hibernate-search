@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
@@ -598,6 +599,7 @@ public class OrmProgrammaticMappingIT {
 		@Id
 		private Integer id;
 
+		@Column(name = "numeric_column")
 		private Integer numeric;
 
 		public Integer getId() {
@@ -627,6 +629,7 @@ public class OrmProgrammaticMappingIT {
 		@Id
 		private Integer id;
 
+		@Column(name = "numeric_column")
 		private Integer numeric;
 
 		private String optionalText;

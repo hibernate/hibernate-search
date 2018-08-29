@@ -269,9 +269,9 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 				name = "indexed_containedIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
-		@MapKeyJoinColumn(name = "key")
+		@MapKeyJoinColumn(name = "map_key")
 		@Column(name = "value")
-		@OrderBy("key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
@@ -283,9 +283,9 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 				name = "indexed_containedNonIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
-		@MapKeyJoinColumn(name = "key")
+		@MapKeyJoinColumn(name = "map_key")
 		@Column(name = "value")
-		@OrderBy("key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<ContainedEntity, String> containedNonIndexedEmbedded = new LinkedHashMap<>();
 
 		@ElementCollection
@@ -293,9 +293,9 @@ public class OrmAutomaticIndexingMapKeysAssociationIT extends AbstractOrmAutomat
 				name = "indexed_containedIndexedEmbeddedNoReindexOnUpdate",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
-		@MapKeyJoinColumn(name = "key")
+		@MapKeyJoinColumn(name = "map_key")
 		@Column(name = "value")
-		@OrderBy("key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )

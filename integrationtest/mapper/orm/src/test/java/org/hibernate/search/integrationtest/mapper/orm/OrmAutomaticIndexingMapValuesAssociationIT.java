@@ -266,7 +266,7 @@ public class OrmAutomaticIndexingMapValuesAssociationIT extends AbstractOrmAutom
 				joinColumns = @JoinColumn(name = "mapHolder"),
 				inverseJoinColumns = @JoinColumn(name = "value")
 		)
-		@MapKeyColumn(name = "key")
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedIndexedEmbedded = new LinkedHashMap<>();
@@ -277,7 +277,7 @@ public class OrmAutomaticIndexingMapValuesAssociationIT extends AbstractOrmAutom
 				joinColumns = @JoinColumn(name = "mapHolder"),
 				inverseJoinColumns = @JoinColumn(name = "value")
 		)
-		@MapKeyColumn(name = "key")
+		@MapKeyColumn(name = "map_key")
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedNonIndexedEmbedded = new LinkedHashMap<>();
 
@@ -287,7 +287,7 @@ public class OrmAutomaticIndexingMapValuesAssociationIT extends AbstractOrmAutom
 				joinColumns = @JoinColumn(name = "mapHolder"),
 				inverseJoinColumns = @JoinColumn(name = "value")
 		)
-		@MapKeyColumn(name = "key")
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
