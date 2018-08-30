@@ -104,6 +104,7 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultEnvIT = false
+@Field boolean enableDefaultEnvLegacyIT = false
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
 
@@ -141,6 +142,11 @@ ALL_ENV""",
 							description: """Which integration tests to run.
 'AUTOMATIC' chooses based on the branch name and whether a release is being performed.
 'DEFAULT_ENV_ONLY' means a single build, while other options will trigger multiple Maven executions in different environments."""
+					),
+					booleanParam(
+							name: 'LEGACY_IT',
+							defaultValue: false,
+							description: 'If true, also enable tests of the legacy code (Search 5) in the default environment.'
 					),
 					string(
 							name: 'RELEASE_VERSION',
@@ -189,6 +195,8 @@ ALL_ENV""",
 				enableDefaultBuild = true
 				enableDefaultEnvIT = true
 				enableNonDefaultSupportedEnvIT = true
+				echo "Enabling legacy integration tests for master or maintenance branch '$env.BRANCH_NAME'"
+				enableDefaultEnvLegacyIT = true
 			} else {
 				echo "Enabling only the default build and integration tests in the default environment for feature branch $env.BRANCH_NAME"
 				enableDefaultBuild = true
@@ -201,13 +209,19 @@ ALL_ENV""",
 			)
 	}
 
+	if ( enableDefaultEnvIT && params.LEGACY_IT ) {
+		echo "Enabling legacy integration tests in default environment due to explicit request"
+		enableDefaultEnvLegacyIT = true
+	}
+
 	enableDefaultBuild = enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT
 
 	echo """Integration test setting: $params.INTEGRATION_TESTS, result:
 enableDefaultBuild=$enableDefaultBuild
 enableDefaultEnvIT=$enableDefaultEnvIT
 enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
-enableExperimentalEnvIT=$enableExperimentalEnvIT"""
+enableExperimentalEnvIT=$enableExperimentalEnvIT
+enableDefaultEnvLegacyIT=$enableDefaultEnvLegacyIT"""
 
 	allEnvironmentLists.each { envList ->
 		// No need to re-test these environments, they are already tested as part of the default build
@@ -303,7 +317,8 @@ stage('Default build') {
 		withDefaultedMaven {
 			sh """ \\
 					mvn clean install -Pdist -Pcoverage -Pjqassistant \\
-					${enableDefaultEnvIT ? '' : '-DskipITs'}
+					${enableDefaultEnvIT ? '' : '-DskipITs'} \\
+					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''}
 			"""
 			dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
 				stash name:'main-build', includes:"org/hibernate/search/**"
