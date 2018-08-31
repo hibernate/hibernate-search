@@ -9,7 +9,9 @@ package org.hibernate.search.engine.backend.index.spi;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A worker that accumulates works in a list (called a changeset),
+ * An entry point to execute works on an index.
+ * <p>
+ * Accumulates works in a list (called a changeset),
  * and executes them only when {@link #execute()} is called.
  * <p>
  * Relative ordering of works within a changeset will be preserved.
@@ -18,7 +20,30 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author Yoann Rodiere
  */
-public interface ChangesetIndexWorker<D> extends IndexWorker<D> {
+public interface ChangesetIndexWorker<D> {
+
+	/**
+	 * Add a document to the index, assuming that the document is absent from the index.
+	 *
+	 * @param documentReferenceProvider A source of information about the identity of the document to add.
+	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 */
+	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+
+	/**
+	 * Update a document in the index, or add it if it's absent from the index.
+	 *
+	 * @param documentReferenceProvider A source of information about the identity of the document to update.
+	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 */
+	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+
+	/**
+	 * Delete a document from the index.
+	 *
+	 * @param documentReferenceProvider A source of information about the identity of the document to delete.
+	 */
+	void delete(DocumentReferenceProvider documentReferenceProvider);
 
 	/**
 	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.

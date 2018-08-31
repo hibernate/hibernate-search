@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -58,11 +57,6 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	@Override
 	public ChangesetIndexWorker<StubDocumentElement> createWorker(SessionContext context) {
 		return new StubChangesetIndexWorker( this, context );
-	}
-
-	@Override
-	public StreamIndexWorker<StubDocumentElement> createStreamWorker(SessionContext context) {
-		return new StubStreamIndexWorker( this, context );
 	}
 
 	@Override

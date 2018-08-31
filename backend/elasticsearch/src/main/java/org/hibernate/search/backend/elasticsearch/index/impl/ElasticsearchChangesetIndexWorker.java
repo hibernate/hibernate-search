@@ -17,29 +17,73 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.common.spi.SessionContext;
+
+import com.google.gson.JsonObject;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchChangesetIndexWorker extends ElasticsearchIndexWorker
-		implements ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchChangesetIndexWorker implements ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> {
 
+	private final ElasticsearchWorkFactory factory;
+	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final URLEncodedString indexName;
+	private final URLEncodedString typeName;
+	private final String tenantId;
+
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
 
 	ElasticsearchChangesetIndexWorker(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContext sessionContext) {
-		super( factory, multiTenancyStrategy, indexName, typeName, sessionContext );
+		this.factory = factory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
+		this.indexName = indexName;
+		this.typeName = typeName;
+		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
-	protected void collect(ElasticsearchWork<?> work) {
-		works.add( work );
+	public void add(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+		String id = referenceProvider.getIdentifier();
+		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
+		String routingKey = referenceProvider.getRoutingKey();
+
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
+		documentContributor.contribute( builder );
+		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
+
+		collect( factory.add( indexName, typeName, elasticsearchId, routingKey, document ) );
+	}
+
+	@Override
+	public void update(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+		String id = referenceProvider.getIdentifier();
+		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
+		String routingKey = referenceProvider.getRoutingKey();
+
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
+		documentContributor.contribute( builder );
+		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
+
+		collect( factory.update( indexName, typeName, elasticsearchId, routingKey, document ) );
+	}
+
+	@Override
+	public void delete(DocumentReferenceProvider referenceProvider) {
+		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
+		String routingKey = referenceProvider.getRoutingKey();
+
+		collect( factory.delete( indexName, typeName, elasticsearchId, routingKey ) );
 	}
 
 	@Override
@@ -59,6 +103,10 @@ public class ElasticsearchChangesetIndexWorker extends ElasticsearchIndexWorker
 		finally {
 			works.clear();
 		}
+	}
+
+	private void collect(ElasticsearchWork<?> work) {
+		works.add( work );
 	}
 
 }

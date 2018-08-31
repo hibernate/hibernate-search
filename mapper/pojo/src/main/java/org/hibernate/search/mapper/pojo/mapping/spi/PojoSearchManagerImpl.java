@@ -13,7 +13,6 @@ import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.StreamPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoSessionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
@@ -26,7 +25,6 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	private final PojoMappingDelegate mappingDelegate;
 	private final PojoSessionContext sessionContext;
 	private ChangesetPojoWorker changesetWorker;
-	private StreamPojoWorker streamWorker;
 
 	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManager> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
@@ -44,14 +42,6 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	@Override
 	public ChangesetPojoWorker createWorker() {
 		return mappingDelegate.createWorker( sessionContext );
-	}
-
-	@Override
-	public StreamPojoWorker getStreamWorker() {
-		if ( streamWorker == null ) {
-			streamWorker = mappingDelegate.createStreamWorker( sessionContext );
-		}
-		return streamWorker;
 	}
 
 	@Override

@@ -28,7 +28,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.Service;
 
@@ -96,7 +95,7 @@ public class HibernateSearchContextService implements Service {
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
-	 * @return The {@link PojoWorker} to use for changes to entities in the given session.
+	 * @return The {@link ChangesetPojoWorker} to use for changes to entities in the given session.
 	 */
 	@SuppressWarnings("unchecked")
 	public ChangesetPojoWorker getCurrentWorker(SessionImplementor sessionImplementor) {
@@ -141,7 +140,7 @@ public class HibernateSearchContextService implements Service {
 //			}
 			// TODO Create a ChangesetWorker (to handle automatic reindexing of containing types),
 			// but ensure changes will be applied without waiting for a call to worker.execute()
-			// TODO also ensure synchronicity if necessary (getStreamWorker(Synchronization.SYNCHRONOUS)? Something else?)
+			// TODO also ensure synchronicity if necessary (make some Session event, such as flush(), wait for the works to be executed)
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}

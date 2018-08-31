@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -64,11 +63,6 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	@Override
 	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
 		return indexingBackendContext.createChangesetIndexWorker( changesetOrchestrator, elasticsearchIndexName, typeName, sessionContext );
-	}
-
-	@Override
-	public StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createStreamIndexWorker( elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override

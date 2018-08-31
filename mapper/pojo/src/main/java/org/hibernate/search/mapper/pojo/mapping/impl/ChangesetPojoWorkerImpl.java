@@ -16,13 +16,17 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 
-class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWorker {
+class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 
+	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 	private final PojoSessionContext sessionContext;
+	private final PojoRuntimeIntrospector introspector;
+
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Class<?>, ChangesetPojoIndexedTypeWorker<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, ChangesetPojoContainedTypeWorker<?>> containedTypeDelegates = new HashMap<>();
@@ -30,9 +34,34 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 	ChangesetPojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
 			PojoSessionContext sessionContext) {
-		super( indexedTypeManagers, sessionContext.getRuntimeIntrospector() );
+		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 		this.sessionContext = sessionContext;
+		this.introspector = sessionContext.getRuntimeIntrospector();
+	}
+
+	@Override
+	public void add(Object entity) {
+		add( null, entity );
+	}
+
+	@Override
+	public void add(Object id, Object entity) {
+		Class<?> clazz = introspector.getClass( entity );
+		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		delegate.add( id, entity );
+	}
+
+	@Override
+	public void update(Object entity) {
+		update( null, entity );
+	}
+
+	@Override
+	public void update(Object id, Object entity) {
+		Class<?> clazz = introspector.getClass( entity );
+		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		delegate.update( id, entity );
 	}
 
 	@Override
@@ -45,6 +74,18 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 		Class<?> clazz = getIntrospector().getClass( entity );
 		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
 		delegate.update( id, entity, dirtyPaths );
+	}
+
+	@Override
+	public void delete(Object entity) {
+		delete( null, entity );
+	}
+
+	@Override
+	public void delete(Object id, Object entity) {
+		Class<?> clazz = introspector.getClass( entity );
+		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		delegate.delete( id, entity );
 	}
 
 	@Override
@@ -75,8 +116,11 @@ class ChangesetPojoWorkerImpl extends PojoWorkerImpl implements ChangesetPojoWor
 		}
 	}
 
-	@Override
-	ChangesetPojoTypeWorker getDelegate(Class<?> clazz) {
+	private PojoRuntimeIntrospector getIntrospector() {
+		return introspector;
+	}
+
+	private ChangesetPojoTypeWorker getDelegate(Class<?> clazz) {
 		ChangesetPojoTypeWorker delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( clazz );

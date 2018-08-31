@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
@@ -77,13 +76,6 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	public ChangesetIndexWorker<LuceneRootDocumentBuilder> createWorker(SessionContext sessionContext) {
 		return indexingBackendContext.createChangesetIndexWorker(
 				changesetOrchestrator, indexName, sessionContext
-		);
-	}
-
-	@Override
-	public StreamIndexWorker<LuceneRootDocumentBuilder> createStreamWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createStreamIndexWorker(
-				streamOrchestrator, indexName, sessionContext
 		);
 	}
 

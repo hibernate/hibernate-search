@@ -40,9 +40,4 @@ public interface PojoSearchManager extends SearchManager {
 	 */
 	ChangesetPojoWorker createWorker();
 
-	/**
-	 * @return A stream worker for this manager.
-	 */
-	StreamPojoWorker getStreamWorker();
-
 }

@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.mapping;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorker;
 
 public interface HibernateOrmMapping extends PojoMapping {
 
@@ -20,7 +20,7 @@ public interface HibernateOrmMapping extends PojoMapping {
 	/**
 	 * @param entity an entity
 	 * @return {@code true} if this entity can be the subject of a work (i.e. it can be passed to
-	 * {@link PojoWorker#add(Object)} for instance), {@code false} if it cannot.
+	 * {@link ChangesetPojoWorker#add(Object)} for instance), {@code false} if it cannot.
 	 */
 	boolean isWorkable(Object entity);
 

@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElastic
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
-import org.hibernate.search.engine.backend.index.spi.StreamIndexWorker;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.EventContext;
 
@@ -71,15 +70,6 @@ public class IndexingBackendContext {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchChangesetIndexWorker( workFactory, multiTenancyStrategy, orchestrator,
-				indexName, typeName, sessionContext );
-	}
-
-	StreamIndexWorker<ElasticsearchDocumentObjectBuilder> createStreamIndexWorker(
-			URLEncodedString indexName, URLEncodedString typeName,
-			SessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
-
-		return new ElasticsearchStreamIndexWorker( workFactory, multiTenancyStrategy, streamOrchestrator,
 				indexName, typeName, sessionContext );
 	}
 }

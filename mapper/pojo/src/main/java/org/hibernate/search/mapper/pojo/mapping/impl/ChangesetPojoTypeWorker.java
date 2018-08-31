@@ -8,12 +8,20 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 
-abstract class ChangesetPojoTypeWorker extends PojoTypeWorker {
+abstract class ChangesetPojoTypeWorker {
+
+	final PojoSessionContext sessionContext;
 
 	ChangesetPojoTypeWorker(PojoSessionContext sessionContext) {
-		super( sessionContext );
+		this.sessionContext = sessionContext;
 	}
 
+	abstract void add(Object id, Object entity);
+
+	abstract void update(Object id, Object entity);
+
 	abstract void update(Object id, Object entity, String... dirtyPaths);
+
+	abstract void delete(Object id, Object entity);
 
 }

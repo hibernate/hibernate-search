@@ -118,10 +118,6 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	StreamPojoIndexedTypeWorker<I, E, D> createStreamWorker(PojoSessionContext sessionContext) {
-		return new StreamPojoIndexedTypeWorker<>( this, sessionContext, indexManager.createStreamWorker( sessionContext ) );
-	}
-
 	IndexSearchTargetBuilder createSearchTarget() {
 		return indexManager.createSearchTarget();
 	}

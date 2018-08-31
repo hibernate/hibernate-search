@@ -18,8 +18,6 @@ public interface IndexManager<D extends DocumentElement> {
 
 	ChangesetIndexWorker<D> createWorker(SessionContext sessionContext);
 
-	StreamIndexWorker<D> createStreamWorker(SessionContext sessionContext);
-
 	IndexSearchTargetBuilder createSearchTarget();
 
 	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);

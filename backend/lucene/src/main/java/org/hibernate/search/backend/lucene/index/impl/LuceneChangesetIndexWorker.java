@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
@@ -22,21 +25,64 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Guillaume Smet
  */
-class LuceneChangesetIndexWorker extends LuceneIndexWorker implements ChangesetIndexWorker<LuceneRootDocumentBuilder> {
+class LuceneChangesetIndexWorker implements ChangesetIndexWorker<LuceneRootDocumentBuilder> {
 
+	private final LuceneWorkFactory factory;
+	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final LuceneIndexWorkOrchestrator orchestrator;
+	private final String indexName;
+	private final String tenantId;
+
 	private final List<LuceneIndexWork<?>> works = new ArrayList<>();
 
 	LuceneChangesetIndexWorker(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContext sessionContext) {
-		super( factory, multiTenancyStrategy, indexName, sessionContext );
+		this.factory = factory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
+		this.indexName = indexName;
+		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
-	protected void collect(LuceneIndexWork<?> work) {
-		works.add( work );
+	public void add(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+		String id = referenceProvider.getIdentifier();
+		String routingKey = referenceProvider.getRoutingKey();
+
+		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
+		documentContributor.contribute( builder );
+		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+
+		collect( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
+		// FIXME remove this explicit commit
+		collect( factory.commit( indexName ) );
+	}
+
+	@Override
+	public void update(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+		String id = referenceProvider.getIdentifier();
+		String routingKey = referenceProvider.getRoutingKey();
+
+		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
+		documentContributor.contribute( builder );
+		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+
+		collect( factory.update( indexName, tenantId, id, routingKey, indexEntry ) );
+		// FIXME remove this explicit commit
+		collect( factory.commit( indexName ) );
+	}
+
+	@Override
+	public void delete(DocumentReferenceProvider referenceProvider) {
+		String id = referenceProvider.getIdentifier();
+		String routingKey = referenceProvider.getRoutingKey();
+
+		collect( factory.delete( indexName, tenantId, id, routingKey ) );
+		// FIXME remove this explicit commit
+		collect( factory.commit( indexName ) );
 	}
 
 	@Override
@@ -53,5 +99,9 @@ class LuceneChangesetIndexWorker extends LuceneIndexWorker implements ChangesetI
 		finally {
 			works.clear();
 		}
+	}
+
+	private void collect(LuceneIndexWork<?> work) {
+		works.add( work );
 	}
 }
