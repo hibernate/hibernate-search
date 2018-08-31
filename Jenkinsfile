@@ -50,6 +50,7 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
  * - new java.lang.IllegalArgumentException java.lang.String
  * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
  * - method hudson.plugins.git.UserRemoteConfig getUrl
+ * - method java.lang.Throwable addSuppressed java.lang.Throwable
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  */
