@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.util.impl.common.logging;
 
+import org.hibernate.search.util.impl.common.MessageConstants;
+
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
  * Common message bundle related to event contexts.
  */
-@MessageBundle(projectCode = "HSEARCH")
+@MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface CommonEventContextMessages {
 
 	@Message(value = "Context: ")

@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.logging.impl;
 
+import org.hibernate.search.util.impl.common.MessageConstants;
+
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
  * Message bundle for event contexts in the POJO mapper.
  */
-@MessageBundle(projectCode = "HSEARCH")
+@MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface PojoEventContextMessages {
 
 	@Message(value = "path '%1$s'")

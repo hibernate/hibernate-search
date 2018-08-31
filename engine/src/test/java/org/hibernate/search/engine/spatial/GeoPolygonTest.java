@@ -44,7 +44,7 @@ public class GeoPolygonTest {
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH000016" );
+				.hasMessageContaining( "HSEARCH000516" );
 
 		SubTest.expectException(
 				() -> new ImmutableGeoPolygon( Arrays.asList(
@@ -56,6 +56,6 @@ public class GeoPolygonTest {
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH000016" );
+				.hasMessageContaining( "HSEARCH000516" );
 	}
 }

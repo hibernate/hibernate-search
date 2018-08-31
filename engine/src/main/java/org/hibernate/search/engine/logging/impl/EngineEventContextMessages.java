@@ -8,13 +8,15 @@ package org.hibernate.search.engine.logging.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.util.impl.common.MessageConstants;
+
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
 /**
  * Message bundle for event contexts related to engine concepts.
  */
-@MessageBundle(projectCode = "HSEARCH")
+@MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface EngineEventContextMessages {
 
 	@Message(value = "    ")

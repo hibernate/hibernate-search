@@ -76,7 +76,7 @@ public class LuceneSearchSortIT {
 	@Test
 	public void byDistanceDesc() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH-LUCENE000543" );
+		thrown.expectMessage( "HSEARCH600043" );
 
 		simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ).desc() );
 	}

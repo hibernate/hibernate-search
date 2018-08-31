@@ -201,7 +201,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH-UTIL000018" );
+				.hasMessageContaining( "HSEARCH000018" );
 	}
 
 	@Test

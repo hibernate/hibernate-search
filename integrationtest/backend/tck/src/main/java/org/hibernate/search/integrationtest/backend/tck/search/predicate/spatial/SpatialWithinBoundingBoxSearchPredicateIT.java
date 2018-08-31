@@ -236,7 +236,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH-UTIL000018" );
+				.hasMessageContaining( "HSEARCH000018" );
 	}
 
 	@Test

@@ -30,7 +30,7 @@ public class JavaBeanMappingFailureReportIT {
 			+ " continuing bootstrap for now to list all mapping problems,"
 			+ " but the bootstrap process will ultimately be aborted.\n"
 			+ "Context: ";
-	private static final String FAILURE_REPORT_INTRODUCTION = "HSEARCH000020: Hibernate Search bootstrap failed."
+	private static final String FAILURE_REPORT_INTRODUCTION = "HSEARCH000520: Hibernate Search bootstrap failed."
 			+ " Failures:\n"
 			+ "\n"
 			+ "    JavaBean mapping: \n";
