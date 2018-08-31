@@ -6,9 +6,8 @@
  */
 
 import groovy.transform.Field
+import groovy.json.JsonSlurper
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
-
-import java.util.regex.Pattern
 
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
@@ -26,6 +25,14 @@ import java.util.regex.Pattern
  */
 
 /*
+ * Expected configuration (optional): multibranch-configuration.yaml, set up using the config file provider plugin
+ * (https://plugins.jenkins.io/config-file-provider).
+ * Expected structure of this file:
+ *
+ * notification:
+ *   email:
+ *     recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
+ *
  * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
  *
  * This file requires the following plugins in particular:
@@ -34,6 +41,8 @@ import java.util.regex.Pattern
  * - https://plugins.jenkins.io/lockable-resources
  * - https://plugins.jenkins.io/pipeline-github
  * - https://plugins.jenkins.io/email-ext
+ * - https://plugins.jenkins.io/config-file-provider
+ * - https://plugins.jenkins.io/pipeline-utility-steps
  *
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
@@ -48,11 +57,12 @@ import java.util.regex.Pattern
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.5.2'
 
-@Field final Pattern MAIN_REPOSITORY_URL_PATTERN = ~/^(git@github.com:|https:\/\/github.com\/)hibernate\/.*.git$/
-// The following should be a space-separated list of email addresses
-@Field final String MAIN_REPOSITORY_MAINTAINER_EMAILS = "yoann+hibernate-ci@hibernate.org guillaume+ci@hibernate.org"
-
+// Default node pattern, to be used for resource-intensive stages.
+// Should not include the master node.
 @Field final String NODE_PATTERN_BASE = 'Slave'
+// Quick-use node pattern, to be used for very light, quick, and environment-independent stages,
+// such as sending a notification. May include the master node in particular.
+@Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave'
 
 @Field final List<JdkITEnvironment> jdkEnvs = [
 		// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
@@ -96,6 +106,8 @@ import java.util.regex.Pattern
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
 
+@Field def multibranchConfiguration = null
+
 @Field String releaseVersionFamily
 
 Throwable mainScriptException = null
@@ -105,6 +117,12 @@ stage('Configure') {
 	defaultJdkEnv = getDefaultEnv( jdkEnvs )
 	defaultDatabaseEnv = getDefaultEnv( databaseEnvs )
 	defaultEsLocalEnv = getDefaultEnv( esLocalEnvs )
+
+	// Load the configuration specific to each "multibranch pipeline job" set up in Jenkins
+	node(QUICK_USE_NODE_PATTERN) {
+		multibranchConfiguration = loadYamlConfiguration('multibranch-configuration.yaml')
+		echo "Multi-branch configuration: $multibranchConfiguration"
+	}
 
 	properties([
 			pipelineTriggers([
@@ -540,6 +558,18 @@ String toMavenElasticsearchProfileArg(String mavenEsProfile) {
 	}
 }
 
+def loadYamlConfiguration(String yamlConfigFileId) {
+	try {
+		configFileProvider([configFile(fileId: yamlConfigFileId, variable: "FILE_PATH")]) {
+			return readYaml(file: FILE_PATH)
+		}
+	}
+	catch (Exception e) {
+		echo "Failed to load configuration file '$yamlConfigFileId'; assuming empty file. Exception was: $e"
+		return [:]
+	}
+}
+
 def notifyBuildEnd() {
 	boolean success = currentBuild.result == 'SUCCESS'
 	boolean successAfterSuccess = success &&
@@ -560,14 +590,11 @@ def notifyBuildEnd() {
 		echo "Notification recipients: adding developers()"
 		recipientProviders.add(developers())
 	}
-	// Notify the maintainers when building a branch from the main repository,
+
+	// Notify the notification recipients configured on the job,
 	// except in the case of a PR build or of a "success after a success"
 	if (!env.CHANGE_ID && !successAfterSuccess) {
-		String scmUrl = scm.getUserRemoteConfigs()[0].getUrl() // See https://stackoverflow.com/a/38255364/6692043
-		if (scmUrl ==~ MAIN_REPOSITORY_URL_PATTERN) {
-			echo "Notification recipients: adding main repository maintainers"
-			explicitRecipients = MAIN_REPOSITORY_MAINTAINER_EMAILS
-		}
+		explicitRecipients = multibranchConfiguration?.notification?.email?.recipients
 	}
 
 	// See https://plugins.jenkins.io/email-ext#Email-extplugin-PipelineExamples
