@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -316,8 +316,8 @@ public class SearchResultLoadingOrTransformingIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( MAIN_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( MAIN_ID ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE );
 			indexAccessors.string_analyzed.write( document, STRING_ANALYZED_VALUE );
 			indexAccessors.integer.write( document, INTEGER_VALUE );
@@ -335,9 +335,9 @@ public class SearchResultLoadingOrTransformingIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, NESTED_OBJECT_INTEGER_VALUE );
 		} );
 
-		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

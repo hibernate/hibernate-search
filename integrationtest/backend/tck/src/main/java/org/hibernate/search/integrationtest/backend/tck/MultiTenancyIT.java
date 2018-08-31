@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -120,7 +120,7 @@ public class MultiTenancyIT {
 
 	@Test
 	public void delete_only_deletes_elements_of_the_tenant() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant2SessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
@@ -139,9 +139,9 @@ public class MultiTenancyIT {
 				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
-		worker.delete( referenceProvider( DOCUMENT_ID_1 ) );
+		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
@@ -163,7 +163,7 @@ public class MultiTenancyIT {
 
 	@Test
 	public void update_only_updates_elements_of_the_tenant() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant2SessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
@@ -173,7 +173,7 @@ public class MultiTenancyIT {
 		assertThat( checkQuery )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		worker.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, UPDATED_STRING );
 			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
 
@@ -182,7 +182,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// The tenant 2 has been updated properly.
 
@@ -284,9 +284,9 @@ public class MultiTenancyIT {
 				)
 				.setup();
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant1SessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
-		worker.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_3 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_5 );
 
@@ -295,7 +295,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -312,9 +312,9 @@ public class MultiTenancyIT {
 				)
 				.setup();
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant1SessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
-		worker.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, UPDATED_STRING );
 			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
 
@@ -323,7 +323,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -340,9 +340,9 @@ public class MultiTenancyIT {
 				)
 				.setup();
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant1SessionContext );
-		worker.delete( referenceProvider( DOCUMENT_ID_1 ) );
-		worker.execute().join();
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
+		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -366,9 +366,9 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( new StubSessionContext() );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
-		worker.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_3 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_5 );
 
@@ -377,7 +377,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -386,9 +386,9 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( new StubSessionContext() );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
-		worker.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, UPDATED_STRING );
 			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
 
@@ -397,7 +397,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -406,14 +406,14 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( new StubSessionContext() );
-		worker.delete( referenceProvider( DOCUMENT_ID_1 ) );
-		worker.execute().join();
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
+		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
+		workPlan.execute().join();
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( tenant1SessionContext );
-		worker.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
+		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_1 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_1 );
 
@@ -422,7 +422,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_1 );
 		} );
 
-		worker.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_2 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_2 );
 
@@ -431,10 +431,10 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_2 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
-		worker = indexManager.createWorker( tenant2SessionContext );
-		worker.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		workPlan = indexManager.createWorkPlan( tenant2SessionContext );
+		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_1 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_3 );
 
@@ -443,7 +443,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_3 );
 		} );
 
-		worker.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, STRING_VALUE_2 );
 			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
 
@@ -452,7 +452,7 @@ public class MultiTenancyIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

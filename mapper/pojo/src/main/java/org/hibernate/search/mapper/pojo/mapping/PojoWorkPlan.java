@@ -9,18 +9,18 @@ package org.hibernate.search.mapper.pojo.mapping;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An entry point to execute works on POJO-mapped indexes.
+ * A set of works to be executed on POJO-mapped indexes.
  * <p>
- * Accumulates works in a list (called a changeset),
- * and executes them only when {@link #execute()} is called.
+ * Works are accumulated when methods such as {@link #add(Object)} or {@link #update(Object, Object)} are called,
+ * and executed only when {@link #execute()} is called.
  * <p>
- * Relative ordering of works within a changeset will be preserved.
+ * Relative ordering of works within a work plan will be preserved.
  * <p>
  * Implementations may not be thread-safe.
  *
  * @author Yoann Rodiere
  */
-public interface ChangesetPojoWorker {
+public interface PojoWorkPlan {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
@@ -111,7 +111,7 @@ public interface ChangesetPojoWorker {
 	void delete(Object id, Object entity);
 
 	/**
-	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.
+	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
 	 * <p>
 	 * In particular, ensure that all data is extracted from the POJOs
 	 * and converted to the backend-specific format.
@@ -122,7 +122,7 @@ public interface ChangesetPojoWorker {
 	void prepare();
 
 	/**
-	 * Start executing all the works in this changeset, and clear the changeset so that it can be re-used.
+	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
 	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
 	 */

@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -25,14 +25,14 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ChangesetPojoWorker worker;
-	private final Map<?, ?> workerPerTransaction;
+	private final PojoWorkPlan workPlan;
+	private final Map<?, ?> workPlanPerTransaction;
 	private final Object transactionIdentifier;
 
-	InTransactionWorkQueueSynchronization(ChangesetPojoWorker worker,
-			Map<?, ?> workerPerTransaction, Object transactionIdentifier) {
-		this.worker = worker;
-		this.workerPerTransaction = workerPerTransaction;
+	InTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
+			Map<?, ?> workPlanPerTransaction, Object transactionIdentifier) {
+		this.workPlan = workPlan;
+		this.workPlanPerTransaction = workPlanPerTransaction;
 		this.transactionIdentifier = transactionIdentifier;
 	}
 
@@ -43,7 +43,7 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 			log.tracef(
 					"Processing Transaction's beforeCompletion() phase for %s. Performing work.", this
 			);
-			CompletableFuture<?> future = worker.execute();
+			CompletableFuture<?> future = workPlan.execute();
 			/*
 			 * TODO decide whether we want the sync/async setting to be scoped per index,
 			 * or per EntityManager/SearchManager, or both (with one scope overriding the other).
@@ -53,7 +53,7 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 		}
 		finally {
 			//clean the Synchronization per Transaction
-			workerPerTransaction.remove( transactionIdentifier );
+			workPlanPerTransaction.remove( transactionIdentifier );
 		}
 	}
 

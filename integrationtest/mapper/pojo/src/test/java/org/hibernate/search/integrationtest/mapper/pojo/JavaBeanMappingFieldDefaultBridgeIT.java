@@ -179,7 +179,7 @@ public class JavaBeanMappingFieldDefaultBridgeIT {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			E entity1 = newEntityFunction.apply( 1, propertyValue );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b

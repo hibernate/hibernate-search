@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -315,8 +315,8 @@ public class SearchProjectionIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 
@@ -331,7 +331,7 @@ public class SearchProjectionIT {
 			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 		} );
-		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
 
@@ -346,7 +346,7 @@ public class SearchProjectionIT {
 			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 		} );
-		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
 
@@ -361,9 +361,9 @@ public class SearchProjectionIT {
 			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
-		worker.add( referenceProvider( EMPTY ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -73,48 +73,48 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidDocumentElement_root() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'null', got 'flattenedObject'." );
 
-		worker.add( referenceProvider( "willNotWork" ), document -> {
+		workPlan.add( referenceProvider( "willNotWork" ), document -> {
 			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
 			indexAccessors.string.write( flattenedObject, "willNotWork" );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
 	public void index_error_invalidDocumentElement_flattened() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'flattenedObject', got 'null'." );
 
-		worker.add( referenceProvider( "willNotWork" ), document -> {
+		workPlan.add( referenceProvider( "willNotWork" ), document -> {
 			indexAccessors.flattenedObject.string.write( document, "willNotWork" );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
 	public void index_error_invalidDocumentElement_nested() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
 		thrown.expectMessage( "expected path 'nestedObject', got 'null'." );
 
-		worker.add( referenceProvider( "willNotWork" ), document -> {
+		workPlan.add( referenceProvider( "willNotWork" ), document -> {
 			indexAccessors.nestedObject.string.write( document, "willNotWork" );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 	}
 
 	@Test
@@ -214,8 +214,8 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectAccessors accessors;
 			DocumentElement object;
 
@@ -245,7 +245,7 @@ public class ObjectFieldStorageIT {
 			accessors.localDate.write( object, NON_MATCHING_LOCAL_DATE );
 		} );
 
-		worker.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
+		workPlan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
 			/*
 			 * Below, we use the same content for both the flattened object and the nested object.
 			 * This is to demonstrate the practical difference of object storage:
@@ -277,7 +277,7 @@ public class ObjectFieldStorageIT {
 			}
 		} );
 
-		worker.add( referenceProvider( "neverMatching" ), document -> {
+		workPlan.add( referenceProvider( "neverMatching" ), document -> {
 			/*
 			 * This should not match, be it on the nested or the flattened object.
 			 * For first-level nesting tests, it's because of the integer field.
@@ -304,9 +304,9 @@ public class ObjectFieldStorageIT {
 			}
 		} );
 
-		worker.add( referenceProvider( "empty" ), document -> { } );
+		workPlan.add( referenceProvider( "empty" ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

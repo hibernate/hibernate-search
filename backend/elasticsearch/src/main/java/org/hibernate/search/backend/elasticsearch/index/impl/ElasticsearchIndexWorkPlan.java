@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchChangesetIndexWorker implements ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -38,7 +38,7 @@ public class ElasticsearchChangesetIndexWorker implements ChangesetIndexWorker<E
 
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
 
-	ElasticsearchChangesetIndexWorker(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	ElasticsearchIndexWorkPlan(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContext sessionContext) {

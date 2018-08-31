@@ -148,14 +148,14 @@ it sets the value of the field it represents to some mapper-provided value.
 
 The other part of indexing (or altering the index in any way) is to give an order to the index manager:
 "add this document", "delete this document", ...
-This is done through the `ChangesetIndexWorker` class.
-The mapper should create a worker whenever it needs to execute a series of works.
+This is done through the `IndexWorkPlan` class.
+The mapper should create a work plan whenever it needs to execute a series of works.
 
-`ChangesetIndexWorker` carries *some* context usually associated to a "session" in the JPA world,
+`IndexWorkPlan` carries *some* context usually associated to a "session" in the JPA world,
 including the tenant identifier when using multi-tenancy, in particular.
-Thus the mapper should instantiate a new worker whenever this context changes.
+Thus the mapper should instantiate a new work plan whenever this context changes.
 
-NOTE: For now index-scoped operations such as flush, optimize, etc. are unavailable from workers.
+NOTE: For now index-scoped operations such as flush, optimize, etc. are unavailable from work plans.
 HSEARCH-3305 will introduce APIs and SPIs for these.
 
 ==== Searching

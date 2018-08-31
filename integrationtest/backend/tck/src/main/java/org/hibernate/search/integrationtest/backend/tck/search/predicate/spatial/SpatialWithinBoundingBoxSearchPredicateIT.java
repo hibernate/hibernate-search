@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate.spatia
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -258,15 +258,15 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
 			indexAccessors.geoPoint.write( document, ADDITIONAL_POINT_1_GEO_POINT );
 		} );
-		worker.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
+		workPlan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
 			indexAccessors.geoPoint.write( document, ADDITIONAL_POINT_2_GEO_POINT );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

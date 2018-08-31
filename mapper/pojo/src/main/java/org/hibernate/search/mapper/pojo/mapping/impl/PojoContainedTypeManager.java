@@ -57,8 +57,8 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 		);
 	}
 
-	ChangesetPojoContainedTypeWorker<E> createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoContainedTypeWorker<>(
+	PojoContainedTypeWorkPlan<E> createWorkPlan(PojoSessionContext sessionContext) {
+		return new PojoContainedTypeWorkPlan<>(
 				this, sessionContext
 		);
 	}

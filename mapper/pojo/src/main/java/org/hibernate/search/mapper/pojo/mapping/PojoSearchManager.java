@@ -28,16 +28,16 @@ public interface PojoSearchManager extends SearchManager {
 	<T> PojoSearchTarget<?> search(Collection<? extends Class<? extends T>> targetedTypes);
 
 	/**
-	 * @return The main worker for this manager. Calling {@link ChangesetPojoWorker#execute()}
+	 * @return The main work plan for this manager. Calling {@link PojoWorkPlan#execute()}
 	 * is optional, as it will be executed upon closing this manager.
 	 */
-	ChangesetPojoWorker getMainWorker();
+	PojoWorkPlan getMainWorkPlan();
 
 	/**
-	 * @return A new worker for this manager, maintaining its changeset state independently from the manager.
-	 * Calling {@link ChangesetPojoWorker#execute()} is required to actually execute works,
+	 * @return A new work plan for this manager, maintaining its state (list of works) independently from the manager.
+	 * Calling {@link PojoWorkPlan#execute()} is required to actually execute works,
 	 * the manager will <strong>not</strong> do it automatically upon closing.
 	 */
-	ChangesetPojoWorker createWorker();
+	PojoWorkPlan createWorkPlan();
 
 }

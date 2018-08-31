@@ -74,7 +74,7 @@ public class JavaBeanAnnotationMappingRoutingIT {
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b
@@ -99,7 +99,7 @@ public class JavaBeanAnnotationMappingRoutingIT {
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b

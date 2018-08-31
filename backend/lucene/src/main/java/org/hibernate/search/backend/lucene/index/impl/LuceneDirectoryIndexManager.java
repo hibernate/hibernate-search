@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
@@ -44,7 +44,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	private final String indexName;
 	private final LuceneIndexModel model;
 
-	private final LuceneIndexWorkOrchestrator changesetOrchestrator;
+	private final LuceneIndexWorkOrchestrator workPlanOrchestrator;
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
@@ -57,7 +57,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 		this.indexName = indexName;
 		this.model = model;
 
-		this.changesetOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
+		this.workPlanOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
 		this.streamOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
 		this.indexWriter = indexWriter;
 	}
@@ -73,9 +73,9 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	}
 
 	@Override
-	public ChangesetIndexWorker<LuceneRootDocumentBuilder> createWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createChangesetIndexWorker(
-				changesetOrchestrator, indexName, sessionContext
+	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContext sessionContext) {
+		return indexingBackendContext.createWorkPlan(
+				workPlanOrchestrator, indexName, sessionContext
 		);
 	}
 
@@ -108,7 +108,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneIndexWorkOrchestrator::close, changesetOrchestrator );
+			closer.push( LuceneIndexWorkOrchestrator::close, workPlanOrchestrator );
 			closer.push( LuceneIndexWorkOrchestrator::close, streamOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexWriter::close, indexWriter );

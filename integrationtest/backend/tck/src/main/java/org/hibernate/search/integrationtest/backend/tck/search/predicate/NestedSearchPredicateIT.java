@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -182,8 +182,8 @@ public class NestedSearchPredicateIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			ObjectAccessors accessors;
 			SecondLevelObjectAccessors secondLevelAccessors;
 			DocumentElement object;
@@ -220,7 +220,7 @@ public class NestedSearchPredicateIT {
 			secondLevelAccessors.self.addMissing( object );
 		} );
 
-		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			ObjectAccessors accessors = indexAccessors.nestedObject;
 			DocumentElement object = accessors.self.add( document );
 			SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
@@ -252,7 +252,7 @@ public class NestedSearchPredicateIT {
 			object = accessors.self.add( document );
 		} );
 
-		worker.add( referenceProvider( "neverMatching" ), document -> {
+		workPlan.add( referenceProvider( "neverMatching" ), document -> {
 			ObjectAccessors accessors = indexAccessors.nestedObject;
 			SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
 
@@ -293,9 +293,9 @@ public class NestedSearchPredicateIT {
 			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 		} );
 
-		worker.add( referenceProvider( "empty" ), document -> { } );
+		workPlan.add( referenceProvider( "empty" ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

@@ -100,7 +100,7 @@ public class JavaBeanMappingDocumentIdDefaultBridgeIT {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
 			E entity1 = newEntityFunction.apply( identifierValue );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( identifierAsString, b -> { } )

@@ -81,7 +81,7 @@ public class JavaBeanPropertyInheritanceIT {
 			entity1.setEmbedded( entity2 );
 			entity2.setEmbedding( entity1 );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.SearchMappingRepository;
@@ -301,8 +301,8 @@ public class ExtensionIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( SECOND_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.integer.write( document, "2" );
 
 			indexAccessors.sort1.write( document, "z" );
@@ -311,7 +311,7 @@ public class ExtensionIT {
 			indexAccessors.sort4.write( document, "z" );
 			indexAccessors.sort5.write( document, "a" );
 		} );
-		worker.add( referenceProvider( FIRST_ID ), document -> {
+		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "'text 1'" );
 
 			indexAccessors.sort1.write( document, "a" );
@@ -320,7 +320,7 @@ public class ExtensionIT {
 			indexAccessors.sort4.write( document, "z" );
 			indexAccessors.sort5.write( document, "a" );
 		} );
-		worker.add( referenceProvider( THIRD_ID ), document -> {
+		workPlan.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.geoPoint.write( document, "{'lat': 40.12, 'lon': -71.34}" );
 
 			indexAccessors.sort1.write( document, "z" );
@@ -329,7 +329,7 @@ public class ExtensionIT {
 			indexAccessors.sort4.write( document, "z" );
 			indexAccessors.sort5.write( document, "a" );
 		} );
-		worker.add( referenceProvider( FOURTH_ID ), document -> {
+		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
 			indexAccessors.yearDays.write( document, "'2018:012'" );
 
 			indexAccessors.sort1.write( document, "z" );
@@ -338,7 +338,7 @@ public class ExtensionIT {
 			indexAccessors.sort4.write( document, "a" );
 			indexAccessors.sort5.write( document, "a" );
 		} );
-		worker.add( referenceProvider( FIFTH_ID ), document -> {
+		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
 			indexAccessors.string.write( document, "'text 2'" );
 			indexAccessors.integer.write( document, "1" );
@@ -347,9 +347,9 @@ public class ExtensionIT {
 
 			indexAccessors.sort5.write( document, "z" );
 		} );
-		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

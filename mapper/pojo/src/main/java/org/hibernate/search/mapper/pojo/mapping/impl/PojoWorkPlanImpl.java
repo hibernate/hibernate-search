@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 
-class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
+class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
@@ -28,10 +28,10 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	private final PojoRuntimeIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Class<?>, ChangesetPojoIndexedTypeWorker<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	private final Map<Class<?>, ChangesetPojoContainedTypeWorker<?>> containedTypeDelegates = new HashMap<>();
+	private final Map<Class<?>, PojoIndexedTypeWorkPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
+	private final Map<Class<?>, PojoContainedTypeWorkPlan<?>> containedTypeDelegates = new HashMap<>();
 
-	ChangesetPojoWorkerImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+	PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
 			PojoSessionContext sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;
@@ -48,7 +48,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -60,7 +60,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
@@ -72,7 +72,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	@Override
 	public void update(Object id, Object entity, String... dirtyPaths) {
 		Class<?> clazz = getIntrospector().getClass( entity );
-		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.update( id, entity, dirtyPaths );
 	}
 
@@ -84,19 +84,19 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	@Override
 	public void delete(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		ChangesetPojoTypeWorker delegate = getDelegate( clazz );
+		PojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.delete( id, entity );
 	}
 
 	@Override
 	public void prepare() {
-		for ( ChangesetPojoContainedTypeWorker<?> delegate : containedTypeDelegates.values() ) {
+		for ( PojoContainedTypeWorkPlan<?> delegate : containedTypeDelegates.values() ) {
 			delegate.resolveDirty( this::updateBecauseOfContained );
 		}
-		for ( ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 			delegate.resolveDirty( this::updateBecauseOfContained );
 		}
-		for ( ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 			delegate.prepare();
 		}
 	}
@@ -106,7 +106,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 		try {
 			prepare();
 			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture[futures.size()] ) );
@@ -120,8 +120,8 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 		return introspector;
 	}
 
-	private ChangesetPojoTypeWorker getDelegate(Class<?> clazz) {
-		ChangesetPojoTypeWorker delegate = indexedTypeDelegates.get( clazz );
+	private PojoTypeWorkPlan getDelegate(Class<?> clazz) {
+		PojoTypeWorkPlan delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( clazz );
 			if ( delegate == null ) {
@@ -131,12 +131,12 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 		return delegate;
 	}
 
-	private ChangesetPojoTypeWorker createDelegate(Class<?> clazz) {
+	private PojoTypeWorkPlan createDelegate(Class<?> clazz) {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
-			ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate = indexedTypeManagerOptional.get()
-					.createWorker( sessionContext );
+			PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeManagerOptional.get()
+					.createWorkPlan( sessionContext );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
@@ -144,8 +144,8 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 			Optional<? extends PojoContainedTypeManager<?>> containedTypeManagerOptional =
 					containedTypeManagers.getByExactClass( clazz );
 			if ( containedTypeManagerOptional.isPresent() ) {
-				ChangesetPojoContainedTypeWorker<?> delegate = containedTypeManagerOptional.get()
-						.createWorker( sessionContext );
+				PojoContainedTypeWorkPlan<?> delegate = containedTypeManagerOptional.get()
+						.createWorkPlan( sessionContext );
 				containedTypeDelegates.put( clazz, delegate );
 				return delegate;
 			}
@@ -156,8 +156,8 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 		);
 	}
 
-	private ChangesetPojoIndexedTypeWorker<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
-		ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
+	private PojoIndexedTypeWorkPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
+		PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate != null ) {
 			return delegate;
 		}
@@ -165,7 +165,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
-			delegate = indexedTypeManagerOptional.get().createWorker( sessionContext );
+			delegate = indexedTypeManagerOptional.get().createWorkPlan( sessionContext );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
@@ -180,7 +180,7 @@ class ChangesetPojoWorkerImpl implements ChangesetPojoWorker {
 	private void updateBecauseOfContained(Object containingEntity) {
 		// TODO ignore the event when containingEntity has provided IDs
 		Class<?> clazz = getIntrospector().getClass( containingEntity );
-		ChangesetPojoIndexedTypeWorker<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
+		PojoIndexedTypeWorkPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 

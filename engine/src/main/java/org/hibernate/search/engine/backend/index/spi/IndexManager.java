@@ -16,7 +16,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
  */
 public interface IndexManager<D extends DocumentElement> {
 
-	ChangesetIndexWorker<D> createWorker(SessionContext sessionContext);
+	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
 
 	IndexSearchTargetBuilder createSearchTarget();
 

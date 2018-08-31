@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
@@ -25,7 +25,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 /**
  * @author Guillaume Smet
  */
-class LuceneChangesetIndexWorker implements ChangesetIndexWorker<LuceneRootDocumentBuilder> {
+class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -35,7 +35,7 @@ class LuceneChangesetIndexWorker implements ChangesetIndexWorker<LuceneRootDocum
 
 	private final List<LuceneIndexWork<?>> works = new ArrayList<>();
 
-	LuceneChangesetIndexWorker(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContext sessionContext) {
 		this.factory = factory;

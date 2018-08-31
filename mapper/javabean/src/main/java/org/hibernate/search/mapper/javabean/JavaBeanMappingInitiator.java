@@ -43,13 +43,13 @@ public interface JavaBeanMappingInitiator extends PojoMappingInitiator<JavaBeanM
 
 	/**
 	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorker}.
+	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan}.
 	 */
 	void addEntityType(Class<?> type);
 
 	/**
 	 * @param types The types to be considered as entity types, i.e. types that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorker}.
+	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan}.
 	 */
 	void addEntityTypes(Set<Class<?>> types);
 

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
@@ -24,7 +24,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 
 	private final PojoMappingDelegate mappingDelegate;
 	private final PojoSessionContext sessionContext;
-	private ChangesetPojoWorker changesetWorker;
+	private PojoWorkPlan workPlan;
 
 	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManager> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
@@ -32,22 +32,22 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 	}
 
 	@Override
-	public ChangesetPojoWorker getMainWorker() {
-		if ( changesetWorker == null ) {
-			changesetWorker = createWorker();
+	public PojoWorkPlan getMainWorkPlan() {
+		if ( workPlan == null ) {
+			workPlan = createWorkPlan();
 		}
-		return changesetWorker;
+		return workPlan;
 	}
 
 	@Override
-	public ChangesetPojoWorker createWorker() {
-		return mappingDelegate.createWorker( sessionContext );
+	public PojoWorkPlan createWorkPlan() {
+		return mappingDelegate.createWorkPlan( sessionContext );
 	}
 
 	@Override
 	public void close() {
-		if ( changesetWorker != null ) {
-			CompletableFuture<?> future = changesetWorker.execute();
+		if ( workPlan != null ) {
+			CompletableFuture<?> future = workPlan.execute();
 			/*
 			 * TODO decide whether we want the sync/async setting to be scoped per index,
 			 * or per EntityManager/SearchManager, or both (with one scope overriding the other)

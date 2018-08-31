@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -259,9 +259,9 @@ public class SearchSortIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 		// Important: do not index the documents in the expected order after sorts
-		worker.add( referenceProvider( SECOND_ID ), document -> {
+		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.string.write( document, "george" );
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7705687,4.835233 ) );
 
@@ -278,7 +278,7 @@ public class SearchSortIT {
 			indexAccessors.nestedObject.string.write( nestedObject, "george" );
 			indexAccessors.nestedObject.integer.write( nestedObject, 2 );
 		} );
-		worker.add( referenceProvider( FIRST_ID ), document -> {
+		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "aaron" );
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7541719, 4.8386221 ) );
 
@@ -295,7 +295,7 @@ public class SearchSortIT {
 			indexAccessors.nestedObject.string.write( nestedObject, "aaron" );
 			indexAccessors.nestedObject.integer.write( nestedObject, 1 );
 		} );
-		worker.add( referenceProvider( THIRD_ID ), document -> {
+		workPlan.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.string.write( document, "zach" );
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7530374, 4.8510299 ) );
 
@@ -312,9 +312,9 @@ public class SearchSortIT {
 			indexAccessors.nestedObject.string.write( nestedObject, "zach" );
 			indexAccessors.nestedObject.integer.write( nestedObject, 3 );
 		} );
-		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

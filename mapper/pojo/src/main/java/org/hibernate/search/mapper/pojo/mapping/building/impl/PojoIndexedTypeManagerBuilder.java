@@ -134,7 +134,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
-		 * Note this will require to allow them to define their own worker APIs.
+		 * Note this will require to allow them to define their own work plan APIs.
 		 */
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )

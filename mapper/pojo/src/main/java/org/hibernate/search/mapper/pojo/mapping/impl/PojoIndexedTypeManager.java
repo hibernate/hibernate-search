@@ -112,9 +112,9 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	ChangesetPojoIndexedTypeWorker<I, E, D> createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoIndexedTypeWorker<>(
-				this, sessionContext, indexManager.createWorker( sessionContext )
+	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(PojoSessionContext sessionContext) {
+		return new PojoIndexedTypeWorkPlan<>(
+				this, sessionContext, indexManager.createWorkPlan( sessionContext )
 		);
 	}
 

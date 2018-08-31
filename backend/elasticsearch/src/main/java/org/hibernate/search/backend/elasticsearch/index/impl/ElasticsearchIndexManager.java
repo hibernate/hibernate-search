@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -36,7 +36,7 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
-	private final ElasticsearchWorkOrchestrator changesetOrchestrator;
+	private final ElasticsearchWorkOrchestrator workPlanOrchestrator;
 
 	ElasticsearchIndexManager(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
@@ -47,13 +47,13 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.typeName = typeName;
 		this.model = model;
-		this.changesetOrchestrator = indexingBackendContext.createChangesetOrchestrator();
+		this.workPlanOrchestrator = indexingBackendContext.createWorkPlanOrchestrator();
 	}
 
 	@Override
 	public void close() {
-		// Index managers own the changeset context, but not the stream context (which is shared)
-		changesetOrchestrator.close();
+		// Index managers own the work plan context, but not the stream context (which is shared)
+		workPlanOrchestrator.close();
 	}
 
 	public ElasticsearchIndexModel getModel() {
@@ -61,8 +61,8 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 	}
 
 	@Override
-	public ChangesetIndexWorker<ElasticsearchDocumentObjectBuilder> createWorker(SessionContext sessionContext) {
-		return indexingBackendContext.createChangesetIndexWorker( changesetOrchestrator, elasticsearchIndexName, typeName, sessionContext );
+	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContext sessionContext) {
+		return indexingBackendContext.createWorkPlan( workPlanOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override

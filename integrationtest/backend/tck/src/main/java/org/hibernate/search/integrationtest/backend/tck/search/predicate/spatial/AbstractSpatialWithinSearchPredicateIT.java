@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -64,8 +64,8 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			indexAccessors.string.write( document, OURSON_QUI_BOIT_STRING );
 			indexAccessors.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
 			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
@@ -73,7 +73,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
 		} );
-		worker.add( referenceProvider( IMOUTO_ID ), document -> {
+		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			indexAccessors.string.write( document, IMOUTO_STRING );
 			indexAccessors.geoPoint.write( document, IMOUTO_GEO_POINT );
 			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( IMOUTO_GEO_POINT.getLatitude() - 1,
@@ -81,7 +81,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
 		} );
-		worker.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
+		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			indexAccessors.string.write( document, CHEZ_MARGOTTE_STRING );
 			indexAccessors.geoPoint.write( document, CHEZ_MARGOTTE_GEO_POINT );
 			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
@@ -89,9 +89,9 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
 		} );
-		worker.add( referenceProvider( EMPTY_ID ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

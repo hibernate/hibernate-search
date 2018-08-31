@@ -26,7 +26,7 @@ import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.Service;
@@ -45,8 +45,8 @@ public class HibernateSearchContextService implements Service {
 	private static final String SEARCH_MANAGER_KEY =
 			HibernateSearchContextService.class.getName() + "#SEARCH_MANAGER_KEY";
 
-	private static final String WORKER_PER_TRANSACTION_MAP_KEY =
-			HibernateSearchContextService.class.getName() + "#WORKER_PER_TRANSACTION_KEY";
+	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
+			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
 
 	public void initialize(SearchMappingRepository mappingRepository, HibernateOrmMapping mapping) {
 		this.mappingRepository = mappingRepository;
@@ -95,32 +95,32 @@ public class HibernateSearchContextService implements Service {
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
-	 * @return The {@link ChangesetPojoWorker} to use for changes to entities in the given session.
+	 * @return The {@link PojoWorkPlan} to use for changes to entities in the given session.
 	 */
 	@SuppressWarnings("unchecked")
-	public ChangesetPojoWorker getCurrentWorker(SessionImplementor sessionImplementor) {
+	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor sessionImplementor) {
 		PojoSearchManager searchManager = getSearchManager( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
-			TransientReference<Map<Transaction, ChangesetPojoWorker>> reference =
-					(TransientReference<Map<Transaction, ChangesetPojoWorker>>) sessionImplementor.getProperties()
-							.get( WORKER_PER_TRANSACTION_MAP_KEY );
-			Map<Transaction, ChangesetPojoWorker> workerPerTransaction = reference == null ? null : reference.get();
-			if ( workerPerTransaction == null ) {
-				workerPerTransaction = new HashMap<>();
-				reference = new TransientReference<>( workerPerTransaction );
-				sessionImplementor.setProperty( WORKER_PER_TRANSACTION_MAP_KEY, reference );
+			TransientReference<Map<Transaction, PojoWorkPlan>> reference =
+					(TransientReference<Map<Transaction, PojoWorkPlan>>) sessionImplementor.getProperties()
+							.get( WORK_PLAN_PER_TRANSACTION_MAP_KEY );
+			Map<Transaction, PojoWorkPlan> workPlanPerTransaction = reference == null ? null : reference.get();
+			if ( workPlanPerTransaction == null ) {
+				workPlanPerTransaction = new HashMap<>();
+				reference = new TransientReference<>( workPlanPerTransaction );
+				sessionImplementor.setProperty( WORK_PLAN_PER_TRANSACTION_MAP_KEY, reference );
 			}
-			ChangesetPojoWorker worker = workerPerTransaction.get( transactionIdentifier );
-			if ( worker == null ) {
-				worker = searchManager.createWorker();
-				workerPerTransaction.put( transactionIdentifier, worker );
+			PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
+			if ( workPlan == null ) {
+				workPlan = searchManager.createWorkPlan();
+				workPlanPerTransaction.put( transactionIdentifier, workPlan );
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
-						worker, workerPerTransaction, transactionIdentifier
+						workPlan, workPlanPerTransaction, transactionIdentifier
 				);
 				registerSynchronization( sessionImplementor, txSync );
 			}
-			return worker;
+			return workPlan;
 		}
 		else if ( false ) {
 			/*
@@ -138,23 +138,23 @@ public class HibernateSearchContextService implements Service {
 //				// for correct configurations.
 //				log.pushedChangesOutOfTransaction();
 //			}
-			// TODO Create a ChangesetWorker (to handle automatic reindexing of containing types),
-			// but ensure changes will be applied without waiting for a call to worker.execute()
+			// TODO Create a work plan (to handle automatic reindexing of containing types),
+			// but ensure changes will be applied without waiting for a call to workPlan.execute()
 			// TODO also ensure synchronicity if necessary (make some Session event, such as flush(), wait for the works to be executed)
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(ChangesetPojoWorker worker,
-			Map<Transaction, ChangesetPojoWorker> workerPerTransaction, Object transactionIdentifier) {
+	private Synchronization createTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
+			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Object transactionIdentifier) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
-					worker, workerPerTransaction, transactionIdentifier
+					workPlan, workPlanPerTransaction, transactionIdentifier
 			);
 		}
 		else {
 			return new PostTransactionWorkQueueSynchronization(
-					worker, workerPerTransaction, transactionIdentifier
+					workPlan, workPlanPerTransaction, transactionIdentifier
 			);
 		}
 	}

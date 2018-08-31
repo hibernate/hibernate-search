@@ -103,9 +103,9 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 			entity3.setId( 3 );
 			entity3.setCoord( new CustomCoordinates( 3.1d, 3.2d ) );
 
-			manager.getMainWorker().add( entity1 );
-			manager.getMainWorker().add( entity2 );
-			manager.getMainWorker().add( entity3 );
+			manager.getMainWorkPlan().add( entity1 );
+			manager.getMainWorkPlan().add( entity2 );
+			manager.getMainWorkPlan().add( entity3 );
 
 			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
 					.add( "1", b -> b

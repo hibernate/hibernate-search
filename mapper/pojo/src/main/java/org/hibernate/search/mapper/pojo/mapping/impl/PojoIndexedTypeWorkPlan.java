@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -24,16 +24,16 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends ChangesetPojoTypeWorker {
+class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends PojoTypeWorkPlan {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
-	private final ChangesetIndexWorker<D> delegate;
+	private final IndexWorkPlan<D> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<I, WorkPlanPerDocument> workPlansPerId = new LinkedHashMap<>();
+	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	ChangesetPojoIndexedTypeWorker(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
-			ChangesetIndexWorker<D> delegate) {
+	PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContext sessionContext,
+			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
 		this.typeManager = typeManager;
 		this.delegate = delegate;
@@ -77,7 +77,7 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Ch
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( WorkPlanPerDocument workPerDocument : workPlansPerId.values() ) {
+		for ( IndexedEntityWorkPlan workPerDocument : workPlansPerId.values() ) {
 			workPerDocument.resolveDirty( containingEntityCollector );
 		}
 	}
@@ -96,29 +96,29 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Ch
 		return delegate.execute();
 	}
 
-	private WorkPlanPerDocument getWork(I identifier) {
-		WorkPlanPerDocument work = workPlansPerId.get( identifier );
+	private IndexedEntityWorkPlan getWork(I identifier) {
+		IndexedEntityWorkPlan work = workPlansPerId.get( identifier );
 		if ( work == null ) {
-			work = new WorkPlanPerDocument( identifier );
+			work = new IndexedEntityWorkPlan( identifier );
 			workPlansPerId.put( identifier, work );
 		}
 		return work;
 	}
 
-	private ChangesetIndexWorker<D> getDelegate() {
+	private IndexWorkPlan<D> getDelegate() {
 		return delegate;
 	}
 
 	private void sendWorksToDelegate() {
 		try {
-			workPlansPerId.values().forEach( WorkPlanPerDocument::sendWorkToDelegate );
+			workPlansPerId.values().forEach( IndexedEntityWorkPlan::sendWorkToDelegate );
 		}
 		finally {
 			workPlansPerId.clear();
 		}
 	}
 
-	private class WorkPlanPerDocument {
+	private class IndexedEntityWorkPlan {
 		private final I identifier;
 		private Supplier<E> entitySupplier;
 
@@ -129,7 +129,7 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Ch
 		private boolean considerAllDirty;
 		private Set<String> dirtyPaths;
 
-		private WorkPlanPerDocument(I identifier) {
+		private IndexedEntityWorkPlan(I identifier) {
 			this.identifier = identifier;
 		}
 
@@ -169,7 +169,7 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Ch
 			this.entitySupplier = entitySupplier;
 			if ( add && !delete ) {
 				/*
-				 * We called add() in the same changeset, so we don't expect the document to be in the index.
+				 * We called add() in the same plan, so we don't expect the document to be in the index.
 				 * Don't delete, just cancel the addition.
 				 */
 				shouldResolveToReindex = false;
@@ -216,7 +216,7 @@ class ChangesetPojoIndexedTypeWorker<I, E, D extends DocumentElement> extends Ch
 			this.entitySupplier = entitySupplier;
 			/*
 			 * If add is true, either this is already an update (in which case we don't need to change the flags)
-			 * or we called add() in the same changeset (in which case we don't expect the document to be in the index).
+			 * or we called add() in the same plan (in which case we don't expect the document to be in the index).
 			 */
 			if ( !add ) {
 				delete = true;

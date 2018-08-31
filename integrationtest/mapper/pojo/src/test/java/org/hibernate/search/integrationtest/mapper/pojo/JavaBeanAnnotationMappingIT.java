@@ -226,13 +226,13 @@ public class JavaBeanAnnotationMappingIT {
 			entity2.getEmbeddingAsMap().add( entity5 );
 			entity3.getEmbeddingAsMap().add( entity5 );
 
-			manager.getMainWorker().add( entity1 );
-			manager.getMainWorker().add( entity2 );
-			manager.getMainWorker().add( entity4 );
-			manager.getMainWorker().delete( entity1 );
-			manager.getMainWorker().add( entity3 );
-			manager.getMainWorker().add( entity5 );
-			manager.getMainWorker().add( entity6 );
+			manager.getMainWorkPlan().add( entity1 );
+			manager.getMainWorkPlan().add( entity2 );
+			manager.getMainWorkPlan().add( entity4 );
+			manager.getMainWorkPlan().delete( entity1 );
+			manager.getMainWorkPlan().add( entity3 );
+			manager.getMainWorkPlan().add( entity5 );
+			manager.getMainWorkPlan().add( entity6 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "2", b -> b

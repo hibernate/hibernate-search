@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
@@ -47,8 +47,8 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public ChangesetPojoWorker createWorker(PojoSessionContext sessionContext) {
-		return new ChangesetPojoWorkerImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
+	public PojoWorkPlan createWorkPlan(PojoSessionContext sessionContext) {
+		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -276,8 +276,8 @@ public class SmokeIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( "1" ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( "1" ), document -> {
 			indexAccessors.string.write( document, "text 1" );
 			indexAccessors.string_analyzed.write( document, "text 1" );
 			indexAccessors.integer.write( document, 1 );
@@ -299,7 +299,7 @@ public class SmokeIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, 102 );
 		} );
 
-		worker.add( referenceProvider( "2" ), document -> {
+		workPlan.add( referenceProvider( "2" ), document -> {
 			indexAccessors.string.write( document, "text 2" );
 			indexAccessors.string_analyzed.write( document, "text 2" );
 			indexAccessors.integer.write( document, 2 );
@@ -321,21 +321,21 @@ public class SmokeIT {
 			indexAccessors.nestedObject.integer.write( nestedObject, 202 );
 		} );
 
-		worker.add( referenceProvider( "3" ), document -> {
+		workPlan.add( referenceProvider( "3" ), document -> {
 			indexAccessors.string.write( document, "text 3" );
 			indexAccessors.string_analyzed.write( document, "text 3" );
 			indexAccessors.integer.write( document, 3 );
 		} );
 
-		worker.add( referenceProvider( "neverMatching" ), document -> {
+		workPlan.add( referenceProvider( "neverMatching" ), document -> {
 			indexAccessors.string.write( document, "never matching" );
 			indexAccessors.string_analyzed.write( document, "never matching" );
 			indexAccessors.integer.write( document, 9484 );
 		} );
 
-		worker.add( referenceProvider( "empty" ), document -> { } );
+		workPlan.add( referenceProvider( "empty" ), document -> { } );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

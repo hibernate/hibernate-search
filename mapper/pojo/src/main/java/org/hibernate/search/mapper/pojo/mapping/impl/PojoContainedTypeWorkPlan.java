@@ -18,14 +18,14 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 /**
  * @param <E> The contained entity type.
  */
-class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
+class PojoContainedTypeWorkPlan<E> extends PojoTypeWorkPlan {
 
 	private final PojoContainedTypeManager<E> typeManager;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Object, WorkPlanPerDocument> workPlansPerId = new LinkedHashMap<>();
+	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	ChangesetPojoContainedTypeWorker(PojoContainedTypeManager<E> typeManager, PojoSessionContext sessionContext) {
+	PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, PojoSessionContext sessionContext) {
 		super( sessionContext );
 		this.typeManager = typeManager;
 	}
@@ -55,24 +55,24 @@ class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( WorkPlanPerDocument workPerDocument : workPlansPerId.values() ) {
+		for ( ContainedEntityWorkPlan workPerDocument : workPlansPerId.values() ) {
 			workPerDocument.resolveDirty( containingEntityCollector );
 		}
 	}
 
-	private WorkPlanPerDocument getWork(Object identifier) {
-		WorkPlanPerDocument work = workPlansPerId.get( identifier );
+	private ContainedEntityWorkPlan getWork(Object identifier) {
+		ContainedEntityWorkPlan work = workPlansPerId.get( identifier );
 		if ( work == null ) {
-			work = new WorkPlanPerDocument();
+			work = new ContainedEntityWorkPlan();
 			workPlansPerId.put( identifier, work );
 		}
 		return work;
 	}
 
-	private class WorkPlanPerDocument {
+	private class ContainedEntityWorkPlan {
 		private Supplier<E> entitySupplier;
 
-		private Boolean createdInThisChangeset;
+		private Boolean createdInThisPlan;
 
 		private boolean shouldResolveToReindex;
 		private boolean considerAllDirty;
@@ -81,9 +81,9 @@ class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			shouldResolveToReindex = true;
-			if ( createdInThisChangeset == null ) {
-				// No update yet, so we actually did create the entity in this changeset
-				createdInThisChangeset = true;
+			if ( createdInThisPlan == null ) {
+				// No update yet, so we actually did create the entity in this plan
+				createdInThisPlan = true;
 			}
 		}
 
@@ -106,20 +106,20 @@ class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
 
 		void delete(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			if ( createdInThisChangeset == null ) {
-				// No add or update yet, and we're performing a delete, so we did not create the entity in this changeset
-				createdInThisChangeset = false;
+			if ( createdInThisPlan == null ) {
+				// No add or update yet, and we're performing a delete, so we did not create the entity in this plan
+				createdInThisPlan = false;
 			}
-			else if ( createdInThisChangeset ) {
+			else if ( createdInThisPlan ) {
 				/*
-				 * We called the first add() in the same changeset, so we don't expect the entity to be contained
+				 * We called the first add() in the same plan, so we don't expect the entity to be contained
 				 * in existing documents.
 				 * Cancel everything.
 				 */
 				shouldResolveToReindex = false;
 				considerAllDirty = false;
 				dirtyPaths = null;
-				createdInThisChangeset = null;
+				createdInThisPlan = null;
 			}
 		}
 
@@ -135,9 +135,9 @@ class ChangesetPojoContainedTypeWorker<E> extends ChangesetPojoTypeWorker {
 
 		private void doUpdate(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			if ( createdInThisChangeset == null ) {
-				// No add yet, and we're performing an update, so we did not create the entity in this changeset
-				createdInThisChangeset = false;
+			if ( createdInThisPlan == null ) {
+				// No add yet, and we're performing an update, so we did not create the entity in this plan
+				createdInThisPlan = false;
 			}
 		}
 

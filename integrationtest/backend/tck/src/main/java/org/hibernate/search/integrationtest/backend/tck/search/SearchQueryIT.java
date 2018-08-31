@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -182,18 +182,18 @@ public class SearchQueryIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexAccessors.string.write( document, STRING_1 );
 		} );
-		worker.add( referenceProvider( DOCUMENT_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexAccessors.string.write( document, STRING_2 );
 		} );
-		worker.add( referenceProvider( DOCUMENT_3 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexAccessors.string.write( document, STRING_3 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

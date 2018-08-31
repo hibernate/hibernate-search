@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
@@ -120,18 +120,18 @@ public class LuceneSearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager_1_1.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan( sessionContext );
 
-		worker.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
 			indexAccessors_1_1.string.write( document, STRING_1 );
 			indexAccessors_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_1 );
 		} );
-		worker.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
 			indexAccessors_1_1.string.write( document, STRING_2 );
 			indexAccessors_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_2 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
@@ -142,13 +142,13 @@ public class LuceneSearchMultiIndexIT {
 
 		// Backend 1 / Index 2
 
-		worker = indexManager_1_2.createWorker( sessionContext );
+		workPlan = indexManager_1_2.createWorkPlan( sessionContext );
 
-		worker.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
+		workPlan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
 			indexAccessors_1_2.string.write( document, STRING_1 );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		searchTarget = indexManager_1_2.createSearchTarget().build();
 		query = searchTarget.query( sessionContext )

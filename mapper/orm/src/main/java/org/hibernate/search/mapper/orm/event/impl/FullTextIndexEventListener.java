@@ -29,7 +29,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.ChangesetPojoWorker;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -77,7 +77,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		if ( isWorkable( context, entity ) ) {
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
-			context.getCurrentWorker( event.getSession() )
+			context.getCurrentWorkPlan( event.getSession() )
 					.delete( event.getId(), entity );
 		}
 	}
@@ -91,7 +91,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
 		if ( isWorkable( context, entity ) ) {
-			context.getCurrentWorker( event.getSession() )
+			context.getCurrentWorkPlan( event.getSession() )
 					.add( event.getId(), entity );
 		}
 	}
@@ -105,12 +105,12 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
 		if ( isWorkable( context, entity ) ) {
-			ChangesetPojoWorker worker = context.getCurrentWorker( event.getSession() );
+			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
 			if ( dirtyCheckingEnabled ) {
-				worker.update( event.getId(), entity, getDirtyPropertyNames( event ) );
+				workPlan.update( event.getId(), entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				worker.update( event.getId(), entity );
+				workPlan.update( event.getId(), entity );
 			}
 		}
 	}
@@ -205,7 +205,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		}
 
 		if ( isWorkable( context, entity ) ) {
-			ChangesetPojoWorker worker = context.getCurrentWorker( event.getSession() );
+			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
 			if ( dirtyCheckingEnabled ) {
 				PersistentCollection persistentCollection = event.getCollection();
 				String collectionRole = null;
@@ -215,22 +215,22 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 				if ( collectionRole != null ) {
 					/*
 					 * Collection role will only be non-null for PostCollectionUpdateEvents.
-					 * For those events, we can pass the role to the worker
+					 * For those events, we can pass the role to the workPlan
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					worker.update( event.getAffectedOwnerIdOrNull(), entity, collectionRole );
+					workPlan.update( event.getAffectedOwnerIdOrNull(), entity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					worker.update( event.getAffectedOwnerIdOrNull(), entity );
+					workPlan.update( event.getAffectedOwnerIdOrNull(), entity );
 				}
 			}
 			else {
-				worker.update( event.getAffectedOwnerIdOrNull(), entity );
+				workPlan.update( event.getAffectedOwnerIdOrNull(), entity );
 			}
 		}
 	}

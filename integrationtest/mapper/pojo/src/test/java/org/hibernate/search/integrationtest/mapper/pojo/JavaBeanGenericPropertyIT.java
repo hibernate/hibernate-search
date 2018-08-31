@@ -80,7 +80,7 @@ public class JavaBeanGenericPropertyIT {
 			entity1.setGenericProperty( genericEntity );
 			genericEntity.setParent( entity1 );
 
-			manager.getMainWorker().add( entity1 );
+			manager.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

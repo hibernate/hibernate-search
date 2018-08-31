@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.index.spi.ChangesetIndexWorker;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -352,11 +352,11 @@ public class ExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
-				() -> worker.add( referenceProvider( FIRST_ID ), document -> {
+				() -> workPlan.add( referenceProvider( FIRST_ID ), document -> {
 					indexAccessors.nativeField_invalidFieldPath.write( document, 45 );
 				} ) )
 				.assertThrown()
@@ -365,8 +365,8 @@ public class ExtensionIT {
 	}
 
 	private void initData() {
-		ChangesetIndexWorker<? extends DocumentElement> worker = indexManager.createWorker( sessionContext );
-		worker.add( referenceProvider( FIRST_ID ), document -> {
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "text 1" );
 
 			indexAccessors.nativeField.write( document, 37 );
@@ -376,7 +376,7 @@ public class ExtensionIT {
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "z" );
 		} );
-		worker.add( referenceProvider( SECOND_ID ), document -> {
+		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.integer.write( document, 2 );
 
 			indexAccessors.nativeField.write( document, 78 );
@@ -386,7 +386,7 @@ public class ExtensionIT {
 			indexAccessors.sort2.write( document, "a" );
 			indexAccessors.sort3.write( document, "z" );
 		} );
-		worker.add( referenceProvider( THIRD_ID ), document -> {
+		workPlan.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 40.12, -71.34 ) );
 
 			indexAccessors.nativeField.write( document, 13 );
@@ -396,7 +396,7 @@ public class ExtensionIT {
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "a" );
 		} );
-		worker.add( referenceProvider( FOURTH_ID ), document -> {
+		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
 			indexAccessors.nativeField.write( document, 89 );
 			indexAccessors.nativeField_unsupportedProjection.write( document, 89 );
 
@@ -404,7 +404,7 @@ public class ExtensionIT {
 			indexAccessors.sort2.write( document, "z" );
 			indexAccessors.sort3.write( document, "z" );
 		} );
-		worker.add( referenceProvider( FIFTH_ID ), document -> {
+		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
 			indexAccessors.string.write( document, "text 2" );
 			indexAccessors.integer.write( document, 1 );
@@ -418,7 +418,7 @@ public class ExtensionIT {
 			indexAccessors.sort3.write( document, "zz" );
 		} );
 
-		worker.execute().join();
+		workPlan.execute().join();
 
 		// Check that all documents are searchable
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

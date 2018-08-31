@@ -38,7 +38,7 @@ public class StubLuceneQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
 				ignored -> work.execute( context )
 		) );
-		// Ignore errors in future changesets and during close(): error handling is the client's responsibility.
+		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
 		latestFuture = future.exceptionally( ignore -> null );
 		return future;
 	}
@@ -51,7 +51,7 @@ public class StubLuceneQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 					ignored -> work.execute( context )
 			) );
 		}
-		// Ignore errors in future changesets and during close(): error handling is the client's responsibility.
+		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
 		latestFuture = future.exceptionally( ignore -> null );
 		return future;
 	}

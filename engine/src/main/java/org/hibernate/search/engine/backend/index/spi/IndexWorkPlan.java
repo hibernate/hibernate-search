@@ -9,18 +9,19 @@ package org.hibernate.search.engine.backend.index.spi;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An entry point to execute works on an index.
+ * A set of works to be executed on an index.
  * <p>
- * Accumulates works in a list (called a changeset),
- * and executes them only when {@link #execute()} is called.
+ * Works are accumulated when methods such as {@link #add(DocumentReferenceProvider, DocumentContributor)}
+ * or {@link #update(DocumentReferenceProvider, DocumentContributor)} are called,
+ * and executed only when {@link #execute()} is called.
  * <p>
- * Relative ordering of works within a changeset will be preserved.
+ * Relative ordering of works within a work plan will be preserved.
  * <p>
  * Implementations may not be thread-safe.
  *
  * @author Yoann Rodiere
  */
-public interface ChangesetIndexWorker<D> {
+public interface IndexWorkPlan<D> {
 
 	/**
 	 * Add a document to the index, assuming that the document is absent from the index.
@@ -46,7 +47,7 @@ public interface ChangesetIndexWorker<D> {
 	void delete(DocumentReferenceProvider documentReferenceProvider);
 
 	/**
-	 * Prepare the changeset execution, i.e. execute as much as possible without writing to the index.
+	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
 	 * <p>
 	 * Calling this method is optional: the {@link #execute()} method
 	 * will perform the preparation if necessary.
@@ -54,7 +55,7 @@ public interface ChangesetIndexWorker<D> {
 	void prepare();
 
 	/**
-	 * Start executing all the works in this changeset, and clear the changeset so that it can be re-used.
+	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
 	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
 	 */
