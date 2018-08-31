@@ -38,9 +38,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
 
-	@Message(id = 18, value = "'%1$s' must not be null.")
-	IllegalArgumentException mustNotBeNull(String objectDescription);
-
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
 	// -----------------------------------
@@ -49,10 +46,14 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_2 = MessageConstants.UTIL_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET_2 + 0,
+			value = "'%1$s' must not be null.")
+	IllegalArgumentException mustNotBeNull(String objectDescription);
+
+	@Message(id = ID_OFFSET_2 + 1,
 			value = "'%1$s' must not be null or empty.")
 	IllegalArgumentException mustNotBeNullNorEmpty(String objectDescription);
 
-	@Message(id = ID_OFFSET_2 + 1,
+	@Message(id = ID_OFFSET_2 + 2,
 			value = "'%1$s' must be positive or zero.")
 	IllegalArgumentException mustBePositiveOrZero(String objectDescription);
 }

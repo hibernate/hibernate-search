@@ -204,7 +204,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH000018" );
+				.hasMessageContaining( "HSEARCH900000" );
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null distance unit",
@@ -213,7 +213,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "HSEARCH000018" );
+				.hasMessageContaining( "HSEARCH900000" );
 	}
 
 	@Test
