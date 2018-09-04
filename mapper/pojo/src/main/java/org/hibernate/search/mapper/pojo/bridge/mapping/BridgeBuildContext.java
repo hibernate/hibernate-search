@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
-import org.hibernate.search.engine.common.spi.ServiceManager;
+import org.hibernate.search.engine.common.BeanProvider;
 
 public interface BridgeBuildContext {
 
-	ServiceManager getServiceManager();
+	BeanProvider getBeanProvider();
 
 }

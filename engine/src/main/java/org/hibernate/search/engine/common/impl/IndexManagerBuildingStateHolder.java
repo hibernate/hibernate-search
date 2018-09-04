@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.common.spi.BeanProvider;
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;

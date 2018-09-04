@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BeanReference;
+import org.hibernate.search.engine.common.BeanProvider;
+import org.hibernate.search.engine.common.BeanReference;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.StringHelper;

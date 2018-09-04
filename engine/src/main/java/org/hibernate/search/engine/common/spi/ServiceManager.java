@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.common.spi;
 
 
+import org.hibernate.search.engine.common.BeanProvider;
+
 /**
  * @author Yoann Rodiere
  */

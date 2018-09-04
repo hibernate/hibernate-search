@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.common.spi.BeanReference;
+import org.hibernate.search.engine.common.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.spi;
 
 
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.util.SearchException;
 
 /**

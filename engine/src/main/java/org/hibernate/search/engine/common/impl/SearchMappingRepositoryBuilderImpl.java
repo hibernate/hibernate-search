@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.SearchMappingRepository;
 import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.engine.common.spi.BeanProvider;
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.common.spi.ServiceManager;

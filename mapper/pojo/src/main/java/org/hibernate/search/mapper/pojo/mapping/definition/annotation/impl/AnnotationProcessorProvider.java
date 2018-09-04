@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.common.spi.BeanProvider;
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;

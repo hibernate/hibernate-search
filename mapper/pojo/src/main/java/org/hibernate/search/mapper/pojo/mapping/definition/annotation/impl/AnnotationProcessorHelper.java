@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.common.spi.BeanProvider;
-import org.hibernate.search.engine.common.spi.BeanReference;
+import org.hibernate.search.engine.common.BeanProvider;
+import org.hibernate.search.engine.common.BeanReference;
 import org.hibernate.search.engine.common.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;

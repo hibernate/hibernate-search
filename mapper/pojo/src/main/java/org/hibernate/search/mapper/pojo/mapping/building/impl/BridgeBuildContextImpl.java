@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.engine.common.spi.ServiceManager;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 
 public class BridgeBuildContextImpl implements BridgeBuildContext {
@@ -19,7 +19,7 @@ public class BridgeBuildContextImpl implements BridgeBuildContext {
 	}
 
 	@Override
-	public ServiceManager getServiceManager() {
-		return buildContext.getServiceManager();
+	public BeanProvider getBeanProvider() {
+		return buildContext.getServiceManager().getBeanProvider();
 	}
 }

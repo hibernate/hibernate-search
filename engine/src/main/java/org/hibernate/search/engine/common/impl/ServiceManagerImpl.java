@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.common.spi.BeanProvider;
+import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.common.spi.ServiceManager;
 
 
