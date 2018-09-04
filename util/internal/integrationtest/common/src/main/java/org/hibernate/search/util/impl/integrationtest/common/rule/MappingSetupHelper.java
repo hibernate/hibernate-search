@@ -10,14 +10,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
@@ -25,12 +20,12 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public class MappingSetupHelper implements TestRule {
+public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.SetupContext, B, R> implements TestRule {
 
-	private final List<SearchMappingRepository> mappingRepositories = new ArrayList<>();
+	private final List<R> toClose = new ArrayList<>();
 
-	public SetupContext withBackendMock(BackendMock backendMock) {
-		return new SetupContext( ConfigurationPropertySource.empty() )
+	public C withBackendMock(BackendMock backendMock) {
+		return createSetupContext( ConfigurationPropertySource.empty() )
 				.withProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
 				.withProperty( "index.default.backend", backendMock.getBackendName() );
 	}
@@ -40,109 +35,107 @@ public class MappingSetupHelper implements TestRule {
 		return statement( base );
 	}
 
+	protected abstract C createSetupContext(ConfigurationPropertySource propertySource);
+
+	protected abstract void close(R toClose) throws Exception;
+
 	private Statement statement(Statement base) {
 		return new Statement() {
 
 			@Override
 			public void evaluate() throws Throwable {
-				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				try ( Closer<Exception> closer = new Closer<>() ) {
 					try {
 						base.evaluate();
 					}
 					finally {
-						closer.pushAll( SearchMappingRepository::close, mappingRepositories );
-						mappingRepositories.clear();
+						closer.pushAll( MappingSetupHelper.this::close, toClose );
+						toClose.clear();
 					}
 				}
 			}
 		};
 	}
 
-	public class SetupContext {
+	public abstract class SetupContext {
 
-		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
-		private final List<MappingDefinition<?>> mappingDefinitions = new ArrayList<>();
+		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
-		SetupContext(ConfigurationPropertySource propertySource) {
-			this.propertySource = propertySource;
+		protected SetupContext() {
 		}
 
-		public SetupContext withProperty(String key, String value) {
+		public final C withProperty(String key, String value) {
 			overriddenProperties.put( key, value );
-			return this;
+			return thisAsC();
 		}
 
 		/**
-		 * Add a mapping initiator to the setup. Note this method must not be called if you use {@link #setup(Function)}.
-		 * @param beforeBuild A function called before Hibernate Search is bootstrapped.
-		 * @param afterBuild A consumer called after Hibernate Search is bootstrapped. Gets passed the result of {@code beforeBuild}.
-		 * @param <T> The type of the result of {@code beforeBuild}.
+		 * Add configuration to be applied to the builder during setup.
+		 * @param beforeBuild A consumer called before Hibernate Search is bootstrapped.
+		 * @param afterBuild A consumer called after Hibernate Search is bootstrapped. Gets passed the result of the builder.
 		 * @return The setup context, for method chaining.
 		 */
-		public <T> SetupContext withMapping(Function<SearchMappingRepositoryBuilder, T> beforeBuild,
-				BiConsumer<SearchMappingRepository, T> afterBuild) {
-			mappingDefinitions.add( new MappingDefinition<>( beforeBuild, afterBuild ) );
-			return this;
+		public final C withConfiguration(Consumer<B> beforeBuild, Consumer<R> afterBuild) {
+			configurations.add( new Configuration<>( beforeBuild, afterBuild ) );
+			return thisAsC();
 		}
 
 		/**
-		 * Setup Hibernate Search, returning the mapping for the given initiator.
-		 * @param beforeBuild A function called before Hibernate Search is bootstrapped.
-		 * @param <T> The type of the result of {@code beforeBuild}.
-		 * @return The result of {@code beforeBuild}
+		 * Add configuration to be applied to the builder during setup.
+		 * @param beforeBuild A consumer called before Hibernate Search is bootstrapped.
+		 * @return The setup context, for method chaining.
 		 */
-		public <T> T setup(Function<SearchMappingRepositoryBuilder, T> beforeBuild) {
-			AtomicReference<T> reference = new AtomicReference<>();
-			withMapping( beforeBuild, (mappingRepository, beforeBuildResult) -> reference.set( beforeBuildResult ) )
-					.setup();
-			return reference.get();
+		public final C withConfiguration(Consumer<B> beforeBuild) {
+			return withConfiguration( beforeBuild, ignored -> { } );
 		}
 
 		/**
-		 * Setup Hibernate Search, returning the {@link SearchMappingRepository}.
-		 * @return The created {@link SearchMappingRepository}
+		 * Setup Hibernate Search, returning the result.
+		 * @return The result of setting up Hibernate Search.
 		 */
-		public SearchMappingRepository setup() {
-			SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder( propertySource );
+		public final R setup() {
+			B builder = createBuilder();
 
 			for ( Map.Entry<String, String> entry : overriddenProperties.entrySet() ) {
-				mappingRepositoryBuilder.setProperty( entry.getKey(), entry.getValue() );
+				setProperty( builder, entry.getKey(), entry.getValue() );
 			}
 
-			List<Object> beforeBuildResults = mappingDefinitions.stream()
-					.map( d -> d.beforeBuild( mappingRepositoryBuilder ) )
-					.collect( Collectors.toList() );
+			configurations.forEach( c -> c.beforeBuild( builder ) );
 
-			SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();
-			mappingRepositories.add( mappingRepository );
+			R result = build( builder );
+			toClose.add( result );
 
-			for ( int i = 0; i < mappingDefinitions.size(); i++ ) {
-				MappingDefinition definition = mappingDefinitions.get( i );
-				definition.afterBuild( mappingRepository, beforeBuildResults.get( i ) );
-			}
+			configurations.forEach( c -> c.afterBuild( result ) );
 
-			return mappingRepository;
+			return result;
 		}
+
+		protected abstract B createBuilder();
+
+		protected abstract void setProperty(B builder, String key, String value);
+
+		protected abstract R build(B builder);
+
+		protected abstract C thisAsC();
 	}
 
-	private static class MappingDefinition<T> {
-		private final Function<SearchMappingRepositoryBuilder, T> beforeBuild;
-		private final BiConsumer<SearchMappingRepository, T> afterBuild;
+	private static class Configuration<B, R> {
+		private final Consumer<B> beforeBuild;
+		private final Consumer<R> afterBuild;
 
-		private MappingDefinition(Function<SearchMappingRepositoryBuilder, T> beforeBuild,
-				BiConsumer<SearchMappingRepository, T> afterBuild) {
+		private Configuration(Consumer<B> beforeBuild, Consumer<R> afterBuild) {
 			this.beforeBuild = beforeBuild;
 			this.afterBuild = afterBuild;
 		}
 
-		T beforeBuild(SearchMappingRepositoryBuilder mappingRepositoryBuilder) {
-			return beforeBuild.apply( mappingRepositoryBuilder );
+		void beforeBuild(B builder) {
+			beforeBuild.accept( builder );
 		}
 
-		void afterBuild(SearchMappingRepository mappingRepository, T beforeBuildResult) {
-			afterBuild.accept( mappingRepository, beforeBuildResult );
+		void afterBuild(R result) {
+			afterBuild.accept( result );
 		}
 
 	}

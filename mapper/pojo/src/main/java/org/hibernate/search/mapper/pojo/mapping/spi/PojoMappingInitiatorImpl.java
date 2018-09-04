@@ -10,15 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoMappingInitiator;
+import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
@@ -28,32 +26,22 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.Pro
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
-		implements PojoMappingInitiator<M>, MappingInitiator<PojoTypeMetadataContributor, M> {
+		implements PojoMappingDefinition, MappingInitiator<PojoTypeMetadataContributor, M> {
 
-	private final SearchMappingRepositoryBuilder mappingRepositoryBuilder;
-	private final MappingKey<M> mappingKey;
 	private final PojoMappingFactory<M> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
-	private final boolean implicitProvidedId;
-	private final boolean multiTenancyEnabled;
+
+	private boolean implicitProvidedId;
+	private boolean multiTenancyEnabled;
 
 	private final AnnotationMappingDefinitionImpl annotationMappingDefinition;
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
-	protected PojoMappingInitiatorImpl(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			MappingKey<M> mappingKey, PojoMappingFactory<M> mappingFactory,
-			PojoBootstrapIntrospector introspector,
-			boolean implicitProvidedId,
-			boolean multiTenancyEnabled) {
-		this.mappingRepositoryBuilder = mappingRepositoryBuilder;
-		this.mappingKey = mappingKey;
+	protected PojoMappingInitiatorImpl(PojoMappingFactory<M> mappingFactory,
+			PojoBootstrapIntrospector introspector) {
 		this.mappingFactory = mappingFactory;
 		this.introspector = introspector;
-		this.implicitProvidedId = implicitProvidedId;
-		this.multiTenancyEnabled = multiTenancyEnabled;
-
-		mappingRepositoryBuilder.addMappingInitiator( this );
 
 		/*
 		 * Make sure to create and add the annotation mapping even if the user does not call the
@@ -78,14 +66,16 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 		return annotationMappingDefinition;
 	}
 
-	@Override
-	public M getResult() {
-		return mappingRepositoryBuilder.getBuiltResult().getMapping( mappingKey );
+	public void setImplicitProvidedId(boolean implicitProvidedId) {
+		this.implicitProvidedId = implicitProvidedId;
 	}
 
-	@Override
-	public MappingKey<M> getMappingKey() {
-		return mappingKey;
+	public void setMultiTenancyEnabled(boolean multiTenancyEnabled) {
+		this.multiTenancyEnabled = multiTenancyEnabled;
+	}
+
+	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
+		annotationMappingDefinition.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 	}
 
 	@Override
@@ -106,10 +96,6 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 				buildContext, propertySource, contributorProvider,
 				introspector, implicitProvidedId, mappingFactory::createMapping
 		);
-	}
-
-	protected final void enableAnnotatedTypeDiscovery() {
-		annotationMappingDefinition.enableAnnotatedTypeDiscovery();
 	}
 
 	protected final void addConfigurationContributor(PojoMappingConfigurationContributor contributor) {

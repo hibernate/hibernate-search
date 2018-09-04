@@ -17,7 +17,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
@@ -46,14 +45,13 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
 					.build();
 
-	public static HibernateOrmMappingInitiator create(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			Metadata metadata,
+	public static HibernateOrmMappingInitiator create(Metadata metadata,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmBootstrapIntrospector introspector =
 				new HibernateOrmBootstrapIntrospector( metadata, sessionFactoryImplementor );
 
 		return new HibernateOrmMappingInitiator(
-				mappingRepositoryBuilder, metadata,
+				metadata,
 				introspector, sessionFactoryImplementor
 		);
 	}
@@ -61,19 +59,20 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 	private final Metadata metadata;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
-	private HibernateOrmMappingInitiator(SearchMappingRepositoryBuilder mappingRepositoryBuilder,
-			Metadata metadata,
+	private HibernateOrmMappingInitiator(Metadata metadata,
 			HibernateOrmBootstrapIntrospector introspector,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		super(
-				mappingRepositoryBuilder, new HibernateOrmMappingKey(),
 				new HibernateOrmMappingFactory( sessionFactoryImplementor ),
-				introspector, false,
-				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
+				introspector
 		);
 
 		this.metadata = metadata;
 		this.introspector = introspector;
+
+		setMultiTenancyEnabled(
+				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
+		);
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 		// Enable annotation mapping if necessary
 		boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
 		if ( enableAnnotationMapping ) {
-			enableAnnotatedTypeDiscovery();
+			setAnnotatedTypeDiscoveryEnabled( true );
 
 			AnnotationMappingDefinition annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : persistentClasses.values() ) {

@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImpl;
 
-public class JavaBeanMappingImpl extends PojoMappingImpl<JavaBeanMapping> implements JavaBeanMapping {
+public class JavaBeanMappingImpl extends PojoMappingImpl<JavaBeanMapping> implements CloseableJavaBeanMapping {
 
 	JavaBeanMappingImpl(PojoMappingDelegate mappingDelegate) {
 		super( mappingDelegate );

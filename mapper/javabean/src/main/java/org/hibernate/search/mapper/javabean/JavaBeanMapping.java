@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.javabean;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 
@@ -14,5 +17,17 @@ public interface JavaBeanMapping extends PojoMapping {
 	PojoSearchManager createSearchManager();
 
 	JavaBeanSearchManagerBuilder createSearchManagerWithOptions();
+
+	static JavaBeanMappingBuilder builder() {
+		return builder( MethodHandles.publicLookup() );
+	}
+
+	static JavaBeanMappingBuilder builder(MethodHandles.Lookup lookup) {
+		return builder( ConfigurationPropertySource.empty(), lookup );
+	}
+
+	static JavaBeanMappingBuilder builder(ConfigurationPropertySource propertySource, MethodHandles.Lookup lookup) {
+		return new JavaBeanMappingBuilder( propertySource, lookup );
+	}
 
 }

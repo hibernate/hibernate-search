@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo;
 
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -14,8 +13,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.CustomMarkerConsumingPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomMarkerAnnotation;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
@@ -56,21 +55,18 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 		);
 
 		setupHelper.withBackendMock( backendMock )
-				.setup( mappingRepositoryBuilder -> {
-					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-					initiator.addEntityType( IndexedEntity.class );
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
 
 					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
-					initiator.annotationMapping().add( IndexedEntity.class );
+					builder.annotationMapping().add( IndexedEntity.class );
 
-					initiator.programmaticMapping()
+					builder.programmaticMapping()
 							.type( IndexedEntity.class )
 									.property( "nonAnnotationMappedEmbedded" )
 											.indexedEmbedded();
-
-					return initiator;
-				} );
+				} )
+				.setup();
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -92,22 +88,22 @@ public class JavaBeanAnnotationMappingDiscoveryIT {
 				} )
 		);
 
-		setupHelper.withBackendMock( backendMock ).setup( mappingRepositoryBuilder -> {
-			JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
-					mappingRepositoryBuilder, false
-			);
+		setupHelper.withBackendMock( backendMock )
+				.withConfiguration( builder -> {
+					builder.setAnnotatedTypeDiscoveryEnabled( false );
+					builder.addEntityType( IndexedEntity.class );
 
-			initiator.addEntityType( IndexedEntity.class );
+					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
+					builder.annotationMapping().add( IndexedEntity.class );
 
-			// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required
-			initiator.annotationMapping().add( IndexedEntity.class );
+					builder.programmaticMapping()
+							.type( IndexedEntity.class )
+									.property( "nonAnnotationMappedEmbedded" )
+											.indexedEmbedded();
+				} )
+				.setup();
 
-			initiator.programmaticMapping()
-					.type( IndexedEntity.class )
-							.property( "nonAnnotationMappedEmbedded" )
-									.indexedEmbedded();
-			return initiator;
-		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)

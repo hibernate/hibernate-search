@@ -6,12 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
+import org.hibernate.search.util.impl.common.Closer;
 
 public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapping, MappingImplementor<M> {
 
 	private final PojoMappingDelegate delegate;
+
+	private final List<CloseDelegate> closeDelegates = new ArrayList<>();
+
+	private boolean closed = false;
 
 	public PojoMappingImpl(PojoMappingDelegate delegate) {
 		this.delegate = delegate;
@@ -19,7 +27,14 @@ public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapp
 
 	@Override
 	public void close() {
-		delegate.close();
+		if ( !closed ) {
+			// Make sure to avoid infinite recursion when one of the delegates calls this.close()
+			closed = true;
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.push( PojoMappingDelegate::close, delegate );
+				closer.pushAll( CloseDelegate::close, closeDelegates );
+			}
+		}
 	}
 
 	protected final PojoMappingDelegate getDelegate() {
@@ -39,5 +54,14 @@ public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapp
 	@Override
 	public boolean isSearchable(Class<?> type) {
 		return delegate.isSearchable( type );
+	}
+
+	public void onClose(CloseDelegate closeable) {
+		closeDelegates.add( closeable );
+	}
+
+	public interface CloseDelegate extends AutoCloseable {
+		@Override
+		void close();
 	}
 }

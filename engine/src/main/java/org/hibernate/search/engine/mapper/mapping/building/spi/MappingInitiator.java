@@ -8,7 +8,6 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 /**
  * An object responsible for initiating a mapping by contributing its basic configuration (indexed types, type metadata),
@@ -18,8 +17,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
  * @param <M> The Java type of the produced mapping
  */
 public interface MappingInitiator<C, M> {
-
-	MappingKey<M> getMappingKey();
 
 	void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<C> configurationCollector);

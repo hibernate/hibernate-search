@@ -20,8 +20,8 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -136,9 +137,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		try {
 			SearchMappingRepositoryBuilder builder = SearchMappingRepository.builder( propertySource );
 
+			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					builder, metadata, sessionFactoryImplementor
+					metadata, sessionFactoryImplementor
 			);
+			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
@@ -157,7 +160,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			// TODO ClassLoaderService
 
 			SearchMappingRepository mappingRepository = builder.build();
-			HibernateOrmMapping mapping = mappingInitiator.getResult();
+			HibernateOrmMapping mapping = mappingRepository.getMapping( mappingKey );
 
 			// TODO JMX
 //			this.jmx = new JMXHook( propertySource );

@@ -39,8 +39,8 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 		this.introspector = introspector;
 	}
 
-	public void enableAnnotatedTypeDiscovery() {
-		this.annotatedTypeDiscoveryEnabled = true;
+	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
+		this.annotatedTypeDiscoveryEnabled = annotatedTypeDiscoveryEnabled;
 	}
 
 	@Override

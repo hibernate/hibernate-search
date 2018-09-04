@@ -22,7 +22,6 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
@@ -42,11 +41,11 @@ import org.hibernate.search.integrationtest.mapper.pojo.bridge.IntegerAsStringVa
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.OptionalIntAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomPropertyBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.annotation.CustomTypeBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -144,24 +143,21 @@ public class JavaBeanAnnotationMappingIT {
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
-				.setup( mappingRepositoryBuilder -> {
-					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-					initiator.addEntityTypes( CollectionHelper.asSet(
+				.withConfiguration( builder -> {
+					builder.addEntityTypes( CollectionHelper.asSet(
 							IndexedEntity.class,
 							OtherIndexedEntity.class,
 							YetAnotherIndexedEntity.class
 					) );
 
-					initiator.annotationMapping().add( IndexedEntity.class );
+					builder.annotationMapping().add( IndexedEntity.class );
 
 					Set<Class<?>> classSet = new HashSet<>();
 					classSet.add( OtherIndexedEntity.class );
 					classSet.add( YetAnotherIndexedEntity.class );
-					initiator.annotationMapping().add( classSet );
-
-					return initiator;
-				} );
+					builder.annotationMapping().add( classSet );
+				} )
+				.setup();
 
 		backendMock.verifyExpectationsMet();
 	}

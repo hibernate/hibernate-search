@@ -8,24 +8,16 @@ package org.hibernate.search.integrationtest.mapper.pojo.test.util.rule;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
+import org.hibernate.search.mapper.javabean.JavaBeanMappingBuilder;
 import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-
-public class JavaBeanMappingSetupHelper implements TestRule {
-
-	private final MappingSetupHelper delegate = new MappingSetupHelper();
+public class JavaBeanMappingSetupHelper
+		extends MappingSetupHelper<JavaBeanMappingSetupHelper.SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping> {
 
 	private final MethodHandles.Lookup lookup;
 
@@ -42,50 +34,23 @@ public class JavaBeanMappingSetupHelper implements TestRule {
 		this.lookup = lookup;
 	}
 
-	public SetupContext withBackendMock(BackendMock backendMock) {
-		return new SetupContext( delegate.withBackendMock( backendMock ) );
+	@Override
+	protected SetupContext createSetupContext(ConfigurationPropertySource propertySource) {
+		return new SetupContext( propertySource );
 	}
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return delegate.apply( base, description );
+	protected void close(CloseableJavaBeanMapping toClose) {
+		// TODO
 	}
 
-	public class SetupContext {
+	public class SetupContext
+			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.SetupContext {
 
-		private final MappingSetupHelper.SetupContext delegate;
+		private final ConfigurationPropertySource propertySource;
 
-		SetupContext(MappingSetupHelper.SetupContext delegate) {
-			this.delegate = delegate;
-		}
-
-		public SetupContext withProperty(String key, String value) {
-			delegate.withProperty( key, value );
-			return this;
-		}
-
-		/**
-		 * Add a mapping initiator to the setup. Note this method must not be called if you use {@link #setup(Function)}.
-		 * @param beforeBuild A function called before Hibernate Search is bootstrapped.
-		 * @param afterBuild A consumer called after Hibernate Search is bootstrapped. Gets passed the resulting mapping.
-		 * @return The setup context, for method chaining.
-		 */
-		public SetupContext withMapping(Function<SearchMappingRepositoryBuilder, JavaBeanMappingInitiator> beforeBuild,
-				BiConsumer<SearchMappingRepository, JavaBeanMapping> afterBuild) {
-			delegate.withMapping(
-					beforeBuild,
-					(mappingRepository, initiator) -> afterBuild.accept( mappingRepository, initiator.getResult() )
-			);
-			return this;
-		}
-
-		/**
-		 * Setup Hibernate Search, returning the mapping for the given initiator.
-		 * @param beforeBuild A function called before Hibernate Search is bootstrapped.
-		 * @return The resulting mapping.
-		 */
-		public JavaBeanMapping setup(Function<SearchMappingRepositoryBuilder, JavaBeanMappingInitiator> beforeBuild) {
-			return delegate.setup( beforeBuild ).getResult();
+		SetupContext(ConfigurationPropertySource propertySource) {
+			this.propertySource = propertySource;
 		}
 
 		public JavaBeanMapping setup(Class<?> ... annotatedEntityTypes) {
@@ -94,28 +59,31 @@ public class JavaBeanMappingSetupHelper implements TestRule {
 		}
 
 		public JavaBeanMapping setup(Set<Class<?>> entityTypes, Set<Class<?>> annotatedTypes) {
-			return setup( mappingRepositoryBuilder -> {
-				JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
-						mappingRepositoryBuilder,
-						lookup,
-						true,
-						false
-				);
-
-				initiator.addEntityTypes( entityTypes );
-
-				initiator.annotationMapping().add( annotatedTypes );
-
-				return initiator;
-			} );
+			return withConfiguration( builder -> {
+				builder.addEntityTypes( entityTypes );
+				builder.annotationMapping().add( annotatedTypes );
+			} )
+					.setup();
 		}
 
-		/**
-		 * Setup Hibernate Search, returning the {@link SearchMappingRepository}.
-		 * @return The created {@link SearchMappingRepository}
-		 */
-		public SearchMappingRepository setup() {
-			return delegate.setup();
+		@Override
+		protected JavaBeanMappingBuilder createBuilder() {
+			return JavaBeanMapping.builder( propertySource, lookup );
+		}
+
+		@Override
+		protected void setProperty(JavaBeanMappingBuilder builder, String key, String value) {
+			builder.setProperty( key, value );
+		}
+
+		@Override
+		protected CloseableJavaBeanMapping build(JavaBeanMappingBuilder builder) {
+			return builder.build();
+		}
+
+		@Override
+		protected SetupContext thisAsC() {
+			return this;
 		}
 	}
 }

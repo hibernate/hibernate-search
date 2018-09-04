@@ -8,19 +8,17 @@ package org.hibernate.search.integrationtest.mapper.pojo;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,24 +53,19 @@ public class JavaBeanAnnotationMappingGeoPointBridgeIT {
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
-				.setup( mappingRepositoryBuilder -> {
-					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
-
-					initiator.addEntityTypes( CollectionHelper.asSet(
-							GeoPointOnTypeEntity.class,
-							GeoPointOnCoordinatesPropertyEntity.class,
-							GeoPointOnCustomCoordinatesPropertyEntity.class
-					) );
-
-					AnnotationMappingDefinition mappingDefinition = initiator.annotationMapping();
-
-					mappingDefinition.add( GeoPointOnTypeEntity.class );
-					mappingDefinition.add( GeoPointOnCoordinatesPropertyEntity.class );
-					mappingDefinition.add( GeoPointOnCustomCoordinatesPropertyEntity.class );
-					mappingDefinition.add( CustomCoordinates.class );
-
-					return initiator;
-				} );
+				.setup(
+						CollectionHelper.asSet(
+								GeoPointOnTypeEntity.class,
+								GeoPointOnCoordinatesPropertyEntity.class,
+								GeoPointOnCustomCoordinatesPropertyEntity.class
+						),
+						CollectionHelper.asSet(
+								GeoPointOnTypeEntity.class,
+								GeoPointOnCoordinatesPropertyEntity.class,
+								GeoPointOnCustomCoordinatesPropertyEntity.class,
+								CustomCoordinates.class
+						)
+				);
 
 		backendMock.verifyExpectationsMet();
 	}

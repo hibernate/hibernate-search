@@ -23,8 +23,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
@@ -57,11 +57,10 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 	private final ConfigurationPropertySource mainPropertySource;
 	private final Properties overriddenProperties = new Properties();
-	private final List<MappingInitiator<?, ?>> mappingInitiators = new ArrayList<>();
+	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private BeanResolver beanResolver;
 	private boolean frozen = false;
-	private SearchMappingRepository builtResult;
 
 	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
 		this.mainPropertySource = mainPropertySource;
@@ -86,7 +85,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder addMappingInitiator(MappingInitiator initiator) {
+	public <M> SearchMappingRepositoryBuilder addMappingInitiator(MappingKey<M> mappingKey,
+			MappingInitiator<?, M> initiator) {
 		if ( frozen ) {
 			throw new AssertionFailure(
 					"Attempt to add a mapping initiator"
@@ -94,7 +94,16 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 					+ " There is a bug in the Hibernate Search integration."
 			);
 		}
-		mappingInitiators.add( initiator );
+
+		MappingInitiator<?, ?> existing = mappingInitiators.putIfAbsent( mappingKey, initiator );
+
+		if ( existing != null ) {
+			throw new AssertionFailure(
+					"Mapping key '" + mappingKey + "' has multiple initiators: '"
+							+ existing + "', '" + initiator + "'."
+							+ " There is a bug in the mapper, please report it."
+			);
+		}
 		return this;
 	}
 
@@ -130,9 +139,13 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( rootBuildContext, propertySource );
 
 			// First phase: collect configuration for all mappings
-			for ( MappingInitiator initiator : mappingInitiators ) {
-				MappingBuildingState<?, ?> mappingBuildingState =
-						new MappingBuildingState<>( rootBuildContext, propertySource, initiator );
+			for ( Map.Entry<MappingKey<?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
+				// We know the key and initiator have compatible types, see how they are put into the map
+				@SuppressWarnings("unchecked")
+				MappingBuildingState<?, ?> mappingBuildingState = new MappingBuildingState<>(
+						rootBuildContext, propertySource,
+						(MappingKey) entry.getKey(), entry.getValue()
+				);
 				mappingBuildingStates.add( mappingBuildingState );
 				mappingBuildingState.collect();
 			}
@@ -156,7 +169,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			builtResult = new SearchMappingRepositoryImpl(
+			return new SearchMappingRepositoryImpl(
 					beanResolver,
 					mappings,
 					indexManagerBuildingStateHolder.getBackendsByName(),
@@ -201,13 +214,6 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 
 			throw rethrownException;
 		}
-
-		return builtResult;
-	}
-
-	@Override
-	public SearchMappingRepository getBuiltResult() {
-		return builtResult;
 	}
 
 	private static class MappingBuildingState<C, M> {
@@ -227,8 +233,8 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		private Mapper<M> mapper; // Initially null, set in createMapper()
 
 		MappingBuildingState(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
-				MappingInitiator<C, M> mappingInitiator) {
-			this.mappingKey = mappingInitiator.getMappingKey();
+				MappingKey<M> mappingKey, MappingInitiator<C, M> mappingInitiator) {
+			this.mappingKey = mappingKey;
 			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingKey );
 			this.propertySource = propertySource;
 			this.mappingInitiator = mappingInitiator;
@@ -270,13 +276,6 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 		}
 
 		void createAndAddMapping(Map<MappingKey<?>, MappingImplementor<?>> mappings) {
-			if ( mappings.containsKey( mappingKey ) ) {
-				throw new AssertionFailure(
-						"Found two mapping initiators using the same key."
-						+ " There is a bug in the mapper, please report it."
-				);
-			}
-
 			try {
 				MappingImplementor<M> mapping = mapper.build();
 				mappings.put( mappingKey, mapping );

@@ -14,13 +14,15 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.engine.common.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -112,13 +114,15 @@ public class SearchSetupHelper implements TestRule {
 				mappingRepositoryBuilder = mappingRepositoryBuilder.setProperty( entry.getKey(), entry.getValue() );
 			}
 
-			StubMappingInitiator initiator = new StubMappingInitiator( mappingRepositoryBuilder, multiTenancyEnabled );
+			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
+			StubMappingKey mappingKey = new StubMappingKey();
+			mappingRepositoryBuilder.addMappingInitiator( mappingKey, initiator );
 			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
 			SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();
 			mappingRepositories.add( mappingRepository );
 
-			StubMapping mapping = initiator.getResult();
+			StubMapping mapping = mappingRepository.getMapping( mappingKey );
 			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
 
 			return mappingRepository;

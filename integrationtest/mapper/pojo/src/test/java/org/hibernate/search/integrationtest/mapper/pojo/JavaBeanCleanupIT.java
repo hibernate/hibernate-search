@@ -11,8 +11,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.SearchMappingRepository;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
+import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
@@ -20,15 +19,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.bridge.StartupStubBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -51,14 +49,7 @@ public class JavaBeanCleanupIT {
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private SearchMappingRepository mappingRepository;
-
-	@After
-	public void cleanup() {
-		if ( mappingRepository != null ) {
-			mappingRepository.close();
-		}
-	}
+	private CloseableJavaBeanMapping mapping;
 
 	@Test
 	public void successfulBuilding() {
@@ -99,8 +90,8 @@ public class JavaBeanCleanupIT {
 
 		assertEquals( 3, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
 
-		mappingRepository.close();
-		mappingRepository = null;
+		mapping.close();
+		mapping = null;
 
 		// Index manager builders must not have been closed.
 		assertEquals( 0, counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
@@ -341,15 +332,13 @@ public class JavaBeanCleanupIT {
 	}
 
 	private void startup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
-		this.mappingRepository = setupHelper.withBackendMock( backendMock )
-				.withMapping(
-						mappingRepositoryBuilder -> {
-							JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create( mappingRepositoryBuilder );
+		this.mapping = setupHelper.withBackendMock( backendMock )
+				.withConfiguration(
+						builder -> {
+							builder.addEntityType( IndexedEntity.class );
+							builder.addEntityType( OtherIndexedEntity.class );
 
-							initiator.addEntityType( IndexedEntity.class );
-							initiator.addEntityType( OtherIndexedEntity.class );
-
-							ProgrammaticMappingDefinition mappingDefinition = initiator.programmaticMapping();
+							ProgrammaticMappingDefinition mappingDefinition = builder.programmaticMapping();
 							mappingDefinition.type( IndexedEntity.class )
 									.indexed( IndexedEntity.INDEX )
 									.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
@@ -380,10 +369,7 @@ public class JavaBeanCleanupIT {
 											);
 
 							additionalMappingContributor.accept( mappingDefinition );
-
-							return initiator;
-						},
-						(mappingRepository, mapping) -> { }
+						}
 				)
 				.setup();
 	}

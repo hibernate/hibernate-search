@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.mapper.javabean.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -101,18 +100,16 @@ public class JavaBeanMappingIndexedIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( mappingRepositoryBuilder -> {
-					JavaBeanMappingInitiator initiator = JavaBeanMappingInitiator.create(
-							mappingRepositoryBuilder, MethodHandles.lookup(),
-							false, false
-					);
-					initiator.addEntityType( AbstractIndexedEntity.class );
-					initiator.programmaticMapping()
-							.type( AbstractIndexedEntity.class )
-							.indexed( indexName )
-									.property( "id" ).documentId();
-					return initiator;
-				} )
+				() -> setupHelper.withBackendMock( backendMock )
+						.withConfiguration( builder -> {
+							builder.setAnnotatedTypeDiscoveryEnabled( false );
+							builder.addEntityType( AbstractIndexedEntity.class );
+							builder.programmaticMapping()
+									.type( AbstractIndexedEntity.class )
+									.indexed( indexName )
+											.property( "id" ).documentId();
+						} )
+						.setup()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
