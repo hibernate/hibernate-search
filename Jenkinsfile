@@ -432,7 +432,11 @@ stage('Non-default environment ITs') {
 				node(NODE_PATTERN_BASE + '&&AWS') {
 					withDefaultedMaven {
 						resumeFromDefaultBuild()
-						withAwsCredentials {
+						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+										 credentialsId   : 'aws-elasticsearch',
+										 usernameVariable: 'AWS_ACCESS_KEY_ID',
+										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+						]]) {
 							mavenNonDefaultIT itEnv, """ \\
 								clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
 								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
@@ -582,17 +586,6 @@ void withDefaultedMaven(Map args, Closure body) {
 	args.putIfAbsent('options', [artifactsPublisher(disabled: true)])
 	args.putIfAbsent('mavenLocalRepo', "$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE")
 	withMaven(args, body)
-}
-
-void withAwsCredentials(Closure body) {
-	withCredentials(
-		[[$class: 'AmazonWebServicesCredentialsBinding',
-			credentialsId: 'aws-elasticsearch',
-			usernameVariable: 'AWS_ACCESS_KEY_ID',
-			passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-		]],
-		body
-	)
 }
 
 void resumeFromDefaultBuild() {
