@@ -56,7 +56,7 @@
         <!-- Skip plugin executions that are not relevant for legacy code -->
         <jqassistant.skip>true</jqassistant.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
-
+        <sonar.skip>true</sonar.skip>
 
         <!-- Dependencies versions -->
 
