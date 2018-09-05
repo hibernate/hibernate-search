@@ -6,7 +6,6 @@
  */
 
 import groovy.transform.Field
-import groovy.json.JsonSlurper
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
