@@ -8,6 +8,7 @@
 import groovy.transform.Field
 import groovy.json.JsonSlurper
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
+import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
@@ -32,6 +33,12 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
  * notification:
  *   email:
  *     recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
+ *
+ * The following credentials are necessary for some features:
+ *
+ * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
+ * - 'coveralls-repository-token' secret text credentials containing the repository token,
+ * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
  *
  * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
  *
@@ -320,6 +327,24 @@ stage('Default build') {
 					${enableDefaultEnvIT ? '' : '-DskipITs'} \\
 					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''}
 			"""
+
+			try {
+				withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
+					sh """ \\
+							mvn coveralls:report \\
+							-DrepoToken=${COVERALLS_TOKEN} \\
+							${env.CHANGE_ID ? """ \\
+									-DpullRequest=${env.CHANGE_ID} \\
+							""" : """ \\
+									-Dbranch=${env.BRANCH_NAME} \\
+							"""} \\
+					"""
+				}
+			}
+			catch (CredentialNotFoundException e) {
+				echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
+			}
+
 			dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
 				stash name:'main-build', includes:"org/hibernate/search/**"
 			}
