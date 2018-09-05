@@ -39,6 +39,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
  * - 'coveralls-repository-token' secret text credentials containing the repository token,
  * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
+ * - 'sonarcloud-hibernate-token' secret text credentials containing a Sonar access token for the Hibernate organization,
+ * to send Sonar analysis input to sonarcloud.io.
  *
  * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
  *
@@ -343,6 +345,27 @@ stage('Default build') {
 			}
 			catch (CredentialNotFoundException e) {
 				echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
+			}
+
+			try {
+				withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
+					sh """ \\
+							mvn sonar:sonar \\
+							-Dsonar.organization=hibernate \\
+							-Dsonar.host.url=https://sonarcloud.io \\
+							-Dsonar.login=${SONARCLOUD_TOKEN} \\
+							${env.CHANGE_ID ? """ \\
+									-Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
+									-Dsonar.pullrequest.key=${env.CHANGE_ID} \\
+									-Dsonar.pullrequest.base=${env.CHANGE_TARGET} \\
+							""" : """ \\
+									-Dsonar.branch.name=${env.BRANCH_NAME} \\
+							"""} \\
+					"""
+				}
+			}
+			catch (CredentialNotFoundException e) {
+				echo "No SonarCloud token configured - skipping SonarCloud report. Error was: ${e}"
 			}
 
 			dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
