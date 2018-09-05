@@ -39,6 +39,7 @@
         <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
+        <module>legacy</module>
         <module>reports</module>
     </modules>
 
