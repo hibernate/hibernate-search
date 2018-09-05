@@ -1,5 +1,10 @@
 # Hibernate Search
 
+[![Build Status](http://ci.hibernate.org/buildStatus/icon?job=hibernate-search/master)](http://ci.hibernate.org/job/hibernate-search/master)
+[![Coverage Status](https://coveralls.io/repos/github/hibernate/hibernate-search/badge.svg?branch=master)](https://coveralls.io/github/hibernate/hibernate-search?branch=master)
+[![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.hibernate.search%3Ahibernate-search-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
+[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
+
 ## Description
 
 Full text search for Java objects
