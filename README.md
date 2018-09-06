@@ -5,6 +5,25 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.hibernate.search%3Ahibernate-search-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
 [![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
 
+## Warning: this is Hibernate Search 6 
+
+This branch currently contains the code of Hibernate Search version 6,
+a new major version which is very different from Hibernate Search 5,
+and is still in its early stages.
+
+If you are looking for the code of the version of Hibernate Search you are currently using,
+you should try branch [5.10](https://github.com/hibernate/hibernate-search/tree/5.10) instead,
+or any of the [older branches](https://github.com/hibernate/hibernate-search/branches/all).
+
+If you are looking for version 6, then keep in mind that most of the old codebase
+has been moved to the `legacy` directory, creating several modules with the same artifact ID.
+
+When importing the Maven modules in Eclipse, you are advised to use
+the `[groupId]:[artifactId]` project name template, in order to avoid conflicts.
+You can distinguish between old and new modules by their group ID:
+legacy modules use `org.hibernate`, while newer modules use `org.hibernate.search`.
+
+
 ## Description
 
 Full text search for Java objects
