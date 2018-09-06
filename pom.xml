@@ -172,6 +172,7 @@
 
         <!-- >>> Lucene -->
         <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
+        <version.org.apache.lucene.javadoc>7_4_0</version.org.apache.lucene.javadoc>
         <!-- TODO define feature pack version for Lucene in this module, not in the legacy module (requires a release of Lucene feature packs) -->
         <version.feature-pack.org.apache.lucene>OVERRIDDEN_IN_LEGACY</version.feature-pack.org.apache.lucene>
 
@@ -183,12 +184,15 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
+        <version.org.hibernate.javadoc>5.3</version.org.hibernate.javadoc>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the ORM integration and various tests -->
         <version.javax.enterprise>2.0</version.javax.enterprise>
+        <!-- This is used to generate a link to the Java EE javadoc -->
+        <version.javaee.javadoc>7</version.javaee.javadoc>
 
         <!-- Test dependencies -->
 
@@ -275,6 +279,9 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- This is used to generate a link to the standard Java library javadoc -->
+        <version.javase.javadoc>8</version.javase.javadoc>
 
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -1071,14 +1078,14 @@
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
-                            <link>http://download.oracle.com/javase/8/docs/api/</link>
-                            <link>http://docs.jboss.org/hibernate/orm/5.3/javadocs/</link>
-                            <link>http://lucene.apache.org/core/7_4_0/core/</link>
-                            <link>http://lucene.apache.org/core/7_4_0/analyzers-common/</link>
-                            <link>http://lucene.apache.org/core/7_4_0/queryparser/</link>
+                            <link>http://download.oracle.com/javase/${version.javase.javadoc}/docs/api/</link>
+                            <link>http://docs.jboss.org/hibernate/orm/${version.org.hibernate.javadoc}/javadocs/</link>
+                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/core/</link>
+                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/analyzers-common/</link>
+                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/queryparser/</link>
                             <link>http://jgroups.org/javadoc/</link>
                             <!-- for javax.batch in the JSR 352 modules -->
-                            <link>https://docs.oracle.com/javaee/7/api/</link>
+                            <link>https://docs.oracle.com/javaee/${version.javaee.javadoc}/api/</link>
                             <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
                         </links>
                         <bottom>
