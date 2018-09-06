@@ -25,25 +25,12 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  */
 
 /*
- * Expected configuration (optional): multibranch-configuration.yaml, set up using the config file provider plugin
- * (https://plugins.jenkins.io/config-file-provider).
- * Expected structure of this file:
- *
- * notification:
- *   email:
- *     recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
- *
- * The following credentials are necessary for some features:
- *
- * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
- * - 'coveralls-repository-token' secret text credentials containing the repository token,
- * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
- * - 'sonarcloud-hibernate-token' secret text credentials containing a Sonar access token for the Hibernate organization,
- * to send Sonar analysis input to sonarcloud.io.
- *
  * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
  *
+ * ### Jenkins configuration
+ *
  * This file requires the following plugins in particular:
+ *
  * - https://plugins.jenkins.io/pipeline-maven
  * - https://plugins.jenkins.io/ec2
  * - https://plugins.jenkins.io/lockable-resources
@@ -53,6 +40,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - https://plugins.jenkins.io/pipeline-utility-steps
  *
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
+ *
  * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
  * - staticMethod org.jenkinsci.plugins.pipeline.modeldefinition.Utils markStageSkippedForConditional java.lang.String
  * - new java.lang.IllegalArgumentException java.lang.String
@@ -61,6 +49,43 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - method java.lang.Throwable addSuppressed java.lang.Throwable
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
+ *
+ * ### Job configuration
+ *
+ * This file gets its configuration from three sources: environment variables, a configuration file, and credentials.
+ * All configuration is optional for the default build (and it should stay that way),
+ * but some features require some configuration.
+ *
+ * #### Environment variables
+ *
+ * The following environment variables are necessary for some features:
+ *
+ * - 'ES_AWS_REGION', containing the name of an AWS region such as 'us-east-1', to test Elasticsearch as a service on AWS.
+ * - 'ES_AWS_<majorminor without dot>_ENDPOINT' (e.g. 'ES_AWS_52_ENDPOINT'),
+ * containing the URL of an AWS Elasticsearch service endpoint using that exact version,
+ * to test Elasticsearch as a service on AWS.
+ *
+ * #### Configuration file
+ *
+ * The configuration file is optional. Its purpose is to host job-specific configuration, such as notification recipients.
+ *
+ * The file is named 'multibranch-configuration.yaml', and it should be set up using the config file provider plugin
+ * (https://plugins.jenkins.io/config-file-provider).
+ * Expected structure of this file:
+ *
+ *     notification:
+ *       email:
+ *         recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
+ *
+ * #### Credentials
+ *
+ * The following credentials are necessary for some features:
+ *
+ * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
+ * - 'coveralls-repository-token' secret text credentials containing the repository token,
+ * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
+ * - 'sonarcloud-hibernate-token' secret text credentials containing a Sonar access token for the Hibernate organization,
+ * to send Sonar analysis input to sonarcloud.io.
  */
 
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
