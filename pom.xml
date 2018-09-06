@@ -1785,6 +1785,19 @@
                                                 <ignore />
                                             </action>
                                         </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.jboss.bridger</groupId>
+                                                <artifactId>bridger</artifactId>
+                                                <versionRange>[1.5.Final,)</versionRange>
+                                                <goals>
+                                                    <goal>transform</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore></ignore>
+                                            </action>
+                                        </pluginExecution>
                                     </pluginExecutions>
                                 </lifecycleMappingMetadata>
                             </configuration>
