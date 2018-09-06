@@ -57,6 +57,7 @@
         <jqassistant.skip>true</jqassistant.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
         <sonar.skip>true</sonar.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!-- Dependencies versions -->
 
