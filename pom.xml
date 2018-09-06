@@ -17,7 +17,7 @@
     <name>Hibernate Search Parent POM</name>
     <description>Hibernate Search Parent POM</description>
 
-    <url>http://search.hibernate.org</url>
+    <url>http://hibernate.org/search/</url>
 
     <inceptionYear>2006</inceptionYear>
 
@@ -909,7 +909,7 @@
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <Implementation-Vendor>hibernate.org</Implementation-Vendor>
                             <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
-                            <Implementation-URL>http://search.hibernate.org</Implementation-URL>
+                            <Implementation-URL>http://hibernate.org/search/</Implementation-URL>
                         </manifestEntries>
                     </archive>
                 </configuration>
