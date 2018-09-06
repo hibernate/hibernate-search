@@ -350,7 +350,7 @@ stage('Non-default environment ITs') {
 				withDefaultedMaven {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
-							clean install -pl integrationtest/orm -P$itEnv.mavenProfile
+							clean install -pl org.hibernate.search:hibernate-search-integrationtest-orm -P$itEnv.mavenProfile
 					"""
 				}
 			}
@@ -364,7 +364,7 @@ stage('Non-default environment ITs') {
 				withDefaultedMaven {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
-							clean install -pl integrationtest/backend-elasticsearch \\
+							clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
 							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
 					"""
 				}
@@ -387,7 +387,7 @@ stage('Non-default environment ITs') {
 						resumeFromDefaultBuild()
 						withAwsCredentials {
 							mavenNonDefaultIT itEnv, """ \\
-								clean install -pl integrationtest/backend-elasticsearch \\
+								clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
 								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
 								-Dtest.elasticsearch.host.provided=true \\
 								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \\
