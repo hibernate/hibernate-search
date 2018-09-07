@@ -8,14 +8,14 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 
 public class StubMapping implements MappingImplementor<StubMapping> {
 
-	private final Map<String, IndexManager<?>> indexManagersByTypeIdentifier;
+	private final Map<String, MappedIndexManager<?>> indexManagersByTypeIdentifier;
 
-	StubMapping(Map<String, IndexManager<?>> indexManagersByTypeIdentifier) {
+	StubMapping(Map<String, MappedIndexManager<?>> indexManagersByTypeIdentifier) {
 		this.indexManagersByTypeIdentifier = indexManagersByTypeIdentifier;
 	}
 
@@ -24,7 +24,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 		return this;
 	}
 
-	public IndexManager<?> getIndexManagerByTypeIdentifier(String typeId) {
+	public MappedIndexManager<?> getIndexManagerByTypeIdentifier(String typeId) {
 		return indexManagersByTypeIdentifier.get( typeId );
 	}
 

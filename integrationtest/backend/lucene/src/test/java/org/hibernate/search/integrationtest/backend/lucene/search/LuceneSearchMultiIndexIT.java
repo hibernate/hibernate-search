@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -61,12 +61,12 @@ public class LuceneSearchMultiIndexIT {
 	// Backend 1 / Index 1
 
 	private IndexAccessors_1_1 indexAccessors_1_1;
-	private IndexManager<?> indexManager_1_1;
+	private MappedIndexManager<?> indexManager_1_1;
 
 	// Backend 1 / Index 2
 
 	private IndexAccessors_1_2 indexAccessors_1_2;
-	private IndexManager<?> indexManager_1_2;
+	private MappedIndexManager<?> indexManager_1_2;
 
 	private SessionContext sessionContext = new StubSessionContext();
 

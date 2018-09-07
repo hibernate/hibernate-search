@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -39,7 +39,7 @@ class StubMapper implements Mapper<StubMapping> {
 
 	@Override
 	public StubMapping build() {
-		Map<String, IndexManager<?>> indexManagersByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
+		Map<String, MappedIndexManager<?>> indexManagersByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
 				.collect( Collectors.toMap( e -> e.getKey().asString(), e -> e.getValue().build() ) );
 		return new StubMapping( indexManagersByTypeIdentifier );
 	}

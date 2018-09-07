@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -170,7 +170,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public IndexManager<D> build() {
+		public MappedIndexManager<D> build() {
 			if ( built != null ) {
 				throw new AssertionFailure(
 						"Trying to build index manager " + indexName + " twice."
@@ -178,7 +178,7 @@ class IndexManagerBuildingStateHolder {
 				);
 			}
 			built = builder.build();
-			return built;
+			return new MappedIndexManagerImpl<>( built );
 		}
 
 		public IndexManagerImplementor<D> getBuilt() {
