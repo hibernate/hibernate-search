@@ -172,7 +172,7 @@
 
         <!-- >>> Lucene -->
         <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
-        <javadoc.org.apache.lucene.tag>7_4_0</javadoc.org.apache.lucene.tag>
+        <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
         <javadoc.org.apache.lucene.core.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analyzers-common.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
         <javadoc.org.apache.lucene.queryparser.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
@@ -187,7 +187,7 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
-        <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/5.3/javadocs/</javadoc.org.hibernate.url>
+        <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
