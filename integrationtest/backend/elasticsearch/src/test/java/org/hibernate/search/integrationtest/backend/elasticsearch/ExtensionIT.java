@@ -11,10 +11,12 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchMappingRepository;
@@ -316,6 +318,24 @@ public class ExtensionIT {
 		thrown.expectMessage( RestClient.class.getName() );
 
 		elasticsearchBackend.getClient( HttpAsyncClient.class );
+	}
+
+	@Test
+	public void indexManager_unwrap() {
+		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+		Assertions.assertThat( indexManager.unwrap( ElasticsearchIndexManager.class ) )
+				.isNotNull();
+	}
+
+	@Test
+	public void indexManager_unwrap_error_unknownType() {
+		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'" );
+		thrown.expectMessage( "this index manager can only be unwrapped to '" + ElasticsearchIndexManager.class.getName() + "'" );
+
+		indexManager.unwrap( String.class );
 	}
 
 	private void initData() {

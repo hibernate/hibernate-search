@@ -26,11 +26,13 @@ import org.apache.lucene.search.TermQuery;
 import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
+import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchMappingRepository;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -391,6 +393,24 @@ public class ExtensionIT {
 		thrown.expectMessage( "this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'" );
 
 		backend.unwrap( String.class );
+	}
+
+	@Test
+	public void indexManager_unwrap() {
+		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+		Assertions.assertThat( indexManager.unwrap( LuceneIndexManager.class ) )
+				.isNotNull();
+	}
+
+	@Test
+	public void indexManager_unwrap_error_unknownType() {
+		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'" );
+		thrown.expectMessage( "this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'" );
+
+		indexManager.unwrap( String.class );
 	}
 
 	private void initData() {
