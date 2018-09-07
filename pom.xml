@@ -172,7 +172,10 @@
 
         <!-- >>> Lucene -->
         <version.org.apache.lucene>7.4.0</version.org.apache.lucene>
-        <version.org.apache.lucene.javadoc>7_4_0</version.org.apache.lucene.javadoc>
+        <javadoc.org.apache.lucene.tag>7_4_0</javadoc.org.apache.lucene.tag>
+        <javadoc.org.apache.lucene.core.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
+        <javadoc.org.apache.lucene.analyzers-common.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
+        <javadoc.org.apache.lucene.queryparser.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
         <!-- TODO define feature pack version for Lucene in this module, not in the legacy module (requires a release of Lucene feature packs) -->
         <version.feature-pack.org.apache.lucene>OVERRIDDEN_IN_LEGACY</version.feature-pack.org.apache.lucene>
 
@@ -184,7 +187,7 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
-        <version.org.hibernate.javadoc>5.3</version.org.hibernate.javadoc>
+        <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/5.3/javadocs/</javadoc.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
@@ -192,7 +195,7 @@
         <!-- Used in the ORM integration and various tests -->
         <version.javax.enterprise>2.0</version.javax.enterprise>
         <!-- This is used to generate a link to the Java EE javadoc -->
-        <version.javaee.javadoc>7</version.javaee.javadoc>
+        <javadoc.javaee.url>https://docs.oracle.com/javaee/7/api/</javadoc.javaee.url>
 
         <!-- Test dependencies -->
 
@@ -280,11 +283,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- This is used to generate a link to the standard Java library javadoc -->
-        <version.javase.javadoc>8</version.javase.javadoc>
-
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <!-- This is used to generate a link to the standard Java library javadoc -->
+        <javadoc.javase.url>http://download.oracle.com/javase/8/docs/api/</javadoc.javase.url>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <!--
@@ -1078,13 +1080,13 @@
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
-                            <link>http://download.oracle.com/javase/${version.javase.javadoc}/docs/api/</link>
-                            <link>http://docs.jboss.org/hibernate/orm/${version.org.hibernate.javadoc}/javadocs/</link>
-                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/core/</link>
-                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/analyzers-common/</link>
-                            <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/queryparser/</link>
+                            <link>${javadoc.javase.url}</link>
+                            <link>${javadoc.org.hibernate.url}</link>
+                            <link>${javadoc.org.apache.lucene.core.url}</link>
+                            <link>${javadoc.org.apache.lucene.analyzers-common.url}</link>
+                            <link>${javadoc.org.apache.lucene.queryparser.url}</link>
                             <!-- For Java EE APIs, in particular javax.batch in the JSR 352 modules -->
-                            <link>https://docs.oracle.com/javaee/${version.javaee.javadoc}/api/</link>
+                            <link>${javadoc.javaee.url}</link>
                         </links>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
