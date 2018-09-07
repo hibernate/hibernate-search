@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
-import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
@@ -229,4 +229,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 32,
 			value = "Unable to convert DSL parameter: %1$s")
 	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 33,
+			value = "Attempt to unwrap an Elasticsearch index manager to '%1$s',"
+					+ " but this index manager can only be unwrapped to '%2$s'.")
+	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
+			@FormatWith(ClassFormatter.class) Class<?> actualClass,
+			@Param EventContext context);
 }

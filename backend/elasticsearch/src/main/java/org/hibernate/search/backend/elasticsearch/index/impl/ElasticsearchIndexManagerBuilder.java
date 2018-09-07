@@ -58,7 +58,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	}
 
 	@Override
-	public ElasticsearchIndexManager build() {
+	public ElasticsearchIndexManagerImpl build() {
 		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
 		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
 		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
@@ -72,7 +72,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		indexingBackendContext.initializeIndex( encodedElasticsearchIndexName, encodedTypeName, model )
 				.join();
 
-		return new ElasticsearchIndexManager(
+		return new ElasticsearchIndexManagerImpl(
 				indexingBackendContext, searchBackendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
 				encodedTypeName, model

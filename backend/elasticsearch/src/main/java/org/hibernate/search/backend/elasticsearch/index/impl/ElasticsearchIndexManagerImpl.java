@@ -10,21 +10,26 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexManager implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder> {
+class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder>,
+		ElasticsearchIndexManager {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,7 +43,7 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 
 	private final ElasticsearchWorkOrchestrator workPlanOrchestrator;
 
-	ElasticsearchIndexManager(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
+	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		this.indexingBackendContext = indexingBackendContext;
@@ -90,6 +95,27 @@ public class ElasticsearchIndexManager implements IndexManagerImplementor<Elasti
 				.append( "elasticsearchName=" ).append( elasticsearchIndexName.original )
 				.append( "]" )
 				.toString();
+	}
+
+	@Override
+	public IndexManager toAPI() {
+		return this;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		if ( clazz.isAssignableFrom( ElasticsearchIndexManager.class ) ) {
+			return (T) this;
+		}
+		throw log.indexManagerUnwrappingWithUnknownType(
+				clazz, ElasticsearchIndexManager.class, getBackendAndIndexEventContext()
+		);
+	}
+
+	private EventContext getBackendAndIndexEventContext() {
+		return indexingBackendContext.getEventContext().append(
+				EventContexts.fromIndexName( hibernateSearchIndexName )
+		);
 	}
 
 }

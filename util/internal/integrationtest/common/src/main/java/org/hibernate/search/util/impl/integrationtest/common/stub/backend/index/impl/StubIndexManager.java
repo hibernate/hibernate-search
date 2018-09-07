@@ -9,16 +9,18 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement> {
+public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement>, IndexManager {
 
 	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
 	public static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
@@ -67,6 +69,19 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	@Override
 	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
 		((StubIndexSearchTarget.Builder)searchTargetBuilder).add( backend, name );
+	}
+
+	@Override
+	public IndexManager toAPI() {
+		return this;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		if ( clazz.isAssignableFrom( IndexManager.class ) ) {
+			return (T) this;
+		}
+		throw new SearchException( "Cannot unwrap " + this + " to " + clazz );
 	}
 
 	void prepare(List<StubIndexWork> works) {

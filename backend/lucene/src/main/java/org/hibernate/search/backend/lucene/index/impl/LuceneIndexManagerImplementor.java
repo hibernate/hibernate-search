@@ -14,11 +14,12 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 /**
  * @author Guillaume Smet
  */
-public interface LuceneIndexManager extends IndexManagerImplementor<LuceneRootDocumentBuilder> {
+public interface LuceneIndexManagerImplementor extends IndexManagerImplementor<LuceneRootDocumentBuilder> {
 
 	String getName();
 
 	LuceneIndexModel getModel();
 
 	ReaderProvider getReaderProvider();
+
 }
