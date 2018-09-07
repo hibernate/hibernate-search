@@ -176,8 +176,6 @@
         <javadoc.org.apache.lucene.core.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analyzers-common.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
         <javadoc.org.apache.lucene.queryparser.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
-        <!-- TODO define feature pack version for Lucene in this module, not in the legacy module (requires a release of Lucene feature packs) -->
-        <version.feature-pack.org.apache.lucene>OVERRIDDEN_IN_LEGACY</version.feature-pack.org.apache.lucene>
 
         <!-- >>> Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
