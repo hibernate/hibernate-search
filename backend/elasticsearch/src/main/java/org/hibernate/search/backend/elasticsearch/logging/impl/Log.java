@@ -20,10 +20,12 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.MessageConstants;
+import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -169,9 +171,10 @@ public interface Log extends BasicLogger {
 	SearchException clientUnwrappingWithUnkownType(Class<?> requestedClass, Class<?> actualClass);
 
 	@Message(id = ID_OFFSET_3 + 19,
-			value = "Attempt to unwrap an Elasticsearch backend to %1$s,"
-					+ " but this backend can only be unwrapped to %2$s.")
-	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass,
+			value = "Attempt to unwrap an Elasticsearch backend to '%1$s',"
+					+ " but this backend can only be unwrapped to '%2$s'.")
+	SearchException backendUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
+			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 20,
