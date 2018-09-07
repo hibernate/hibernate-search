@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.engine.backend;
 
+/**
+ * A backend as viewed by Hibernate Search users.
+ * <p>
+ * This interface exposes all operations that Hibernate Search users
+ * should be able to execute directly on the backend, without having to go through mapper-specific APIs.
+ */
 public interface Backend {
 
 	// TODO add standard APIs related to analysis (which is backend-scoped). To test if an analyzer is defined, for example.
