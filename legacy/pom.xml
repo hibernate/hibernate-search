@@ -77,7 +77,6 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.3.Final</version.org.hibernate>
-        <version.org.hibernate.javadoc>5.3</version.org.hibernate.javadoc>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
         <!--
@@ -127,8 +126,6 @@
 
         <!-- >>> JBoss modules -->
         <version.wildfly>13.0.0.Final</version.wildfly>
-        <!-- This is used to generate a link to the Java EE javadoc -->
-        <version.javaee.javadoc>7</version.javaee.javadoc>
 
         <!-- >>> JMS -->
         <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
