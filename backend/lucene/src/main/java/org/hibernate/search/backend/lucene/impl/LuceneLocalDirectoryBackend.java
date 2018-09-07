@@ -70,7 +70,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 
 	@Override
 	public <T> T unwrap(Class<T> clazz) {
-		if ( LuceneBackend.class.isAssignableFrom( clazz ) ) {
+		if ( clazz.isAssignableFrom( LuceneBackend.class ) ) {
 			return (T) this;
 		}
 		throw log.backendUnwrappingWithUnknownType(

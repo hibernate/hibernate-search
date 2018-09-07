@@ -89,7 +89,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public <T> T unwrap(Class<T> clazz) {
-		if ( ElasticsearchBackend.class.isAssignableFrom( clazz ) ) {
+		if ( clazz.isAssignableFrom( ElasticsearchBackend.class ) ) {
 			return (T) this;
 		}
 		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
