@@ -23,11 +23,16 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TermQuery;
+import org.assertj.core.api.Assertions;
+
+import org.hibernate.search.backend.lucene.LuceneBackend;
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.common.spi.SearchMappingRepository;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -49,9 +54,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ExtensionIT {
 
+	private static final String BACKEND_NAME = "myLuceneBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	private static final String FIRST_ID = "1";
@@ -63,13 +70,17 @@ public class ExtensionIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	private SearchMappingRepository mappingRepository;
 	private IndexAccessors indexAccessors;
 	private MappedIndexManager<?> indexManager;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		this.mappingRepository = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
@@ -362,6 +373,24 @@ public class ExtensionIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
+	}
+
+	@Test
+	public void backend_unwrap() {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Assertions.assertThat( backend.unwrap( LuceneBackend.class ) )
+				.isNotNull();
+	}
+
+	@Test
+	public void backend_unwrap_error_unknownType() {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'" );
+		thrown.expectMessage( "this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'" );
+
+		backend.unwrap( String.class );
 	}
 
 	private void initData() {
