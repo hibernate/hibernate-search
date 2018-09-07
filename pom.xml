@@ -1083,10 +1083,8 @@
                             <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/core/</link>
                             <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/analyzers-common/</link>
                             <link>http://lucene.apache.org/core/${version.org.apache.lucene.javadoc}/queryparser/</link>
-                            <link>http://jgroups.org/javadoc/</link>
-                            <!-- for javax.batch in the JSR 352 modules -->
+                            <!-- For Java EE APIs, in particular javax.batch in the JSR 352 modules -->
                             <link>https://docs.oracle.com/javaee/${version.javaee.javadoc}/api/</link>
-                            <link>http://docs.jboss.org/jberet/${version.org.jberet.javadoc}/javadoc/jberet-core/</link>
                         </links>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
