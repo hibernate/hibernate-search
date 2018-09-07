@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.spi.SearchMappingRepository;
@@ -54,6 +55,15 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 			throw new SearchException( "No backend registered for backend name '" + backendName + "'" );
 		}
 		return backend.toAPI();
+	}
+
+	@Override
+	public IndexManager getIndexManager(String indexManagerName) {
+		IndexManagerImplementor<?> indexManager = indexManagers.get( indexManagerName );
+		if ( indexManager == null ) {
+			throw new SearchException( "No index manager registered for index manager name '" + indexManagerName + "'" );
+		}
+		return indexManager.toAPI();
 	}
 
 	@Override

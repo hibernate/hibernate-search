@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -34,7 +36,7 @@ import org.apache.lucene.index.IndexWriter;
  * @author Guillaume Smet
  */
 // TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider {
+class LuceneDirectoryIndexManager implements LuceneIndexManagerImplementor, LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -142,6 +144,21 @@ class LuceneDirectoryIndexManager implements LuceneIndexManager, ReaderProvider 
 		catch (IOException e) {
 			log.unableToCloseIndexReader( getBackendAndIndexEventContext(), e );
 		}
+	}
+
+	@Override
+	public IndexManager toAPI() {
+		return this;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> clazz) {
+		if ( clazz.isAssignableFrom( LuceneIndexManager.class ) ) {
+			return (T) this;
+		}
+		throw log.indexManagerUnwrappingWithUnknownType(
+				clazz, LuceneIndexManager.class, getBackendAndIndexEventContext()
+		);
 	}
 
 	private EventContext getBackendAndIndexEventContext() {

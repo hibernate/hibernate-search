@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -17,6 +18,8 @@ import org.hibernate.search.engine.common.spi.SessionContext;
  * This is the interface provided to mappers to access the index manager.
  */
 public interface MappedIndexManager<D extends DocumentElement> {
+
+	IndexManager toAPI();
 
 	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
 

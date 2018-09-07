@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -19,6 +20,11 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 
 	MappedIndexManagerImpl(IndexManagerImplementor<D> implementor) {
 		this.implementor = implementor;
+	}
+
+	@Override
+	public IndexManager toAPI() {
+		return implementor.toAPI();
 	}
 
 	@Override

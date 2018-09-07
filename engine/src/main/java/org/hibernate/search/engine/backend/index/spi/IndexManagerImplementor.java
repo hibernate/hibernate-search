@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.spi.SessionContext;
 
 /**
@@ -15,6 +16,11 @@ import org.hibernate.search.engine.common.spi.SessionContext;
  * This is the interface implemented by backends and provided to the engine.
  */
 public interface IndexManagerImplementor<D extends DocumentElement> extends AutoCloseable {
+
+	/**
+	 * @return The object that should be exposed as API to users.
+	 */
+	IndexManager toAPI();
 
 	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
 

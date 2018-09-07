@@ -31,14 +31,14 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 	private final SearchBackendContext searchBackendContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
-	private final Set<LuceneIndexManager> indexManagers = new LinkedHashSet<>();
+	private final Set<LuceneIndexManagerImplementor> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, LuceneIndexManager indexManager) {
+	LuceneIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, LuceneIndexManagerImplementor indexManager) {
 		this.searchBackendContext = searchBackendContext;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(SearchBackendContext searchBackendContext, LuceneIndexManager indexManager) {
+	void add(SearchBackendContext searchBackendContext, LuceneIndexManagerImplementor indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
 			throw log.cannotMixLuceneSearchTargetWithOtherBackend(
 					this, indexManager, searchBackendContext.getEventContext()
@@ -50,11 +50,11 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 	@Override
 	public IndexSearchTarget build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
-		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManager::getModel )
+		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManagerImplementor::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		// TODO obviously, this will have to be changed once we have the full storage complexity from Search 5
-		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManager::getReaderProvider )
+		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManagerImplementor::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new LuceneIndexSearchTarget( searchBackendContext, indexModels, readerProviders );

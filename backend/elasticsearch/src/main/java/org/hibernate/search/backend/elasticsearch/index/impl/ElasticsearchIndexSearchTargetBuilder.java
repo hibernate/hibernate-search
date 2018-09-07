@@ -30,14 +30,14 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 	private final SearchBackendContext searchBackendContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
-	private final Set<ElasticsearchIndexManager> indexManagers = new LinkedHashSet<>();
+	private final Set<ElasticsearchIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	ElasticsearchIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, ElasticsearchIndexManager indexManager) {
+	ElasticsearchIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, ElasticsearchIndexManagerImpl indexManager) {
 		this.searchBackendContext = searchBackendContext;
 		this.indexManagers.add( indexManager );
 	}
 
-	void add(SearchBackendContext searchBackendContext, ElasticsearchIndexManager indexManager) {
+	void add(SearchBackendContext searchBackendContext, ElasticsearchIndexManagerImpl indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
 			throw log.cannotMixElasticsearchSearchTargetWithOtherBackend(
 					this, indexManager, searchBackendContext.getEventContext()
@@ -49,7 +49,7 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 	@Override
 	public IndexSearchTarget build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
-		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManager::getModel )
+		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		ElasticsearchSearchTargetModel searchTargetModel = new ElasticsearchSearchTargetModel( indexModels );
 		return new ElasticsearchIndexSearchTarget( searchBackendContext, searchTargetModel );
