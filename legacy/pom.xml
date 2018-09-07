@@ -96,7 +96,7 @@
         <!-- in line with the version used in WildFly 13 -->
         <version.org.jberet>1.2.4.Final</version.org.jberet>
         <!-- they didn't publish the javadoc for the other 1.2.x -->
-        <version.org.jberet.javadoc>1.2.0.Final</version.org.jberet.javadoc>
+        <javadoc.org.jberet.url>http://docs.jboss.org/jberet/1.2.0.Final/javadoc/jberet-core/</javadoc.org.jberet.url>
 
         <!-- >>> Apache dependencies -->
         <!-- Some of these are necessary for Avro, some for the Elasticsearch backend, some for additional Lucene analyzers -->
