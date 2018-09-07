@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -70,7 +70,7 @@ public class SearchResultLoadingOrTransformingIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexAccessors indexAccessors;
-	private IndexManager<?> indexManager;
+	private MappedIndexManager<?> indexManager;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before

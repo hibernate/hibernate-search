@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.index.spi.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
 /**
  * @author Yoann Rodiere
@@ -18,6 +18,6 @@ public interface IndexManagerBuildingState<D extends DocumentElement> {
 
 	IndexModelBindingContext getRootBindingContext();
 
-	IndexManager<D> build();
+	MappedIndexManager<D> build();
 
 }

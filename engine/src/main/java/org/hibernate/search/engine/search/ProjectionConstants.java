@@ -19,11 +19,8 @@ public final class ProjectionConstants {
 	/**
 	 * Project to an object representing the match.
 	 * <p>
-	 * The actual type of the object depends on the entry point
-	 * for your query query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
-	 * may return a Java representation of the document,
-	 * but a {@link org.hibernate.search.engine.common.SearchManager} will
-	 * return a Java representation of the mapped object.
+	 * The actual type of the reference depends on the mapper used to create the query:
+	 * a POJO mapper may return the POJO mapped to the index, for example.
 	 * <p>
 	 * As a general rule, a projection on {@link #OBJECT} will result in the same value
 	 * which would have been returned by the query if not using projections
@@ -35,11 +32,8 @@ public final class ProjectionConstants {
 	/**
 	 * Project to a reference to the match.
 	 * <p>
-	 * The actual type of the reference depends on the entry point
-	 * for your query query: an {@link org.hibernate.search.engine.backend.index.spi.IndexManager}
-	 * will return a {@link DocumentReference},
-	 * but a {@link org.hibernate.search.engine.common.SearchManager} may
-	 * return an implementation-specific type.
+	 * The actual type of the reference depends on the mapper used to create the query:
+	 * a POJO mapper may return a class/identifier couple, for example.
 	 * <p>
 	 * As a general rule, a projection on {@link #REFERENCE} will result in the same value
 	 * which would have been returned by the query if not using projections

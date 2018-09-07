@@ -7,13 +7,20 @@
 package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.common.spi.SessionContext;
 
 /**
- * The @link {@link IndexManager} as viewed from the engine.
+ * The object responsible for applying works and searches to a full-text index.
  * <p>
- * This interface provides additional methods to allow the engine to manage the index manager lifecycle.
+ * This is the interface implemented by backends and provided to the engine.
  */
-public interface IndexManagerImplementor<D extends DocumentElement> extends IndexManager<D>, AutoCloseable {
+public interface IndexManagerImplementor<D extends DocumentElement> extends AutoCloseable {
+
+	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
+
+	IndexSearchTargetBuilder createSearchTarget();
+
+	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
 
 	@Override
 	void close();
