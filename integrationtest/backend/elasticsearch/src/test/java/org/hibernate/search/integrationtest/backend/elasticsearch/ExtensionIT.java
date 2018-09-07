@@ -9,24 +9,24 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchMappingRepository;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -274,6 +274,24 @@ public class ExtensionIT {
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+	}
+
+	@Test
+	public void backend_unwrap() {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
+				.isNotNull();
+	}
+
+	@Test
+	public void backend_unwrap_error_unknownType() {
+		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Attempt to unwrap an Elasticsearch backend to '" + String.class.getName() + "'" );
+		thrown.expectMessage( "this backend can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'" );
+
+		backend.unwrap( String.class );
 	}
 
 	@Test
