@@ -33,7 +33,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRootDocumentBuilder>, Backend {
+public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRootDocumentBuilder>, LuceneBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
