@@ -64,7 +64,6 @@
         <!-- >>> Lucene -->
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
         <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
-        <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
 
         <!-- >>> Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
@@ -147,7 +146,7 @@
             Ranges are maintained as best effort on our knowledge but only the
             exact versions in this pom are being tested.
             Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
-        <osgi.version-range.org.apache.lucene>[7.4.0,7.5.0)</osgi.version-range.org.apache.lucene>
+        <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
         <osgi.version-range.org.hibernate>[5.3.0,5.4.0)</osgi.version-range.org.hibernate>
         <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
         <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
