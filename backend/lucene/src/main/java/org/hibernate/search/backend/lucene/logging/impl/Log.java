@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManager;
 import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 import org.hibernate.search.util.impl.common.logging.EventContextFormatter;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -209,9 +210,10 @@ public interface Log extends BasicLogger {
 	SearchException multiTenancyEnabledButNoTenantIdProvided(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 33,
-			value = "Attempt to unwrap a Lucene backend to %1$s,"
-					+ " but this backend can only be unwrapped to %2$s.")
-	SearchException backendUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass,
+			value = "Attempt to unwrap a Lucene backend to '%1$s',"
+					+ " but this backend can only be unwrapped to '%2$s'.")
+	SearchException backendUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
+			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 34,
