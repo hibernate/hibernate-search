@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategyImpl;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -56,27 +58,39 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	@Override
 	public BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
+		EventContext backendContext = EventContexts.fromBackendName( name );
+
+		DirectoryProvider directoryProvider = getDirectoryProvider( backendContext, propertySource );
+
+		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( backendContext, propertySource );
+
+		return new LuceneBackendImpl(
+				name,
+				directoryProvider,
+				new StubLuceneWorkFactory( multiTenancyStrategy ),
+				multiTenancyStrategy
+		);
+	}
+
+	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
 		// TODO be more clever about the type, also supports providing a class
 		Optional<String> directoryProviderProperty = DIRECTORY_PROVIDER.get( propertySource );
-
-		EventContext backendContext = EventContexts.fromBackendName( name );
 
 		if ( !directoryProviderProperty.isPresent() ) {
 			throw log.undefinedLuceneDirectoryProvider( backendContext );
 		}
 
-		String directoryProvider = directoryProviderProperty.get();
+		String directoryProviderString = directoryProviderProperty.get();
 
-		if ( "local_directory".equals( directoryProvider ) ) {
+		if ( "local_directory".equals( directoryProviderString ) ) {
 			// TODO GSM: implement the checks properly
 			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
 
-			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( backendContext, propertySource );
-
-			return new LuceneBackendImpl( name, rootDirectory, new StubLuceneWorkFactory( multiTenancyStrategy ), multiTenancyStrategy );
+			initializeRootDirectory( rootDirectory, backendContext );
+			return new MMapDirectoryProvider( backendContext, rootDirectory );
 		}
 
-		throw log.unrecognizedLuceneDirectoryProvider( directoryProvider, backendContext );
+		throw log.unrecognizedLuceneDirectoryProvider( directoryProviderString, backendContext );
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(EventContext backendContext, ConfigurationPropertySource propertySource) {
@@ -93,6 +107,22 @@ public class LuceneBackendFactory implements BackendFactory {
 						multiTenancyStrategyConfiguration,
 						backendContext.render()
 				) );
+		}
+	}
+
+	private void initializeRootDirectory(Path rootDirectory, EventContext eventContext) {
+		if ( Files.exists( rootDirectory ) ) {
+			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
+				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory, eventContext );
+			}
+		}
+		else {
+			try {
+				Files.createDirectories( rootDirectory );
+			}
+			catch (Exception e) {
+				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, eventContext, e );
+			}
 		}
 	}
 }

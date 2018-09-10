@@ -7,9 +7,8 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
+import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
@@ -39,7 +38,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final String name;
 
-	private final Path rootDirectory;
+	private final DirectoryProvider directoryProvider;
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -48,24 +47,22 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	LuceneBackendImpl(String name, Path rootDirectory, LuceneWorkFactory workFactory,
+	LuceneBackendImpl(String name, DirectoryProvider directoryProvider, LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
-		this.rootDirectory = rootDirectory;
+		this.directoryProvider = directoryProvider;
 
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				eventContext, new MMapDirectoryProvider( eventContext, rootDirectory ),
+				eventContext, directoryProvider,
 				workFactory, multiTenancyStrategy
 		);
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, multiTenancyStrategy, queryOrchestrator
 		);
-
-		initializeRootDirectory( rootDirectory );
 	}
 
 	@Override
@@ -113,24 +110,8 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "name=" ).append( name ).append( ", " )
-				.append( "rootDirectory=" ).append( rootDirectory )
+				.append( "directoryProvider=" ).append( directoryProvider )
 				.append( "]" )
 				.toString();
-	}
-
-	private void initializeRootDirectory(Path rootDirectory) {
-		if ( Files.exists( rootDirectory ) ) {
-			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory, eventContext );
-			}
-		}
-		else {
-			try {
-				Files.createDirectories( rootDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, eventContext, e );
-			}
-		}
 	}
 }

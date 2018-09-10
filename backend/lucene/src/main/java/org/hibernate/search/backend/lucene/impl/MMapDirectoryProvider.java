@@ -26,9 +26,17 @@ class MMapDirectoryProvider implements DirectoryProvider {
 
 	private final Path rootDirectory;
 
-	public MMapDirectoryProvider(EventContext backendContext, Path rootDirectory) {
+	MMapDirectoryProvider(EventContext backendContext, Path rootDirectory) {
 		this.backendContext = backendContext;
 		this.rootDirectory = rootDirectory;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() +
+				"[" +
+				"rootDirectory=" + rootDirectory +
+				"]";
 	}
 
 	@Override
