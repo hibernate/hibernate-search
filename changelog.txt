@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.4.Final (10-09-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3339 @SpatialBridge in "contained" entity triggers exception at bootstrap
+    * HSEARCH-3267 Restore option to run WildFly integration tests against manually prepared distribution
+
+** Task
+    * HSEARCH-3343 Upgrade to Hibernate ORM 5.3.6.Final
+    * HSEARCH-3252 Avoid using _JAVA_OPTIONS in Travis builds
+
 5.10.3.Final (24-07-2018)
 -------------------------
 
