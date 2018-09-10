@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.6.Final (10-09-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3339 @SpatialBridge in "contained" entity triggers exception at bootstrap
+
+** Task
+    * HSEARCH-3345 Upgrade to Hibernate ORM 5.1.15.Final
+    * HSEARCH-3342 Backport some internal/configuration changes from 5.10 to 5.6 to allow for easier backports
+
 5.6.5.Final (28-05-2018)
 -------------------------
 
