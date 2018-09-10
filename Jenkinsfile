@@ -76,6 +76,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *     notification:
  *       email:
  *         recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
+ *     sonar:
+ *       organization: ... # string containing the sonar organization. Mandatory in order to enable Sonar analysis.
  *
  * #### Credentials
  *
@@ -84,8 +86,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
  * - 'coveralls-repository-token' secret text credentials containing the repository token,
  * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
- * - 'sonarcloud-hibernate-token' secret text credentials containing a Sonar access token for the Hibernate organization,
- * to send Sonar analysis input to sonarcloud.io.
+ * - 'sonarcloud-hibernate-token' secret text credentials containing a Sonar access token for the configured organization
+ * (see "Configuration file" above) to send Sonar analysis input to sonarcloud.io.
  */
 
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
@@ -371,11 +373,12 @@ stage('Default build') {
 				echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
 			}
 
-			try {
+			if ( multibranchConfiguration?.sonar?.organization ) {
+				def sonarOrganization = multibranchConfiguration.sonar.organization
 				withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
 					sh """ \\
 							mvn sonar:sonar \\
-							-Dsonar.organization=hibernate \\
+							-Dsonar.organization=${sonarOrganization} \\
 							-Dsonar.host.url=https://sonarcloud.io \\
 							-Dsonar.login=${SONARCLOUD_TOKEN} \\
 							${env.CHANGE_ID ? """ \\
@@ -387,9 +390,6 @@ stage('Default build') {
 							"""} \\
 					"""
 				}
-			}
-			catch (CredentialNotFoundException e) {
-				echo "No SonarCloud token configured - skipping SonarCloud report. Error was: ${e}"
 			}
 
 			dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
