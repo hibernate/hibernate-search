@@ -76,7 +76,7 @@
         <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate03</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.3.3.Final</version.org.hibernate>
+        <version.org.hibernate>5.3.6.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
         <!--
@@ -88,7 +88,7 @@
         <!-- Necessary to build the OSGi feature; must be aligned with ORM dependencies -->
         <version.org.javassist>3.23.1-GA</version.org.javassist>
         <version.org.jboss.jandex>2.0.5.Final</version.org.jboss.jandex>
-        <version.net.bytebuddy>1.8.13</version.net.bytebuddy>
+        <version.net.bytebuddy>1.8.17</version.net.bytebuddy>
         <version.com.fasterxml.classmate>1.3.4</version.com.fasterxml.classmate>
 
         <!-- >>> JSR 352 -->
