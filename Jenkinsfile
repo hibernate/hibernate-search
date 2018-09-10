@@ -69,7 +69,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *
  * The configuration file is optional. Its purpose is to host job-specific configuration, such as notification recipients.
  *
- * The file is named 'multibranch-configuration.yaml', and it should be set up using the config file provider plugin
+ * The file is named 'job-configuration.yaml', and it should be set up using the config file provider plugin
  * (https://plugins.jenkins.io/config-file-provider).
  * Expected structure of this file:
  *
@@ -143,7 +143,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
 
-@Field def multibranchConfiguration = null
+@Field def jobConfiguration = null
 
 @Field String releaseVersionFamily
 
@@ -155,10 +155,10 @@ stage('Configure') {
 	defaultDatabaseEnv = getDefaultEnv( databaseEnvs )
 	defaultEsLocalEnv = getDefaultEnv( esLocalEnvs )
 
-	// Load the configuration specific to each "multibranch pipeline job" set up in Jenkins
+	// Load the configuration specific to each job set up in Jenkins
 	node(QUICK_USE_NODE_PATTERN) {
-		multibranchConfiguration = loadYamlConfiguration('multibranch-configuration.yaml')
-		echo "Multi-branch configuration: $multibranchConfiguration"
+		jobConfiguration = loadYamlConfiguration('job-configuration.yaml')
+		echo "Job configuration: $jobConfiguration"
 	}
 
 	properties([
@@ -373,8 +373,8 @@ stage('Default build') {
 				echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
 			}
 
-			if ( multibranchConfiguration?.sonar?.organization ) {
-				def sonarOrganization = multibranchConfiguration.sonar.organization
+			if ( jobConfiguration?.sonar?.organization ) {
+				def sonarOrganization = jobConfiguration.sonar.organization
 				withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
 					sh """ \\
 							mvn sonar:sonar \\
@@ -675,7 +675,7 @@ def notifyBuildEnd() {
 	// Notify the notification recipients configured on the job,
 	// except in the case of a PR build or of a "success after a success"
 	if (!env.CHANGE_ID && !successAfterSuccess) {
-		explicitRecipients = multibranchConfiguration?.notification?.email?.recipients
+		explicitRecipients = jobConfiguration?.notification?.email?.recipients
 	}
 
 	// See https://plugins.jenkins.io/email-ext#Email-extplugin-PipelineExamples
