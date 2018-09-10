@@ -27,6 +27,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.StringHelper;
 
@@ -39,10 +40,23 @@ import org.hibernate.search.util.StringHelper;
  */
 public class SearchITHelper {
 
-	private final SearchFactoryHolder sfHolder;
+	public interface SearchIntegratorProvider {
+		SearchIntegrator get();
+	}
 
-	public SearchITHelper(SearchFactoryHolder sfHolder) {
-		this.sfHolder = sfHolder;
+	private final SearchIntegratorProvider integratorProvider;
+
+	public SearchITHelper(final SearchFactoryHolder sfHolder) {
+		this( new SearchIntegratorProvider() {
+			@Override
+			public SearchIntegrator get() {
+				return sfHolder.getSearchFactory();
+			}
+		} );
+	}
+
+	public SearchITHelper(SearchIntegratorProvider integratorProvider) {
+		this.integratorProvider = integratorProvider;
 	}
 
 	public WorkExecutor executor() {
@@ -98,7 +112,7 @@ public class SearchITHelper {
 	}
 
 	public QueryBuilder queryBuilder(Class<?> clazz) {
-		return sfHolder.getSearchFactory().buildQueryBuilder().forEntity( clazz ).get();
+		return integratorProvider.get().buildQueryBuilder().forEntity( clazz ).get();
 	}
 
 	public HSQuery hsQuery(Class<?> ... classes) {
@@ -106,7 +120,7 @@ public class SearchITHelper {
 	}
 
 	public HSQuery hsQuery(Query query, Class<?> ... classes) {
-		return sfHolder.getSearchFactory().createHSQuery( query, classes );
+		return integratorProvider.get().createHSQuery( query, classes );
 	}
 
 	public AssertBuildingHSQueryContext assertThat(String fieldName, String value) {
@@ -166,7 +180,7 @@ public class SearchITHelper {
 		public void execute() {
 			TransactionContextForTest tc = new TransactionContextForTest();
 			for ( Work work : works ) {
-					sfHolder.getSearchFactory().getWorker().performWork( work, tc );
+				integratorProvider.get().getWorker().performWork( work, tc );
 			}
 			tc.end();
 			works.clear();
@@ -488,7 +502,7 @@ public class SearchITHelper {
 
 		@Override
 		protected HSQuery getHSQuery() {
-			HSQuery hsQuery = sfHolder.getSearchFactory().createHSQuery( luceneQuery, classes );
+			HSQuery hsQuery = integratorProvider.get().createHSQuery( luceneQuery, classes );
 			for ( Consumer<HSQuery> consumer : before ) {
 				consumer.accept( hsQuery );
 			}
