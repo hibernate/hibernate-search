@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
-import org.hibernate.search.backend.lucene.index.impl.LuceneDirectoryIndexManagerBuilder;
+import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
@@ -33,7 +33,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRootDocumentBuilder>, LuceneBackend {
+public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentBuilder>, LuceneBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,7 +48,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	LuceneLocalDirectoryBackend(String name, Path rootDirectory, LuceneWorkFactory workFactory,
+	LuceneBackendImpl(String name, Path rootDirectory, LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
@@ -95,7 +95,7 @@ public class LuceneLocalDirectoryBackend implements BackendImplementor<LuceneRoo
 		 * or a reversible conversion of that name, as an internal key (file names, ...),
 		 * and therefore the internal key should stay unique.
 		 */
-		return new LuceneDirectoryIndexManagerBuilder(
+		return new LuceneIndexManagerBuilder(
 				indexingContext, searchContext,
 				indexName, context, propertySource
 		);

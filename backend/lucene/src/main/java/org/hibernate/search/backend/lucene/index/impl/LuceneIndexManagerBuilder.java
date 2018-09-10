@@ -30,7 +30,7 @@ import org.apache.lucene.store.Directory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
+public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,7 +43,7 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	private final BackendBuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
 
-	public LuceneDirectoryIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
+	public LuceneIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName,
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
@@ -66,13 +66,13 @@ public class LuceneDirectoryIndexManagerBuilder implements IndexManagerBuilder<L
 	}
 
 	@Override
-	public LuceneDirectoryIndexManager build() {
+	public LuceneIndexManagerImpl build() {
 		LuceneIndexModel model = null;
 		IndexWriter indexWriter = null;
 		try {
 			model = new LuceneIndexModel( indexName, schemaRootNodeBuilder );
 			indexWriter = createIndexWriter( model );
-			return new LuceneDirectoryIndexManager(
+			return new LuceneIndexManagerImpl(
 					indexingBackendContext, searchBackendContext, indexName, model, indexWriter
 			);
 		}
