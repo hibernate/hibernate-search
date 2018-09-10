@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -36,7 +37,8 @@ import org.apache.lucene.index.IndexWriter;
  * @author Guillaume Smet
  */
 // TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-class LuceneDirectoryIndexManager implements LuceneIndexManagerImplementor, LuceneIndexManager, ReaderProvider {
+class LuceneIndexManagerImpl
+		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -50,7 +52,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManagerImplementor, Luce
 	private final LuceneIndexWorkOrchestrator streamOrchestrator;
 	private final IndexWriter indexWriter;
 
-	LuceneDirectoryIndexManager(IndexingBackendContext indexingBackendContext,
+	LuceneIndexManagerImpl(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
 		this.indexingBackendContext = indexingBackendContext;
@@ -64,13 +66,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManagerImplementor, Luce
 		this.indexWriter = indexWriter;
 	}
 
-	@Override
-	public String getName() {
-		return indexName;
-	}
-
-	@Override
-	public LuceneIndexModel getModel() {
+	LuceneIndexModel getModel() {
 		return model;
 	}
 
@@ -121,8 +117,7 @@ class LuceneDirectoryIndexManager implements LuceneIndexManagerImplementor, Luce
 		}
 	}
 
-	@Override
-	public ReaderProvider getReaderProvider() {
+	ReaderProvider getReaderProvider() {
 		return this;
 	}
 

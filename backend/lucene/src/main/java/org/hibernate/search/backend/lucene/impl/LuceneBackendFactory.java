@@ -73,7 +73,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( backendContext, propertySource );
 
-			return new LuceneLocalDirectoryBackend( name, rootDirectory, new StubLuceneWorkFactory( multiTenancyStrategy ), multiTenancyStrategy );
+			return new LuceneBackendImpl( name, rootDirectory, new StubLuceneWorkFactory( multiTenancyStrategy ), multiTenancyStrategy );
 		}
 
 		throw log.unrecognizedLuceneDirectoryProvider( directoryProvider, backendContext );
