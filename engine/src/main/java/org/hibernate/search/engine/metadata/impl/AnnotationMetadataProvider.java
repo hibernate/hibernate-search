@@ -809,14 +809,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
-		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
-				member,
-				false,
-				false,
-				parseContext.getIndexManagerType(),
-				reflectionManager,
-				configContext.getServiceManager()
-		);
+		FieldBridge fieldBridge = null;
+		if ( !parseContext.skipFieldBridges() ) {
+			fieldBridge = bridgeFactory.buildFieldBridge(
+					member,
+					false,
+					false,
+					parseContext.getIndexManagerType(),
+					reflectionManager,
+					configContext.getServiceManager()
+			);
+		}
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
@@ -864,7 +867,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-		FieldBridge spatialBridge = determineSpatialFieldBridge( spatialAnnotation, parseContext );
+		FieldBridge spatialBridge = null;
+		if ( !parseContext.skipFieldBridges() ) {
+			spatialBridge = determineSpatialFieldBridge( spatialAnnotation, parseContext );
+		}
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
