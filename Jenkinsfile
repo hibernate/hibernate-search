@@ -522,13 +522,23 @@ stage('Release') {
 	}
 }
 
-currentBuild.result = 'SUCCESS'
 } // End of the code triggering notifications
 catch (any) {
 	mainScriptException = any
 	throw any
 }
 finally {
+	/*
+	 * Set the build result so that the email notifications correctly report it.
+	 * We have to do it manually because Jenkins only does that automatically *after* the build.
+	 */
+	if (mainScriptException) {
+		currentBuild.result = 'FAILURE'
+	}
+	else {
+		currentBuild.result = 'SUCCESS'
+	}
+	
 	try {
 		notifyBuildEnd()
 	}
