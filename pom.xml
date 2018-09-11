@@ -304,7 +304,7 @@
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
         <!--
-            The path to the root project directory.
+            The absolute path to the root project directory.
             This property is set by the build-helper plugin.
             We initialize it to some crude, potentially wrong value,
             because the Sonar Maven plugin uses this property indirectly,
@@ -315,6 +315,12 @@
              - https://www.mojohaus.org/build-helper-maven-plugin/rootlocation-mojo.html
          -->
         <rootProject.directory>${user.dir}</rootProject.directory>
+        <!--
+            The absolute path to an empty subdirectory of the root project.
+            This is used in places where we need a path to an existing, empty directory,
+            such as when fooling Sonar into thinking there is no "main" source in a project.
+         -->
+        <rootProject.emptySubdirectory>${rootProject.directory}/.empty</rootProject.emptySubdirectory>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.10.3.Final</previous.stable>
