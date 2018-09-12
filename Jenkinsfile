@@ -144,6 +144,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 @Field boolean enableExperimentalEnvIT = false
 
 @Field def jobConfiguration = null
+@Field String gitHubRepoId = null
 
 @Field String releaseVersionFamily
 
@@ -159,6 +160,18 @@ stage('Configure') {
 	node(QUICK_USE_NODE_PATTERN) {
 		jobConfiguration = loadYamlConfiguration('job-configuration.yaml')
 		echo "Job configuration: $jobConfiguration"
+	}
+
+	// See https://stackoverflow.com/a/38255364/6692043
+	def scmUrl = scm.getUserRemoteConfigs()[0].getUrl()
+	def gitHubUrlMatcher = (scmUrl =~ /^(?:git@github.com:|https:\/\/github\.com\/)([^\/]+)\/([^.]+)\.git$/)
+	if (gitHubUrlMatcher.matches()) {
+		String owner = gitHubUrlMatcher.group(1)
+		String name = gitHubUrlMatcher.group(2)
+		gitHubRepoId = owner + '/' + name
+		echo "Detected GitHub repository ID: $gitHubRepoId"
+	} else {
+		echo "Could not detect GitHub repository ID for URL: $scmUrl"
 	}
 
 	properties([
@@ -387,6 +400,10 @@ stage('Default build') {
 										-Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
 										-Dsonar.pullrequest.key=${env.CHANGE_ID} \\
 										-Dsonar.pullrequest.base=${env.CHANGE_TARGET} \\
+										${gitHubRepoId ? """ \\
+												-Dsonar.pullrequest.provider=GitHub \\
+												-Dsonar.pullrequest.github.repository=${gitHubRepoId} \\
+										""" : ''} \\
 								""" : """ \\
 										-Dsonar.branch.name=${env.BRANCH_NAME} \\
 								"""} \\
