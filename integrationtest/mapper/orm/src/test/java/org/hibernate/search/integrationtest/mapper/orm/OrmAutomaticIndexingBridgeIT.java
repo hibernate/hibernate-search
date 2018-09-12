@@ -21,18 +21,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
@@ -43,11 +38,9 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,29 +50,17 @@ import org.junit.Test;
  * {@link TypeBridge}s or {@link PropertyBridge}s are involved.
  */
 public class OrmAutomaticIndexingBridgeIT {
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
 	private SessionFactory sessionFactory;
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( ContainedEntity.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "typeBridge", b2 -> b2
 						.field( "directField", String.class )
@@ -92,15 +73,12 @@ public class OrmAutomaticIndexingBridgeIT {
 				)
 		);
 
-		sessionFactory = sfb.build();
+		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.setup(
+						IndexedEntity.class,
+						ContainedEntity.class
+				);
 		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test

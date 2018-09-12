@@ -30,10 +30,13 @@ import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Type;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
+import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
@@ -44,21 +47,12 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomPropertyBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.IntegerAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.OptionalIntAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalIntUserType;
-import org.hibernate.search.integrationtest.mapper.orm.usertype.OptionalStringUserType;
-import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,10 +64,11 @@ import org.assertj.core.api.Assertions;
  */
 public class OrmProgrammaticMappingIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -82,23 +77,6 @@ public class OrmProgrammaticMappingIT {
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
-				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( ParentIndexedEntity.class )
-				.addAnnotatedClass( OtherIndexedEntity.class )
-				.addAnnotatedClass( YetAnotherIndexedEntity.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
@@ -158,15 +136,15 @@ public class OrmProgrammaticMappingIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		sessionFactory = sfb.build();
+		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() )
+				.setup(
+						IndexedEntity.class,
+						ParentIndexedEntity.class,
+						OtherIndexedEntity.class,
+						YetAnotherIndexedEntity.class
+				);
 		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test
