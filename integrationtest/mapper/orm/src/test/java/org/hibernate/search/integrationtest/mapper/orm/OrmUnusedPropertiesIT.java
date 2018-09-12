@@ -11,42 +11,29 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class OrmUnusedPropertiesIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-	private static final String DEFAULT_BACKEND_PROPERTY_KEY = PREFIX + "index.default.backend";
+	private static final String DEFAULT_BACKEND_PROPERTY_KEY = SearchOrmSettings.PREFIX + "index.default.backend";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+
+	@Rule
 	public ExpectedLog4jLog log = ExpectedLog4jLog.create();
-
-	private SessionFactory sessionFactory;
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
-	}
 
 	@Test
 	public void checkDisabled_unusedProperty() {
@@ -56,8 +43,8 @@ public class OrmUnusedPropertiesIT {
 		);
 		log.expectMessage( "Configuration property tracking is disabled" );
 		setup( builder -> {
-			builder.applySetting( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
-			builder.applySetting( unusedPropertyKey, "bar" );
+			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
+			builder.setProperty( unusedPropertyKey, "bar" );
 		} );
 	}
 
@@ -76,7 +63,7 @@ public class OrmUnusedPropertiesIT {
 		);
 
 		setup( builder -> {
-			builder.applySetting( unusedPropertyKey, "bar" );
+			builder.setProperty( unusedPropertyKey, "bar" );
 		} );
 	}
 
@@ -90,30 +77,18 @@ public class OrmUnusedPropertiesIT {
 		log.expectMessageMissing( "Some properties in the Hibernate Search configuration were not used" );
 		log.expectMessageMissing( "Configuration property tracking is disabled" );
 		setup( builder -> {
-			builder.applySetting( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
+			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
 		} );
 	}
 
-	private void setup(Consumer<StandardServiceRegistryBuilder> propertyContributor) {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( DEFAULT_BACKEND_PROPERTY_KEY, "stubBackend" );
-		propertyContributor.accept( registryBuilder );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
+	private void setup(Consumer<SimpleSessionFactoryBuilder> configurationContributor) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "myTextField", String.class )
 		);
 
-		sessionFactory = sfb.build();
+		ormSetupHelper.withBackendMock( backendMock )
+				.withConfiguration( configurationContributor )
+				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 

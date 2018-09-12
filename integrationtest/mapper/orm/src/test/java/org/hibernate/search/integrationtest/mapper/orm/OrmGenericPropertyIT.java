@@ -16,21 +16,14 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Type;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,10 +33,11 @@ import org.junit.Test;
  */
 public class OrmGenericPropertyIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -52,21 +46,6 @@ public class OrmGenericPropertyIT {
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( GenericEntity.class )
-				.addAnnotatedClass( StringGenericEntity.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "genericProperty", b2 -> b2
 						/*
@@ -78,15 +57,13 @@ public class OrmGenericPropertyIT {
 				)
 		);
 
-		sessionFactory = sfb.build();
+		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.setup(
+						IndexedEntity.class,
+						GenericEntity.class,
+						StringGenericEntity.class
+				);
 		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test

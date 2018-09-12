@@ -11,70 +11,35 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsumingPropertyBridge;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerAnnotation;
+import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsumingPropertyBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerAnnotation;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class OrmAnnotationMappingDiscoveryIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public StaticCounters counters = new StaticCounters();
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
-	private SessionFactory sessionFactory;
+	@Rule
+	public StaticCounters counters = new StaticCounters();
 
 	@Test
 	public void discoveryEnabled() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
-				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new HibernateOrmSearchMappingContributor() {
-					@Override
-					public void contribute(HibernateOrmMappingDefinition definition) {
-						definition.programmaticMapping()
-								.type( IndexedEntity.class )
-										.property( "nonAnnotationMappedEmbedded" )
-												.indexedEmbedded();
-					}
-				} );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		// We register NonExplicitlyRegistered* types here, but it's only for Hibernate ORM.
-		// Only entity types will be passed to Hibernate Search.
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredType.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredNonMappedType.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredNonAnnotationMappedType.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> b2
 						/*
@@ -96,51 +61,30 @@ public class OrmAnnotationMappingDiscoveryIT {
 				)
 		);
 
-		sessionFactory = sfb.build();
+		ormSetupHelper.withBackendMock( backendMock )
+				.withProperty(
+						SearchOrmSettings.MAPPING_CONTRIBUTOR,
+						new HibernateOrmSearchMappingContributor() {
+							@Override
+							public void contribute(HibernateOrmMappingDefinition definition) {
+								definition.programmaticMapping()
+										.type( IndexedEntity.class )
+										.property( "nonAnnotationMappedEmbedded" )
+										.indexedEmbedded();
+							}
+						}
+				)
+				.setup(
+						IndexedEntity.class,
+						NonExplicitlyRegisteredType.class,
+						NonExplicitlyRegisteredNonMappedType.class,
+						NonExplicitlyRegisteredNonAnnotationMappedType.class
+				);
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void discoveryDisabled() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" )
-				.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
-				.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR, new HibernateOrmSearchMappingContributor() {
-					@Override
-					public void contribute(HibernateOrmMappingDefinition definition) {
-						definition.programmaticMapping()
-								.type( IndexedEntity.class )
-										.property( "nonAnnotationMappedEmbedded" )
-												.indexedEmbedded();
-
-						/*
-						 * Annotations should be completely ignored.
-						 * We add some of the annotation mapping programmatically,
-						 * just to check that discovery is disabled for nested types.
-						 */
-						definition.programmaticMapping()
-								.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
-										.property( "id" ).documentId()
-										.property( "annotationMappedEmbedded" )
-												.indexedEmbedded();
-					}
-				} );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		// We register NonExplicitlyRegistered* types here, but it's only for Hibernate ORM.
-		// None of those types will be passed to Hibernate Search, since annotation mapping is disabled.
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredType.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredNonMappedType.class )
-				.addAnnotatedClass( NonExplicitlyRegisteredNonAnnotationMappedType.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> {
 					/*
@@ -156,15 +100,40 @@ public class OrmAnnotationMappingDiscoveryIT {
 				} )
 		);
 
-		sessionFactory = sfb.build();
-		backendMock.verifyExpectationsMet();
-	}
+		ormSetupHelper.withBackendMock( backendMock )
+				.withProperty( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
+				.withProperty(
+						SearchOrmSettings.MAPPING_CONTRIBUTOR,
+						new HibernateOrmSearchMappingContributor() {
+							@Override
+							public void contribute(HibernateOrmMappingDefinition definition) {
+								definition.programmaticMapping()
+										.type( IndexedEntity.class )
+										.property( "nonAnnotationMappedEmbedded" )
+										.indexedEmbedded();
 
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
+								/*
+								 * Annotations should be completely ignored.
+								 * We add some of the annotation mapping programmatically,
+								 * just to check that discovery is disabled for nested types.
+								 */
+								definition.programmaticMapping()
+										.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
+										.property( "id" ).documentId()
+										.property( "annotationMappedEmbedded" )
+										.indexedEmbedded();
+							}
+						}
+				)
+				// We register NonExplicitlyRegistered* types here, but it's only for Hibernate ORM.
+				// None of those types will be passed to Hibernate Search, since annotation mapping is disabled.
+				.setup(
+						IndexedEntity.class,
+						NonExplicitlyRegisteredType.class,
+						NonExplicitlyRegisteredNonMappedType.class,
+						NonExplicitlyRegisteredNonAnnotationMappedType.class
+				);
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = "indexed")

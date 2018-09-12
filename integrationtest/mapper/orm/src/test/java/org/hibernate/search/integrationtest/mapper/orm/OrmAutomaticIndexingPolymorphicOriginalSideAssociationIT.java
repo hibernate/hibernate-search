@@ -19,20 +19,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,32 +36,16 @@ import org.junit.Test;
  */
 public class OrmAutomaticIndexingPolymorphicOriginalSideAssociationIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
 	private SessionFactory sessionFactory;
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( IndexedEntity.class )
-				.addAnnotatedClass( ContainingEntity.class )
-				.addAnnotatedClass( FirstMiddleContainingEntity.class )
-				.addAnnotatedClass( SecondMiddleContainingEntity.class )
-				.addAnnotatedClass( ContainedEntity.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "child", b3 -> b3
 						.objectField( "containedSingle", b2 -> b2
@@ -77,15 +54,15 @@ public class OrmAutomaticIndexingPolymorphicOriginalSideAssociationIT {
 				)
 		);
 
-		sessionFactory = sfb.build();
+		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.setup(
+						IndexedEntity.class,
+						ContainingEntity.class,
+						FirstMiddleContainingEntity.class,
+						SecondMiddleContainingEntity.class,
+						ContainedEntity.class
+				);
 		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	/**

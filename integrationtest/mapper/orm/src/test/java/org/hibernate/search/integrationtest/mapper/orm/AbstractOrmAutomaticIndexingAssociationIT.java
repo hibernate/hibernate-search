@@ -15,18 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.service.ServiceRegistry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,10 +87,11 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 		TIndexed extends TContaining, TContaining, TContained
 		> {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
 	protected SessionFactory sessionFactory;
 
@@ -110,20 +104,6 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "stubBackend" );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( primitives.getIndexedClass() )
-				.addAnnotatedClass( primitives.getContainedClass() );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-
 		backendMock.expectSchema( primitives.getIndexName(), b -> b
 				.objectField( "containedIndexedEmbedded", b2 -> b2
 						.field( "indexedField", String.class )
@@ -151,15 +131,9 @@ public abstract class AbstractOrmAutomaticIndexingAssociationIT<
 				)
 		);
 
-		sessionFactory = sfb.build();
+		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.setup( primitives.getIndexedClass(), primitives.getContainedClass() );
 		backendMock.verifyExpectationsMet();
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test
