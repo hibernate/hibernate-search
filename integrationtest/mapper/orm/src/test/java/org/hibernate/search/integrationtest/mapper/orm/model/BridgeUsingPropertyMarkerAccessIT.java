@@ -38,7 +38,7 @@ import org.junit.runners.Parameterized;
  * @param <TIndexed> The entity class under test.
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = "HSEARCH-2759")
+@TestForIssue(jiraKey = { "HSEARCH-2759", "HSEARCH-2847" })
 public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private static final String INDEX_NAME = "IndexedEntity";
@@ -48,7 +48,10 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 		return new Object[][] {
 				{ PrivateFieldAccessEntity.PRIMITIVES },
 				{ ProtectedFieldAccessEntity.PRIMITIVES },
-				{ PublicFieldAccessEntity.PRIMITIVES }
+				{ PublicFieldAccessEntity.PRIMITIVES },
+				{ PublicMethodAccessEntity.PRIMITIVES },
+				{ ProtectedMethodAccessEntity.PRIMITIVES },
+				{ PrivateMethodAccessEntity.PRIMITIVES }
 		};
 	}
 
@@ -192,5 +195,183 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 		@Longitude
 		private Double longitude;
+	}
+
+	@Entity
+	@Indexed(index = INDEX_NAME)
+	@GeoPointBridge(fieldName = "location")
+	public static final class PublicMethodAccessEntity {
+		static final ModelPrimitives<PublicMethodAccessEntity> PRIMITIVES = new ModelPrimitives<PublicMethodAccessEntity>() {
+			@Override
+			public Class<PublicMethodAccessEntity> getModelClass() {
+				return PublicMethodAccessEntity.class;
+			}
+
+			@Override
+			public PublicMethodAccessEntity create(int id, double latitude, double longitude) {
+				PublicMethodAccessEntity entity = new PublicMethodAccessEntity();
+				entity.idWithUnpredictableName = id;
+				entity.latitudeWithUnpredictableName = latitude;
+				entity.longitudeWithUnpredictableName = longitude;
+				return entity;
+			}
+		};
+
+		/*
+		 * Give unpredictable names to properties, so that we're sure Hibernate Search
+		 * accessed the data through methods, and not direct field access.
+		 */
+
+		private Integer idWithUnpredictableName;
+
+		private Double latitudeWithUnpredictableName;
+
+		private Double longitudeWithUnpredictableName;
+
+		// Put the @Id annotation here to set the Hibernate ORM access type to "property"
+		@Id
+		@DocumentId
+		public Integer getId() {
+			return idWithUnpredictableName;
+		}
+
+		public void setId(Integer id) {
+			this.idWithUnpredictableName = id;
+		}
+
+		@Latitude
+		public Double getLatitude() {
+			return latitudeWithUnpredictableName;
+		}
+
+		public void setLatitude(Double latitude) {
+			this.latitudeWithUnpredictableName = latitude;
+		}
+
+		@Longitude
+		public Double getLongitude() {
+			return longitudeWithUnpredictableName;
+		}
+
+		public void setLongitude(Double longitude) {
+			this.longitudeWithUnpredictableName = longitude;
+		}
+	}
+
+	@Entity
+	@Indexed(index = INDEX_NAME)
+	@GeoPointBridge(fieldName = "location")
+	public static final class ProtectedMethodAccessEntity {
+		static final ModelPrimitives<ProtectedMethodAccessEntity> PRIMITIVES = new ModelPrimitives<ProtectedMethodAccessEntity>() {
+			@Override
+			public Class<ProtectedMethodAccessEntity> getModelClass() {
+				return ProtectedMethodAccessEntity.class;
+			}
+
+			@Override
+			public ProtectedMethodAccessEntity create(int id, double latitude, double longitude) {
+				ProtectedMethodAccessEntity entity = new ProtectedMethodAccessEntity();
+				entity.idWithUnpredictableName = id;
+				entity.latitudeWithUnpredictableName = latitude;
+				entity.longitudeWithUnpredictableName = longitude;
+				return entity;
+			}
+		};
+
+		/*
+		 * Give unpredictable names to properties, so that we're sure Hibernate Search
+		 * accessed the data through methods, and not direct field access.
+		 */
+
+		private Integer idWithUnpredictableName;
+
+		private Double latitudeWithUnpredictableName;
+
+		private Double longitudeWithUnpredictableName;
+
+		// Put the @Id annotation here to set the Hibernate ORM access type to "property"
+		@Id
+		@DocumentId
+		protected Integer getId() {
+			return idWithUnpredictableName;
+		}
+
+		protected void setId(Integer id) {
+			this.idWithUnpredictableName = id;
+		}
+
+		@Latitude
+		protected Double getLatitude() {
+			return latitudeWithUnpredictableName;
+		}
+
+		protected void setLatitude(Double latitude) {
+			this.latitudeWithUnpredictableName = latitude;
+		}
+
+		@Longitude
+		protected Double getLongitude() {
+			return longitudeWithUnpredictableName;
+		}
+
+		protected void setLongitude(Double longitude) {
+			this.longitudeWithUnpredictableName = longitude;
+		}
+	}
+
+	@Entity
+	@Indexed(index = INDEX_NAME)
+	@GeoPointBridge(fieldName = "location")
+	public static final class PrivateMethodAccessEntity {
+		static final ModelPrimitives<PrivateMethodAccessEntity> PRIMITIVES = new ModelPrimitives<PrivateMethodAccessEntity>() {
+			@Override
+			public Class<PrivateMethodAccessEntity> getModelClass() {
+				return PrivateMethodAccessEntity.class;
+			}
+
+			@Override
+			public PrivateMethodAccessEntity create(int id, double latitude, double longitude) {
+				PrivateMethodAccessEntity entity = new PrivateMethodAccessEntity();
+				entity.idWithUnpredictableName = id;
+				entity.latitudeWithUnpredictableName = latitude;
+				entity.longitudeWithUnpredictableName = longitude;
+				return entity;
+			}
+		};
+
+		private Integer idWithUnpredictableName;
+
+		private Double latitudeWithUnpredictableName;
+
+		private Double longitudeWithUnpredictableName;
+
+		// Put the @Id annotation here to set the Hibernate ORM access type to "property"
+		@Id
+		@DocumentId
+		private Integer getId() {
+			return idWithUnpredictableName;
+		}
+
+		private void setId(Integer id) {
+			this.idWithUnpredictableName = id;
+		}
+
+		@Latitude
+		private Double getLatitude() {
+			return latitudeWithUnpredictableName;
+		}
+
+		private void setLatitude(Double latitude) {
+			this.latitudeWithUnpredictableName = latitude;
+		}
+
+		@Longitude
+		private Double getLongitude() {
+			return longitudeWithUnpredictableName;
+		}
+
+		private void setLongitude(Double longitude) {
+			this.longitudeWithUnpredictableName = longitude;
+		}
 	}
 }
